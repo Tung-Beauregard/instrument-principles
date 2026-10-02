@@ -45,7 +45,7 @@ button,select,input{font:inherit;color:inherit}
 #stage canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 #ov{pointer-events:none}
 body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!important}
-/* 網站分頁:LCQ 與 GC-MS 兩頁互相切換 */
+/* 網站分頁:離子阱質譜、GC-MS、UV-Vis 三頁互相切換 */
 #sitenav{position:fixed;left:16px;top:16px;z-index:11;display:flex;gap:2px;padding:3px;border-radius:11px;background:var(--panel);border:1px solid var(--line);
   -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow)}
 #sitenav a{padding:5px 12px;border-radius:8px;font-size:13px;font-weight:500;line-height:1.5;color:var(--ink2);text-decoration:none;white-space:nowrap}
@@ -152,7 +152,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
   <canvas id="ov"></canvas>
 </div>
 
-<nav id="sitenav" aria-label="儀器原理"><a href="./" aria-current="page">離子阱質譜</a><a href="gc-ms/">GC-MS</a></nav>
+<nav id="sitenav" aria-label="儀器原理"><a href="./" aria-current="page">離子阱質譜</a><a href="gc-ms/">GC-MS</a><a href="uv-vis/">UV-Vis</a></nav>
 <div id="bar">
   <button id="play" class="icon" aria-label="播放"><svg viewBox="0 0 24 24"><path id="playIcon" d="M8 5v14l11-7z"/></svg></button>
   <div id="rail" role="slider" tabindex="0" aria-label="章節與時間" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
