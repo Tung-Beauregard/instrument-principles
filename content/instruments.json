@@ -26,6 +26,15 @@
       "image": "./assets/uv-vis.svg",
       "imageAlt": "光源、光柵與樣品槽的光路概念示意",
       "href": "./uv-vis/"
+    },
+    {
+      "id": "lcq-3d",
+      "name": "LCQ 離子之旅",
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/lcq-3d.svg",
+      "imageAlt": "離子沿著導軌穿過毛細管、多極柱與離子阱的概念示意",
+      "href": "./lcq-3d/"
     }
   ]
 }

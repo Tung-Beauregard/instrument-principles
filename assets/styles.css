@@ -16,7 +16,7 @@ a:focus-visible { outline: 2px solid #a5f3cd; outline-offset: 6px; }
 .site-header { padding-block: 34px; border-bottom: 1px solid #253430; }
 h1 { margin: 0; font-size: 25px; font-weight: 600; letter-spacing: .16em; }
 main { flex: 1; display: flex; align-items: center; padding-block: 76px; }
-.instrument-grid { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.instrument-grid { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
 .instrument-card { --accent: #a5f3cd; --tint: #14251e; min-width: 0; }
 .instrument-card.blue { --accent: #a4c9ef; --tint: #14212a; }
 .instrument-card.lavender { --accent: #c9b6ef; --tint: #211e2b; }
@@ -32,6 +32,9 @@ h2 { margin: 0; font-size: 17px; font-weight: 500; line-height: 1.5; }
 .site-footer a:hover { color: #a5f3cd; }
 .visits { display: inline-flex; align-items: baseline; gap: 12px; }
 .visits b { color: #f0f3ee; font-variant-numeric: tabular-nums; font-weight: 500; }
+@media (max-width: 960px) {
+  .instrument-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (max-width: 850px) {
   .wrap { width: calc(100% - 48px); }
   .instrument-grid { gap: 16px; }

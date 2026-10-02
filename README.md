@@ -6,9 +6,10 @@
 - [離子阱質譜](https://tung-beauregard.github.io/instrument-principles/lcq/)
 - [UV-Vis 分光光度計](https://tung-beauregard.github.io/instrument-principles/uv-vis/)
 - [GC-MS](https://tung-beauregard.github.io/instrument-principles/gc-ms/)
+- [LCQ 離子之旅](https://tung-beauregard.github.io/instrument-principles/lcq-3d/)
 - [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-目前共有三份教材：離子阱質譜、GC-MS、UV-Vis 分光光度計。儀器型號與規格以各教材的來源說明為準。
+目前共有四份教材：離子阱質譜、GC-MS、UV-Vis 分光光度計、LCQ 離子之旅。儀器型號與規格以各教材的來源說明為準。
 
 ## 專案結構
 
@@ -23,6 +24,8 @@ content/
 lcq/index.html             原本根目錄的離子阱教材
 gc-ms/index.html           GC-MS 教材
 uv-vis/index.html          UV-Vis 分光光度計教材
+lcq-3d/index.html          LCQ 離子之旅；LCQ Deca XP 拆解式 3D 導覽
+lcq-3d/MAINTENANCE.md      LCQ 離子之旅的程式結構與修改方式
 scripts/check-site.mjs     資料、相對連結與靜態備援檢查
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
@@ -30,7 +33,7 @@ INSTRUMENTS.md             各儀器功能、數據與示意說明
 AGENTS.md                  未來開發與維護規則
 ```
 
-根目錄現在是入口頁；原本位於根目錄的離子阱教學移至 `lcq/`。GC-MS 網址維持 `gc-ms/`，三份教材都能返回入口並互相切換。教材本身的模型、科學計算與原有控制功能保留。
+根目錄現在是入口頁；原本位於根目錄的離子阱教學移至 `lcq/`。GC-MS 網址維持 `gc-ms/`，四份教材都能返回入口並互相切換。教材本身的模型、科學計算與原有控制功能保留。
 
 ## 維護內容
 
@@ -64,7 +67,7 @@ node scripts/check-site.mjs
 node --check assets/app.js
 ```
 
-另需實際檢查：桌面與手機入口排版、三個教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
+另需實際檢查：桌面與手機入口排版、四個教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
 
 ## 品牌與資料來源
 
