@@ -1,6 +1,6 @@
-# 儀器原理｜W AI Studio
+# 儀器框
 
-以互動 3D 教材認識分析儀器。入口頁延續 W AI Studio 的品牌風格，整理已開放與即將加入的教材。
+互動儀器教材入口。頁面只保留「儀器框」、儀器圖與名稱連結、返回主頁及到站人數，色彩延續 W AI Studio。
 
 - [儀器入口](https://tung-beauregard.github.io/instrument-principles/)
 - [離子阱質譜](https://tung-beauregard.github.io/instrument-principles/lcq/)
@@ -16,10 +16,10 @@
 index.html                 儀器入口；含完整靜態備援內容
 assets/
   styles.css               入口頁樣式與響應式版面
-  app.js                   教材清單載入、首頁動畫控制
+  app.js                   教材清單載入、到站人數
   *.svg                    品牌與儀器概念示意
 content/
-  instruments.json         儀器清單、順序、介紹、狀態與連結
+  instruments.json         儀器名稱、順序、圖片、狀態與連結
 lcq/index.html             原本根目錄的離子阱教材
 gc-ms/index.html           GC-MS 教材
 uv-vis/index.html          UV-Vis 分光光度計教材
@@ -34,15 +34,18 @@ AGENTS.md                  未來開發與維護規則
 
 ## 維護內容
 
-HTTP 網站會載入 `content/instruments.json`；此檔是儀器卡片文案的主要來源。排列順序就是陣列順序。入口用安全 DOM API 填入純文字，資料載入失敗時保留 HTML 的完整卡片與連結。
+HTTP 網站會載入 `content/instruments.json`；此檔是儀器卡片的主要資料來源。排列順序就是陣列順序。入口用安全 DOM API 填入純文字，資料載入失敗時保留 HTML 的完整卡片與連結。
 
 - `status: "ready"`：教材已完成，必須填入有效相對網址 `href`。
 - `status: "upcoming"`：僅顯示準備中狀態，不產生可點擊的教材連結。
 - `theme`：`mint`、`blue` 或 `lavender`。
+- `name`：儀器名稱，也是入口連結文字。
 - `image`：本站 SVG 或其他靜態圖片相對路徑。
-- 修改資料後，同步更新 `index.html` 的靜態備援卡片、數量及相關介紹。執行檢查避免兩份文案不一致。
+- 修改資料後，同步更新 `index.html` 的靜態備援卡片。執行檢查避免兩份內容不一致。
 
-新增教材時，先以 `upcoming` 建立項目；完成獨立教材頁面並驗證後，更新標題、標籤、連結與狀態。同時更新入口靜態備援，以及 W AI Studio 的卡片與介紹彈窗。
+新增教材時，先以 `upcoming` 建立項目；完成獨立教材頁面並驗證後，更新名稱、連結與狀態。同時更新入口靜態備援，以及 W AI Studio 的卡片與介紹彈窗。
+
+到站人數沿用 LCQ 教材的 Abacus 計數與 `lcq-visited` 儲存記錄，避免在入口與 LCQ 間重複計算同一瀏覽器。僅正式網站會新增計數；本機預覽或無法使用儲存空間時只讀取。服務暫時不可用時顯示「—」。清除瀏覽器資料或更換瀏覽器會重新計數，因此不是精確的不重複人數。
 
 ## 本機預覽與檢查
 
@@ -65,6 +68,6 @@ node --check assets/app.js
 
 ## 品牌與資料來源
 
-品牌色與 W 標誌沿用 [w-studio](https://github.com/Tung-Beauregard/w-studio) 的 `brand-guide.md`：背景 `#0B1111`、薄荷綠 `#A5F3CD`、主字色 `#F0F3EE`。入口插圖是結構或概念示意，不是儀器照片、真實量測訊號或精確光學配置。
+品牌色沿用 [w-studio](https://github.com/Tung-Beauregard/w-studio) 的 `brand-guide.md`：背景 `#0B1111`、薄荷綠 `#A5F3CD`、主字色 `#F0F3EE`。入口插圖是結構或概念示意，不是儀器照片、真實量測訊號或精確光學配置。
 
 教材來源及模擬限制見 [INSTRUMENTS.md](./INSTRUMENTS.md)。未來的維護約定見 [AGENTS.md](./AGENTS.md)。

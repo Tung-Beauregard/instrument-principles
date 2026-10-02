@@ -17,7 +17,8 @@ for (const item of instruments) {
   const articleStart = html.lastIndexOf('<article', heading);
   const articleEnd = html.indexOf('</article>', heading);
   const fallback = html.slice(articleStart, articleEnd);
-  for (const text of [...item.titleLines, item.description, item.category, item.actionLabel, ...item.tags]) assert.ok(fallback.includes(text.replaceAll('&', '&amp;').replaceAll('<', '&lt;')), `Fallback out of sync: ${item.id}: ${text}`);
+  assert.ok(fallback.includes(item.name.replaceAll('&', '&amp;').replaceAll('<', '&lt;')), `Fallback name out of sync: ${item.id}`);
+  assert.ok(fallback.includes(`src="${item.image}"`), `Fallback image out of sync: ${item.id}`);
   assert.ok(fs.existsSync(path.join(root, item.image)), `Missing artwork ${item.image}`);
   if (item.status === 'ready') {
     assert.ok(item.href && item.href.startsWith('./'));
@@ -29,7 +30,6 @@ for (const item of instruments) {
   }
 }
 const ready = instruments.filter(item => item.status === 'ready').length;
-assert.ok(html.includes(`${ready} 個教材已開放`), 'Static ready count out of sync');
 const files = ['index.html', ...instruments.filter(item => item.status === 'ready').map(item => item.href.replace('./', '') + 'index.html')];
 for (const file of files) {
   const source = read(file);

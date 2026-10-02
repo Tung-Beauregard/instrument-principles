@@ -4,88 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1111">
-  <meta name="description" content="W AI Studio 儀器原理：用互動 3D 教材認識離子阱質譜、GC-MS 與 UV-Vis，從儀器構造、樣品路徑到圖譜訊號，一步步看懂分析原理。">
-  <meta property="og:title" content="儀器原理 — 讓原理看得見｜W AI Studio">
-  <meta property="og:description" content="把儀器打開，讓原理看得見。探索離子阱質譜、GC-MS 與 UV-Vis 分光光度計互動教材。">
+  <meta name="description" content="儀器框：離子阱質譜、GC-MS 與 UV-Vis 互動教材入口。">
+  <meta property="og:title" content="儀器框">
+  <meta property="og:description" content="離子阱質譜、GC-MS 與 UV-Vis 互動教材入口。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/">
   <link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
   <link rel="stylesheet" href="./assets/styles.css">
   <script src="./assets/app.js" defer></script>
-  <title>儀器原理 — 讓原理看得見｜W AI Studio</title>
+  <title>儀器框</title>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到主要內容</a>
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <a class="brand" href="https://tung-beauregard.github.io/w-studio/" aria-label="返回 W AI Studio 主頁">
-        <img src="./assets/w-mark-mint.svg" alt="" width="44" height="44">
-        <span class="wordmark">AI STUDIO<small>BUILD USEFUL THINGS</small></span>
-      </a>
-      <span class="brand-divider" aria-hidden="true"></span><a class="site-name" href="#top">儀器原理</a>
-      <nav class="main-nav" aria-label="主要導覽"><a href="#instruments">探索儀器</a><a href="#guide">如何開始</a><a class="home-link" href="https://tung-beauregard.github.io/w-studio/">返回主頁 <span aria-hidden="true">↗</span></a></nav>
+  <header class="site-header wrap"><h1>儀器框</h1></header>
+  <main class="wrap" id="main">
+    <div class="instrument-grid" id="instrument-grid">
+      <article class="instrument-card mint" aria-labelledby="lcq-title">
+        <a href="./lcq/" aria-labelledby="lcq-title">
+          <img src="./assets/lcq.svg" alt="離子阱質譜儀結構示意" width="440" height="260">
+          <div class="card-label"><h2 id="lcq-title">離子阱質譜</h2><span aria-hidden="true">↗</span></div>
+        </a>
+      </article>
+      <article class="instrument-card blue" aria-labelledby="gc-ms-title">
+        <a href="./gc-ms/" aria-labelledby="gc-ms-title">
+          <img src="./assets/gc-ms.svg" alt="氣相層析儀連接質譜儀的結構示意" width="440" height="260">
+          <div class="card-label"><h2 id="gc-ms-title">GC-MS</h2><span aria-hidden="true">↗</span></div>
+        </a>
+      </article>
+      <article class="instrument-card lavender" aria-labelledby="uv-vis-title">
+        <a href="./uv-vis/" aria-labelledby="uv-vis-title">
+          <img src="./assets/uv-vis.svg" alt="光源、光柵與樣品槽的光路概念示意" width="440" height="260">
+          <div class="card-label"><h2 id="uv-vis-title">UV-Vis 分光光度計</h2><span aria-hidden="true">↗</span></div>
+        </a>
+      </article>
     </div>
-  </header>
-  <main id="main">
-    <section class="hero wrap" id="top" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> A LITTLE CURIOSITY. A CLOSER LOOK.</p>
-        <p class="hero-category">W AI STUDIO <span>/</span> 互動科學教室</p>
-        <h1 id="hero-title">把儀器打開，<br>讓原理<span class="accent">看得見。</span></h1>
-        <p class="hero-description">從樣品進入的那一刻，到圖譜上的一個訊號。<br>跟著 3D 動畫走進儀器，親手探索分析背後的原理。</p>
-        <div class="hero-actions"><a class="button primary" href="#instruments">選一台儀器，開始探索 <span aria-hidden="true">↗</span></a><a class="text-link" href="#guide"><span class="play-icon" aria-hidden="true">▷</span> 第一次來？從這裡開始</a></div>
-        <div class="hero-tags"><span>3D 拆解</span><span>互動操作</span><span>繁體中文解說</span></div>
-      </div>
-      <div class="hero-art" role="img" aria-label="分析原理概念示意：樣品沿路徑進入分析區，最後轉換成訊號。">
-        <div class="art-top"><span><i aria-hidden="true"></i> INSIDE THE INSTRUMENT</span><span>FIG. 01</span></div>
-        <svg class="analysis-art" viewBox="0 0 600 425" fill="none" aria-hidden="true">
-          <defs>
-            <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".8" fill="#587568" opacity=".25"/></pattern>
-            <linearGradient id="metal" x1="160" y1="90" x2="390" y2="285" gradientUnits="userSpaceOnUse"><stop stop-color="#405b50"/><stop offset=".48" stop-color="#182c25"/><stop offset="1" stop-color="#10231c"/></linearGradient>
-            <linearGradient id="beam"><stop stop-color="#a5f3cd" stop-opacity="0"/><stop offset=".5" stop-color="#a5f3cd"/><stop offset="1" stop-color="#a5f3cd" stop-opacity="0"/></linearGradient>
-          </defs>
-          <rect width="600" height="425" fill="url(#grid)"/>
-          <ellipse cx="309" cy="225" rx="202" ry="151" stroke="#35483e" stroke-dasharray="3 8"/>
-          <ellipse cx="309" cy="225" rx="167" ry="116" stroke="#24382e"/>
-          <path d="M33 244H549M309 50V385" stroke="#496c58" stroke-opacity=".25"/>
-          <path d="M201 185L268 144L427 206L361 247Z" fill="#1b3027" stroke="#496454"/>
-          <path d="M201 185V274L361 337V247Z" fill="#11241c" stroke="#496454"/>
-          <path d="M361 247L427 206V296L361 337Z" fill="#0d1e18" stroke="#496454"/>
-          <path d="M219 255L365 312L411 284" stroke="#75af8d" stroke-opacity=".4"/>
-          <path d="M225 120L292 80L445 138L378 180Z" fill="url(#metal)" stroke="#7b9d87"/>
-          <path d="M225 120V144L378 204V180Z" fill="#263c30" stroke="#62866e"/>
-          <path d="M378 180L445 138V162L378 204Z" fill="#15281f" stroke="#62866e"/>
-          <path d="M236 159V178M388 195V223M281 99V122" stroke="#88b699" stroke-dasharray="3 4"/>
-          <ellipse cx="299" cy="220" rx="49" ry="65" transform="rotate(-24 299 220)" fill="url(#metal)" stroke="#8eb59e"/>
-          <ellipse cx="299" cy="220" rx="24" ry="39" transform="rotate(-24 299 220)" fill="#0b1b15" stroke="#77a68a"/>
-          <path d="M97 213L155 235L187 216L129 195Z" fill="#2b4b3b" stroke="#72927d"/>
-          <path d="M97 213V233L155 255V235Z" fill="#173123" stroke="#72927d"/>
-          <path d="M155 235L187 216V237L155 255Z" fill="#0e2119" stroke="#72927d"/>
-          <path d="M74 223C147 218 219 236 297 222S439 235 505 204" stroke="#a5f3cd" stroke-opacity=".1" stroke-width="20"/>
-          <path class="signal-flow" d="M74 223C147 218 219 236 297 222S439 235 505 204" stroke="url(#beam)" stroke-width="2" stroke-dasharray="9 10"/>
-          <g fill="#a5f3cd"><circle cx="87" cy="222" r="3"/><circle cx="212" cy="226" r="3"/><circle cx="283" cy="221" r="4"/><circle cx="300" cy="225" r="3"/><circle cx="309" cy="214" r="3"/><circle cx="299" cy="208" r="2"/><circle cx="323" cy="218" r="2"/><circle cx="401" cy="223" r="3"/><circle cx="479" cy="212" r="3"/></g>
-          <path d="M114 203V161H56M434 158H484V117M301 301V355H226" stroke="#769d85" stroke-width="1"/>
-          <g fill="#abc5b5" font-family="Consolas,monospace" font-size="11"><text x="42" y="150">01 / SAMPLE</text><text x="461" y="105">02 / ANALYZE</text><text x="172" y="374">FOLLOW THE PATH →</text></g>
-          <g stroke="#52745f"><path d="M28 42H40M34 36V48M554 356H566M560 350V362"/></g>
-        </svg>
-        <div class="signal-card"><div class="signal-caption"><span>03 / SIGNAL</span><span class="signal-status">訊號，變得有跡可循</span></div><svg viewBox="0 0 330 60" fill="none" aria-hidden="true"><path d="M0 48H330M0 20H330" stroke="#496454" stroke-opacity=".3"/><path class="spectrum" d="M3 48H26V42V48H46V35V48H66V21V48H89V38V48H113V7V48H131V37V48H158V27V48H184V13V48H206V40V48H231V30V48H254V18V48H284V37V48H326" stroke="#a5f3cd" stroke-width="2"/></svg></div>
-        <div class="art-bottom"><span>樣品 <b>→</b> 分析 <b>→</b> 訊號</span><span>CONCEPT VIEW / 概念示意</span></div>
-      </div>
-      <div class="hero-bottom"><span><b>01 /</b> 看不見的過程，一步步看懂。</span><a href="#instruments">向下探索 <span aria-hidden="true">↓</span></a><span class="signature">BUILT WITH CURIOSITY</span></div>
-    </section>
-    <section class="section wrap" id="instruments" aria-labelledby="instruments-title">
-      <div class="section-heading"><div><p class="eyebrow">01 — EXPLORE THE INSTRUMENTS</p><h2 id="instruments-title">每一台儀器，<span>都有一段旅程。</span></h2><p class="section-description">選擇想了解的分析方式，從外觀走進原理。</p></div><p class="availability" id="availability"><i aria-hidden="true"></i> 3 個教材已開放</p></div>
-      <div class="instrument-grid" id="instrument-grid">
-        <article class="instrument-card" aria-labelledby="lcq-title"><div class="card-visual mint"><div class="visual-meta"><span>INSTRUMENT 01</span><span class="visual-tag">3D 互動</span></div><img src="./assets/lcq.svg" alt="離子阱質譜儀結構示意" width="440" height="260"><span class="visual-foot">ION TRAP MASS SPECTROMETRY</span></div><div class="card-body"><p class="card-kicker">離子阱質譜 · LCQ DECA XP</p><h3 id="lcq-title">離子如何被留住，<br>又如何被分開？</h3><p class="card-description">沿著離子前進的路徑，看懂電灑游離、離子導引與離子阱，再親手調整射頻振幅。</p><div class="card-tags"><span>13 章動畫</span><span>約 5 分鐘</span><span>互動操作台</span></div><a class="card-action" href="./lcq/">探索離子阱質譜 <span aria-hidden="true">↗</span></a></div></article>
-        <article class="instrument-card" aria-labelledby="gc-ms-title"><div class="card-visual blue"><div class="visual-meta"><span>INSTRUMENT 02</span><span class="visual-tag">3D 互動</span></div><img src="./assets/gc-ms.svg" alt="氣相層析儀連接質譜儀的結構示意" width="440" height="260"><span class="visual-foot">GAS CHROMATOGRAPHY–MASS SPECTROMETRY</span></div><div class="card-body"><p class="card-kicker">氣相層析質譜 · GC-MS</p><h3 id="gc-ms-title">一針樣品，<br>怎麼變成一張圖譜？</h3><p class="card-description">跟著精油樣品，從自動進樣、管柱分離走到質譜偵測，觀察升溫如何改變出峰。</p><div class="card-tags"><span>8 站導覽</span><span>升溫比較</span><span>圖譜連動</span></div><a class="card-action" href="./gc-ms/">探索 GC-MS <span aria-hidden="true">↗</span></a></div></article>
-        <article class="instrument-card" aria-labelledby="uv-vis-title"><div class="card-visual lavender"><div class="visual-meta"><span>INSTRUMENT 03</span><span class="visual-tag">3D 互動</span></div><img src="./assets/uv-vis.svg" alt="光源、光柵與樣品槽的光路概念示意" width="440" height="260"><span class="visual-foot">UV–VISIBLE SPECTROPHOTOMETRY</span></div><div class="card-body"><p class="card-kicker">紫外可見光分光光度計 · UV-VIS</p><h3 id="uv-vis-title">一束光，<br>如何讀懂一份樣品？</h3><p class="card-description">沿著雙光束與雙單色器的光路，觀察光柵如何選出波長，再比較樣品與頻寬對吸收光譜的影響。</p><div class="card-tags"><span>8 章導覽</span><span>波長調整</span><span>光譜掃描</span></div><a class="card-action" href="./uv-vis/">探索 UV-Vis <span aria-hidden="true">↗</span></a></div></article>
-      </div>
-    </section>
-    <section class="guide-band" id="guide" aria-labelledby="guide-title"><div class="wrap section guide-layout"><div class="guide-intro"><p class="eyebrow">02 — START WITH CURIOSITY</p><h2 id="guide-title">不用先懂所有名詞。<br><span>帶著好奇心就好。</span></h2><p class="section-description">跟著導覽看一遍，再回到你最想弄懂的地方。<br>每一次調整，都是一次理解的機會。</p><a class="text-link" href="./lcq/">從離子阱的第一章開始 <span aria-hidden="true">↗</span></a></div><ol class="guide-steps"><li><span class="step-number">01</span><div><h3>先看全貌</h3><p>播放動畫或開啟導覽，認識儀器的主要部件。</p></div><span class="step-icon" aria-hidden="true">↗</span></li><li><span class="step-number">02</span><div><h3>跟著樣品走</h3><p>沿著樣品或離子的路徑，理解每個階段的任務。</p></div><span class="step-icon" aria-hidden="true">→</span></li><li><span class="step-number">03</span><div><h3>換你試試看</h3><p>調整射頻、升溫速率或光譜頻寬，觀察圖譜的變化。</p></div><span class="step-icon" aria-hidden="true">↔</span></li></ol></div></section>
-    <section class="wrap notes" aria-label="使用提醒"><span class="note-symbol" aria-hidden="true">i</span><p>為了讓原理更容易看見，部分尺寸、時間與訊號經過簡化或放大。各教材內附有說明；GC-MS 與 UV-Vis 的圖譜為教學模擬。建議使用電腦，獲得完整互動體驗。</p><button class="motion-toggle" id="motion-toggle" type="button" aria-pressed="false" hidden>暫停首頁動畫 <span aria-hidden="true">Ⅱ</span></button></section>
-    <section class="wrap studio-return" aria-labelledby="studio-title"><img src="./assets/w-mark-mint.svg" width="66" height="66" alt=""><div><p class="eyebrow">MORE FROM W AI STUDIO</p><h2 id="studio-title">好奇心，不只在實驗室。</h2><p>回到我的數位工作室，看看其他專案與實用工具。</p></div><a class="button outline" href="https://tung-beauregard.github.io/w-studio/">前往 W AI Studio 主頁 <span aria-hidden="true">↗</span></a></section>
   </main>
-  <footer class="site-footer wrap"><a class="footer-brand" href="https://tung-beauregard.github.io/w-studio/">W AI STUDIO <span>/ 儀器原理</span></a><span>© <span id="year">2026</span> W AI Studio · Crafted with curiosity.</span><div><a href="https://github.com/Tung-Beauregard/instrument-principles">GitHub <span aria-hidden="true">↗</span></a><a href="#top">回到頂端 <span aria-hidden="true">↑</span></a></div></footer>
+  <footer class="site-footer wrap">
+    <a href="https://tung-beauregard.github.io/w-studio/">返回主頁 <span aria-hidden="true">↗</span></a>
+    <span class="visits" id="visits" title="使用瀏覽器儲存記錄，同一瀏覽器重複開啟不重複計數；需啟用 JavaScript。">到站人數 <b id="visits-number" aria-live="polite">—</b></span>
+  </footer>
 </body>
 </html>
