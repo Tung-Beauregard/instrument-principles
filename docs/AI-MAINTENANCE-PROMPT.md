@@ -10,7 +10,8 @@
 請更新 Tung-Beauregard/instrument-principles 儲存庫的維護資料。
 
 先讀最新版 AGENTS.md、README.md 和 docs/HANDOFF.md，
-依 AGENTS.md 第 0 節與第 8 節，核對目前程式碼，
+依 AGENTS.md 第 0 節與第 8 節，從 content/instruments.json
+盤點所有教材（包含新加入的項目），並核對目前程式碼，
 補齊或增量更新各儀器的 MAINTENANCE.md、INSTRUMENTS.md、
 docs/VALIDATION.md 與 docs/HANDOFF.md，並同步更新 README 的文件索引。
 
