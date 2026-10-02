@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LCQ Deca XP 離子阱</title>
-<meta name="description" content="把 LCQ Deca XP 離子阱質譜儀拆開來看:從電灑游離、進入真空、離子導引到離子阱掃描,說明儀器怎麼分辨不同質荷比的離子。">
+<title>離子阱質譜原理</title>
+<meta name="description" content="離子阱質譜原理的互動 3D 解說,以 LCQ Deca XP 為例:從電灑游離、進入真空、離子導引到離子阱掃描,說明儀器怎麼分辨不同質荷比的離子。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
@@ -148,7 +148,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
 </script>
 </head>
 <body>
-<div id="stage" aria-label="LCQ Deca XP 離子阱質譜儀的立體解說動畫">
+<div id="stage" aria-label="離子阱質譜原理的立體解說動畫,以 LCQ Deca XP 為例">
   <canvas id="ov"></canvas>
 </div>
 
@@ -191,7 +191,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
 <dialog id="about">
   <div class="in">
     <h2>關於這段動畫</h2>
-    <p>這是 Thermo Finnigan LCQ Deca XP 離子阱質譜儀的解說動畫。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比把離子分開。</p>
+    <p>這是離子阱質譜原理的解說動畫,以 Thermo Finnigan LCQ Deca XP 為例。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比把離子分開。</p>
     <h3>操作</h3>
     <ul>
       <li>空白鍵播放或暫停,左右方向鍵切換章節。</li>
@@ -213,7 +213,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
   </div>
 </dialog>
 
-<div id="loading"><div class="box"><b>LCQ Deca XP</b><span>正在載入立體模型</span><div class="bar"><i></i></div></div></div>
+<div id="loading"><div class="box"><b>離子阱質譜原理</b><span>正在載入立體模型</span><div class="bar"><i></i></div></div></div>
 
 <script type="module">
 // ---- core.js ----
@@ -1939,9 +1939,9 @@ function drawOverlay(story) {
     const ty = H * 0.2, maxW = W - 64 * U;
     g.shadowColor = C.shadow; g.shadowBlur = 24 * U;
     g.fillStyle = C.text;
-    fitText(g, 'LCQ Deca XP', 600, 96 * U, true, W / 2, ty, maxW);
-    const t2 = fitText(g, '把離子阱質譜儀拆開來看', 700, 46 * U, false, W / 2, ty + 80 * U, maxW);
-    drawWrapped(g, '離子從噴針走到偵測器的路徑,以及儀器怎麼依質荷比把離子分開', fnt(400, 24 * U), W / 2, ty + 80 * U + t2 * 0.6 + 34 * U, Math.min(maxW, 980 * U), 36 * U, a, C.sub);
+    fitText(g, 'Ion Trap MS', 600, 96 * U, true, W / 2, ty, maxW);
+    const t2 = fitText(g, '離子阱質譜原理', 700, 46 * U, false, W / 2, ty + 80 * U, maxW);
+    drawWrapped(g, '以 Thermo Finnigan LCQ Deca XP 為例', fnt(400, 24 * U), W / 2, ty + 80 * U + t2 * 0.6 + 34 * U, Math.min(maxW, 980 * U), 36 * U, a, C.sub);
     g.shadowBlur = 0;
     g.textAlign = 'left'; g.globalAlpha = 1;
   }
@@ -1964,9 +1964,11 @@ function drawEndCard(g, a) {
   g.globalAlpha = a;
   const maxW = W - 64 * U, y0 = H * 0.4;
   g.fillStyle = C.text;
-  fitText(g, 'LCQ Deca XP', 600, 84 * U, true, W / 2, y0, maxW);
-  fitText(g, '把離子阱質譜儀拆開來看', 700, 40 * U, false, W / 2, y0 + 70 * U, maxW);
-  let yy = y0 + 150 * U;
+  fitText(g, 'Ion Trap MS', 600, 84 * U, true, W / 2, y0, maxW);
+  fitText(g, '離子阱質譜原理', 700, 40 * U, false, W / 2, y0 + 70 * U, maxW);
+  g.fillStyle = C.sub;
+  fitText(g, '以 Thermo Finnigan LCQ Deca XP 為例', 400, 22 * U, false, W / 2, y0 + 112 * U, maxW);
+  let yy = y0 + 170 * U;
   yy += drawWrapped(g, '數值取自 Finnigan LCQ Series Hardware Manual、LCQ Deca Hardware Manual、LCQ Deca XP Plus 規格表、March (1997) 與 Wong & Cooks (1997)。', fnt(400, 19 * U), W / 2, yy, Math.min(maxW, 1300 * U), 30 * U, a, C.sub);
   drawWrapped(g, '毛細管長度、桿子尺寸與偵測器幾何為示意;液滴、離子雲與振盪幅度已放大,時間也放慢了很多倍。', fnt(400, 19 * U), W / 2, yy + 4 * U, Math.min(maxW, 1300 * U), 30 * U, a, C.sub);
   g.globalAlpha = 1;
@@ -2090,19 +2092,15 @@ const CHAPTERS = [
     update(ST, t) { OVS.title = win(t, 0.8, 6.6, 0.9); F.scanLed = 1; F.winGlow = 0.6; },
   },
   {
-    key: 'outside', title: '儀器外觀', dur: 16,
-    cam: [KP(5, V3(0.33, 0.72, 1.92), V3(-0.02, 0.31, 0.3)), KP(11, V3(-0.78, 0.8, 1.55), V3(-0.12, 0.32, 0.3)), KP(16, V3(-0.62, 0.64, 1.16), V3(-0.2, 0.33, 0.4))],
+    key: 'outside', title: '質譜儀在做什麼', dur: 11,
+    cam: [KP(4.5, V3(0.33, 0.72, 1.92), V3(-0.02, 0.31, 0.3)), KP(11, V3(-0.62, 0.64, 1.16), V3(-0.2, 0.33, 0.4))],
     cues: [
-      [0.4, '實驗室裡這台 **LCQ Deca XP**,寬 79 公分、高 56 公分、深 76 公分。樣品從左前方的離子源進去,最後在電腦上變成一張質譜圖。'],
-      [8.6, '右下的**注射幫浦**可以直接把樣品推進離子源;接上 LC 時,左邊的**切換閥**決定流出液送進質譜儀,還是排到廢液。'],
+      [0.4, '質譜儀做三件事:把分子變成帶電的**離子**、依**質荷比**把離子分開、再把離子數出來。下面打開機器,沿著離子走的路看一遍。'],
     ],
     update(ST, t) {
       F.scanLed = 1; F.winGlow = 0.6;
       OVS.labels = labels(ST, t, [
-        ['cab:source', '離子源', '電灑游離(ESI)', 1.6, 15.6, -70, -70],
-        ['cab:leds', '狀態燈', 'Power · Vacuum · Comm. · System · Scan', 2.6, 8.4, 50, -80],
-        ['cab:syringe', '注射幫浦', '常用 5 µL/min', 8.8, 15.6, 60, -60],
-        ['cab:valve', '切換閥', '六向閥', 9.4, 15.6, -60, 70],
+        ['cab:source', '離子源', '樣品從這裡進去', 2, 10.6, -70, -70],
       ]);
     },
   },
@@ -2313,7 +2311,7 @@ const CHAPTERS = [
       [0.3, '同一個離子阱還能做**串聯質譜**。以{611|蘆丁 [M+H]⁺ m/z 611}當前驅物離子:先用一段寬頻波形把其他離子全部排掉,只留下 611。'],
       [8.6, '再把射頻振幅調到讓 611 停在 **q = 0.25**,用它自己的振盪頻率輕輕推 30 ms。離子和氦原子一次次碰撞,累積能量後斷鍵。'],
       [16.8, '失去一個鼠李糖基(146)得到 {465|m/z 465},失去整個芸香糖基(308)就是{303|槲皮素苷元 m/z 303}。最後照樣掃描排出,得到產物離子譜圖。'],
-      [27.6, 'MS/MS 不需要第二個分析器,每一步都在同一個阱裡按時間先後完成;LCQ Deca XP 最多可以做到 MS¹⁰。'],
+      [27.6, 'MS/MS 不需要第二個分析器,每一步都在同一個阱裡按時間先後完成;這台儀器最多可以做到 MS¹⁰。'],
     ],
     enter(ST) {
       ST.trap.reset(36); ST.trap.V = 500; setSample('np'); ST.trap.fill(18); ST.spectrum.reset();
@@ -2832,7 +2830,7 @@ async function record(opt = {}) {
     } else {
       const url = URL.createObjectURL(new Blob([buf], { type: 'video/mp4' }));
       const a = document.createElement('a');
-      a.href = url; a.download = 'lcq-deca-xp.mp4';
+      a.href = url; a.download = 'ion-trap-ms.mp4';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     }
