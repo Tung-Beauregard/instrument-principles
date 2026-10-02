@@ -44,7 +44,14 @@ button,select,input{font:inherit;color:inherit}
 #stage{position:fixed;inset:0;touch-action:none}
 #stage canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 #ov{pointer-events:none}
-body.rec #bar,body.rec #lab,body.rec #hint{display:none!important}
+body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!important}
+/* 網站分頁:LCQ 與 GC-MS 兩頁互相切換 */
+#sitenav{position:fixed;left:16px;top:16px;z-index:11;display:flex;gap:2px;padding:3px;border-radius:11px;background:var(--panel);border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+#sitenav a{padding:5px 12px;border-radius:8px;font-size:13px;font-weight:500;line-height:1.5;color:var(--ink2);text-decoration:none;white-space:nowrap}
+#sitenav a:hover{background:var(--hover);color:var(--ink)}
+#sitenav a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+#sitenav a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 #bar{position:fixed;left:16px;right:16px;bottom:14px;z-index:10;display:flex;align-items:center;gap:10px;
   padding:8px 10px;background:var(--panel);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
@@ -71,7 +78,7 @@ body.rec #bar,body.rec #lab,body.rec #hint{display:none!important}
 .pill:hover{background:var(--hover)}
 .pill.on{background:var(--accent);color:var(--accent-ink);border-color:transparent}
 
-#lab{position:fixed;left:16px;top:16px;z-index:9;width:300px;max-height:calc(100% - 100px);overflow:auto;padding:16px 16px 14px;
+#lab{position:fixed;left:16px;top:62px;z-index:9;width:300px;max-height:calc(100% - 146px);overflow:auto;padding:16px 16px 14px;
   background:var(--panel);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);
   border-radius:14px;box-shadow:var(--shadow);font-size:14px}
 #lab h2{margin:0 0 4px;font-size:17px;font-weight:700}
@@ -124,6 +131,8 @@ body.rec #bar,body.rec #lab,body.rec #hint{display:none!important}
   .icon{width:34px;height:34px}
   #labBtn{padding:0 10px}
   #lab{left:8px;right:8px;top:auto;bottom:66px;width:auto;max-height:46%}
+  #sitenav{left:8px;top:8px}
+  #hint{top:56px}
 }
 @media (prefers-reduced-motion: reduce){
   #loading .bar i{animation:none;width:100%}
@@ -143,6 +152,7 @@ body.rec #bar,body.rec #lab,body.rec #hint{display:none!important}
   <canvas id="ov"></canvas>
 </div>
 
+<nav id="sitenav" aria-label="儀器原理"><a href="./" aria-current="page">LCQ 離子阱</a><a href="gc-ms/">GC-MS</a></nav>
 <div id="bar">
   <button id="play" class="icon" aria-label="播放"><svg viewBox="0 0 24 24"><path id="playIcon" d="M8 5v14l11-7z"/></svg></button>
   <div id="rail" role="slider" tabindex="0" aria-label="章節與時間" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>

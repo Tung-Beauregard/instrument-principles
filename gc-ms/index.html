@@ -1,0 +1,2915 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GC-MS 拆開來看</title>
+<meta name="description" content="用 3D 模型拆開 ALS 自動進樣器、6850 GC 與 5973N 質譜,跟著一針精油樣品看它在管柱裡怎麼分開、在質譜裡怎麼被辨認。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap">
+<style>
+/* 版面:全螢幕 3D 舞台;左上是導覽文字,上方靠左是控制面板(右上空給較高的 ALS 與 GC),底部是儀器主控台(柱溫、層析圖、質譜) */
+:root{
+  color-scheme:dark;
+  --bg:#060a12;
+  --glass:rgba(11,17,29,.76);
+  --glass-2:rgba(14,21,36,.93);
+  --line:rgba(160,190,240,.12);
+  --line-2:rgba(160,190,240,.24);
+  --ink:#eef3fb;
+  --ink-2:#b9c4d8;
+  --muted:#8290aa;
+  --accent:#7fe3ff;
+  --accent-ink:#04141b;
+  --warn:#ffcf70;
+  /* 成分類別(層析圖與質譜共用,已驗證色盲可分) */
+  --c-mh:#3987e5;
+  --c-om:#d95926;
+  --c-sh:#9085e9;
+  --c-os:#c98500;
+  --c-solv:#8a93a6;
+  --f-display:"Outfit","Noto Sans TC",system-ui,sans-serif;
+  --f-body:"Noto Sans TC","Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,"Noto Sans TC",monospace;
+  --r:14px;
+  --r-sm:9px;
+  --gut:24px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 var(--f-body);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+.tags{position:fixed;inset:0;pointer-events:none;overflow:hidden;transition:opacity .3s}
+
+.hud{position:fixed;inset:0;display:grid;gap:14px 18px;padding:calc(20px + env(safe-area-inset-top, 0px)) var(--gut) calc(20px + env(safe-area-inset-bottom, 0px));
+  grid-template-columns:minmax(300px,390px) minmax(0,1fr) auto;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  grid-template-areas:"brief ctl ctl" "brief hole hole" "con con con";
+  pointer-events:none;transition:opacity .3s}
+.hud>*{pointer-events:auto;min-width:0}
+.hud>.hole{grid-row:1 / 3;grid-column:2 / 4;pointer-events:none}
+.app.bare .hud,.app.bare .tags{opacity:0;pointer-events:none}
+.app.bare .hud>*{pointer-events:none}
+
+/* ---------- 左上:標題與導覽 ---------- */
+.brief{grid-area:brief;align-self:start;display:flex;flex-direction:column;gap:12px}
+/* 網站分頁(只在 GitHub Pages 版出現) */
+.sitenav{display:inline-flex;align-self:flex-start;gap:2px;padding:3px;border-radius:10px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
+.ttl{margin:0;display:flex;flex-direction:column;text-wrap:balance}
+.ttl-a{font:800 50px/1 var(--f-display);letter-spacing:-.01em;color:var(--ink)}
+.ttl-b{font:900 42px/1.15 var(--f-body);letter-spacing:.04em;color:var(--accent);margin-top:2px}
+.lede{margin:0;color:var(--ink-2);font-size:14.5px;line-height:1.7;max-width:34em}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line-2);background:var(--glass);border-radius:var(--r-sm);padding:6px 11px 7px;min-width:100px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.chip-k{display:block;font:500 10.5px/1.25 var(--f-body);letter-spacing:.14em;color:var(--muted);white-space:nowrap}
+.chip-v{display:block;font:500 17px/1.35 var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip.lead .chip-v{color:var(--accent)}
+.story{margin:0;background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:12px 15px;font-size:14px;line-height:1.75;color:var(--ink);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);min-height:6.4em}
+.cpd{font-weight:700;white-space:nowrap}
+.cpd i{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 5px 2px 1px;vertical-align:middle}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.95em}
+.hl{color:var(--accent);font-weight:600}
+
+/* ---------- 上方:控制 ---------- */
+.panel{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(14px) saturate(120%);-webkit-backdrop-filter:blur(14px) saturate(120%);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.ctl{grid-area:ctl;justify-self:start;align-self:start;padding:12px 14px;display:flex;flex-direction:column;gap:10px;max-width:100%}
+.ctl-row{display:flex;gap:10px 16px;align-items:flex-end;flex-wrap:wrap}
+.ctl-g{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ctl-g.grow{flex:1 1 170px}
+.ctl-k{font-size:10.5px;line-height:1.2;letter-spacing:.14em;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.ctl-k .num{letter-spacing:0;color:var(--ink-2)}
+.ico.ctl-x{display:none}
+.seg{display:flex;gap:2px;padding:3px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--line);flex-wrap:wrap}
+.seg button{border:0;background:none;cursor:pointer;padding:5px 10px;border-radius:7px;font-size:12.5px;line-height:1.3;color:var(--ink-2);white-space:nowrap;text-align:center}
+.seg button small{display:block;font:400 10px/1.25 var(--f-mono);color:var(--muted)}
+.seg button:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#0a0f19}
+.seg button[aria-pressed="true"] small{color:#46536a}
+.ico-row{display:flex;gap:6px}
+.ico{border:1px solid var(--line);background:rgba(255,255,255,.06);cursor:pointer;width:34px;height:34px;display:grid;place-items:center;border-radius:9px;color:var(--ink);padding:0}
+.ico:hover{background:rgba(255,255,255,.12)}
+.ico[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.ico svg{width:16px;height:16px;display:block}
+.ico.ico-txt{width:auto;display:inline-flex;align-items:center;gap:6px;padding:0 12px 0 10px;font-size:13px;font-weight:500;white-space:nowrap}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;cursor:pointer;margin:0;--p:0%}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--accent) var(--p),rgba(255,255,255,.16) var(--p))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--ink);border:3px solid var(--accent);box-shadow:0 0 0 4px rgba(127,227,255,.16)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:rgba(255,255,255,.16)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--accent)}
+input[type=range]::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--ink);border:3px solid var(--accent)}
+
+/* ---------- 底部:主控台 ---------- */
+.console{grid-area:con;display:grid;grid-template-columns:200px minmax(0,1fr) 330px;height:226px;position:relative}
+.cs{display:flex;flex-direction:column;min-width:0;min-height:0;padding:10px 14px 10px;gap:6px;position:relative}
+.cs+.cs{border-left:1px solid var(--line)}
+.cs-h{display:flex;align-items:center;gap:6px 12px;min-height:24px;flex-wrap:wrap}
+.cs-t{font-size:12px;font-weight:600;letter-spacing:.12em;color:var(--ink-2);white-space:nowrap}
+.cs-sub{font:400 11.5px/1.3 var(--f-mono);color:var(--muted);white-space:nowrap}
+.cs-sp{flex:1}
+.legend{display:flex;gap:4px 11px;flex-wrap:wrap;font-size:11px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.cv{display:block;width:100%;min-height:0;flex:1 1 auto;touch-action:none}
+.cv-over{flex:0 0 36px;cursor:pointer}
+#cvChrom{cursor:grab}
+#cvChrom.drag{cursor:grabbing}
+#cvMS{cursor:pointer}
+.mini{border:1px solid var(--line);background:rgba(255,255,255,.05);cursor:pointer;border-radius:7px;padding:2px 9px;font-size:12px;line-height:1.5;color:var(--ink-2);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.mini:hover{color:var(--ink);background:rgba(255,255,255,.1)}
+.mini[aria-pressed="true"]{background:var(--ink);color:#0a0f19;border-color:transparent}
+select.mini{-webkit-appearance:none;appearance:none;padding:2px 22px 2px 9px;font:inherit;font-size:12px;line-height:1.5;background-color:rgba(255,255,255,.05);background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 10 6%27%3E%3Cpath d=%27M1 1l4 4 4-4%27 fill=%27none%27 stroke=%27%23b9c4d8%27 stroke-width=%271.4%27 stroke-linecap=%27round%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:9px 6px}
+select.mini option{background:#111a2c;color:var(--ink)}
+select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
+.mini svg{width:11px;height:11px;display:block}
+.mini.play{min-width:64px;justify-content:center}
+.eic{border-color:rgba(127,227,255,.5);color:var(--accent)}
+.eic b{font-family:var(--f-mono);font-weight:500}
+.oven-T{font:600 34px/1.05 var(--f-display);font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+.oven-T small{font-size:15px;font-weight:500;color:var(--ink-2);margin-left:3px}
+.oven-p{font:400 11.5px/1.55 var(--f-mono);color:var(--muted)}
+.ms-hit{font-size:12px;line-height:1.45;color:var(--ink-2);min-height:1.45em}
+.ms-hit b{color:var(--ink);font-weight:600}
+.foot{font-size:11px;line-height:1.4;color:var(--muted)}
+.seg.seg-sm{padding:2px;border-radius:8px}
+.seg.seg-sm button{padding:2px 9px;font-size:11.5px;border-radius:6px}
+.qctl{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);min-height:24px}
+.qctl label{white-space:nowrap}
+.qctl input[type=range]{flex:1 1 auto;min-width:60px;height:20px}
+.qctl .num{min-width:52px;color:var(--ink-2);white-space:nowrap}
+.tourbar{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap}
+.tour-step{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--accent);white-space:nowrap}
+.tour-dots{display:flex;gap:4px}
+.tour-dots i{width:14px;height:3px;border-radius:2px;background:var(--line-2)}
+.tour-dots i.done{background:rgba(127,227,255,.45)}
+.tour-dots i.on{background:var(--accent)}
+.tabs{display:none}
+
+.ptable{position:absolute;left:10px;right:10px;top:40px;bottom:10px;overflow:auto;background:var(--glass-2);border:1px solid var(--line-2);border-radius:10px;z-index:5}
+.ptable table{width:100%;border-collapse:collapse;font-size:12px}
+.ptable th{position:sticky;top:0;background:#111a2c;text-align:left;font-weight:500;color:var(--muted);padding:6px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ptable td{padding:5px 9px;border-bottom:1px solid var(--line);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ptable td.n{font-family:var(--f-mono);text-align:right}
+.ptable th.n{text-align:right}
+.ptable tbody tr{cursor:pointer}
+.ptable tbody tr:hover td{background:rgba(255,255,255,.05)}
+.ptable tbody tr.on td{background:rgba(127,227,255,.1)}
+.ptable i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+/* ---------- 3D 標籤、提示框、說明視窗 ---------- */
+.tag{position:absolute;left:0;top:0;opacity:0;display:flex;align-items:center;gap:6px;padding:3px 9px 3px 7px;border-radius:999px;background:rgba(7,11,19,.82);border:1px solid var(--line-2);font:500 11.5px/1.35 var(--f-body);color:var(--ink);white-space:nowrap;will-change:transform;transition:opacity .25s}
+.tag i{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);flex:none}
+.tag em{font:400 10.5px/1.2 var(--f-mono);font-style:normal;color:var(--muted)}
+.tag.band{border-color:rgba(255,255,255,.4)}
+.tag.part{background:rgba(7,11,19,.7);font-size:11px}
+.tag.part i{background:var(--ink-2);box-shadow:none}
+.tag.neutral{border-color:rgba(160,190,240,.2)}
+.tag.neutral i{background:var(--muted);box-shadow:none}
+
+.tip{position:fixed;z-index:30;left:0;top:0;pointer-events:none;background:var(--glass-2);border:1px solid var(--line-2);border-radius:8px;padding:6px 10px;font-size:12px;line-height:1.55;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.45);max-width:260px}
+.tip .num{color:var(--ink-2)}
+.tip i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+.modal{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:24px 16px;background:rgba(3,6,12,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.modal-card{position:relative;width:min(700px,100%);max-height:min(84vh,860px);overflow:auto;background:var(--glass-2);border:1px solid var(--line-2);border-radius:16px;padding:24px 28px 26px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.modal h2{margin:0 0 10px;font:700 22px/1.35 var(--f-body);text-wrap:balance;padding-right:36px}
+.modal h3{margin:20px 0 6px;font-size:12.5px;font-weight:600;letter-spacing:.16em;color:var(--accent)}
+.modal p{margin:0 0 8px;color:var(--ink-2);font-size:14px;line-height:1.8;max-width:64ch}
+.modal b{color:var(--ink);font-weight:600}
+.modal .x{position:absolute;right:16px;top:16px}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px;color:var(--ink-2);margin-top:4px}
+.kbd{font:500 11.5px/1.6 var(--f-mono);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:0 6px;color:var(--ink);white-space:nowrap}
+
+.load{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:13px;pointer-events:none;transition:opacity .5s}
+.load i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--accent);animation:spin 1s linear infinite}
+.load.gone{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.note3d{grid-area:hole;align-self:center;justify-self:center;max-width:420px;background:var(--glass-2);border:1px solid var(--line-2);border-radius:12px;padding:14px 16px;font-size:13.5px;line-height:1.7;color:var(--ink-2)}
+.only-m,.btn-sheet{display:none}
+
+/* ---------- 中等寬度 ---------- */
+@media (max-width:1180px){
+  .hud{grid-template-columns:minmax(260px,330px) minmax(0,1fr) auto}
+  .ttl-a{font-size:42px}
+  .ttl-b{font-size:34px}
+  .lede{font-size:13.5px}
+  .console{grid-template-columns:minmax(0,1fr) 300px}
+  .cs-oven{display:none}
+  .cs-chrom{border-left:0!important}
+  .console{height:212px}
+  /* 控制面板收進「設定」按鈕,3D 用整個右半邊 */
+  .ctl{display:none;position:fixed;top:16px;right:16px;z-index:35;width:min(560px,calc(100vw - 32px));background:var(--glass-2);box-shadow:0 18px 50px rgba(0,0,0,.55)}
+  .app.sheet .ctl{display:flex}
+  .app.sheet .ico.ctl-x{display:grid;position:absolute;right:10px;top:10px}
+  .ctl-row:first-of-type{padding-right:44px}
+  .btn-sheet{display:inline-flex}
+}
+@media (max-height:760px) and (min-width:761px){
+  .lede{display:none}
+  .story{min-height:0}
+}
+
+/* ---------- 手機 ---------- */
+@media (max-width:760px){
+  :root{--gut:16px}
+  .hud{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(150px,1fr) auto;grid-template-areas:"brief" "hole" "con";padding:calc(12px + env(safe-area-inset-top, 0px)) var(--gut) calc(14px + env(safe-area-inset-bottom, 0px));gap:10px;overflow-y:auto}
+  .hud>.hole{grid-area:hole}
+  .ttl{flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .ttl-a{font-size:27px}
+  .ttl-b{font-size:23px;margin:0}
+  .lede{display:none}
+  .brief{gap:8px}
+  .chip{flex:1 1 0;min-width:0;padding:5px 8px 6px}
+  .chip-k{letter-spacing:.08em}
+  .chip-v{font-size:13.5px}
+  .chip-k .kname{display:none}
+  .story{font-size:13px;line-height:1.65;min-height:0;max-height:9.8em;overflow:auto;padding:9px 12px}
+  .ctl{top:auto;left:12px;right:12px;bottom:12px;width:auto;box-shadow:0 -10px 40px rgba(0,0,0,.5)}
+  .console{grid-template-columns:minmax(0,1fr);height:252px}
+  .cs-ms{display:none;border-left:0!important}
+  .console[data-tab="ms"] .cs-ms{display:flex}
+  .console[data-tab="ms"] .cs-chrom{display:none}
+  .tabs{display:flex}
+  .legend{font-size:10.5px;gap:3px 9px}
+  .modal-card{padding:20px 18px 22px}
+  .tag{font-size:10.5px;padding:2px 7px 2px 6px}
+  .tag em{display:none}
+  .tag.keep em{display:inline}
+  .tag.part{display:none}
+  .only-m{display:inline-flex}
+  .no-m{display:none!important}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .load i{animation:none}
+  .tag,.hud,.tags{transition:none}
+}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"}}
+</script>
+
+</head>
+<body>
+<div class="app" id="app">
+  <canvas id="gl" tabindex="-1" aria-label="ALS 自動進樣器、氣相層析儀與質譜儀的 3D 模型,可拖曳旋轉"></canvas>
+  <div class="tags" id="tags" aria-hidden="true"></div>
+  <div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
+
+  <div class="hud" id="hud">
+    <header class="brief">
+      <nav class="sitenav" aria-label="儀器原理"><a href="../">LCQ 離子阱</a><a href="./" aria-current="page">GC-MS</a></nav>
+      <h1 class="ttl"><span class="ttl-a">GC-MS</span><span class="ttl-b">拆開來看</span></h1>
+      <p class="lede">層析圖上的每一支峰,都來自同一針樣品。它們一起被打進管柱,出來時卻相隔好幾分鐘。按「導覽」,鏡頭會跟著一個成分的分子,從 ALS 自動進樣器、6850 GC 的 30&nbsp;m 管柱,一路走進 5973N 質譜。</p>
+      <div class="chips">
+        <div class="chip lead"><span class="chip-k">時間</span><span class="chip-v" id="chipT">0.00 min</span></div>
+        <div class="chip"><span class="chip-k">柱溫</span><span class="chip-v" id="chipOven">60.0 °C</span></div>
+        <div class="chip"><span class="chip-k" id="chipKk">滯留因子 k</span><span class="chip-v" id="chipK">4.60</span></div>
+      </div>
+      <p class="story" id="story" aria-live="polite"></p>
+      <div class="tourbar" id="tourbar" hidden>
+        <span class="tour-step" id="tourStep">導覽</span>
+        <span class="tour-dots" id="tourDots" aria-hidden="true"></span>
+        <span class="cs-sp"></span>
+        <button class="mini" id="tourNext" type="button">下一步</button>
+        <button class="mini" id="tourEnd" type="button">結束導覽</button>
+      </div>
+    </header>
+
+    <section class="panel ctl" id="ctl" aria-label="控制">
+      <button class="ico ctl-x" id="btnSheetX" type="button" aria-label="關閉設定"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+      <div class="ctl-row">
+        <div class="ctl-g">
+          <span class="ctl-k">追蹤成分</span>
+          <div class="seg" id="segTrack" role="group" aria-label="追蹤成分">
+            <button type="button" data-track="auto" aria-pressed="true">自動</button>
+            <button type="button" data-track="apin" aria-pressed="false">α-Pinene</button>
+            <button type="button" data-track="lim" aria-pressed="false">Limonene</button>
+            <button type="button" data-track="caryo" aria-pressed="false">Caryophyllene</button>
+          </div>
+        </div>
+        <div class="ctl-g grow">
+          <label class="ctl-k" for="tSlider"><span>時間</span><span class="num" id="tSliderV">0.00 min</span></label>
+          <input type="range" id="tSlider" min="0" max="56.33" step="0.01" value="0">
+        </div>
+      </div>
+      <div class="ctl-row">
+        <div class="ctl-g">
+          <span class="ctl-k">升溫速率</span>
+          <div class="seg" id="segRate" role="group" aria-label="升溫速率">
+            <button type="button" data-rate="3" aria-pressed="true">3 °C/min<small>56 min</small></button>
+            <button type="button" data-rate="5" aria-pressed="false">5 °C/min<small>35 min</small></button>
+            <button type="button" data-rate="10" aria-pressed="false">10 °C/min<small>19 min</small></button>
+          </div>
+        </div>
+        <div class="ctl-g">
+          <span class="ctl-k">儀器</span>
+          <div class="seg" id="segX" role="group" aria-label="儀器">
+            <button type="button" data-x="0" aria-pressed="true">組裝</button>
+            <button type="button" data-x="1" aria-pressed="false">拆開</button>
+          </div>
+        </div>
+        <div class="ico-row">
+          <button class="ico" id="btnInj" type="button" title="重新進樣 (I)" aria-label="重新進樣"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v3M6 4.5h4M7 4.5v6.5l1 2.5 1-2.5V4.5"/><path d="M5.2 8h1.8M5.2 10h1.8"/></svg></button>
+          <button class="ico ico-txt" id="btnTour" type="button" title="導覽:鏡頭跟著一個成分的分子走一趟 (C)" aria-pressed="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="3.5" cy="12.5" r="1.7"/><circle cx="12.5" cy="3.5" r="1.7"/><path d="M5.3 12.5h4.4a2.4 2.4 0 0 0 0-4.8H6.3a2.4 2.4 0 0 1 0-4.8h4.4"/></svg>導覽</button>
+          <button class="ico" id="btnHelp" type="button" title="原理說明 (H)" aria-label="原理說明"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5.8 5.8a2.3 2.3 0 1 1 3.2 2.1c-.6.3-1 .8-1 1.5v.4"/><circle cx="8" cy="12.6" r=".5" fill="currentColor"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <div class="hole" id="hole"></div>
+
+    <section class="panel console" id="console" aria-label="主控台" data-tab="chrom">
+      <div class="cs cs-oven">
+        <div class="cs-h"><span class="cs-t">柱溫箱</span></div>
+        <div class="oven-T"><span id="ovenT">60.0</span><small>°C</small></div>
+        <div class="oven-p" id="ovenP">60 → 220 °C · 3 °C/min<br>保持 3 min</div>
+        <canvas class="cv" id="cvOven" aria-label="升溫程式"></canvas>
+      </div>
+      <div class="cs cs-chrom">
+        <div class="cs-h">
+          <div class="seg tabs" id="segTab" role="group" aria-label="切換圖表"><button type="button" data-tab="chrom" aria-pressed="true">層析圖</button><button type="button" data-tab="ms" aria-pressed="false">質譜</button></div>
+          <span class="cs-t no-m">總離子層析圖 TIC</span>
+          <div class="legend" id="legend"></div>
+          <span class="cs-sp"></span>
+          <button class="mini eic" id="btnEic" type="button" hidden></button>
+          <button class="mini no-m" id="btnTable" type="button" aria-pressed="false">峰表</button>
+          <button class="mini play" id="btnPlay" type="button"></button>
+          <select class="mini sel" id="speedSel" aria-label="播放速度" title="播放速度:0.1×、0.5× 是慢動作,3× 只加快時間軸"><option value="0.1">0.1×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="3">3×</option></select>
+          <button class="mini btn-sheet" id="btnSheet" type="button" aria-haspopup="true">設定</button>
+        </div>
+        <canvas class="cv" id="cvChrom" aria-label="總離子層析圖,拖曳可前後捲動時間,點峰可追蹤該成分"></canvas>
+        <canvas class="cv cv-over" id="cvOver" aria-label="整次分析的層析圖總覽,點選或拖曳可跳到該時間"></canvas>
+        <div class="ptable" id="ptable" hidden></div>
+      </div>
+      <div class="cs cs-ms">
+        <div class="cs-h">
+          <div class="seg tabs" role="group" aria-label="切換圖表"><button type="button" data-tab="chrom" aria-pressed="false">層析圖</button><button type="button" data-tab="ms" aria-pressed="true">質譜</button></div>
+          <span class="cs-t no-m">質譜</span><span class="cs-sub" id="msTime">0.00 min</span>
+          <span class="cs-sp"></span>
+          <div class="seg seg-sm" id="segMsView" role="group" aria-label="質譜面板"><button type="button" data-v="spec" aria-pressed="true">譜圖</button><button type="button" data-v="quad" aria-pressed="false">四極桿</button></div>
+        </div>
+        <div class="ms-hit" id="msHit"></div>
+        <canvas class="cv" id="cvMS" aria-label="目前時間的質譜,點一根質譜線可抽出該離子的層析圖"></canvas>
+        <div class="foot" id="msFoot">點一根質譜線,可在層析圖上抽出該離子(EIC);暫停在峰上可看碎片怎麼來</div>
+        <div class="qctl" id="qctl" hidden>
+          <label for="qSlider">固定 m/z</label>
+          <input type="range" id="qSlider" min="40" max="230" step="1" value="93">
+          <span class="num" id="qVal">掃描中</span>
+          <button class="mini" id="btnScan" type="button" aria-pressed="true">自動掃描</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="tip" id="tip" hidden></div>
+
+  <div class="modal" id="help" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <button class="ico x" id="helpX" type="button" aria-label="關閉說明"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+      <h2 id="helpTitle">一支峰是怎麼來的</h2>
+      <p>這個頁面用 ALS 自動進樣器、6850 GC 和 5973N 質譜當模型,把一針精油從進樣到出圖譜的過程拆開來看。管柱裡的色帶、底下的層析圖和質譜,都是同一個模型即時算出來的,所以拖動時間、改升溫速率,三者會一起變。</p>
+
+      <h3>進樣:ALS 與進樣口</h3>
+      <p>ALS 先用溶劑洗針,再從樣品瓶抽 <b>1 μL</b>,穿過隔墊打進 <b>250 °C</b> 的玻璃襯管。液體瞬間氣化,體積脹大兩三百倍。分流模式下大部分蒸氣從分流出口排掉,只有一小部分被載氣(He)帶進管柱。ALS 在推下活塞的同一刻送出開始訊號,GC 從這一刻開始計時。</p>
+
+      <h3>分開的原理:液膜與載氣</h3>
+      <p>HP-5MS 管柱內壁塗了一層 <b>0.25 μm</b> 的液膜(5% 苯基聚矽氧烷)。分子不停在載氣和液膜之間進出:溶在液膜裡的時候停住不動,回到載氣裡才往前走。<b>k 值</b>就是「在液膜裡的量 ÷ 在載氣裡的量」,所以一個成分的前進速度是載氣的 <b>1/(1+k)</b>。k 越大,出來得越晚。角落的放大鏡畫的就是這件事,分子停在金色液膜裡的比例就是 k/(1+k)。</p>
+
+      <h3>升溫程式</h3>
+      <p>k 會隨溫度急速下降。60 °C 時 (E)-Caryophyllene 的 k 將近 300,幾乎黏在管柱入口不動;升到 130 °C 左右 k 降到 4 上下,它才真正開始跑。升溫讓每個成分在各自合適的溫度離開,前面的峰不會擠成一團,後面的峰也不會拖成又寬又矮的小丘。</p>
+      <p>升溫越快,分析越短,但相鄰成分之間的距離縮得比峰寬還快。Limonene 和 1,8-Cineole 在 3 °C/min 時 Rs 約 0.9,看得到兩支峰中間的凹谷;10 °C/min 時只剩 0.7,幾乎併成一支。</p>
+
+      <h3>質譜:為什麼量得到質量</h3>
+      <p>分子不帶電,電場推不動它,所以第一步是讓它帶電。管柱出口經過 250 °C 的傳輸線,直接伸進真空中的離子源。燈絲放出的電子被加速到 <b>70 eV</b>,撞上分子,把分子的一個電子撞掉,分子就變成帶一個正電的<b>分子離子 M⁺•</b>。電子的質量只有質子的 1/1836,少一個電子幾乎不影響質量,電荷又是 +1,所以 M⁺• 的 m/z 就等於分子量。</p>
+      <p>帶電之後,推斥極和透鏡用電場把離子推進<b>四極桿</b>。四根桿子兩兩相對,加上直流電壓 U 和射頻電壓 V。離子一邊前進一邊被來回推拉,能不能穩定穿過只看 m/z:太輕的離子跟著射頻擺動,擺幅越來越大,撞上桿子;太重的離子跟不上射頻,被直流慢慢拉向桿子。U 和 V 依固定比例一起往上掃,能通過的 m/z 就從 40 一路掃到 400。質譜面板切到「四極桿」,可以看到每個離子在 Mathieu 穩定圖上的位置:越重越靠左,只有落進頂端窄窄窗口的那一個能通過。</p>
+      <p>穿過四極桿的離子撞上<b>高能倍增極</b>,轉成電子,再經電子倍增器放大十萬倍以上,變成量得到的電流。記下每個 m/z 收到多少離子就是質譜;同一次掃描的離子全部加起來,就是 TIC 上的一個點。整個過程在高真空裡進行,離子才不會在半路撞上空氣分子;中性的分子電場推不動,直接被渦輪分子泵抽走。</p>
+
+      <h3>為什麼會有碎片</h3>
+      <p>把分子的電子撞掉只需要大約 8 到 10 eV,70 eV 的電子帶來的能量多得多,多出來的部分留在 M⁺• 裡,讓它劇烈振動,比較弱的鍵就斷了。斷開時一邊帶著正電,另一邊是中性的自由基或小分子。只有帶電的那一邊會被電場推進四極桿;中性的那一邊推不動,被真空泵抽走,所以在質譜上看不到它。</p>
+      <p>因此質譜上的每一根線都是「帶電的那一塊」,兩根線的差就是失去的中性碎片。α-Pinene 的 136 → 121 差 15,是失去甲基 CH₃•;136 → 93 差 43,是失去異丙基 C₃H₇•。醇類容易失去水(差 18),乙酸酯會失去乙酸(差 60)。有些分子離子不穩定到幾乎看不到,例如 Linalool 的 154 只剩約 1%,這時要靠碎片和 KI 判斷。</p>
+      <p>同一個分子在 70 eV 下的斷法很固定,碎片分布可以當指紋,拿去和 NIST 等資料庫比對;大家都用 70 eV,不同儀器的質譜才能互相比較。暫停在任一支峰上,放大鏡會切到離子源,一步一步示範這個成分的分子怎麼帶電、怎麼斷開,譜圖上也會圈出正在示範的那一根。</p>
+
+      <h3>Limonene 和 1,8-Cineole</h3>
+      <p>兩者的 KI 只差 2,在 HP-5MS 上常疊成一支峰。可是碎片完全不同:Limonene 的基峰是 m/z 68,1,8-Cineole 是 m/z 43、81、108。在質譜上點 m/z 68,層析圖會抽出這個離子的 EIC,只剩 Limonene 那一支。峰正中間的質譜相似度會偏低,也是因為兩者的碎片混在一起。</p>
+
+      <h3>KI 為什麼比滯留時間可靠</h3>
+      <p>改升溫速率,所有峰的滯留時間都會跟著變;用前後兩支正烷烴換算的 KI 卻只差一兩個單位。峰表裡的 KI 就是用同一個模型跑一組 C7 到 C18 正烷烴換算出來的,可以切換升溫速率比較看看。</p>
+
+      <h3>操作</h3>
+      <div class="keys">
+        <span class="kbd">空白鍵</span><span>播放或暫停,出峰時會自動放慢</span>
+        <span class="kbd">, .</span><span>播放速度變慢或變快。0.1× 和 0.5× 是慢動作:時間軸和進樣、分子、碎裂、離子這些動畫一起放慢;3× 只加快時間軸</span>
+        <span class="kbd">[ ]</span><span>時間往前或往後 0.1 min,按住 Shift 為 1 min</span>
+        <span class="kbd">0 1 2 3</span><span>自動追蹤,或追蹤 α-Pinene、Limonene、Caryophyllene</span>
+        <span class="kbd">F</span><span>切換升溫速率</span>
+        <span class="kbd">X</span><span>組裝或拆開儀器</span>
+        <span class="kbd">I</span><span>重新進樣</span>
+        <span class="kbd">C</span><span>導覽:鏡頭跟著一個成分的分子走完全程(用「追蹤成分」先選要跟哪一個);N 跳到下一站,Esc 結束</span>
+        <span class="kbd">Q</span><span>質譜面板切換譜圖與四極桿穩定圖</span>
+        <span class="kbd">R</span><span>重設視角</span>
+        <span class="kbd">/</span><span>隱藏介面</span>
+        <span class="kbd">滑鼠</span><span>拖曳旋轉,右鍵拖曳平移,滾輪縮放;在層析圖上拖曳可捲動時間,點峰可追蹤該成分</span>
+      </div>
+
+      <h3>數字從哪來</h3>
+      <p>管柱 HP-5MS 30 m × 0.25 mm × 0.25 μm,He 定流 1.0 mL/min(死時間約 1.4 min),柱溫 60 °C 起以 3、5 或 10 °C/min 升到 220 °C 後保持 3 min,溶劑延遲 3 min;進樣口與傳輸線 250 °C、離子源 230 °C。各成分的滯留由 KI 值換算(簡化的熱力學模型),峰寬以約 7 萬理論板數估算。樣品是虛構的示範組成;質譜只取主要離子,強度為概略值,只供說明,不可拿來鑑定。</p>
+    </div>
+  </div>
+</div>
+<script type="module">
+/* =========================================================
+   GC-MS 拆開來看:資料、滯留模型、圖表與介面
+   3D 場景在 scene.js(動態載入 three.js);three.js 載不到時,這裡的圖表與控制照常運作
+   ========================================================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth01 = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+const easeIO = t => { t = clamp(t, 0, 1); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const f2 = v => v.toFixed(2);
+const f1 = v => v.toFixed(1);
+
+/* ---------- 成分類別與示範樣品 ---------- */
+// glow 是 3D 色帶的發光色(sRGB 0–1);圖表用 CSS 變數裡驗證過的顏色
+const CLS = {
+  mh: { name: '單萜烯', v: '--c-mh', glow: [0.33, 0.62, 1.0] },
+  om: { name: '含氧單萜', v: '--c-om', glow: [1.0, 0.45, 0.2] },
+  sh: { name: '倍半萜烯', v: '--c-sh', glow: [0.66, 0.58, 1.0] },
+  os: { name: '含氧倍半萜', v: '--c-os', glow: [1.0, 0.72, 0.12] },
+  sv: { name: '溶劑', v: '--c-solv', glow: [0.78, 0.84, 0.95] },
+};
+// KI 取自實驗室 GC 工具內建的萜類 KI 表(非極性管柱);amt 是虛構的示範組成(面積 %)
+// ms 是 70 eV EI 質譜的主要離子(m/z: 相對強度),只取 m/z 40 以上,強度為概略值
+const CPDS = [
+  { id: 'apin', name: 'α-Pinene', ki: 939, amt: 18, cls: 'mh', mw: 136,
+    ms: { 41: 15, 53: 7, 67: 6, 77: 24, 79: 19, 80: 6, 91: 40, 92: 33, 93: 100, 94: 4, 105: 7, 107: 4, 119: 2, 121: 10, 136: 8 } },
+  { id: 'camph', name: 'Camphene', ki: 954, amt: 4, cls: 'mh', mw: 136,
+    ms: { 41: 34, 53: 15, 67: 36, 68: 10, 77: 18, 79: 42, 80: 12, 91: 30, 92: 12, 93: 100, 105: 8, 107: 33, 121: 72, 136: 18 } },
+  { id: 'bpin', name: 'β-Pinene', ki: 979, amt: 7, cls: 'mh', mw: 136,
+    ms: { 41: 55, 53: 15, 67: 10, 69: 40, 77: 20, 79: 22, 80: 8, 91: 35, 92: 8, 93: 100, 94: 12, 121: 8, 136: 5 } },
+  { id: 'myrc', name: 'β-Myrcene', ki: 990, amt: 3, cls: 'mh', mw: 136,
+    ms: { 41: 85, 53: 15, 67: 10, 69: 78, 77: 9, 79: 15, 91: 13, 92: 6, 93: 100, 94: 7, 121: 4, 136: 2 } },
+  { id: 'cym', name: 'p-Cymene', ki: 1024, amt: 2.5, cls: 'mh', mw: 134,
+    ms: { 41: 6, 65: 5, 77: 6, 91: 20, 105: 3, 115: 5, 117: 10, 119: 100, 120: 9, 134: 28 } },
+  { id: 'lim', name: 'Limonene', ki: 1029, amt: 9, cls: 'mh', mw: 136,
+    ms: { 41: 25, 53: 25, 67: 65, 68: 100, 77: 12, 79: 25, 92: 15, 93: 68, 94: 22, 107: 20, 121: 20, 136: 22 } },
+  { id: 'cin', name: '1,8-Cineole', ki: 1031, amt: 12, cls: 'om', mw: 154,
+    ms: { 41: 30, 43: 100, 55: 22, 69: 25, 71: 50, 81: 65, 84: 35, 93: 35, 96: 18, 108: 55, 111: 35, 125: 8, 139: 30, 154: 25 } },
+  { id: 'lin', name: 'Linalool', ki: 1096, amt: 8, cls: 'om', mw: 154, tail: true,
+    ms: { 41: 60, 43: 50, 55: 50, 67: 15, 69: 45, 71: 100, 80: 25, 83: 10, 93: 75, 121: 12, 136: 8, 154: 1 } },
+  { id: 'camphor', name: 'Camphor', ki: 1146, amt: 10, cls: 'om', mw: 152,
+    ms: { 41: 45, 55: 30, 67: 15, 69: 30, 81: 75, 83: 25, 95: 100, 108: 45, 109: 20, 110: 8, 137: 5, 152: 35 } },
+  { id: 'born', name: 'Borneol', ki: 1169, amt: 4, cls: 'om', mw: 154, tail: true,
+    ms: { 41: 25, 43: 12, 55: 12, 67: 12, 93: 10, 95: 100, 96: 8, 110: 15, 121: 8, 136: 5, 139: 8, 154: 2 } },
+  { id: 'terp', name: 'α-Terpineol', ki: 1188, amt: 5, cls: 'om', mw: 154, tail: true,
+    ms: { 41: 30, 43: 35, 55: 10, 59: 100, 67: 30, 79: 15, 81: 40, 92: 25, 93: 75, 107: 15, 121: 55, 136: 45 } },
+  { id: 'bac', name: 'Bornyl acetate', ki: 1285, amt: 6, cls: 'om', mw: 196,
+    ms: { 41: 20, 43: 55, 67: 10, 80: 12, 93: 30, 95: 100, 108: 15, 110: 8, 121: 25, 136: 35, 154: 5, 196: 2 } },
+  { id: 'caryo', name: '(E)-Caryophyllene', short: 'Caryophyllene', ki: 1417, amt: 6, cls: 'sh', mw: 204,
+    ms: { 41: 80, 55: 25, 69: 70, 79: 70, 91: 80, 93: 100, 105: 55, 107: 30, 120: 30, 133: 88, 147: 15, 161: 30, 189: 12, 204: 8 } },
+  { id: 'hum', name: 'α-Humulene', ki: 1452, amt: 2.5, cls: 'sh', mw: 204,
+    ms: { 41: 40, 67: 15, 79: 25, 80: 35, 91: 20, 93: 100, 107: 20, 121: 30, 136: 10, 147: 25, 161: 5, 204: 5 } },
+  { id: 'cox', name: 'Caryophyllene oxide', short: 'Caryo. oxide', ki: 1582, amt: 3, cls: 'os', mw: 220,
+    ms: { 41: 95, 43: 100, 69: 70, 79: 85, 91: 75, 93: 80, 95: 55, 107: 45, 109: 60, 121: 45, 161: 35, 177: 20, 187: 15, 205: 8, 220: 2 } },
+];
+const SOLV = { id: 'solv', name: '溶劑', ki: 600, amt: 0, cls: 'sv', solvent: true };
+const BYID = new Map([...CPDS, SOLV].map(c => [c.id, c]));
+
+const MZ0 = 40, MZ1 = 230, MZN = MZ1 - MZ0 + 1;
+for (const c of CPDS) {
+  const rel = new Float32Array(MZN); let sum = 0, base = 0;
+  for (const [m, v] of Object.entries(c.ms)) {
+    const i = +m - MZ0; if (i < 0 || i >= MZN) continue;
+    rel[i] = v; sum += v; if (v > base) { base = v; c.baseMz = +m; }
+  }
+  c.frac = rel.map(v => v / sum);               // 佔總離子流的比例
+  c.lib = unitVec(rel.map(v => Math.sqrt(v)));  // 比對用(強度開根號後的單位向量)
+  c.label = c.short || c.name;
+}
+function unitVec(a) { let s = 0; for (const v of a) s += v * v; s = Math.sqrt(s) || 1; return a.map(v => v / s); }
+
+/* ---------- 質譜碎片:放大鏡示範與譜圖標註 ----------
+   每個成分挑幾種有把握的斷法。ion 是帶電的碎片,loss 是失去的中性碎片,兩者相加等於分子量。
+   ionRad:奇電子離子(⁺•);lossMol:失去的是中性分子,否則是自由基(•) */
+const FRAG = {
+  apin: { f: 'C10H16', ch: [
+    { mz: 136 },
+    { mz: 121, ion: 'C9H13', loss: 'CH3', note: '失去一個甲基' },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '四員環打開後失去異丙基,剩下的 C₇H₉⁺ 很穩定,是基峰' }] },
+  camph: { f: 'C10H16', ch: [
+    { mz: 136 },
+    { mz: 121, ion: 'C9H13', loss: 'CH3', note: '失去一個甲基,在 Camphene 特別明顯' },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '失去 C₃H₇• 之後的 C₇H₉⁺' }] },
+  bpin: { f: 'C10H16', ch: [
+    { mz: 136 },
+    { mz: 121, ion: 'C9H13', loss: 'CH3', note: '失去一個甲基' },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '和 α-Pinene 一樣是四員環打開後失去異丙基;兩者碎片很像,要靠 KI 分辨' }] },
+  myrc: { f: 'C10H16', ch: [
+    { mz: 136, note: '鏈狀,分子離子很弱' },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '失去 C₃H₇•' },
+    { mz: 69, ion: 'C5H9', loss: 'C5H7', note: '烯丙位的鍵斷開,得到穩定的異戊烯基離子 C₅H₉⁺' }] },
+  cym: { f: 'C10H14', ch: [
+    { mz: 134, note: '苯環讓分子離子比較穩定,看得到不少' },
+    { mz: 119, ion: 'C9H11', loss: 'CH3', note: '苯甲位的鍵斷開、失去甲基,留下很穩定的離子,是基峰' },
+    { mz: 91, ion: 'C7H7', loss: 'C3H7', lossTxt: 'CH₃• + C₂H₄', note: '再失去 C₂H₄,變成七員環的卓鎓離子 C₇H₇⁺' }] },
+  lim: { f: 'C10H16', ch: [
+    { mz: 136 },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '失去 C₃H₇•' },
+    { mz: 68, ion: 'C5H8', ionRad: true, loss: 'C5H8', lossMol: true, note: '逆 Diels-Alder:六員環一分為二,帶電的一半是 m/z 68,另一半是中性的異戊二烯;這是 Limonene 的基峰' }] },
+  cin: { f: 'C10H18O', ch: [
+    { mz: 154, note: '醚類,分子離子看得到' },
+    { mz: 139, ion: 'C9H15O', loss: 'CH3', note: '失去一個甲基' },
+    { mz: 43, ion: 'C3H7', loss: 'C7H11O', note: '很小的碎片離子;整數質量 43 也可能是 C₂H₃O⁺,要靠高解析質譜才分得出來' }] },
+  lin: { f: 'C10H18O', ch: [
+    { mz: 154, note: '只剩約 1%:醇類的分子離子很容易斷' },
+    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: '失去一分子水,醇類的特徵' },
+    { mz: 71, ion: 'C4H7O', loss: 'C6H11', note: 'α 斷裂:接著 OH 的碳旁邊的鍵斷開,帶走 C₆H₁₁•,留下含氧的 C₄H₇O⁺,是基峰' }] },
+  camphor: { f: 'C10H16O', ch: [
+    { mz: 152, note: '酮類,分子離子看得到約三成' },
+    { mz: 108, ion: 'C8H12', ionRad: true, loss: 'C2H4O', lossMol: true, note: '重排後失去 C₂H₄O' },
+    { mz: 95, ion: 'C7H11', loss: 'C3H5O', note: '環斷開、經過幾步之後失去含氧的 C₃H₅O,留下 C₇H₁₁⁺;Camphor 和 Borneol 的基峰都是它' }] },
+  born: { f: 'C10H18O', ch: [
+    { mz: 154, note: '醇類,分子離子很弱' },
+    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: '失去一分子水' },
+    { mz: 95, ion: 'C7H11', loss: 'C3H7O', lossTxt: 'H₂O + C₃H₅•', note: '失去水之後再失去 C₃H₅•,和 Camphor 一樣得到 C₇H₁₁⁺' }] },
+  terp: { f: 'C10H18O', ch: [
+    { mz: 154, note: '醇類,分子離子很弱' },
+    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: '失去一分子水' },
+    { mz: 59, ion: 'C3H7O', loss: 'C7H11', note: 'α 斷裂:帶 OH 的異丙基整段斷下來,(CH₃)₂C=OH⁺ 就是 m/z 59,α-Terpineol 的招牌碎片' }] },
+  bac: { f: 'C12H20O2', ch: [
+    { mz: 196, note: '乙酸酯,分子離子很弱' },
+    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'C2H4O2', lossMol: true, note: '失去一分子乙酸(60),乙酸酯常見的斷法' },
+    { mz: 43, ion: 'C2H3O', loss: 'C10H17O', note: '乙醯離子 CH₃CO⁺,乙酸酯幾乎都看得到' }] },
+  caryo: { f: 'C15H24', ch: [
+    { mz: 204, note: '倍半萜 C₁₅H₂₄,分子量 204' },
+    { mz: 161, ion: 'C12H17', loss: 'C3H7', note: '失去 C₃H₇•' },
+    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: '分子裂成大小兩塊,小的那塊 C₇H₉⁺ 帶電,是基峰' }] },
+  hum: { f: 'C15H24', ch: [
+    { mz: 204 },
+    { mz: 147, ion: 'C11H15', loss: 'C4H9', note: '失去 C₄H₉•' },
+    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: '小的那塊 C₇H₉⁺ 帶電,是基峰' }] },
+  cox: { f: 'C15H24O', ch: [
+    { mz: 220, note: '環氧化物,分子離子很弱' },
+    { mz: 205, ion: 'C14H21O', loss: 'CH3', note: '失去一個甲基' },
+    { mz: 177, ion: 'C12H17O', loss: 'C3H7', note: '失去 C₃H₇•' }] },
+};
+const SUBS = '₀₁₂₃₄₅₆₇₈₉';
+const fmtF = (f, tail = '') => f.replace(/\d/g, d => SUBS[+d]) + tail;
+const nominal = f => { let s = 0; for (const [, el, n] of f.matchAll(/([A-Z])(\d*)/g)) s += { C: 12, H: 1, O: 16 }[el] * (+n || 1); return s; };
+const atomsOf = f => { let C = 0, O = 0; for (const [, el, n] of f.matchAll(/([A-Z])(\d*)/g)) { if (el === 'C') C += +n || 1; if (el === 'O') O += +n || 1; } return { C, O }; };
+const ionTxt = ch => ch.ion ? fmtF(ch.ion, ch.ionRad ? '⁺•' : '⁺') : 'M⁺•';
+const lossTxt = ch => ch.lossTxt || fmtF(ch.loss, ch.lossMol ? '' : '•');
+
+/* ---------- 管柱與升溫程式 ---------- */
+const COL = { tM: 1.37, N: 70000, sig0: 0.0006 };          // 死時間(min)、理論板數、進樣帶寬(管長比例)
+const PROG = { T0: 60, Tf: 220, hold: 3, delay: 3.0 };      // °C、min
+const RATES = [3, 5, 10];
+const DT = 0.005;                                           // 模擬步長(min)
+const SCAN = 0.0048;                                        // 質譜掃描間隔(約每秒 3.5 次)
+const KABUND = 7800;                                        // 面積 → 豐度的比例
+const R_GAS = 8.314;
+
+// ln k(T):以等效碳數 x = KI/100 線性內插的吸附焓與熵(HP-5MS、相比 250 校正過)
+function lnk(x, Tc) { const T = Tc + 273.15; return (45000 + 4600 * (x - 10)) / (R_GAS * T) - (14.2 + 0.8 * (x - 10)); }
+const kOf = (c, Tc) => Math.exp(lnk(c.ki / 100, Tc));
+const ovenT = (t, rate) => Math.min(PROG.T0 + rate * Math.max(0, t), PROG.Tf);
+const runEnd = rate => (PROG.Tf - PROG.T0) / rate + PROG.hold;
+
+function simulate(rate) {
+  const tEnd = runEnd(rate), n = Math.ceil(tEnd / DT) + 2;
+  const run = { rate, tEnd, n, sp: new Map() };
+  const sigL = Math.sqrt(1 / COL.N + COL.sig0 * COL.sig0);
+  for (const c of [...CPDS, SOLV]) {
+    const z = new Float32Array(n); let zz = 0, tR = null;
+    for (let i = 0; i < n; i++) {
+      z[i] = zz;
+      const v = 1 / (COL.tM * (1 + kOf(c, ovenT(i * DT, rate))));
+      if (tR === null && zz + v * DT >= 1) tR = i * DT + (1 - zz) / v;
+      zz += v * DT;
+    }
+    if (tR === null) tR = tEnd + 60;
+    const Te = ovenT(tR, rate), ke = kOf(c, Te);
+    const sig = sigL * COL.tM * (1 + ke) * (c.solvent ? 1.8 : 1);
+    run.sp.set(c.id, { id: c.id, z, tR, Te, ke, sig, tau: c.tail ? 0.7 * sig : 0, A: c.amt * KABUND });
+  }
+  // 同一個模型跑一組正烷烴,用 van den Dool 公式換算 KI
+  const alk = [];
+  for (let cn = 7; cn <= 18; cn++) {
+    let zz = 0, t = 0;
+    for (;;) {
+      const v = 1 / (COL.tM * (1 + Math.exp(lnk(cn, ovenT(t, rate)))));
+      if (zz + v * DT >= 1) { t += (1 - zz) / v; break; }
+      zz += v * DT; t += DT; if (t > tEnd + 200) break;
+    }
+    alk.push([cn, t]);
+  }
+  run.alk = alk;
+  for (const c of CPDS) {
+    const p = run.sp.get(c.id); let i = 0;
+    while (i < alk.length - 2 && alk[i + 1][1] < p.tR) i++;
+    const [n0, ta] = alk[i], tb = alk[i + 1][1];
+    p.kiCalc = 100 * n0 + 100 * (p.tR - ta) / (tb - ta);
+  }
+  // 總覽圖:每個區間取最大值,窄峰才不會被平均掉
+  const bins = 900; run.ov = new Float32Array(bins); run.ovMax = 0;
+  const jEnd = Math.floor(tEnd / SCAN);
+  for (let j = 0; j <= jEnd; j++) {
+    const t = j * SCAN; if (t < PROG.delay) continue;
+    const v = ticClean(run, t); const b = Math.min(bins - 1, Math.floor(t / tEnd * bins));
+    if (v > run.ov[b]) run.ov[b] = v;
+  }
+  for (const v of run.ov) run.ovMax = Math.max(run.ovMax, v);
+  run.ticMax = run.ovMax;
+  return run;
+}
+
+const SQ2PI = Math.sqrt(2 * Math.PI);
+// 尺度化互補誤差函數 erfcx(x) = exp(x²)·erfc(x),x ≥ 0(Abramowitz & Stegun 7.1.26)
+function erfcxPos(x) { const t = 1 / (1 + 0.3275911 * x); return t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))); }
+// 峰形(面積為 1):高斯,醇類加一點拖尾(指數修正高斯)
+function shape(p, t) {
+  const d = t - p.tR, s = p.sig;
+  if (!p.tau) { const u = d / s; return u * u > 60 ? 0 : Math.exp(-0.5 * u * u) / (s * SQ2PI); }
+  const tau = p.tau, z = (s / tau - d / s) / Math.SQRT2;
+  if (d / s < -9) return 0;
+  if (z >= 0) return 0.5 / tau * Math.exp(-0.5 * d * d / (s * s)) * erfcxPos(z);
+  const e1 = 0.5 * (s / tau) ** 2 - d / tau;
+  return 0.5 / tau * (2 * Math.exp(e1) - Math.exp(-0.5 * d * d / (s * s)) * erfcxPos(-z));
+}
+function hash(i) { let x = Math.imul((i | 0) ^ 0x9e3779b9, 0x85ebca6b); x ^= x >>> 13; x = Math.imul(x, 0xc2b2ae35); x ^= x >>> 16; return (x >>> 0) / 4294967295; }
+const baseAt = T => 2.2e4 + 5.5e4 * Math.exp((T - PROG.Tf) / 40);       // 基線(溫度越高管柱流失越多)
+const noiseAt = j => (hash(j) - 0.5) * 1.2e4;
+function ticClean(run, t) {
+  let s = 0;
+  for (const c of CPDS) { const p = run.sp.get(c.id); if (Math.abs(t - p.tR) < 9 * p.sig + 8 * p.tau) s += p.A * shape(p, t); }
+  return s + baseAt(ovenT(t, run.rate));
+}
+function zAt(p, t) {
+  const f = t / DT, i = Math.floor(f);
+  if (i <= 0) return Math.max(0, p.z[0]);
+  if (i >= p.z.length - 1) return p.z[p.z.length - 1];
+  return lerp(p.z[i], p.z[i + 1], f - i);
+}
+function timeForZ(p, z) {
+  let lo = 0, hi = p.z.length - 1;
+  if (z <= 0) return 0;
+  if (p.z[hi] < z) return hi * DT;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (p.z[m] < z) lo = m; else hi = m; }
+  return (lo + (z - p.z[lo]) / Math.max(1e-9, p.z[hi] - p.z[lo])) * DT;
+}
+// 帶寬(管長比例):σ² = σ0² + z/N
+const bandSig = z => Math.sqrt(COL.sig0 * COL.sig0 + Math.min(1, Math.max(0, z)) / COL.N);
+
+/* ---------- 狀態 ---------- */
+const S = {
+  rate: 3, run: null, t: 0, playing: false, speed: 1, slow: 1, injected: false,
+  inj: null, track: 'auto', trackId: null, explode: 0, explodeTarget: 0,
+  eic: null, table: false, tab: 'chrom', bare: false, sheet: false,
+  hoverChrom: null, hoverMS: null, chromY: 0, sweep: MZ0, msOn: false,
+  tour: null, msView: 'spec', simMz: null, msFocus: null, lensCh: null,
+};
+const RUNS = new Map();
+function getRun(rate) { if (!RUNS.has(rate)) RUNS.set(rate, simulate(rate)); return RUNS.get(rate); }
+
+const INJ_STEPS = [
+  { k: 'turn1', d: 1.0, txt: 'ALS 轉動樣品盤,把樣品瓶轉到注射針正下方。' },
+  { k: 'dip', d: 0.7, txt: '注射針往下插進樣品瓶。' },
+  { k: 'draw', d: 1.5, txt: '活塞上下抽動幾次排掉氣泡,再抽進 <span class="hl">1 μL</span> 樣品。' },
+  { k: 'lift', d: 0.6, txt: '針頭退出樣品瓶。' },
+  { k: 'turn2', d: 0.8, txt: '樣品盤轉開,讓出通往進樣口的空位。' },
+  { k: 'down', d: 0.7, txt: '注射針穿過隔墊,伸進 <span class="hl">250 °C</span> 的玻璃襯管。' },
+  { k: 'push', d: 0.35, txt: '活塞一推到底,樣品瞬間氣化;GC 在這一刻開始計時。' },
+  { k: 'up', d: 0.8, txt: '' },
+];
+const INJ_TOTAL = INJ_STEPS.reduce((a, s) => a + s.d, 0);
+function injStepAt(el) {
+  let acc = 0;
+  for (let i = 0; i < INJ_STEPS.length; i++) { const s = INJ_STEPS[i]; if (el < acc + s.d) return { i, k: s.k, f: (el - acc) / s.d }; acc += s.d; }
+  return null;
+}
+function startInjection() {
+  S.playing = false; S.injected = false; S.t = 0; S.eic = null; S.chromY = 0;
+  S.inj = { el: 0, pushed: false };
+  S.vaporAt = -1; markDirty();
+}
+function finishInjection() { if (S.inj) S.inj = null; S.injected = true; }
+
+/* ---------- 追蹤與敘述 ---------- */
+function currentTrack() {
+  if (S.track !== 'auto') return S.track;
+  if (!S.injected) return null;
+  const run = S.run, sv = run.sp.get('solv');
+  if (S.t < sv.tR + 2.5 * sv.sig) return 'solv';
+  for (const c of CPDS) { const p = run.sp.get(c.id); if (p.tR + 2.5 * p.sig + 2 * p.tau >= S.t) return c.id; }
+  return null;
+}
+const dot = c => `<b class="cpd"><i style="background:${CLS[c.cls].glowCss}"></i>${c.name}</b>`;
+function partner(c) {
+  const run = S.run, p = run.sp.get(c.id);
+  let best = null;
+  for (const o of CPDS) {
+    if (o === c) continue; const q = run.sp.get(o.id);
+    const dt = Math.abs(q.tR - p.tR);
+    if (dt < 3 * (p.sig + q.sig) && (!best || dt < best.dt)) best = { o, q, dt, rs: dt / (2 * (p.sig + q.sig)) };
+  }
+  return best;
+}
+function selectiveIon(c, o) {
+  let best = c.baseMz, bs = -1;
+  for (let i = 0; i < MZN; i++) {
+    const a = c.frac[i], b = o.frac[i]; if (a <= 0) continue;
+    const s = (a - 1.5 * b) * Math.sqrt(i + MZ0);
+    if (s > bs) { bs = s; best = i + MZ0; }
+  }
+  return best;
+}
+const elutingWin = p => 2.5 * p.sig + 2 * p.tau;
+function columnText(c, p, t, T) {
+  const z = zAt(p, t), k = kOf(c, T), pct = Math.round(z * 100), fs = k / (1 + k), v = 100 / (1 + k);
+  if (k > 40) return `${dot(c)} 幾乎整個溶在液膜裡(k ≈ <span class="num">${Math.round(k)}</span>,${(fs * 100).toFixed(1)}% 的時間不動),還停在管柱的 <span class="num">${pct}%</span> 處。等柱溫升上來 k 變小,它才開始跑;預計 <span class="num">${f2(p.tR)} min</span> 流出。`;
+  return `${dot(c)} 走到管柱的 <span class="num">${pct}%</span>。在 <span class="num">${f1(T)} °C</span> 下 k = <span class="num">${f2(k)}</span>:它有 ${Math.round(fs * 100)}% 的時間溶在液膜裡,只用載氣 ${v < 10 ? v.toFixed(1) : Math.round(v)}% 的速度前進,預計 <span class="num">${f2(p.tR)} min</span> 流出。`;
+}
+function coeluteText(c) {
+  const pr = partner(c); if (!pr) return '';
+  const ion = selectiveIon(c, pr.o);
+  return ` 它和 ${dot(pr.o)} 只差 <span class="num">${(pr.dt * 60).toFixed(1)}</span> 秒(Rs <span class="num">${f2(pr.rs)}</span>),TIC 上疊成一支;在質譜上點 m/z <span class="num">${ion}</span> 可以把 ${c.label} 單獨抽出來。`;
+}
+function msStory(c) {
+  const F = FRAG[c.id], list = F.ch.map(h => h.mz).join('、');
+  return `${dot(c)}(${fmtF(F.f)},分子量 <span class="num">${c.mw}</span>)在離子源被 70 eV 的電子撞掉一個電子,變成帶正電的 M⁺•。多出來的能量讓鍵斷開:帶正電的那一塊被電場推往四極桿,中性的那一塊電場推不動,被真空泵抽走。所以質譜上看到的是 <span class="num">${list}</span> 這些帶電的碎片,兩根之間的差就是失去的中性碎片。`;
+}
+function storyHTML() {
+  if (S.tour && S.tour.on) return tourStory();
+  if (S.inj && (!S.injected || S.t < 0.25)) { const st = injStepAt(S.inj.el); if (st && INJ_STEPS[st.i].txt) return INJ_STEPS[st.i].txt; return INJ_STEPS[6].txt; }
+  if (!S.injected) return '按下播放,ALS 會先抽 1 μL 樣品打進進樣口,GC 才開始計時。或按「導覽」,跟著一個成分的分子一站一站走。';
+  const run = S.run, t = S.t, T = ovenT(t, run.rate);
+  const id = S.trackId;
+  if (t < 0.06) return '樣品在 250 °C 的襯管裡氣化,載氣把蒸氣推進管柱;所有成分這時都擠在管柱入口。';
+  if (!id) {
+    if (S.track === 'auto') return `所有成分都已流出。柱溫升到 <span class="num">220 °C</span> 再保持 3 min,把殘留的重成分烤出管柱,準備下一針。`;
+    return '';
+  }
+  const c = BYID.get(id), p = run.sp.get(id), z = zAt(p, t), k = kOf(c, T);
+  if (c.solvent) {
+    if (z < 1) return `溶劑跑在最前面:它幾乎不溶進液膜(k ≈ <span class="num">${f2(k)}</span>),跟著載氣直接衝過 30 m。這時質譜還在<span class="hl">溶劑延遲</span>,燈絲關著,免得大量溶劑燒壞燈絲。`;
+    return `溶劑已在 <span class="num">${f2(p.tR)} min</span> 流出;質譜要到 <span class="num">${f1(PROG.delay)} min</span> 才打開燈絲。`;
+  }
+  if (S.msFocus === id) return msStory(c) + coeluteText(c);
+  const d = t - p.tR;
+  if (z < 1 && d < -2.5 * p.sig) return columnText(c, p, t, T);
+  if (Math.abs(d) <= elutingWin(p)) return `${dot(c)} 正在離開管柱(<span class="num">${f2(p.tR)} min</span>,<span class="num">${f1(p.Te)} °C</span>,KI <span class="num">${Math.round(p.kiCalc)}</span>)。暫停在這支峰上,放大鏡會切到離子源,示範它的分子怎麼帶電、怎麼斷成碎片。` + coeluteText(c);
+  return `${dot(c)} 已在 <span class="num">${f2(p.tR)} min</span> 流出(<span class="num">${f1(p.Te)} °C</span>,KI <span class="num">${Math.round(p.kiCalc)}</span>)。`;
+}
+// 質譜放大鏡要示範哪個成分:暫停在出峰上,或指定追蹤的成分已經流出
+function msFocusNow() {
+  if (S.tour && S.tour.on) return TOUR[S.tour.i].k === 'source' ? S.tour.cid : null;
+  const id = S.trackId; if (!S.injected || !id || S.inj) return null;
+  const c = BYID.get(id); if (c.solvent) return null;
+  const p = S.run.sp.get(id), d = S.t - p.tR, w = elutingWin(p);
+  if (Math.abs(d) <= w && !S.playing && !tAnim) return id;
+  if (S.track !== 'auto' && d > w) return id;
+  return null;
+}
+
+/* ---------- 導覽:鏡頭跟著一個成分的分子走一趟 ---------- */
+const TOUR = [
+  { k: 'als', name: '進樣' }, { k: 'inlet', name: '進樣口' }, { k: 'column', name: '管柱' }, { k: 'xfer', name: '傳輸線' },
+  { k: 'source', name: '離子源' }, { k: 'quad', name: '四極桿' }, { k: 'det', name: '偵測器' }, { k: 'done', name: '完成' },
+];
+const tourOn = () => !!(S.tour && S.tour.on);
+function setTour(on, byUser) {
+  if (on) {
+    const cid = S.track !== 'auto' && BYID.get(S.track) && !BYID.get(S.track).solvent ? S.track : 'apin';
+    S.tour = { on: true, i: 0, t: 0, cid, paused: false };
+    S.track = cid; setPressed(E.segTrack, 'track', cid);
+    S.eic = null; S.sheet = false; E.app.classList.remove('sheet');
+    tourEnter(0);
+  } else if (S.tour) {
+    S.tour.on = false; S.simMz = null; S.msView = 'spec'; syncMsView();
+  }
+  E.btnTour.setAttribute('aria-pressed', String(!!on));
+  E.tourbar.hidden = !on;
+  onTourChange(!!on, !!byUser);
+  markDirty();
+}
+function tourEnter(i) {
+  const T = S.tour; T.i = i; T.t = 0;
+  const p = S.run.sp.get(T.cid), k = TOUR[i].k, apex = p.tR + (p.tau ? p.tau * 0.5 : 0);
+  S.playing = false; tAnim = null;
+  if (k === 'als') startInjection();
+  else if (!S.injected || S.inj) finishInjection();
+  if (k === 'column' && S.t < 0.05) S.t = 0.05;
+  if (k === 'xfer') S.t = Math.max(S.t, timeForZ(p, 0.93));
+  if (k === 'source' || k === 'quad' || k === 'det' || k === 'done') S.t = apex;
+  S.simMz = null; S.msView = k === 'quad' ? 'quad' : 'spec'; syncMsView();
+  updateTourBar(); markDirty();
+}
+function tourNext() { if (!tourOn()) return; if (S.tour.i >= TOUR.length - 1) setTour(false); else tourEnter(S.tour.i + 1); }
+function updateTourBar() {
+  const T = S.tour; if (!T) return;
+  E.tourStep.textContent = `導覽 ${T.i + 1}/${TOUR.length} · ${TOUR[T.i].name}`;
+  E.tourDots.innerHTML = TOUR.map((s, j) => `<i class="${j < T.i ? 'done' : j === T.i ? 'on' : ''}"></i>`).join('');
+  E.tourNext.hidden = T.i >= TOUR.length - 1;
+}
+function tourTick(dt) {
+  const T = S.tour; if (!T || !T.on || T.paused) return;
+  T.t += dt;
+  const c = BYID.get(T.cid), p = S.run.sp.get(T.cid), k = TOUR[T.i].k;
+  if (k === 'als') { S.playing = false; if (S.inj && S.inj.pushed && S.inj.el > INJ_TOTAL - 0.6) tourEnter(1); else if (!S.inj && S.injected) tourEnter(1); return; }
+  if (k === 'inlet') { S.t = Math.min(0.2, S.t + dt * 0.05); if (T.t > 4.5) tourEnter(2); return; }
+  if (k === 'column') {
+    // 跟著色帶走:分子幾乎不動(k 很大)時快轉,至少每秒前進管長的 6%
+    const v = 1 / (COL.tM * (1 + kOf(c, ovenT(S.t, S.run.rate))));
+    S.t = Math.min(S.run.tEnd, S.t + dt * clamp(0.06 / v, 0.5, 4));
+    if (zAt(p, S.t) >= 0.93) tourEnter(3);
+    return;
+  }
+  if (k === 'xfer') { const apex = p.tR + (p.tau ? p.tau * 0.5 : 0); S.t = Math.min(apex, S.t + dt * 0.1); if (S.t >= apex) tourEnter(4); return; }
+  const dur = { source: 16, quad: 12, det: 9, done: 10 }[k];
+  if (T.t > dur) tourNext();
+}
+function tourStory() {
+  const T = S.tour, c = BYID.get(T.cid), p = S.run.sp.get(T.cid), k = TOUR[T.i].k;
+  switch (k) {
+    case 'als': { const st = S.inj && injStepAt(S.inj.el); const txt = st && INJ_STEPS[st.i].txt; return `跟著 ${dot(c)} 的分子走一趟。` + (txt || INJ_STEPS[6].txt); }
+    case 'inlet': return `1 μL 在 250 °C 的玻璃襯管裡瞬間氣化,脹成幾百倍體積的蒸氣。分流模式下大部分從分流出口排掉,只有一小部分被氦氣推進管柱,${dot(c)} 的分子也在裡面。`;
+    case 'column': return columnText(c, p, S.t, ovenT(S.t, S.run.rate)) + ' 放大鏡裡:分子溶進金色液膜時停住,回到載氣才往前走。';
+    case 'xfer': return `${dot(c)} 走到管柱末端,經過 250 °C 的傳輸線,直接伸進質譜的真空腔;管柱出口就在離子源旁邊。`;
+    case 'source': return msStory(c);
+    case 'quad': return `帶正電的離子被推進四極桿。四根桿子加上直流電壓 U 和射頻電壓 V,離子一邊前進一邊被來回推拉:太輕的被射頻甩出去,太重的被直流拉向桿子,只有一種 m/z 能穩定穿過。底下的質譜面板換成穩定圖:${c.label} 的每個碎片是掃描線上的一個點,U、V 一起往上掃,點就往右滑,落進頂端窗口的那一個才通過。`;
+    case 'det': return `穿過四極桿的離子撞上高能倍增極,轉成電子,電子倍增器再放大十萬倍以上,變成量得到的電流。四極桿每掃一次,就記下每個 m/z 收到多少離子:這就是 ${dot(c)} 的質譜,分子離子 m/z <span class="num">${c.mw}</span>,最強的是 m/z <span class="num">${c.baseMz}</span>;同一次掃描全部加起來,就是 TIC 上的一個點。`;
+    default: return `導覽結束。${dot(c)} 在 <span class="num">${f2(p.tR)} min</span> 被偵測到,KI <span class="num">${Math.round(p.kiCalc)}</span>。按播放繼續看其他成分,或在「追蹤成分」換一個再按一次導覽。`;
+  }
+}
+
+/* ---------- 圖表共用 ---------- */
+const E = {};
+const COLORS = {};
+const SIZES = new Map();
+const ro = new ResizeObserver(es => { for (const e of es) SIZES.set(e.target, e.contentRect); markDirty(); });
+function fitCanvas(cv) {
+  const r = SIZES.get(cv); if (!r || r.width < 4 || r.height < 4) return null;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: r.width, h: r.height };
+}
+function niceStep(range, target) {
+  const raw = range / Math.max(1, target), p = Math.pow(10, Math.floor(Math.log10(raw)));
+  for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= raw) return m * p;
+  return 10 * p;
+}
+function rrect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+let hatch = null;
+function hatchPattern(ctx) {
+  if (hatch) return hatch;
+  const c = document.createElement('canvas'); c.width = c.height = 8;
+  const g = c.getContext('2d'); g.strokeStyle = 'rgba(160,190,240,.16)'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(-2, 10); g.lineTo(10, -2); g.moveTo(-2, 2); g.lineTo(2, -2); g.moveTo(6, 10); g.lineTo(10, 6); g.stroke();
+  hatch = ctx.createPattern(c, 'repeat'); return hatch;
+}
+const FONT_SM = '10.5px "IBM Plex Mono", ui-monospace, Consolas, monospace';
+const FONT_LB = '500 11px "Noto Sans TC", "Outfit", system-ui, sans-serif';
+
+/* ---------- 層析圖 ---------- */
+const CH = { pl: 40, pr: 12, pt: 22, pb: 18, cur: 0.65 };
+const winSpan = () => Math.max(2.4, S.run.tEnd / 7);
+function chromWindow() { const W = winSpan(), t0 = S.t - CH.cur * W; return [t0, t0 + W, W]; }
+function chromSeries(t0, t1) {
+  const run = S.run, jEnd = Math.floor(run.tEnd / SCAN);
+  const j0 = Math.max(Math.ceil(PROG.delay / SCAN), Math.floor(t0 / SCAN)), j1 = Math.min(jEnd, Math.ceil(t1 / SCAN));
+  const n = Math.max(0, j1 - j0 + 1);
+  const act = CPDS.filter(c => { const p = run.sp.get(c.id); const m = 9 * p.sig + 8 * p.tau; return p.tR > t0 - m && p.tR < t1 + m; });
+  const tic = new Float32Array(n), comp = act.map(() => new Float32Array(n)), eic = S.eic ? new Float32Array(n) : null;
+  const ei = S.eic ? S.eic - MZ0 : 0;
+  let ymax = 0;
+  for (let k = 0; k < n; k++) {
+    const j = j0 + k, t = j * SCAN; let s = 0;
+    for (let ci = 0; ci < act.length; ci++) {
+      const c = act[ci], p = run.sp.get(c.id), v = p.A * shape(p, t);
+      comp[ci][k] = v; s += v; if (eic) eic[k] += v * c.frac[ei];
+    }
+    s += baseAt(ovenT(t, run.rate)) + noiseAt(j);
+    tic[k] = s; if (s > ymax) ymax = s;
+    if (eic) eic[k] += 300 + hash(j * 131 + ei) * 900;
+  }
+  return { j0, n, act, tic, comp, eic, ymax };
+}
+function drawChrom() {
+  const g = fitCanvas(E.cvChrom); if (!g) return;
+  const { ctx, w, h } = g, { pl, pr, pt, pb } = CH, pw = w - pl - pr, ph = h - pt - pb;
+  ctx.clearRect(0, 0, w, h); if (pw < 30 || ph < 24) return;
+  const run = S.run, [t0, t1, W] = chromWindow();
+  const X = t => pl + (t - t0) / W * pw;
+  const xNow = X(S.t);
+  const ser = chromSeries(t0, t1);
+  const target = Math.max(ser.ymax, run.ticMax * 0.025);
+  S.chromY = S.chromY > 0 ? lerp(S.chromY, target, S.playing ? 0.1 : 0.3) : target;
+  // 有 EIC 時切成上下兩格,各用自己的縱軸(不疊雙軸)
+  const hasE = !!ser.eic && S.injected;
+  const phT = hasE ? Math.round(ph * 0.58) : ph, eTop = pt + phT + 12, phE = hasE ? ph - phT - 12 : 0;
+  const ys = S.chromY / 0.88, Y = v => pt + phT - v / ys * phT;
+  let yse = 1, YE = () => 0;
+  if (hasE) {
+    let em = 0; for (const v of ser.eic) em = Math.max(em, v);
+    const et = Math.max(em, 2e4);
+    S.eicY = S.eicY > 0 ? lerp(S.eicY, et, S.playing ? 0.1 : 0.3) : et;
+    yse = S.eicY / 0.85; YE = v => eTop + phE - v / yse * phE;
+  }
+
+  // 格線與座標
+  ctx.font = FONT_SM; ctx.textBaseline = 'middle';
+  const yAxis = (scale, YF, n) => {
+    const step = niceStep(scale / 1e6, n) * 1e6;
+    ctx.strokeStyle = COLORS.grid; ctx.lineWidth = 1; ctx.fillStyle = COLORS.muted; ctx.textAlign = 'right';
+    for (let v = 0; v <= scale * 1.001; v += step) {
+      const y = Math.round(YF(v)) + .5; ctx.beginPath(); ctx.moveTo(pl, y); ctx.lineTo(w - pr, y); ctx.stroke();
+      ctx.fillText(+(v / 1e6).toFixed(2) + '', pl - 6, y);
+    }
+  };
+  yAxis(ys, Y, hasE ? 2 : 3);
+  if (hasE) yAxis(yse, YE, 1);
+  ctx.textAlign = 'left'; ctx.fillText('×10⁶', 4, 9);
+  const xStep = niceStep(W, Math.max(2, pw / 80));
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  for (let t = Math.ceil(t0 / xStep) * xStep; t <= t1; t += xStep) {
+    if (t < 0) continue; const x = Math.round(X(t)) + .5;
+    ctx.strokeStyle = COLORS.grid; ctx.beginPath(); ctx.moveTo(x, pt); ctx.lineTo(x, pt + ph); ctx.stroke();
+    ctx.fillText(+t.toFixed(2) + '', x, h - 4);
+  }
+  ctx.strokeStyle = COLORS.axis; ctx.beginPath(); ctx.moveTo(pl, pt + ph + .5); ctx.lineTo(w - pr, pt + ph + .5); ctx.stroke();
+  ctx.textAlign = 'right'; ctx.fillStyle = COLORS.muted; ctx.fillText('min', w - pr, h - 4);
+
+  // 溶劑延遲與分析結束之後的區域
+  ctx.save(); ctx.beginPath(); ctx.rect(pl, pt, pw, ph); ctx.clip();
+  const shade = (a, b, label) => {
+    const xa = X(a), xb = X(b); if (xb <= pl || xa >= w - pr) return;
+    ctx.fillStyle = hatchPattern(ctx); ctx.fillRect(xa, pt, xb - xa, ph);
+    const cx = (Math.max(xa, pl) + Math.min(xb, w - pr)) / 2;
+    if (label && Math.min(xb, w - pr) - Math.max(xa, pl) > 70) { ctx.fillStyle = COLORS.muted; ctx.font = FONT_LB; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, cx, pt + ph * .45); }
+  };
+  shade(Math.max(t0, -1), PROG.delay, '溶劑延遲');
+  if (t1 > run.tEnd) shade(run.tEnd, t1 + 1, '分析結束');
+
+  if (S.injected && ser.n > 1) {
+    const xs = new Float32Array(ser.n); for (let k = 0; k < ser.n; k++) xs[k] = X((ser.j0 + k) * SCAN);
+    const y0 = Y(0);
+    const pass = (past) => {
+      ctx.save(); ctx.beginPath();
+      if (past) ctx.rect(pl, 0, xNow - pl, h); else ctx.rect(xNow, 0, w, h);
+      ctx.clip();
+      const a0 = past ? 1 : 0.38;
+      ctx.save(); ctx.beginPath(); ctx.rect(pl, pt - 2, pw, phT + 2); ctx.clip();
+      // 各成分的面積(淡色)
+      ser.act.forEach((c, ci) => {
+        const arr = ser.comp[ci]; let any = false;
+        ctx.beginPath(); ctx.moveTo(xs[0], y0);
+        for (let k = 0; k < ser.n; k++) { const v = arr[k]; if (v > ys * 0.002) any = true; ctx.lineTo(xs[k], Y(v)); }
+        ctx.lineTo(xs[ser.n - 1], y0); ctx.closePath();
+        if (any) { ctx.fillStyle = COLORS[c.cls]; ctx.globalAlpha = a0 * 0.26; ctx.fill(); }
+      });
+      ctx.globalAlpha = a0;
+      // TIC
+      ctx.beginPath(); for (let k = 0; k < ser.n; k++) { const y = Y(ser.tic[k]); k ? ctx.lineTo(xs[k], y) : ctx.moveTo(xs[k], y); }
+      ctx.strokeStyle = COLORS.ink; ctx.lineWidth = past ? 1.6 : 1.2; ctx.lineJoin = 'round'; ctx.stroke();
+      ctx.restore();
+      // EIC(下方小圖)
+      if (hasE) {
+        ctx.save(); ctx.beginPath(); ctx.rect(pl, eTop - 2, pw, phE + 2); ctx.clip(); ctx.globalAlpha = a0;
+        ctx.beginPath(); for (let k = 0; k < ser.n; k++) { const y = YE(ser.eic[k]); k ? ctx.lineTo(xs[k], y) : ctx.moveTo(xs[k], y); }
+        ctx.strokeStyle = COLORS.accent; ctx.lineWidth = past ? 1.8 : 1.2; ctx.stroke();
+        ctx.lineTo(xs[ser.n - 1], YE(0)); ctx.lineTo(xs[0], YE(0)); ctx.closePath();
+        ctx.fillStyle = COLORS.accent; ctx.globalAlpha = a0 * 0.12; ctx.fill();
+        ctx.restore();
+      }
+      ctx.restore();
+    };
+    pass(true); pass(false);
+  }
+  ctx.restore();
+  if (hasE) {
+    ctx.strokeStyle = COLORS.axis; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pl, pt + phT + .5); ctx.lineTo(w - pr, pt + phT + .5); ctx.stroke();
+    ctx.font = FONT_LB; ctx.fillStyle = COLORS.ink2; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(`EIC m/z ${S.eic}`, pl + 6, eTop + 11);
+  }
+
+  // 峰名(依峰高排序,撞到就往上一層,再撞到就不標)
+  if (S.injected) {
+    const boxes = [], labels = [];
+    for (const c of ser.act) {
+      const p = run.sp.get(c.id); if (p.tR < t0 || p.tR > t1 || p.tR < PROG.delay) continue;
+      const tp = p.tR + (p.tau ? p.tau * 0.5 : 0);
+      labels.push({ c, x: X(tp), y: Y(ticClean(run, tp)), h: p.A / p.sig, past: tp <= S.t });
+    }
+    labels.sort((a, b) => b.h - a.h);
+    ctx.font = FONT_LB; ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+    for (const L of labels) {
+      const tw = ctx.measureText(L.c.label).width + 12;
+      let bx = clamp(L.x - tw / 2, pl + 2, w - pr - tw - 2), by = Math.max(L.y - 7, 14);
+      let ok = false;
+      for (let lvl = 0; lvl < 3 && !ok; lvl++) {
+        const yy = by - lvl * 14; if (yy < 12) break;
+        const b = { x0: bx - 3, x1: bx + tw + 3, y0: yy - 12, y1: yy + 2 };
+        if (!boxes.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0)) { boxes.push(b); by = yy; ok = true; }
+      }
+      if (!ok) continue;
+      ctx.globalAlpha = L.past ? 1 : 0.5;
+      ctx.fillStyle = COLORS[L.c.cls]; ctx.beginPath(); ctx.arc(bx + 4, by - 4, 3.2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = L.past ? COLORS.ink2 : COLORS.muted; ctx.fillText(L.c.label, bx + 11, by);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // 游標與時間
+  ctx.strokeStyle = COLORS.accent; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(Math.round(xNow) + .5, pt - 2); ctx.lineTo(Math.round(xNow) + .5, pt + ph); ctx.stroke();
+  const lab = f2(S.t);
+  ctx.font = '500 11px "IBM Plex Mono", ui-monospace, monospace';
+  const lw = ctx.measureText(lab).width + 12;
+  const lx = clamp(xNow - lw / 2, 2, w - lw - 2);
+  ctx.fillStyle = COLORS.accent; rrect(ctx, lx, 2, lw, 16, 5); ctx.fill();
+  ctx.fillStyle = COLORS.accentInk; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(lab, lx + lw / 2, 10.5);
+
+  if (!S.injected) { ctx.fillStyle = COLORS.ink2; ctx.font = FONT_LB; ctx.textAlign = 'center'; ctx.fillText('等待進樣', pl + pw / 2, pt + ph / 2); }
+
+  // 滑鼠十字線
+  if (S.hoverChrom && !S.dragChrom) {
+    const x = S.hoverChrom.x; if (x >= pl && x <= w - pr) {
+      ctx.strokeStyle = COLORS.ink2; ctx.globalAlpha = .5; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(Math.round(x) + .5, pt); ctx.lineTo(Math.round(x) + .5, pt + ph); ctx.stroke(); ctx.globalAlpha = 1;
+    }
+  }
+}
+function chromTimeAtX(x) { const r = SIZES.get(E.cvChrom); const pw = r.width - CH.pl - CH.pr; const [t0, , W] = chromWindow(); return t0 + (x - CH.pl) / pw * W; }
+function chromTip(x, y) {
+  const t = chromTimeAtX(x), run = S.run;
+  if (t < 0 || t > run.tEnd) return null;
+  let html = `<span class="num">${f2(t)} min · ${f1(ovenT(t, run.rate))} °C</span>`;
+  if (t < PROG.delay) return html + '<br>溶劑延遲,質譜還沒開始收訊號';
+  const tot = ticClean(run, t);
+  html += `<br>TIC <span class="num">${(tot / 1e6).toFixed(3)}×10⁶</span>`;
+  if (S.eic) { let e = 0; for (const c of CPDS) { const p = run.sp.get(c.id); e += p.A * shape(p, t) * c.frac[S.eic - MZ0]; } html += `<br>EIC m/z ${S.eic} <span class="num">${(e / 1e6).toFixed(3)}×10⁶</span>`; }
+  const parts = [];
+  for (const c of CPDS) { const p = run.sp.get(c.id); const v = p.A * shape(p, t); if (v > tot * 0.04 && v > 2e4) parts.push([c, v]); }
+  parts.sort((a, b) => b[1] - a[1]);
+  for (const [c, v] of parts.slice(0, 3)) html += `<br><i style="background:${COLORS[c.cls]}"></i>${c.name} <span class="num">${Math.round(v / tot * 100)}%</span>`;
+  return html;
+}
+function peakNearX(x) {
+  const run = S.run; let best = null;
+  for (const c of CPDS) {
+    const p = run.sp.get(c.id); if (p.tR < PROG.delay) continue;
+    const r = SIZES.get(E.cvChrom), [t0, , W] = chromWindow();
+    const px = CH.pl + (p.tR - t0) / W * (r.width - CH.pl - CH.pr);
+    const d = Math.abs(px - x); if (d < 10 && (!best || d < best.d)) best = { c, d };
+  }
+  return best && best.c;
+}
+
+/* ---------- 總覽 ---------- */
+function drawOver() {
+  const g = fitCanvas(E.cvOver); if (!g) return;
+  const { ctx, w, h } = g, pl = CH.pl, pr = CH.pr, pw = w - pl - pr, top = 3, bh = h - 15;
+  ctx.clearRect(0, 0, w, h);
+  const run = S.run, X = t => pl + t / run.tEnd * pw, n = run.ov.length;
+  ctx.fillStyle = 'rgba(255,255,255,.035)'; rrect(ctx, pl, top, pw, bh, 4); ctx.fill();
+  const xNow = X(S.t);
+  const area = (past) => {
+    ctx.save(); ctx.beginPath(); past ? ctx.rect(0, 0, xNow, h) : ctx.rect(xNow, 0, w, h); ctx.clip();
+    ctx.beginPath(); ctx.moveTo(pl, top + bh);
+    for (let i = 0; i < n; i++) { const v = run.ov[i] / run.ovMax; ctx.lineTo(pl + (i + .5) / n * pw, top + bh - Math.pow(v, 0.75) * (bh - 3)); }
+    ctx.lineTo(pl + pw, top + bh); ctx.closePath();
+    ctx.fillStyle = past && S.injected ? 'rgba(238,243,251,.5)' : 'rgba(238,243,251,.16)'; ctx.fill();
+    ctx.restore();
+  };
+  area(true); area(false);
+  const [t0, t1] = chromWindow();
+  const xa = clamp(X(t0), pl, pl + pw), xb = clamp(X(t1), pl, pl + pw);
+  ctx.fillStyle = 'rgba(127,227,255,.1)'; ctx.fillRect(xa, top, xb - xa, bh);
+  ctx.strokeStyle = 'rgba(127,227,255,.5)'; ctx.lineWidth = 1; ctx.strokeRect(Math.round(xa) + .5, top + .5, Math.round(xb - xa), bh - 1);
+  ctx.fillStyle = COLORS.accent; ctx.fillRect(Math.round(xNow) - 1, top - 1, 2, bh + 2);
+  ctx.beginPath(); ctx.arc(xNow, top + bh / 2, 4.5, 0, Math.PI * 2); ctx.fill();
+  ctx.font = FONT_SM; ctx.fillStyle = COLORS.muted; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  const step = run.tEnd > 40 ? 10 : 5;
+  for (let t = 0; t <= run.tEnd + 1e-6; t += step) ctx.fillText(t + '', clamp(X(t), pl + 6, w - pr - 8), h - 1);
+}
+function overTimeAtX(x) { const r = SIZES.get(E.cvOver); return clamp((x - CH.pl) / (r.width - CH.pl - CH.pr) * S.run.tEnd, 0, S.run.tEnd); }
+
+/* ---------- 質譜 ---------- */
+const BG = new Float32Array(MZN);
+for (const [m, v] of [[40, 900], [41, 300], [43, 250], [44, 1600], [55, 260], [57, 300], [69, 240], [73, 700], [147, 260], [207, 2200], [208, 420], [209, 360]]) BG[m - MZ0] = v;
+function spectrumAt(t) {
+  if (!S.injected || t < PROG.delay || t > S.run.tEnd) return null;
+  const run = S.run, out = new Float32Array(MZN), who = new Int8Array(MZN).fill(-1), best = new Float32Array(MZN);
+  const contrib = []; let total = 0;
+  const j = Math.round(t / SCAN), bleed = 0.35 + Math.exp((ovenT(t, run.rate) - PROG.Tf) / 40);
+  // 每次掃描的離子統計起伏(約 ±8%),所以比對相似度不會剛好 100
+  CPDS.forEach((c, ci) => {
+    const p = run.sp.get(c.id); if (Math.abs(t - p.tR) > 9 * p.sig + 8 * p.tau) return;
+    const v = p.A * shape(p, t); if (v < 1) return;
+    contrib.push([c, v]); total += v;
+    for (let i = 0; i < MZN; i++) { if (!c.frac[i]) continue; const a = v * c.frac[i] * (0.92 + 0.16 * hash(j * 7919 + i * 13 + ci * 101)); out[i] += a; if (a > best[i]) { best[i] = a; who[i] = ci; } }
+  });
+  for (let i = 0; i < MZN; i++) {
+    const b = BG[i] * bleed + (hash(j * 977 + i * 31) > 0.82 ? hash(j * 61 + i) * 500 : 0);
+    out[i] += b; if (b > best[i]) { best[i] = b; who[i] = -1; }
+  }
+  let mx = 0; for (const v of out) mx = Math.max(mx, v);
+  // 比對:強度開根號後的餘弦相似度
+  const q = unitVec(out.map(v => Math.sqrt(v)));
+  let hit = null;
+  for (const c of CPDS) { let s = 0; for (let i = 0; i < MZN; i++) s += q[i] * c.lib[i]; if (!hit || s > hit.s) hit = { c, s }; }
+  contrib.sort((a, b) => b[1] - a[1]);
+  return { out, who, mx, total, contrib, hit };
+}
+const MS = { pl: 34, pr: 10, pt: 18, pb: 18 };
+// 譜圖上要解讀的成分:放大鏡正在示範的,或這一刻佔七成以上的那一個
+function msFocusCpd(sp) {
+  if (S.msFocus) return BYID.get(S.msFocus);
+  if (sp && sp.total > 5e4 && sp.contrib[0] && sp.contrib[0][1] > 0.7 * sp.total) return sp.contrib[0][0];
+  return null;
+}
+function drawMS() {
+  if (S.msView === 'quad') { drawQuad(); return; }
+  const g = fitCanvas(E.cvMS); if (!g) return;
+  const { ctx, w, h } = g, { pl, pr, pt, pb } = MS, pw = w - pl - pr, ph = h - pt - pb;
+  ctx.clearRect(0, 0, w, h); if (pw < 30 || ph < 20) return;
+  const X = m => pl + (m - MZ0 + .5) / MZN * pw, Y = v => pt + ph - v * ph;
+  ctx.font = FONT_SM; ctx.strokeStyle = COLORS.grid; ctx.lineWidth = 1; ctx.fillStyle = COLORS.muted;
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (const v of [0, .5, 1]) { const y = Math.round(Y(v)) + .5; ctx.beginPath(); ctx.moveTo(pl, y); ctx.lineTo(w - pr, y); ctx.stroke(); ctx.fillText(Math.round(v * 100) + '', pl - 5, y); }
+  ctx.textAlign = 'left'; ctx.fillText('%', 4, 8);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  for (const m of [50, 100, 150, 200]) ctx.fillText(m + '', X(m), h - 4);
+  ctx.textAlign = 'right'; ctx.fillText('m/z', w - pr, h - 4);
+  ctx.strokeStyle = COLORS.axis; ctx.beginPath(); ctx.moveTo(pl, pt + ph + .5); ctx.lineTo(w - pr, pt + ph + .5); ctx.stroke();
+
+  const sp = S.spec;
+  if (!sp) {
+    ctx.fillStyle = COLORS.ink2; ctx.font = FONT_LB; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const msg = !S.injected ? '等待進樣' : S.t < PROG.delay ? '溶劑延遲中,燈絲還沒打開' : '分析已結束';
+    ctx.fillText(msg, pl + pw / 2, pt + ph / 2); return;
+  }
+  // 四極桿正在掃的 m/z
+  const xs = X(S.sweep);
+  ctx.fillStyle = 'rgba(127,227,255,.18)'; ctx.fillRect(xs - 1, pt, 2, ph);
+  const bw = Math.max(1.5, Math.min(3, pw / MZN * 0.7));
+  for (let i = 0; i < MZN; i++) {
+    const v = sp.out[i] / sp.mx; if (v < 0.004) continue;
+    const ci = sp.who[i], col = ci >= 0 ? COLORS[CPDS[ci].cls] : COLORS.solv;
+    const x = X(i + MZ0); ctx.fillStyle = col;
+    ctx.fillRect(x - bw / 2, Y(v), bw, Math.max(1, v * ph));
+  }
+  // 標出最強的幾根
+  const idx = [...sp.out.keys()].sort((a, b) => sp.out[b] - sp.out[a]).slice(0, 7);
+  const placed = []; ctx.font = '500 10.5px "IBM Plex Mono", ui-monospace, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  for (const i of idx) {
+    const v = sp.out[i] / sp.mx; if (v < 0.07 || (sp.who[i] < 0 && !BG[i])) continue;
+    const x = X(i + MZ0); if (placed.some(px => Math.abs(px - x) < 22)) continue; placed.push(x);
+    ctx.fillStyle = COLORS.ink2; ctx.fillText(i + MZ0 + '', x, Math.max(11, Y(v) - 4));
+  }
+  // 碎片解讀:標出分子離子,以及放大鏡正在示範的那一根
+  const fc = msFocusCpd(sp);
+  if (fc) {
+    ctx.font = '500 10.5px "IBM Plex Mono", ui-monospace, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    const tagAt = (mz, txt, col) => {
+      const v = sp.out[mz - MZ0] / sp.mx, x = X(mz);
+      ctx.fillStyle = col;
+      // 很高的那幾根上方已經有 m/z 數字,標註改放在線的右邊
+      if (v > 0.6) { const tw = ctx.measureText(txt).width; ctx.textAlign = 'left'; ctx.fillText(txt, Math.min(x + 6, w - pr - tw), Y(v) + 12); ctx.textAlign = 'center'; return; }
+      ctx.fillText(txt, clamp(x, pl + 14, w - pr - 14), Math.max(22, Y(v) - (v > 0.07 ? 16 : 5)));
+    };
+    if (fc.mw <= MZ1) tagAt(fc.mw, 'M⁺•', COLORS.muted);
+    const L = S.lensCh;
+    if (S.msFocus === fc.id && L && L.cid === fc.id) {
+      const ch = FRAG[fc.id].ch[L.i], v = sp.out[ch.mz - MZ0] / sp.mx, x = X(ch.mz), y = Y(v);
+      ctx.strokeStyle = COLORS.accent; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.stroke();
+      if (ch.ion) tagAt(ch.mz, '−' + lossTxt(ch), COLORS.accent);
+    }
+  }
+  if (S.eic) {
+    const x = X(S.eic); ctx.fillStyle = COLORS.accent;
+    ctx.beginPath(); ctx.moveTo(x, pt + ph + 2); ctx.lineTo(x - 4.5, pt + ph + 9); ctx.lineTo(x + 4.5, pt + ph + 9); ctx.closePath(); ctx.fill();
+  }
+  if (S.hoverMS != null) {
+    const x = X(S.hoverMS); ctx.strokeStyle = COLORS.ink2; ctx.globalAlpha = .45;
+    ctx.beginPath(); ctx.moveTo(Math.round(x) + .5, pt); ctx.lineTo(Math.round(x) + .5, pt + ph); ctx.stroke(); ctx.globalAlpha = 1;
+  }
+}
+function msAtX(x) { const r = SIZES.get(E.cvMS), pw = r.width - MS.pl - MS.pr; return clamp(Math.round(MZ0 - .5 + (x - MS.pl) / pw * MZN), MZ0, MZ1); }
+function msTip(m) {
+  const sp = S.spec; if (!sp) return null;
+  const i = m - MZ0, v = sp.out[i] / sp.mx;
+  let html = `m/z <span class="num">${m}</span> · 相對強度 <span class="num">${(v * 100).toFixed(1)}%</span>`;
+  const parts = [];
+  for (const [c, a] of sp.contrib) { const x = a * c.frac[i]; if (x > sp.out[i] * 0.05) parts.push([c, x]); }
+  for (const [c, x] of parts.slice(0, 3)) html += `<br><i style="background:${COLORS[c.cls]}"></i>${c.name} <span class="num">${Math.round(x / sp.out[i] * 100)}%</span>`;
+  if (!parts.length && v > 0.004) html += '<br>背景離子(空氣、管柱流失)';
+  // 這一根是怎麼來的
+  const fc = msFocusCpd(sp);
+  if (fc) {
+    const ch = FRAG[fc.id].ch.find(h => h.mz === m);
+    if (ch && !ch.ion) html += `<br><b>M⁺•</b>:${fc.label} 撞掉一個電子後沒有斷,m/z ${m} 就是分子量${ch.note ? ';' + ch.note : ''}`;
+    else if (ch) html += `<br><b>${ionTxt(ch)}</b>:M⁺• 失去 ${lossTxt(ch)}(${nominal(ch.loss)})後留下的帶電碎片;${ch.note}。中性的 ${lossTxt(ch)} 電場推不動,所以譜上看不到它`;
+    else if (m === fc.mw) html += `<br><b>M⁺•</b>:分子離子,m/z 就是分子量`;
+  }
+  html += `<br><span style="color:var(--muted)">點一下抽出 m/z ${m} 的層析圖</span>`;
+  return html;
+}
+
+/* ---------- 四極桿穩定圖(Mathieu 方程第一穩定區) ----------
+   a ∝ U/(m/z),q ∝ V/(m/z);穩定區是 aP(q)(y 方向)和 b1(q)(x 方向)底下的三角形,頂點在 (0.706, 0.237)。
+   U/V 固定時所有離子都在同一條掃描線上,q 和 m/z 成反比;掃描線貼著頂點下方,窗口內只容得下一個 m/z */
+const aP = q => q * q / 2 - 7 * q ** 4 / 128 + 29 * q ** 6 / 2304 - 68687 * q ** 8 / 18874368;
+const b1q = q => 1 - q - q * q / 8 + q ** 3 / 64 - q ** 4 / 1536 - 11 * q ** 5 / 36864 + 49 * q ** 6 / 589824;
+const QZ = { lam: 0.3306, q1: 0.6944, q2: 0.7084, qc: 0.7014, qMax: 1.05, aMax: 0.36 };
+const QP = { pl: 26, pr: 10, pt: 12, pb: 16 };
+function quadIons() {
+  const sp = S.spec, out = [];
+  const fc = sp ? msFocusCpd(sp) : null;
+  if (sp && sp.total > 5e4) {
+    const idx = [...sp.out.keys()].filter(i => sp.who[i] >= 0).sort((a, b) => sp.out[b] - sp.out[a]).slice(0, 8);
+    for (const i of idx) { const v = sp.out[i] / sp.mx; if (v >= 0.05) out.push({ mz: i + MZ0, v, cls: CPDS[sp.who[i]].cls }); }
+    if (fc && fc.mw <= MZ1 && !out.some(o => o.mz === fc.mw)) out.push({ mz: fc.mw, v: Math.max(0.05, sp.out[fc.mw - MZ0] / sp.mx), cls: fc.cls });
+  }
+  if (!out.length) { // 還沒有訊號時,拿 α-Pinene 的主要離子當示範
+    const c = BYID.get('apin');
+    for (const [m, v] of Object.entries(c.ms).sort((a, b) => b[1] - a[1]).slice(0, 7)) out.push({ mz: +m, v: v / 100, cls: c.cls, demo: true });
+  }
+  return out;
+}
+function quadState(mz, set) { const q = QZ.qc * set / mz; return { q, a: QZ.lam * q, pass: q >= QZ.q1 && q <= QZ.q2, heavy: q < QZ.q1 }; }
+function drawQuad() {
+  const g = fitCanvas(E.cvMS); if (!g) return;
+  const { ctx, w, h } = g, { pl, pr, pt, pb } = QP, pw = w - pl - pr, ph = h - pt - pb;
+  ctx.clearRect(0, 0, w, h); if (pw < 40 || ph < 30) return;
+  const X = q => pl + q / QZ.qMax * pw, Y = a => pt + ph - a / QZ.aMax * ph;
+  ctx.strokeStyle = COLORS.axis; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pl + .5, pt); ctx.lineTo(pl + .5, pt + ph + .5); ctx.lineTo(w - pr, pt + ph + .5); ctx.stroke();
+  ctx.font = FONT_SM; ctx.fillStyle = COLORS.muted; ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left'; ctx.fillText('a ∝ U', 2, pt + 2);
+  ctx.textAlign = 'right'; ctx.fillText('q ∝ V', w - pr, h - 3);
+  ctx.textAlign = 'center'; for (const q of [0.5, 1]) ctx.fillText(q + '', X(q), h - 3);
+  // 穩定區
+  ctx.beginPath(); ctx.moveTo(X(0), Y(0));
+  for (let q = 0.01; q <= 0.706; q += 0.01) ctx.lineTo(X(q), Y(aP(q)));
+  for (let q = 0.706; q <= 0.908; q += 0.004) ctx.lineTo(X(q), Y(Math.max(0, b1q(q))));
+  ctx.lineTo(X(0.908), Y(0)); ctx.closePath();
+  ctx.fillStyle = 'rgba(127,227,255,.12)'; ctx.fill(); ctx.strokeStyle = 'rgba(127,227,255,.5)'; ctx.stroke();
+  ctx.font = FONT_LB; ctx.fillStyle = COLORS.muted; ctx.textAlign = 'center';
+  ctx.fillText('穩定區', X(0.6), Y(0.05));
+  // 掃描線與窗口
+  const qEnd = Math.min(QZ.qMax, QZ.aMax / QZ.lam);
+  ctx.strokeStyle = COLORS.ink2; ctx.globalAlpha = .5; ctx.beginPath(); ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(qEnd), Y(QZ.lam * qEnd)); ctx.stroke(); ctx.globalAlpha = 1;
+  ctx.strokeStyle = COLORS.accent; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(X(QZ.q1), Y(QZ.lam * QZ.q1)); ctx.lineTo(X(QZ.q2), Y(QZ.lam * QZ.q2)); ctx.stroke();
+  ctx.font = FONT_LB; ctx.textAlign = 'left'; ctx.fillStyle = COLORS.ink2;
+  ctx.fillText('← 較重的離子', X(0.03), Y(0.31));
+  ctx.textAlign = 'right'; ctx.fillText('較輕的離子 →', X(QZ.qMax), Y(0.15));
+  // 離子
+  const set = S.sweep, ions = quadIons().map(o => ({ ...o, ...quadState(o.mz, set) })).sort((a, b) => a.v - b.v);
+  const placed = [];
+  for (const o of ions) {
+    const off = o.q > QZ.qMax, x = X(Math.min(o.q, QZ.qMax)), y = Y(Math.min(QZ.lam * Math.min(o.q, QZ.qMax), QZ.aMax));
+    const r = 2.6 + 3.2 * Math.sqrt(o.v);
+    ctx.globalAlpha = o.pass ? 1 : 0.55;
+    ctx.fillStyle = COLORS[o.cls]; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    if (o.pass) { ctx.strokeStyle = COLORS.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, y, r + 2.5, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.globalAlpha = 1;
+    if (off) continue;
+    const lab = o.pass ? `m/z ${o.mz} 通過` : o.mz + '';
+    ctx.font = o.pass ? '600 11px "IBM Plex Mono", monospace' : FONT_SM; ctx.textAlign = 'center';
+    const lw = ctx.measureText(lab).width, ly = o.pass ? y - r - 7 : y + r + 11;
+    if (!o.pass && placed.some(b => Math.abs(b.x - x) < (b.w + lw) / 2 + 3 && Math.abs(b.y - ly) < 11)) continue;
+    placed.push({ x, y: ly, w: lw });
+    ctx.fillStyle = o.pass ? COLORS.ink : COLORS.muted; ctx.fillText(lab, clamp(x, pl + lw / 2, w - pr - lw / 2), ly);
+  }
+  const nOff = ions.filter(o => o.q > QZ.qMax).length;
+  if (nOff) { ctx.font = FONT_SM; ctx.fillStyle = COLORS.muted; ctx.textAlign = 'right'; ctx.fillText(`還有 ${nOff} 個更輕的 →`, w - pr, Y(QZ.lam * QZ.qMax) - 10); }
+}
+function quadTip(x, y) {
+  const r = SIZES.get(E.cvMS); if (!r) return null;
+  const pw = r.width - QP.pl - QP.pr, ph = r.height - QP.pt - QP.pb, set = S.sweep;
+  let best = null;
+  for (const o of quadIons()) {
+    const s = quadState(o.mz, set), q = Math.min(s.q, QZ.qMax);
+    const px = QP.pl + q / QZ.qMax * pw, py = QP.pt + ph - Math.min(QZ.lam * q, QZ.aMax) / QZ.aMax * ph;
+    const d = Math.hypot(px - x, py - y); if (d < 12 && (!best || d < best.d)) best = { o, s, d };
+  }
+  if (!best) return `四極桿設定在 m/z <span class="num">${Math.round(set)}</span>。每個點是一種離子,越重越靠左;U、V 一起往上掃,所有點一起往右滑,滑進頂端窗口的那一個才穩定。`;
+  const { o, s } = best;
+  if (s.pass) return `m/z <span class="num">${o.mz}</span> 在穩定區內:在桿子之間來回擺動但擺幅有限,可以一路穿過四極桿打到偵測器。`;
+  if (s.heavy) return `m/z <span class="num">${o.mz}</span> 對目前的設定太重(q 太小,位在穩定區左上方):射頻推不太動它,直流把它慢慢拉向負極的桿子,撞上去就不見了。`;
+  return `m/z <span class="num">${o.mz}</span> 對目前的設定太輕(q 太大):它跟著射頻劇烈擺動,擺幅越來越大,撞上桿子。`;
+}
+
+/* ---------- 升溫程式小圖 ---------- */
+function drawOven() {
+  const g = fitCanvas(E.cvOven); if (!g) return;
+  const { ctx, w, h } = g, pl = 26, pr = 6, pt = 8, pb = 14, pw = w - pl - pr, ph = h - pt - pb;
+  ctx.clearRect(0, 0, w, h); if (pw < 20 || ph < 16) return;
+  const run = S.run, X = t => pl + t / run.tEnd * pw, Y = T => pt + ph - (T - 40) / 200 * ph;
+  ctx.font = FONT_SM; ctx.fillStyle = COLORS.muted; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  ctx.strokeStyle = COLORS.grid; ctx.lineWidth = 1;
+  for (const T of [60, 220]) { const y = Math.round(Y(T)) + .5; ctx.beginPath(); ctx.moveTo(pl, y); ctx.lineTo(w - pr, y); ctx.stroke(); ctx.fillText(T + '', pl - 4, y); }
+  ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillText(f1(run.tEnd) + ' min', w - pr, h - 1);
+  const tr = (PROG.Tf - PROG.T0) / run.rate, xNow = X(S.t);
+  const path = () => { ctx.beginPath(); ctx.moveTo(X(0), Y(PROG.T0)); ctx.lineTo(X(tr), Y(PROG.Tf)); ctx.lineTo(X(run.tEnd), Y(PROG.Tf)); };
+  ctx.save(); ctx.beginPath(); ctx.rect(xNow, 0, w, h); ctx.clip(); path(); ctx.strokeStyle = 'rgba(238,243,251,.28)'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, xNow, h); ctx.clip(); path(); ctx.strokeStyle = COLORS.warm; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+  ctx.fillStyle = COLORS.warm; ctx.beginPath(); ctx.arc(xNow, Y(ovenT(S.t, run.rate)), 4, 0, Math.PI * 2); ctx.fill();
+}
+
+/* ---------- 峰表 ---------- */
+function buildTable() {
+  const run = S.run, total = CPDS.reduce((a, c) => a + c.amt, 0);
+  const rows = CPDS.map((c, i) => {
+    const p = run.sp.get(c.id);
+    return `<tr data-id="${c.id}"><td class="n">${i + 1}</td><td><i style="background:${COLORS[c.cls]}"></i>${c.name}</td><td class="n">${f2(p.tR)}</td><td class="n">${Math.round(p.kiCalc)}</td><td class="n">${c.ki}</td><td class="n">${(c.amt / total * 100).toFixed(1)}</td><td>${CLS[c.cls].name}</td></tr>`;
+  }).join('');
+  E.ptable.innerHTML = `<table><thead><tr><th class="n">#</th><th>成分</th><th class="n">RT (min)</th><th class="n">KI(本次)</th><th class="n">KI(資料庫)</th><th class="n">面積 %</th><th>類別</th></tr></thead><tbody>${rows}</tbody></table>`;
+  syncTable();
+}
+function syncTable() { if (E.ptable.hidden) return; for (const tr of E.ptable.querySelectorAll('tbody tr')) tr.classList.toggle('on', tr.dataset.id === S.trackId); }
+
+/* ---------- 介面 ---------- */
+let dirty = true;
+function markDirty() { dirty = true; }
+function setPressed(group, attr, val) { for (const b of group.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset[attr] === String(val))); }
+// 使用者自己動了時間、速率或追蹤,就結束導覽
+function userTakesOver() { if (tourOn()) setTour(false, true); }
+function setTime(t, user) {
+  if (user) { userTakesOver(); S.playing = false; if (!S.injected) finishInjection(); }
+  S.t = clamp(t, 0, S.run.tEnd); markDirty();
+}
+function setRate(r) {
+  if (r === S.rate) return;
+  userTakesOver();
+  const old = S.run, nu = getRun(r), id = currentTrack();
+  let tn = S.t * nu.tEnd / old.tEnd;
+  if (id && S.injected) {
+    const po = old.sp.get(id), pn = nu.sp.get(id), z = zAt(po, S.t);
+    tn = z < 1 ? timeForZ(pn, z) : pn.tR + (S.t - po.tR) * (pn.sig / po.sig);
+  }
+  S.rate = r; S.run = nu; S.t = clamp(tn, 0, nu.tEnd); S.chromY = 0;
+  E.tSlider.max = nu.tEnd.toFixed(2);
+  E.ovenP.innerHTML = `${PROG.T0} → ${PROG.Tf} °C · ${r} °C/min<br>保持 ${PROG.hold} min`;
+  setPressed(E.segRate, 'rate', r); buildTable(); markDirty();
+}
+function setTrack(v) { userTakesOver(); S.track = v; setPressed(E.segTrack, 'track', v); markDirty(); }
+function setExplode(v) { S.explodeTarget = v; setPressed(E.segX, 'x', v); }
+function togglePlay() {
+  if (tourOn()) { S.tour.paused = !S.tour.paused; markDirty(); return; }
+  if (S.inj) return;
+  if (!S.injected) { startInjection(); return; }
+  if (S.t >= S.run.tEnd - 1e-3) { S.t = 0; }
+  S.playing = !S.playing; markDirty();
+}
+function syncMsView() {
+  if (!E.segMsView) return;
+  setPressed(E.segMsView, 'v', S.msView);
+  const quad = S.msView === 'quad';
+  E.qctl.hidden = !quad; E.msFoot.hidden = quad;
+  E.cvMS.setAttribute('aria-label', quad ? '四極桿穩定圖:每個點是一種離子,落進頂端窗口的才能通過' : '目前時間的質譜,點一根質譜線可抽出該離子的層析圖');
+  E.btnScan.setAttribute('aria-pressed', String(S.simMz == null));
+  if (S.simMz != null) E.qSlider.value = S.simMz;
+  E.qVal.textContent = S.simMz == null ? '掃描中' : 'm/z ' + S.simMz;
+  E.qSlider.style.setProperty('--p', ((+E.qSlider.value - MZ0) / (MZ1 - MZ0) * 100).toFixed(1) + '%');
+  markDirty();
+}
+// 0.1×、0.5× 是慢動作:時間軸和所有動畫一起放慢;3× 只加快時間軸
+const SPEEDS = [0.1, 0.5, 1, 3];
+function setSpeed(v) {
+  S.speed = v; S.slow = Math.min(1, v);
+  E.speedSel.value = String(v); E.speedSel.classList.toggle('slow', v < 1);
+  markDirty();
+}
+const PLAY_SVG = '<svg viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.8l7 4.2-7 4.2z"/></svg>';
+const PAUSE_SVG = '<svg viewBox="0 0 12 12" fill="currentColor"><rect x="2.4" y="1.8" width="2.6" height="8.4" rx=".6"/><rect x="7" y="1.8" width="2.6" height="8.4" rx=".6"/></svg>';
+let lastPlayState = '';
+function syncPlayBtn() {
+  const st = tourOn() ? (S.tour.paused ? 'tplay' : 'tpause') : S.inj ? 'inj' : S.playing ? 'pause' : 'play';
+  if (st === lastPlayState) return; lastPlayState = st;
+  E.btnPlay.innerHTML = st === 'pause' || st === 'tpause' ? PAUSE_SVG + '暫停' : st === 'tplay' ? PLAY_SVG + '繼續' : st === 'inj' ? PLAY_SVG + '進樣中' : PLAY_SVG + (S.injected ? '播放' : '進樣');
+  E.btnPlay.setAttribute('aria-label', st === 'tpause' ? '暫停導覽' : st === 'tplay' ? '繼續導覽' : st === 'pause' ? '暫停' : '播放');
+}
+function showTip(html, x, y) {
+  if (!html) { E.tip.hidden = true; return; }
+  E.tip.innerHTML = html; E.tip.hidden = false;
+  const r = E.tip.getBoundingClientRect();
+  const tx = clamp(x + 14, 8, innerWidth - r.width - 8), ty = clamp(y - r.height - 12, 8, innerHeight - r.height - 8);
+  E.tip.style.transform = `translate(${tx}px,${ty}px)`;
+}
+function openHelp(open) {
+  E.help.hidden = !open;
+  if (open) { S.wasPlaying = S.playing; S.playing = false; if (tourOn()) { S.tour.wasPaused = S.tour.paused; S.tour.paused = true; } E.helpX.focus(); }
+  else { if (S.wasPlaying) S.playing = true; if (tourOn()) S.tour.paused = !!S.tour.wasPaused; E.btnHelp.focus(); }
+}
+
+function initUI() {
+  for (const id of ['story', 'chipT', 'chipOven', 'chipK', 'chipKk', 'tSlider', 'tSliderV', 'segTrack', 'segRate', 'segX', 'segTab', 'btnInj', 'btnTour', 'btnHelp', 'btnPlay', 'speedSel', 'btnTable', 'btnEic', 'btnSheet', 'btnSheetX', 'cvChrom', 'cvOver', 'cvMS', 'cvOven', 'ovenT', 'ovenP', 'msTime', 'msHit', 'msFoot', 'segMsView', 'qctl', 'qSlider', 'qVal', 'btnScan', 'tourbar', 'tourStep', 'tourDots', 'tourNext', 'tourEnd', 'ptable', 'tip', 'help', 'helpX', 'legend', 'console', 'app', 'hole', 'load', 'tags', 'hud'])
+    E[id] = document.getElementById(id);
+  const map = { ink: '--ink', ink2: '--ink-2', muted: '--muted', accent: '--accent', accentInk: '--accent-ink', solv: '--c-solv', warm: '--warn' };
+  for (const [k, v] of Object.entries(map)) COLORS[k] = cssv(v);
+  for (const k of Object.keys(CLS)) { COLORS[k] = cssv(CLS[k].v); CLS[k].glowCss = COLORS[k]; }
+  COLORS.grid = 'rgba(160,190,240,.09)'; COLORS.axis = 'rgba(160,190,240,.26)';
+  E.legend.innerHTML = ['mh', 'om', 'sh', 'os'].map(k => `<span><i style="background:${COLORS[k]}"></i>${CLS[k].name}</span>`).join('');
+  for (const cv of [E.cvChrom, E.cvOver, E.cvMS, E.cvOven]) ro.observe(cv);
+
+  E.segTrack.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setTrack(b.dataset.track); });
+  E.segRate.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setRate(+b.dataset.rate); });
+  E.segX.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setExplode(+b.dataset.x); });
+  for (const g of $$('.tabs')) g.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    S.tab = b.dataset.tab; E.console.dataset.tab = S.tab;
+    for (const t of $$('.tabs')) setPressed(t, 'tab', S.tab); markDirty();
+  });
+  E.tSlider.addEventListener('input', () => setTime(+E.tSlider.value, true));
+  E.btnPlay.addEventListener('click', togglePlay);
+  E.btnInj.addEventListener('click', () => { userTakesOver(); startInjection(); });
+  E.speedSel.addEventListener('change', () => setSpeed(+E.speedSel.value));
+  E.btnTour.addEventListener('click', () => setTour(!tourOn()));
+  E.tourNext.addEventListener('click', tourNext);
+  E.tourEnd.addEventListener('click', () => setTour(false));
+  E.segMsView.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    S.msView = b.dataset.v; if (S.msView === 'spec') S.simMz = null; syncMsView();
+  });
+  E.qSlider.addEventListener('input', () => { S.simMz = +E.qSlider.value; syncMsView(); });
+  E.btnScan.addEventListener('click', () => { S.simMz = null; syncMsView(); });
+  E.btnHelp.addEventListener('click', () => openHelp(true));
+  E.helpX.addEventListener('click', () => openHelp(false));
+  E.help.addEventListener('click', e => { if (e.target === E.help) openHelp(false); });
+  E.btnTable.addEventListener('click', () => { S.table = !S.table; E.ptable.hidden = !S.table; E.btnTable.setAttribute('aria-pressed', String(S.table)); syncTable(); });
+  E.ptable.addEventListener('click', e => { const tr = e.target.closest('tr[data-id]'); if (!tr) return; jumpToPeak(tr.dataset.id); });
+  E.btnEic.addEventListener('click', () => { S.eic = null; markDirty(); });
+  E.btnSheet.addEventListener('click', () => { S.sheet = !S.sheet; E.app.classList.toggle('sheet', S.sheet); });
+  E.btnSheetX.addEventListener('click', () => { S.sheet = false; E.app.classList.remove('sheet'); });
+
+  // 層析圖:拖曳捲動時間,點峰追蹤
+  let drag = null;
+  E.cvChrom.addEventListener('pointerdown', e => {
+    if (!S.injected && !S.inj) finishInjection();
+    drag = { x0: e.offsetX, t0: S.t, moved: false, id: e.pointerId };
+    E.cvChrom.setPointerCapture(e.pointerId); S.dragChrom = true; E.cvChrom.classList.add('drag');
+  });
+  E.cvChrom.addEventListener('pointermove', e => {
+    if (drag) {
+      const r = SIZES.get(E.cvChrom), W = winSpan(), pw = r.width - CH.pl - CH.pr;
+      if (Math.abs(e.offsetX - drag.x0) > 3) drag.moved = true;
+      if (drag.moved) setTime(drag.t0 - (e.offsetX - drag.x0) / pw * W, true);
+      showTip(null); return;
+    }
+    S.hoverChrom = { x: e.offsetX }; showTip(chromTip(e.offsetX, e.offsetY), e.clientX, e.clientY); markDirty();
+  });
+  const endDrag = e => {
+    if (!drag) return;
+    if (!drag.moved) { const c = peakNearX(e.offsetX); if (c) jumpToPeak(c.id); else animateTime(chromTimeAtX(e.offsetX)); }
+    drag = null; S.dragChrom = false; E.cvChrom.classList.remove('drag');
+  };
+  E.cvChrom.addEventListener('pointerup', endDrag);
+  E.cvChrom.addEventListener('pointercancel', endDrag);
+  E.cvChrom.addEventListener('pointerleave', () => { S.hoverChrom = null; if (!drag) showTip(null); markDirty(); });
+
+  let odrag = false;
+  E.cvOver.addEventListener('pointerdown', e => { odrag = true; E.cvOver.setPointerCapture(e.pointerId); setTime(overTimeAtX(e.offsetX), true); });
+  E.cvOver.addEventListener('pointermove', e => { if (odrag) setTime(overTimeAtX(e.offsetX), true); });
+  E.cvOver.addEventListener('pointerup', () => { odrag = false; });
+  E.cvOver.addEventListener('pointercancel', () => { odrag = false; });
+
+  E.cvMS.addEventListener('pointermove', e => {
+    if (S.msView === 'quad') { S.hoverMS = null; showTip(quadTip(e.offsetX, e.offsetY), e.clientX, e.clientY); return; }
+    const m = msAtX(e.offsetX); S.hoverMS = S.spec ? m : null; showTip(S.spec ? msTip(m) : null, e.clientX, e.clientY); markDirty();
+  });
+  E.cvMS.addEventListener('pointerleave', () => { S.hoverMS = null; showTip(null); markDirty(); });
+  E.cvMS.addEventListener('click', e => {
+    if (S.msView === 'quad') {
+      // 點一個離子,就把四極桿固定在它的 m/z
+      const r = SIZES.get(E.cvMS); if (!r) return;
+      const pw = r.width - QP.pl - QP.pr, ph = r.height - QP.pt - QP.pb;
+      let best = null;
+      for (const o of quadIons()) {
+        const q = Math.min(quadState(o.mz, S.sweep).q, QZ.qMax), px = QP.pl + q / QZ.qMax * pw, py = QP.pt + ph - Math.min(QZ.lam * q, QZ.aMax) / QZ.aMax * ph;
+        const d = Math.hypot(px - e.offsetX, py - e.offsetY); if (d < 14 && (!best || d < best.d)) best = { o, d };
+      }
+      if (best) { S.simMz = best.o.mz; syncMsView(); }
+      return;
+    }
+    if (!S.spec) return; const m = msAtX(e.offsetX);
+    // 點在沒有訊號的位置就取最近的一根
+    let best = m, bv = -1;
+    for (let d = -2; d <= 2; d++) { const i = m + d - MZ0; if (i < 0 || i >= MZN) continue; const v = S.spec.out[i] / (1 + Math.abs(d)); if (v > bv) { bv = v; best = m + d; } }
+    S.eic = S.eic === best ? null : best; S.chromY = 0; S.eicY = 0; markDirty();
+  });
+
+  addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const tg = e.target, inField = tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA');
+    if (!E.help.hidden) { if (e.key === 'Escape') openHelp(false); return; }
+    if (e.key === 'Escape' && S.sheet) { S.sheet = false; E.app.classList.remove('sheet'); return; }
+    if (e.key === 'Escape' && tourOn()) { setTour(false); return; }
+    if (inField && !['/', 'h', 'H', '?'].includes(e.key)) return;
+    const onBtn = tg && tg.tagName === 'BUTTON';
+    switch (e.key) {
+      case ' ': if (onBtn) return; e.preventDefault(); togglePlay(); break;
+      case '[': setTime(S.t - (e.shiftKey ? 1 : 0.1), true); break;
+      case ']': setTime(S.t + (e.shiftKey ? 1 : 0.1), true); break;
+      case '{': setTime(S.t - 1, true); break;
+      case '}': setTime(S.t + 1, true); break;
+      case '0': setTrack('auto'); break;
+      case '1': setTrack('apin'); break;
+      case '2': setTrack('lim'); break;
+      case '3': setTrack('caryo'); break;
+      case 'f': case 'F': setRate(RATES[(RATES.indexOf(S.rate) + 1) % RATES.length]); break;
+      case ',': case '<': setSpeed(SPEEDS[Math.max(0, SPEEDS.indexOf(S.speed) - 1)]); break;
+      case '.': case '>': setSpeed(SPEEDS[Math.min(SPEEDS.length - 1, SPEEDS.indexOf(S.speed) + 1)]); break;
+      case 'x': case 'X': setExplode(S.explodeTarget ? 0 : 1); break;
+      case 'c': case 'C': setTour(!tourOn()); break;
+      case 'n': case 'N': if (tourOn()) tourNext(); else return; break;
+      case 'q': case 'Q': S.msView = S.msView === 'quad' ? 'spec' : 'quad'; if (S.msView === 'spec') S.simMz = null; syncMsView(); break;
+      case 'i': case 'I': userTakesOver(); startInjection(); break;
+      case 'r': case 'R': resetView(false); break;
+      case 'h': case 'H': case '?': openHelp(true); break;
+      case '/': e.preventDefault(); S.bare = !S.bare; E.app.classList.toggle('bare', S.bare); break;
+      default: return;
+    }
+  });
+}
+function jumpToPeak(id) {
+  if (!S.injected) finishInjection();
+  const p = S.run.sp.get(id); setTrack(id); animateTime(p.tR + (p.tau ? p.tau * 0.5 : 0));
+}
+let tAnim = null;
+function animateTime(to) {
+  if (!S.injected) finishInjection();
+  S.playing = false; to = clamp(to, 0, S.run.tEnd);
+  if (REDUCED) { S.t = to; markDirty(); return; }
+  tAnim = { from: S.t, to, start: performance.now(), dur: 650 };
+}
+
+/* ---------- 每一格的狀態推進與介面同步 ---------- */
+let uiClock = 0, lastStory = '', lastChip = '';
+function tick(dt, now) {
+  // 進樣動畫
+  if (S.inj) {
+    S.inj.el += dt * S.slow;
+    const st = injStepAt(S.inj.el);
+    if (!S.inj.pushed && (!st || st.i > 6 || (st.i === 6 && st.f > 0.6))) {
+      S.inj.pushed = true; S.injected = true; S.t = 0; S.vaporAt = now; S.playing = !REDUCED && !tourOn();
+    }
+    if (!st) S.inj = null;
+    markDirty();
+  }
+  if (tourOn()) { tourTick(dt * S.slow); markDirty(); }
+  if (tAnim) {
+    const k = easeIO((now - tAnim.start) / tAnim.dur);
+    S.t = lerp(tAnim.from, tAnim.to, k); if (k >= 1) tAnim = null; markDirty();
+  }
+  // 播放:出峰時自動放慢
+  if (S.playing && S.injected) {
+    let near = 0;
+    for (const c of CPDS) { const p = S.run.sp.get(c.id); const u = (S.t - p.tR) / (2.6 * p.sig + p.tau); if (u > -3 && u < 3) near = Math.max(near, Math.exp(-u * u)); }
+    S.t += dt * S.speed / (1 + 11 * near);
+    if (S.t >= S.run.tEnd) { S.t = S.run.tEnd; S.playing = false; }
+    markDirty();
+  }
+  S.msOn = S.injected && S.t >= PROG.delay && S.t < S.run.tEnd;
+  // 四極桿掃描(畫面上放慢,約 3 秒掃一次);固定 m/z 時停在那裡
+  if (S.simMz != null) S.sweep = S.simMz;
+  else if (S.msOn || S.msView === 'quad') { S.sweep += dt * S.slow * (MZ1 - MZ0) / 3; if (S.sweep > MZ1) S.sweep = MZ0; }
+  S.trackId = currentTrack();
+  S.spec = spectrumAt(S.t);
+  S.msFocus = msFocusNow();
+  if (S.explode !== S.explodeTarget) {
+    const d = dt / 1.3; S.explode = S.explodeTarget > S.explode ? Math.min(S.explodeTarget, S.explode + d) : Math.max(S.explodeTarget, S.explode - d);
+  }
+
+  // 圖表每格重畫(都很輕);文字每 0.1 秒更新一次
+  drawChrom(); drawOver(); drawMS(); drawOven();
+  syncPlayBtn();
+  uiClock += dt;
+  if (uiClock > 0.1 || dirty) {
+    uiClock = 0; dirty = false;
+    const run = S.run, T = ovenT(S.injected ? S.t : 0, run.rate);
+    const chip = `${f2(S.t)}|${f1(T)}|${S.trackId}`;
+    if (chip !== lastChip) {
+      lastChip = chip;
+      E.chipT.textContent = f2(S.t) + ' min';
+      E.chipOven.textContent = f1(T) + ' °C';
+      E.ovenT.textContent = f1(T);
+      E.tSliderV.textContent = f2(S.t) + ' min';
+      E.msTime.textContent = f2(S.t) + ' min';
+      E.tSlider.value = S.t.toFixed(2);
+      E.tSlider.style.setProperty('--p', (S.t / run.tEnd * 100).toFixed(2) + '%');
+      const c = S.trackId ? BYID.get(S.trackId) : null;
+      E.chipKk.innerHTML = c ? `k<span class="kname"> · ${c.solvent ? '溶劑' : c.label}</span>` : '滯留因子 k';
+      E.chipK.textContent = c ? (() => { const k = kOf(c, T); return k >= 100 ? Math.round(k) + '' : k >= 10 ? f1(k) : f2(k); })() : '無';
+      syncTable();
+    }
+    const st = storyHTML();
+    if (st !== lastStory) { lastStory = st; E.story.innerHTML = st; }
+    const sp = S.spec, L = S.lensCh;
+    let hit;
+    if (S.msView === 'quad') hit = S.simMz != null ? `固定在 m/z <b>${S.simMz}</b>:只有這個 m/z 穿得過四極桿` : `掃描中,現在只放行 m/z <span class="num">${Math.round(S.sweep)}</span>;點一個離子可以固定`;
+    else if (S.msFocus && L && L.cid === S.msFocus) {
+      const ch = FRAG[L.cid].ch[L.i];
+      hit = ch.ion ? `放大鏡:m/z <b>${ch.mz}</b> 是 ${ionTxt(ch)},M⁺• 失去 ${lossTxt(ch)}(${nominal(ch.loss)})` : `放大鏡:M⁺• 沒有斷,m/z <b>${ch.mz}</b> 就是分子量`;
+    }
+    else if (!sp) hit = S.injected && S.t >= S.run.tEnd ? '分析結束' : '質譜尚未收訊號';
+    else if (sp.total < 5e4) hit = '只有背景離子(空氣、管柱流失),沒有可比對的成分';
+    else hit = `最佳比對 <b>${sp.hit.c.name}</b> · 相似度 <span class="num">${Math.min(99, Math.floor(sp.hit.s * 100))}</span>`;
+    if (E.msHit.innerHTML !== hit) E.msHit.innerHTML = hit;
+    const eicTxt = S.eic ? `EIC m/z <b>${S.eic}</b> ✕` : '';
+    if (E.btnEic.hidden !== !S.eic) E.btnEic.hidden = !S.eic;
+    if (S.eic && E.btnEic.innerHTML !== eicTxt) { E.btnEic.innerHTML = eicTxt; E.btnEic.setAttribute('aria-label', `清除 m/z ${S.eic} 的抽取離子層析圖`); }
+  }
+}
+
+/* =========================================================
+   3D 場景(three.js 動態載入)
+   單位:公分;x 向右、y 向上、z 朝向觀眾
+   ========================================================= */
+let THREE = null, PolyCurve = null;
+const G = { ready: false };
+const L = {
+  gc: { x0: -87, x1: -37, y1: 54, z0: -28, z1: 28 },
+  oven: { x0: -84, x1: -47, y0: 5, y1: 45, z0: -22, z1: 27 },
+  inlet: { x: -74, z: 6, y: 54 },
+  coil: { x0: -80, x1: -53, cy: 25, cz: 4, R: 9, turns: 10 },
+  ms: { x0: -10, x1: 48, y1: 44, z0: -28, z1: 28 },
+  ax: { y: 24, z: 0 },
+  src: 0, q0: 6, q1: 28, det: 33,
+  mag: { x: -28, y: -13, z: 58, len: 46, R: 7.4 },
+};
+const NB = CPDS.length + 1;
+const BAND_SP = [...CPDS, SOLV];
+const DEF_VIEW = { tgt: [19, 47, 0], dir: [-0.24, 0.3, 0.92] };
+const rand = (a, b) => a + Math.random() * (b - a);
+
+async function init3D() {
+  const probe = document.createElement('canvas');
+  if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) throw new Error('no-webgl');
+  THREE = await import('three');
+  const [{ OrbitControls }, { RoomEnvironment }, { RoundedBoxGeometry }, { EffectComposer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }] = await Promise.all([
+    import('three/addons/controls/OrbitControls.js'),
+    import('three/addons/environments/RoomEnvironment.js'),
+    import('three/addons/geometries/RoundedBoxGeometry.js'),
+    import('three/addons/postprocessing/EffectComposer.js'),
+    import('three/addons/postprocessing/RenderPass.js'),
+    import('three/addons/postprocessing/UnrealBloomPass.js'),
+    import('three/addons/postprocessing/OutputPass.js'),
+  ]);
+  G.RBG = RoundedBoxGeometry;
+  PolyCurve = class extends THREE.Curve {
+    constructor(pts) {
+      super(); this.pts = pts; this.cum = new Float32Array(pts.length);
+      for (let i = 1; i < pts.length; i++) this.cum[i] = this.cum[i - 1] + pts[i].distanceTo(pts[i - 1]);
+      this.len = this.cum[pts.length - 1];
+    }
+    getPoint(t, out = new THREE.Vector3()) {
+      const d = clamp(t, 0, 1) * this.len, c = this.cum; let lo = 0, hi = c.length - 1;
+      while (hi - lo > 1) { const m = (lo + hi) >> 1; if (c[m] < d) lo = m; else hi = m; }
+      const seg = c[hi] - c[lo] || 1;
+      return out.copy(this.pts[lo]).lerp(this.pts[hi], (d - c[lo]) / seg);
+    }
+    getPointAt(u, out) { return this.getPoint(u, out); }
+    getUtoTmapping(u) { return u; }
+    getLength() { return this.len; }
+  };
+
+  const canvas = document.getElementById('gl');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.95;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x060a12);
+  scene.fog = new THREE.Fog(0x060a12, 520, 1500);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.32;
+  const camera = new THREE.PerspectiveCamera(30, 1, 2, 3200);
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.minDistance = 25; controls.maxDistance = 950;
+  controls.maxPolarAngle = Math.PI * 0.53;
+  controls.screenSpacePanning = true;
+  controls.addEventListener('start', () => { G.fly = null; G.userMoved = true; G.injCam = false; if (tourOn()) setTour(false, true); });
+  const rt = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 });
+  const composer = new EffectComposer(renderer, rt);
+  composer.addPass(new RenderPass(scene, camera));
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.6, 0.38, 1.0);
+  composer.addPass(bloom);
+  composer.addPass(new OutputPass());
+  Object.assign(G, { renderer, scene, camera, controls, composer, bloom });
+  // 儀器這一組整體左右鏡像:質譜在左、GC 在右、氦氣鋼瓶在最右邊。
+  // 組內仍沿用原本的座標(GC 在 x<0),要換成世界座標一律經過 G.world.localToWorld
+  G.world = new THREE.Group(); G.world.scale.x = -1; scene.add(G.world); G.world.updateMatrixWorld(true);
+
+  // 光(跟著鏡像換邊)
+  scene.add(new THREE.HemisphereLight(0xc2d4ff, 0x1a1510, 0.32));
+  const key = new THREE.DirectionalLight(0xfff3e6, 1.55);
+  key.position.set(150, 270, 200); key.target.position.set(15, 0, 0);
+  key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+  Object.assign(key.shadow.camera, { left: -200, right: 200, top: 170, bottom: -130, near: 60, far: 760 });
+  key.shadow.bias = -0.0004; key.shadow.normalBias = 0.5; key.shadow.radius = 3;
+  scene.add(key, key.target);
+  const rim = new THREE.DirectionalLight(0x8fd8ff, 0.9); rim.position.set(-170, 150, -260); scene.add(rim);
+  const fill = new THREE.DirectionalLight(0xa9bbff, 0.3); fill.position.set(-220, 70, 140); scene.add(fill);
+  G.ovenLight = new THREE.PointLight(0xff7a2a, 0, 70, 1.6); G.ovenLight.position.set(-65, 25, 0); G.world.add(G.ovenLight);
+
+  for (const k of Object.keys(CLS)) { const c = CLS[k].glow; CLS[k].lin = new THREE.Color().setRGB(c[0], c[1], c[2], THREE.SRGBColorSpace); }
+  buildMaterials();
+  buildRoom();
+  buildBench();
+  buildGC();
+  buildInlet();
+  buildALS();
+  buildTransfer();
+  buildMSD();
+  buildMagnifier();
+  buildHelium();
+  buildFx();
+  rebuildColumn(0);
+  buildTags();
+  drawPosters();
+
+  addEventListener('resize', resize3D);
+  new ResizeObserver(() => updateViewOffset()).observe(E.hole);
+  resize3D();
+  resetView(true);
+  G.ready = true;
+}
+
+/* ---------- 材質與幾何小工具 ---------- */
+let M = {};
+function buildMaterials() {
+  const std = (color, roughness, metalness, extra) => new THREE.MeshStandardMaterial({ color, roughness, metalness, ...extra });
+  M = {
+    shell: std(0xc3c9d1, 0.5, 0.05),
+    shell2: std(0x99a3ae, 0.55, 0.1),
+    door: std(0xbac1ca, 0.45, 0.08),
+    panel: std(0x232a37, 0.45, 0.2),
+    dark: std(0x141922, 0.6, 0.2),
+    cavity: std(0x59616e, 0.42, 0.75, { side: THREE.BackSide }),
+    cavityDark: std(0x272d38, 0.6, 0.4, { side: THREE.BackSide }),
+    steel: std(0xc6ced8, 0.28, 0.95),
+    steel2: std(0xc6ced8, 0.3, 0.95, { side: THREE.DoubleSide }),
+    steelDark: std(0x7b8592, 0.35, 0.9),
+    gold: std(0xa88a45, 0.38, 0.85),
+    bench: new THREE.MeshPhysicalMaterial({ color: 0x141922, roughness: 0.32, metalness: 0, clearcoat: 0.6, clearcoatRoughness: 0.25 }),
+    cabinet: std(0x232a37, 0.6, 0.15),
+    wall: std(0x0d131e, 0.9, 0.0),
+    blue: std(0x2f5d9a, 0.45, 0.1),
+    red: std(0xb4432a, 0.7, 0.0),
+    cap: std(0x1d4f8c, 0.5, 0.1),
+    capRed: std(0x9a2b23, 0.5, 0.1),
+    white: std(0xeef1f4, 0.7, 0.0),
+    cyl: std(0x5b6573, 0.4, 0.55),
+    srcVol: std(0xc6ced8, 0.3, 0.9, { transparent: true, opacity: 0.32, depthWrite: false }),
+  };
+  M.glassClear = glassMat(0xd8efff, 0.04, 0.55);
+  M.glassDark = glassMat(0x9fc0dd, 0.1, 0.45);
+  M.glassDoor = glassMat(0x8fb2d4, 0.09, 0.4);
+  M.glassVial = glassMat(0xe6f3ff, 0.06, 0.7);
+  M.film = glassMat(0xffb547, 0.14, 0.55);
+  M.ledCyan = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x7fe3ff).multiplyScalar(2.4) });
+}
+function glassMat(hex, base, rim) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Color(hex) }, uBase: { value: base }, uRim: { value: rim }, uFade: { value: 1 } },
+    vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = -mv.xyz; gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'uniform vec3 uColor; uniform float uBase; uniform float uRim; uniform float uFade; varying vec3 vN; varying vec3 vV; void main(){ vec3 n = normalize(vN); vec3 v = normalize(vV); float f = pow(clamp(1.0 - abs(dot(n, v)), 0.0, 1.0), 2.2); float a = (uBase + uRim * f) * uFade; gl_FragColor = vec4(uColor * (0.35 + 1.1 * f), a); }',
+    transparent: true, depthWrite: false, side: THREE.DoubleSide,
+  });
+}
+function spriteMat() {
+  return new THREE.ShaderMaterial({
+    uniforms: { uScale: { value: 400 } },
+    vertexShader: 'uniform float uScale; attribute float aSize; attribute vec3 aColor; varying vec3 vC; void main(){ vC = aColor; vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = aSize * uScale / max(1.0, -mv.z); gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'varying vec3 vC; void main(){ vec2 p = gl_PointCoord - 0.5; float a = 1.0 - smoothstep(0.0, 0.5, length(p)); gl_FragColor = vec4(vC, a * a); }',
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+}
+const shadows = (o, cast = true, recv = true) => { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = recv; } }); return o; };
+function box(w, h, d, m, x, y, z, r = 0.8) {
+  const rr = Math.min(r, w / 2 - 0.01, h / 2 - 0.01, d / 2 - 0.01);
+  const g = rr > 0.05 ? new G.RBG(w, h, d, 2, rr) : new THREE.BoxGeometry(w, h, d);
+  const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; return o;
+}
+const boxAt = (m, x0, x1, y0, y1, z0, z1, r = 0.8) => box(x1 - x0, y1 - y0, z1 - z0, m, (x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2, r);
+function cyl(r0, r1, h, m, seg = 32, open = false) { const o = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, h, seg, 1, open), m); o.castShadow = o.receiveShadow = true; return o; }
+function washer(rOut, rIn, th, m) {
+  const s = new THREE.Shape(); s.absarc(0, 0, rOut, 0, Math.PI * 2, false);
+  const h = new THREE.Path(); h.absarc(0, 0, rIn, 0, Math.PI * 2, true); s.holes.push(h);
+  const g = new THREE.ExtrudeGeometry(s, { depth: th, bevelEnabled: false, curveSegments: 36 });
+  g.translate(0, 0, -th / 2); g.rotateY(Math.PI / 2);   // 軸向改成 x
+  const o = new THREE.Mesh(g, m); o.castShadow = o.receiveShadow = true; return o;
+}
+// 切掉一塊的厚壁圓筒(軸向 y),看得到裡面
+function cutCyl(rOut, rIn, h, t0, tl, m) {
+  const g = new THREE.Group(), seg = Math.max(8, Math.round(48 * tl / (2 * Math.PI)));
+  g.add(new THREE.Mesh(new THREE.CylinderGeometry(rOut, rOut, h, seg, 1, true, t0, tl), m));
+  g.add(new THREE.Mesh(new THREE.CylinderGeometry(rIn, rIn, h, seg, 1, true, t0, tl), m));
+  const capG = new THREE.RingGeometry(rIn, rOut, seg, 1, t0 - Math.PI / 2, tl);
+  for (const y of [h / 2, -h / 2]) { const c = new THREE.Mesh(capG, m); c.rotation.x = -Math.PI / 2; c.position.y = y; g.add(c); }
+  for (const a of [t0, t0 + tl]) {
+    const q = new THREE.Mesh(new THREE.PlaneGeometry(rOut - rIn, h), m);
+    const rm = (rOut + rIn) / 2; q.position.set(rm * Math.sin(a), 0, rm * Math.cos(a)); q.rotation.y = a - Math.PI / 2; g.add(q);
+  }
+  return shadows(g);
+}
+function tubeAlong(points, r, m, seg = 64, rs = 8) {
+  const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)));
+  const o = new THREE.Mesh(new THREE.TubeGeometry(curve, seg, r, rs, false), m); o.castShadow = true; return o;
+}
+function canvasTex(w, h) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  return { c, g: c.getContext('2d'), t };
+}
+
+/* ---------- 房間 ---------- */
+function buildRoom() {
+  const { c, g, t } = canvasTex(512, 512);
+  g.fillStyle = '#0d121b'; g.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+    const v = 21 + ((i * 7 + j * 3) % 5) * 2; g.fillStyle = `rgb(${v},${v + 5},${v + 13})`; g.fillRect(i * 128 + 3, j * 128 + 3, 122, 122);
+  }
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(14, 14); t.anisotropy = 8;
+  void c;
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(2800, 2800), new THREE.MeshStandardMaterial({ map: t, roughness: 0.62, metalness: 0.05 }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -92; floor.receiveShadow = true; G.scene.add(floor);
+  const wall = new THREE.Mesh(new THREE.PlaneGeometry(1600, 520), M.wall); wall.position.set(0, 160, -175); wall.receiveShadow = true; G.scene.add(wall);
+  // 牆上的燈條
+  const strip = new THREE.Mesh(new THREE.BoxGeometry(1400, 0.8, 0.8), new THREE.MeshBasicMaterial({ color: new THREE.Color(0x7fe3ff).multiplyScalar(0.9) }));
+  strip.position.set(0, 210, -174); G.scene.add(strip);
+  // 掛在牆上的三張說明圖
+  G.posters = [];
+  [[-205, 'part'], [-45, 'ki'], [115, 'ei']].forEach(([x, kind]) => {
+    const tex = canvasTex(1024, 680);
+    const frame = boxAt(M.panel, x - 51, x + 51, 72, 142, -174, -171, 1.2); G.scene.add(frame);
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(98, 65.1), new THREE.MeshBasicMaterial({ map: tex.t, color: new THREE.Color(0.85, 0.85, 0.85), toneMapped: false }));
+    face.position.set(x, 107, -170.9); G.scene.add(face);
+    G.posters.push({ kind, ...tex });
+  });
+}
+async function drawPosters() {
+  try { await Promise.race([Promise.all(['900 64px "Noto Sans TC"', '500 30px "Noto Sans TC"', '600 30px "IBM Plex Mono"'].map(f => document.fonts.load(f, '分配保留指數電子撞擊游離前進速度載氣液膜換升溫率幾乎不變碎片質譜指紋'))), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* 字型載不到就用系統字 */ }
+  for (const P of G.posters) {
+    const g = P.g, W = 1024, H = 680;
+    g.fillStyle = '#0b1322'; g.fillRect(0, 0, W, H);
+    g.strokeStyle = '#1f3452'; g.lineWidth = 6; g.strokeRect(14, 14, W - 28, H - 28);
+    g.strokeStyle = '#7fe3ff'; g.lineWidth = 4;
+    for (const [x, y, dx, dy] of [[30, 30, 1, 1], [W - 30, 30, -1, 1], [30, H - 30, 1, -1], [W - 30, H - 30, -1, -1]]) { g.beginPath(); g.moveTo(x, y + dy * 34); g.lineTo(x, y); g.lineTo(x + dx * 34, y); g.stroke(); }
+    const title = (t, s) => { g.fillStyle = '#eaf5ff'; g.font = '900 66px "Noto Sans TC", sans-serif'; g.fillText(t, 64, 122); g.fillStyle = '#8fb3d6'; g.font = '500 30px "Noto Sans TC", sans-serif'; g.fillText(s, 66, 172); };
+    g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    if (P.kind === 'part') {
+      title('分配', 'k = 溶在液膜的量 ÷ 在載氣中的量');
+      const y0 = 250, y1 = 470;
+      g.fillStyle = 'rgba(255,181,71,.28)'; g.fillRect(70, y0, 884, 30); g.fillRect(70, y1 - 30, 884, 30);
+      g.strokeStyle = '#5c7da3'; g.lineWidth = 5; g.beginPath(); g.moveTo(70, y0); g.lineTo(954, y0); g.moveTo(70, y1); g.lineTo(954, y1); g.stroke();
+      let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      for (let i = 0; i < 22; i++) { g.fillStyle = '#ffb547'; g.beginPath(); g.arc(90 + rnd() * 840, rnd() < .5 ? y0 + 15 : y1 - 15, 9, 0, 7); g.fill(); }
+      for (let i = 0; i < 9; i++) {
+        const x = 110 + rnd() * 760, y = y0 + 60 + rnd() * 100;
+        g.fillStyle = '#7fe3ff'; g.beginPath(); g.arc(x, y, 10, 0, 7); g.fill();
+        g.strokeStyle = 'rgba(127,227,255,.6)'; g.lineWidth = 3; g.beginPath(); g.moveTo(x + 18, y); g.lineTo(x + 70, y); g.stroke();
+        g.beginPath(); g.moveTo(x + 70, y); g.lineTo(x + 60, y - 7); g.lineTo(x + 60, y + 7); g.closePath(); g.fillStyle = 'rgba(127,227,255,.6)'; g.fill();
+      }
+      g.fillStyle = '#cfe6ff'; g.font = '600 34px "Noto Sans TC", sans-serif'; g.fillText('前進速度 = 載氣速度 × 1 / (1 + k)', 64, 560);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('金色是液膜(固定相),藍色是正在載氣裡前進的分子', 64, 612);
+    } else if (P.kind === 'ki') {
+      title('保留指數 KI', '用前後兩支正烷烴把滯留時間換成刻度');
+      const base = 470, X = t => 90 + t * 820;
+      g.strokeStyle = '#5c7da3'; g.lineWidth = 3; g.beginPath(); g.moveTo(70, base); g.lineTo(954, base); g.stroke();
+      const pk = (t, hgt, col, lab) => {
+        g.strokeStyle = col; g.lineWidth = 5; g.beginPath();
+        for (let i = -40; i <= 40; i++) { const x = X(t) + i * 1.2, y = base - hgt * Math.exp(-0.5 * (i / 9) ** 2); i === -40 ? g.moveTo(x, y) : g.lineTo(x, y); }
+        g.stroke(); g.fillStyle = col; g.font = '600 30px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText(lab, X(t), base - hgt - 16); g.textAlign = 'left';
+      };
+      pk(0.1, 150, '#8fa3bd', 'C10'); pk(0.9, 140, '#8fa3bd', 'C11'); pk(0.42, 190, '#7fe3ff', 'x');
+      g.fillStyle = '#cfe6ff'; g.font = '600 32px "IBM Plex Mono", monospace'; g.fillText('KI = 100 × [ n + (tx − tn) / (tn+1 − tn) ]', 64, 560);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('換升溫速率,滯留時間會變,KI 幾乎不變', 64, 612);
+    } else {
+      title('電子撞擊游離', '70 eV 電子撞掉一個電子,分子帶正電後斷成碎片');
+      const cx = 230, cy = 360;
+      g.fillStyle = '#5aa2ff'; for (const [dx, dy] of [[0, 0], [38, -22], [38, 22], [-38, -22], [-38, 22], [0, 44], [0, -44]]) { g.beginPath(); g.arc(cx + dx, cy + dy, 22, 0, 7); g.fill(); }
+      g.strokeStyle = '#ffe28a'; g.lineWidth = 4; g.setLineDash([12, 10]); g.beginPath(); g.moveTo(70, 250); g.lineTo(cx - 30, cy - 20); g.stroke(); g.setLineDash([]);
+      g.fillStyle = '#ffe28a'; g.font = '600 30px "IBM Plex Mono", monospace'; g.fillText('e⁻', 64, 236);
+      g.strokeStyle = '#7fe3ff'; g.lineWidth = 4; g.beginPath(); g.moveTo(330, cy); g.lineTo(450, cy); g.stroke();
+      g.beginPath(); g.moveTo(450, cy); g.lineTo(434, cy - 10); g.lineTo(434, cy + 10); g.closePath(); g.fillStyle = '#7fe3ff'; g.fill();
+      const frag = (x, y, r, lab) => { g.fillStyle = '#ff8a4c'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.fillStyle = '#cfe6ff'; g.font = '500 26px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText(lab, x, y + r + 34); g.textAlign = 'left'; };
+      frag(540, 330, 36, 'm/z 136'); frag(680, 300, 28, '121'); frag(800, 360, 30, '93'); frag(905, 300, 22, '77');
+      g.fillStyle = '#cfe6ff'; g.font = '600 32px "Noto Sans TC", sans-serif'; g.fillText('M + e⁻ → M⁺• + 2e⁻ → 碎片離子', 64, 560);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('碎片的 m/z 分布就是質譜,也是比對用的指紋', 64, 612);
+    }
+    P.t.needsUpdate = true;
+  }
+}
+
+/* ---------- 實驗桌 ---------- */
+function buildBench() {
+  const s = G.scene;
+  s.add(boxAt(M.bench, -128, 128, -4, 0, -46, 46, 1.2));
+  s.add(boxAt(M.cabinet, -124, 124, -90, -4, -42, 41, 0.6));
+  for (const x of [-62, 0, 62]) s.add(boxAt(M.dark, x - 0.3, x + 0.3, -86, -8, 41, 41.4, 0));
+  for (const x of [-70, -54, -8, 8, 54, 70]) s.add(boxAt(M.steelDark, x - 0.6, x + 0.6, -24, -12, 41.2, 42.6, 0.3));
+  const led = new THREE.Mesh(new THREE.BoxGeometry(252, 0.5, 0.5), M.ledCyan); led.position.set(0, -4.4, 45.6); s.add(led);
+}
+
+/* ---------- 氣相層析儀 GC ---------- */
+function buildGC() {
+  const g = new THREE.Group(); G.world.add(g); G.gc = g;
+  const { x0, x1, y1, z0, z1 } = L.gc, o = L.oven;
+  g.add(boxAt(M.shell2, x0, x1, 0, o.y0, z0, z1, 1));
+  g.add(boxAt(M.shell, x0, x1, o.y1, y1, z0, z1, 1.4));
+  g.add(boxAt(M.shell, x0, o.x0, o.y0, o.y1, z0, z1, 0.4));
+  g.add(boxAt(M.shell, o.x1, x1, o.y0, o.y1, z0, z1, 0.6));
+  g.add(boxAt(M.shell, o.x0, o.x1, o.y0, o.y1, z0, o.z0, 0.3));
+  const cav = new THREE.Mesh(new THREE.BoxGeometry(o.x1 - o.x0, o.y1 - o.y0, o.z1 - o.z0), M.cavity);
+  cav.position.set((o.x0 + o.x1) / 2, (o.y0 + o.y1) / 2, (o.z0 + o.z1) / 2); cav.receiveShadow = true; g.add(cav);
+  // 柱溫箱後方的風扇與加熱圈
+  const fan = new THREE.Group(); fan.position.set(-65.5, 25, -21.2);
+  fan.add(cyl(2.2, 2.2, 1.2, M.steelDark).rotateX(Math.PI / 2));
+  for (let i = 0; i < 6; i++) { const b = box(1.6, 7.5, 0.3, M.steel, 0, 4.2, 0, 0.1); const p = new THREE.Group(); p.add(b); p.rotation.z = i * Math.PI / 3; b.rotation.y = 0.5; fan.add(p); }
+  g.add(fan); G.fan = fan;
+  G.heaterMat = new THREE.MeshStandardMaterial({ color: 0x3a2a22, roughness: 0.6, metalness: 0.4, emissive: new THREE.Color(1, 0.35, 0.08), emissiveIntensity: 0 });
+  const heater = new THREE.Mesh(new THREE.TorusGeometry(11.5, 0.45, 8, 72), G.heaterMat); heater.position.set(-65.5, 25, -20.6); g.add(heater);
+  // 爐門(左邊鉸鏈)
+  const door = new THREE.Group(); door.position.set(o.x0 - 1, 0, z1 + 0.8); g.add(door); G.door = door;
+  const dw = o.x1 + 1 - (o.x0 - 1), dsh = new THREE.Shape();
+  dsh.moveTo(0, 4); dsh.lineTo(dw, 4); dsh.lineTo(dw, 46); dsh.lineTo(0, 46); dsh.lineTo(0, 4);
+  const hole = new THREE.Path(); hole.moveTo(3.5, 8.5); hole.lineTo(3.5, 41.5); hole.lineTo(dw - 3.5, 41.5); hole.lineTo(dw - 3.5, 8.5); hole.lineTo(3.5, 8.5); dsh.holes.push(hole);
+  const dg = new THREE.ExtrudeGeometry(dsh, { depth: 1.8, bevelEnabled: true, bevelThickness: 0.3, bevelSize: 0.3, bevelSegments: 2 }); dg.translate(0, 0, -1.8);
+  const dm = new THREE.Mesh(dg, M.door); dm.castShadow = dm.receiveShadow = true; door.add(dm);
+  const win = new THREE.Mesh(new THREE.PlaneGeometry(dw - 7, 33), M.glassDoor); win.position.set(dw / 2, 25, -0.9); door.add(win);
+  door.add(box(1.2, 14, 1.6, M.panel, dw - 2, 25, 0.8, 0.5));
+  // 右側面板:顯示幕、指示燈、按鍵
+  const fx = (o.x1 + x1) / 2;
+  const disp = canvasTex(256, 160); G.gcDisp = disp;
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(8, 5), new THREE.MeshBasicMaterial({ map: disp.t, toneMapped: false })); scr.position.set(fx, 38, z1 + 0.06); scr.scale.x = -1; g.add(scr);
+  g.add(boxAt(M.panel, fx - 4.6, fx + 4.6, 35, 41, z1 - 0.2, z1 + 0.02, 0.3));
+  G.ledReady = new THREE.MeshBasicMaterial({ color: 0x1a2a1f }); G.ledRun = new THREE.MeshBasicMaterial({ color: 0x14242a });
+  const l1 = cyl(0.45, 0.45, 0.4, G.ledReady, 16).rotateX(Math.PI / 2); l1.position.set(fx - 2.2, 32.4, z1 + 0.2); g.add(l1);
+  const l2 = cyl(0.45, 0.45, 0.4, G.ledRun, 16).rotateX(Math.PI / 2); l2.position.set(fx + 2.2, 32.4, z1 + 0.2); g.add(l2);
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) g.add(box(2.1, 1.7, 0.6, r === 3 && c === 2 ? M.blue : M.panel, fx - 2.6 + c * 2.6, 26.5 - r * 2.6, z1 + 0.25, 0.3));
+
+  // 管柱支架(跟管柱一起移動)
+  const c = L.coil, cg = new THREE.Group(); g.add(cg); G.coilGrp = cg;
+  for (const x of [c.x0 - 0.6, c.x1 + 0.6]) { const r = new THREE.Mesh(new THREE.TorusGeometry(c.R + 0.9, 0.22, 6, 64), M.steel); r.rotation.y = Math.PI / 2; r.position.set(x, c.cy, c.cz); cg.add(r); }
+  for (const a of [Math.PI * 0.5, Math.PI * 1.17, Math.PI * 1.83]) { const b = cyl(0.18, 0.18, c.x1 - c.x0 + 1.2, M.steel, 6); b.rotation.z = Math.PI / 2; b.position.set((c.x0 + c.x1) / 2, c.cy + (c.R + 0.9) * Math.cos(a), c.cz + (c.R + 0.9) * Math.sin(a)); cg.add(b); }
+  shadows(g);
+  cav.castShadow = false;
+}
+
+/* ---------- 進樣口 ---------- */
+function buildInlet() {
+  const g = new THREE.Group(); g.position.set(L.inlet.x, L.inlet.y, L.inlet.z); G.gc.add(g); G.inlet = g;
+  const blk = cutCyl(3.4, 1.05, 8, Math.PI * 0.42, Math.PI * 1.36, M.steel2); blk.position.y = 4; g.add(blk);
+  g.add(cyl(4.2, 4.2, 0.8, M.steelDark, 40).translateY(0.4));
+  const liner = new THREE.Group(); g.add(liner); G.liner = liner;
+  const lt = cyl(0.82, 0.82, 7.2, M.glassClear, 24, true); lt.position.y = 4; lt.castShadow = false; liner.add(lt);
+  const wool = cyl(0.62, 0.62, 1.3, new THREE.MeshStandardMaterial({ color: 0xf2f4f7, roughness: 1, transparent: true, opacity: 0.75 }), 16); wool.position.y = 3.2; liner.add(wool);
+  const nut = new THREE.Group(); g.add(nut); G.septumNut = nut;
+  const n = cyl(1.9, 1.9, 1.8, M.steelDark, 18); n.position.y = 8.9; nut.add(n);
+  const sep = new THREE.Group(); g.add(sep); G.septum = sep;
+  const s = cyl(1.05, 1.05, 0.5, M.red, 24); s.position.y = 9.6; sep.add(s);
+  // 分流出口管線
+  G.splitPath = [[-71.4, 60.2, 5.6], [-67, 60.4, 1], [-63, 58.5, -12], [-63, 55.6, -24]];
+  G.gc.add(tubeAlong(G.splitPath, 0.32, M.steel, 48, 6));
+  G.gc.add(boxAt(M.panel, -66, -58, 54, 58, -27, -20, 0.6));
+}
+
+/* ---------- ALS 自動進樣器 ---------- */
+function buildALS() {
+  const g = new THREE.Group(); g.position.set(L.inlet.x, 0, 0); G.gc.add(g); G.als = g;
+  g.add(box(3, 14, 3, M.shell2, 0, 61, -4, 0.6));
+  g.add(boxAt(M.shell, -5.6, 5.6, 74, 104, -5.8, 2.6, 1.2));
+  g.add(boxAt(M.panel, -1.2, 1.2, 76, 102, 2.5, 3.1, 0.3));
+  g.add(boxAt(M.shell2, -5.6, 5.6, 102.5, 105, -5.8, 2.6, 0.8));
+  g.add(cyl(1.1, 1.1, 5, M.steelDark, 16).translateY(71.5));
+  // 樣品盤
+  const tur = new THREE.Group(); tur.position.y = 68; g.add(tur); G.turret = tur;
+  tur.add(cyl(8.6, 8.6, 1.2, M.panel, 56).translateY(0.6));
+  G.vials = [];
+  const kinds = [null, 'wash', 'wash', 'sample', 'sample2', 'sample2', null, null, 'waste', 'waste'];
+  kinds.forEach((k, p) => {
+    const a = p * Math.PI * 2 / 10, x = 6 * Math.sin(a), z = 6 * Math.cos(a);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.98, 0.16, 6, 20), M.steelDark); ring.rotation.x = Math.PI / 2; ring.position.set(x, 1.25, z); tur.add(ring);
+    if (!k) return;
+    const v = new THREE.Group(); v.position.set(x, 1.4, z); tur.add(v);
+    const gl = cyl(0.8, 0.8, 3.2, M.glassVial, 20, false); gl.position.y = 1.6; gl.castShadow = false; v.add(gl);
+    const liqCol = k === 'sample' ? 0xe0a43a : k === 'sample2' ? 0xc9a24a : k === 'waste' ? 0x8b8f80 : 0x9ccfff;
+    const liq = cyl(0.66, 0.66, 1.8, new THREE.MeshStandardMaterial({ color: liqCol, roughness: 0.2, transparent: true, opacity: 0.85, emissive: new THREE.Color(liqCol), emissiveIntensity: k === 'sample' ? 0.35 : 0.12 }), 20); liq.position.y = 1.0; v.add(liq);
+    const cap = cyl(0.88, 0.88, 0.7, k === 'sample' ? M.capRed : M.cap, 20); cap.position.y = 3.5; v.add(cap);
+    if (k === 'sample') G.sampleLiq = liq;
+  });
+  // 注射針
+  const sy = new THREE.Group(); sy.position.set(0, 73.2, 6); g.add(sy); G.syringe = sy;
+  sy.add(cyl(0.13, 0.13, 9, M.steel, 8).translateY(4.5));
+  const barrel = cyl(0.78, 0.78, 8, M.glassClear, 20, true); barrel.position.y = 13; barrel.castShadow = false; sy.add(barrel);
+  sy.add(cyl(1.3, 1.3, 0.4, M.steelDark, 20).translateY(17.1));
+  sy.add(cyl(0.3, 0.3, 0.8, M.steel, 10).translateY(9.3));
+  G.syLiq = cyl(0.6, 0.6, 1, new THREE.MeshStandardMaterial({ color: 0xe0a43a, roughness: 0.2, emissive: new THREE.Color(0xe0a43a), emissiveIntensity: 0.4 }), 16);
+  G.syLiq.position.y = 9.6; G.syLiq.scale.y = 0.001; sy.add(G.syLiq);
+  const pl = new THREE.Group(); sy.add(pl); G.plunger = pl;
+  pl.add(cyl(0.6, 0.6, 0.6, M.dark, 16).translateY(10.0));
+  pl.add(cyl(0.24, 0.24, 15, M.steel, 10).translateY(17.5));
+  pl.add(cyl(1.1, 1.1, 0.5, M.steelDark, 20).translateY(25.2));
+  const car = box(3.6, 3, 2.6, M.panel, 0, 14, -2.2, 0.5); sy.add(car);
+  const pcar = box(3.2, 1.6, 2.4, M.panel, 0, 25.6, -2.1, 0.4); pl.add(pcar);
+  shadows(g);
+}
+
+/* ---------- 傳輸線 ---------- */
+function buildTransfer() {
+  const x0 = L.gc.x1 - 9, x1 = L.ms.x0 + 1;
+  const g = new THREE.Group(); g.position.set((x0 + x1) / 2, L.ax.y, L.ax.z); g.rotation.z = -Math.PI / 2; G.world.add(g);
+  g.add(cutCyl(2.0, 0.95, x1 - x0, Math.PI * 0.12, Math.PI * 1.3, M.steel2));
+  for (const y of [-(x1 - x0) / 2 + 9.6, (x1 - x0) / 2 - 1.6]) { const n = cyl(2.6, 2.6, 2.4, M.steelDark, 6); n.position.y = y; g.add(n); }
+  const band = cutCyl(2.25, 2.0, 5, Math.PI * 0.12, Math.PI * 1.3, M.panel); band.position.y = 4; g.add(band);
+}
+
+/* ---------- 質譜儀 MSD ---------- */
+function buildMSD() {
+  const g = new THREE.Group(); G.world.add(g); G.msd = g;
+  const { x0, x1, y1, z0, z1 } = L.ms, ax = L.ax;
+  g.add(boxAt(M.shell2, x0, x1, 0, 3, z0, z1, 1));
+  g.add(boxAt(M.shell, x0, x0 + 2.5, 3, y1 - 3, z0, z1, 0.4));
+  g.add(boxAt(M.shell, x1 - 2.5, x1, 3, y1 - 3, z0, z1, 0.4));
+  g.add(boxAt(M.shell, x0, x1, 3, y1 - 3, z0, z0 + 2, 0.3));
+  const cav = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0 - 5, y1 - 6, z1 - z0 - 4), M.cavityDark);
+  cav.position.set((x0 + x1) / 2, y1 / 2, (z0 + z1) / 2); cav.receiveShadow = true; g.add(cav);
+  const top = new THREE.Group(); g.add(top); G.msTop = top;
+  top.add(boxAt(M.shell, x0, x1, y1 - 3, y1, z0, z1, 1.4));
+  const front = new THREE.Group(); g.add(front); G.msFront = front;
+  M.shellFade = M.shell.clone(); M.shellFade.transparent = true;
+  front.add(boxAt(M.shellFade, x0, x1, 3, 12, z1 - 2, z1, 0.6));
+  front.add(boxAt(M.shellFade, x0, x1, 38, y1 - 3, z1 - 2, z1, 0.6));
+  front.add(boxAt(M.shellFade, x0, -6, 12, 38, z1 - 2, z1, 0.4));
+  front.add(boxAt(M.shellFade, 40, x1, 12, 38, z1 - 2, z1, 0.4));
+  G.msWin = new THREE.Mesh(new THREE.PlaneGeometry(46, 26), glassMat(0x8fb2d4, 0.07, 0.38)); G.msWin.position.set(17, 25, z1 - 1); front.add(G.msWin);
+  const disp = canvasTex(256, 160); G.msDisp = disp;
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 3.4), new THREE.MeshBasicMaterial({ map: disp.t, toneMapped: false })); scr.position.set(44, 33, z1 + 0.06); scr.scale.x = -1; front.add(scr);
+  front.add(boxAt(M.panel, 41, 47, 31, 35, z1 - 0.2, z1 + 0.02, 0.3));
+  const pb = cyl(0.9, 0.9, 0.6, M.blue, 20).rotateX(Math.PI / 2); pb.position.set(44, 16, z1 + 0.25); front.add(pb);
+
+  // 真空腔(玻璃)
+  const man = cyl(8.5, 8.5, 46, M.glassDark, 56, true); man.rotation.z = Math.PI / 2; man.position.set(17, ax.y, ax.z); man.castShadow = false; g.add(man);
+  for (const x of [-6, 40]) { const r = new THREE.Mesh(new THREE.TorusGeometry(8.6, 0.5, 8, 56), M.steelDark); r.rotation.y = Math.PI / 2; r.position.set(x, ax.y, ax.z); g.add(r); }
+  // 離子源
+  const src = new THREE.Group(); src.position.set(L.src, ax.y, ax.z); g.add(src); G.src = src;
+  const vol = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 4), M.srcVol); src.add(vol);
+  src.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(4, 4, 4)), new THREE.LineBasicMaterial({ color: 0xaab4c0 })));
+  const rep = washer(2.2, 0.55, 0.35, M.steel); rep.position.x = -2.5; src.add(rep);
+  G.filMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.25, 0.12, 0.06) });
+  for (const s of [1, -1]) {
+    const pts = []; for (let i = 0; i <= 80; i++) { const a = i / 80 * Math.PI * 2 * 6; pts.push(new THREE.Vector3(-1 + 2 * i / 80, 0.28 * Math.cos(a), 0.28 * Math.sin(a))); }
+    const coil = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 160, 0.07, 5), G.filMat); coil.position.y = s * 3.3; src.add(coil);
+    for (const x of [-1.2, 1.2]) { const p = cyl(0.1, 0.1, 1.4, M.steel, 6); p.position.set(x, s * 3.9, 0); src.add(p); }
+  }
+  G.beamMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.35, 0.75, 1.6), transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+  const beam = cyl(0.2, 0.2, 6.2, G.beamMat, 10, true); beam.castShadow = false; src.add(beam);
+  const lens = new THREE.Group(); lens.position.set(L.src, ax.y, ax.z); g.add(lens); G.lens = lens;
+  for (const [x, r] of [[2.8, 0.75], [3.7, 0.65], [4.6, 0.75]]) { const w = washer(2.5, r, 0.25, M.steel); w.position.x = x; lens.add(w); }
+  // 四極桿
+  const quad = new THREE.Group(); quad.position.set((L.q0 + L.q1) / 2, ax.y, ax.z); g.add(quad); G.quad = quad;
+  for (const [dy, dz] of [[1.34, 1.34], [1.34, -1.34], [-1.34, 1.34], [-1.34, -1.34]]) { const r = cyl(0.95, 0.95, L.q1 - L.q0, M.gold, 28); r.rotation.z = Math.PI / 2; r.position.set(0, dy, dz); quad.add(r); }
+  const qt = cyl(3.1, 3.1, L.q1 - L.q0 + 1, M.glassClear, 40, true); qt.rotation.z = Math.PI / 2; qt.castShadow = false; quad.add(qt);
+  for (const x of [-(L.q1 - L.q0) / 2 - 0.3, (L.q1 - L.q0) / 2 + 0.3]) { const w = washer(3.3, 2.0, 0.6, M.steelDark); w.position.x = x; quad.add(w); }
+  // 偵測器
+  const det = new THREE.Group(); det.position.set(L.det, ax.y, ax.z); g.add(det); G.det = det;
+  const ex = washer(2.3, 0.7, 0.3, M.steel); ex.position.x = -4; det.add(ex);
+  const hed = cyl(1.3, 1.3, 0.5, M.steel, 24); hed.position.set(0, 5.6, 0); det.add(hed);
+  det.add(cyl(0.2, 0.2, 3, M.steelDark, 6).translateY(7.6));
+  const prof = []; for (let i = 0; i <= 14; i++) { const y = i / 14 * 5.2; prof.push(new THREE.Vector2(0.35 + 1.25 * Math.pow(i / 14, 2.2), y)); }
+  G.hornMat = new THREE.MeshStandardMaterial({ color: 0x3b3f4a, roughness: 0.4, metalness: 0.3, emissive: new THREE.Color(0.3, 0.8, 1.0), emissiveIntensity: 0, side: THREE.DoubleSide });
+  const horn = new THREE.Mesh(new THREE.LatheGeometry(prof, 32), G.hornMat); horn.position.set(0, -7.9, 0); det.add(horn);
+  // 渦輪分子泵
+  const tp = new THREE.Group(); tp.position.set(17, 9.4, 0); g.add(tp);
+  tp.add(cyl(6, 6, 11.8, M.cyl, 40));
+  tp.add(cyl(6.8, 6.8, 0.8, M.steelDark, 40).translateY(6.1));
+  const rot = new THREE.Group(); rot.position.y = 6.7; tp.add(rot); G.turbo = rot;
+  for (let i = 0; i < 14; i++) { const b = box(0.4, 0.18, 5.2, M.steel, 0, 0, 2.9, 0.05); b.rotation.x = 0.4; const p = new THREE.Group(); p.add(b); p.rotation.y = i / 14 * Math.PI * 2; rot.add(p); }
+  shadows(g);
+  cav.castShadow = false; man.castShadow = false; qt.castShadow = false;
+}
+
+/* ---------- 管柱(路徑依拆開程度重建) ---------- */
+function bez(P, a, b, c, d, n) { for (let i = 1; i <= n; i++) { const t = i / n, u = 1 - t; P.push(new THREE.Vector3().addScaledVector(a, u * u * u).addScaledVector(b, 3 * u * u * t).addScaledVector(c, 3 * u * t * t).addScaledVector(d, t * t * t)); } }
+function columnPoints(k) {
+  const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  const P = [], ix = L.inlet.x, iz = L.inlet.z, c = L.coil, cz = c.cz + 30 * k;
+  for (let y = L.inlet.y + 0.4; y > 44; y -= 0.5) P.push(V3(ix, y, iz));
+  P.push(V3(ix, 44, iz));
+  bez(P, V3(ix, 44, iz), V3(ix, 37 - 4 * k, iz + 4 * k), V3(c.x0, c.cy + c.R, cz - 7), V3(c.x0, c.cy + c.R, cz), 36);
+  const steps = c.turns * 120, len = c.x1 - c.x0;
+  for (let i = 1; i <= steps; i++) { const th = i / steps * c.turns * Math.PI * 2; P.push(V3(c.x0 + len * i / steps, c.cy + c.R * Math.cos(th), cz + c.R * Math.sin(th))); }
+  const ce = V3(c.x1, c.cy + c.R, cz), tx = L.oven.x1 + 1;
+  bez(P, ce, V3(c.x1, c.cy + c.R, cz + 6), V3(tx - 7, L.ax.y, L.ax.z + 4 * k), V3(tx, L.ax.y, L.ax.z), 36);
+  const sx = L.src - 1.6 - 6 * k;
+  for (let x = tx + 0.6; x < sx; x += 0.6) P.push(V3(x, L.ax.y, L.ax.z));
+  P.push(V3(sx, L.ax.y, L.ax.z));
+  return P;
+}
+function rebuildColumn(k) {
+  const curve = new PolyCurve(columnPoints(k));
+  const geo = new THREE.TubeGeometry(curve, 1700, 0.44, 6, false);
+  const uv = geo.attributes.uv, aS = new Float32Array(uv.count);
+  for (let i = 0; i < uv.count; i++) aS[i] = uv.getX(i);
+  geo.setAttribute('aS', new THREE.BufferAttribute(aS, 1));
+  if (!G.colMesh) {
+    const cols = []; for (let i = 0; i < NB; i++) { const c = CLS[BAND_SP[i].cls].glow; cols.push(new THREE.Color().setRGB(c[0], c[1], c[2], THREE.SRGBColorSpace)); }
+    G.colMat = new THREE.ShaderMaterial({
+      uniforms: { uBase: { value: new THREE.Color(0x5e3416) }, uC: { value: new Float32Array(NB) }, uW: { value: new Float32Array(NB).fill(0.01) }, uA: { value: new Float32Array(NB) }, uCol: { value: cols } },
+      vertexShader: 'attribute float aS; varying float vS; varying vec3 vN; varying vec3 vV; void main(){ vS = aS; vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = -mv.xyz; gl_Position = projectionMatrix * mv; }',
+      fragmentShader: `#define NB ${NB}
+        uniform vec3 uBase; uniform float uC[NB]; uniform float uW[NB]; uniform float uA[NB]; uniform vec3 uCol[NB];
+        varying float vS; varying vec3 vN; varying vec3 vV;
+        void main(){
+          vec3 n = normalize(vN), v = normalize(vV), l = normalize(vec3(-0.35, 0.8, 0.5));
+          float dif = max(dot(n, l), 0.0), spec = pow(max(dot(reflect(-l, n), v), 0.0), 28.0), rim = pow(clamp(1.0 - dot(n, v), 0.0, 1.0), 2.0);
+          vec3 col = uBase * (0.22 + 0.85 * dif) + vec3(0.35) * spec + uBase * rim * 0.4;
+          vec3 glow = vec3(0.0);
+          for (int i = 0; i < NB; i++) { float d = (vS - uC[i]) / uW[i]; glow += uCol[i] * uA[i] * exp(-0.5 * d * d); }
+          gl_FragColor = vec4(col + glow, 1.0);
+        }`,
+    });
+    G.colMesh = new THREE.Mesh(geo, G.colMat); G.colMesh.castShadow = true; G.world.add(G.colMesh);
+  } else { G.colMesh.geometry.dispose(); G.colMesh.geometry = geo; }
+  G.colCurve = curve; G.colK = k;
+}
+
+/* ---------- 放大鏡:管柱內部 ----------
+   掛在相機上、固定在 3D 可視區的空白角落,永遠畫在最上層(不會被介面面板或儀器擋住) */
+const MOL_N = 48, GAS_N = 170, ATOM_N = 24;
+const lensTop = (o, order) => { o.renderOrder = 20 + order; o.frustumCulled = false; const ms = Array.isArray(o.material) ? o.material : [o.material]; for (const x of ms) x.depthTest = false; return o; };
+function buildMagnifier() {
+  const m = L.mag, holder = new THREE.Group(); G.camera.add(holder); G.scene.add(G.camera); G.mag = holder;
+  // 兩種放大鏡的內容也左右鏡像,讓載氣與離子都往左走,和儀器的流向一致
+  const g = new THREE.Group(); g.scale.x = -1; holder.add(g); G.lensGC = g;
+  const ms = new THREE.Group(); ms.scale.x = -1; holder.add(ms); G.lensMS = ms; ms.visible = false;
+  buildLensMS(ms);
+  const top = lensTop;
+  const wallMat = glassMat(0xd8efff, 0.05, 0.6), ringMat = M.steel.clone();
+  const film = top(cyl(m.R - 0.8, m.R - 0.8, m.len, M.film, 64, true), 0); film.rotation.z = Math.PI / 2; film.castShadow = false; g.add(film);
+  const wall = top(cyl(m.R, m.R, m.len, wallMat, 64, true), 4); wall.rotation.z = Math.PI / 2; wall.castShadow = false; g.add(wall);
+  for (const x of [-m.len / 2, m.len / 2]) { const r = top(new THREE.Mesh(new THREE.TorusGeometry(m.R + 0.1, 0.28, 8, 64), ringMat), 5); r.rotation.y = Math.PI / 2; r.position.x = x; g.add(r); }
+  G.molMesh = top(new THREE.InstancedMesh(new THREE.SphereGeometry(0.62, 14, 10), new THREE.MeshBasicMaterial({ color: 0xffffff, fog: false }), MOL_N), 2);
+  G.molMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  for (let i = 0; i < MOL_N; i++) G.molMesh.setColorAt(i, new THREE.Color(0, 0, 0));
+  g.add(G.molMesh);
+  G.mol = Array.from({ length: MOL_N }, () => ({ x: rand(-m.len / 2, m.len / 2), r: rand(0, 5), th: rand(0, Math.PI * 2), film: Math.random() < 0.5, id: null, vis: 0 }));
+  const gp = new Float32Array(GAS_N * 3), gs = new Float32Array(GAS_N), gc = new Float32Array(GAS_N * 3);
+  G.gas = Array.from({ length: GAS_N }, () => ({ x: rand(-m.len / 2, m.len / 2), r: Math.sqrt(Math.random()) * 5.6, th: rand(0, Math.PI * 2) }));
+  for (let i = 0; i < GAS_N; i++) { gs[i] = 0.6; gc.set([0.24, 0.32, 0.45], i * 3); }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(gp, 3).setUsage(THREE.DynamicDrawUsage));
+  geo.setAttribute('aSize', new THREE.BufferAttribute(gs, 1)); geo.setAttribute('aColor', new THREE.BufferAttribute(gc, 3));
+  G.gasPts = top(new THREE.Points(geo, spriteMat()), 1); g.add(G.gasPts);
+  // 管柱上的放大圈與連線
+  G.zoomRing = new THREE.Mesh(new THREE.TorusGeometry(1.5, 0.13, 8, 40), new THREE.MeshBasicMaterial({ color: new THREE.Color(0x7fe3ff).multiplyScalar(1.15) }));
+  G.world.add(G.zoomRing);
+  const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3).setUsage(THREE.DynamicDrawUsage));
+  G.zoomLines = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x7fe3ff, transparent: true, opacity: 0.45 })); G.zoomLines.frustumCulled = false; G.scene.add(G.zoomLines);
+}
+
+/* ---------- 放大鏡(離子源模式):電子撞擊、帶電、碎裂 ----------
+   透鏡座標:x 往右通往四極桿,y 往上是燈絲;原子只畫碳(類別色)與氧(紅),氫省略 */
+function buildLensMS(g) {
+  // 深色底板:讓這一格像一張插圖,不和後面的儀器混在一起
+  const bs = new THREE.Shape(), bw = 58, bh = 30, br = 3;
+  bs.moveTo(-bw / 2 + br, -bh / 2); bs.lineTo(bw / 2 - br, -bh / 2); bs.quadraticCurveTo(bw / 2, -bh / 2, bw / 2, -bh / 2 + br); bs.lineTo(bw / 2, bh / 2 - br); bs.quadraticCurveTo(bw / 2, bh / 2, bw / 2 - br, bh / 2);
+  bs.lineTo(-bw / 2 + br, bh / 2); bs.quadraticCurveTo(-bw / 2, bh / 2, -bw / 2, bh / 2 - br); bs.lineTo(-bw / 2, -bh / 2 + br); bs.quadraticCurveTo(-bw / 2, -bh / 2, -bw / 2 + br, -bh / 2);
+  const back = new THREE.Mesh(new THREE.ShapeGeometry(bs, 6), new THREE.MeshBasicMaterial({ color: 0x070c16, transparent: true, opacity: 0.86, depthTest: false, depthWrite: false, fog: false }));
+  back.position.set(1, 0.6, -7); back.renderOrder = 19; back.frustumCulled = false; g.add(back);
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x7fe3ff, transparent: true, opacity: 0.38, depthTest: false });
+  g.add(lensTop(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(46, 19, 12)), lineMat), 0));
+  const plate = new THREE.MeshBasicMaterial({ color: 0x9aa7b8, transparent: true, opacity: 0.2, depthTest: false, side: THREE.DoubleSide });
+  const rep = lensTop(new THREE.Mesh(new THREE.PlaneGeometry(10, 15), plate), 1); rep.rotation.y = Math.PI / 2; rep.position.x = -21.5; g.add(rep);
+  const exit = lensTop(new THREE.Mesh(new THREE.TorusGeometry(3.6, 0.32, 8, 40), new THREE.MeshBasicMaterial({ color: 0xc4cfdc, transparent: true, opacity: 0.6, depthTest: false })), 1);
+  exit.rotation.y = Math.PI / 2; exit.position.x = 21.5; g.add(exit);
+  G.lFil = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.1, 0.35), depthTest: false, fog: false });
+  const fp = []; for (let i = 0; i <= 60; i++) { const a = i / 60 * Math.PI * 2 * 5; fp.push(new THREE.Vector3(-1.8 + 3.6 * i / 60, 8.3 + 0.4 * Math.cos(a), 0.4 * Math.sin(a))); }
+  g.add(lensTop(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(fp), 120, 0.09, 5), G.lFil), 2));
+  G.lBeam = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.35, 0.8, 1.6), transparent: true, opacity: 0.14, depthTest: false, blending: THREE.AdditiveBlending, fog: false });
+  const beam = lensTop(new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 16, 8, 1, true), G.lBeam), 2); g.add(beam);
+  G.atoms = lensTop(new THREE.InstancedMesh(new THREE.SphereGeometry(1.08, 18, 14), new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, fog: false }), ATOM_N), 4);
+  G.atoms.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  for (let i = 0; i < ATOM_N; i++) G.atoms.setColorAt(i, new THREE.Color(0, 0, 0));
+  g.add(G.atoms);
+  G.elec = lensTop(new THREE.InstancedMesh(new THREE.SphereGeometry(0.46, 10, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.9, 2.2, 3.0), depthTest: false, fog: false }), 3), 5);
+  G.elec.instanceMatrix.setUsage(THREE.DynamicDrawUsage); g.add(G.elec);
+  const fg = new THREE.BufferGeometry();
+  fg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3), 3).setUsage(THREE.DynamicDrawUsage));
+  fg.setAttribute('aSize', new THREE.BufferAttribute(new Float32Array(1), 1).setUsage(THREE.DynamicDrawUsage));
+  fg.setAttribute('aColor', new THREE.BufferAttribute(new Float32Array(3), 3).setUsage(THREE.DynamicDrawUsage));
+  const fm = spriteMat(); fm.depthTest = false;
+  G.lFlash = lensTop(new THREE.Points(fg, fm), 6); g.add(G.lFlash);
+}
+// 依原子數排出一團緊密的原子(面心立方格點,由內往外取)
+let FCC = null;
+function blobPts(n, d) {
+  if (!FCC) {
+    FCC = []; for (let i = -3; i <= 3; i++) for (let j = -3; j <= 3; j++) for (let k = -3; k <= 3; k++) if (((i + j + k) & 1) === 0) FCC.push([i, j, k]);
+    const key = p => p[0] * p[0] + p[1] * p[1] + p[2] * p[2] + 0.013 * p[0] - 0.009 * p[1] + 0.004 * p[2];
+    FCC.sort((a, b) => key(a) - key(b));
+  }
+  const s = d / Math.SQRT2; return FCC.slice(0, n).map(p => new THREE.Vector3(p[0] * s, p[1] * s, p[2] * s));
+}
+// 一種斷法的原子排列:帶電的那團在下,要掉的中性那團黏在上面
+function layoutChannel(cid, ch) {
+  const all = atomsOf(FRAG[cid].f), ion = ch.ion ? atomsOf(ch.ion) : all, los = ch.ion ? atomsOf(ch.loss) : { C: 0, O: 0 };
+  const ip = blobPts(ion.C + ion.O, 2.05), lp = blobPts(los.C + los.O, 2.05);
+  const rad = pts => pts.reduce((r, p) => Math.max(r, p.length()), 0);
+  const off = new THREE.Vector3(0.5, rad(ip) + rad(lp) + 1.5, 0.3);
+  const atoms = [];
+  ip.forEach((p, i) => atoms.push({ p, ion: true, O: i >= ion.C }));
+  lp.forEach((p, i) => atoms.push({ p: p.add(off), ion: false, O: i >= los.C }));
+  const cm = new THREE.Vector3(); for (const a of atoms) cm.add(a.p); cm.divideScalar(atoms.length);
+  const ionC = new THREE.Vector3(), losC = new THREE.Vector3(); let ni = 0, nl = 0, top = 0;
+  for (const a of atoms) { a.p.sub(cm); top = Math.max(top, a.p.y); if (a.ion) { ionC.add(a.p); ni++; } else { losC.add(a.p); nl++; } }
+  if (ni) ionC.divideScalar(ni); if (nl) losC.divideScalar(nl);
+  return { atoms, ionC, losC, top, hasLoss: !!ch.ion };
+}
+const LENS_T = 6.4;   // 每種斷法示範幾秒
+function updateLensMS(dt) {
+  const cid = S.msFocus, A = G.lensAnim || (G.lensAnim = { cid: null });
+  if (A.cid !== cid) { A.cid = cid; A.i = 0; A.t = 0; A.lay = cid ? layoutChannel(cid, FRAG[cid].ch[0]) : null; }
+  if (!cid) { S.lensCh = null; G.lensLab = null; return; }
+  A.t += dt;
+  if (A.t > LENS_T) { A.t = 0; A.i = (A.i + 1) % FRAG[cid].ch.length; A.lay = layoutChannel(cid, FRAG[cid].ch[A.i]); }
+  const t = A.t, lay = A.lay, c = BYID.get(cid), F = FRAG[cid], ch = F.ch[A.i];
+  const phase = t < 1.3 ? 'mol' : t < 2.6 ? 'ion' : 'split';
+  S.lensCh = { cid, i: A.i, mz: ch.mz, phase };
+  const bx = t < 1.0 ? -15 + 15 * (1 - (1 - t) ** 3) : 0, by = 0.4;
+  const ts = Math.max(0, t - 2.6);
+  const ionDx = Math.min(3.4 * ts * ts, 27);                                 // 帶電的被電場加速往右
+  const ionFade = clamp(1 - (ionDx - 18) / 6, 0, 1) * clamp((LENS_T - t) / 0.4, 0, 1);
+  const losD = new THREE.Vector3(-0.9 * ts, 2.4 * ts, -1.5 * ts), losFade = clamp(1 - ts / 3.4, 0, 1);  // 中性的慢慢飄走
+  const lin = CLS[c.cls].lin, hot = phase === 'mol' ? 0.55 : 1.9;
+  const mm = _m4.m, q = _m4.q, sc = _m4.s, p = _m4.p, col = _m4.c; q.identity();
+  for (let i = 0; i < ATOM_N; i++) {
+    const a = lay.atoms[i];
+    if (!a) { sc.setScalar(0.0001); p.set(0, 0, 0); mm.compose(p, q, sc); G.atoms.setMatrixAt(i, mm); G.atoms.setColorAt(i, col.setRGB(0, 0, 0)); continue; }
+    const withIon = a.ion || !lay.hasLoss;
+    p.copy(a.p); p.x += bx; p.y += by;
+    if (phase === 'ion') { const v = 0.2; p.x += v * Math.sin(t * 83 + i * 1.7); p.y += v * Math.sin(t * 71 + i * 2.3); p.z += v * Math.sin(t * 97 + i); }
+    let s = 1, b = hot;
+    if (phase === 'split') { if (withIon) { p.x += ionDx; s = ionFade; } else { p.add(losD); s = losFade; b = 0.45; } }
+    if (a.O) col.setRGB(1.0 * b, 0.26 * b, 0.2 * b);
+    else if (phase === 'split' && !withIon) col.setRGB(0.55 * b, 0.6 * b, 0.68 * b);
+    else col.copy(lin).multiplyScalar(b);
+    sc.setScalar(Math.max(0.0001, s)); mm.compose(p, q, sc); G.atoms.setMatrixAt(i, mm); G.atoms.setColorAt(i, col);
+  }
+  G.atoms.instanceMatrix.needsUpdate = true; G.atoms.instanceColor.needsUpdate = true;
+  // 電子:一顆從燈絲射下來撞上分子;撞完之後,原來那顆和被撞掉的那顆一起離開
+  const hitY = lay.top + by + 1.0, E3 = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+  if (t >= 1.0 && t < 1.3) E3[0] = [0, lerp(8.0, hitY, (t - 1.0) / 0.3), 0, 1];
+  if (t >= 1.3 && t < 2.1) { const k = (t - 1.3) / 0.8; E3[1] = [0.6 * k, lerp(hitY - 1, -9, k), 0.8 * k, 1]; E3[2] = [lerp(0.5, 11, k), lerp(hitY, 5, k), lerp(0, 4, k), 1]; }
+  for (let i = 0; i < 3; i++) { p.set(E3[i][0], E3[i][1], E3[i][2]); sc.setScalar(Math.max(0.0001, E3[i][3])); mm.compose(p, q, sc); G.elec.setMatrixAt(i, mm); }
+  G.elec.instanceMatrix.needsUpdate = true;
+  const fa = G.lFlash.geometry.attributes, fk = t >= 1.25 && t < 1.7 ? 1 - (t - 1.25) / 0.45 : 0;
+  fa.position.setXYZ(0, 0, hitY - 0.8, 0); fa.aSize.setX(0, fk * 4 * G.mag.scale.x); fa.aColor.setXYZ(0, 1.5 * fk, 1.9 * fk, 2.5 * fk);
+  fa.position.needsUpdate = fa.aSize.needsUpdate = fa.aColor.needsUpdate = true;
+  G.lBeam.opacity = 0.1 + (t >= 0.9 && t < 1.45 ? 0.3 : 0);
+  // 標籤
+  const Lb = G.lensLab || (G.lensLab = { ion: new THREE.Vector3(), loss: new THREE.Vector3() });
+  if (phase === 'split' && lay.hasLoss) {
+    Lb.ion.copy(lay.ionC).add(new THREE.Vector3(bx + ionDx, by + 2.6, 0));
+    Lb.loss.copy(lay.losC).add(losD).add(new THREE.Vector3(bx, by + 2.4, 0));
+  } else Lb.ion.set(bx + (phase === 'split' ? ionDx : 0), lay.top + by + 2.4, 0);
+  if (phase === 'mol') { Lb.ionTxt = `${fmtF(F.f)} 分子`; Lb.ionSub = `中性 · 質量 ${c.mw}`; }
+  else if (phase === 'ion') { Lb.ionTxt = 'M⁺•'; Lb.ionSub = `少一個電子 · m/z ${c.mw}`; }
+  else if (!lay.hasLoss) { Lb.ionTxt = 'M⁺• 沒有斷'; Lb.ionSub = `m/z ${c.mw} = 分子量`; }
+  else { Lb.ionTxt = ionTxt(ch); Lb.ionSub = `m/z ${ch.mz} · 帶電,推往四極桿`; Lb.lossTxt = lossTxt(ch); Lb.lossSub = `${nominal(ch.loss)} · 中性,偵測不到`; }
+  Lb.ionVis = phase !== 'split' || ionFade > 0.3;
+  Lb.lossVis = phase === 'split' && lay.hasLoss && losFade > 0.25;
+  Lb.title = `${c.label} · 斷法 ${A.i + 1}/${F.ch.length}`;
+}
+
+/* ---------- 氦氣鋼瓶與管線 ---------- */
+function buildHelium() {
+  const g = new THREE.Group(); g.position.set(-152, -92, -24); G.world.add(g);
+  g.add(cyl(11, 11, 128, M.cyl, 40).translateY(64));
+  const sh = new THREE.Mesh(new THREE.SphereGeometry(11, 40, 16, 0, Math.PI * 2, 0, Math.PI / 2), M.cyl); sh.position.y = 128; g.add(sh);
+  g.add(cyl(2.4, 3, 6, M.steelDark, 20).translateY(141));
+  g.add(box(6, 4, 4, M.steel, 0, 146, 0, 0.6));
+  for (const [x, z] of [[-4.2, 2.4], [4.2, 2.4]]) {
+    const gg = cyl(2.4, 2.4, 1.4, M.steel, 24); gg.rotation.x = Math.PI / 2; gg.position.set(x, 149, z); g.add(gg);
+    const face = new THREE.Mesh(new THREE.CircleGeometry(2.0, 24), M.white); face.position.set(x, 149, z + 0.75); g.add(face);
+  }
+  const band = cyl(11.2, 11.2, 8, new THREE.MeshStandardMaterial({ color: 0x8a6d3b, roughness: 0.5, metalness: 0.3 }), 40); band.position.y = 114; g.add(band);
+  const lab = canvasTex(256, 128); lab.g.fillStyle = '#e8edf2'; lab.g.fillRect(0, 0, 256, 128); lab.g.fillStyle = '#20262f'; lab.g.font = '800 72px "Outfit", system-ui, sans-serif'; lab.g.fillText('He', 70, 92); lab.t.wrapS = THREE.RepeatWrapping; lab.t.repeat.x = -1; lab.t.needsUpdate = true;
+  const lb = new THREE.Mesh(new THREE.CylinderGeometry(11.15, 11.15, 16, 40, 1, true, -0.55, 1.1), new THREE.MeshStandardMaterial({ map: lab.t, roughness: 0.6 })); lb.position.y = 80; g.add(lb);
+  shadows(g);
+  const pts = [[-152, 54, -24], [-150, 60, -28], [-128, 64, -36], [-100, 58, -36], [-80, 50, -31], [-62, 51, -28.5]].map(p => new THREE.Vector3(...p));
+  const curve = new THREE.CatmullRomCurve3(pts), geo = new THREE.TubeGeometry(curve, 160, 0.42, 6, false);
+  const len = curve.getLength(), uv = geo.attributes.uv, aS = new Float32Array(uv.count);
+  for (let i = 0; i < uv.count; i++) aS[i] = uv.getX(i) * len;
+  geo.setAttribute('aS', new THREE.BufferAttribute(aS, 1));
+  G.flowMat = new THREE.ShaderMaterial({
+    uniforms: { uTime: { value: 0 }, uCol: { value: new THREE.Color(0x7fe3ff) } },
+    vertexShader: 'attribute float aS; varying float vS; varying vec3 vN; void main(){ vS = aS; vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform float uTime; uniform vec3 uCol; varying float vS; varying vec3 vN; void main(){ float d = fract(vS / 7.0 - uTime * 0.9); float dash = smoothstep(0.0, 0.12, d) * (1.0 - smoothstep(0.3, 0.42, d)); float sh = 0.25 + 0.6 * max(dot(normalize(vN), normalize(vec3(-0.3, 0.8, 0.5))), 0.0); gl_FragColor = vec4(vec3(0.55, 0.6, 0.68) * sh + uCol * dash * 0.75, 1.0); }',
+  });
+  G.world.add(new THREE.Mesh(geo, G.flowMat));
+  G.heAnchor = new THREE.Vector3(152, 60, -14);   // 世界座標(鏡像後在最右邊)
+}
+
+/* ---------- 粒子:蒸氣、離子、閃光 ---------- */
+const ION_N = 520, FX_N = 160;
+function makePoints(n) {
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3).setUsage(THREE.DynamicDrawUsage));
+  geo.setAttribute('aSize', new THREE.BufferAttribute(new Float32Array(n), 1).setUsage(THREE.DynamicDrawUsage));
+  geo.setAttribute('aColor', new THREE.BufferAttribute(new Float32Array(n * 3), 3).setUsage(THREE.DynamicDrawUsage));
+  const pts = new THREE.Points(geo, spriteMat()); pts.frustumCulled = false; G.scene.add(pts); return pts;
+}
+function buildFx() {
+  G.ionMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.22, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }), ION_N);
+  G.ionMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); G.ionMesh.frustumCulled = false;
+  for (let i = 0; i < ION_N; i++) G.ionMesh.setColorAt(i, new THREE.Color(0, 0, 0));
+  G.msd.add(G.ionMesh);
+  G.ions = Array.from({ length: ION_N }, () => ({ s: 0 }));
+  G.fx = makePoints(FX_N); G.fxP = Array.from({ length: FX_N }, () => ({ life: 0 }));
+  G.vap = makePoints(140); G.vapP = Array.from({ length: 140 }, () => ({ life: 0 }));
+  G.splitCurve = new THREE.CatmullRomCurve3(G.splitPath.map(p => new THREE.Vector3(...p)));
+  G.hornGlow = 0; G.spawnAcc = 0;
+}
+
+/* ---------- 標籤 ---------- */
+const TAGS = [];
+// near / far:相機距離在這個範圍內才顯示(遠看只標大部件,靠近才標細部)
+// text 可以是字串,或每格重算的函式
+function tag(text, sub, pos, cls = '', show = () => true, near = Infinity, far = 0) {
+  const el = document.createElement('div'); el.className = 'tag ' + cls;
+  el.innerHTML = `<i></i><span></span>${sub !== null ? '<em></em>' : ''}`;
+  const fn = typeof text === 'function' ? text : null;
+  el.querySelector('span').textContent = fn ? '' : text;
+  E.tags.appendChild(el);
+  const t = { el, pos, show, sub, near, far, txtFn: fn, em: el.querySelector('em'), span: el.querySelector('span'), lastSub: '', lastTxt: fn ? '' : text, vis: -1 };
+  TAGS.push(t); return t;
+}
+function buildTags() {
+  const W = (x, y, z) => () => new THREE.Vector3(x, y, z);
+  // obj() 的偏移量照原本(未鏡像)的寫法,x 取負號後經過鏡像,標籤仍落在物件右側
+  const obj = (o, x, y, z) => { const v = new THREE.Vector3(); return () => o.localToWorld(v.set(-x, y, z)); };
+  const ex = () => S.explode > 0.5, always = () => true, m = L.mag;
+  tag('ALS 自動進樣器', () => S.inj ? '進樣中' : '待命', obj(G.als, 5.6, 104, 2.6));
+  tag('進樣口', () => '250 °C · 分流', obj(G.inlet, 4.2, 6, 2.5));
+  tag('柱溫箱', () => f1(ovenT(S.injected ? S.t : 0, S.run.rate)) + ' °C', W(47, 47.5, 29));
+  tag('管柱 HP-5MS', () => '30 m × 0.25 mm', () => G.coilGrp.localToWorld(new THREE.Vector3(-55, 14.5, 13)));
+  tag('傳輸線', () => '250 °C', W(12, 27.4, 1.5));
+  tag('質譜儀', () => S.msOn ? 'EI 70 eV · 掃描中' : '燈絲關閉', () => G.msd.localToWorld(new THREE.Vector3(46, 47, 26)), '', always, Infinity, 150);
+  tag('離子源', () => S.msOn ? 'EI 70 eV · 230 °C' : '燈絲關閉', obj(G.src, 0, 5.6, 0), '', always, 150);
+  tag('四極桿', () => S.simMz != null ? '固定 m/z ' + S.simMz : S.msOn ? 'm/z ' + Math.round(S.sweep) : 'm/z 40–400', obj(G.quad, 0, 4.2, 0), '', always, 150);
+  tag('偵測器', () => '電子倍增器', obj(G.det, 0, 8.8, 0), '', always, 150);
+  tag('載氣 He', () => '1.0 mL/min', () => G.heAnchor);
+  const lens = (x, y, z) => { const v = new THREE.Vector3(); return () => G.mag.visible ? G.mag.localToWorld(v.set(x, y, z)) : null; };
+  const lensAt = fn => { const v = new THREE.Vector3(); return () => { const q = G.mag.visible ? fn() : null; return q ? G.lensMS.localToWorld(v.copy(q)) : null; }; };
+  const lensMSAt = (x, y, z) => { const v = new THREE.Vector3(); return () => G.mag.visible ? G.lensMS.localToWorld(v.set(x, y, z)) : null; };
+  const isGC = () => G.lensMode !== 'ms', isMS = () => G.lensMode === 'ms' && !!G.lensLab;
+  const nLens0 = TAGS.length;
+  G.magTag = tag(() => G.lensMode === 'ms' ? '放大:離子源' : '放大:管柱內部', () => (G.lensMode === 'ms' ? G.lensLab && G.lensLab.title : G.magSub) || '',
+    () => G.mag.visible ? G.mag.localToWorld(new THREE.Vector3(-m.len / 2 + 1, G.lensMode === 'ms' ? 11.6 : m.R + 2.6, 0)) : null);
+  tag('液膜 0.25 μm', null, lens(-m.len / 2 + 1, -m.R - 1.4, 0), 'part', isGC);
+  tag('載氣', null, lens(m.len / 2 - 8, -m.R - 1.4, 0), 'part', isGC);
+  tag(() => G.lensLab ? G.lensLab.ionTxt : '', () => G.lensLab ? G.lensLab.ionSub : '', lensAt(() => G.lensLab && G.lensLab.ionVis ? G.lensLab.ion : null), 'band keep', isMS);
+  tag(() => G.lensLab && G.lensLab.lossTxt || '', () => G.lensLab && G.lensLab.lossSub || '', lensAt(() => G.lensLab && G.lensLab.lossVis ? G.lensLab.loss : null), 'neutral keep', isMS);
+  tag('燈絲 · 70 eV 電子', null, lensMSAt(-2.4, 8.8, 0), 'part', isMS);
+  tag('← 往四極桿', null, lensMSAt(21, -7.6, 0), 'part', isMS);
+  for (let i = nLens0; i < TAGS.length; i++) TAGS[i].lens = true;   // 放大鏡上的標籤
+  G.bandTag = tag('', () => G.bandSub || '', () => G.bandPos, 'band', () => !!G.bandPos);
+  tag('隔墊', null, obj(G.septum, 2, 10, 1), 'part', ex);
+  tag('玻璃襯管', null, obj(G.liner, 1.4, 6, 1.2), 'part', ex);
+  tag('注射針 10 μL', null, obj(G.syringe, 1.6, 15, 0.8), 'part', ex);
+  tag('樣品盤', null, obj(G.turret, 8.8, 1.5, 3), 'part', ex);
+  tag('推斥極', null, obj(G.src, -2.6, -2.8, 2), 'part', ex, 170);
+  tag('燈絲', null, obj(G.src, 1.2, 3.4, 1), 'part', ex, 170);
+  tag('離子透鏡', null, obj(G.lens, 3.7, -2.9, 2), 'part', ex, 170);
+  tag('高能倍增極', null, obj(G.det, 1.4, 5.8, 1), 'part', ex, 170);
+  tag('渦輪分子泵', null, W(-23.5, 12, 6), 'part', ex);
+  tag('加熱圈與風扇', null, () => G.gc.localToWorld(new THREE.Vector3(-55, 14, -20)), 'part', ex);
+}
+const _v = { p: null };
+// 介面面板的位置(標籤落在面板上就不畫)
+let panelRects = [], panelClock = 0;
+function refreshPanelRects() {
+  panelRects = ['.brief', '#ctl', '#console', '.note3d'].map(s => document.querySelector(s)).filter(Boolean)
+    .map(el => el.getBoundingClientRect()).filter(r => r.width > 0 && r.height > 0);
+  G.holeRect = E.hole.getBoundingClientRect();
+}
+// 放大鏡固定在可視區的角落:寬的版面管柱模式放左下、離子源模式放右下(靠近各自的儀器),窄的版面放右上
+const _lens = { v: null };
+function placeLens(mode, show, dt) {
+  const r = G.holeRect, cam = G.camera, m = L.mag;
+  G.mag.visible = !!(show && r && r.width > 10);
+  G.lensGC.visible = mode !== 'ms'; G.lensMS.visible = mode === 'ms';
+  if (!G.mag.visible) { G.lensPos = null; G.lensRect = null; return; }
+  if (!_lens.v) _lens.v = new THREE.Vector3();
+  const W = innerWidth, H = innerHeight, wide = r.width / Math.max(1, r.height) > 1.45;
+  const ms = mode === 'ms', wPx = clamp(r.width * (wide ? (ms ? 0.46 : 0.27) : (ms ? 0.86 : 0.5)), 170, ms ? 560 : 430), hPx = wPx * (ms ? 30 / 58 : 2 * m.R / m.len);
+  // 寬版:管柱放大鏡在右下(靠近 GC),離子源放大鏡在左下(靠近質譜);窄版放在上方質譜那一側
+  const cx = !wide ? (ms ? r.left + r.width / 2 : r.left + wPx * 0.56 + 12) : ms ? r.left + wPx / 2 + 22 : r.right - wPx / 2 - 18;
+  const cy = wide ? r.bottom - hPx / 2 - (ms ? 14 : 6) : r.top + hPx / 2 + (ms ? 24 : 44);
+  const D = 90, v = _lens.v.set(cx / W * 2 - 1, 1 - cy / H * 2, 0.5).applyMatrix4(cam.projectionMatrixInverse);
+  v.multiplyScalar(-D / v.z);
+  if (!G.lensPos || REDUCED) G.lensPos = v.clone(); else G.lensPos.lerp(v, 1 - Math.exp(-dt * 7));
+  G.mag.position.copy(G.lensPos);
+  G.lensRect = { left: cx - wPx / 2, right: cx + wPx / 2, top: cy - hPx / 2 - 18, bottom: cy + hPx / 2 };
+  G.mag.scale.setScalar(wPx * 2 * D * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) / H / (ms ? 58 : m.len + 1));
+  if (ms) G.mag.rotation.set(0.06, -0.12, 0); else G.mag.rotation.set(0.2, -0.28, 0.02);
+  cam.updateMatrixWorld(true);
+}
+// 導覽時的鏡頭:每一站有自己的取景,管柱和傳輸線兩站跟著色帶走
+const _tc = { follow: null, init: false, stage: -1 };
+function tourCamera(dt) {
+  const T = S.tour, k = TOUR[T.i].k, p = S.run.sp.get(T.cid), V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  if (_tc.stage !== T.i) { _tc.stage = T.i; _tc.init = false; }
+  let want;
+  if (k === 'als') want = viewFor(SHOTS[1]);
+  else if (k === 'inlet') want = { pos: V3(50, 77, 52), tgt: V3(74, 58, 6) };
+  else if (k === 'column' || k === 'xfer') {
+    const b = G.world.localToWorld(G.colCurve.getPoint(clamp(zAt(p, S.t), 0, 1)));
+    const f = _tc.follow || (_tc.follow = new THREE.Vector3());
+    if (!_tc.init) { f.copy(b); _tc.init = true; } else f.lerp(b, 1 - Math.exp(-dt * 1.6));
+    want = { tgt: f.clone(), pos: f.clone().add(k === 'column' ? V3(-20, 26, 88) : V3(-8, 18, 62)) };
+  }
+  else if (k === 'source') { const s = G.src.getWorldPosition(new THREE.Vector3()); want = { tgt: s, pos: s.clone().add(V3(4, 12, 46)) }; }
+  else if (k === 'quad') { const x = lerp(L.q0 - 2, L.q1 + 2, smooth01(T.t / 10)), t = G.world.localToWorld(V3(x, L.ax.y, L.ax.z)); want = { tgt: t, pos: t.clone().add(V3(-6, 14, 50)) }; }
+  else if (k === 'det') { const d = G.det.getWorldPosition(new THREE.Vector3()); d.y -= 2; want = { tgt: d, pos: d.clone().add(V3(-12, 12, 34)) }; }
+  else want = viewFor(null);
+  const a = REDUCED ? 1 : 1 - Math.exp(-dt * 2.0);
+  G.camera.position.lerp(want.pos, a); G.controls.target.lerp(want.tgt, a);
+}
+function onTourChange(on, byUser) {
+  if (!G.ready) return;
+  G.fly = null; G.injCam = false; _tc.stage = -1;
+  if (on) G.userMoved = false;
+  else if (!byUser) resetView(false);
+}
+function updateTags() {
+  const cam = G.camera, W = innerWidth, H = innerHeight;
+  if (!_v.p) _v.p = new THREE.Vector3();
+  const remeasure = (panelClock = (panelClock + 1) % 30) === 1 || !panelRects.length;
+  if (remeasure) refreshPanelRects();
+  for (const t of TAGS) {
+    if ((remeasure && t.vis === 1) || !t.w) { t.w = t.el.offsetWidth || 120; t.h = t.el.offsetHeight || 20; }
+    let show = t.show();
+    let p = null;
+    if (show) { p = t.pos(); if (!p) show = false; }
+    if (show && (t.near < Infinity || t.far > 0)) { const d = cam.position.distanceTo(p); if (d > t.near || d < t.far) show = false; }
+    if (show) {
+      _v.p.copy(p).project(cam);
+      if (_v.p.z > 1 || Math.abs(_v.p.x) > 1.15 || Math.abs(_v.p.y) > 1.15) show = false;
+    }
+    const x = (_v.p.x + 1) / 2 * W, y = (1 - _v.p.y) / 2 * H;
+    // 整個標籤框(從錨點往右延伸)碰到面板就不畫
+    const rects = !t.lens && G.lensRect ? [...panelRects, G.lensRect] : panelRects;
+    if (show && !S.bare) for (const r of rects) if (x - 9 < r.right + 6 && x - 9 + t.w > r.left - 6 && y - t.h / 2 < r.bottom + 6 && y + t.h / 2 > r.top - 6) { show = false; break; }
+    if (t.vis !== (show ? 1 : 0)) { t.el.style.opacity = show ? '1' : '0'; t.vis = show ? 1 : 0; }
+    if (!show) continue;
+    t.el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-9px,-50%)`;
+    if (t.txtFn) { const s = t.txtFn(); if (s !== t.lastTxt) { t.lastTxt = s; t.span.textContent = s; t.w = 0; } }
+    if (t.sub) { const s = t.sub(); if (s !== t.lastSub) { t.lastSub = s; if (t.em) t.em.textContent = s; t.w = 0; } }
+  }
+}
+
+/* ---------- 視角 ---------- */
+function updateViewOffset() {
+  if (!G.camera) return;
+  const r = E.hole.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+  const cx = r.width > 40 ? r.left + r.width / 2 : W / 2, cy = r.height > 40 ? r.top + r.height / 2 : H / 2;
+  G.camera.setViewOffset(W, H, -(cx - W / 2), -(cy - H / 2), W, H);
+  G.camera.updateProjectionMatrix();
+}
+function fitDistance() {
+  const r = E.hole.getBoundingClientRect(), H = innerHeight, tan = Math.tan(THREE.MathUtils.degToRad(G.camera.fov / 2));
+  const hw = Math.max(200, r.width) / H, hh = Math.max(150, r.height) / H;
+  return clamp(Math.max(80 / (tan * hw), 68 / (tan * hh)), 150, 900);
+}
+function viewFor(shot) {
+  if (!shot || !shot.pos) {
+    const d = fitDistance(), t = new THREE.Vector3(...DEF_VIEW.tgt), dir = new THREE.Vector3(...DEF_VIEW.dir).normalize();
+    return { pos: t.clone().addScaledVector(dir, d), tgt: t };
+  }
+  return { pos: new THREE.Vector3(...shot.pos), tgt: new THREE.Vector3(...shot.tgt) };
+}
+function flyTo(v, dur = 1.6) { G.fly = { p0: G.camera.position.clone(), t0: G.controls.target.clone(), p1: v.pos, t1: v.tgt, start: performance.now(), dur: REDUCED ? 1 : dur * 1000 }; }
+function resetView(instant) {
+  if (!G.ready && !instant) return;
+  const v = viewFor(null);
+  G.userMoved = false;
+  if (instant) { G.camera.position.copy(v.pos); G.controls.target.copy(v.tgt); G.controls.update(); }
+  else flyTo(v, 1.4);
+}
+const SHOTS = [null, { pos: [36, 96, 66], tgt: [74, 72, 4] }];
+
+/* ---------- 每一格 ---------- */
+const _m4 = { m: null, q: null, s: null, p: null, c: null };
+function update3D(dt, now) {
+  if (!_m4.m) { _m4.m = new THREE.Matrix4(); _m4.q = new THREE.Quaternion(); _m4.s = new THREE.Vector3(); _m4.p = new THREE.Vector3(); _m4.c = new THREE.Color(); }
+  const run = S.run, T = ovenT(S.injected ? S.t : 0, run.rate), sec = now / 1000;
+  // 慢動作:分子、離子、放大鏡這些「過程」的動畫用放慢後的時間;鏡頭和介面反應維持正常速度
+  const sdt = dt * S.slow; G.simSec = (G.simSec || 0) + sdt;
+  const tk = tourOn() ? TOUR[S.tour.i].k : null;
+  if (tk) { G.fly = null; G.injCam = false; tourCamera(dt); }
+  else {
+    // 進樣時鏡頭先飛到 ALS,打完針再拉回全景(使用者自己轉過鏡頭就不搶)
+    if (S.inj && S.inj !== G.lastInj) { G.lastInj = S.inj; if (!G.userMoved && !REDUCED) { G.injCam = true; flyTo(viewFor(SHOTS[1]), 1.5); } }
+    if (G.injCam && (!S.inj || (S.inj.pushed && S.t > 0.45))) { G.injCam = false; flyTo(viewFor(null), 2.4); }
+    if (G.fly) {
+      const k = easeIO((now - G.fly.start) / G.fly.dur);
+      G.camera.position.lerpVectors(G.fly.p0, G.fly.p1, k); G.controls.target.lerpVectors(G.fly.t0, G.fly.t1, k);
+      if (k >= 1) G.fly = null;
+    }
+  }
+  if (S.inj) G.lastInj = S.inj;
+  G.controls.update();
+  G.camera.updateMatrixWorld(true);
+  if (!G.holeRect) refreshPanelRects();
+  // 放大鏡:管柱模式或離子源模式;導覽時由每一站決定
+  let lensMode = S.msFocus ? 'ms' : 'gc', lensShow;
+  if (tk) { lensMode = tk === 'source' ? 'ms' : 'gc'; lensShow = tk === 'column' || tk === 'xfer' || tk === 'source'; }
+  else lensShow = !S.bare && G.camera.position.distanceTo(G.controls.target) > (lensMode === 'ms' ? 70 : 105);
+  G.lensMode = lensMode;
+  placeLens(lensMode, lensShow, dt);
+  if (lensMode === 'ms' && G.mag.visible) updateLensMS(sdt); else { S.lensCh = null; if (lensMode !== 'ms') G.lensLab = null; }
+
+  // 拆開
+  if (G.lastX !== S.explode) {
+    G.lastX = S.explode; const k = easeIO(S.explode);
+    G.door.rotation.y = -1.75 * k;
+    G.coilGrp.position.z = 30 * k;
+    G.als.position.y = 12 * k;
+    G.septumNut.position.y = 15 * k; G.septum.position.y = 9.5 * k; G.liner.position.y = 4.5 * k;
+    G.msTop.position.y = 18 * k; G.msFront.position.z = 16 * k;
+    M.shellFade.opacity = 1 - k; M.shellFade.depthWrite = k < 0.5; G.msFront.visible = k < 0.98;
+    G.msWin.material.uniforms.uFade.value = 1 - k;
+    G.src.position.x = L.src - 6 * k; G.lens.position.x = L.src - 2.5 * k; G.det.position.x = L.det + 7 * k;
+    if (Math.abs(G.colK - k) > 1e-4) rebuildColumn(k);
+  }
+
+  // 柱溫箱:加熱圈、風扇、指示燈、顯示幕
+  const heat = clamp((T - 45) / 175, 0, 1);
+  G.heaterMat.emissiveIntensity = 0.3 + 2.6 * heat;
+  G.ovenLight.intensity = 400 * (0.15 + heat);
+  G.fan.rotation.z -= sdt * (S.injected ? 14 : 6);
+  G.turbo.rotation.y += sdt * 30;
+  const running = S.injected && S.t < run.tEnd;
+  G.ledReady.color.setRGB(running ? 0.1 : 0.4, running ? 0.2 : 2.4, running ? 0.12 : 0.6);
+  G.ledRun.color.setRGB(running ? 0.6 : 0.08, running ? 2.4 : 0.16, running ? 3.0 : 0.2);
+  G.flowMat.uniforms.uTime.value = G.simSec;
+  G.dispClock = (G.dispClock || 0) + dt;
+  if (G.dispClock > 0.2) { G.dispClock = 0; drawDisplays(T, running); }
+
+  // 管柱色帶
+  const U = G.colMat.uniforms;
+  for (let i = 0; i < NB; i++) {
+    const c = BAND_SP[i], p = run.sp.get(c.id);
+    let z = -1, a = 0, sig = 0.002;
+    if (S.injected) {
+      z = zAt(p, S.t); sig = Math.max(bandSig(z), 0.0011);
+      if (z < 1 + 4 * sig) {
+        const amt = c.solvent ? 30 : c.amt;
+        a = (0.5 + 0.5 * Math.sqrt(amt / 18)) * clamp(Math.pow(0.0035 / sig, 0.45), 0.7, 2.0) * 4.2;
+        if (S.t < 0.03) a *= S.t / 0.03;
+      }
+    }
+    U.uC.value[i] = z; U.uW.value[i] = sig; U.uA.value[i] = a;
+  }
+
+  // 追蹤的色帶:管柱上的圈、連線、標籤
+  const tid = S.trackId, tc = tid ? BYID.get(tid) : null;
+  let sStar = null;
+  if (tc && S.injected) {
+    const p = run.sp.get(tid), z = zAt(p, S.t);
+    if (z <= 1) sStar = Math.max(0, z);
+  }
+  const m = L.mag, za = G.zoomLines.geometry.attributes.position;
+  const lineTo = (from, l1, l2) => {
+    const e1 = G.mag.localToWorld(l1), e2 = G.mag.localToWorld(l2);
+    za.setXYZ(0, from.x, from.y, from.z); za.setXYZ(1, e1.x, e1.y, e1.z); za.setXYZ(2, from.x, from.y, from.z); za.setXYZ(3, e2.x, e2.y, e2.z);
+    za.needsUpdate = true; G.zoomLines.visible = G.mag.visible;
+  };
+  if (sStar !== null && lensMode !== 'ms') {
+    const pos = G.colCurve.getPoint(sStar), tan = G.colCurve.getTangent(Math.min(0.9999, sStar));
+    G.zoomRing.visible = true; G.zoomRing.position.copy(pos); G.zoomRing.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tan.normalize());
+    const wpos = G.world.localToWorld(pos.clone());
+    lineTo(wpos, new THREE.Vector3(-m.len / 2, m.R * 0.85, 0), new THREE.Vector3(m.len / 2, m.R * 0.85, 0));
+    G.bandPos = wpos.clone().add(new THREE.Vector3(0, 2.4, 0));
+    const k = kOf(tc, T);
+    G.bandSub = `k ${k >= 100 ? Math.round(k) : k >= 10 ? f1(k) : f2(k)}`;
+    if (G.bandTag.lastTxt !== tc.name) { G.bandTag.lastTxt = tc.name; G.bandTag.span.textContent = tc.name; }
+  } else {
+    G.zoomRing.visible = false; G.bandPos = null; G.zoomLines.visible = false;
+    // 離子源模式:連線接到 3D 裡的離子源
+    if (lensMode === 'ms' && G.mag.visible) lineTo(G.src.getWorldPosition(new THREE.Vector3()), new THREE.Vector3(-23, 9.5, 0), new THREE.Vector3(23, 9.5, 0));
+  }
+
+  updateMagnifier(sdt, T, sStar, tc);
+  updateIons(sdt, G.simSec);
+  updateVapor(sdt, now);
+  updateALS();
+  // 偵測器與離子源
+  G.hornGlow *= Math.exp(-sdt * 5);
+  G.hornMat.emissiveIntensity = Math.min(3, G.hornGlow * 0.25);
+  const fil = S.msOn ? 1 : 0;
+  G.filMat.color.setRGB(0.25 + 3.2 * fil, 0.12 + 1.6 * fil, 0.06 + 0.5 * fil);
+  G.beamMat.opacity = fil * (0.35 + 0.15 * Math.sin(G.simSec * 37));
+  updateTags();
+}
+
+function drawDisplays(T, running) {
+  const d = G.gcDisp, g = d.g;
+  g.fillStyle = '#05100b'; g.fillRect(0, 0, 256, 160);
+  g.fillStyle = running ? '#7dffb0' : '#4fae7a'; g.font = '600 30px "IBM Plex Mono", monospace';
+  g.fillText(running ? 'RUN' : S.injected ? 'POST' : 'READY', 14, 42);
+  g.font = '500 30px "IBM Plex Mono", monospace';
+  g.fillText(f2(S.injected ? S.t : 0).padStart(6, ' ') + ' min', 14, 92);
+  g.fillText('OVEN ' + f1(T) + '°C', 14, 140);
+  d.t.needsUpdate = true;
+  const m = G.msDisp, h = m.g;
+  h.fillStyle = '#05100b'; h.fillRect(0, 0, 256, 160);
+  h.fillStyle = S.msOn ? '#7dffb0' : '#4fae7a'; h.font = '600 28px "IBM Plex Mono", monospace';
+  h.fillText(S.msOn ? 'SCAN' : 'EM OFF', 14, 42);
+  h.font = '500 26px "IBM Plex Mono", monospace';
+  h.fillText('40-400 u', 14, 90); h.fillText('SRC 230°C', 14, 136);
+  m.t.needsUpdate = true;
+}
+
+/* ---------- 放大鏡模擬 ---------- */
+function updateMagnifier(dt, T, sStar, tc) {
+  const m = L.mag, run = S.run, half = m.len / 2 - 0.8;
+  G.magClock = (G.magClock || 0) + dt;
+  // 每 0.4 秒依放大處的組成重新分配分子
+  if (G.magClock > 0.4) {
+    G.magClock = 0;
+    const comp = [];
+    if (sStar !== null) {
+      for (const c of BAND_SP) {
+        const p = run.sp.get(c.id), z = zAt(p, S.t); if (z > 1.01) continue;
+        const sg = Math.max(bandSig(z), 0.0011), d = (sStar - z) / sg; if (Math.abs(d) > 3.2) continue;
+        comp.push([c.id, (c.solvent ? 30 : c.amt) * Math.exp(-0.5 * d * d)]);
+      }
+    }
+    const tot = comp.reduce((a, b) => a + b[1], 0);
+    const want = new Map(); let assigned = 0;
+    if (tot > 0) {
+      const fr = comp.map(([id, v]) => [id, v / tot * MOL_N]);
+      for (const [id, v] of fr) { want.set(id, Math.floor(v)); assigned += Math.floor(v); }
+      fr.sort((a, b) => (b[1] % 1) - (a[1] % 1));
+      for (let i = 0; assigned < MOL_N && i < fr.length; i++, assigned++) want.set(fr[i][0], want.get(fr[i][0]) + 1);
+    }
+    const have = new Map();
+    for (const o of G.mol) if (o.id && want.get(o.id)) { const h = (have.get(o.id) || 0) + 1; if (h <= want.get(o.id)) have.set(o.id, h); else o.id = null; } else o.id = null;
+    for (const o of G.mol) {
+      if (o.id) continue;
+      for (const [id, w] of want) { if ((have.get(id) || 0) < w) { o.id = id; have.set(id, (have.get(id) || 0) + 1); const k = kOf(BYID.get(id), T); o.film = Math.random() < k / (1 + k); o.r = o.film ? rand(5.95, 6.5) : Math.sqrt(Math.random()) * 5.3; break; } }
+    }
+    let inFilm = 0, n = 0;
+    for (const o of G.mol) if (o.id) { n++; if (o.film) inFilm++; }
+    if (sStar === null) G.magSub = tc && !tc.solvent && S.injected ? `${tc.label} 已離開管柱` : '沒有追蹤的成分';
+    else G.magSub = `${Math.round(sStar * 100)}% 處 · 液膜裡 ${n ? Math.round(inFilm / n * 100) : 0}%`;
+  }
+  const mm = _m4.m, q = _m4.q, sc = _m4.s, p = _m4.p, col = _m4.c;
+  q.identity();
+  for (let i = 0; i < MOL_N; i++) {
+    const o = G.mol[i];
+    o.vis = lerp(o.vis, o.id ? 1 : 0, Math.min(1, dt * 6));
+    if (o.id) {
+      const c = BYID.get(o.id), k = kOf(c, T), tg = 0.32;
+      if (o.film) { if (Math.random() < dt / (k * tg)) { o.film = false; o.r = 5.2; } }
+      else if (Math.random() < dt / tg) { o.film = true; o.r = rand(5.95, 6.5); }
+      if (!o.film) {
+        o.x += dt * (4 + 24 * (1 - (o.r / 5.9) ** 2));
+        o.r = clamp(o.r + (Math.random() - 0.5) * dt * 9, 0, 5.4); o.th += (Math.random() - 0.5) * dt * 2;
+      }
+      if (o.x > half) o.x -= 2 * half;
+      const b = o.film ? 0.55 : 2.2;
+      col.copy(CLS[c.cls].lin).multiplyScalar(b);
+    } else col.setRGB(0, 0, 0);
+    const s = o.vis < 0.02 ? 0.0001 : o.vis;
+    p.set(o.x, o.r * Math.cos(o.th), o.r * Math.sin(o.th)); sc.set(s, s, s);
+    mm.compose(p, q, sc); G.molMesh.setMatrixAt(i, mm); G.molMesh.setColorAt(i, col);
+  }
+  G.molMesh.instanceMatrix.needsUpdate = true; G.molMesh.instanceColor.needsUpdate = true;
+  const pa = G.gasPts.geometry.attributes.position;
+  for (let i = 0; i < GAS_N; i++) {
+    const o = G.gas[i]; o.x += dt * (6 + 30 * (1 - (o.r / 5.9) ** 2)); if (o.x > half) o.x -= 2 * half;
+    pa.setXYZ(i, o.x, o.r * Math.cos(o.th), o.r * Math.sin(o.th));
+  }
+  pa.needsUpdate = true;
+}
+
+/* ---------- 離子 ---------- */
+function spawnFx(x, y, z, r, g, b, size, life, vx = 0, vy = 0, vz = 0, local = true) {
+  const f = G.fxP.find(o => o.life <= 0); if (!f) return;
+  const w = local ? G.msd.localToWorld(new THREE.Vector3(x, y, z)) : new THREE.Vector3(x, y, z);
+  Object.assign(f, { x: w.x, y: w.y, z: w.z, r, g, b, size, life, max: life, vx, vy, vz });
+}
+function updateIons(dt, sec) {
+  const ax = L.ax, srcX = G.src.position.x, lensX = G.lens.position.x, q0 = L.q0, q1 = L.q1, detX = G.det.position.x;
+  const sp = S.spec;
+  if (S.msOn && sp && sp.contrib.length) {
+    const rate = 150 * Math.pow(Math.min(1, sp.total / (S.run.ticMax * 0.9)), 0.55);
+    G.spawnAcc += rate * dt;
+    while (G.spawnAcc >= 1) {
+      G.spawnAcc -= 1;
+      const slot = G.ions.find(o => o.s === 0); if (!slot) break;
+      let r = Math.random() * sp.total, c = sp.contrib[0][0];
+      for (const [cc, v] of sp.contrib) { r -= v; if (r <= 0) { c = cc; break; } }
+      let u = Math.random(), mz = c.baseMz;
+      for (let i = 0; i < MZN; i++) { u -= c.frac[i]; if (u <= 0) { mz = i + MZ0; break; } }
+      Object.assign(slot, { s: 1, x: srcX - 1.6, y: ax.y + rand(-0.2, 0.2), z: ax.z + rand(-0.2, 0.2), vx: rand(4, 7), vy: rand(-0.6, 0.6), vz: rand(-0.6, 0.6), c, mz, ph: rand(0, 6.28), ph2: rand(0, 6.28), t: 0 });
+    }
+  } else G.spawnAcc = 0;
+  const mm = _m4.m, q = _m4.q, sc = _m4.s, p = _m4.p, col = _m4.c;
+  q.identity();
+  for (let i = 0; i < ION_N; i++) {
+    const o = G.ions[i];
+    if (o.s === 1) {
+      o.x += o.vx * dt; o.y += o.vy * dt; o.z += o.vz * dt;
+      if (o.x >= srcX - 0.1) {
+        o.s = 2; o.vx = 9;
+        if (Math.random() < 0.25) spawnFx(o.x, o.y, o.z, 0.5, 1.1, 2.4, 1.2, 0.18);
+      }
+    } else if (o.s === 2) {
+      o.vx = Math.min(16, o.vx + 30 * dt); o.x += o.vx * dt;
+      o.y += (ax.y - o.y) * Math.min(1, 5 * dt); o.z += (ax.z - o.z) * Math.min(1, 5 * dt);
+      if (o.x >= q0) {
+        o.s = 3; o.t = 0;
+        const d = Math.abs(o.mz - S.sweep);
+        o.stable = S.simMz != null ? Math.abs(o.mz - S.simMz) < 0.5 : Math.min(d, MZN - d) < 16;
+        o.amp = 0.28;
+      }
+    } else if (o.s === 3) {
+      o.x += 11 * dt; o.t += dt;
+      const s = o.x - q0;
+      if (!o.stable) o.amp = 0.28 * Math.exp(0.3 * s);
+      const w = 2.2 + 140 / o.mz;
+      o.y = ax.y + o.amp * Math.sin(w * s + o.ph); o.z = ax.z + o.amp * Math.cos(0.83 * w * s + o.ph2);
+      if (o.amp > 1.1) { o.s = 0; spawnFx(o.x, o.y, o.z, 2.0, 1.1, 0.35, 1.0, 0.3); continue; }
+      if (o.x >= q1) { o.s = 4; o.t = 0; o.x0 = o.x; o.y0 = o.y; o.z0 = o.z; }
+    } else if (o.s === 4) {
+      o.t += dt * 3.2; const k = Math.min(1, o.t);
+      const hx = detX, hy = ax.y + 5.4;
+      o.x = lerp(o.x0, hx, k); o.y = lerp(o.y0, hy, k * k); o.z = lerp(o.z0, ax.z, k);
+      if (k >= 1) {
+        o.s = 0; G.hornGlow += 1;
+        spawnFx(hx, hy - 0.4, ax.z, 1.6, 2.0, 2.4, 1.6, 0.22);
+        for (let e = 0; e < 3; e++) { const sl = G.ions.find(v => v.s === 0); if (!sl) break; Object.assign(sl, { s: 5, x: hx + rand(-0.4, 0.4), y: hy - 0.5, z: ax.z + rand(-0.4, 0.4), t: 0, ex: rand(-0.3, 0.3) }); }
+      }
+    } else if (o.s === 5) {
+      o.t += dt; o.y -= dt * 18; o.x += (detX + o.ex - o.x) * Math.min(1, dt * 8);
+      if (o.y < ax.y - 6.5) o.s = 0;
+    }
+    if (o.s === 0) { sc.set(0.0001, 0.0001, 0.0001); col.setRGB(0, 0, 0); }
+    else {
+      let s = 1;
+      if (o.s === 5) { s = 0.45; col.setRGB(0.7, 1.9, 2.6); }
+      else {
+        const b = o.s === 1 ? 0.5 : 2.6;
+        col.copy(CLS[o.c.cls].lin).multiplyScalar(b); if (o.s > 1) col.addScalar(0.25);
+        s = o.s === 1 ? 1.15 : 0.75 + o.mz / 260;
+      }
+      sc.set(s, s, s);
+    }
+    p.set(o.x || 0, o.y || 0, o.z || 0);
+    mm.compose(p, q, sc); G.ionMesh.setMatrixAt(i, mm); G.ionMesh.setColorAt(i, col);
+  }
+  G.ionMesh.instanceMatrix.needsUpdate = true; G.ionMesh.instanceColor.needsUpdate = true;
+  // 閃光
+  const fa = G.fx.geometry.attributes;
+  for (let i = 0; i < FX_N; i++) {
+    const f = G.fxP[i];
+    if (f.life > 0) {
+      f.life -= dt; const k = Math.max(0, f.life / f.max);
+      f.x += f.vx * dt; f.y += f.vy * dt; f.z += f.vz * dt;
+      fa.position.setXYZ(i, f.x, f.y, f.z); fa.aSize.setX(i, f.size * (0.6 + 0.6 * k)); fa.aColor.setXYZ(i, f.r * k, f.g * k, f.b * k);
+    } else fa.aSize.setX(i, 0);
+  }
+  fa.position.needsUpdate = fa.aSize.needsUpdate = fa.aColor.needsUpdate = true;
+}
+
+/* ---------- 進樣的蒸氣 ---------- */
+function updateVapor(dt, now) {
+  const P = G.vapP, a = G.vap.geometry.attributes, il = G.inlet.localToWorld(new THREE.Vector3(0, 0, 0));
+  if (S.vaporAt > 0 && S.vaporAt !== G.lastVap) {
+    G.lastVap = S.vaporAt;
+    for (let i = 0; i < P.length; i++) {
+      const toSplit = i % 10 < 7;
+      Object.assign(P[i], { life: rand(1.1, 1.9), max: 1.9, split: toSplit, u: 0, sp: rand(0.5, 0.9), x: il.x + rand(-0.6, 0.6), y: il.y + rand(5.5, 7.5), z: il.z + rand(-0.6, 0.6), delay: rand(0, 0.25), off: [rand(-0.5, 0.5), rand(-0.5, 0.5), rand(-0.5, 0.5)] });
+    }
+  }
+  for (let i = 0; i < P.length; i++) {
+    const o = P[i];
+    if (o.life > 0) {
+      o.life -= dt;
+      if (o.delay > 0) { o.delay -= dt; }
+      else if (o.split) {
+        o.u = Math.min(1, o.u + dt * o.sp);
+        const pt = G.splitCurve.getPoint(o.u); const w = G.gc.localToWorld(pt);
+        o.x = lerp(o.x, w.x + o.off[0], 0.2); o.y = lerp(o.y, w.y + o.off[1], 0.2); o.z = lerp(o.z, w.z + o.off[2], 0.2);
+        if (o.u >= 1) { o.x += o.off[0] * dt * 8; o.y += dt * 6; o.z -= dt * 6; }
+      } else { o.y -= dt * 7; o.x += o.off[0] * dt; o.z += o.off[2] * dt; if (o.y < il.y - 2) o.life = Math.min(o.life, 0.15); }
+      const k = clamp(o.life / 0.6, 0, 1);
+      a.position.setXYZ(i, o.x, o.y, o.z); a.aSize.setX(i, 0.9 + (1 - k) * 1.1); a.aColor.setXYZ(i, 0.42 * k, 0.5 * k, 0.65 * k);
+    } else a.aSize.setX(i, 0);
+  }
+  a.position.needsUpdate = a.aSize.needsUpdate = a.aColor.needsUpdate = true;
+}
+
+/* ---------- ALS 動作 ---------- */
+function updateALS() {
+  const turret = G.turret, sy = G.syringe, pl = G.plunger;
+  const samp = -3 * Math.PI * 2 / 10;
+  let rot = 0, dy = 0, plg = 0, fill = 0;
+  if (S.inj) {
+    const st = injStepAt(S.inj.el), k = st ? smooth01(st.f) : 1, kk = st ? st.k : 'done';
+    switch (kk) {
+      case 'turn1': rot = samp * k; break;
+      case 'dip': rot = samp; dy = -3.8 * k; break;
+      case 'draw': {
+        rot = samp; dy = -3.8;
+        const f = st.f; plg = f < 0.6 ? 1.6 * Math.abs(Math.sin(f / 0.6 * Math.PI * 2)) : 1.6 * smooth01((f - 0.6) / 0.4);
+        fill = f < 0.6 ? 0.25 * Math.abs(Math.sin(f / 0.6 * Math.PI * 2)) : smooth01((f - 0.6) / 0.4);
+        break;
+      }
+      case 'lift': rot = samp; dy = -3.8 * (1 - k); plg = 1.6; fill = 1; break;
+      case 'turn2': rot = samp * (1 - k); plg = 1.6; fill = 1; break;
+      case 'down': dy = -17.2 * k; plg = 1.6; fill = 1; break;
+      case 'push': dy = -17.2; plg = 1.6 * (1 - k); fill = 1 - k; break;
+      case 'up': dy = -17.2 * (1 - k); break;
+      default: break;
+    }
+  }
+  turret.rotation.y = rot; sy.position.y = 73.2 + dy; pl.position.y = plg;
+  G.syLiq.scale.y = Math.max(0.001, fill * 1.6); G.syLiq.position.y = 9.6 + fill * 0.8;
+  G.syLiq.visible = fill > 0.01;
+}
+
+/* ---------- 尺寸 ---------- */
+function resize3D() {
+  const w = innerWidth, h = innerHeight;
+  G.renderer.setSize(w, h, false); G.composer.setSize(w, h);
+  G.camera.aspect = w / h; updateViewOffset();
+  if (G.ready && !G.userMoved && !G.fly && !tourOn()) resetView(true);
+  const sc = h * G.renderer.getPixelRatio() / (2 * Math.tan(THREE.MathUtils.degToRad(G.camera.fov / 2)));
+  for (const pts of [G.fx, G.vap, G.gasPts, G.lFlash]) pts.material.uniforms.uScale.value = sc;
+}
+
+/* ---------- 啟動 ---------- */
+initUI();
+S.run = getRun(S.rate);
+E.tSlider.max = S.run.tEnd.toFixed(2);
+buildTable();
+let kicked = false;
+function kickoff() {
+  if (kicked) return; kicked = true;
+  if (REDUCED) { finishInjection(); S.t = 11.3; S.playing = false; markDirty(); }
+  else startInjection();
+}
+function show3DError(err) {
+  console.warn('3D 模型載入失敗', err);
+  E.load.classList.add('gone');
+  const n = document.createElement('div'); n.className = 'note3d';
+  n.textContent = '3D 模型沒有載入(這台電腦可能擋了 cdn.jsdelivr.net,或瀏覽器沒有開啟 WebGL)。底下的層析圖、質譜和所有控制仍然可以操作。';
+  E.hud.appendChild(n);
+}
+init3D().then(() => { E.load.classList.add('gone'); setTimeout(kickoff, 500); }).catch(err => { show3DError(err); kickoff(); });
+setTimeout(kickoff, 7000);
+let lastFrame = performance.now(), frameErr = false;
+function step(dt, now) {
+  try {
+    tick(dt, now);
+    if (G.ready) { update3D(dt, now); G.composer.render(); }
+  } catch (e) { if (!frameErr) { frameErr = true; console.error(e); } }
+}
+function frame(now) {
+  const dt = Math.min(0.05, Math.max(0, (now - lastFrame) / 1000)); lastFrame = now;
+  step(dt, now);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+
+</script>
+</body>
+</html>
