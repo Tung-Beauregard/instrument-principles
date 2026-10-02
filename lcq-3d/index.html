@@ -1,0 +1,3336 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LCQ Deca XP 離子之旅</title>
+<meta name="description" content="把 LCQ Deca XP 離子阱質譜儀拆開來看:從電灑噴針、加熱毛細管、多極柱到離子阱與偵測器,一路追著離子變成質譜。">
+<meta name="theme-color" content="#070a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;500;600;700;800&display=swap">
+<style>
+/* 版面:整個視窗是一張實驗桌,左上是標題與讀值,右上是儀器控制,下方是穩定圖與質譜兩個示波窗。
+   單一深色場景(和原網站一樣只做暗色),所有顏色都從下列 token 取用。 */
+:root {
+  color-scheme: dark;
+  --bg: #070a12;
+  --glass: rgba(13, 18, 32, 0.78);
+  --glass-hi: rgba(19, 25, 41, 0.92);
+  --line: rgba(255, 255, 255, 0.11);
+  --line-ion: rgba(127, 227, 255, 0.34);
+  --fg: #eef2fa;
+  --fg-2: #c3cadc;
+  --fg-3: #8d97b3;
+  --ion: #7fe3ff;
+  --heat: #ffb454;
+  --ok: #3ddc84;
+  --stop: #ff7a6b;
+  --knob-hi: #f4f7ff;
+  --knob-lo: #aab4c8;
+  --on-bg: #eef4ff;
+  --on-fg: #101626;
+  --shade: rgba(4, 6, 12, 0.62);
+  --f-ui: "Outfit", "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+  --f-zh: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+  --f-mono: "DM Mono", "Cascadia Mono", ui-monospace, Menlo, monospace;
+}
+
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; background: var(--bg); color: var(--fg); overflow: hidden; }
+body { font-family: var(--f-ui); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ion); outline-offset: 2px; }
+
+#app { position: relative; height: 100%; overflow: hidden; background: var(--bg); }
+#gl, #ov { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#gl { touch-action: none; cursor: grab; }
+#gl.drag { cursor: grabbing; }
+#gl.pick { cursor: pointer; }
+#ov { pointer-events: none; }
+
+.vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(7, 10, 19, 0.7), rgba(7, 10, 19, 0) 30%),
+    radial-gradient(120% 90% at 55% 55%, rgba(0, 0, 0, 0) 55%, rgba(3, 5, 10, 0.55));
+}
+
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ---------- 左上:標題、讀值、說明 ---------- */
+.side {
+  position: absolute; top: 20px; left: 20px;
+  width: min(330px, 42vw);
+  display: flex; flex-direction: column; gap: 10px;
+  pointer-events: none;
+}
+.brand h1 { margin: 0; line-height: 1; display: flex; flex-direction: column; gap: 6px; }
+.brand h1 span {
+  font: 600 18px/1 var(--f-ui); letter-spacing: 0.08em; color: #dfe6f5;
+}
+.brand h1 b {
+  font: 900 38px/1.05 var(--f-zh); letter-spacing: 0.02em; color: var(--ion);
+  text-shadow: 0 0 24px rgba(127, 227, 255, 0.25);
+}
+.brand p {
+  margin: 10px 0 0; font: 400 13px/1.65 var(--f-zh); color: var(--fg-2);
+  max-width: 30em; text-wrap: pretty;
+}
+.stats { display: flex; gap: 6px; flex-wrap: wrap; }
+.stat {
+  border-radius: 10px; padding: 6px 10px 5px; min-width: 0;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.stat i {
+  font: 500 9px/1 var(--f-mono); letter-spacing: 0.12em; color: var(--fg-3); font-style: normal;
+  text-transform: uppercase;
+}
+.stat i em { font: 500 9.5px/1 var(--f-zh); font-style: normal; letter-spacing: 0.04em; margin-right: 4px; color: var(--fg-2); }
+.stat b { font: 500 15px/1.1 var(--f-mono); color: var(--fg); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stat.hot b { color: var(--ion); }
+.stat b .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: var(--fg-3); }
+
+.why {
+  margin: 0; border-radius: 12px; padding: 10px 12px;
+  font: 400 13px/1.65 var(--f-zh); color: var(--fg-2); text-wrap: pretty;
+  transition: opacity 0.25s;
+}
+.why b { color: var(--fg); font-weight: 700; }
+.why .c { color: var(--ion); }
+.why .a { color: var(--heat); }
+.why .g { color: var(--ok); }
+.why .k { display: block; font: 500 10px/1.2 var(--f-mono); letter-spacing: 0.1em; color: var(--fg-3); margin-bottom: 5px; }
+
+/* ---------- 右上:控制卡 ---------- */
+.ctl {
+  position: absolute; top: 18px; right: 18px;
+  border-radius: 16px; padding: 10px 11px;
+  background: linear-gradient(150deg, var(--glass-hi), var(--glass));
+  box-shadow: 0 18px 50px -20px rgba(0, 0, 0, 0.67);
+  display: flex; flex-direction: column; gap: 10px;
+  max-width: calc(100% - 36px);
+}
+.row { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+.grp { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.lab {
+  font: 600 10px/1 var(--f-ui); letter-spacing: 0.12em; color: #9ea8c2; text-transform: uppercase;
+}
+.lab em { font: 500 10.5px/1 var(--f-zh); font-style: normal; letter-spacing: 0.06em; margin-right: 5px; color: var(--fg-2); text-transform: none; }
+.seg { display: flex; padding: 2px; border-radius: 11px; background: rgba(255, 255, 255, 0.05); }
+.seg button {
+  border: 0; background: none; cursor: pointer; height: 28px; padding: 0 10px; border-radius: 9px;
+  font: 500 12.5px/1 var(--f-ui); color: #cfd6e8; white-space: nowrap;
+  transition: background 0.18s, color 0.18s;
+}
+.seg button:hover { background: rgba(255, 255, 255, 0.07); }
+.seg button.on { background: var(--on-bg); color: var(--on-fg); }
+.seg button .zh { font-family: var(--f-zh); }
+.mono { font-family: var(--f-mono) !important; font-size: 12px !important; }
+
+.slide-g { flex: 1 1 220px; }
+.slide { position: relative; height: 28px; display: flex; align-items: center; gap: 10px; }
+.slide input[type="range"] {
+  -webkit-appearance: none; appearance: none; flex: 1; min-width: 140px; height: 28px; margin: 0;
+  background: transparent; cursor: pointer;
+}
+.slide input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px;
+  background: linear-gradient(90deg, rgba(127, 227, 255, 0.25), var(--ion)) 0 / var(--fill, 0%) 100% no-repeat, rgba(255, 255, 255, 0.12);
+}
+.slide input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.12); }
+.slide input[type="range"]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--ion); }
+.slide input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; margin-top: -6px;
+  background: linear-gradient(var(--knob-hi), var(--knob-lo));
+  box-shadow: 0 0 0 3px rgba(127, 227, 255, 0.2), 0 3px 8px rgba(0, 0, 0, 0.53);
+}
+.slide input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px; border: 0; border-radius: 50%;
+  background: linear-gradient(var(--knob-hi), var(--knob-lo));
+  box-shadow: 0 0 0 3px rgba(127, 227, 255, 0.2), 0 3px 8px rgba(0, 0, 0, 0.53);
+}
+.slide output { font: 500 12px/1 var(--f-mono); color: var(--ion); min-width: 74px; text-align: right; font-variant-numeric: tabular-nums; }
+
+.chip {
+  border: 1px solid var(--line); background: rgba(255, 255, 255, 0.04); cursor: pointer;
+  height: 28px; padding: 0 10px; border-radius: 9px; font: 500 12px/1 var(--f-zh); color: var(--fg-2);
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.chip:hover { background: rgba(255, 255, 255, 0.08); }
+.chip.on { border-color: var(--line-ion); color: var(--ion); background: rgba(127, 227, 255, 0.1); }
+.chip .led { width: 7px; height: 7px; border-radius: 50%; background: var(--fg-3); }
+.chip.on .led { background: var(--ion); box-shadow: 0 0 8px var(--ion); }
+
+.tools { display: flex; gap: 6px; flex-wrap: wrap; }
+.tool {
+  height: 30px; border: 0; border-radius: 10px; padding: 0 11px; cursor: pointer;
+  background: rgba(255, 255, 255, 0.07); color: #dfe4f3;
+  display: inline-flex; align-items: center; gap: 7px; font: 500 12.5px/1 var(--f-zh); white-space: nowrap;
+}
+.tool:hover { background: rgba(255, 255, 255, 0.13); }
+.tool.on { background: var(--on-bg); color: var(--on-fg); }
+.tool svg { width: 15px; height: 15px; flex: none; }
+.tool.rec svg { color: var(--stop); }
+
+/* ---------- 下方:穩定圖與質譜 ---------- */
+.hud {
+  position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
+  display: flex; gap: 10px; align-items: flex-end; pointer-events: none;
+  max-width: calc(100% - 32px);
+}
+.scope { border-radius: 14px; padding: 8px 10px 9px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.scope header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.scope header b { font: 600 12px/1 var(--f-zh); color: var(--fg); letter-spacing: 0.04em; }
+.scope header i { font: 500 10px/1 var(--f-mono); color: var(--fg-3); font-style: normal; letter-spacing: 0.06em; white-space: nowrap; }
+.scope canvas { display: block; width: 330px; height: 186px; max-width: 100%; border-radius: 8px; }
+
+.hint {
+  position: absolute; left: 20px; bottom: 18px; pointer-events: none;
+  font: 400 11.5px/1.5 var(--f-zh); color: var(--fg-3);
+}
+
+/* ---------- 說明視窗 ---------- */
+.modal {
+  position: absolute; inset: 0; z-index: 20; display: grid; place-items: center;
+  background: var(--shade); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  padding-inline: 16px;
+}
+.modal .card {
+  position: relative; width: min(620px, 100%); max-height: min(78vh, 760px); overflow: auto;
+  border-radius: 18px; padding: 22px 24px 20px; background: var(--glass-hi); border: 1px solid var(--line);
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
+}
+.modal h2 { margin: 0 34px 12px 0; font: 700 21px/1.3 var(--f-zh); text-wrap: balance; }
+.modal h3 {
+  margin: 20px 0 6px; font: 600 11px/1 var(--f-mono); letter-spacing: 0.14em; color: var(--ion);
+}
+.modal p, .modal li { font: 400 13.5px/1.75 var(--f-zh); color: var(--fg-2); margin: 0; max-width: 62ch; }
+.modal p + p { margin-top: 8px; }
+.modal ul { margin: 6px 0 0; padding-left: 1.2em; }
+.modal b { color: var(--fg); }
+.modal .x {
+  position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border-radius: 10px; border: 0;
+  background: rgba(255, 255, 255, 0.07); cursor: pointer; display: grid; place-items: center; color: var(--fg-2);
+}
+.modal .x:hover { background: rgba(255, 255, 255, 0.14); }
+.modal table { border-collapse: collapse; width: 100%; margin-top: 6px; font: 400 12.5px/1.5 var(--f-zh); color: var(--fg-2); }
+.modal td { padding: 5px 8px 5px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.modal td:first-child { color: var(--fg); white-space: nowrap; }
+.modal td.n { font-family: var(--f-mono); color: var(--ion); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.modal .tbl { overflow-x: auto; }
+.modal .note { margin-top: 18px; font-size: 12px; color: var(--fg-3); }
+
+/* ---------- 錄影進度 ---------- */
+.recbox {
+  position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; background: var(--shade);
+  padding-inline: 16px;
+}
+.recbox .card {
+  width: min(440px, 100%); border-radius: 16px; padding: 18px 20px; background: var(--glass-hi); border: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.recbox h2 { margin: 0; font: 700 17px/1.3 var(--f-zh); }
+.recbox p { margin: 0; font: 400 13px/1.6 var(--f-zh); color: var(--fg-2); }
+.recbox .bar { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.recbox .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, rgba(127, 227, 255, 0.4), var(--ion)); }
+.recbox .opts { display: flex; gap: 10px; flex-wrap: wrap; }
+.recbox .act { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.recbox .tool.primary { background: var(--on-bg); color: var(--on-fg); }
+.recbox a.tool { text-decoration: none; }
+
+.toast {
+  position: absolute; left: 50%; top: 18px; transform: translateX(-50%); z-index: 25;
+  border-radius: 12px; padding: 9px 14px; font: 500 13px/1.4 var(--f-zh); color: var(--fg);
+  pointer-events: none; transition: opacity 0.3s; opacity: 0;
+}
+.toast.show { opacity: 1; }
+
+/* 導覽或錄影時把介面收起來,只留畫面 */
+#app.cine .side, #app.cine .hud, #app.cine .hint { opacity: 0; pointer-events: none; }
+#app.cine .ctl { opacity: 0.18; transition: opacity 0.3s; }
+#app.cine .ctl:hover { opacity: 1; }
+.side, .hud, .hint { transition: opacity 0.4s; }
+
+/* ---------- 窄螢幕 ---------- */
+@media (max-width: 1100px) {
+  .scope canvas { width: 270px; height: 152px; }
+  .hint { display: none; }
+}
+@media (max-width: 860px) {
+  .hud { display: none; }
+}
+@media (max-width: 760px) {
+  .side { top: 12px; left: 16px; right: 16px; width: auto; gap: 8px; }
+  .brand h1 span { font-size: 13px; }
+  .brand h1 b { font-size: 26px; }
+  .brand p { display: none; }
+  .stat { padding: 5px 8px 4px; }
+  .stat b { font-size: 13px; }
+  .why { font-size: 12px; padding: 8px 10px; }
+  .ctl { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: none; padding: 9px; gap: 8px; }
+  .row { gap: 10px; }
+  .seg button { padding: 0 8px; font-size: 12px; }
+  .slide input[type="range"] { min-width: 0; }
+}
+@media (max-width: 420px) {
+  .why { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .why, .toast, .side, .hud, .hint { transition: none; }
+}
+
+/* 只用在「儀器原理」網站版:左上角的教材分頁列,其他元件往下讓位 */
+#sitenav {
+  position: absolute; left: 16px; top: 16px; z-index: 12;
+  display: flex; gap: 2px; padding: 3px; border-radius: 11px;
+  background: var(--glass); border: 1px solid var(--line);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  max-width: calc(100% - 32px); overflow-x: auto; scrollbar-width: none;
+}
+#sitenav::-webkit-scrollbar { display: none; }
+#sitenav a {
+  padding: 5px 12px; border-radius: 8px; font: 500 13px/1.5 var(--f-zh);
+  color: var(--fg-2); text-decoration: none; white-space: nowrap;
+}
+#sitenav a:hover { background: rgba(255, 255, 255, 0.07); color: var(--fg); }
+#sitenav a[aria-current="page"] { background: var(--on-bg); color: var(--on-fg); }
+#sitenav a:focus-visible { outline: 2px solid var(--ion); outline-offset: 2px; }
+#app.cine #sitenav { opacity: 0; pointer-events: none; }
+.side { top: 66px; }
+
+/* 中等寬度時分頁列和右上控制卡會擠在一起,控制卡改放到底部 */
+@media (max-width: 960px) and (min-width: 761px) {
+  .ctl { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: none; }
+  .hud { display: none; }
+  .hint { display: none; }
+}
+@media (max-width: 760px) {
+  .side { top: 58px; }
+}
+@media (max-width: 420px) {
+  #sitenav a { padding-left: 7px; padding-right: 7px; font-size: 11.5px; }
+}
+
+</style>
+</head>
+<body>
+<main id="app">
+  <nav id="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="./" aria-current="page">離子之旅</a></nav>
+  <canvas id="gl" aria-label="LCQ Deca XP 的 3D 模型,可拖曳旋轉、滾輪縮放"></canvas>
+  <canvas id="ov" aria-hidden="true"></canvas>
+  <div class="vignette"></div>
+
+  <aside class="side">
+    <div class="brand">
+      <h1><span>LCQ DECA XP</span><b>離子之旅</b></h1>
+      <p>一滴樣品溶液從噴針出來,最後變成質譜上的一根峰。把離子阱質譜儀拆開,沿著離子走的路線,看它經過的每個零件,以及壓力從一大氣壓一路降到 10⁻⁵ Torr。</p>
+    </div>
+    <div class="stats">
+      <div class="stat glass"><i><em>階段</em>STEP</i><b id="stPhase"><span class="dot"></span>注入</b></div>
+      <div class="stat glass hot"><i><em>射出點</em>m/z</i><b id="stMz">50.0</b></div>
+      <div class="stat glass"><i><em>m/z 524 的</em>q<sub>z</sub></i><b id="stQ">0.087</b></div>
+    </div>
+    <p class="why glass" id="why" aria-live="polite"></p>
+  </aside>
+
+  <section class="ctl" aria-label="儀器控制">
+    <div class="row">
+      <div class="grp"><span class="lab"><em>掃描</em>SCAN</span>
+        <div class="seg" role="group" aria-label="掃描模式">
+          <button id="mFull" class="on mono" aria-pressed="true">Full MS</button><button id="mMS2" class="mono" aria-pressed="false">MS/MS</button>
+        </div>
+      </div>
+      <div class="grp"><span class="lab"><em>機身</em>VIEW</span>
+        <div class="seg" role="group" aria-label="機身顯示">
+          <button id="vExt" aria-pressed="false"><span class="zh">外觀</span></button><button id="vAsm" class="on" aria-pressed="true"><span class="zh">組裝</span></button><button id="vExp" aria-pressed="false"><span class="zh">展開</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="grp slide-g"><span class="lab"><em>RF 振幅</em>EJECT m/z</span>
+        <div class="slide"><input type="range" id="rf" min="0" max="1000" value="0" aria-label="RF 振幅,對應目前射出的 m/z"><output id="rfOut" for="rf">m/z 50</output></div>
+      </div>
+      <button class="chip on" id="auto" aria-pressed="true"><span class="led"></span>自動循環</button>
+    </div>
+    <div class="row tools">
+      <button class="tool" id="tourBtn" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><span id="tourTxt">播放導覽</span></button>
+      <button class="tool rec" id="recBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5" fill="currentColor"/></svg>錄成影片</button>
+      <button class="tool" id="helpBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.4c-.7.3-1 .8-1 1.5v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>原理</button>
+    </div>
+  </section>
+
+  <div class="hud">
+    <section class="scope glass"><header><b>穩定圖</b><i>q<sub>z</sub> ・ a<sub>z</sub></i></header><canvas id="cvStab" width="660" height="372"></canvas></section>
+    <section class="scope glass"><header><b id="specTitle">質譜</b><i id="specSub">Full MS ・ m/z 150 至 2000</i></header><canvas id="cvSpec" width="660" height="372"></canvas></section>
+  </div>
+  <div class="hint">拖曳旋轉,滾輪縮放,點零件看說明。按 C 播放導覽。</div>
+
+  <div class="modal" id="help" hidden>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <button class="x" id="helpX" aria-label="關閉"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l10 10M12 2L2 12"/></svg></button>
+      <div id="helpBody"></div>
+    </div>
+  </div>
+
+  <div class="recbox" id="recbox" hidden>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="recTitle">
+      <h2 id="recTitle">錄成影片</h2>
+      <p id="recMsg">把整段導覽逐格算圖,存成 MP4(H.264)。錄製時不能操作畫面,電腦慢一點也不會掉格。</p>
+      <div class="opts" id="recOpts">
+        <div class="grp"><span class="lab"><em>解析度</em>SIZE</span><div class="seg"><button id="r1080" class="on mono">1920×1080</button><button id="r720" class="mono">1280×720</button></div></div>
+        <div class="grp"><span class="lab"><em>每秒格數</em>FPS</span><div class="seg"><button id="f30" class="on mono">30</button><button id="f60" class="mono">60</button></div></div>
+      </div>
+      <div class="bar"><i id="recBar"></i></div>
+      <div class="act">
+        <button class="tool" id="recCancel">取消</button>
+        <button class="tool primary" id="recGo">開始錄製</button>
+        <a class="tool primary" id="recSave" hidden>儲存影片</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast glass" id="toast" role="status"></div>
+</main>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"}}
+</script>
+<script type="module">
+const BUILD = {"target":"site","canExport":true};
+// ==== 00_core.js ====
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+// ---------------------------------------------------------------- 小工具
+const TAU = Math.PI * 2;
+const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const clamp = (x, a, b) => (x < a ? a : x > b ? b : x);
+const lerp = (a, b, t) => a + (b - a) * t;
+const inv = (a, b, x) => clamp((x - a) / (b - a), 0, 1);
+const smooth = (t) => t * t * (3 - 2 * t);
+const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const approach = (cur, target, rate, dt) => cur + (target - cur) * (1 - Math.exp(-rate * dt));
+const $ = (s) => document.querySelector(s);
+const QUERY = new URLSearchParams(location.search);
+
+// 可重現的亂數:錄影時每一格都要一樣
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const RNG = { f: mulberry32(20261001), seed(s) { this.f = mulberry32(s); } };
+const rnd = (a = 0, b = 1) => a + (b - a) * RNG.f();
+const rndi = (n) => Math.floor(RNG.f() * n);
+function rndn() {
+  let u = 0;
+  while (u === 0) u = RNG.f();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * RNG.f());
+}
+// 固定雜訊(質譜基線用),不吃 RNG
+const hash1 = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+// ---------------------------------------------------------------- 顏色:依 m/z 由綠青到琥珀
+const MZ_STOPS = [
+  [0.0, '#5dffb0'], [0.3, '#4fd8ff'], [0.45, '#6aa8ff'],
+  [0.62, '#a98bff'], [0.8, '#ff73c6'], [1.0, '#ffb454'],
+].map(([t, c]) => [t, new THREE.Color(c)]);
+function mzColor(mz, out = new THREE.Color()) {
+  const t = clamp(Math.log(mz / 50) / Math.log(2000 / 50), 0, 1);
+  for (let i = 1; i < MZ_STOPS.length; i++) {
+    if (t <= MZ_STOPS[i][0]) {
+      const [t0, c0] = MZ_STOPS[i - 1], [t1, c1] = MZ_STOPS[i];
+      return out.copy(c0).lerp(c1, (t - t0) / (t1 - t0));
+    }
+  }
+  return out.copy(MZ_STOPS[MZ_STOPS.length - 1][1]);
+}
+const css = (c) => '#' + c.getHexString();
+const rgba = (c, a) => `rgba(${Math.round(c.r * 255)},${Math.round(c.g * 255)},${Math.round(c.b * 255)},${a})`;
+
+const COL = {
+  ion: new THREE.Color('#7fe3ff'),
+  heat: new THREE.Color('#ffb454'),
+  ok: new THREE.Color('#3ddc84'),
+  stop: new THREE.Color('#ff7a6b'),
+  fg: '#eef2fa', fg2: '#c3cadc', fg3: '#8d97b3',
+};
+
+// ---------------------------------------------------------------- 示範樣品:LCQ 正離子校正液
+// 咖啡因、MRFA 與 Ultramark 1621;豐度只是示意
+const SPECIES = [
+  { mz: 195.1, ab: 0.62, name: '咖啡因' },
+  { mz: 524.3, ab: 1.0, name: 'MRFA' },
+  { mz: 1022.0, ab: 0.24, name: 'Ultramark' },
+  { mz: 1122.0, ab: 0.33, name: 'Ultramark' },
+  { mz: 1222.0, ab: 0.4, name: 'Ultramark' },
+  { mz: 1322.0, ab: 0.43, name: 'Ultramark' },
+  { mz: 1422.0, ab: 0.39, name: 'Ultramark' },
+  { mz: 1522.0, ab: 0.31, name: 'Ultramark' },
+  { mz: 1622.0, ab: 0.23, name: 'Ultramark' },
+  { mz: 1722.0, ab: 0.15, name: 'Ultramark' },
+  { mz: 1822.0, ab: 0.1, name: 'Ultramark' },
+  { mz: 1922.0, ab: 0.06, name: 'Ultramark' },
+];
+const PRODUCT = { mz: 138.1, ab: 1.0, name: '碎片' }; // 咖啡因 195 失去 CH3NCO(57 u)
+const PRECURSOR = 0; // MS/MS 前驅離子:咖啡因 m/z 195
+SPECIES.forEach((s) => { s.col = mzColor(s.mz); });
+PRODUCT.col = mzColor(PRODUCT.mz);
+const AB_SUM = SPECIES.reduce((s, x) => s + x.ab, 0);
+function pickSpecies() {
+  let r = RNG.f() * AB_SUM;
+  for (let i = 0; i < SPECIES.length; i++) { r -= SPECIES[i].ab; if (r <= 0) return i; }
+  return SPECIES.length - 1;
+}
+
+// ---------------------------------------------------------------- 離子阱的固定參數
+const TRAP = {
+  r0: 0.707, // cm,環電極內半徑
+  z0: 0.785, // cm,中心到端蓋
+  qEject: 0.83, // LCQ 的共振射出點 (q_z)eject
+  qEdge: 0.908, // a = 0 時 β_z = 1 的穩定邊界
+  qAct: 0.25, // MS/MS 活化 q(預設 Activation Q)
+};
+const AX = 5.0; // 離子軸線高度(場景單位 = cm)
+
+// ==== 10_scene.js ====
+// ---------------------------------------------------------------- 算圖器、相機、後製
+const app = $('#app');
+const glCanvas = $('#gl');
+const renderer = new THREE.WebGLRenderer({ canvas: glCanvas, antialias: false, powerPreference: 'high-performance' });
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+const BG = new THREE.Color('#070a12');
+scene.background = BG;
+scene.fog = new THREE.Fog(BG, 80, 190);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.34;
+
+const camera = new THREE.PerspectiveCamera(30, 16 / 9, 0.05, 420);
+camera.position.set(1, 24, 47);
+const controls = new OrbitControls(camera, glCanvas);
+controls.target.set(-4, 3.2, -0.5);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 2.5;
+controls.maxDistance = 110;
+controls.maxPolarAngle = Math.PI * 0.495;
+controls.screenSpacePanning = true;
+controls.update();
+
+const sceneRT = new THREE.WebGLRenderTarget(8, 8, { type: THREE.HalfFloatType, samples: 4 });
+const composer = new EffectComposer(renderer, sceneRT);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.75, 0.45, 1.45);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+const VIEW = { w: 1, h: 1, dpr: 1 };
+// 畫面比 16:9 窄(直式手機)時放大垂直視角,讓左右看到的範圍和寬螢幕一樣
+function fitFov(baseFov) {
+  const a = camera.aspect, ref = 16 / 9;
+  if (a >= ref) return baseFov;
+  return THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(baseFov / 2)) * ref / a));
+}
+function setRenderSize(w, h, dpr) {
+  VIEW.w = w; VIEW.h = h; VIEW.dpr = dpr;
+  renderer.setPixelRatio(dpr);
+  renderer.setSize(w, h, false);
+  composer.setPixelRatio(dpr);
+  composer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+function fitToWindow() {
+  const r = app.getBoundingClientRect();
+  setRenderSize(Math.max(1, r.width), Math.max(1, r.height), Math.min(window.devicePixelRatio || 1, 1.5));
+}
+
+// ---------------------------------------------------------------- 燈光
+scene.add(new THREE.HemisphereLight(0x9db4ff, 0x120e0a, 0.42));
+const keyLight = new THREE.DirectionalLight(0xfff0dc, 1.75);
+keyLight.position.set(-16, 34, 24);
+keyLight.target.position.set(-4, 0, 0);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+Object.assign(keyLight.shadow.camera, { left: -40, right: 34, top: 26, bottom: -22, near: 1, far: 95 });
+keyLight.shadow.bias = -0.0004;
+keyLight.shadow.normalBias = 0.025;
+keyLight.shadow.radius = 3;
+scene.add(keyLight, keyLight.target);
+const rimLight = new THREE.DirectionalLight(0x7fd8ff, 1.35);
+rimLight.position.set(16, 18, -30);
+scene.add(rimLight);
+const fillLight = new THREE.DirectionalLight(0xb7c4ff, 0.32);
+fillLight.position.set(24, 6, 34);
+scene.add(fillLight);
+
+// ---------------------------------------------------------------- 畫布貼圖小工具
+function canvasTex(w, h, draw, { srgb = true, repeat = null } = {}) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const g = c.getContext('2d');
+  draw(g, w, h);
+  const t = new THREE.CanvasTexture(c);
+  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+  return t;
+}
+function roundRect(g, x, y, w, h, r) {
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r);
+  g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r);
+  g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+}
+
+// ---------------------------------------------------------------- 房間:地板、背牆、牆上螢幕
+const FLOOR = -11.5;
+{
+  const tex = canvasTex(512, 512, (g, w, h) => {
+    g.fillStyle = '#0b0f18'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 2600; i++) {
+      g.fillStyle = `rgba(255,255,255,${Math.random() * 0.018})`;
+      g.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+    }
+    g.strokeStyle = '#151b29'; g.lineWidth = 3;
+    for (let i = 0; i <= 4; i++) {
+      g.beginPath(); g.moveTo(i * w / 4, 0); g.lineTo(i * w / 4, h); g.stroke();
+      g.beginPath(); g.moveTo(0, i * h / 4); g.lineTo(w, i * h / 4); g.stroke();
+    }
+  }, { repeat: [14, 14] });
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(320, 320),
+    new THREE.MeshStandardMaterial({ map: tex, color: 0xb9c3d8, roughness: 0.34, metalness: 0.25 })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = FLOOR;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  const wallTex = canvasTex(1024, 256, (g, w, h) => {
+    g.fillStyle = '#0a0e17'; g.fillRect(0, 0, w, h);
+    g.strokeStyle = '#121828'; g.lineWidth = 4;
+    for (let i = 0; i <= 8; i++) { g.beginPath(); g.moveTo(i * w / 8, 0); g.lineTo(i * w / 8, h); g.stroke(); }
+    g.fillStyle = '#0d1220'; g.fillRect(0, h * 0.62, w, h * 0.08);
+  }, { repeat: [3, 1] });
+  const wall = new THREE.Mesh(
+    new THREE.PlaneGeometry(320, 70),
+    new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.82, metalness: 0.1 })
+  );
+  wall.position.set(0, FLOOR + 35, -34);
+  scene.add(wall);
+
+  const strip = new THREE.Mesh(
+    new THREE.BoxGeometry(260, 0.12, 0.12),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color(0x2b6a84).multiplyScalar(1.6) })
+  );
+  strip.position.set(0, 25.5, -33.8);
+  scene.add(strip);
+}
+
+// 牆上三個示意螢幕:電灑、穩定圖、質譜
+function wallScreen(x, draw) {
+  const tex = canvasTex(512, 288, (g, w, h) => {
+    g.fillStyle = '#060a12'; g.fillRect(0, 0, w, h);
+    g.strokeStyle = 'rgba(127,227,255,0.12)'; g.lineWidth = 1;
+    for (let i = 1; i < 8; i++) { g.beginPath(); g.moveTo(i * w / 8, 0); g.lineTo(i * w / 8, h); g.stroke(); }
+    for (let i = 1; i < 5; i++) { g.beginPath(); g.moveTo(0, i * h / 5); g.lineTo(w, i * h / 5); g.stroke(); }
+    g.strokeStyle = '#7fe3ff'; g.fillStyle = '#7fe3ff'; g.lineWidth = 3; g.lineCap = 'round';
+    draw(g, w, h);
+  });
+  const grp = new THREE.Group();
+  const frame = new THREE.Mesh(new RoundedBoxGeometry(17.2, 10, 0.5, 3, 0.25),
+    new THREE.MeshStandardMaterial({ color: 0x1a2030, metalness: 0.6, roughness: 0.4 }));
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(16, 9),
+    new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.55, roughness: 0.3 }));
+  scr.position.z = 0.26;
+  grp.add(frame, scr);
+  grp.position.set(x, 15, -33.4);
+  scene.add(grp);
+}
+wallScreen(-40, (g, w, h) => {
+  g.beginPath(); g.moveTo(120, 70); g.lineTo(220, 144); g.stroke();
+  g.beginPath(); g.moveTo(220, 144); g.lineTo(236, 138); g.lineTo(240, 150); g.closePath(); g.fill();
+  for (let i = 0; i < 26; i++) {
+    const a = (i / 26 - 0.5) * 0.9, d = 30 + (i * 37) % 150;
+    g.globalAlpha = 0.9 - d / 220;
+    g.beginPath(); g.arc(240 + Math.cos(a) * d, 144 + Math.sin(a) * d, 6 - d / 40, 0, TAU); g.fill();
+  }
+  g.globalAlpha = 1; g.fillRect(400, 132, 70, 24);
+});
+wallScreen(0, (g, w, h) => {
+  g.beginPath();
+  for (let i = 0; i <= 60; i++) { const q = i / 60; g.lineTo(60 + q * 330, 210 - 150 * Math.sin(q * Math.PI * 0.94) * (1 - q * 0.2)); }
+  g.lineTo(390, 210); g.closePath(); g.globalAlpha = 0.18; g.fill(); g.globalAlpha = 1; g.stroke();
+  g.beginPath(); g.moveTo(40, 210); g.lineTo(470, 210); g.stroke();
+  [90, 150, 230, 300].forEach((x, i) => { g.fillStyle = ['#5dffb0', '#4fd8ff', '#a98bff', '#ffb454'][i]; g.beginPath(); g.arc(x, 210, 9, 0, TAU); g.fill(); });
+});
+wallScreen(40, (g, w, h) => {
+  g.beginPath(); g.moveTo(40, 240); g.lineTo(480, 240); g.stroke();
+  [[90, 120], [160, 200], [270, 70], [300, 90], [330, 104], [360, 98], [390, 80], [420, 56]].forEach(([x, hh]) => {
+    g.beginPath(); g.moveTo(x, 240); g.lineTo(x, 240 - hh); g.stroke();
+  });
+});
+
+// ---------------------------------------------------------------- 實驗桌(主控台)與導軌
+const BENCH = { x0: -34, x1: 21, z0: -8.5, z1: 8.5 };
+const benchMat = new THREE.MeshStandardMaterial({ color: 0x161b27, metalness: 0.55, roughness: 0.45 });
+{
+  const w = BENCH.x1 - BENCH.x0, d = BENCH.z1 - BENCH.z0, h = -FLOOR;
+  const bench = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 4, 0.5), benchMat);
+  bench.position.set((BENCH.x0 + BENCH.x1) / 2, FLOOR + h / 2, 0);
+  bench.receiveShadow = true;
+  scene.add(bench);
+  const mat = new THREE.Mesh(new RoundedBoxGeometry(w - 1.2, 0.16, d - 1.2, 2, 0.06),
+    new THREE.MeshStandardMaterial({ color: 0x1c2232, metalness: 0.15, roughness: 0.85 }));
+  mat.position.set(bench.position.x, 0.02, 0);
+  mat.receiveShadow = true;
+  scene.add(mat);
+  const led = new THREE.Mesh(new THREE.BoxGeometry(w - 1.6, 0.05, 0.05),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color(0x7fe3ff).multiplyScalar(1.15) }));
+  led.position.set(bench.position.x, -0.42, BENCH.z1 + 0.02);
+  scene.add(led);
+}
+const railMat = new THREE.MeshStandardMaterial({ color: 0x2a3142, metalness: 0.75, roughness: 0.32 });
+{
+  const rail = new THREE.Mesh(new RoundedBoxGeometry(50, 0.5, 1.9, 2, 0.08), railMat);
+  rail.position.set(-6.5, 0.35, 0);
+  rail.castShadow = true; rail.receiveShadow = true;
+  scene.add(rail);
+  const groove = new THREE.Mesh(new THREE.BoxGeometry(49.6, 0.06, 0.18), new THREE.MeshStandardMaterial({ color: 0x0b0e15, roughness: 0.9 }));
+  groove.position.set(-6.5, 0.61, 0.45);
+  const groove2 = groove.clone(); groove2.position.z = -0.45;
+  scene.add(groove, groove2);
+  // 刻度
+  const tick = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.02, 0.3), new THREE.MeshBasicMaterial({ color: 0x5b6680 }));
+  const ticks = new THREE.InstancedMesh(tick.geometry, tick.material, 49);
+  const m = new THREE.Matrix4();
+  for (let i = 0; i < 49; i++) { m.makeTranslation(-30.5 + i, 0.61, i % 5 === 0 ? 0.78 : 0.82); ticks.setMatrixAt(i, m); }
+  scene.add(ticks);
+}
+
+// 桌前的三個螢幕(貼圖在 panels 模組每格更新)
+const consoleScreens = {};
+function consoleScreen(id, x, w, h, canvas) {
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const bez = new THREE.Mesh(new RoundedBoxGeometry(w + 0.7, h + 0.7, 0.3, 3, 0.2),
+    new THREE.MeshStandardMaterial({ color: 0x0c1019, metalness: 0.5, roughness: 0.35 }));
+  bez.position.set(x, -4.9, BENCH.z1 + 0.05);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+    new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.9, roughness: 0.25, metalness: 0 }));
+  scr.position.set(x, -4.9, BENCH.z1 + 0.22);
+  scene.add(bez, scr);
+  consoleScreens[id] = { tex, mesh: scr };
+}
+
+// ==== 20_materials.js ====
+// ---------------------------------------------------------------- 材質
+const MAT = {
+  steel: new THREE.MeshStandardMaterial({ color: 0x8e96a2, metalness: 1, roughness: 0.4, side: THREE.DoubleSide }),
+  // 剖面統一用霧面黃銅色,一眼看出「這裡是切開的」
+  steelCut: new THREE.MeshStandardMaterial({ color: 0x9c7f4e, metalness: 0.9, roughness: 0.5, side: THREE.DoubleSide }),
+  heater: new THREE.MeshStandardMaterial({ color: 0x1d2129, metalness: 0.7, roughness: 0.4, side: THREE.DoubleSide }),
+  heaterCut: new THREE.MeshStandardMaterial({ color: 0x5a2a18, metalness: 0.4, roughness: 0.6, side: THREE.DoubleSide, emissive: 0xff5a1f, emissiveIntensity: 0.55 }),
+  steelDark: new THREE.MeshStandardMaterial({ color: 0x737c8b, metalness: 1, roughness: 0.4, side: THREE.DoubleSide }),
+  rod: new THREE.MeshStandardMaterial({ color: 0x9aa2ae, metalness: 1, roughness: 0.45 }),
+  gold: new THREE.MeshStandardMaterial({ color: 0xd9ab55, metalness: 1, roughness: 0.28, side: THREE.DoubleSide }),
+  goldCut: new THREE.MeshStandardMaterial({ color: 0xf0cf8a, metalness: 1, roughness: 0.45, side: THREE.DoubleSide }),
+  copper: new THREE.MeshStandardMaterial({ color: 0xa8653d, metalness: 1, roughness: 0.36, side: THREE.DoubleSide, emissive: 0xff5a10, emissiveIntensity: 0 }),
+  copperCut: new THREE.MeshStandardMaterial({ color: 0xc8936a, metalness: 1, roughness: 0.45, side: THREE.DoubleSide, emissive: 0xff5a10, emissiveIntensity: 0 }),
+  black: new THREE.MeshStandardMaterial({ color: 0x141821, metalness: 0.55, roughness: 0.42, side: THREE.DoubleSide }),
+  anod: new THREE.MeshStandardMaterial({ color: 0x242b3a, metalness: 0.72, roughness: 0.34, side: THREE.DoubleSide }),
+  ceramic: new THREE.MeshPhysicalMaterial({ color: 0xa9a293, metalness: 0, roughness: 0.55, clearcoat: 0.25, clearcoatRoughness: 0.4, side: THREE.DoubleSide }),
+  ceramicCut: new THREE.MeshStandardMaterial({ color: 0xb3ab9c, metalness: 0, roughness: 0.8, side: THREE.DoubleSide }),
+  peek: new THREE.MeshStandardMaterial({ color: 0x8f7b58, roughness: 0.5, metalness: 0 }),
+  hose: new THREE.MeshStandardMaterial({ color: 0x2c3240, roughness: 0.55, metalness: 0.3 }),
+  cable: new THREE.MeshStandardMaterial({ color: 0x1a1e27, roughness: 0.6, metalness: 0.1 }),
+  hvCable: new THREE.MeshStandardMaterial({ color: 0xb8402e, roughness: 0.5, metalness: 0.05 }),
+  glassDark: new THREE.MeshStandardMaterial({ color: 0x0d1118, roughness: 0.12, metalness: 0.4 }),
+  em: new THREE.MeshPhysicalMaterial({ color: 0x1b1d22, metalness: 0.2, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.08, side: THREE.DoubleSide }),
+  emCut: new THREE.MeshStandardMaterial({ color: 0x3a3f4a, metalness: 0.2, roughness: 0.5, side: THREE.DoubleSide }),
+  cabinet: new THREE.MeshPhysicalMaterial({ color: 0xe6e0cf, roughness: 0.5, metalness: 0.03, clearcoat: 0.25, clearcoatRoughness: 0.4, transparent: true }),
+  cabinetDark: new THREE.MeshStandardMaterial({ color: 0x3a4150, roughness: 0.45, metalness: 0.3, transparent: true }),
+  pump: new THREE.MeshStandardMaterial({ color: 0x3b4558, roughness: 0.42, metalness: 0.6 }),
+  pumpLight: new THREE.MeshStandardMaterial({ color: 0x6f7889, roughness: 0.42, metalness: 0.8 }),
+  blade: new THREE.MeshStandardMaterial({ color: 0x9aa3b1, metalness: 1, roughness: 0.34, side: THREE.DoubleSide }),
+};
+// 加熱塊剖面:靠近毛細管最熱,往外漸暗(ShapeGeometry 的 u 就是半徑)
+{
+  const c = document.createElement('canvas'); c.width = 128; c.height = 4;
+  const g = c.getContext('2d');
+  const grd = g.createLinearGradient(0, 0, 128, 0);
+  grd.addColorStop(0, '#ffffff'); grd.addColorStop(0.25, '#ffb070'); grd.addColorStop(0.6, '#5a2010'); grd.addColorStop(1, '#1a0804');
+  g.fillStyle = grd; g.fillRect(0, 0, 128, 4);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+  MAT.heaterCut.emissiveMap = t;
+  MAT.heaterCut.emissiveIntensity = 1.0;
+  MAT.heaterCut.color.set(0x2a1a14);
+}
+const CUTMAT = new Map([
+  [MAT.steel, MAT.steelCut], [MAT.steelDark, MAT.steelCut], [MAT.gold, MAT.goldCut],
+  [MAT.copper, MAT.copperCut], [MAT.ceramic, MAT.ceramicCut], [MAT.em, MAT.emCut],
+  [MAT.anod, MAT.steelCut], [MAT.black, MAT.steelCut], [MAT.heater, MAT.heaterCut],
+]);
+
+// 真空腔的玻璃:菲涅耳邊緣發亮、中間幾乎透明
+function glassMaterial(color, opacity = 0.05, rim = 0.5) {
+  return new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    uniforms: {
+      uColor: { value: new THREE.Color(color) },
+      uOpacity: { value: opacity }, uRim: { value: rim }, uFade: { value: 1 },
+    },
+    vertexShader: /* glsl */`
+      varying vec3 vN; varying vec3 vW;
+      void main(){
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vW = wp.xyz; vN = normalize(mat3(modelMatrix) * normal);
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }`,
+    fragmentShader: /* glsl */`
+      uniform vec3 uColor; uniform float uOpacity, uRim, uFade;
+      varying vec3 vN; varying vec3 vW;
+      void main(){
+        vec3 v = normalize(cameraPosition - vW);
+        float f = pow(1.0 - abs(dot(normalize(vN), v)), 3.0);
+        float a = (uOpacity + f * uRim) * uFade;
+        gl_FragColor = vec4(uColor * (0.5 + 1.4 * f), a);
+      }`,
+  });
+}
+
+// ---------------------------------------------------------------- 旋轉體(剖面)工具
+// 剖面用 (r, 軸向) 的折線描述;每段各自做成旋轉面再合併,稜線才會銳利。
+// 切口朝向相機上方 (+y、+z),露出內部。
+const CUT_CENTER = Math.PI * 1.75;
+function latheParts(polylines, { cut = 0, seg = 72, center = CUT_CENTER } = {}) {
+  const phiStart = cut ? center + cut / 2 : 0;
+  const phiLen = cut ? TAU - cut : TAU;
+  const geos = polylines.map((pl) => new THREE.LatheGeometry(pl.map(([r, y]) => new THREE.Vector2(Math.max(r, 1e-4), y)), seg, phiStart, phiLen));
+  const g = mergeGeometries(geos.map((x) => x.toNonIndexed()), false);
+  geos.forEach((x) => x.dispose());
+  return g;
+}
+// 切口兩側的截面:用剖面的外框做成平面
+function cutCaps(outline, cut, center = CUT_CENTER) {
+  const shape = new THREE.Shape(outline.map(([r, y]) => new THREE.Vector2(r, y)));
+  const caps = [];
+  for (const phi of [center + cut / 2, center - cut / 2]) {
+    const g = new THREE.ShapeGeometry(shape, 8);
+    g.rotateY(phi - Math.PI / 2);
+    caps.push(g.toNonIndexed());
+  }
+  return mergeGeometries(caps, false);
+}
+// 組合成實心剖面零件;axis 'x' 沿離子軸,'y' 直立(幫浦用)
+function solidOfRevolution({ polylines, outline, mat, cut = 1.75, seg = 72, shadow = true, axis = 'x', center = CUT_CENTER }) {
+  const inner = new THREE.Group();
+  const body = new THREE.Mesh(latheParts(polylines, { cut, seg, center }), mat);
+  body.castShadow = shadow; body.receiveShadow = true;
+  inner.add(body);
+  if (cut && outline) {
+    const caps = new THREE.Mesh(cutCaps(outline, cut, center), CUTMAT.get(mat) || mat);
+    caps.castShadow = false; caps.receiveShadow = true;
+    inner.add(caps);
+  }
+  if (axis === 'x') inner.rotation.z = -Math.PI / 2; // 旋轉體的 y 軸 → 世界 x 軸
+  const outer = new THREE.Group();
+  outer.add(inner);
+  return outer;
+}
+// 矩形剖面的環(內半徑 a、外半徑 b、軸向 y0 到 y1)
+function ringSolid(a, b, y0, y1, mat, opts = {}) {
+  return solidOfRevolution({
+    polylines: [[[a, y0], [b, y0]], [[b, y0], [b, y1]], [[b, y1], [a, y1]], [[a, y1], [a, y0]]],
+    outline: [[a, y0], [b, y0], [b, y1], [a, y1]],
+    mat, ...opts,
+  });
+}
+// 沿著曲線的管子
+function tube(points, r, mat, { seg = 64, radial = 10, closed = false, shadow = true } = {}) {
+  const curve = new THREE.CatmullRomCurve3(points, closed, 'centripetal');
+  const m = new THREE.Mesh(new THREE.TubeGeometry(curve, seg, r, radial, closed), mat);
+  m.castShadow = shadow;
+  m.userData.curve = curve;
+  return m;
+}
+function mesh(geo, mat, { cast = true, recv = true } = {}) {
+  const m = new THREE.Mesh(geo, mat);
+  m.castShadow = cast; m.receiveShadow = recv;
+  return m;
+}
+// 立柱與滑座:把零件固定在導軌上
+function postTo(group, x, topY, { r = 0.32, z = 0 } = {}) {
+  const h = topY - 1.15;
+  const post = mesh(new THREE.CylinderGeometry(r, r, h, 20), MAT.anod);
+  post.position.set(x, 1.15 + h / 2, z);
+  const car = mesh(new RoundedBoxGeometry(2.0, 0.55, 2.5, 2, 0.1), MAT.black);
+  car.position.set(x, 0.88, z);
+  const knob = mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.5, 16), MAT.steelDark);
+  knob.rotation.x = Math.PI / 2;
+  knob.position.set(x, 0.88, z + 1.45);
+  group.add(post, car, knob);
+  return post;
+}
+
+// ==== 30_instrument.js ====
+// ---------------------------------------------------------------- 零件登記
+// 每個零件是一個 Group,原點在導軌中心線上(世界 x = 零件參考點,y = 0,z = 0),
+// 離子軸在 y = AX。組裝與展開時只改 group.position.x。
+const COMPS = {};
+const PICKS = [];
+function comp(id, xA, xE, title, info) {
+  const g = new THREE.Group();
+  g.position.x = xA;
+  scene.add(g);
+  COMPS[id] = { id, group: g, xA, xE, title, info };
+  return g;
+}
+function registerPicks() {
+  for (const c of Object.values(COMPS)) {
+    c.group.traverse((o) => { if (o.isMesh) { o.userData.comp = c.id; PICKS.push(o); } });
+  }
+}
+
+// 主要尺寸(組裝狀態的世界 x)
+const LAY = {
+  inlet: -20.0, capLen: 10.0,
+  tube: -9.9, skim: -8.6,
+  mp1: -4.7, mp1Len: 5.1, // 兩支多極柱都約 2 英吋長
+  lens1: -1.6,
+  mp2: 1.5, mp2Len: 5.1,
+  ent: 4.6,
+  trap: 6.6,
+  det: 9.7,
+};
+
+// ================================================================ 1. 電灑離子源
+const SRC = {};
+{
+  const g = comp('source', LAY.inlet, LAY.inlet - 5.0, '電灑離子源 (ESI)', 'source');
+  // 源腔:大氣壓區,畫成琥珀色的玻璃圓筒,前後是金屬板
+  const R = 3.0, x0 = -6.2, x1 = 0.35, t = 0.14;
+  const srcGlass = glassMaterial('#ffc983', 0.02, 0.32);
+  const shellGeo = new THREE.CylinderGeometry(R, R, x1 - x0, 64, 1, true);
+  shellGeo.rotateZ(-Math.PI / 2);
+  const shell = new THREE.Mesh(shellGeo, srcGlass);
+  shell.position.set((x0 + x1) / 2, AX, 0);
+  shell.renderOrder = 2;
+  g.add(shell);
+  const shellEdge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(R, R, x1 - x0, 32, 1, true).rotateZ(-Math.PI / 2), 30), new THREE.LineBasicMaterial({ color: 0xffc983, transparent: true, opacity: 0.35 }));
+  shellEdge.position.copy(shell.position);
+  g.add(shellEdge);
+  SRC.glass = srcGlass; SRC.edge = shellEdge.material;
+  // 後板與前板(前板就是擋噴板,中間開孔讓毛細管入口露出來)
+  const back = ringSolid(0.0, R, x0, x0 + 0.14, MAT.anod, { cut: 2.5 });
+  back.position.y = AX;
+  const front = ringSolid(0.55, R, x1 - 0.16, x1, MAT.steel, { cut: 2.5 });
+  front.position.y = AX;
+  const ring1 = ringSolid(R, R + 0.12, x0, x0 + 0.5, MAT.steelDark, { cut: 2.5 });
+  const ring2 = ringSolid(R, R + 0.12, x1 - 0.5, x1, MAT.steelDark, { cut: 2.5 });
+  ring1.position.y = AX; ring2.position.y = AX;
+  g.add(back, front, ring1, ring2);
+  // 底部廢液口
+  const drain = mesh(new THREE.CylinderGeometry(0.28, 0.28, 2.6, 16), MAT.steelDark);
+  drain.position.set(-3.6, AX - R - 1.1, 0);
+  g.add(drain);
+  postTo(g, -1.3, AX - R + 0.1, { r: 0.4 });
+  postTo(g, -5.0, AX - R + 0.1, { r: 0.4 });
+
+  // 噴灑探針:從上方垂直插進源腔(正交噴灑),針尖在毛細管入口的斜前上方
+  const tip = V3(-0.8, AX + 1.3, 0);
+  const aim = V3(0, -1, 0);
+  const probe = new THREE.Group();
+  probe.position.copy(tip);
+  probe.quaternion.setFromUnitVectors(V3(0, -1, 0), aim); // 探針本地 -y = 噴灑方向
+  g.add(probe);
+  const P = (geo, mat, y) => { const m = mesh(geo, mat); m.position.y = y; probe.add(m); return m; };
+  P(new THREE.CylinderGeometry(0.012, 0.012, 0.5, 8), MAT.steel, 0.25); // 針
+  P(new THREE.CylinderGeometry(0.11, 0.055, 0.5, 20), MAT.steel, 0.68); // 鞘氣噴嘴
+  P(new THREE.CylinderGeometry(0.42, 0.11, 0.9, 28), MAT.steel, 1.38);
+  P(new THREE.CylinderGeometry(0.42, 0.42, 3.2, 32), MAT.steelDark, 3.43);
+  P(new THREE.CylinderGeometry(0.62, 0.62, 0.5, 32), MAT.anod, 2.6); // 安裝環
+  P(new THREE.CylinderGeometry(0.5, 0.5, 1.4, 6), MAT.anod, 5.73); // 尾端螺帽
+  const cone = P(new THREE.ConeGeometry(0.02, 0.05, 16), new THREE.MeshBasicMaterial({ color: new THREE.Color(0xbfefff).multiplyScalar(2.2) }), -0.02);
+  cone.rotation.x = Math.PI; // 泰勒錐
+  SRC.g = g; SRC.probe = probe; SRC.tipLocal = tip.clone(); SRC.aim = aim.clone(); SRC.cone = cone;
+  // 探針側邊的氮氣管與尾端的樣品管(PEEK);座標換算到 g 的本地空間
+  const inG = (v) => v.clone().applyQuaternion(probe.quaternion).add(probe.position);
+  const side = inG(V3(0.42, 3.0, 0));
+  const tail = inG(V3(0, 6.43, 0));
+  // 氮氣管從探針側邊往上、往後繞,不擋住噴霧
+  g.add(tube([side, side.clone().add(V3(0.5, 0.9, -0.6)), V3(-0.2, AX + 6.6, -3.0), V3(-2.4, AX + 6.4, -6.8), V3(-4.5, 0.6, -7.9)], 0.08, MAT.hose, { seg: 90 }));
+  SRC.peekStart = tail.clone();
+}
+
+// ================================================================ 2. 加熱毛細管
+{
+  const g = comp('cap', LAY.inlet, LAY.inlet - 5.0, '加熱傳輸毛細管', 'cap');
+  const L = LAY.capLen;
+  // 不鏽鋼細管(切開一道縫,看得見管內的離子)
+  const capTube = solidOfRevolution({
+    polylines: [[[0.085, 0], [0.085, L]], [[0.03, 0], [0.03, L]], [[0.03, 0], [0.085, 0]], [[0.03, L], [0.085, L]]],
+    outline: [[0.03, 0], [0.085, 0], [0.085, L], [0.03, L]],
+    mat: MAT.steel, cut: 1.6, seg: 40,
+  });
+  capTube.position.y = AX;
+  g.add(capTube);
+  // 入口螺帽
+  const nut = solidOfRevolution({
+    polylines: [[[0.09, -0.05], [0.32, 0.45]], [[0.32, 0.45], [0.32, 0.9]], [[0.32, 0.9], [0.09, 0.9]]],
+    outline: [[0.09, -0.05], [0.32, 0.45], [0.32, 0.9], [0.09, 0.9]],
+    mat: MAT.steel, cut: 1.6, seg: 40,
+  });
+  nut.position.y = AX;
+  g.add(nut);
+  // 加熱塊:深色金屬,切開的剖面是紅熱的
+  const blk = ringSolid(0.12, 0.72, 2.4, 8.6, MAT.heater, { cut: 1.75 });
+  blk.position.y = AX;
+  g.add(blk);
+  for (let i = 0; i < 7; i++) {
+    const fin = ringSolid(0.72, 0.95, 2.9 + i * 0.85, 3.02 + i * 0.85, MAT.heater, { cut: 1.75, seg: 56 });
+    fin.position.y = AX;
+    g.add(fin);
+  }
+  // 加熱線
+  g.add(tube([V3(6.0, AX - 0.7, -0.4), V3(6.4, AX - 2.2, -1.4), V3(7.2, 1.0, -2.6), V3(8.0, 0.6, -4.5)], 0.06, MAT.cable));
+  postTo(g, 3.4, AX - 0.72);
+  postTo(g, 7.6, AX - 0.72);
+}
+
+// ================================================================ 3. 管透鏡
+{
+  const g = comp('tube', LAY.tube, LAY.tube - 2.4, '管透鏡 (tube lens)', 'tube');
+  const s = solidOfRevolution({
+    polylines: [[[0.33, -0.5], [0.33, 0.5]], [[0.78, -0.36], [0.78, 0.5]], [[0.33, -0.5], [0.64, -0.5]], [[0.64, -0.5], [0.78, -0.36]], [[0.33, 0.5], [0.78, 0.5]]],
+    outline: [[0.33, -0.5], [0.64, -0.5], [0.78, -0.36], [0.78, 0.5], [0.33, 0.5]],
+    mat: MAT.steel, cut: 1.75,
+  });
+  s.position.y = AX;
+  g.add(s);
+  postTo(g, 0, AX - 0.78, { r: 0.24 });
+}
+
+// ================================================================ 4. 截取錐 (skimmer)
+{
+  const g = comp('skim', LAY.skim, LAY.skim - 1.3, '截取錐 (skimmer)', 'skim');
+  const s = solidOfRevolution({
+    polylines: [
+      [[0.06, 0], [1.25, 1.0]], [[0.04, 0.06], [1.12, 1.0]], [[0.04, 0.06], [0.06, 0]],
+      [[1.12, 1.0], [2.6, 1.0]], [[1.25, 1.0], [2.6, 1.0]], [[2.6, 1.0], [2.6, 1.18]], [[2.6, 1.18], [1.12, 1.18]],
+    ],
+    outline: [[0.04, 0.06], [0.06, 0], [1.25, 1.0], [2.6, 1.0], [2.6, 1.18], [1.12, 1.18], [1.12, 1.0]],
+    mat: MAT.steel, cut: 1.75,
+  });
+  s.position.y = AX;
+  g.add(s);
+  postTo(g, 0.6, AX - 2.6, { r: 0.3 });
+}
+
+// ================================================================ 5 與 7. 多極柱
+const RODS = { a: [], b: [] }; // RF 兩相
+const rodMatA = MAT.rod.clone(); rodMatA.emissive = new THREE.Color(0x29c7ff); rodMatA.emissiveIntensity = 0;
+const rodMatB = MAT.rod.clone(); rodMatB.emissive = new THREE.Color(0xff5fc4); rodMatB.emissiveIntensity = 0;
+function multipole(id, x, xE, n, len, rr, rodR, title) {
+  const g = comp(id, x, xE, title, id);
+  for (let i = 0; i < n; i++) {
+    const th = (n === 4 ? 0 : Math.PI / n) + (i / n) * TAU;
+    // 第一支是「方柱」四極柱,第二支是圓柱八極柱
+    const geo = n === 4 ? new THREE.BoxGeometry(len, rodR * 1.8, rodR * 1.8) : new THREE.CylinderGeometry(rodR, rodR, len, 20);
+    const m = mesh(geo, i % 2 ? rodMatB : rodMatA);
+    if (n === 4) m.rotation.x = th;
+    else m.rotation.z = Math.PI / 2;
+    m.position.set(0, AX + Math.sin(th) * rr, Math.cos(th) * rr);
+    g.add(m);
+  }
+  for (const s of [-1, 1]) {
+    const h = ringSolid(rr + rodR + 0.08, rr + rodR + 0.55, -0.16, 0.16, MAT.ceramic, { cut: 1.75 });
+    h.position.set(s * (len / 2 - 0.45), AX, 0);
+    g.add(h);
+    postTo(g, s * (len / 2 - 0.45), AX - (rr + rodR + 0.55), { r: 0.22 });
+  }
+  return g;
+}
+multipole('mp1', LAY.mp1, LAY.mp1, 4, LAY.mp1Len, 0.42, 0.15, '方柱四極柱');
+multipole('mp2', LAY.mp2, LAY.mp2 + 2.4, 8, LAY.mp2Len, 0.38, 0.085, '八極柱');
+
+// ================================================================ 6 與 8. 平板透鏡
+function plateLens(id, x, xE, rh, R, title) {
+  const g = comp(id, x, xE, title, id);
+  const s = ringSolid(rh, R, -0.06, 0.06, MAT.steel, { cut: 1.75 });
+  s.position.y = AX;
+  g.add(s);
+  postTo(g, 0, AX - R, { r: 0.2 });
+  return g;
+}
+plateLens('lens1', LAY.lens1, LAY.lens1 + 1.2, 0.14, 1.6, '多極柱間透鏡');
+const entG = plateLens('ent', LAY.ent, LAY.ent + 3.6, 0.12, 1.5, '入口透鏡 (閘門)');
+const gateRing = new THREE.Mesh(new THREE.TorusGeometry(1.56, 0.025, 8, 96), new THREE.MeshBasicMaterial({ color: 0x3ddc84 }));
+gateRing.rotation.y = Math.PI / 2;
+gateRing.position.set(0, AX, 0);
+entG.add(gateRing);
+
+// ================================================================ 9. 三維四極離子阱
+const TRAPPARTS = {};
+{
+  const g = comp('trap', LAY.trap, LAY.trap + 5.0, '離子阱', 'trap');
+  const { r0, z0 } = TRAP;
+  const cut = 1.9;
+  // 環電極:內面雙曲線 r² − 2z² = r0²
+  const h = 0.95, Ro = 2.3;
+  const inner = [];
+  for (let i = 0; i <= 40; i++) { const y = -h + (2 * h * i) / 40; inner.push([Math.sqrt(r0 * r0 + 2 * y * y), y]); }
+  const rh = inner[inner.length - 1][0];
+  const ring = solidOfRevolution({
+    polylines: [inner, [[rh, h], [Ro, h]], [[Ro, h], [Ro, -h]], [[Ro, -h], [rh, -h]]],
+    outline: [...inner, [Ro, h], [Ro, -h]],
+    mat: MAT.steel, cut, seg: 96,
+  });
+  ring.position.y = AX;
+  g.add(ring);
+  TRAPPARTS.ring = ring;
+  // 端蓋:內面雙曲線 z² − r²/2 = z0²,做成碟形
+  const rHole = 0.075, Rf = 1.75, th = 0.28, Rflange = 2.3;
+  const f = (r) => Math.sqrt(z0 * z0 + (r * r) / 2);
+  function endcap(sign) {
+    const face = [], backC = [];
+    for (let i = 0; i <= 30; i++) { const r = rHole + ((Rf - rHole) * i) / 30; face.push([r, sign * f(r)]); backC.push([r, sign * (f(r) + th)]); }
+    const yF = sign * f(Rf), yB = sign * (f(Rf) + th);
+    const polylines = [face, [[Rf, yF], [Rflange, yF]], [[Rflange, yF], [Rflange, yB]], [[Rflange, yB], [Rf, yB]], backC.slice().reverse(), [[rHole, sign * (f(rHole) + th)], [rHole, sign * f(rHole)]]];
+    const outline = [...face, [Rflange, yF], [Rflange, yB], ...backC.slice().reverse()];
+    const s = solidOfRevolution({ polylines, outline, mat: MAT.steel, cut, seg: 96 });
+    s.position.y = AX;
+    return s;
+  }
+  TRAPPARTS.capIn = endcap(-1);
+  TRAPPARTS.capOut = endcap(1);
+  g.add(TRAPPARTS.capIn, TRAPPARTS.capOut);
+  // 石英間隔環
+  const yF = f(Rf);
+  TRAPPARTS.spIn = ringSolid(1.95, 2.24, -yF, -h, MAT.ceramic, { cut });
+  TRAPPARTS.spOut = ringSolid(1.95, 2.24, h, yF, MAT.ceramic, { cut });
+  TRAPPARTS.spIn.position.y = AX; TRAPPARTS.spOut.position.y = AX;
+  g.add(TRAPPARTS.spIn, TRAPPARTS.spOut);
+  // 氦氣進氣細管:接在出口端蓋的小接頭上(跟著端蓋移動)
+  TRAPPARTS.he = tube([V3(0, 2.2, -0.9), V3(0.25, 3.4, -1.3), V3(0.2, 4.8, -2.6), V3(-0.4, 5.2, -6.2)], 0.06, MAT.steelDark);
+  const nip = mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.5, 14), MAT.steel);
+  nip.position.set(0, 2.05, -0.82);
+  nip.rotation.x = -0.4;
+  const heG = new THREE.Group();
+  heG.add(TRAPPARTS.he, nip);
+  heG.position.set(1.75, AX - 0.4, 0);
+  TRAPPARTS.capOut.add(heG);
+  heG.position.y = 0; // capOut 的原點已在 y = AX
+  TRAPPARTS.heG = heG;
+  // 支架
+  const bracket = mesh(new RoundedBoxGeometry(3.2, 0.4, 2.2, 2, 0.08), MAT.anod);
+  bracket.position.set(0, AX - 2.5, 0);
+  g.add(bracket);
+  postTo(g, 0, AX - 2.7, { r: 0.4 });
+}
+
+// ================================================================ 10. 偵測系統:轉換打拿極 + 電子倍增管
+const DET = {};
+{
+  const g = comp('det', LAY.det, LAY.det + 7.0, '偵測器', 'det');
+  // 轉換打拿極:軸線下方、朝上的淺碗
+  const bowl = [], under = [];
+  for (let i = 0; i <= 20; i++) { const r = (0.78 * i) / 20; bowl.push([r, 0.22 * (r / 0.78) ** 2]); under.push([r, 0.22 * (r / 0.78) ** 2 - 0.14]); }
+  const dyn = new THREE.Group();
+  const dg = latheParts([bowl, under, [[0.78, 0.22], [0.78, 0.08]]], { seg: 64 });
+  const dm = mesh(dg, MAT.steel);
+  dyn.add(dm);
+  dyn.position.set(0, AX - 2.3, 0);
+  g.add(dyn);
+  const ins = mesh(new THREE.CylinderGeometry(0.26, 0.3, 1.0, 24), MAT.ceramic);
+  ins.position.set(0, AX - 2.95, 0);
+  g.add(ins);
+  postTo(g, 0, AX - 3.45, { r: 0.3 });
+  g.add(tube([V3(0.3, AX - 3.0, 0), V3(1.2, AX - 3.1, -0.6), V3(1.8, 1.4, -2.6), V3(2.2, 0.6, -5.0)], 0.1, MAT.hvCable));
+  DET.dynLocal = V3(0, AX - 2.3 + 0.12, 0);
+
+  // 電子倍增管:軸線上方、開口朝下的彎曲喇叭
+  const curve = new THREE.CatmullRomCurve3([
+    V3(0, AX + 1.75, 0), V3(0, AX + 2.45, 0), V3(0.08, AX + 3.2, -0.45), V3(0.12, AX + 3.65, -1.35), V3(0.12, AX + 3.75, -2.45),
+  ], false, 'centripetal');
+  const rFn = (u) => 0.16 + 0.56 * Math.pow(1 - smooth(clamp(u / 0.42, 0, 1)), 1.6);
+  // 倍增管畫成深色半透明玻璃(實物是鉛玻璃),看得見裡面的電子雪崩
+  const emGlass = glassMaterial('#9aa6bb', 0.2, 0.75);
+  const horn = new THREE.Mesh(hornGeometry(curve, rFn, 80, 28), emGlass);
+  horn.renderOrder = 3;
+  g.add(horn);
+  const hornIn = new THREE.Mesh(hornGeometry(curve, (u) => rFn(u) * 0.86, 80, 28), new THREE.MeshBasicMaterial({ color: 0x0a0d14, transparent: true, opacity: 0.55, side: THREE.BackSide, depthWrite: false }));
+  hornIn.renderOrder = 2;
+  g.add(hornIn);
+  const anode = mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.6, 20), MAT.steel);
+  anode.rotation.x = Math.PI / 2;
+  anode.position.copy(curve.getPointAt(1)).add(V3(0, 0, -0.25));
+  g.add(anode);
+  g.add(tube([anode.position.clone().add(V3(0, 0, -0.3)), V3(0.2, AX + 3.4, -3.6), V3(0.6, 1.5, -4.6), V3(1.0, 0.6, -6.2)], 0.07, MAT.cable));
+  const mount = mesh(new RoundedBoxGeometry(0.5, 4.6, 0.5, 2, 0.08), MAT.anod);
+  mount.position.set(0.9, AX + 1.3, -2.4);
+  g.add(mount);
+  DET.curve = curve; DET.rFn = rFn;
+}
+
+// 沿曲線、半徑可變的喇叭形管
+function hornGeometry(curve, rFn, tubular, radial) {
+  const frames = curve.computeFrenetFrames(tubular, false);
+  const pos = [], idx = [];
+  for (let i = 0; i <= tubular; i++) {
+    const u = i / tubular, P = curve.getPointAt(u), N = frames.normals[i], B = frames.binormals[i], r = rFn(u);
+    for (let j = 0; j <= radial; j++) {
+      const v = (j / radial) * TAU;
+      pos.push(P.x + r * (Math.cos(v) * N.x + Math.sin(v) * B.x), P.y + r * (Math.cos(v) * N.y + Math.sin(v) * B.y), P.z + r * (Math.cos(v) * N.z + Math.sin(v) * B.z));
+    }
+  }
+  for (let i = 0; i < tubular; i++) for (let j = 0; j < radial; j++) {
+    const a = i * (radial + 1) + j, b = a + radial + 1;
+    idx.push(a, b, a + 1, b, b + 1, a + 1);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+// ==== 32_facility.js ====
+// ================================================================ 真空腔:三個抽氣區
+const MANI = { group: new THREE.Group(), glass: [], edges: [], regions: [] };
+scene.add(MANI.group);
+{
+  const Y0 = 1.6, Y1 = 9.2, Z = 3.0;
+  const defs = [
+    { id: 'R1', x0: -10.9, x1: -7.5, col: '#e3a9c6' },
+    { id: 'R2', x0: -7.5, x1: -1.6, col: '#aaa5e8' },
+    { id: 'R3', x0: -1.6, x1: 12.6, col: '#8fd8ef' },
+  ];
+  for (const d of defs) {
+    const w = d.x1 - d.x0, h = Y1 - Y0, dz = 2 * Z;
+    const gm = glassMaterial(d.col, 0.014, 0.2);
+    const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, dz), gm);
+    box.position.set((d.x0 + d.x1) / 2, (Y0 + Y1) / 2, 0);
+    box.renderOrder = 2;
+    const em = new THREE.LineBasicMaterial({ color: d.col, transparent: true, opacity: 0.4 });
+    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(box.geometry), em);
+    edges.position.copy(box.position);
+    MANI.group.add(box, edges);
+    MANI.glass.push(gm); MANI.edges.push(em);
+    MANI.regions.push({ ...d, center: box.position.clone(), top: V3((d.x0 + d.x1) / 2, Y1, 0) });
+  }
+  const port = (x, y, z, r, rotX) => {
+    const m = mesh(new THREE.CylinderGeometry(r, r, 0.5, 28), MAT.steelDark);
+    m.position.set(x, y, z); m.rotation.x = rotX;
+    MANI.group.add(m);
+  };
+  port(-9.2, 1.35, -1.4, 0.55, 0); // 第一區 → 機械幫浦
+  port(-4.6, 4.0, -3.25, 0.6, Math.PI / 2); // 第二區 → 渦輪中段
+  port(4.0, 5.4, -3.25, 1.0, Math.PI / 2); // 分析區 → 渦輪主口
+}
+
+// ================================================================ 幫浦與管路:一個群組,導覽拉近時淡出,畫面比較乾淨
+const PUMPS = { group: new THREE.Group(), mats: [], op: 1 };
+scene.add(PUMPS.group);
+const fadeMat = (m) => { const c = m.clone(); c.transparent = true; PUMPS.mats.push(c); return c; };
+const PM = { pump: fadeMat(MAT.pump), light: fadeMat(MAT.pumpLight), hose: fadeMat(MAT.hose), blade: fadeMat(MAT.blade), dark: fadeMat(MAT.steelDark), black: fadeMat(MAT.black) };
+function setPumpsOpacity(op) {
+  if (Math.abs(op - PUMPS.op) < 1e-3) return;
+  PUMPS.op = op;
+  for (const m of PUMPS.mats) { m.opacity = op; m.depthWrite = op > 0.98; }
+  PUMPS.group.visible = op > 0.01;
+}
+PUMPS.group.renderOrder = -1;
+
+// ================================================================ 渦輪分子幫浦(分流式,兩個進氣口)
+const TURBO = {};
+{
+  const g = new THREE.Group();
+  g.position.set(3.0, 0.2, -5.6);
+  PUMPS.group.add(g);
+  const shell = solidOfRevolution({
+    polylines: [[[2.05, 0.4], [2.05, 6.0]], [[1.9, 0.55], [1.9, 6.0]], [[1.9, 6.0], [2.5, 6.0]], [[2.5, 6.0], [2.5, 6.35]], [[2.5, 6.35], [1.9, 6.35]], [[1.9, 0.55], [2.05, 0.4]]],
+    outline: [[1.9, 0.55], [2.05, 0.4], [2.05, 6.0], [2.5, 6.0], [2.5, 6.35], [1.9, 6.35]],
+    mat: PM.light, cut: 1.6, axis: 'y', center: 0.35,
+  });
+  shell.traverse((o) => { if (o.isMesh) o.material = PM.light; });
+  g.add(shell);
+  const base = mesh(new THREE.CylinderGeometry(2.2, 2.3, 0.6, 40), PM.pump);
+  base.position.y = 0.3;
+  g.add(base);
+  const rotor = new THREE.Group();
+  g.add(rotor);
+  const hub = mesh(new THREE.CylinderGeometry(0.5, 0.55, 5.2, 24), PM.blade);
+  hub.position.y = 3.3;
+  rotor.add(hub);
+  const bladeGeo = new THREE.BoxGeometry(1.3, 0.035, 0.34);
+  const NB = 18, stages = 7;
+  const rb = new THREE.InstancedMesh(bladeGeo, PM.blade, NB * stages);
+  const sb = new THREE.InstancedMesh(bladeGeo, PM.dark, NB * (stages - 1));
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), s1 = V3(1, 1, 1);
+  let k = 0, ks = 0;
+  for (let s = 0; s < stages; s++) {
+    for (let i = 0; i < NB; i++) {
+      const th = (i / NB) * TAU + s * 0.17;
+      e.set(0.5, -th, 0, 'YXZ'); q.setFromEuler(e);
+      m4.compose(V3(Math.cos(th) * 1.2, 1.6 + s * 0.68, -Math.sin(th) * 1.2), q, s1);
+      rb.setMatrixAt(k++, m4);
+      if (s < stages - 1) {
+        e.set(-0.5, -th - 0.09, 0, 'YXZ'); q.setFromEuler(e);
+        m4.compose(V3(Math.cos(th + 0.09) * 1.25, 1.94 + s * 0.68, -Math.sin(th + 0.09) * 1.25), q, s1);
+        sb.setMatrixAt(ks++, m4);
+      }
+    }
+  }
+  rb.castShadow = true;
+  rotor.add(rb);
+  g.add(sb);
+  PUMPS.group.add(tube([V3(3.0, 6.55, -5.6), V3(3.1, 7.4, -5.1), V3(3.8, 6.6, -3.9), V3(4.0, 5.4, -3.3)], 0.85, PM.light, { radial: 24 }));
+  PUMPS.group.add(tube([V3(1.05, 3.6, -5.6), V3(-1.5, 3.9, -4.8), V3(-4.0, 4.0, -3.9), V3(-4.6, 4.0, -3.3)], 0.48, PM.light, { radial: 20 }));
+  TURBO.g = g; TURBO.rotor = rotor;
+}
+
+// ================================================================ 機械幫浦(迴轉式,實機有兩台,這裡畫一台),放在後方右側
+{
+  const g = new THREE.Group();
+  g.position.set(15.4, 0.2, -5.9);
+  g.rotation.y = Math.PI;
+  PUMPS.group.add(g);
+  const body = mesh(new RoundedBoxGeometry(4.8, 3.0, 3.1, 3, 0.3), PM.pump);
+  body.position.y = 1.7;
+  const motor = mesh(new THREE.CylinderGeometry(1.25, 1.25, 3.4, 32), PM.light);
+  motor.rotation.z = Math.PI / 2;
+  motor.position.set(4.0, 1.55, 0);
+  const fan = mesh(new THREE.CylinderGeometry(1.3, 1.3, 0.5, 32), PM.black);
+  fan.rotation.z = Math.PI / 2;
+  fan.position.set(5.9, 1.55, 0);
+  const handle = tube([V3(-1.6, 3.2, 0), V3(-1.4, 3.9, 0), V3(1.4, 3.9, 0), V3(1.6, 3.2, 0)], 0.1, PM.black);
+  g.add(body, motor, fan, handle);
+  // 吸氣管沿桌面後緣接到第一區;渦輪的排氣也接到這裡
+  PUMPS.group.add(tube([V3(15.0, 3.3, -5.9), V3(14.2, 4.4, -7.2), V3(9.0, 0.8, -7.9), V3(-4.0, 0.7, -7.9), V3(-8.8, 0.7, -5.4), V3(-9.2, 0.8, -2.6), V3(-9.2, 1.1, -1.45)], 0.3, PM.hose, { seg: 200, radial: 14 }));
+  PUMPS.group.add(tube([V3(5.0, 0.8, -5.6), V3(7.5, 0.7, -6.8), V3(12.6, 1.0, -6.6), V3(13.4, 2.2, -5.9)], 0.24, PM.hose, { seg: 80, radial: 12 }));
+}
+
+// ================================================================ 注射幫浦(機殼右下的平台上)與 PEEK 管
+const SYR = {};
+{
+  const g = new THREE.Group();
+  g.position.set(13.2, 0.2, 6.4);
+  scene.add(g);
+  const base = mesh(new RoundedBoxGeometry(6.2, 1.5, 2.3, 2, 0.15), MAT.pump);
+  base.position.set(0, 0.75, 0);
+  const disp = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.7), new THREE.MeshBasicMaterial({ color: new THREE.Color(0x3ddc84).multiplyScalar(0.7) }));
+  disp.position.set(1.9, 0.8, 1.16);
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 3.6, 28, 1, true), glassMaterial('#cfe9ff', 0.12, 0.7));
+  barrel.rotation.z = Math.PI / 2;
+  barrel.position.set(-0.4, 1.95, 0);
+  const liquid = mesh(new THREE.CylinderGeometry(0.3, 0.3, 2.0, 24), new THREE.MeshStandardMaterial({ color: 0x9fd8ff, transparent: true, opacity: 0.35, roughness: 0.1 }));
+  liquid.rotation.z = Math.PI / 2;
+  liquid.position.set(-1.2, 1.95, 0);
+  const plunger = mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.8, 12), MAT.steel);
+  plunger.rotation.z = Math.PI / 2;
+  plunger.position.set(1.4, 1.95, 0);
+  const pusher = mesh(new RoundedBoxGeometry(0.5, 1.2, 1.4, 2, 0.08), MAT.black);
+  pusher.position.set(2.9, 1.8, 0);
+  const needle = mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.6, 10), MAT.steel);
+  needle.rotation.z = Math.PI / 2;
+  needle.position.set(-2.5, 1.95, 0);
+  g.add(base, disp, barrel, liquid, plunger, pusher, needle);
+  SYR.g = g; SYR.tip = V3(13.2 - 2.8, 0.2 + 1.95, 6.4);
+  SYR.peek = null; SYR.lastX = null;
+}
+// PEEK 管:注射針頭沿桌面前緣接到噴針尾端;離子源移動時重建
+function updatePeek() {
+  const sx = COMPS.source.group.position.x;
+  if (SYR.lastX !== null && Math.abs(sx - SYR.lastX) < 1e-3) return;
+  SYR.lastX = sx;
+  const end = SRC.peekStart.clone().add(COMPS.source.group.position);
+  // 沿桌面前緣往左,繞到離子源腔的左後方,再上到噴針尾端(不擋住噴霧)
+  const pts = [SYR.tip.clone(), V3(SYR.tip.x - 1.2, 0.9, 6.7), V3(-6, 0.62, 7.4), V3(sx - 5.0, 0.62, 7.2), V3(sx - 7.6, 1.2, 3.0), V3(sx - 7.2, 6.0, -1.2), V3(end.x - 1.4, end.y + 1.2, -0.8), V3(end.x, end.y + 0.5, 0), end];
+  const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), 240, 0.045, 8, false);
+  if (!SYR.peek) { SYR.peek = mesh(geo, MAT.peek); scene.add(SYR.peek); }
+  else { SYR.peek.geometry.dispose(); SYR.peek.geometry = geo; }
+}
+
+// ================================================================ 機殼(外觀模式):米白色,右前緣藍色條紋,右上狀態燈
+const CAB = { panels: [], open: 1 };
+const FONT_TEX = []; // 用到網頁字型的貼圖,字型載入後重畫
+function fontTex(w, h, draw) {
+  const t = canvasTex(w, h, draw);
+  FONT_TEX.push({ t, draw });
+  return t;
+}
+{
+  const X0 = -29.6, X1 = 18.6, Y0 = 0.15, Y1 = 17.6, Z0 = -8.6, Z1 = 4.3, T = 0.4;
+  const W = X1 - X0, H = Y1 - Y0, D = Z1 - Z0;
+  const cx = (X0 + X1) / 2, cy = (Y0 + Y1) / 2, cz = (Z0 + Z1) / 2;
+  const FRONT = V3(0, -2, 11);
+  const add = (m, off) => { m.castShadow = true; m.receiveShadow = true; scene.add(m); CAB.panels.push({ m, base: m.position.clone(), off }); };
+  const rr = (x, y, w, h, r) => { const s = new THREE.Shape(); s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h); s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y); return s; };
+  // 前板:左側凹進去的離子源面板,中間開圓窗
+  const win = { x: LAY.inlet - 1.2, y: AX + 0.8, r: 2.6 };
+  const shape = rr(-W / 2, -H / 2, W, H, 0.6);
+  const hole = new THREE.Path(); hole.absarc(win.x - cx, win.y - cy, win.r, 0, TAU, true);
+  shape.holes.push(hole);
+  const front = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: T, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.08, bevelSegments: 2, curveSegments: 48 }), MAT.cabinet);
+  front.position.set(cx, cy, Z1 - T);
+  add(front, FRONT);
+  const recessShape = rr(-6.5, -5.2, 13, 10.4, 0.9);
+  const rh = new THREE.Path(); rh.absarc(0, 0, win.r, 0, TAU, true); recessShape.holes.push(rh);
+  const recess = new THREE.Mesh(new THREE.ExtrudeGeometry(recessShape, { depth: 0.12, bevelEnabled: false, curveSegments: 48 }), MAT.cabinetDark);
+  recess.position.set(win.x, win.y, Z1 + 0.02);
+  add(recess, FRONT);
+  const glassF = new THREE.Mesh(new THREE.CircleGeometry(win.r, 48), glassMaterial('#cfe9ff', 0.04, 0.6));
+  glassF.position.set(win.x, win.y, Z1 - 0.05);
+  add(glassF, FRONT);
+  // 機殼上的零件要用自己的材質,淡出時才不會動到其他共用材質
+  const rimMat = MAT.steel.clone(); rimMat.transparent = true;
+  const rim = mesh(new THREE.TorusGeometry(win.r + 0.05, 0.14, 12, 64), rimMat);
+  rim.position.set(win.x, win.y, Z1 + 0.16);
+  add(rim, FRONT);
+  // 分流閥:離子源左邊
+  const valveMat = MAT.steelDark.clone(); valveMat.transparent = true;
+  const valve = mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.5, 32), valveMat);
+  valve.rotation.x = Math.PI / 2;
+  valve.position.set(win.x - 4.6, win.y + 2.4, Z1 + 0.3);
+  add(valve, FRONT);
+  const vbtn = mesh(new THREE.CapsuleGeometry(0.22, 0.5, 6, 16), new THREE.MeshStandardMaterial({ color: 0x2f6fb5, roughness: 0.35, metalness: 0.2, transparent: true }));
+  vbtn.rotation.z = Math.PI / 2;
+  vbtn.position.set(win.x - 4.6, win.y - 0.4, Z1 + 0.25);
+  add(vbtn, FRONT);
+  // 左上:機名
+  const logoTex = fontTex(1024, 160, (g2, w, h) => {
+    g2.clearRect(0, 0, w, h);
+    g2.textBaseline = 'middle';
+    g2.font = '700 96px Outfit, "Microsoft JhengHei", sans-serif';
+    g2.fillStyle = '#5a6170'; g2.fillText('LCQ DECA', 10, 84);
+    const x = 14 + g2.measureText('LCQ DECA ').width;
+    g2.fillStyle = '#2f6fb5'; g2.fillText('XP', x, 84);
+  });
+  const logo = new THREE.Mesh(new THREE.PlaneGeometry(12, 1.875), new THREE.MeshStandardMaterial({ map: logoTex, transparent: true, roughness: 0.5, depthWrite: false }));
+  logo.position.set(X0 + 7.6, Y1 - 2.0, Z1 + 0.11);
+  logo.renderOrder = 3;
+  add(logo, FRONT);
+  CAB.panels[CAB.panels.length - 1].decal = true;
+  // 右上:橢圓形狀態燈面板
+  const ledPanel = new THREE.Mesh(new THREE.ExtrudeGeometry(rr(-5.6, -1.25, 11.2, 2.5, 1.25), { depth: 0.12, bevelEnabled: false, curveSegments: 24 }), MAT.cabinetDark);
+  const LP = V3(X1 - 9.4, Y1 - 2.4, Z1 + 0.02);
+  ledPanel.position.copy(LP);
+  add(ledPanel, FRONT);
+  const ledTex = fontTex(1024, 228, (g2, w, h) => {
+    g2.clearRect(0, 0, w, h);
+    g2.fillStyle = '#c3cadc'; g2.font = '500 30px "DM Mono", Consolas, monospace'; g2.textAlign = 'center'; g2.textBaseline = 'middle';
+    ['POWER', 'VACUUM', 'COMM', 'SYSTEM', 'SCAN'].forEach((t, i) => g2.fillText(t, 132 + i * 190, 160));
+  });
+  const ledLab = new THREE.Mesh(new THREE.PlaneGeometry(11.2, 2.5), new THREE.MeshBasicMaterial({ map: ledTex, transparent: true, depthWrite: false }));
+  ledLab.position.copy(LP).add(V3(0, 0, 0.14));
+  ledLab.renderOrder = 3;
+  add(ledLab, FRONT);
+  CAB.panels[CAB.panels.length - 1].decal = true;
+  CAB.leds = [];
+  for (let i = 0; i < 5; i++) {
+    const col = i === 4 ? 0x5aa9ff : 0x3ddc84;
+    const led = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 12), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(2.4), transparent: true }));
+    led.position.copy(LP).add(V3(-5.6 + (132 + i * 190) / 1024 * 11.2, 0.35, 0.18));
+    add(led, FRONT);
+    CAB.leds.push(led);
+  }
+  // 右前緣:藍色直條紋(有凹槽)
+  const stripe = new THREE.Group();
+  const stripeMat = new THREE.MeshStandardMaterial({ color: 0x2f6fb5, roughness: 0.4, metalness: 0.25, transparent: true });
+  for (let i = 0; i < 6; i++) {
+    const rib = mesh(new RoundedBoxGeometry(0.34, H - 0.8, 0.3, 2, 0.1), stripeMat);
+    rib.position.set(X1 - 2.6 + i * 0.42, cy, Z1 + 0.12);
+    stripe.add(rib);
+  }
+  scene.add(stripe);
+  CAB.panels.push({ m: stripe, base: stripe.position.clone(), off: FRONT, group: [stripeMat] });
+  // 右下:注射幫浦平台
+  const shelf = mesh(new RoundedBoxGeometry(8.2, 0.5, 3.4, 2, 0.12), MAT.cabinet);
+  shelf.position.set(13.0, 0.0, 6.2);
+  add(shelf, V3(0, -1, 4));
+  // 頂、左、右、後
+  const top = mesh(new RoundedBoxGeometry(W + 0.2, T, D + 0.2, 2, 0.15), MAT.cabinet);
+  top.position.set(cx, Y1, cz);
+  add(top, V3(0, 14, 0));
+  const left = mesh(new RoundedBoxGeometry(T, H, D, 2, 0.15), MAT.cabinet);
+  left.position.set(X0, cy, cz);
+  add(left, V3(-12, 0, 0));
+  const right = mesh(new RoundedBoxGeometry(T, H, D, 2, 0.15), MAT.cabinet);
+  right.position.set(X1, cy, cz);
+  add(right, V3(12, 0, 0));
+  const back = mesh(new RoundedBoxGeometry(W, H, T, 2, 0.15), MAT.cabinetDark);
+  back.position.set(cx, cy, Z0);
+  add(back, V3(0, 0, -10));
+  const ventTex = canvasTex(256, 256, (g2, w, h) => {
+    g2.fillStyle = '#e8e3d3'; g2.fillRect(0, 0, w, h);
+    g2.fillStyle = '#6b6f78';
+    for (let r = 0; r < 9; r++) for (let c = 0; c < 4; c++) { roundRect(g2, 30 + c * 52, 26 + r * 24, 40, 8, 4); g2.fill(); }
+  });
+  const vent = new THREE.Mesh(new THREE.PlaneGeometry(7, 7), new THREE.MeshStandardMaterial({ map: ventTex, roughness: 0.6, transparent: true }));
+  vent.rotation.y = Math.PI / 2;
+  vent.position.set(X1 + T / 2 + 0.02, 8.5, -2.2);
+  add(vent, V3(12, 0, 0));
+}
+function setCabinetOpen(o) {
+  CAB.open = o;
+  const e = smooth(clamp(o, 0, 1));
+  const op = 1 - smooth(clamp(o * 1.25, 0, 1));
+  for (const p of CAB.panels) {
+    p.m.position.copy(p.base).addScaledVector(p.off, e);
+    p.m.visible = op > 0.01;
+    const ms = p.group || (Array.isArray(p.m.material) ? p.m.material : [p.m.material]);
+    for (const m of ms) {
+      if (m.uniforms) m.uniforms.uFade.value = op;
+      else { m.opacity = op; if (!p.decal) m.depthWrite = op > 0.98; }
+    }
+  }
+}
+
+// ==== 40_particles.js ====
+// ================================================================ 點粒子
+// 兩組:離子用「覆蓋」混合,疊在一起也保有顏色;電子、火花、氣體用「相加」混合來發光
+const PT_UNI = { uScale: { value: 1000 }, uMaxPx: { value: 18 } };
+function makePoints(additive, max) {
+  const S = { max, n: 0, pos: new Float32Array(max * 3), col: new Float32Array(max * 4), size: new Float32Array(max) };
+  const geo = new THREE.BufferGeometry();
+  S.attrs = [
+    new THREE.BufferAttribute(S.pos, 3).setUsage(THREE.DynamicDrawUsage),
+    new THREE.BufferAttribute(S.col, 4).setUsage(THREE.DynamicDrawUsage),
+    new THREE.BufferAttribute(S.size, 1).setUsage(THREE.DynamicDrawUsage),
+  ];
+  geo.setAttribute('position', S.attrs[0]);
+  geo.setAttribute('aColor', S.attrs[1]);
+  geo.setAttribute('aSize', S.attrs[2]);
+  const mat = new THREE.ShaderMaterial({
+    uniforms: PT_UNI,
+    vertexShader: /* glsl */`
+      attribute vec4 aColor; attribute float aSize;
+      uniform float uScale, uMaxPx;
+      varying vec4 vC;
+      void main(){
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        gl_Position = projectionMatrix * mv;
+        float s = aSize * uScale / max(0.001, -mv.z);
+        vC = aColor;
+        if (s < 1.6) { vC.a *= s / 1.6; s = 1.6; }
+        gl_PointSize = min(s, uMaxPx);
+      }`,
+    fragmentShader: additive ? /* glsl */`
+      varying vec4 vC;
+      void main(){
+        vec2 d = gl_PointCoord - 0.5;
+        float r2 = dot(d, d) * 4.0;
+        if (r2 > 1.0) discard;
+        float a = (exp(-r2 * 4.5) + 0.25 * exp(-r2 * 1.2) * (1.0 - r2)) * vC.a;
+        gl_FragColor = vec4(vC.rgb * a, a);
+      }` : /* glsl */`
+      varying vec4 vC;
+      void main(){
+        vec2 d = gl_PointCoord - 0.5;
+        float r = length(d) * 2.0;
+        if (r > 1.0) discard;
+        float core = smoothstep(1.0, 0.55, r);
+        float a = core * vC.a;
+        vec3 c = vC.rgb * (1.0 + 0.6 * smoothstep(0.5, 0.0, r));
+        gl_FragColor = vec4(c * a, a);
+      }`,
+    transparent: true, depthWrite: false,
+    blending: THREE.CustomBlending, blendEquation: THREE.AddEquation,
+    blendSrc: THREE.OneFactor, blendDst: additive ? THREE.OneFactor : THREE.OneMinusSrcAlphaFactor,
+  });
+  S.obj = new THREE.Points(geo, mat);
+  S.obj.frustumCulled = false;
+  S.obj.renderOrder = additive ? 11 : 10;
+  S.geo = geo;
+  scene.add(S.obj);
+  return S;
+}
+const PN = makePoints(false, 12000), PA = makePoints(true, 12000);
+function pushPt(S, x, y, z, c, inten, a, s) {
+  if (S.n >= S.max) return;
+  const i = S.n++;
+  S.pos[i * 3] = x; S.pos[i * 3 + 1] = y; S.pos[i * 3 + 2] = z;
+  S.col[i * 4] = c.r * inten; S.col[i * 4 + 1] = c.g * inten; S.col[i * 4 + 2] = c.b * inten; S.col[i * 4 + 3] = a;
+  S.size[i] = s;
+}
+const P = (x, y, z, c, inten, a, s) => pushPt(PN, x, y, z, c, inten, a, s);
+const PG = (x, y, z, c, inten, a, s) => pushPt(PA, x, y, z, c, inten, a, s);
+function flushPoints() {
+  for (const S of [PN, PA]) {
+    for (const a of S.attrs) {
+      a.clearUpdateRanges();
+      a.addUpdateRange(0, S.n * a.itemSize);
+      a.needsUpdate = true;
+    }
+    S.geo.setDrawRange(0, S.n);
+    S.n = 0;
+  }
+}
+
+// ================================================================ 液滴(實心小球)
+const DROP_MAX = 360;
+const dropMat = new THREE.MeshPhysicalMaterial({
+  color: 0xd6f1ff, roughness: 0.04, metalness: 0, transparent: true, opacity: 0.62,
+  clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: 2.2, emissive: 0x3a8fc0, emissiveIntensity: 0.35,
+});
+const dropMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 18, 12), dropMat, DROP_MAX);
+dropMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+dropMesh.frustumCulled = false;
+dropMesh.count = 0;
+dropMesh.renderOrder = 5;
+scene.add(dropMesh);
+
+// ================================================================ 模擬狀態
+const SIM = {
+  drops: [], plume: [], ions: [], trap: [], fly: [], sec: [], gas: [], he: [], trail: [],
+  emit: 0, gasEmit: 0, t: 0, spray: 1,
+  detectHook: null,
+};
+const K = { tip: V3(), aim: V3(), inlet: V3(), nodes: new Array(10).fill(0), trapC: 0, trapIn: 0, trapOut: 0, spread: 0, dyn: V3(), emPts: [], detX: 0 };
+const tmpV = V3(), tmpV2 = V3(), tmpC = new THREE.Color();
+const C_WHITE = new THREE.Color(1, 1, 1), C_GAS = new THREE.Color('#9fb3d9'), C_HE = new THREE.Color('#c8d6ff'), C_E = new THREE.Color('#bff4ff');
+
+// 每格依零件目前的位置重算關鍵點
+function updateKeys() {
+  const src = COMPS.source.group.position, cap = COMPS.cap.group.position.x;
+  K.tip.copy(SRC.tipLocal).add(src);
+  K.inlet.set(cap, AX, 0);
+  K.aim.copy(SRC.aim); // 正交噴灑:液滴往下噴,只有帶電的小液滴與離子被電場拉進入口
+  const x = (id) => COMPS[id].group.position.x;
+  K.spread = TRAPPARTS.capOut.position.x;
+  K.trapC = x('trap');
+  K.trapIn = K.trapC - K.spread - TRAP.z0;
+  K.trapOut = K.trapC + K.spread + TRAP.z0;
+  const n = K.nodes;
+  n[0] = cap; n[1] = cap + LAY.capLen; n[2] = x('skim'); n[3] = x('mp1') - LAY.mp1Len / 2; n[4] = x('mp1') + LAY.mp1Len / 2;
+  n[5] = x('lens1'); n[6] = x('mp2') - LAY.mp2Len / 2; n[7] = x('mp2') + LAY.mp2Len / 2; n[8] = x('ent'); n[9] = K.trapIn;
+  K.detX = x('det');
+  K.dyn.copy(DET.dynLocal).add(COMPS.det.group.position);
+}
+const SEG_SPEED = [7.0, 4.0, 5.0, 4.6, 4.6, 4.6, 4.6, 4.0, 3.0];
+const tri = (x) => { const t = ((x / TAU) % 1 + 1) % 1; return 4 * Math.abs(t - 0.5) - 1; };
+
+// β(q):a = 0 時 Mathieu 方程的特徵指數,用來決定阱內振盪頻率(在 panels 模組算表)
+function betaOf(q) {
+  const tb = STAB.betaTable;
+  if (!tb) return q / Math.SQRT2;
+  const f = clamp(q / STAB.qMax, 0, 1) * (tb.length - 1);
+  const i = Math.min(tb.length - 2, Math.floor(f));
+  return lerp(tb[i], tb[i + 1], f - i);
+}
+const W_SEC = 32; // 視覺上的長期振盪角頻率尺度
+const qOf = (mz) => TRAP.qEject * CY.M / mz;
+
+// ---------------------------------------------------------------- 產生
+function spawnDrop(off, p, v, r0, life) {
+  if (SIM.drops.length >= DROP_MAX) return;
+  SIM.drops.push({ x: p.x, y: p.y, z: p.z, vx: v.x, vy: v.y, vz: v.z, r0, r: r0, age: 0, life, off, fis: 0 });
+}
+function perp(a, out) { // 與 a 垂直的隨機方向
+  out.set(rndn(), rndn(), rndn());
+  out.addScaledVector(a, -out.dot(a)).normalize();
+  return out;
+}
+function spawnPlumeIon(x, y, z, vx, vy, vz) {
+  const sp = pickSpecies();
+  SIM.plume.push({ sp, x, y, z, vx, vy, vz, age: 0, fade: 1, lost: false });
+}
+function newTransit(sp, seg, ry, rz) {
+  const quad = rnd(0.05, 0.19), oct = rnd(0.05, 0.2);
+  return {
+    sp, seg, u: 0, lt: rnd(0, 5), ry, rz,
+    jet: rnd(0.08, 0.7), jth: rnd(0, TAU),
+    A1: quad, A2: quad * rnd(0.6, 1.1), w1: rnd(8, 12), w2: rnd(8, 12) * 1.13, p1: rnd(0, TAU), p2: rnd(0, TAU),
+    B1: oct, B2: oct * rnd(0.6, 1.1), v1: rnd(6, 9), v2: rnd(6, 9) * 1.1,
+    dir: 1, fade: 1, dead: false, block: false,
+  };
+}
+function spMz(sp) { return sp === -1 ? PRODUCT.mz : SPECIES[sp].mz; }
+function spCol(sp) { return sp === -1 ? PRODUCT.col : SPECIES[sp].col; }
+
+// ---------------------------------------------------------------- 電灑:液滴 → 分裂 → 氣相離子
+function stepSpray(dt) {
+  const rate = 34 * SIM.spray;
+  SIM.emit += rate * dt;
+  while (SIM.emit >= 1) {
+    SIM.emit -= 1;
+    const p = tmpV.copy(K.tip).addScaledVector(K.aim, 0.14);
+    const v = tmpV2.copy(K.aim).multiplyScalar(rnd(2.3, 3.3)).addScaledVector(perp(K.aim, V3()), rnd(0, 0.95));
+    spawnDrop(false, p, v, rnd(0.032, 0.058), rnd(0.75, 1.15));
+  }
+  const ix = K.inlet.x, iy = K.inlet.y, iz = K.inlet.z;
+  const ds = SIM.drops;
+  let w = 0;
+  for (let i = 0; i < ds.length; i++) {
+    const d = ds[i];
+    d.age += dt;
+    const dx = ix - d.x, dy = iy - d.y, dz = iz - d.z;
+    const dist = Math.hypot(dx, dy, dz) + 1e-6;
+    // 電場把液滴拉向入口;越小的液滴(荷質比越大)越容易被拉過去
+    const pull = (d.off ? 9.0 : 2.6) / (0.25 + dist);
+    d.vx += (dx / dist) * pull * dt; d.vy += (dy / dist) * pull * dt; d.vz += (dz / dist) * pull * dt;
+    const drag = Math.exp(-(d.off ? 2.2 : 0.9) * dt);
+    d.vx *= drag; d.vy *= drag; d.vz *= drag;
+    d.x += d.vx * dt; d.y += d.vy * dt; d.z += d.vz * dt;
+    const f = d.age / d.life;
+    d.r = d.r0 * Math.pow(Math.max(0, 1 - f), 0.55);
+    // 庫倫分裂:到瑞利極限時噴出一串小液滴
+    if (!d.off && ((d.fis === 0 && f > 0.42) || (d.fis === 1 && f > 0.7))) {
+      d.fis++;
+      const n = 3 + rndi(3);
+      for (let k = 0; k < n; k++) {
+        const v = V3(d.vx, d.vy, d.vz).multiplyScalar(rnd(0.9, 1.15)).addScaledVector(perp(K.aim, V3()), rnd(0.25, 0.75));
+        spawnDrop(true, V3(d.x, d.y, d.z), v, d.r * rnd(0.24, 0.32), rnd(0.28, 0.42));
+      }
+    }
+    let gone = false;
+    if (dist < 0.17) { // 進入毛細管:剩下的溶劑在管內蒸乾
+      gone = true;
+      if (RNG.f() < 0.6) SIM.ions.push(newTransit(pickSpecies(), 0, rnd(-0.01, 0.01), rnd(-0.01, 0.01)));
+    } else if (f >= 1) {
+      gone = true;
+      if (RNG.f() < (d.off ? 0.55 : 0.35)) spawnPlumeIon(d.x, d.y, d.z, d.vx, d.vy, d.vz);
+    } else if ((d.x > ix - 0.05 && dist > 0.5) || d.y < AX - 2.75) {
+      gone = true; // 打在前板上,或落進底部廢液口
+    }
+    if (!gone) ds[w++] = d;
+  }
+  ds.length = w;
+
+  // 氣相離子:電場加上流進毛細管的氣流,越靠近入口流速越快
+  const pl = SIM.plume;
+  w = 0;
+  const relax = 1 - Math.exp(-4.5 * dt);
+  for (let i = 0; i < pl.length; i++) {
+    const p = pl[i];
+    p.age += dt;
+    const dx = ix - p.x, dy = iy - p.y, dz = iz - p.z;
+    const dist = Math.hypot(dx, dy, dz) + 1e-6;
+    if (!p.lost) {
+      const sp = 1.0 + 2.6 / (0.3 + dist);
+      p.vx += ((dx / dist) * sp - p.vx) * relax;
+      p.vy += ((dy / dist) * sp - p.vy) * relax;
+      p.vz += ((dz / dist) * sp - p.vz) * relax;
+      if (p.age > 3.2 || p.y < AX - 2.7) p.lost = true;
+    } else p.fade -= dt * 2.5;
+    p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+    if (!p.lost && dist < 0.16) {
+      SIM.ions.push(newTransit(p.sp, 0, (p.y - iy) * 0.15, (p.z - iz) * 0.15));
+      continue;
+    }
+    if (p.fade > 0) pl[w++] = p;
+  }
+  pl.length = w;
+
+  // 中性氣體:鞘氣從噴嘴吹出,毛細管出口的超音速噴流大多被機械幫浦抽走
+  SIM.gasEmit += dt * 40 * SIM.spray;
+  while (SIM.gasEmit >= 1) {
+    SIM.gasEmit -= 1;
+    if (RNG.f() < 0.55) {
+      const v = V3().copy(K.aim).multiplyScalar(rnd(4, 6.5)).addScaledVector(perp(K.aim, V3()), rnd(0.6, 2.2));
+      const p = V3().copy(K.tip).addScaledVector(K.aim, -0.5).addScaledVector(perp(K.aim, V3()), 0.1);
+      SIM.gas.push({ x: p.x, y: p.y, z: p.z, vx: v.x, vy: v.y, vz: v.z, age: 0, life: rnd(0.4, 0.8), k: 0 });
+    } else {
+      const a = rnd(0, TAU), s = rnd(0.3, 1.6);
+      SIM.gas.push({ x: K.nodes[1], y: AX, z: 0, vx: rnd(4, 7), vy: Math.sin(a) * s, vz: Math.cos(a) * s, age: 0, life: rnd(0.35, 0.6), k: 1 });
+    }
+  }
+  const gs = SIM.gas;
+  w = 0;
+  for (let i = 0; i < gs.length; i++) {
+    const g = gs[i];
+    g.age += dt;
+    if (g.k === 1 && g.x > K.nodes[2] - 0.4 && Math.hypot(g.y - AX, g.z) > 0.08) { g.vx *= 0.2; g.vy -= 6 * dt; }
+    g.x += g.vx * dt; g.y += g.vy * dt; g.z += g.vz * dt;
+    if (g.age < g.life) gs[w++] = g;
+  }
+  gs.length = w;
+}
+
+// ---------------------------------------------------------------- 傳輸:毛細管 → 多極柱 → 入口透鏡
+function stepTransit(dt) {
+  const n = K.nodes, is = SIM.ions;
+  let w = 0;
+  for (let i = 0; i < is.length; i++) {
+    const o = is[i];
+    o.lt += dt;
+    if (o.block) { // 閘門關著:被入口透鏡擋回、散掉
+      o.fade -= dt * 3.2;
+      o.u = Math.max(0, o.u - dt * 0.7 / Math.max(0.3, n[o.seg + 1] - n[o.seg]));
+      if (o.fade > 0) is[w++] = o;
+      continue;
+    }
+    if (o.dead) { o.fade -= dt * 2.2; if (o.fade > 0) is[w++] = o; continue; }
+    const L = Math.max(0.15, n[o.seg + 1] - n[o.seg]);
+    o.u += (SEG_SPEED[o.seg] * dt) / L;
+    // 截取錐擋掉外圈的離子
+    if (o.seg === 1 && o.jet > 0.56 && o.u > 0.86) { o.dead = true; o.u = 0.86; }
+    if ((o.seg === 7 || o.seg === 8) && !CY.gate && o.u > 0.55) { o.block = true; }
+    if (o.u >= 1) {
+      if (o.seg === 8) {
+        enterTrap(o);
+        continue;
+      }
+      o.seg++; o.u = 0;
+    }
+    // 目標徑向位置
+    let ty = 0, tz = 0;
+    switch (o.seg) {
+      case 0: ty = 0.012 * Math.sin(o.lt * 9 + o.p1); tz = 0.012 * Math.cos(o.lt * 8 + o.p2); break;
+      case 1: { const e = Math.pow(Math.sin(Math.PI * Math.min(1, o.u)), 0.8) * (1 - 0.6 * o.u) + 0.05; ty = o.jet * e * Math.sin(o.jth); tz = o.jet * e * Math.cos(o.jth); break; }
+      case 3: ty = o.A1 * Math.sin(o.w1 * o.lt + o.p1); tz = o.A2 * Math.sin(o.w2 * o.lt + o.p2); break;
+      case 6: ty = o.B1 * tri(o.v1 * o.lt + o.p1); tz = o.B2 * tri(o.v2 * o.lt + o.p2); break;
+      default: ty = 0.03 * Math.sin(o.lt * 6 + o.p1); tz = 0.03 * Math.cos(o.lt * 6 + o.p2);
+    }
+    const k = 1 - Math.exp(-(o.seg === 1 ? 30 : 12) * dt);
+    o.ry += (ty - o.ry) * k; o.rz += (tz - o.rz) * k;
+    is[w++] = o;
+  }
+  is.length = w;
+}
+function transitPos(o, out) {
+  const n = K.nodes;
+  return out.set(lerp(n[o.seg], n[o.seg + 1], clamp(o.u, 0, 1)), AX + o.ry, o.rz);
+}
+
+// ---------------------------------------------------------------- 離子阱
+function enterTrap(o) {
+  if (SIM.trap.length > 220) return;
+  const mz = spMz(o.sp), q = qOf(mz);
+  const wz = W_SEC * Math.pow(betaOf(q), 0.75), wr = wz / 2;
+  // 少數幾顆當「示蹤離子」:熱運動振幅大一點,留下軌跡,看得出 8 字形
+  const tracer = SIM.trail.length < 4 && o.sp >= 0 && o.sp <= 1 && RNG.f() < 0.3;
+  SIM.trap.push({
+    sp: o.sp, st: 'trap', fade: 1, flash: 0,
+    Az: rnd(0.6, 0.74), pz: Math.PI, // 從入口端蓋的孔進來,先擺盪到另一側,再被氦氣冷卻
+    Ax: rnd(0.04, 0.3), Ay: rnd(0.04, 0.3), px: rnd(0, TAU), dp: 1,
+    th: tracer ? rnd(0.4, 0.46) : rnd(0.1, 0.3), tr: tracer ? rnd(0.26, 0.32) : rnd(0.07, 0.2), wz, wr, x: K.trapIn, y: AX, z: 0,
+    trail: tracer ? [] : null,
+  });
+  const t = SIM.trap[SIM.trap.length - 1];
+  if (t.trail) SIM.trail.push(t);
+}
+function stepTrap(dt, time) {
+  const tr = SIM.trap;
+  let w = 0;
+  const z0 = TRAP.z0;
+  for (let i = 0; i < tr.length; i++) {
+    const o = tr[i];
+    const mz = spMz(o.sp), q = qOf(mz);
+    o.wz = W_SEC * Math.pow(betaOf(Math.min(q, STAB.qMax)), 0.75);
+    o.wr = o.wz / 2; // 低 q 時 β_r ≈ β_z / 2,r–z 平面上畫出 8 字形
+    o.pz += o.wz * dt; o.px += o.wr * dt;
+    o.flash = Math.max(0, o.flash - dt * 2.5);
+    // 判斷這顆離子現在的命運
+    const resonant = q >= TRAP.qEject;
+    const isoKick = CY.iso && o.sp !== PRECURSOR && o.sp !== -1;
+    if ((resonant || isoKick) && o.st === 'trap') { o.st = 'eject'; o.det = !isoKick && CY.detOn; }
+    if (o.st === 'eject') {
+      o.Az = Math.max(o.Az, 0.14) * Math.exp(dt / 0.11);
+      o.Ax *= Math.exp(-dt / 0.15); o.Ay *= Math.exp(-dt / 0.15);
+    } else {
+      // 與氦氣碰撞:振幅衰減到熱運動大小,相位被打亂
+      const act = CY.act && o.sp === PRECURSOR;
+      const tz = act ? 0.46 : o.th;
+      o.Az = tz + (o.Az - tz) * Math.exp(-dt / (act ? 0.35 : 0.85));
+      o.Ax = o.tr + (o.Ax - o.tr) * Math.exp(-dt / 0.85);
+      o.Ay = o.tr + (o.Ay - o.tr) * Math.exp(-dt / 0.85);
+      if (RNG.f() < dt * 4) { o.pz += rndn() * 0.5; o.px += rndn() * 0.5; }
+      if (act && RNG.f() < dt * 0.95) { // 碰撞誘導解離:m/z 195 → 138 + 中性 CH3NCO
+        o.sp = -1; o.flash = 1; o.Az = 0.3; o.pz = rnd(0, TAU);
+        SIM.sec.push({ k: 'neutral', x: o.x, y: o.y, z: o.z, vx: rnd(-1, 1), vy: rnd(-1, 1), vz: rnd(-1, 1), age: 0, life: 0.9 });
+      }
+    }
+    // 示蹤離子固定 z 與 r 的相位關係 (ω_z = 2ω_r,相差 90°),畫出乾淨的 8 字
+    let z = o.Az * Math.cos(o.trail ? 2 * o.px + Math.PI / 2 : o.pz);
+    z += -0.5 * q * z * Math.cos(time * TAU * 7) * 0.5; // RF 微運動
+    const xr = o.Ax * Math.cos(o.px), yr = o.Ay * Math.sin(o.px + 0.7);
+    o.x = K.trapC + z; o.y = AX + xr; o.z = yr * 0.6;
+    if (o.trail) { o.trail.push(o.x, o.y, o.z); if (o.trail.length > 600) o.trail.splice(0, 3); }
+    if (o.st === 'eject' && Math.abs(z) > z0 + K.spread * 0.9) {
+      const out = z > 0;
+      SIM.fly.push({ sp: o.sp, k: out && o.det ? 'det' : 'lost', dir: out ? 1 : -1, t: 0, x0: o.x, y0: o.y, z0: o.z, x: o.x, y: o.y, z: o.z, fade: 1 });
+      if (o.trail) SIM.trail.splice(SIM.trail.indexOf(o), 1);
+      continue;
+    }
+    tr[w++] = o;
+  }
+  tr.length = w;
+}
+
+// ---------------------------------------------------------------- 射出後:打拿極 → 二次粒子 → 電子倍增管
+const bez = (a, b, c, d, t) => { const u = 1 - t; return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d; };
+function stepFly(dt) {
+  const fl = SIM.fly;
+  let w = 0;
+  const mouth = DET.curve.getPointAt(0.02).add(COMPS.det.group.position);
+  for (let i = 0; i < fl.length; i++) {
+    const f = fl[i];
+    f.t += dt;
+    if (f.k === 'det') {
+      const T = 0.3, u = Math.min(1, f.t / T);
+      const p0x = K.trapOut + 0.05, d = K.dyn;
+      f.x = bez(f.x0, p0x + 1.0, d.x, d.x, u);
+      f.y = bez(f.y0, AX, d.y + 1.4, d.y, u);
+      f.z = bez(f.z0, 0, d.z, d.z, u);
+      if (u >= 1) {
+        for (let k = 0; k < 2; k++) SIM.sec.push({ k: 'e2', sp: f.sp, t: 0, x0: d.x, y0: d.y, z0: d.z, mx: mouth.x, my: mouth.y, mz: mouth.z, off: rnd(-0.2, 0.2), x: d.x, y: d.y, z: d.z });
+        SIM.sec.push({ k: 'hit', x: d.x, y: d.y, z: d.z, age: 0, life: 0.25, sp: f.sp });
+        continue;
+      }
+    } else {
+      f.x += f.dir * 3.2 * dt; f.y += (f.y - AX) * 2 * dt; f.z += f.z * 2 * dt;
+      f.fade -= dt * 2.6;
+      if (f.fade <= 0) continue;
+    }
+    fl[w++] = f;
+  }
+  fl.length = w;
+
+  const sc = SIM.sec, det = COMPS.det.group.position;
+  w = 0;
+  for (let i = 0; i < sc.length; i++) {
+    const s = sc[i];
+    if (s.k === 'e2') {
+      s.t += dt;
+      const u = Math.min(1, s.t / 0.2);
+      s.x = bez(s.x0, s.x0 + 0.35 + s.off, s.mx - 0.25, s.mx, u);
+      s.y = bez(s.y0, s.y0 + 1.3, s.my - 0.9, s.my, u);
+      s.z = bez(s.z0, s.z0 + s.off, s.mz, s.mz, u);
+      if (u >= 1) { s.k = 'cas'; s.t = 0; }
+      sc[w++] = s;
+    } else if (s.k === 'cas') {
+      s.t += dt;
+      if (s.t > 0.34) { if (SIM.detectHook) SIM.detectHook(spMz(s.sp)); continue; }
+      sc[w++] = s;
+    } else {
+      s.age += dt;
+      if (s.k === 'neutral') { s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt; }
+      if (s.age < s.life) sc[w++] = s;
+    }
+  }
+  sc.length = w;
+}
+
+// ---------------------------------------------------------------- 氦氣原子
+function initHe() {
+  SIM.he.length = 0;
+  for (let i = 0; i < 80; i++) {
+    const r = Math.sqrt(RNG.f()) * 0.95, a = RNG.f() * TAU;
+    SIM.he.push({ z: (RNG.f() * 2 - 1) * 0.72, y: Math.sin(a) * r, x: Math.cos(a) * r });
+  }
+}
+initHe();
+function stepHe(dt) {
+  for (const h of SIM.he) {
+    h.z += rndn() * 0.6 * dt; h.y += rndn() * 0.6 * dt; h.x += rndn() * 0.6 * dt;
+    const r = Math.hypot(h.x, h.y);
+    if (r > 1.0) { h.x *= 0.9 / r; h.y *= 0.9 / r; }
+    if (Math.abs(h.z) > 0.74) h.z *= 0.95;
+  }
+}
+
+function simStep(dt, time) {
+  updateKeys();
+  stepSpray(dt);
+  stepTransit(dt);
+  stepTrap(dt, time);
+  stepFly(dt);
+  stepHe(dt);
+}
+function simClear() {
+  for (const k of ['drops', 'plume', 'ions', 'trap', 'fly', 'sec', 'gas', 'trail']) SIM[k].length = 0;
+  SIM.emit = 0; SIM.gasEmit = 0;
+  initHe();
+}
+
+// ---------------------------------------------------------------- 把狀態畫成粒子
+const dropM4 = new THREE.Matrix4(), dropQ = new THREE.Quaternion(), dropS = V3(), dropP = V3();
+function drawParticles(time) {
+  const ION = 1.9; // 離子核心亮度(覆蓋混合,單顆會被 bloom 抓到一點光暈)
+  const SZ = 0.05;
+  // 液滴
+  let n = 0;
+  for (const d of SIM.drops) {
+    if (n >= DROP_MAX) break;
+    dropS.setScalar(Math.max(0.004, d.r));
+    dropM4.compose(dropP.set(d.x, d.y, d.z), dropQ, dropS);
+    dropMesh.setMatrixAt(n++, dropM4);
+  }
+  dropMesh.count = n;
+  dropMesh.instanceMatrix.needsUpdate = true;
+  for (const d of SIM.drops) PG(d.x, d.y, d.z, COL.ion, 0.5, 0.35, d.r * 3.6); // 電荷光暈
+  for (const p of SIM.plume) { P(p.x, p.y, p.z, SPECIES[p.sp].col, ION, p.fade, SZ); }
+  for (const g of SIM.gas) PG(g.x, g.y, g.z, C_GAS, 0.7, (1 - g.age / g.life) * 0.18, 0.04);
+  // 傳輸中
+  for (const o of SIM.ions) {
+    transitPos(o, tmpV);
+    P(tmpV.x, tmpV.y, tmpV.z, spCol(o.sp), ION, o.fade, SZ);
+  }
+  // 阱內
+  for (const o of SIM.trail) {
+    const t = o.trail, m = t.length / 3, c = spCol(o.sp);
+    for (let j = 0; j < m; j++) { const a = j / m; PG(t[j * 3], t[j * 3 + 1], t[j * 3 + 2], c, 1.5, 0.15 + a * 0.75, 0.03); }
+  }
+  for (const o of SIM.trap) {
+    const c = spCol(o.sp);
+    const hot = o.st === 'eject' ? 1.5 : CY.act && o.sp === PRECURSOR ? 1.4 : 1;
+    P(o.x, o.y, o.z, c, ION * hot + o.flash * 3, 1, SZ + o.flash * 0.05);
+    if (hot > 1 || o.flash > 0) PG(o.x, o.y, o.z, c, 1.2, 0.5, 0.14);
+  }
+  for (const f of SIM.fly) { P(f.x, f.y, f.z, spCol(f.sp), ION * 1.3, f.fade, SZ * 1.1); PG(f.x, f.y, f.z, spCol(f.sp), 1, 0.4 * f.fade, 0.16); }
+  // 二次粒子、電子雪崩
+  const dg = COMPS.det.group.position;
+  for (const s of SIM.sec) {
+    if (s.k === 'e2') PG(s.x, s.y, s.z, C_E, 2.4, 1, 0.06);
+    else if (s.k === 'cas') {
+      const u = s.t / 0.34;
+      const m = Math.min(26, Math.floor(Math.pow(2, 1 + u * 4.6)));
+      for (let k = 0; k < m; k++) {
+        const uu = clamp(0.02 + u * 0.98 - k * 0.006, 0.02, 1);
+        DET.curve.getPointAt(uu, tmpV).add(dg);
+        const rr = DET.rFn(uu) * 0.45, h = k * 3.71 + s.t * 57.3;
+        PG(tmpV.x + (hash1(h) - 0.5) * rr, tmpV.y + (hash1(h + 1.3) - 0.5) * rr, tmpV.z + (hash1(h + 2.9) - 0.5) * rr, C_E, 1.8, 0.85, 0.045);
+      }
+    } else if (s.k === 'hit') {
+      const a = 1 - s.age / s.life;
+      PG(s.x, s.y + 0.05, s.z, spCol(s.sp), 2.2 * a, a, 0.3 * (1 - a) + 0.1);
+    } else if (s.k === 'neutral') {
+      PG(s.x, s.y, s.z, C_GAS, 1.0, (1 - s.age / s.life) * 0.6, 0.05);
+    }
+  }
+  // 氦氣:只有拉近時才看得出來
+  for (const h of SIM.he) PG(K.trapC + h.z, AX + h.y, h.x, C_HE, 0.7, 0.3, 0.026);
+  flushPoints();
+}
+
+// ==== 50_cycle.js ====
+// ================================================================ 儀器的掃描循環
+// M 是「目前位在射出點 (q = 0.908) 的 m/z」,和環電極上的 RF 振幅成正比。
+const CY = {
+  mode: 'full', auto: true, scripted: false,
+  phase: 'inject', pt: 0, idx: 0,
+  M: 50, gate: true, iso: false, act: false, detOn: true,
+  manualM: 50, processed: false, lastGateOpen: true,
+  scanFrom: 150, scanTo: 2000, scanStart: 50,
+  flashes: [], // 偵測到離子時在質譜上的閃光
+};
+const M_INJECT = 50;
+const M_ACT = (TRAP.qAct / TRAP.qEject) * 195.1; // 讓 m/z 195 落在 q = 0.25
+const SEQ = {
+  full: [['agc', 0.9], ['inject', 3.2], ['cool', 1.1], ['scan', 6.5], ['hold', 1.8]],
+  msms: [['agc', 0.9], ['inject', 3.2], ['cool', 0.8], ['isolate', 1.9], ['cool2', 0.6], ['activate', 2.8], ['cool3', 0.6], ['scan', 4.6], ['hold', 1.8]],
+};
+const RANGE = { full: [150, 2000], msms: [50, 210] };
+const PHASE_NAME = {
+  agc: 'AGC 預掃描', inject: '注入', cool: '冷卻', isolate: '隔離', cool2: '冷卻', activate: '活化', cool3: '冷卻',
+  scan: '掃描', hold: '完成', manual: '手動',
+};
+
+// 質譜:理想峰值,掃描線經過時才顯示
+const SPEC = {
+  mode: 'full',
+  peaks: [],
+  reset(mode) {
+    this.mode = mode;
+    if (mode === 'full') this.peaks = SPECIES.map((s) => ({ mz: s.mz, I: s.ab, col: s.col, show: 0 }));
+    else this.peaks = [{ mz: PRODUCT.mz, I: 1.0, col: PRODUCT.col, show: 0 }, { mz: SPECIES[PRECURSOR].mz, I: 0.17, col: SPECIES[PRECURSOR].col, show: 0 }];
+    this.cursor = null;
+    this.done = false;
+  },
+  cursor: null, done: false,
+};
+SPEC.reset('full');
+
+function setMode(mode) {
+  if (CY.mode === mode) return;
+  CY.mode = mode;
+  CY.scanFrom = RANGE[mode][0]; CY.scanTo = RANGE[mode][1];
+  CY.idx = 0; CY.pt = 0; CY.phase = SEQ[mode][0][0];
+  CY.processed = false;
+  ejectAllQuietly();
+  SPEC.reset(mode);
+}
+function ejectAllQuietly() {
+  for (const o of SIM.trap) SIM.fly.push({ sp: o.sp, k: 'lost', dir: o.z >= 0 ? 1 : -1, t: 0, x0: o.x, y0: o.y, z0: o.z, x: o.x, y: o.y, z: o.z, fade: 1 });
+  SIM.trap.length = 0; SIM.trail.length = 0;
+}
+function gotoPhase(name) {
+  const seq = SEQ[CY.mode];
+  const i = seq.findIndex((s) => s[0] === name);
+  if (i >= 0) { CY.idx = i; CY.phase = name; CY.pt = 0; onPhaseStart(name); }
+}
+function onPhaseStart(name) {
+  if (name === 'inject' || name === 'agc') { SPEC.reset(CY.mode); }
+  if (name === 'scan') { CY.scanStart = CY.M; }
+}
+
+function cycleStep(dt) {
+  if (!CY.auto && !CY.scripted) return manualStep(dt);
+  const seq = SEQ[CY.mode];
+  CY.pt += dt;
+  const name = seq[CY.idx][0];
+  const dur = CY.scripted && CY.durOv ? CY.durOv : seq[CY.idx][1];
+  CY.phase = name;
+  const u = clamp(CY.pt / dur, 0, 1);
+  CY.iso = false; CY.act = false; CY.detOn = true;
+  switch (name) {
+    case 'agc':
+      // 先收 0.3 秒,量一下離子總量,再全部倒掉
+      CY.gate = u < 0.33;
+      CY.M = u < 0.5 ? M_INJECT : lerp(M_INJECT, 2100, smooth(inv(0.5, 0.95, u)));
+      break;
+    case 'inject': CY.gate = true; CY.M = M_INJECT; break;
+    case 'cool': case 'cool2': CY.gate = false; CY.M = M_INJECT; break;
+    case 'cool3': CY.gate = false; CY.M = lerp(M_ACT, M_INJECT, smooth(u)); break;
+    case 'isolate': CY.gate = false; CY.iso = u > 0.12 && u < 0.85; CY.M = M_INJECT; CY.detOn = false; break;
+    case 'activate': CY.gate = false; CY.M = lerp(M_INJECT, M_ACT, smooth(inv(0, 0.15, u))); CY.act = u > 0.15 && u < 0.92; break;
+    case 'scan': {
+      CY.gate = false;
+      const from = CY.mode === 'full' ? CY.scanFrom : CY.scanFrom;
+      // 先把 RF 拉到起始質量,再線性往上掃
+      CY.M = u < 0.06 ? lerp(CY.scanStart, from, smooth(u / 0.06)) : lerp(from, CY.scanTo, (u - 0.06) / 0.94);
+      SPEC.cursor = CY.M;
+      break;
+    }
+    case 'hold': CY.gate = false; CY.M = lerp(CY.scanTo, M_INJECT, smooth(inv(0, 0.3, u))); SPEC.cursor = null; SPEC.done = true; break;
+  }
+  if (CY.pt >= dur && !CY.scripted) {
+    CY.idx = (CY.idx + 1) % seq.length;
+    CY.pt = 0;
+    onPhaseStart(seq[CY.idx][0]);
+  }
+  revealPeaks(dt);
+}
+
+// 手動:滑桿直接控制 RF。拉回最左邊就打開入口透鏡重新收集
+function manualStep(dt) {
+  CY.phase = 'manual';
+  CY.iso = false; CY.act = false; CY.detOn = true;
+  const target = CY.manualM;
+  const refill = target <= 62;
+  if (refill) {
+    CY.gate = true; CY.M = approach(CY.M, target, 10, dt);
+    if (!CY.lastGateOpen) { SPEC.reset(CY.mode); CY.processed = false; }
+    CY.lastGateOpen = true; CY.sub = null;
+  } else {
+    CY.gate = false; CY.lastGateOpen = false;
+    if (CY.mode === 'msms' && !CY.processed) {
+      // MS/MS:先自動做完隔離與活化,才跟著滑桿掃描
+      if (!CY.sub) CY.sub = { t: 0 };
+      CY.sub.t += dt;
+      const t = CY.sub.t;
+      if (t < 1.4) { CY.iso = t > 0.15; CY.M = M_INJECT; CY.phase = 'isolate'; }
+      else if (t < 3.6) { CY.M = M_ACT; CY.act = t > 1.6 && t < 3.4; CY.phase = 'activate'; }
+      else { CY.processed = true; CY.sub = null; }
+      CY.detOn = false;
+    } else {
+      CY.M = approach(CY.M, target, 8, dt);
+      SPEC.cursor = CY.M;
+    }
+  }
+  revealPeaks(dt);
+}
+
+function revealPeaks(dt) {
+  if (SPEC.cursor == null) return;
+  for (const p of SPEC.peaks) if (p.mz <= SPEC.cursor) p.show = Math.min(1, p.show + dt * 3.2);
+}
+
+// 偵測器收到離子時,在質譜上閃一下
+SIM.detectHook = (mz) => {
+  if (SPEC.cursor == null) return; // AGC 預掃描只量總量,不畫譜
+  CY.flashes.push({ mz, a: 1 });
+  if (CY.flashes.length > 40) CY.flashes.shift();
+};
+function stepFlashes(dt) {
+  for (const f of CY.flashes) f.a -= dt * 2.2;
+  CY.flashes = CY.flashes.filter((f) => f.a > 0);
+}
+
+// ==== 60_panels.js ====
+// ================================================================ Mathieu 穩定圖
+// u'' + (a − 2q cos 2ξ) u = 0;一個週期 π 的單值矩陣跡 |tr| < 2 即穩定,tr = 2 cos(πβ)
+const STAB = { qMax: 0.908, betaTable: null, grid: null, segs: null, Q: [0, 1.5], A: [-0.75, 0.3] };
+function mathieuTrace(a, q, N) {
+  const h = Math.PI / N;
+  let u1 = 1, v1 = 0, u2 = 0, v2 = 1;
+  for (let i = 0; i < N; i++) {
+    const x = i * h;
+    const f0 = a - 2 * q * Math.cos(2 * x), fm = a - 2 * q * Math.cos(2 * x + h), f1 = a - 2 * q * Math.cos(2 * x + 2 * h);
+    for (let s = 0; s < 2; s++) {
+      let u = s ? u2 : u1, v = s ? v2 : v1;
+      const k1u = v, k1v = -f0 * u;
+      const k2u = v + 0.5 * h * k1v, k2v = -fm * (u + 0.5 * h * k1u);
+      const k3u = v + 0.5 * h * k2v, k3v = -fm * (u + 0.5 * h * k2u);
+      const k4u = v + h * k3v, k4v = -f1 * (u + h * k3u);
+      u += (h / 6) * (k1u + 2 * k2u + 2 * k3u + k4u);
+      v += (h / 6) * (k1v + 2 * k2v + 2 * k3v + k4v);
+      if (s) { u2 = u; v2 = v; } else { u1 = u; v1 = v; }
+    }
+  }
+  return u1 + v2;
+}
+{
+  const n = 240, tb = new Float32Array(n + 1);
+  for (let i = 0; i <= n; i++) {
+    const q = (STAB.qMax * i) / n;
+    tb[i] = Math.acos(clamp(mathieuTrace(0, q, 160) / 2, -1, 1)) / Math.PI;
+  }
+  tb[n] = 1;
+  STAB.betaTable = tb;
+  // 三維阱:z 方向用 (a_z, q_z),徑向用 (−a_z/2, −q_z/2);兩者都穩定才算
+  const NX = 150, NY = 100, f = new Float32Array((NX + 1) * (NY + 1));
+  for (let j = 0; j <= NY; j++) for (let i = 0; i <= NX; i++) {
+    const q = lerp(STAB.Q[0], STAB.Q[1], i / NX), a = lerp(STAB.A[0], STAB.A[1], j / NY);
+    const tz = Math.abs(mathieuTrace(a, q, 56)), tr = Math.abs(mathieuTrace(-a / 2, q / 2, 56));
+    f[j * (NX + 1) + i] = 2 - Math.max(tz, tr);
+  }
+  // marching squares 取 f = 0 的邊界
+  const segs = [];
+  const P2 = (i, j) => [i / NX, j / NY];
+  const val = (i, j) => f[j * (NX + 1) + i];
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+    const c = [val(i, j), val(i + 1, j), val(i + 1, j + 1), val(i, j + 1)];
+    const pts = [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]];
+    const cross = [];
+    for (let e = 0; e < 4; e++) {
+      const a0 = c[e], a1 = c[(e + 1) % 4];
+      if ((a0 > 0) !== (a1 > 0)) {
+        const t = a0 / (a0 - a1), p0 = pts[e], p1 = pts[(e + 1) % 4];
+        cross.push(P2(p0[0] + (p1[0] - p0[0]) * t, p0[1] + (p1[1] - p0[1]) * t));
+      }
+    }
+    if (cross.length === 2) segs.push(cross[0], cross[1]);
+    else if (cross.length === 4) segs.push(cross[0], cross[1], cross[2], cross[3]);
+  }
+  STAB.grid = { NX, NY, f };
+  STAB.segs = segs;
+}
+
+// ================================================================ 共用的繪圖小工具
+const FONT = {
+  zh: '"Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif',
+  ui: 'Outfit, "Noto Sans TC", "Microsoft JhengHei", sans-serif',
+  mono: '"DM Mono", "Cascadia Mono", Consolas, monospace',
+};
+function panelBg(g, w, h, title, sub) {
+  g.clearRect(0, 0, w, h);
+  g.fillStyle = '#070b15';
+  roundRect(g, 0, 0, w, h, 16); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,0.08)'; g.lineWidth = 2;
+  roundRect(g, 1, 1, w - 2, h - 2, 15); g.stroke();
+  g.textBaseline = 'alphabetic';
+  g.fillStyle = COL.fg; g.font = `700 24px ${FONT.zh}`; g.textAlign = 'left';
+  g.fillText(title, 22, 38);
+  g.fillStyle = COL.fg3; g.font = `500 18px ${FONT.mono}`; g.textAlign = 'right';
+  g.fillText(sub, w - 22, 37);
+  g.textAlign = 'left';
+}
+
+// ================================================================ 穩定圖面板
+const cvStab = $('#cvStab'), cvSpec = $('#cvSpec');
+const gStab = cvStab.getContext('2d'), gSpec = cvSpec.getContext('2d');
+const trapCounts = new Map();
+function drawStab() {
+  const g = gStab, w = cvStab.width, h = cvStab.height;
+  panelBg(g, w, h, '穩定圖', 'a = 0 的軸上操作');
+  const L = 70, R = 24, T = 62, B = 58;
+  const pw = w - L - R, ph = h - T - B;
+  const X = (q) => L + ((q - STAB.Q[0]) / (STAB.Q[1] - STAB.Q[0])) * pw;
+  const Y = (a) => T + (1 - (a - STAB.A[0]) / (STAB.A[1] - STAB.A[0])) * ph;
+  // 穩定區塊
+  const { NX, NY, f } = STAB.grid;
+  g.save();
+  g.beginPath(); g.rect(L, T, pw, ph); g.clip();
+  g.fillStyle = 'rgba(127,227,255,0.13)';
+  const cw = pw / NX, ch = ph / NY;
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+    if (f[j * (NX + 1) + i] > 0) g.fillRect(L + i * cw, T + (NY - j - 1) * ch, cw + 0.6, ch + 0.6);
+  }
+  g.strokeStyle = 'rgba(127,227,255,0.85)'; g.lineWidth = 2.2;
+  g.beginPath();
+  for (let k = 0; k < STAB.segs.length; k += 2) {
+    const [x0, y0] = STAB.segs[k], [x1, y1] = STAB.segs[k + 1];
+    g.moveTo(L + x0 * pw, T + (1 - y0) * ph); g.lineTo(L + x1 * pw, T + (1 - y1) * ph);
+  }
+  g.stroke();
+  g.restore();
+  // 座標軸
+  g.strokeStyle = 'rgba(195,202,220,0.35)'; g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(L, T); g.lineTo(L, T + ph); g.lineTo(L + pw, T + ph); g.stroke();
+  g.setLineDash([6, 6]); g.strokeStyle = 'rgba(238,242,250,0.45)';
+  g.beginPath(); g.moveTo(L, Y(0)); g.lineTo(L + pw, Y(0)); g.stroke(); g.setLineDash([]);
+  g.fillStyle = COL.fg3; g.font = `500 17px ${FONT.mono}`; g.textAlign = 'center';
+  for (const q of [0, 0.5, 1.0, 1.5]) { g.fillText(q.toFixed(1), X(q), T + ph + 26); }
+  g.textAlign = 'right';
+  for (const a of [-0.6, -0.3, 0, 0.3]) g.fillText(a.toFixed(1), L - 10, Y(a) + 6);
+  g.textAlign = 'left'; g.fillStyle = COL.fg2; g.font = `500 18px ${FONT.mono}`;
+  g.fillText('q', L + pw - 14, T + ph - 10);
+  g.fillText('a', L + 8, T + 20);
+  // 共振射出點 0.83、穩定邊界 0.908、活化點 0.25
+  g.font = `500 16px ${FONT.mono}`; g.textAlign = 'center';
+  g.strokeStyle = 'rgba(255,122,107,0.95)'; g.lineWidth = 2.4;
+  g.beginPath(); g.moveTo(X(TRAP.qEject), Y(0) - 24); g.lineTo(X(TRAP.qEject), Y(0) + 24); g.stroke();
+  g.fillStyle = '#ff9a8d'; g.fillText('0.83', X(TRAP.qEject) - 6, Y(0) + 44);
+  g.strokeStyle = 'rgba(238,242,250,0.5)'; g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(X(TRAP.qEdge), Y(0) - 14); g.lineTo(X(TRAP.qEdge), Y(0) + 14); g.stroke();
+  g.fillStyle = COL.fg3; g.fillText('0.908', X(TRAP.qEdge) + 10, Y(0) - 22);
+  if (CY.mode === 'msms') {
+    g.strokeStyle = 'rgba(255,180,84,0.8)'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(X(TRAP.qAct), Y(0) - 18); g.lineTo(X(TRAP.qAct), Y(0) + 18); g.stroke();
+    g.fillStyle = '#ffc77a'; g.fillText('0.25', X(TRAP.qAct), Y(0) + 44);
+  }
+  // 阱內離子:依 m/z 分組,畫在 q 軸上
+  trapCounts.clear();
+  for (const o of SIM.trap) trapCounts.set(o.sp, (trapCounts.get(o.sp) || 0) + 1);
+  const keys = [...trapCounts.keys()].sort((a, b) => spMz(a) - spMz(b));
+  g.textAlign = 'center';
+  let lastLabelX = -1e9;
+  for (const sp of keys) {
+    const q = qOf(spMz(sp));
+    if (q > STAB.Q[1]) continue;
+    const n = trapCounts.get(sp), c = spCol(sp), x = X(q), y = Y(0);
+    const r = 4 + Math.sqrt(n) * 1.3;
+    const grd = g.createRadialGradient(x, y, 0, x, y, r * 2.6);
+    grd.addColorStop(0, rgba(c, 0.9)); grd.addColorStop(1, rgba(c, 0));
+    g.fillStyle = grd; g.beginPath(); g.arc(x, y, r * 2.6, 0, TAU); g.fill();
+    g.fillStyle = '#ffffff'; g.beginPath(); g.arc(x, y, r * 0.45, 0, TAU); g.fill();
+    if (x - lastLabelX > 52 && (sp === -1 || sp <= 1 || sp === 4)) {
+      g.fillStyle = rgba(c, 1); g.font = `500 16px ${FONT.mono}`;
+      g.fillText(spMz(sp).toFixed(0), x, y - r - 16);
+      lastLabelX = x;
+    }
+  }
+  g.textAlign = 'left';
+}
+
+// ================================================================ 質譜面板
+function drawSpec() {
+  const g = gSpec, w = cvSpec.width, h = cvSpec.height;
+  const [m0, m1] = RANGE[SPEC.mode];
+  panelBg(g, w, h, SPEC.mode === 'full' ? '質譜 Full MS' : '質譜 MS/MS 195', `m/z ${m0} 至 ${m1}`);
+  const L = 70, R = 24, T = 62, B = 58;
+  const pw = w - L - R, ph = h - T - B;
+  const X = (mz) => L + ((mz - m0) / (m1 - m0)) * pw;
+  const Y = (I) => T + ph - I * ph * 0.92;
+  // 格線與座標
+  g.strokeStyle = 'rgba(195,202,220,0.1)'; g.lineWidth = 1;
+  for (const I of [0.5, 1]) { g.beginPath(); g.moveTo(L, Y(I / 0.92 * 0.92)); g.lineTo(L + pw, Y(I / 0.92 * 0.92)); g.stroke(); }
+  g.strokeStyle = 'rgba(195,202,220,0.35)'; g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(L, T); g.lineTo(L, T + ph); g.lineTo(L + pw, T + ph); g.stroke();
+  g.fillStyle = COL.fg3; g.font = `500 17px ${FONT.mono}`; g.textAlign = 'center';
+  const ticks = SPEC.mode === 'full' ? [200, 500, 1000, 1500, 2000] : [50, 100, 150, 200];
+  for (const t of ticks) { g.fillText(String(t), X(t), T + ph + 26); g.beginPath(); g.moveTo(X(t), T + ph); g.lineTo(X(t), T + ph + 6); g.stroke(); }
+  g.textAlign = 'right';
+  for (const I of [0, 50, 100]) g.fillText(String(I), L - 10, Y(I / 100) + 6);
+  g.textAlign = 'left';
+  // 基線雜訊(只畫到掃描線)
+  const lim = SPEC.cursor == null ? (SPEC.done ? m1 : m0) : SPEC.cursor;
+  g.strokeStyle = 'rgba(195,202,220,0.45)'; g.lineWidth = 1.2;
+  g.beginPath();
+  for (let px = 0; px <= pw; px += 2) {
+    const mz = m0 + (px / pw) * (m1 - m0);
+    if (mz > lim) break;
+    const n = hash1(Math.floor(mz * 3)) * 0.018;
+    g.lineTo(L + px, Y(n));
+  }
+  g.stroke();
+  // 峰
+  for (const p of SPEC.peaks) {
+    if (p.show <= 0) continue;
+    const x = X(p.mz), y = Y(p.I * smooth(p.show));
+    g.strokeStyle = rgba(p.col, 0.35); g.lineWidth = 7;
+    g.beginPath(); g.moveTo(x, Y(0)); g.lineTo(x, y); g.stroke();
+    g.strokeStyle = rgba(p.col, 1); g.lineWidth = 2.6;
+    g.beginPath(); g.moveTo(x, Y(0)); g.lineTo(x, y); g.stroke();
+  }
+  // 主要峰的 m/z 標記
+  g.font = `500 16px ${FONT.mono}`; g.textAlign = 'center';
+  const lab = SPEC.mode === 'full' ? [195.1, 524.3, 1022.0, 1322.0, 1922.0] : [138.1, 195.1];
+  for (const p of SPEC.peaks) {
+    if (p.show < 0.6 || !lab.includes(p.mz)) continue;
+    g.fillStyle = rgba(p.col, 1);
+    g.fillText(p.mz.toFixed(1), X(p.mz), Y(p.I) - 10);
+  }
+  // 偵測到離子的閃光
+  for (const f of CY.flashes) {
+    const x = X(f.mz);
+    if (x < L || x > L + pw) continue;
+    const grd = g.createRadialGradient(x, Y(0), 0, x, Y(0), 13);
+    grd.addColorStop(0, `rgba(191,244,255,${0.7 * f.a})`); grd.addColorStop(1, 'rgba(191,244,255,0)');
+    g.fillStyle = grd; g.beginPath(); g.arc(x, Y(0), 13, 0, TAU); g.fill();
+  }
+  // 掃描線
+  if (SPEC.cursor != null && SPEC.cursor >= m0) {
+    const x = X(Math.min(m1, SPEC.cursor));
+    const grd = g.createLinearGradient(x - 30, 0, x, 0);
+    grd.addColorStop(0, 'rgba(127,227,255,0)'); grd.addColorStop(1, 'rgba(127,227,255,0.18)');
+    g.fillStyle = grd; g.fillRect(x - 30, T, 30, ph);
+    g.strokeStyle = 'rgba(127,227,255,0.95)'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(x, T); g.lineTo(x, T + ph); g.stroke();
+  }
+  g.textAlign = 'left';
+}
+
+// ================================================================ 調諧參數螢幕(只在 3D 主控台上)
+const cvTune = document.createElement('canvas');
+cvTune.width = 520; cvTune.height = 372;
+const gTune = cvTune.getContext('2d');
+// Tune 頁面的參數名稱;數值是文獻中常見的正離子示例
+const TUNE_ROWS = [
+  ['Spray Voltage', '4.50', 'kV'],
+  ['Capillary Temp', '275', '°C'],
+  ['Sheath Gas', '30', 'arb'],
+  ['Aux Gas', '10', 'arb'],
+  ['Capillary Voltage', '10', 'V'],
+  ['Tube Lens Offset', '15', 'V'],
+  ['Multipole 1 Offset', '−6.2', 'V'],
+  ['Lens Voltage', '−24', 'V'],
+  ['Multipole 2 Offset', '−10.5', 'V'],
+  ['Multipole RF Amp', '400', 'Vp-p'],
+  ['Entrance Lens', '−51', 'V'],
+];
+function drawTune(time) {
+  const g = gTune, w = cvTune.width, h = cvTune.height;
+  panelBg(g, w, h, '調諧參數', 'ESI+ 示例值');
+  g.font = `400 16px ${FONT.mono}`;
+  TUNE_ROWS.forEach(([k, v, u], i) => {
+    const y = 76 + i * 27;
+    g.fillStyle = COL.fg2; g.textAlign = 'left'; g.fillText(k, 22, y);
+    g.fillStyle = '#7fe3ff'; g.textAlign = 'right'; g.fillText(v, w - 82, y);
+    g.fillStyle = COL.fg3; g.textAlign = 'left'; g.fillText(u, w - 72, y);
+  });
+  g.textAlign = 'left';
+}
+
+// 三個主控台螢幕
+consoleScreen('tune', -21.5, 8.6, 6.15, cvTune);
+consoleScreen('stab', -9.8, 8.6, 4.85, cvStab);
+consoleScreen('spec', 1.6, 8.6, 4.85, cvSpec);
+let tuneDrawn = 0;
+function updatePanels(time) {
+  drawStab();
+  drawSpec();
+  if (time - tuneDrawn > 1 || tuneDrawn === 0) { drawTune(time); tuneDrawn = time || 0.001; consoleScreens.tune.tex.needsUpdate = true; }
+  consoleScreens.stab.tex.needsUpdate = true;
+  consoleScreens.spec.tex.needsUpdate = true;
+}
+
+// ==== 70_overlay.js ====
+// ================================================================ 疊加層:零件標籤、字幕、影片用的抬頭顯示
+const ovCanvas = $('#ov');
+const ovCtx = ovCanvas.getContext('2d');
+const LABELS = [];
+// anchor: 'comp' 用零件本地座標;'world' 用世界座標
+function addLabel(id, compId, local, name, val, opt = {}) {
+  LABELS.push({ id, compId, local, name, val, dx: opt.dx ?? 40, dy: opt.dy ?? -46, sets: opt.sets || [], a: 0, t: 0, kind: opt.kind || 'part', dyn: opt.dyn || null });
+}
+{
+  const pi = (v) => v.clone().applyQuaternion(SRC.probe.quaternion).add(SRC.probe.position);
+  addLabel('R0', 'source', V3(-3.4, AX + 3.05, 0), '大氣壓', '760 Torr', { dx: -40, dy: -44, sets: ['asm'], kind: 'region' });
+  addLabel('R1', null, MANI.regions[0].top, '第一區', '≈ 1 Torr', { dx: -30, dy: -40, sets: ['asm'], kind: 'region' });
+  addLabel('R2', null, MANI.regions[1].top, '第二區', '≈ 10⁻³ Torr', { dx: 10, dy: -52, sets: ['asm'], kind: 'region' });
+  addLabel('R3', null, MANI.regions[2].top.clone().add(V3(-2, 0, 0)), '分析區', '≈ 10⁻⁵ Torr', { dx: 30, dy: -44, sets: ['asm'], kind: 'region' });
+  addLabel('probe', 'source', pi(V3(0, 1.4, 0)), 'ESI 噴灑針', '+4.5 kV', { dx: -110, dy: -40, sets: ['asm', 'exp'] });
+  addLabel('n2', 'source', pi(V3(0.42, 3.2, 0)), '氮氣', '鞘氣・輔助氣', { dx: -96, dy: -18, sets: ['exp'] });
+  addLabel('syringe', null, V3(12.6, 2.6, 6.4), '注射幫浦', '樣品溶液', { dx: 30, dy: -50, sets: ['exp', 'ext'] });
+  addLabel('cap', 'cap', V3(5.6, AX + 1.0, 0), '加熱毛細管', '275 °C', { dx: 20, dy: -58, sets: ['asm', 'exp'] });
+  addLabel('tube', 'tube', V3(0, AX + 0.8, 0), '管透鏡', '', { dx: -22, dy: -64, sets: ['exp'] });
+  addLabel('skim', 'skim', V3(0.6, AX + 1.2, 0), '截取錐', '', { dx: 6, dy: -86, sets: ['exp'] });
+  addLabel('mp1', 'mp1', V3(0, AX + 0.6, 0), '四極柱', 'RF 導引', { dx: 0, dy: -70, sets: ['exp'] });
+  addLabel('lens1', 'lens1', V3(0, AX + 1.6, 0), '透鏡', '隔開兩區', { dx: 6, dy: -46, sets: ['exp'] });
+  addLabel('mp2', 'mp2', V3(0, AX + 0.5, 0), '八極柱', 'RF 導引', { dx: 0, dy: -72, sets: ['exp'] });
+  addLabel('ent', 'ent', V3(0, AX + 1.55, 0), '入口透鏡', '', { dx: -24, dy: -54, sets: ['exp'], dyn: () => (CY.gate ? '開' : '關') });
+  addLabel('ring', 'trap', V3(0, AX + 2.3, 0), '環電極', 'RF', { dx: 12, dy: -60, sets: ['asm', 'exp'] });
+  addLabel('capIn', 'trap', V3(-1.9, AX - 1.4, 0.6), '入口端蓋', '', { dx: -70, dy: 50, sets: ['exp'] });
+  addLabel('capOut', 'trap', V3(1.9, AX - 1.4, 0.6), '出口端蓋', '', { dx: 40, dy: 56, sets: ['exp'] });
+  addLabel('he', 'trap', V3(-1.6, AX + 5.4, -2.3), '氦氣', '≈ 1 mTorr', { dx: -80, dy: -24, sets: ['exp'] });
+  addLabel('dyn', 'det', V3(0.3, AX - 2.25, 0.5), '轉換打拿極', '−15 kV', { dx: 46, dy: 40, sets: ['asm', 'exp'] });
+  addLabel('em', 'det', V3(0.1, AX + 3.4, -0.6), '電子倍增管', '', { dx: 46, dy: -40, sets: ['asm', 'exp'] });
+  addLabel('turbo', null, V3(3.0, 6.7, -5.6), '渦輪分子幫浦', '分流式', { dx: 60, dy: -36, sets: ['asm'] });
+  addLabel('fore', null, V3(15.4, 3.6, -5.9), '機械幫浦', '迴轉式', { dx: 50, dy: -40, sets: [] });
+  addLabel('cabSrc', null, V3(LAY.inlet - 1.2, AX + 3.5, 4.4), '離子源', '', { dx: -60, dy: -50, sets: ['ext'] });
+  addLabel('cabLed', null, V3(9.2, 16.4, 4.4), '狀態燈', 'POWER・VACUUM・SCAN', { dx: -40, dy: -46, sets: ['ext'] });
+}
+const LABEL_BY_ID = Object.fromEntries(LABELS.map((l) => [l.id, l]));
+
+const _pv = V3();
+function labelWorld(l, out) {
+  out.copy(l.local);
+  if (l.compId) out.add(COMPS[l.compId].group.position);
+  return out;
+}
+function setLabelSet(ids) {
+  const s = new Set(ids);
+  for (const l of LABELS) l.t = s.has(l.id) ? 1 : 0;
+}
+function stepLabels(dt) {
+  for (const l of LABELS) l.a = approach(l.a, l.t, 7, dt);
+}
+
+// 中文斷行:逐字量寬度
+function wrapText(g, text, maxW) {
+  const lines = [];
+  let cur = '';
+  for (const ch of text) {
+    if (g.measureText(cur + ch).width > maxW && cur) {
+      // 避免標點落在行首
+      if ('，。、;:!?)」』'.includes(ch) && cur.length > 1) { lines.push(cur.slice(0, -1)); cur = cur.slice(-1) + ch; }
+      else { lines.push(cur); cur = ch; }
+    } else cur += ch;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function drawLabels(g, W, H, s, hoverId) {
+  const placed = [];
+  const items = [];
+  for (const l of LABELS) {
+    if (l.a < 0.02) continue;
+    labelWorld(l, _pv).project(camera);
+    if (_pv.z > 1 || _pv.z < -1) continue;
+    const x = (_pv.x * 0.5 + 0.5) * W, y = (-_pv.y * 0.5 + 0.5) * H;
+    if (x < -50 || x > W + 50 || y < -50 || y > H + 50) continue;
+    items.push({ l, x, y });
+  }
+  items.sort((a, b) => a.y + a.l.dy - (b.y + b.l.dy));
+  for (const it of items) {
+    const { l, x, y } = it;
+    const val = l.dyn ? l.dyn() : l.val;
+    const fsN = 12.5 * s, fsV = 11.5 * s, padX = 9 * s, hgt = 24 * s;
+    g.font = `500 ${fsN}px ${FONT.zh}`;
+    const wN = g.measureText(l.name).width;
+    g.font = `500 ${fsV}px ${FONT.mono}`;
+    const wV = val ? g.measureText(val).width + 8 * s : 0;
+    const tw = padX * 2 + 12 * s + wN + wV;
+    let tx = x + l.dx * s, ty = y + l.dy * s;
+    if (l.dx < 0) tx -= tw;
+    tx = clamp(tx, 10 * s, W - tw - 10 * s);
+    ty = clamp(ty, 10 * s, H - hgt - 10 * s);
+    // 和已放好的標籤重疊就往上推
+    for (let k = 0; k < 6; k++) {
+      const hit = placed.find((r) => tx < r.x + r.w + 6 * s && tx + tw + 6 * s > r.x && ty < r.y + r.h + 4 * s && ty + hgt + 4 * s > r.y);
+      if (!hit) break;
+      ty = hit.y - hgt - 6 * s;
+    }
+    placed.push({ x: tx, y: ty, w: tw, h: hgt });
+    const a = l.a * (hoverId && hoverId !== l.compId && l.kind === 'part' ? 0.45 : 1);
+    const isRegion = l.kind === 'region';
+    // 引線
+    const ex = clamp(x, tx, tx + tw), ey = ty + hgt / 2;
+    g.globalAlpha = a;
+    g.strokeStyle = isRegion ? 'rgba(195,202,220,0.45)' : 'rgba(127,227,255,0.6)';
+    g.lineWidth = 1.2 * s;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(ex, ey); g.stroke();
+    g.fillStyle = isRegion ? '#c3cadc' : '#7fe3ff';
+    g.beginPath(); g.arc(x, y, 2.6 * s, 0, TAU); g.fill();
+    g.fillStyle = isRegion ? 'rgba(127,227,255,0.10)' : 'rgba(127,227,255,0.18)';
+    g.beginPath(); g.arc(x, y, 6 * s, 0, TAU); g.fill();
+    // 標籤本體
+    g.fillStyle = 'rgba(10,14,26,0.88)';
+    roundRect(g, tx, ty, tw, hgt, 8 * s); g.fill();
+    g.strokeStyle = hoverId === l.compId && l.compId ? 'rgba(127,227,255,0.9)' : isRegion ? 'rgba(255,255,255,0.16)' : 'rgba(127,227,255,0.34)';
+    g.lineWidth = 1 * s; g.stroke();
+    g.fillStyle = isRegion ? '#c3cadc' : '#7fe3ff';
+    g.beginPath(); g.arc(tx + padX + 3 * s, ty + hgt / 2, 2.6 * s, 0, TAU); g.fill();
+    g.textBaseline = 'middle';
+    g.fillStyle = '#e9f7ff'; g.font = `500 ${fsN}px ${FONT.zh}`;
+    g.fillText(l.name, tx + padX + 12 * s, ty + hgt / 2 + 0.5 * s);
+    if (val) {
+      g.fillStyle = l.id === 'ent' ? (CY.gate ? '#3ddc84' : '#ff7a6b') : isRegion ? '#eef2fa' : '#7fe3ff';
+      g.font = `500 ${fsV}px ${FONT.mono}`;
+      if (/[一-鿿]/.test(val)) g.font = `500 ${fsV}px ${FONT.zh}`;
+      g.fillText(val, tx + padX + 12 * s + wN + 8 * s, ty + hgt / 2 + 0.5 * s);
+    }
+    g.globalAlpha = 1;
+  }
+  g.textBaseline = 'alphabetic';
+}
+
+// 導覽字幕
+function drawCaption(g, W, H, s, cap, alpha) {
+  if (!cap || alpha <= 0.01) return;
+  const maxW = Math.min(W * 0.62, 1180 * s / 1.75);
+  const fsM = 31 * s / 1.75 * 1.0, fsS = 21 * s / 1.75, fsC = 14 * s / 1.75;
+  g.font = `500 ${fsM}px ${FONT.zh}`;
+  const lm = wrapText(g, cap.main, maxW);
+  g.font = `400 ${fsS}px ${FONT.zh}`;
+  const ls = cap.sub ? wrapText(g, cap.sub, maxW) : [];
+  g.font = `500 ${fsM}px ${FONT.zh}`;
+  let w = Math.max(...lm.map((t) => g.measureText(t).width));
+  g.font = `400 ${fsS}px ${FONT.zh}`;
+  if (ls.length) w = Math.max(w, ...ls.map((t) => g.measureText(t).width));
+  const padX = 30 * s / 1.75, padY = 22 * s / 1.75;
+  const lhM = fsM * 1.45, lhS = fsS * 1.6;
+  const h = padY * 2 + fsC * 1.9 + lm.length * lhM + (ls.length ? 6 * s / 1.75 + ls.length * lhS : 0);
+  const bw = w + padX * 2, bx = (W - bw) / 2, by = H - h - 46 * s / 1.75;
+  g.globalAlpha = alpha;
+  g.fillStyle = 'rgba(9,13,24,0.74)';
+  roundRect(g, bx, by, bw, h, 16 * s / 1.75); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,0.12)'; g.lineWidth = 1.2 * s / 1.75; g.stroke();
+  let y = by + padY + fsC;
+  g.textAlign = 'center';
+  g.fillStyle = '#7fe3ff'; g.font = `500 ${fsC}px ${FONT.mono}`;
+  g.fillText(cap.chap, W / 2, y);
+  y += fsC * 0.9;
+  g.fillStyle = '#eef2fa'; g.font = `500 ${fsM}px ${FONT.zh}`;
+  for (const t of lm) { y += lhM; g.fillText(t, W / 2, y - lhM * 0.22); }
+  if (ls.length) {
+    y += 6 * s / 1.75;
+    g.fillStyle = '#c3cadc'; g.font = `400 ${fsS}px ${FONT.zh}`;
+    for (const t of ls) { y += lhS; g.fillText(t, W / 2, y - lhS * 0.25); }
+  }
+  g.textAlign = 'left';
+  g.globalAlpha = 1;
+}
+
+// 影片左上角的標題
+function drawBug(g, W, H, s, a) {
+  if (a <= 0.01) return;
+  const k = s / 1.75;
+  g.globalAlpha = a;
+  g.fillStyle = '#dfe6f5'; g.font = `600 ${20 * k}px ${FONT.ui}`;
+  g.fillText('LCQ DECA XP', 44 * k, 62 * k);
+  g.fillStyle = '#7fe3ff'; g.font = `900 ${38 * k}px ${FONT.zh}`;
+  g.fillText('離子之旅', 44 * k, 108 * k);
+  g.globalAlpha = 1;
+}
+// 導覽與影片裡的兩個示波窗:疊在畫面右側一欄
+function drawScopes(g, W, H, s, aStab, aSpec) {
+  const k = s / 1.75;
+  const w = 540 * k, h = w * (cvSpec.height / cvSpec.width), m = 40 * k, gap = 18 * k;
+  const x = W - w - m;
+  let y = m;
+  for (const [cv, a] of [[cvStab, aStab], [cvSpec, aSpec]]) {
+    if (a > 0.01) {
+      g.globalAlpha = a;
+      g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowBlur = 24 * k;
+      g.drawImage(cv, x, y, w, h);
+      g.shadowBlur = 0;
+      y += (h + gap) * Math.min(1, a * 1.5);
+    }
+  }
+  g.globalAlpha = 1;
+}
+function drawNote(g, W, H, s, a) {
+  if (a <= 0.01) return;
+  const k = s / 1.75;
+  g.globalAlpha = a * 0.8;
+  g.fillStyle = '#8d97b3'; g.font = `400 ${15 * k}px ${FONT.zh}`; g.textAlign = 'right';
+  g.fillText('示意動畫:零件尺寸與時間尺度經過調整', W - 40 * k, 50 * k);
+  g.textAlign = 'left';
+  g.globalAlpha = 1;
+}
+
+// ==== 80_tour.js ====
+// ================================================================ 導覽腳本(也是影片的分鏡)
+// 鏡頭關鍵格:[時間, 相機位置, 看向哪裡, 視角, 是否在此停住]
+const SHOTS = [
+  [0, [26, 24, 64], [-5, 8, 0], 30, 1],
+  [7, [16, 19, 52], [-5, 7.5, 0], 30, 0],
+  [13, [10, 24, 44], [-6, 4.5, -1], 30, 1],
+  [16.5, [-16.8, 8.2, 8.4], [-20.2, 5.3, 0], 30, 0],
+  [27, [-23.2, 7.8, 8.2], [-20.3, 5.2, 0], 30, 1],
+  [30, [-12.4, 9.6, 12.0], [-15.2, 5.0, 0], 30, 0],
+  [37.5, [-7.8, 9.0, 10.6], [-11.0, 5.0, 0], 30, 1],
+  [40, [-6.0, 8.4, 9.2], [-9.0, 5.0, 0], 30, 0],
+  [47.5, [-11.6, 8.2, 8.8], [-8.7, 5.0, 0], 30, 1],
+  [50.5, [2, 20, 41], [-5, 4.5, 0], 30, 0],
+  [54, [2, 18, 36], [-3, 4.5, 0], 30, 1],
+  [56.5, [0.2, 9.6, 13.0], [-2.0, 5.0, 0], 30, 0],
+  [61, [6.8, 9.0, 12.4], [4.6, 5.0, 0], 30, 0],
+  [63.5, [14.4, 8.6, 9.8], [11.0, 5.0, 0], 30, 1],
+  [72, [14.8, 7.9, 8.6], [12.4, 5.0, 0], 30, 0],
+  [84, [15.2, 8.2, 9.6], [12.8, 5.0, 0], 30, 1],
+  [91, [20.6, 8.0, 17.2], [18.6, 5.2, 0], 30, 0],
+  [99, [21.4, 7.4, 16.0], [18.9, 5.2, 0], 30, 1],
+  [102, [6, 19, 47], [-3, 5.0, 0], 30, 0],
+  [110, [4, 17, 43], [-3, 5.0, 0], 30, 1],
+  [113.5, [14.8, 8.4, 9.4], [12.6, 5.0, 0], 30, 1],
+  [131, [14.6, 8.0, 8.8], [12.6, 5.0, 0], 30, 1],
+  [134.5, [18, 25, 60], [-5, 5.5, 0], 30, 0],
+  [141, [24, 28, 68], [-5, 6, 0], 30, 1],
+];
+// 分段:每段的機身狀態、標籤、示波窗與字幕
+const SCENES = [
+  { t: 0, view: 'ext', labels: ['cabSrc', 'cabLed', 'syringe'], hud: [0, 0], bug: 1,
+    caps: [{ t: 0.8, chap: 'LCQ DECA XP', main: '一台三維離子阱質譜儀,把它拆開來看', sub: '樣品溶液從前面的離子源進去,出來的是一張質譜。我們跟著離子走完全程。' }] },
+  { t: 7, view: 'asm', labels: ['R0', 'R1', 'R2', 'R3', 'turbo', 'fore'], hud: [0, 0], bug: 1,
+    caps: [{ t: 7.6, chap: '01 ・ 四個壓力區', main: '從一大氣壓到 10⁻⁵ Torr,壓力差了將近一億倍', sub: '兩台迴轉式機械幫浦和一台分流式渦輪分子幫浦,一段一段把壓力降下來。' }] },
+  { t: 14.5, view: 'asm', labels: ['probe'], hud: [0, 0], bug: 0,
+    caps: [
+      { t: 15, chap: '02 ・ 電灑游離 ESI', main: '噴針加上約 4.5 kV,液面被拉成泰勒錐,噴出帶電液滴', sub: '注射幫浦把樣品慢慢推進噴針,氮氣鞘氣幫忙霧化。' },
+      { t: 21.5, chap: '02 ・ 電灑游離 ESI', main: '液滴邊飛邊蒸發,電荷越擠越密,超過瑞利極限就分裂', sub: '一再分裂之後,離子脫離液滴進入氣相。這裡畫的是正交噴灑,大液滴直直落下,離子被電場拉向毛細管入口。' },
+    ] },
+  { t: 28.5, view: 'asm', labels: ['cap'], hud: [0, 0], bug: 0,
+    caps: [{ t: 29, chap: '03 ・ 加熱毛細管', main: '離子和殘餘的小液滴被吸進加熱的不鏽鋼毛細管', sub: '溶劑在管內蒸乾。出口那一端,壓力只剩約 1 Torr。' }] },
+  { t: 38.5, view: 'asm', labels: ['tube', 'skim'], hud: [0, 0], bug: 0,
+    caps: [{ t: 39, chap: '04 ・ 管透鏡與截取錐', main: '氣體衝出毛細管後膨脹,管透鏡把離子推回中心', sub: '截取錐只讓中央的離子束通過,大部分中性氣體被機械幫浦抽走。' }] },
+  { t: 49, view: 'exp', labels: ['mp1', 'lens1', 'mp2', 'tube', 'skim', 'ent'], hud: [0, 0], bug: 0,
+    caps: [
+      { t: 49.5, chap: '05 ・ 展開', main: '把零件沿著導軌拉開', sub: '實際上它們緊密排在真空腔裡,這裡拉開才看得清楚。' },
+      { t: 55.5, chap: '05 ・ 四極柱與八極柱', main: '加上 RF 電壓的多極柱,把離子約束在軸線附近往前送', sub: '中間的透鏡也是隔板,前面約 10⁻³ Torr,後面約 10⁻⁵ Torr。' },
+    ] },
+  { t: 62.5, view: 'exp', labels: ['ent', 'ring', 'he', 'capIn', 'capOut'], hud: [0, 0], bug: 0,
+    caps: [{ t: 63, chap: '06 ・ 注入離子阱', main: '入口透鏡打開,離子進入離子阱', sub: '先用 AGC 預掃描估計離子量,決定要收多久。阱內約 1 mTorr 的氦氣讓離子慢下來、聚到中心。' }] },
+  { t: 72, view: 'exp', labels: ['ring'], hud: [1, 0], bug: 0,
+    caps: [{ t: 72.5, chap: '07 ・ 穩定圖', main: '離子在阱裡繞著中心做 8 字形的振盪', sub: '它的 q 值和 RF 電壓成正比、和 m/z 成反比。輕的離子 q 大,重的離子 q 小,只要都在穩定區內就會被留住。' }] },
+  { t: 84, view: 'exp', labels: ['capOut'], hud: [1, 1], bug: 0,
+    caps: [
+      { t: 84.5, chap: '08 ・ 質量選擇不穩定掃描', main: 'RF 電壓往上升,離子依 m/z 由小到大輪流被射出', sub: 'q 到達 0.83 時,端蓋上的共振電壓把離子振出阱外。實機的掃描速度約每秒 5500 u。' },
+      { t: 91.5, chap: '09 ・ 偵測', main: '離子撞上 −15 kV 的轉換打拿極,打出二次粒子', sub: '連續式電子倍增管把訊號放大數十萬倍。依射出的先後,排成一張質譜。' },
+    ] },
+  { t: 101, view: 'asm', labels: [], hud: [0, 1], bug: 0,
+    caps: [{ t: 101.5, chap: '10 ・ 一張質譜', main: '這是 LCQ 的正離子校正液', sub: '咖啡因 m/z 195、胜肽 MRFA m/z 524,以及 Ultramark 1621 一整排相隔 100 的峰。峰高為示意。' }] },
+  { t: 111, view: 'exp', labels: [], hud: [1, 1], bug: 0,
+    caps: [
+      { t: 111.5, chap: '11 ・ MS/MS', main: '串聯質譜,只留下 m/z 195,再把它打碎', sub: '同一個離子阱裡,依時間順序完成隔離、活化與掃描。' },
+      { t: 116.5, chap: '11 ・ MS/MS 隔離', main: '寬頻激發電壓把 m/z 195 以外的離子都趕出去', sub: '頻率在 m/z 195 的位置留一個缺口,只有它不受影響。' },
+      { t: 119.5, chap: '11 ・ MS/MS 活化', main: 'm/z 195 被放在 q = 0.25 輕推,反覆撞上氦氣後斷裂', sub: '咖啡因失去 CH₃NCO(57 u),變成碎片 m/z 138。' },
+      { t: 124.5, chap: '11 ・ MS/MS 掃描', main: '碎片比前驅離子輕,先被射出', sub: '低於前驅離子 m/z 約 27% 的碎片留不住,這就是離子阱的三分之一規則。' },
+    ] },
+  { t: 133, view: 'asm', labels: [], hud: [0, 0], bug: 1,
+    caps: [{ t: 133.5, chap: 'LCQ DECA XP', main: '游離、傳輸、捕捉、掃描、偵測', sub: '實機一輪不到一秒,一張接一張記錄下來。' }] },
+];
+// 每段要不要顯示幫浦、真空腔玻璃的濃淡(拉近時淡掉,畫面乾淨)
+const SCENE_FX = [[1, 1], [1, 1], [0, 0.25], [0, 0.25], [0, 0.2], [0, 1], [0, 1], [0, 1], [0, 1], [1, 1], [0, 1], [1, 1]];
+SCENES.forEach((s, i) => { s.pumps = SCENE_FX[i][0]; s.glass = SCENE_FX[i][1]; });
+const TOUR_DUR = 141;
+// 依時間觸發的儀器指令
+const TOUR_ACTIONS = [
+  [0, () => { setMode('full'); CY.auto = true; CY.scripted = false; }],
+  [58.5, () => { CY.scripted = true; CY.durOv = null; gotoPhase('hold'); }],
+  [61.5, () => gotoPhase('agc')],
+  [62.4, () => gotoPhase('inject')],
+  [67.5, () => gotoPhase('cool')],
+  [85.5, () => { CY.durOv = 14; gotoPhase('scan'); }],
+  [100, () => { CY.durOv = null; gotoPhase('hold'); }],
+  [111, () => { setMode('msms'); CY.scripted = true; gotoPhase('inject'); }],
+  [115, () => gotoPhase('cool')],
+  [116.5, () => { CY.durOv = 2.6; gotoPhase('isolate'); }],
+  [119.2, () => { CY.durOv = 0.4; gotoPhase('cool2'); }],
+  [119.6, () => { CY.durOv = 4.4; gotoPhase('activate'); }],
+  [124, () => { CY.durOv = 0.5; gotoPhase('cool3'); }],
+  [124.5, () => { CY.durOv = 7.5; gotoPhase('scan'); }],
+  [132.5, () => { CY.durOv = null; gotoPhase('hold'); }],
+];
+
+const TOUR = { on: false, t: 0, scene: -1, act: 0, hudA: [0, 0], bugA: 0, saved: null, look: V3() };
+// 三次 Hermite:經過關鍵格時保持速度連續,標記停住的格速度為 0
+function shotAt(t, pos, look) {
+  const S = SHOTS, n = S.length;
+  let i = 0;
+  while (i < n - 2 && t >= S[i + 1][0]) i++;
+  const a = S[i], b = S[i + 1];
+  const dt = b[0] - a[0], s = clamp((t - a[0]) / dt, 0, 1);
+  const slope = (k, j, c) => {
+    if (S[k][4] || k === 0 || k === n - 1) return 0;
+    return ((S[k + 1][j][c] - S[k - 1][j][c]) / (S[k + 1][0] - S[k - 1][0])) * 0.7;
+  };
+  const s2 = s * s, s3 = s2 * s;
+  const h00 = 2 * s3 - 3 * s2 + 1, h10 = s3 - 2 * s2 + s, h01 = -2 * s3 + 3 * s2, h11 = s3 - s2;
+  for (let j = 1; j <= 2; j++) {
+    const out = j === 1 ? pos : look;
+    for (let c = 0; c < 3; c++) {
+      out.setComponent(c, h00 * a[j][c] + h10 * dt * slope(i, j, c) + h01 * b[j][c] + h11 * dt * slope(i + 1, j, c));
+    }
+  }
+  return lerp(a[3], b[3], smooth(s));
+}
+function sceneAt(t) { let k = 0; for (let i = 0; i < SCENES.length; i++) if (t >= SCENES[i].t) k = i; return k; }
+function tourState() {
+  const t = TOUR.t, sc = SCENES[sceneAt(t)];
+  const next = SCENES[sceneAt(t) + 1];
+  const end = next ? next.t : TOUR_DUR;
+  let cap = null, a = 0;
+  for (let i = 0; i < sc.caps.length; i++) {
+    const c = sc.caps[i];
+    if (t < c.t) break;
+    cap = c;
+    const cEnd = i + 1 < sc.caps.length ? sc.caps[i + 1].t : end;
+    a = Math.min(inv(c.t, c.t + 0.5, t), 1 - inv(cEnd - 0.45, cEnd, t));
+  }
+  if (t > TOUR_DUR - 1.2) a *= 1 - inv(TOUR_DUR - 1.2, TOUR_DUR - 0.2, t);
+  return { cap, capA: a, hudStab: TOUR.hudA[0], hudSpec: TOUR.hudA[1], bug: TOUR.bugA, fade: inv(0, 0.8, t) * (1 - inv(TOUR_DUR - 1.0, TOUR_DUR, t)) };
+}
+function tourStep(dt) {
+  TOUR.t += dt;
+  const t = TOUR.t;
+  while (TOUR.act < TOUR_ACTIONS.length && t >= TOUR_ACTIONS[TOUR.act][0]) TOUR_ACTIONS[TOUR.act++][1]();
+  const k = sceneAt(t), sc = SCENES[k];
+  if (k !== TOUR.scene) {
+    TOUR.scene = k;
+    setLabelSet(sc.labels);
+    VS.explodeT = sc.view === 'exp' ? 1 : 0;
+    VS.cabT = sc.view === 'ext' ? 0 : 1;
+  }
+  VS.explode = approach(VS.explode, VS.explodeT, 1.6, dt);
+  VS.cab = approach(VS.cab, VS.cabT, 0.9, dt);
+  VS.pumps = approach(VS.pumps, sc.pumps, 2.5, dt);
+  VS.glass = approach(VS.glass, sc.glass, 2.5, dt);
+  TOUR.hudA[0] = approach(TOUR.hudA[0], sc.hud[0], 3, dt);
+  TOUR.hudA[1] = approach(TOUR.hudA[1], sc.hud[1], 3, dt);
+  TOUR.bugA = approach(TOUR.bugA, sc.bug, 2.5, dt);
+  camera.fov = fitFov(shotAt(t, camera.position, TOUR.look));
+  camera.lookAt(TOUR.look);
+  if (t >= TOUR_DUR && !EXPORT.active) stopTour();
+}
+// 每次導覽都從同一個狀態開始,錄影才會每一格都一樣
+function resetForTour() {
+  RNG.seed(20261001);
+  simClear();
+  CY.mode = 'full'; CY.scanFrom = RANGE.full[0]; CY.scanTo = RANGE.full[1];
+  CY.auto = true; CY.scripted = false; CY.durOv = null; CY.M = M_INJECT; CY.flashes = [];
+  SPEC.reset('full');
+  VS.explode = 0; VS.explodeT = 0; VS.cab = 0; VS.cabT = 0; VS.pumps = 1; VS.glass = 1;
+  TOUR.t = 0; TOUR.scene = -1; TOUR.act = 0; TOUR.hudA = [0, 0]; TOUR.bugA = 1;
+  for (const l of LABELS) { l.a = 0; l.t = 0; }
+  TURBO.rotor.rotation.y = 0;
+  simTime = 0;
+  applyLayout();
+  prewarm();
+}
+function startTour() {
+  if (TOUR.on) return;
+  TOUR.saved = { view: VS.view, mode: CY.mode, auto: CY.auto, fov: camera.fov };
+  closeHelp();
+  resetForTour();
+  TOUR.on = true;
+  app.classList.add('cine');
+  $('#tourBtn').classList.add('on'); $('#tourBtn').setAttribute('aria-pressed', 'true');
+  $('#tourTxt').textContent = '停止導覽';
+  controls.enabled = false;
+}
+function stopTour() {
+  if (!TOUR.on) return;
+  TOUR.on = false;
+  app.classList.remove('cine');
+  $('#tourBtn').classList.remove('on'); $('#tourBtn').setAttribute('aria-pressed', 'false');
+  $('#tourTxt').textContent = '播放導覽';
+  CY.scripted = false; CY.durOv = null;
+  const s = TOUR.saved || { view: 'asm', mode: 'full', auto: true, fov: 30 };
+  setMode(s.mode); syncModeButtons();
+  CY.auto = true; syncAuto();
+  CY.idx = 0; CY.pt = 0; onPhaseStart(SEQ[CY.mode][0][0]);
+  setView(s.view === 'ext' ? 'asm' : s.view);
+  camera.fov = 30; camera.updateProjectionMatrix();
+  controls.target.copy(TOUR.look);
+  controls.enabled = true;
+  controls.update();
+}
+
+// ==== 85_help.js ====
+// ================================================================ 「原理」視窗的內容
+const HELP_HTML = `
+<h2 id="helpTitle">離子阱質譜儀怎麼把分子變成一張譜</h2>
+<p>LCQ Deca XP 是三維四極離子阱質譜儀。樣品溶液在大氣壓下被電灑成離子,經過四個壓力越來越低的區域,在離子阱裡先存起來,再依質荷比 (m/z) 一種一種射到偵測器上。</p>
+
+<h3>一條路,四個壓力區</h3>
+<p>離子源在一大氣壓 (760 Torr)。毛細管出口到截取錐之間約 <b>1 Torr</b>,由迴轉式機械幫浦抽(實機有兩台)。四極柱所在的區域約 <b>10⁻³ Torr</b>,接渦輪分子幫浦的中段口;離子阱與偵測器所在的分析區約 <b>2×10⁻⁵ Torr</b>,接同一台分流式渦輪幫浦的主口。阱內另外通入約 1 mL/min 的氦氣,局部壓力約 1 mTorr。</p>
+
+<h3>電灑游離 (ESI)</h3>
+<p>噴針加上約 4.5 至 5 kV 的電壓,液面被拉成泰勒錐並噴出帶電液滴。液滴蒸發變小,表面電荷密度升高,超過瑞利極限就分裂成更小的液滴,一再重複後離子進入氣相。氮氣鞘氣與輔助氣幫助霧化與去溶劑。</p>
+<p>各代 LCQ Deca 的離子源幾何不同,例如 XP Plus 是正交噴灑,XP MAX 的 Ion Max 源約 60°。這裡以正交噴灑示意。</p>
+
+<h3>把離子送進真空</h3>
+<p>加熱毛細管(ESI 常用 200 至 350 °C)把離子帶進第一個真空區。管透鏡把衝出毛細管的離子推回中心,接地的截取錐只讓中央的離子束通過;毛細管的孔和截取錐刻意錯開一點,減少中性液滴直接進入。接著是<b>方柱四極柱</b>、多極柱間透鏡與<b>八極柱</b>,都加上約 2.45 MHz、400 Vp-p 的 RF 電壓,把離子約束在軸線上送到入口透鏡。多極柱間透鏡同時是兩個真空區之間的隔板。</p>
+
+<h3>離子阱怎麼篩選質量</h3>
+<p>離子阱由一個環電極和兩個端蓋組成,內面都是雙曲面,r₀ = 0.707 cm、z₀ = 0.785 cm。環電極加上 0.76 MHz 的 RF,振幅最高約 8500 V。離子的運動由 Mathieu 方程描述,參數 q<sub>z</sub> = 8eV / [m (r₀² + 2z₀²) Ω²],和 RF 振幅 V 成正比、和 m/z 成反比。</p>
+<p>只要 q<sub>z</sub> 小於 0.908(a = 0 時的穩定邊界),離子就會被留住。掃描時 RF 振幅線性上升,m/z 小的離子先到達 <b>q<sub>z</sub> = 0.83</b>,這時端蓋上加的共振電壓把它振出阱外。以最大振幅計算,0.83 正好對應 m/z 約 2000。掃描速度約每秒 5500 u。</p>
+<p>注入前先做 <b>AGC</b> 預掃描,量出離子流有多強,再決定注入時間,讓阱內的離子數接近設定值。離子太多會互相排斥(空間電荷效應),讓峰變寬、質量偏移。</p>
+
+<h3>MS/MS</h3>
+<p>隔離:端蓋加上一組 5 至 380 kHz 的寬頻激發電壓,只在前驅離子的頻率留一個缺口,其他離子都被趕出去。活化:把前驅離子放在 q = 0.25(預設 Activation Q),以它的長期振盪頻率激發約 30 ms,它和氦氣反覆碰撞、累積內能後斷裂。最後再掃描出碎片。</p>
+<p>活化時 q = 0.25,穩定邊界 0.908 對應前驅離子 m/z 的 0.25 / 0.908 ≈ 27%,更輕的碎片留不住,這就是離子阱的「三分之一規則」。畫面中的例子是咖啡因 m/z 195 失去 CH₃NCO (57 u),得到碎片 m/z 138。</p>
+
+<h3>偵測</h3>
+<p>射出的離子撞上離軸、與離子束成直角的轉換打拿極(正離子用 −15 kV),打出二次粒子,再由連續式電子倍增管(−0.8 至 −2.5 kV,增益約 3×10⁵)放大成電流。三維離子阱是往兩個端蓋同時射出,只有往出口端蓋那一側的離子會打到偵測器。</p>
+
+<h3>常用數值</h3>
+<div class="tbl"><table>
+<tr><td>質量範圍</td><td class="n">m/z 15 至 200、50 至 2000、100 至 4000</td></tr>
+<tr><td>離子阱 RF</td><td class="n">0.76 MHz,0 至 8500 V (0-p)</td></tr>
+<tr><td>共振射出點</td><td class="n">q<sub>z</sub> = 0.83</td></tr>
+<tr><td>多極柱 RF</td><td class="n">2.45 MHz,400 Vp-p</td></tr>
+<tr><td>噴灑電壓</td><td class="n">±4.5 至 ±5 kV</td></tr>
+<tr><td>氦氣</td><td class="n">約 1 mL/min,阱內約 1 mTorr</td></tr>
+<tr><td>轉換打拿極</td><td class="n">±15 kV</td></tr>
+<tr><td>MS/MS 預設</td><td class="n">Activation Q 0.25,30 ms</td></tr>
+</table></div>
+
+<p class="note">畫面說明:示範樣品是 LCQ 正離子校正液(咖啡因、MRFA、Ultramark 1621),峰高為示意。零件尺寸與時間尺度經過放大,實機一輪掃描不到一秒。顏色代表 m/z,由綠青(輕)到琥珀(重)。主控台上的調諧參數是文獻中常見的示例值。資料來源:Thermo Finnigan LCQ Deca 與 LCQ Series Hardware Manual、LCQ Deca XP Plus 規格表、Wong 與 Cooks (Current Separations 16:3)。</p>
+`;
+
+// ==== 90_main.js ====
+// ================================================================ 視圖狀態:外觀 / 組裝 / 展開
+const VS = { view: 'asm', explode: 0, explodeT: 0, cab: 1, cabT: 1, glass: 1, glassT: 1, pumps: 1, pumpsT: 1 };
+const VIEW_LABELS = {
+  ext: LABELS.filter((l) => l.sets.includes('ext')).map((l) => l.id),
+  asm: LABELS.filter((l) => l.sets.includes('asm')).map((l) => l.id),
+  exp: LABELS.filter((l) => l.sets.includes('exp')).map((l) => l.id),
+};
+function setView(v) {
+  VS.view = v;
+  VS.explodeT = v === 'exp' ? 1 : 0;
+  VS.cabT = v === 'ext' ? 0 : 1;
+  if (!TOUR.on) setLabelSet(VIEW_LABELS[v]);
+  for (const [id, key] of [['#vExt', 'ext'], ['#vAsm', 'asm'], ['#vExp', 'exp']]) {
+    const b = $(id); b.classList.toggle('on', key === v); b.setAttribute('aria-pressed', String(key === v));
+  }
+}
+function viewStep(dt) {
+  VS.explode = approach(VS.explode, VS.explodeT, 3.0, dt);
+  VS.cab = approach(VS.cab, VS.cabT, 2.4, dt);
+  VS.glass = approach(VS.glass, 1, 3, dt);
+  VS.pumps = approach(VS.pumps, 1, 3, dt);
+}
+const trapLight = new THREE.PointLight(0x7fe3ff, 0, 3.5, 2);
+scene.add(trapLight);
+// 離子源腔內的小燈,讓噴針與噴霧看得見
+const srcLight = new THREE.PointLight(0xfff1dc, 1.6, 5, 2);
+scene.add(srcLight);
+function applyLayout() {
+  const e = ease(clamp(VS.explode, 0, 1));
+  for (const c of Object.values(COMPS)) c.group.position.x = lerp(c.xA, c.xE, e);
+  TRAPPARTS.capIn.position.x = -1.0 * e; TRAPPARTS.capOut.position.x = 1.0 * e;
+  TRAPPARTS.spIn.position.x = -0.5 * e; TRAPPARTS.spOut.position.x = 0.5 * e;
+  const mf = (1 - smooth(clamp(VS.explode * 1.6, 0, 1))) * VS.glass;
+  for (const gm of MANI.glass) gm.uniforms.uFade.value = mf;
+  for (const em of MANI.edges) em.opacity = 0.3 * mf;
+  MANI.group.position.y = 5 * smooth(clamp(VS.explode, 0, 1));
+  MANI.group.visible = mf > 0.01;
+  SRC.glass.uniforms.uFade.value = 0.35 + 0.65 * VS.glass;
+  SRC.edge.opacity = 0.35 * (0.3 + 0.7 * VS.glass);
+  setPumpsOpacity(VS.pumps);
+  setCabinetOpen(VS.cab);
+  updatePeek();
+}
+// 會動的小東西:RF 光、閘門燈、加熱塊、渦輪
+function animateProps(dt, t) {
+  const rf = 0.5 + 0.5 * Math.sin(t * TAU * 1.3);
+  rodMatA.emissiveIntensity = 0.02 + 0.12 * rf;
+  rodMatB.emissiveIntensity = 0.02 + 0.12 * (1 - rf);
+  gateRing.material.color.set(CY.gate ? 0x3ddc84 : 0xff6b5b).multiplyScalar(1.3);
+  MAT.heaterCut.emissiveIntensity = 0.9 + 0.08 * Math.sin(t * 2.1);
+  SRC.cone.material.color.setScalar(1.6 + 0.8 * Math.sin(t * 40) ** 2).multiply(new THREE.Color(0.75, 0.94, 1));
+  TURBO.rotor.rotation.y -= dt * 2.4;
+  trapLight.position.set(K.trapC, AX, 0);
+  trapLight.intensity = 0.15 + 0.6 * (CY.M / 2000);
+  srcLight.position.copy(K.tip).add(V3(-0.6, 0.9, 1.2));
+  if (CAB.leds) {
+    const scanOn = CY.phase === 'scan' && Math.sin(t * 18) > 0;
+    CAB.leds[4].material.color.set(scanOn ? 0x5aa9ff : 0x1b2a40).multiplyScalar(scanOn ? 2.4 : 1);
+  }
+}
+
+// ================================================================ 說明文字
+const PHASE_WHY = {
+  agc: '<span class="k">AGC</span><b>自動增益控制</b>:先短暫收一點離子做預掃描,量出離子流有多強,再決定這一輪要收多久。離子太多會互相排斥(空間電荷效應),讓質量跑掉。',
+  inject: '<span class="k">INJECT</span><b>注入</b>:入口透鏡打開,離子流進離子阱。阱裡有約 1 mTorr 的<span class="c">氦氣</span>,離子和氦原子碰撞後慢下來,留在阱的中央。',
+  cool: '<span class="k">COOL</span><b>冷卻</b>:入口透鏡關上。每個離子在 RF 電場裡繞著中心做 8 字形的振盪,和氦氣碰撞後振幅越來越小。',
+  isolate: '<span class="k">ISOLATE</span><b>隔離</b>:端蓋加上一組寬頻激發電壓,頻率只在 m/z 195 的位置留一個缺口,其他離子都被趕出阱外。',
+  activate: '<span class="k">ACTIVATE</span><b>活化</b>:把 m/z 195 放在 <span class="a">q = 0.25</span>,用它自己的振盪頻率輕推約 30 ms,讓它反覆撞上氦氣、累積能量後斷成碎片 <span class="c">m/z 138</span>。',
+  scan: '<span class="k">SCAN</span><b>掃描</b>:環電極的 RF 電壓往上升,每種離子的 q 跟著變大。m/z 小的離子先碰到 <span class="a">q = 0.83</span> 的共振射出點,從出口端蓋的小孔飛向偵測器。',
+  hold: '<span class="k">DONE</span><b>完成一張譜</b>:RF 電壓降回起點、阱內清空,下一輪重新注入。實機一張全掃描只要零點幾秒,這裡放慢了約 20 倍。',
+  manual: '<span class="k">MANUAL</span><b>手動掃描</b>:滑桿就是環電極上的 RF 振幅。往右推,射出點的 m/z 跟著上升,離子依序被射出;拉回最左邊,入口透鏡打開重新收集。',
+};
+PHASE_WHY.cool2 = PHASE_WHY.cool;
+PHASE_WHY.cool3 = PHASE_WHY.cool;
+const COMP_WHY = {
+  source: '<span class="k">ESI SOURCE</span><b>電灑游離源</b>:樣品溶液流過噴針,針尖加上約 4.5 kV 的高壓,液面被拉成泰勒錐,噴出帶電的小液滴。氮氣鞘氣幫忙霧化。液滴一邊蒸發一邊分裂,最後放出氣相離子。',
+  cap: '<span class="k">ION TRANSFER CAPILLARY</span><b>加熱毛細管</b>:不鏽鋼細管把大氣壓下的離子帶進真空。加熱讓殘餘的溶劑蒸乾,管上的小電壓幫離子通過。',
+  tube: '<span class="k">TUBE LENS</span><b>管透鏡</b>:毛細管出口的氣體以超音速膨脹,管透鏡的電壓把離子往中心推,對準截取錐的小孔。',
+  skim: '<span class="k">SKIMMER</span><b>截取錐</b>:接地的錐形小孔,只讓氣流中央的離子進到下一區,大部分氣體被機械幫浦抽走。毛細管的孔和它刻意錯開一點,減少中性液滴直接衝進去。',
+  mp1: '<span class="k">SQUARE QUADRUPOLE</span><b>方柱四極柱</b>:四根方形電極加上約 2.45 MHz 的 RF 電壓,在中心形成把離子推回軸線的場,帶著離子穿過約 10⁻³ Torr 的區域。',
+  lens1: '<span class="k">INTERMULTIPOLE LENS</span><b>多極柱間透鏡</b>:既是隔開兩個真空區的隔板,也能加上阻擋電壓當作閘門。',
+  mp2: '<span class="k">OCTAPOLE</span><b>八極柱</b>:八根圓柱電極的 RF 導引,把離子送到離子阱門口。',
+  ent: '<span class="k">ENTRANCE LENS</span><b>入口透鏡</b>:離子阱的閘門。注入時打開,冷卻與掃描時加上阻擋電壓,把後面來的離子擋在外面。',
+  trap: '<span class="k">ION TRAP</span><b>三維四極離子阱</b>:一個環電極夾在兩個端蓋中間,內面都是雙曲面,r₀ = 0.707 cm。環電極加上 0.76 MHz 的 RF,振幅最高約 8500 V。阱內充約 1 mTorr 的氦氣。',
+  det: '<span class="k">DETECTOR</span><b>偵測系統</b>:離子撞上 <span class="a">−15 kV</span> 的轉換打拿極,打出二次粒子,再由連續式電子倍增管放大數十萬倍,變成可以量測的電流。',
+};
+
+// ================================================================ 介面
+const UI = { hover: null, lastStats: 0, why: '' };
+const whyEl = $('#why');
+function setWhy(html) { if (UI.why !== html) { UI.why = html; whyEl.innerHTML = html; } }
+function updateStats(t) {
+  if (t - UI.lastStats < 0.1) return;
+  UI.lastStats = t;
+  const ph = CY.phase;
+  const col = ph === 'scan' ? '#7fe3ff' : ph === 'inject' || ph === 'agc' ? '#3ddc84' : ph === 'activate' || ph === 'isolate' ? '#ffb454' : '#8d97b3';
+  $('#stPhase').innerHTML = `<span class="dot" style="background:${col};box-shadow:0 0 8px ${col}"></span>${PHASE_NAME[ph] || ph}`;
+  $('#stMz').textContent = CY.M.toFixed(1);
+  $('#stQ').textContent = Math.min(9.99, qOf(524.3)).toFixed(3);
+  if (!UI.hover) setWhy(PHASE_WHY[ph] || '');
+  const rf = $('#rf');
+  const top = RANGE[CY.mode][1];
+  if (CY.auto) {
+    rf.value = String(Math.round((clamp(CY.M, 50, top) - 50) / (top - 50) * 1000));
+  }
+  rf.style.setProperty('--fill', `${(rf.value / 10).toFixed(1)}%`);
+  $('#rfOut').textContent = `m/z ${Math.round(CY.auto ? CY.M : CY.manualM)}`;
+}
+
+function bindUI() {
+  $('#mFull').onclick = () => { setMode('full'); syncModeButtons(); };
+  $('#mMS2').onclick = () => { setMode('msms'); syncModeButtons(); };
+  $('#vExt').onclick = () => setView('ext');
+  $('#vAsm').onclick = () => setView('asm');
+  $('#vExp').onclick = () => setView('exp');
+  const rf = $('#rf');
+  rf.addEventListener('input', () => {
+    if (TOUR.on) stopTour();
+    CY.auto = false; syncAuto();
+    const top = RANGE[CY.mode][1];
+    CY.manualM = 50 + (rf.value / 1000) * (top - 50);
+  });
+  $('#auto').onclick = () => {
+    CY.auto = !CY.auto;
+    if (CY.auto) { CY.idx = 0; CY.pt = 0; onPhaseStart(SEQ[CY.mode][0][0]); }
+    else CY.manualM = CY.M;
+    syncAuto();
+  };
+  $('#tourBtn').onclick = () => (TOUR.on ? stopTour() : startTour());
+  $('#helpBtn').onclick = openHelp;
+  $('#helpX').onclick = closeHelp;
+  $('#help').addEventListener('click', (e) => { if (e.target.id === 'help') closeHelp(); });
+  const recBtn = $('#recBtn');
+  if (recBtn) {
+    if (!BUILD.canExport || typeof VideoEncoder === 'undefined') recBtn.hidden = true;
+    else recBtn.onclick = openRec;
+  }
+  window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' && e.key !== 'Escape') return;
+    if (e.key === 'Escape') { closeHelp(); if (TOUR.on) stopTour(); }
+    else if (e.key === 'c' || e.key === 'C') TOUR.on ? stopTour() : startTour();
+    else if (e.key === 'e' || e.key === 'E') setView(VS.view === 'exp' ? 'asm' : 'exp');
+  });
+  // 滑鼠移到零件上:亮標籤、換說明;點一下:鏡頭靠過去
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  let downAt = null;
+  glCanvas.addEventListener('pointermove', (e) => {
+    if (TOUR.on || EXPORT.active) return;
+    const r = glCanvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(PICKS, false)[0];
+    const id = hit && VS.cab > 0.5 ? hit.object.userData.comp : null;
+    if (id !== UI.hover) {
+      UI.hover = id;
+      glCanvas.classList.toggle('pick', !!id);
+      if (id) setWhy(COMP_WHY[id] || ''); else UI.lastStats = 0;
+    }
+  });
+  glCanvas.addEventListener('pointerdown', (e) => { downAt = [e.clientX, e.clientY]; glCanvas.classList.add('drag'); });
+  glCanvas.addEventListener('pointerup', (e) => {
+    glCanvas.classList.remove('drag');
+    if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5) return;
+    if (UI.hover) focusOn(UI.hover);
+  });
+  glCanvas.addEventListener('pointerleave', () => { UI.hover = null; glCanvas.classList.remove('pick'); UI.lastStats = 0; });
+  window.addEventListener('resize', onResize);
+}
+function syncModeButtons() {
+  $('#mFull').classList.toggle('on', CY.mode === 'full'); $('#mFull').setAttribute('aria-pressed', String(CY.mode === 'full'));
+  $('#mMS2').classList.toggle('on', CY.mode === 'msms'); $('#mMS2').setAttribute('aria-pressed', String(CY.mode === 'msms'));
+  $('#specSub') && ($('#specSub').textContent = '');
+}
+function syncAuto() { const b = $('#auto'); b.classList.toggle('on', CY.auto); b.setAttribute('aria-pressed', String(CY.auto)); }
+
+// 鏡頭飛到零件
+const FLY = { on: false, t: 0, p0: V3(), p1: V3(), t0: V3(), t1: V3() };
+function focusOn(id) {
+  const c = COMPS[id];
+  const box = new THREE.Box3().setFromObject(c.group);
+  const center = box.getCenter(V3());
+  center.y = Math.max(center.y, AX - 0.5);
+  const size = Math.max(4, box.getSize(V3()).length());
+  const dir = camera.position.clone().sub(controls.target).normalize();
+  FLY.p0.copy(camera.position); FLY.t0.copy(controls.target);
+  FLY.t1.copy(center); FLY.p1.copy(center).addScaledVector(dir, size * 1.25 + 3);
+  FLY.t = 0; FLY.on = true;
+}
+function flyStep(dt) {
+  if (!FLY.on) return;
+  FLY.t = Math.min(1, FLY.t + dt / 1.1);
+  const e = ease(FLY.t);
+  camera.position.lerpVectors(FLY.p0, FLY.p1, e);
+  controls.target.lerpVectors(FLY.t0, FLY.t1, e);
+  if (FLY.t >= 1) FLY.on = false;
+}
+
+// ================================================================ 說明視窗
+function openHelp() { $('#helpBody').innerHTML = HELP_HTML; $('#help').hidden = false; $('#helpX').focus(); }
+function closeHelp() { $('#help').hidden = true; }
+
+// ================================================================ 主迴圈
+let simTime = 0, lastNow = performance.now();
+function onResize() {
+  if (EXPORT.active) return;
+  fitToWindow();
+  const r = app.getBoundingClientRect(), dpr = VIEW.dpr;
+  ovCanvas.width = Math.round(r.width * dpr); ovCanvas.height = Math.round(r.height * dpr);
+}
+function tick(dt) {
+  simTime += dt;
+  if (TOUR.on) tourStep(dt);
+  else { viewStep(dt); flyStep(dt); }
+  applyLayout();
+  const n = Math.max(1, Math.ceil(dt * 60 - 1e-6)), h = dt / n;
+  for (let i = 0; i < n; i++) { cycleStep(h); simStep(h, simTime - dt + (i + 1) * h); }
+  stepFlashes(dt);
+  stepLabels(dt);
+  animateProps(dt, simTime);
+}
+function renderScene() {
+  PT_UNI.uScale.value = (VIEW.h * VIEW.dpr * 0.5) / Math.tan((camera.fov * Math.PI) / 360);
+  PT_UNI.uMaxPx.value = 18 * VIEW.dpr * Math.max(1, VIEW.h / 1080);
+  camera.updateProjectionMatrix();
+  drawParticles(simTime);
+  updatePanels(simTime);
+  composer.render();
+}
+function drawUIOverlay() {
+  const W = ovCanvas.width, H = ovCanvas.height, dpr = VIEW.dpr;
+  ovCtx.clearRect(0, 0, W, H);
+  drawLabels(ovCtx, W, H, dpr, UI.hover);
+  if (TOUR.on) {
+    const s = dpr * clamp(H / dpr / 1080, 0.62, 1.3) * 1.75;
+    const st = tourState();
+    drawScopes(ovCtx, W, H, s, st.hudStab, st.hudSpec);
+    drawBug(ovCtx, W, H, s, st.bug);
+    drawCaption(ovCtx, W, H, s, st.cap, st.capA);
+  }
+}
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (EXPORT.active) { lastNow = now; return; }
+  const dt = Math.min(0.05, Math.max(0, (now - lastNow) / 1000));
+  lastNow = now;
+  if (dt <= 0) return;
+  tick(dt);
+  if (!TOUR.on) camera.fov = fitFov(30);
+  if (!TOUR.on && !FLY.on) controls.update();
+  renderScene();
+  drawUIOverlay();
+  updateStats(simTime);
+}
+
+// 先讓離子流跑 9 秒(閘門關著),再從 AGC 開始第一輪,畫面一開就是工作中的樣子
+function prewarm() {
+  CY.scripted = true; CY.durOv = null;
+  CY.idx = SEQ[CY.mode].findIndex((s) => s[0] === 'cool'); CY.phase = 'cool'; CY.pt = 0;
+  for (let i = 0; i < 540; i++) { cycleStep(1 / 60); simStep(1 / 60, simTime); simTime += 1 / 60; }
+  CY.scripted = false; CY.idx = 0; CY.pt = 0; CY.phase = SEQ[CY.mode][0][0];
+  onPhaseStart(CY.phase);
+}
+function boot() {
+  registerPicks();
+  bindUI();
+  onResize();
+  setView(QUERY.get('view') || 'asm');
+  VS.explode = VS.explodeT; VS.cab = VS.cabT;
+  applyLayout();
+  prewarm();
+  for (const l of LABELS) l.a = l.t;
+  syncModeButtons(); syncAuto();
+  requestAnimationFrame(frame);
+  document.fonts && document.fonts.ready.then(() => {
+    for (const f of FONT_TEX) { const c = f.t.image; f.draw(c.getContext('2d'), c.width, c.height); f.t.needsUpdate = true; }
+  });
+  if (QUERY.has('tour')) startTour();
+  if (QUERY.has('render') && typeof autoRender === 'function') autoRender();
+}
+
+// ==== 95_export.js ====
+// ================================================================ 錄成影片:逐格算圖 → WebCodecs H.264 → MP4
+const EXPORT = { active: false, cancel: false, w: 1920, h: 1080, fps: 30, url: null };
+const MUXER_URL = 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.mjs';
+const VIDEO_NAME = 'LCQ_Deca_XP_離子之旅.mp4';
+
+// 背景分頁的 setTimeout 會被節流,用 MessageChannel 讓出執行緒
+const _mc = new MessageChannel();
+let _mcRes = null;
+_mc.port1.onmessage = () => { const r = _mcRes; _mcRes = null; if (r) r(); };
+const yieldNow = () => new Promise((r) => { _mcRes = r; _mc.port2.postMessage(0); });
+
+// 錄影前把所有會用到的字都載入,避免前幾格用到備用字型
+async function loadFonts() {
+  if (!document.fonts) return;
+  const texts = [HELP_HTML.replace(/<[^>]+>/g, ''), ...SCENES.flatMap((s) => s.caps.flatMap((c) => [c.chap, c.main, c.sub])), ...LABELS.flatMap((l) => [l.name, l.val]), '穩定圖質譜調諧參數示意動畫零件尺寸與時間尺度經過調整離子之旅開關'].join('');
+  const uniq = [...new Set(texts)].join('');
+  const jobs = [];
+  for (const w of [400, 500, 700, 900]) jobs.push(document.fonts.load(`${w} 24px "Noto Sans TC"`, uniq));
+  for (const w of [400, 500, 600, 700]) jobs.push(document.fonts.load(`${w} 24px Outfit`, 'LCQ DECA XP 0123456789'));
+  for (const w of [400, 500]) jobs.push(document.fonts.load(`${w} 24px "DM Mono"`, 'm/z 0123456789.−+ TorrkVq'));
+  try { await Promise.all(jobs); } catch (e) { /* 字型載入失敗就用備用字型 */ }
+  for (const f of FONT_TEX) { const c = f.t.image; f.draw(c.getContext('2d'), c.width, c.height); f.t.needsUpdate = true; }
+}
+
+async function pickConfig(w, h, fps) {
+  const bitrate = Math.round(w * h * fps * 0.11);
+  for (const codec of ['avc1.640033', 'avc1.640028', 'avc1.4d0028', 'avc1.42E028']) {
+    const c = { codec, width: w, height: h, bitrate, framerate: fps, avc: { format: 'avc' } };
+    try { const s = await VideoEncoder.isConfigSupported(c); if (s.supported) return c; } catch (e) { /* 試下一個 */ }
+  }
+  return null;
+}
+
+async function exportVideo({ w = 1920, h = 1080, fps = 30, seconds = TOUR_DUR, onProgress = () => {} } = {}) {
+  const { Muxer, ArrayBufferTarget } = await import(MUXER_URL);
+  const config = await pickConfig(w, h, fps);
+  if (!config) throw new Error('這個瀏覽器不支援 H.264 編碼,請改用 Chrome 或 Edge。');
+  await loadFonts();
+  EXPORT.active = true; EXPORT.cancel = false;
+  if (TOUR.on) stopTour();
+  app.classList.add('cine');
+  const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: 'avc', width: w, height: h, frameRate: fps }, fastStart: 'in-memory', firstTimestampBehavior: 'offset' });
+  let encErr = null;
+  const enc = new VideoEncoder({ output: (chunk, meta) => muxer.addVideoChunk(chunk, meta), error: (e) => { encErr = e; } });
+  enc.configure(config);
+  const comp = document.createElement('canvas'); comp.width = w; comp.height = h;
+  const cg = comp.getContext('2d');
+  const ov = document.createElement('canvas'); ov.width = w; ov.height = h;
+  const og = ov.getContext('2d');
+  const saved = { fov: camera.fov, pos: camera.position.clone(), target: controls.target.clone() };
+  setRenderSize(w, h, 1);
+  resetForTour();
+  TOUR.on = true; controls.enabled = false;
+  const N = Math.ceil(Math.min(TOUR_DUR, seconds) * fps), dt = 1 / fps, s = (h / 1080) * 1.75;
+  const t0 = performance.now();
+  try {
+    for (let i = 0; i < N; i++) {
+      if (EXPORT.cancel) throw new Error('cancelled');
+      if (encErr) throw encErr;
+      tick(dt);
+      renderScene();
+      const st = tourState();
+      og.clearRect(0, 0, w, h);
+      drawLabels(og, w, h, s * 0.95, null);
+      drawScopes(og, w, h, s, st.hudStab, st.hudSpec);
+      drawBug(og, w, h, s, st.bug);
+      drawNote(og, w, h, s, st.bug);
+      drawCaption(og, w, h, s, st.cap, st.capA);
+      cg.globalAlpha = 1;
+      cg.fillStyle = '#000'; cg.fillRect(0, 0, w, h);
+      cg.globalAlpha = st.fade;
+      cg.drawImage(glCanvas, 0, 0, w, h);
+      cg.drawImage(ov, 0, 0);
+      cg.globalAlpha = 1;
+      const frame = new VideoFrame(comp, { timestamp: Math.round((i * 1e6) / fps), duration: Math.round(1e6 / fps) });
+      enc.encode(frame, { keyFrame: i % (fps * 2) === 0 });
+      frame.close();
+      while (enc.encodeQueueSize > 4) await new Promise((r) => enc.addEventListener('dequeue', r, { once: true }));
+      if (i % 6 === 0) {
+        const el = (performance.now() - t0) / 1000;
+        onProgress(i / N, el, (el / Math.max(1, i)) * (N - i));
+        await yieldNow();
+      }
+    }
+    await enc.flush();
+    muxer.finalize();
+    return new Blob([muxer.target.buffer], { type: 'video/mp4' });
+  } finally {
+    try { enc.close(); } catch (e) { /* 已關閉 */ }
+    TOUR.on = false;
+    EXPORT.active = false;
+    app.classList.remove('cine');
+    CY.scripted = false; CY.durOv = null; CY.auto = true; syncAuto();
+    setMode('full'); syncModeButtons();
+    setView('asm');
+    camera.fov = saved.fov; camera.position.copy(saved.pos); controls.target.copy(saved.target);
+    controls.enabled = true;
+    onResize();
+    controls.update();
+  }
+}
+
+
+// ==== 96_recui.js ====
+// @standalone-only:只放進可雙擊開啟的完整版,發布版不含錄影視窗與下載連結
+// ---------------------------------------------------------------- 錄影視窗
+const REC = { w: 1920, h: 1080, fps: 30 };
+function openRec() {
+  if (TOUR.on) stopTour();
+  $('#recbox').hidden = false;
+  $('#recMsg').textContent = `把整段導覽(約 ${Math.round(TOUR_DUR)} 秒)逐格算圖,存成 MP4 (H.264)。錄製時不能操作畫面;電腦慢一點也不會掉格,只是要等久一點。`;
+  $('#recBar').style.width = '0%';
+  $('#recGo').hidden = false; $('#recSave').hidden = true; $('#recOpts').hidden = false;
+  $('#recCancel').textContent = '取消';
+}
+function bindRec() {
+  const pick = (ids, on) => ids.forEach((id) => $(id).classList.toggle('on', id === on));
+  $('#r1080').onclick = () => { REC.w = 1920; REC.h = 1080; pick(['#r1080', '#r720'], '#r1080'); };
+  $('#r720').onclick = () => { REC.w = 1280; REC.h = 720; pick(['#r1080', '#r720'], '#r720'); };
+  $('#f30').onclick = () => { REC.fps = 30; pick(['#f30', '#f60'], '#f30'); };
+  $('#f60').onclick = () => { REC.fps = 60; pick(['#f30', '#f60'], '#f60'); };
+  $('#recCancel').onclick = () => { if (EXPORT.active) EXPORT.cancel = true; else $('#recbox').hidden = true; };
+  $('#recGo').onclick = async () => {
+    $('#recGo').hidden = true; $('#recOpts').hidden = true;
+    $('#recCancel').textContent = '停止';
+    const fmt = (s) => `${Math.floor(s / 60)} 分 ${String(Math.floor(s % 60)).padStart(2, '0')} 秒`;
+    try {
+      const blob = await exportVideo({ ...REC, onProgress: (p, el, eta) => {
+        $('#recBar').style.width = `${(p * 100).toFixed(1)}%`;
+        $('#recMsg').textContent = `算圖中 ${(p * 100).toFixed(0)}%,已花 ${fmt(el)},大約還要 ${fmt(eta)}。`;
+      } });
+      if (EXPORT.url) URL.revokeObjectURL(EXPORT.url);
+      EXPORT.url = URL.createObjectURL(blob);
+      const a = $('#recSave');
+      a.href = EXPORT.url; a.download = VIDEO_NAME; a.hidden = false;
+      $('#recBar').style.width = '100%';
+      $('#recMsg').textContent = `完成,影片大小 ${(blob.size / 1048576).toFixed(1)} MB。按「儲存影片」存到電腦。`;
+      $('#recCancel').textContent = '關閉';
+    } catch (e) {
+      $('#recMsg').textContent = e.message === 'cancelled' ? '已停止錄製。' : `錄製失敗:${e.message}`;
+      $('#recCancel').textContent = '關閉';
+    }
+  };
+}
+
+
+// ==== 99_boot.js ====
+// ================================================================ 開始
+if (typeof bindRec === 'function') bindRec();
+boot();
+// 除錯用:在主控台可以用 window.LCQ 查看狀態
+window.LCQ = { THREE, scene, camera, controls, CY, SIM, VS, TOUR, COMPS, setView, setMode, startTour, stopTour, tourStep, tick, renderScene, exportVideo, K, LABELS, SHOTS, SCENES, resetForTour, tourState, drawLabels, drawScopes, drawBug, drawCaption, drawNote, applyLayout };
+
+</script>
+</body>
+</html>
