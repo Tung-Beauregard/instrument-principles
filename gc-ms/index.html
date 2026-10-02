@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>GC-MS 拆開來看</title>
-<meta name="description" content="用 3D 模型拆開 ALS 自動進樣器、6850 GC 與 5973N 質譜,跟著一針精油樣品看它在管柱裡怎麼分開、在質譜裡怎麼被辨認。">
+<meta name="description" content="用 3D 模型把 GC-MS 拆開來看:跟著一針精油樣品,看成分怎麼在管柱裡分開、在質譜裡怎麼帶電、碎裂、被篩選。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap">
@@ -45,18 +45,22 @@ button{font:inherit;color:inherit}
 #gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
 .tags{position:fixed;inset:0;pointer-events:none;overflow:hidden;transition:opacity .3s}
 
-.hud{position:fixed;inset:0;display:grid;gap:14px 18px;padding:calc(20px + env(safe-area-inset-top, 0px)) var(--gut) calc(20px + env(safe-area-inset-bottom, 0px));
+.hud{position:fixed;inset:0;display:grid;gap:14px 18px;padding:calc(20px + env(safe-area-inset-top, 0px)) var(--gut) calc(8px + env(safe-area-inset-bottom, 0px));
   grid-template-columns:minmax(300px,390px) minmax(0,1fr) auto;
-  grid-template-rows:auto minmax(0,1fr) auto;
-  grid-template-areas:"brief ctl ctl" "brief hole hole" "con con con";
+  grid-template-rows:auto minmax(0,1fr) auto auto;
+  grid-template-areas:"brief ctl ctl" "brief hole hole" "con con con" "foot foot foot";
   pointer-events:none;transition:opacity .3s}
 .hud>*{pointer-events:auto;min-width:0}
 .hud>.hole{grid-row:1 / 3;grid-column:2 / 4;pointer-events:none}
+/* 最底下的小字:儀器來源 */
+.credit{grid-area:foot;margin:-8px 0 0;justify-self:end;font-size:11px;line-height:1.4;color:var(--muted);text-align:right;padding:2px 8px;border-radius:6px;background:var(--glass-2)}
+.credit span{display:inline-block}
 .app.bare .hud,.app.bare .tags{opacity:0;pointer-events:none}
 .app.bare .hud>*{pointer-events:none}
 
 /* ---------- 左上:標題與導覽 ---------- */
-.brief{grid-area:brief;align-self:start;display:flex;flex-direction:column;gap:12px}
+/* 左欄不超出自己的格子;放不下時只有說明框縮短、在框內捲動,導覽按鈕不會被下方控制台蓋住 */
+.brief{grid-area:brief;align-self:start;display:flex;flex-direction:column;gap:12px;max-height:100%;min-height:0}
 /* 網站分頁(只在 GitHub Pages 版出現) */
 .sitenav{display:inline-flex;align-self:flex-start;gap:2px;padding:3px;border-radius:10px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
@@ -71,7 +75,7 @@ button{font:inherit;color:inherit}
 .chip-k{display:block;font:500 10.5px/1.25 var(--f-body);letter-spacing:.14em;color:var(--muted);white-space:nowrap}
 .chip-v{display:block;font:500 17px/1.35 var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
 .chip.lead .chip-v{color:var(--accent)}
-.story{margin:0;background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:12px 15px;font-size:14px;line-height:1.75;color:var(--ink);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);min-height:6.4em}
+.story{margin:0;background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:12px 15px;font-size:14px;line-height:1.75;color:var(--ink);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);min-height:6.4em;overflow-y:auto}
 .cpd{font-weight:700;white-space:nowrap}
 .cpd i{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 5px 2px 1px;vertical-align:middle}
 .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.95em}
@@ -145,7 +149,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 .qctl label{white-space:nowrap}
 .qctl input[type=range]{flex:1 1 auto;min-width:60px;height:20px}
 .qctl .num{min-width:52px;color:var(--ink-2);white-space:nowrap}
-.tourbar{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap}
+.tourbar{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;background:var(--glass);border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 8px 6px 11px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .tour-step{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--accent);white-space:nowrap}
 .tour-dots{display:flex;gap:4px}
 .tour-dots i{width:14px;height:3px;border-radius:2px;background:var(--line-2)}
@@ -212,7 +216,8 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
   .ctl-row:first-of-type{padding-right:44px}
   .btn-sheet{display:inline-flex}
 }
-@media (max-height:760px) and (min-width:761px){
+/* 矮螢幕不放導言;中等寬度的左欄較窄、字會折得比較多,高度 860 以下就收 */
+@media (max-height:760px) and (min-width:761px), (max-height:860px) and (min-width:761px) and (max-width:1180px){
   .lede{display:none}
   .story{min-height:0}
 }
@@ -220,7 +225,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 /* ---------- 手機 ---------- */
 @media (max-width:760px){
   :root{--gut:16px}
-  .hud{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(150px,1fr) auto;grid-template-areas:"brief" "hole" "con";padding:calc(12px + env(safe-area-inset-top, 0px)) var(--gut) calc(14px + env(safe-area-inset-bottom, 0px));gap:10px;overflow-y:auto}
+  .hud{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(150px,1fr) auto auto;grid-template-areas:"brief" "hole" "con" "foot";padding:calc(12px + env(safe-area-inset-top, 0px)) var(--gut) calc(14px + env(safe-area-inset-bottom, 0px));gap:10px;overflow-y:auto}
   .hud>.hole{grid-area:hole}
   .ttl{flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap}
   .ttl-a{font-size:27px}
@@ -234,6 +239,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
   .story{font-size:13px;line-height:1.65;min-height:0;max-height:9.8em;overflow:auto;padding:9px 12px}
   .ctl{top:auto;left:12px;right:12px;bottom:12px;width:auto;box-shadow:0 -10px 40px rgba(0,0,0,.5)}
   .console{grid-template-columns:minmax(0,1fr);height:252px}
+  .credit{justify-self:start;text-align:left;margin-top:-4px}
   .cs-ms{display:none;border-left:0!important}
   .console[data-tab="ms"] .cs-ms{display:flex}
   .console[data-tab="ms"] .cs-chrom{display:none}
@@ -268,7 +274,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
     <header class="brief">
       <nav class="sitenav" aria-label="儀器原理"><a href="../">離子阱質譜</a><a href="./" aria-current="page">GC-MS</a><a href="../uv-vis/">UV-Vis</a></nav>
       <h1 class="ttl"><span class="ttl-a">GC-MS</span><span class="ttl-b">拆開來看</span></h1>
-      <p class="lede">層析圖上的每一支峰,都來自同一針樣品。它們一起被打進管柱,出來時卻相隔好幾分鐘。按「導覽」,鏡頭會跟著一個成分的分子,從 ALS 自動進樣器、6850 GC 的 30&nbsp;m 管柱,一路走進 5973N 質譜。</p>
+      <p class="lede">層析圖上的每一支峰,都來自同一針樣品。它們一起被打進管柱,出來時卻相隔好幾分鐘。按「導覽」,鏡頭會跟著一個成分的分子,從進樣、30&nbsp;m 的管柱,一路走進質譜。</p>
       <div class="chips">
         <div class="chip lead"><span class="chip-k">時間</span><span class="chip-v" id="chipT">0.00 min</span></div>
         <div class="chip"><span class="chip-k">柱溫</span><span class="chip-v" id="chipOven">60.0 °C</span></div>
@@ -368,6 +374,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
         </div>
       </div>
     </section>
+    <p class="credit"><span>GC-MS 原理,</span><span>以 Agilent 6850 GC(含 ALS 自動進樣器)與 5973N MSD 為例</span></p>
   </div>
 
   <div class="tip" id="tip" hidden></div>
@@ -376,7 +383,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
       <button class="ico x" id="helpX" type="button" aria-label="關閉說明"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
       <h2 id="helpTitle">一支峰是怎麼來的</h2>
-      <p>這個頁面用 ALS 自動進樣器、6850 GC 和 5973N 質譜當模型,把一針精油從進樣到出圖譜的過程拆開來看。管柱裡的色帶、底下的層析圖和質譜,都是同一個模型即時算出來的,所以拖動時間、改升溫速率,三者會一起變。</p>
+      <p>這個頁面把一針精油從進樣到出圖譜的過程拆開來看。管柱裡的色帶、底下的層析圖和質譜,都是同一個模型即時算出來的,所以拖動時間、改升溫速率,三者會一起變。</p>
 
       <h3>進樣:ALS 與進樣口</h3>
       <p>ALS 先用溶劑洗針,再從樣品瓶抽 <b>1 μL</b>,穿過隔墊打進 <b>250 °C</b> 的玻璃襯管。液體瞬間氣化,體積脹大兩三百倍。分流模式下大部分蒸氣從分流出口排掉,只有一小部分被載氣(He)帶進管柱。ALS 在推下活塞的同一刻送出開始訊號,GC 從這一刻開始計時。</p>
@@ -945,10 +952,12 @@ function drawChrom() {
   ctx.textAlign = 'left'; ctx.fillText('×10⁶', 4, 9);
   const xStep = niceStep(W, Math.max(2, pw / 80));
   ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  // 刻度數字碰到右端的單位「min」就只畫格線
+  const unitL = w - pr - ctx.measureText('min').width - 6;
   for (let t = Math.ceil(t0 / xStep) * xStep; t <= t1; t += xStep) {
-    if (t < 0) continue; const x = Math.round(X(t)) + .5;
+    if (t < 0) continue; const x = Math.round(X(t)) + .5, s = +t.toFixed(2) + '';
     ctx.strokeStyle = COLORS.grid; ctx.beginPath(); ctx.moveTo(x, pt); ctx.lineTo(x, pt + ph); ctx.stroke();
-    ctx.fillText(+t.toFixed(2) + '', x, h - 4);
+    if (x + ctx.measureText(s).width / 2 < unitL) ctx.fillText(s, x, h - 4);
   }
   ctx.strokeStyle = COLORS.axis; ctx.beginPath(); ctx.moveTo(pl, pt + ph + .5); ctx.lineTo(w - pr, pt + ph + .5); ctx.stroke();
   ctx.textAlign = 'right'; ctx.fillStyle = COLORS.muted; ctx.fillText('min', w - pr, h - 4);
@@ -1236,7 +1245,7 @@ function msTip(m) {
 const aP = q => q * q / 2 - 7 * q ** 4 / 128 + 29 * q ** 6 / 2304 - 68687 * q ** 8 / 18874368;
 const b1q = q => 1 - q - q * q / 8 + q ** 3 / 64 - q ** 4 / 1536 - 11 * q ** 5 / 36864 + 49 * q ** 6 / 589824;
 const QZ = { lam: 0.3306, q1: 0.6944, q2: 0.7084, qc: 0.7014, qMax: 1.05, aMax: 0.36 };
-const QP = { pl: 26, pr: 10, pt: 12, pb: 16 };
+const QP = { pl: 26, pr: 10, pt: 20, pb: 16 };
 function quadIons() {
   const sp = S.spec, out = [];
   const fc = sp ? msFocusCpd(sp) : null;
@@ -1261,7 +1270,8 @@ function drawQuad() {
   ctx.beginPath(); ctx.moveTo(pl + .5, pt); ctx.lineTo(pl + .5, pt + ph + .5); ctx.lineTo(w - pr, pt + ph + .5); ctx.stroke();
   ctx.font = FONT_SM; ctx.fillStyle = COLORS.muted; ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left'; ctx.fillText('a ∝ U', 2, pt + 2);
-  ctx.textAlign = 'right'; ctx.fillText('q ∝ V', w - pr, h - 3);
+  // 單位放在橫軸右端的上方,刻度 1 離右緣很近,放同一列會疊在一起
+  ctx.textAlign = 'right'; ctx.fillText('q ∝ V', w - pr, pt + ph - 4);
   ctx.textAlign = 'center'; for (const q of [0.5, 1]) ctx.fillText(q + '', X(q), h - 3);
   // 穩定區
   ctx.beginPath(); ctx.moveTo(X(0), Y(0));
