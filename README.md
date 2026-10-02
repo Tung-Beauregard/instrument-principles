@@ -71,3 +71,7 @@ node --check assets/app.js
 品牌色沿用 [w-studio](https://github.com/Tung-Beauregard/w-studio) 的 `brand-guide.md`：背景 `#0B1111`、薄荷綠 `#A5F3CD`、主字色 `#F0F3EE`。入口插圖是結構或概念示意，不是儀器照片、真實量測訊號或精確光學配置。
 
 教材來源及模擬限制見 [INSTRUMENTS.md](./INSTRUMENTS.md)。未來的維護約定見 [AGENTS.md](./AGENTS.md)。
+
+## 跨 AI 維護
+
+要請 Claude 或其他 AI 補齊教材的程式結構、科學依據、驗證方法與交接紀錄，可直接使用 [跨 AI 維護文件補齊指令](./docs/AI-MAINTENANCE-PROMPT.md)。文件內附完整指令與補齊後的日常交接用語。
