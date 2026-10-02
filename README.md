@@ -74,4 +74,6 @@ node --check assets/app.js
 
 ## 跨 AI 維護
 
-要請 Claude 或其他 AI 補齊教材的程式結構、科學依據、驗證方法與交接紀錄，可直接使用 [跨 AI 維護文件補齊指令](./docs/AI-MAINTENANCE-PROMPT.md)。文件內附完整指令與補齊後的日常交接用語。
+所有 AI 接手時遵循 [AGENTS.md](./AGENTS.md) 第 0 節的流程；第 8 節定義維護資料的內容、文件分工與更新責任。[CLAUDE.md](./CLAUDE.md) 引用同一份規則。
+
+目前的文件缺口與交接狀態見 [docs/HANDOFF.md](./docs/HANDOFF.md)。要請 Claude 或其他 AI 首次補齊、或依最新程式更新維護資料，可直接使用 [文件更新提示詞](./docs/AI-MAINTENANCE-PROMPT.md)。
