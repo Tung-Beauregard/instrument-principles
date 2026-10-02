@@ -1,0 +1,67 @@
+{
+  "instruments": [
+    {
+      "id": "lcq",
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/lcq.svg",
+      "imageAlt": "離子阱質譜儀結構示意",
+      "visualLabel": "ION TRAP MASS SPECTROMETRY",
+      "category": "離子阱質譜 · LCQ DECA XP",
+      "titleLines": [
+        "離子如何被留住，",
+        "又如何被分開？"
+      ],
+      "description": "沿著離子前進的路徑，看懂電灑游離、離子導引與離子阱，再親手調整射頻振幅。",
+      "tags": [
+        "13 章動畫",
+        "約 5 分鐘",
+        "互動操作台"
+      ],
+      "href": "./lcq/",
+      "actionLabel": "探索離子阱質譜"
+    },
+    {
+      "id": "gc-ms",
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/gc-ms.svg",
+      "imageAlt": "氣相層析儀連接質譜儀的結構示意",
+      "visualLabel": "GAS CHROMATOGRAPHY–MASS SPECTROMETRY",
+      "category": "氣相層析質譜 · GC-MS",
+      "titleLines": [
+        "一針樣品，",
+        "怎麼變成一張圖譜？"
+      ],
+      "description": "跟著精油樣品，從自動進樣、管柱分離走到質譜偵測，觀察升溫如何改變出峰。",
+      "tags": [
+        "8 站導覽",
+        "升溫比較",
+        "圖譜連動"
+      ],
+      "href": "./gc-ms/",
+      "actionLabel": "探索 GC-MS"
+    },
+    {
+      "id": "uv-vis",
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/uv-vis.svg",
+      "imageAlt": "光源、光柵與樣品槽的光路概念示意",
+      "visualLabel": "UV–VISIBLE SPECTROPHOTOMETRY",
+      "category": "紫外可見光分光光度計 · UV-VIS",
+      "titleLines": [
+        "一束光，",
+        "如何讀懂一份樣品？"
+      ],
+      "description": "沿著雙光束與雙單色器的光路，觀察光柵如何選出波長，再比較樣品與頻寬對吸收光譜的影響。",
+      "tags": [
+        "8 章導覽",
+        "波長調整",
+        "光譜掃描"
+      ],
+      "href": "./uv-vis/",
+      "actionLabel": "探索 UV-Vis"
+    }
+  ]
+}

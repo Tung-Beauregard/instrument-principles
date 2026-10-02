@@ -1,0 +1,2923 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>離子阱質譜原理</title>
+<meta name="description" content="離子阱質譜原理的互動 3D 解說,以 LCQ Deca XP 為例:從電灑游離、進入真空、離子導引到離子阱掃描,說明儀器怎麼分辨不同質荷比的離子。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('lcq-theme'); } catch (e) {}
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<style>
+:root{
+  --font:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --bg:#e6eaee; --ink:#16202b; --ink2:#55636f; --panel:rgba(255,255,255,.84); --panel-solid:#fbfcfd;
+  --line:rgba(22,32,43,.13); --accent:#0b8580; --accent-ink:#ffffff; --track:rgba(22,32,43,.12);
+  --hover:rgba(22,32,43,.06); --shadow:0 6px 22px rgba(20,30,40,.12);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1015; --ink:#e6ecf2; --ink2:#93a0ae; --panel:rgba(15,20,27,.82); --panel-solid:#121820;
+    --line:rgba(230,236,242,.12); --accent:#3cc3bc; --accent-ink:#03201e; --track:rgba(230,236,242,.14);
+    --hover:rgba(230,236,242,.07); --shadow:0 8px 28px rgba(0,0,0,.45);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1015; --ink:#e6ecf2; --ink2:#93a0ae; --panel:rgba(15,20,27,.82); --panel-solid:#121820;
+  --line:rgba(230,236,242,.12); --accent:#3cc3bc; --accent-ink:#03201e; --track:rgba(230,236,242,.14);
+  --hover:rgba(230,236,242,.07); --shadow:0 8px 28px rgba(0,0,0,.45);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);overflow:hidden;-webkit-font-smoothing:antialiased}
+button,select,input{font:inherit;color:inherit}
+#stage{position:fixed;inset:0;touch-action:none}
+#stage canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+#ov{pointer-events:none}
+body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!important}
+/* 網站分頁:離子阱質譜、GC-MS、UV-Vis 三頁互相切換 */
+#sitenav{position:fixed;left:16px;top:16px;z-index:11;display:flex;gap:2px;padding:3px;border-radius:11px;background:var(--panel);border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+#sitenav a{padding:5px 12px;border-radius:8px;font-size:13px;font-weight:500;line-height:1.5;color:var(--ink2);text-decoration:none;white-space:nowrap}
+#sitenav a:hover{background:var(--hover);color:var(--ink)}
+#sitenav a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+#sitenav a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+#bar{position:fixed;left:16px;right:16px;bottom:14px;z-index:10;display:flex;align-items:center;gap:10px;
+  padding:8px 10px;background:var(--panel);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.icon{width:38px;height:38px;flex:none;display:grid;place-items:center;border:0;border-radius:10px;background:transparent;cursor:pointer}
+.icon:hover{background:var(--hover)}
+.icon svg{width:20px;height:20px;fill:currentColor}
+#play{background:var(--accent);color:var(--accent-ink)}
+#play:hover{filter:brightness(1.08);background:var(--accent)}
+#rail{flex:1;min-width:0;display:flex;gap:3px;height:38px;align-items:center;cursor:pointer;outline:none}
+#rail:focus-visible{box-shadow:0 0 0 2px var(--accent);border-radius:6px}
+.seg{position:relative;height:6px;border-radius:3px;background:var(--track);overflow:hidden;transition:height .15s}
+#rail:hover .seg{height:10px}
+.seg i{position:absolute;inset:0;width:0;background:var(--accent);border-radius:inherit}
+.seg.cur{background:color-mix(in srgb,var(--accent) 22%,var(--track))}
+#tip{position:fixed;z-index:12;padding:5px 9px;border-radius:7px;background:var(--panel-solid);border:1px solid var(--line);
+  font-size:13px;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow);display:none}
+#time{font-family:var(--mono);font-size:13px;color:var(--ink2);white-space:nowrap;min-width:92px;text-align:right}
+#visits{display:flex;align-items:center;gap:6px;padding:0 4px;font-size:13px;color:var(--ink2);white-space:nowrap}
+#visits[hidden]{display:none}
+#visits svg{width:16px;height:16px;fill:currentColor;opacity:.75;flex:none}
+#visits b{font-family:var(--mono);font-weight:500;color:var(--ink)}
+.pill{height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--line);background:transparent;cursor:pointer;white-space:nowrap;font-size:14px}
+.pill:hover{background:var(--hover)}
+.pill.on{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+
+#lab{position:fixed;left:16px;top:62px;z-index:9;width:300px;max-height:calc(100% - 146px);overflow:auto;padding:16px 16px 14px;
+  background:var(--panel);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);font-size:14px}
+#lab h2{margin:0 0 4px;font-size:17px;font-weight:700}
+#lab .sub{margin:0 0 14px;color:var(--ink2);font-size:13px;line-height:1.55}
+#lab label{display:block}
+#lab select{width:100%;margin-top:6px;padding:7px 8px;border-radius:8px;border:1px solid var(--line);background:var(--panel-solid)}
+#lab .row{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 6px}
+#lab output{font-family:var(--mono);font-size:15px;font-weight:600}
+#lab input[type=range]{width:100%;accent-color:var(--accent)}
+#lab .scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink2)}
+#lab .chk{display:flex;gap:8px;align-items:center;margin:14px 0 4px;cursor:pointer}
+#lab .chk input{accent-color:var(--accent);width:16px;height:16px}
+#lab .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+#lab .btns button{height:36px;border-radius:9px;border:1px solid var(--line);background:var(--panel-solid);cursor:pointer}
+#lab .btns button:hover{background:var(--hover)}
+#lab .btns .main{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+#lab .hint{margin:12px 0 0;color:var(--ink2);font-size:12.5px;line-height:1.6}
+#lab .read{margin-top:10px;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink2)}
+
+#about{max-width:min(640px,calc(100% - 32px));max-height:calc(100% - 40px);padding:0;border:1px solid var(--line);border-radius:16px;
+  background:var(--panel-solid);color:var(--ink);box-shadow:var(--shadow)}
+#about::backdrop{background:rgba(5,8,12,.45)}
+#about .in{padding:22px 24px 20px;font-size:14.5px;line-height:1.75}
+#about h2{margin:0 0 10px;font-size:19px}
+#about h3{margin:18px 0 6px;font-size:15px}
+#about p{margin:0 0 10px}
+#about ul{margin:0 0 10px;padding-left:20px}
+#about code{font-family:var(--mono);font-size:13px}
+#about .foot{display:flex;gap:8px;justify-content:flex-end;padding:12px 24px 18px;flex-wrap:wrap}
+#about .foot button{height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--line);background:transparent;cursor:pointer}
+#about .foot .main{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+#recState{font-size:13px;color:var(--ink2);align-self:center;margin-right:auto}
+
+#loading{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:var(--bg);transition:opacity .6s}
+#loading.done{opacity:0;pointer-events:none}
+#loading .box{text-align:center}
+#loading b{display:block;font-size:22px;letter-spacing:.04em;margin-bottom:10px}
+#loading span{font-size:13px;color:var(--ink2)}
+#loading .bar{width:180px;height:3px;margin:14px auto 0;border-radius:2px;background:var(--track);overflow:hidden}
+#loading .bar i{display:block;height:100%;width:30%;background:var(--accent);animation:ld 1.1s ease-in-out infinite}
+@keyframes ld{0%{transform:translateX(-100%)}100%{transform:translateX(340%)}}
+#hint{position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:9;padding:7px 14px;border-radius:9px;background:var(--panel);
+  border:1px solid var(--line);font-size:13px;color:var(--ink2);pointer-events:none;opacity:0;transition:opacity .4s}
+#hint.show{opacity:1}
+
+@media (max-width:680px){
+  #bar{left:8px;right:8px;bottom:8px;gap:6px;padding:6px}
+  #time{display:none}
+  #visits .lab{display:none}
+  .icon{width:34px;height:34px}
+  #labBtn{padding:0 10px}
+  #lab{left:8px;right:8px;top:auto;bottom:66px;width:auto;max-height:46%}
+  #sitenav{left:8px;top:8px}
+  #hint{top:56px}
+}
+@media (prefers-reduced-motion: reduce){
+  #loading .bar i{animation:none;width:100%}
+}
+@media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="stage" aria-label="離子阱質譜原理的立體解說動畫,以 LCQ Deca XP 為例">
+  <canvas id="ov"></canvas>
+</div>
+
+<nav id="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="./" aria-current="page">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a></nav>
+<div id="bar">
+  <button id="play" class="icon" aria-label="播放"><svg viewBox="0 0 24 24"><path id="playIcon" d="M8 5v14l11-7z"/></svg></button>
+  <div id="rail" role="slider" tabindex="0" aria-label="章節與時間" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+  <span id="time">00:00 / 00:00</span>
+  <span id="visits" hidden title="以裝置計算,同一台裝置重複開啟只算一次"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C6.6 5 2.8 9.1 1.5 12c1.3 2.9 5.1 7 10.5 7s9.2-4.1 10.5-7C21.2 9.1 17.4 5 12 5zm0 11.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-7a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg><span class="lab">到站人數</span><b id="visitsN">0</b></span>
+  <button id="labBtn" class="pill" aria-pressed="false">自己操作</button>
+  <button id="themeBtn" class="icon" aria-label="切換深淺色"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  <button id="fsBtn" class="icon" aria-label="全螢幕"><svg viewBox="0 0 24 24"><path d="M4 9V4h5v2H6v3zm10-5h6v5h-2V6h-4zM4 15h2v3h3v2H4zm14 0h2v5h-5v-2h3z"/></svg></button>
+  <button id="infoBtn" class="icon" aria-label="說明與資料來源"><svg viewBox="0 0 24 24"><path d="M11 10h2v7h-2zm0-3h2v2h-2zm1-5a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg></button>
+</div>
+<div id="tip"></div>
+<div id="hint"></div>
+
+<aside id="lab" hidden aria-label="離子阱操作台">
+  <h2>離子阱操作台</h2>
+  <p class="sub">調高環形電極的射頻振幅,看哪一種離子先對上端帽的節拍、先被排出。</p>
+  <label>樣品
+    <select id="labSample">
+      <option value="cal">校正液:咖啡因 195、MRFA 524、Ultramark 1222</option>
+      <option value="np">天然物:檜木醇 165、兒茶素 291、槲皮素 303、扁柏脂素 355、蘆丁 611</option>
+    </select>
+  </label>
+  <div class="row"><span>環形電極射頻振幅</span><output id="labVOut">500 V</output></div>
+  <input type="range" id="labV" min="0" max="8500" step="1" value="500" aria-label="環形電極射頻振幅">
+  <div class="scale"><span>0 V</span><span>8500 V</span></div>
+  <label class="chk"><input type="checkbox" id="labAC" checked>端帽交流電壓(約 280 kHz)</label>
+  <div class="btns">
+    <button id="labInject">重新裝填</button>
+    <button id="labScan" class="main">自動掃描</button>
+  </div>
+  <div class="read" id="labRead"></div>
+  <p class="hint">關掉端帽交流電壓,離子要到 q = 0.908 才會被甩出;照 0.83 換算,質荷比會多算約 9%,峰也比較寬。</p>
+  <p class="hint">拖曳畫面旋轉視角,滾輪或雙指縮放。</p>
+</aside>
+
+<dialog id="about">
+  <div class="in">
+    <h2>關於這段動畫</h2>
+    <p>這是離子阱質譜原理的解說動畫,以 Thermo Finnigan LCQ Deca XP 為例。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比把離子分開。</p>
+    <h3>操作</h3>
+    <ul>
+      <li>空白鍵播放或暫停,左右方向鍵切換章節。</li>
+      <li>暫停時可以拖曳畫面旋轉視角。</li>
+      <li>「自己操作」會開啟離子阱操作台,可以自己調射頻振幅、做掃描。</li>
+    </ul>
+    <h3>數值與示意</h3>
+    <p>射頻頻率 760 kHz、振幅 0 至 8500 V(零到峰值)、掃描速率每秒約 5,500 個 m/z 單位、氦氣約 10⁻³ Torr、轉換二次發射電極 ±15 kV、倍增器增益約 3×10⁵、各區氣壓等數值取自 Finnigan LCQ Series Hardware Manual(LCQ Deca XP MAX)與 LCQ Deca Hardware Manual。離子阱尺寸 r₀ = 7.07 mm、z₀ = 7.85 mm 取自 March(1997);排出點 q = 0.83 取自 Wong 與 Cooks(1997)。約 280 kHz 的端帽交流頻率與每 m/z 約 4.25 V 是依上述數值計算的,手冊沒有直接寫;實機的對應關係由質量校正決定。</p>
+    <p>機身尺寸與 MSⁿ 取自 LCQ Deca XP Plus 規格表;噴針約 4.5 kV、毛細管最高 350 °C 取自 Thermo 應用報告 315;活化 q = 0.25、30 ms 取自已發表的 Deca XP Plus 方法。蘆丁的碎片是黃酮苷常見的裂解方式,不是這台儀器的實測。截取錐錯開約 1.5 mm 是從零件標示推定的。</p>
+    <p>為什麼停在 q = 0.83 而不是穩定邊界 0.908:共振推出的峰比較窄;而且在 0.908 才排出的話,8500 V 只掃得到約 m/z 1830,用 0.83 才到得了 2000。</p>
+    <p>毛細管長度、桿子粗細、孔徑、偵測器尺寸等手冊沒有寫的部分是示意。離子源畫成探針由上方噴入;XP Plus 的正交離子源是從側面水平噴入,XP MAX 的 Ion Max 離子源約 60 度,原理相同。液滴、離子雲和振盪幅度都放大過,時間也放慢了很多倍,才看得到。</p>
+    <h3>錄成影片</h3>
+    <p>可以把整段動畫錄成 1920×1080 的 MP4,沿用目前的深色或淺色模式。錄製時畫面會逐格算圖,通常一到幾分鐘。</p>
+  </div>
+  <div class="foot">
+    <span id="recState"></span>
+    <button id="recBtn">錄成影片</button>
+    <button id="aboutClose" class="main">關閉</button>
+  </div>
+</dialog>
+
+<div id="loading"><div class="box"><b>離子阱質譜原理</b><span>正在載入立體模型</span><div class="bar"><i></i></div></div></div>
+
+<script type="module">
+// ---- core.js ----
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+// ---------- small helpers ----------
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
+const ease = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const sstep = (a, b, x) => smooth((x - a) / (b - a));
+// 0 before a, rises over f seconds, 1 until b - f, falls to 0 at b
+const win = (t, a, b, f = 0.6) => Math.min(sstep(a, a + f, t), 1 - sstep(b - f, b, t));
+function makeRng(seed) {
+  let s = (seed * 2654435761) >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function gauss(r) {
+  const u = Math.max(1e-9, r()), v = r();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+
+// ---------- physics of the LCQ trap ----------
+// r0, z0 in mm (March 1997); RF 0.76 MHz, 0 to 8500 V(0-p) (LCQ Series Hardware Manual)
+// q_z = 8eV / (m (r0^2 + 2 z0^2) Omega^2)  ->  q = V / (kV * m/z), kV = 5.1175 V per Th
+const PHYS = { r0: 7.07, z0: 7.85, fRF: 760e3, Vmax: 8500, qEject: 0.83, qMax: 0.908, kV: 5.1175, scanRate: 5500 };
+const qOf = (V, mz) => V / (PHYS.kV * mz);
+const vEjectOf = (mz) => PHYS.qEject * PHYS.kV * mz;
+function betaExact(q) {
+  // continued fraction for a = 0
+  if (q <= 0) return 0;
+  let b = Math.min(0.98, q / Math.SQRT2);
+  for (let it = 0; it < 200; it++) {
+    let up = 0, dn = 0;
+    for (let k = 10; k >= 1; k--) {
+      const s1 = b + 2 * k, s2 = b - 2 * k;
+      up = (q * q) / (s1 * s1 - up);
+      dn = (q * q) / (s2 * s2 - dn);
+    }
+    const nb = Math.sqrt(Math.max(0, up + dn));
+    if (Math.abs(nb - b) < 1e-12) { b = nb; break; }
+    b = 0.6 * b + 0.4 * Math.min(1, nb);
+  }
+  return Math.min(1, b);
+}
+const BETA_N = 2048;
+const BETA_LUT = (() => {
+  const a = new Float32Array(BETA_N + 1);
+  for (let i = 0; i <= BETA_N; i++) a[i] = betaExact((i / BETA_N) * PHYS.qMax);
+  return a;
+})();
+function betaOf(q) {
+  if (q <= 0) return 0;
+  if (q >= PHYS.qMax) return 1;
+  const x = (q / PHYS.qMax) * BETA_N, i = Math.floor(x), f = x - i;
+  return BETA_LUT[i] * (1 - f) + BETA_LUT[Math.min(BETA_N, i + 1)] * f;
+}
+const BETA_EJECT = betaOf(PHYS.qEject);
+
+// ---------- samples and colour by m/z ----------
+const SAMPLES = {
+  cal: [
+    { name: '咖啡因', mz: 195.09, ab: 1.0 },
+    { name: 'MRFA', mz: 524.27, ab: 0.8 },
+    { name: 'Ultramark', mz: 1222.0, ab: 0.7 },
+  ],
+  np: [
+    { name: '檜木醇', mz: 165.09, ab: 0.55 },
+    { name: '兒茶素', mz: 291.09, ab: 0.7 },
+    { name: '槲皮素', mz: 303.05, ab: 1.0 },
+    { name: '扁柏脂素', mz: 355.12, ab: 0.45 },
+    { name: '蘆丁', mz: 611.16, ab: 0.85 },
+  ],
+};
+const MZ_STOPS = [[0, '#ff5470'], [0.24, '#ff8b3d'], [0.44, '#ffd447'], [0.62, '#7fdc7a'], [0.8, '#3fc3ff'], [1, '#a98bff']]
+  .map(([t, h]) => [t, new THREE.Color(h)]);
+const mzT = (mz) => clamp((Math.log10(mz) - 2) / (Math.log10(2000) - 2), 0, 1);
+function colorForMz(mz, out = new THREE.Color()) {
+  const t = mzT(mz);
+  for (let i = 1; i < MZ_STOPS.length; i++) {
+    if (t <= MZ_STOPS[i][0]) {
+      const [t0, c0] = MZ_STOPS[i - 1], [t1, c1] = MZ_STOPS[i];
+      return out.copy(c0).lerp(c1, (t - t0) / (t1 - t0));
+    }
+  }
+  return out.copy(MZ_STOPS[MZ_STOPS.length - 1][1]);
+}
+const cssForMz = (mz) => '#' + colorForMz(mz).getHexString();
+
+// ---------- theme ----------
+const PALETTE = {
+  dark: { top: '#05080c', horizon: '#141b23', floor: '#0f141a', key: 2.3, rim: 1.0, fill: 0.3, hemi: 0.25, env: 0.3,
+    bloomT: 2.4, bloomS: 0.75, vig: 0.32, grain: 0.022 },
+  light: { top: '#f7f9fb', horizon: '#d9e0e7', floor: '#dfe5eb', key: 2.9, rim: 0.7, fill: 0.55, hemi: 0.7, env: 0.85,
+    bloomT: 2.6, bloomS: 0.3, vig: 0.12, grain: 0.012 },
+};
+const themeState = { dark: true };
+function computeDark() {
+  const a = document.documentElement.getAttribute('data-theme');
+  if (a === 'dark') return true;
+  if (a === 'light') return false;
+  return matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+// ---------- renderer, scene, camera ----------
+const stage = $('#stage');
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+renderer.domElement.id = 'gl';
+stage.prepend(renderer.domElement);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(32, 16 / 9, 0.01, 80);
+camera.position.set(1.6, 1.2, 2.4);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+// backdrop: gradient dome + floor that fades into fog
+const sky = new THREE.Mesh(
+  new THREE.SphereGeometry(40, 48, 24),
+  new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false, fog: false,
+    uniforms: { uTop: { value: new THREE.Color() }, uHor: { value: new THREE.Color() }, uBot: { value: new THREE.Color() } },
+    vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+    fragmentShader: `uniform vec3 uTop, uHor, uBot; varying vec3 vP;
+      void main(){ float h = normalize(vP).y; vec3 c = h > 0.0 ? mix(uHor, uTop, pow(clamp(h,0.0,1.0), 0.55)) : mix(uHor, uBot, pow(clamp(-h,0.0,1.0), 0.35));
+      gl_FragColor = vec4(c, 1.0); }`,
+  })
+);
+sky.renderOrder = -10;
+scene.add(sky);
+const floor = new THREE.Mesh(new THREE.CircleGeometry(30, 96), new THREE.MeshStandardMaterial({ color: '#10151b', roughness: 0.92, metalness: 0 }));
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+scene.fog = new THREE.Fog('#141b23', 5.5, 16);
+
+const hemi = new THREE.HemisphereLight('#dfe8f2', '#20262e', 0.4);
+scene.add(hemi);
+const key = new THREE.DirectionalLight('#fff2e2', 2.6);
+key.position.set(-2.4, 4.2, 3.0);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -1.5, right: 1.5, top: 1.6, bottom: -1.2, near: 1, far: 10 });
+key.shadow.bias = -0.0004;
+key.shadow.normalBias = 0.015;
+key.shadow.radius = 3;
+scene.add(key, key.target);
+const rim = new THREE.DirectionalLight('#bcd6ff', 1.1);
+rim.position.set(2.8, 2.2, -3.2);
+scene.add(rim);
+const fill = new THREE.DirectionalLight('#ffffff', 0.35);
+fill.position.set(3.2, 1.0, 3.5);
+scene.add(fill);
+
+// ---------- post processing ----------
+const rt = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 });
+const composer = new EffectComposer(renderer, rt);
+const renderPass = new RenderPass(scene, camera);
+const gtao = new GTAOPass(scene, camera, 4, 4);
+gtao.output = GTAOPass.OUTPUT.Default;
+gtao.blendIntensity = 0.7;
+const bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), 0.6, 0.45, 0.8);
+const outPass = new OutputPass();
+const finish = new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uVig: { value: 0.3 }, uGrain: { value: 0.02 }, uAspect: { value: 1.7 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float uTime, uVig, uGrain, uAspect; varying vec2 vUv;
+    float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+    void main(){ vec4 c = texture2D(tDiffuse, vUv); vec2 d = (vUv - 0.5) * vec2(uAspect, 1.0) / uAspect * 1.6;
+      c.rgb *= 1.0 - uVig * smoothstep(0.35, 1.05, length(d));
+      c.rgb += (h(floor(vUv * vec2(1920.0, 1080.0)) + fract(uTime * 0.731) * 91.7) - 0.5) * uGrain;
+      gl_FragColor = c; }`,
+});
+composer.addPass(renderPass);
+composer.addPass(gtao);
+composer.addPass(bloom);
+composer.addPass(outPass);
+composer.addPass(finish);
+
+const view = { w: 1, h: 1, pr: 1, shiftX: 0, shiftY: 0, ao: true };
+function setRenderSize(w, h, pr) {
+  view.w = w; view.h = h; view.pr = pr;
+  renderer.setPixelRatio(pr);
+  renderer.setSize(w, h, false);
+  composer.setPixelRatio(pr);
+  composer.setSize(w, h);
+  camera.aspect = w / h;
+  applyViewOffset();
+  finish.uniforms.uAspect.value = w / h;
+}
+function applyViewOffset() {
+  const { w, h } = view;
+  camera.setViewOffset(w, h, view.shiftX * w, view.shiftY * h, w, h);
+  camera.updateProjectionMatrix();
+}
+
+function applyTheme() {
+  const dark = (themeState.dark = computeDark());
+  const P = dark ? PALETTE.dark : PALETTE.light;
+  sky.material.uniforms.uTop.value.set(P.top);
+  sky.material.uniforms.uHor.value.set(P.horizon);
+  sky.material.uniforms.uBot.value.set(P.floor);
+  floor.material.color.set(P.floor);
+  scene.fog.color.set(P.horizon);
+  key.intensity = P.key; rim.intensity = P.rim; fill.intensity = P.fill; hemi.intensity = P.hemi;
+  scene.environmentIntensity = P.env;
+  bloom.threshold = P.bloomT; bloom.strength = P.bloomS;
+  finish.uniforms.uVig.value = P.vig; finish.uniforms.uGrain.value = P.grain;
+  for (const s of POINT_SYSTEMS) s.setTheme(dark);
+  for (const s of LINE_SYSTEMS) s.setTheme(dark);
+  if (typeof onThemeChanged === 'function') onThemeChanged(dark);
+}
+
+// ---------- particle systems ----------
+const POINT_SYSTEMS = [];
+const LINE_SYSTEMS = [];
+function pointsMaterial() {
+  return new THREE.ShaderMaterial({
+    uniforms: { uScale: { value: 1 }, uLight: { value: 0 }, uAdd: { value: 1 } },
+    vertexShader: `attribute vec3 color; attribute float size; attribute float alpha; varying vec3 vC; varying float vA; uniform float uScale;
+      void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv;
+        gl_PointSize = clamp(size * uScale / -mv.z, 1.5, 220.0); vC = color; vA = alpha; }`,
+    fragmentShader: `varying vec3 vC; varying float vA; uniform float uLight, uAdd;
+      void main(){ vec2 d = gl_PointCoord - 0.5; float r = length(d) * 2.0; if (r > 1.0) discard;
+        float core = 1.0 - smoothstep(0.0, 0.45, r); float halo = pow(1.0 - r, 2.0);
+        vec3 cD = mix(vC * (0.35 * halo + 2.2 * core) + vec3(core * core * 0.25), vC * (0.6 * halo + 3.4 * core) + vec3(core * core * 1.1), uAdd);
+        vec3 cL = vC * (0.55 + 0.45 * core);
+        float aD = vA * (0.85 * halo + core);
+        float aL = vA * (1.0 - smoothstep(0.55, 0.95, r)) * 0.95;
+        vec3 c = mix(cD, cL, uLight); float a = mix(aD, aL, uLight);
+        gl_FragColor = vec4(c * a, a); }`,
+    transparent: true, depthWrite: false,
+    blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneFactor,
+  });
+}
+class PointCloud {
+  constructor(max, parent, additive = true) {
+    this.max = max; this.n = 0; this.additive = additive;
+    this.pos = new Float32Array(max * 3); this.col = new Float32Array(max * 3);
+    this.siz = new Float32Array(max); this.alp = new Float32Array(max);
+    const g = (this.geo = new THREE.BufferGeometry());
+    g.setAttribute('position', new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage));
+    g.setAttribute('color', new THREE.BufferAttribute(this.col, 3).setUsage(THREE.DynamicDrawUsage));
+    g.setAttribute('size', new THREE.BufferAttribute(this.siz, 1).setUsage(THREE.DynamicDrawUsage));
+    g.setAttribute('alpha', new THREE.BufferAttribute(this.alp, 1).setUsage(THREE.DynamicDrawUsage));
+    this.mat = pointsMaterial();
+    this.obj = new THREE.Points(g, this.mat);
+    this.obj.frustumCulled = false;
+    this.obj.renderOrder = 5;
+    parent.add(this.obj);
+    POINT_SYSTEMS.push(this);
+    this.setTheme(themeState.dark);
+  }
+  setTheme(dark) {
+    this.mat.uniforms.uLight.value = dark ? 0 : 1;
+    this.mat.uniforms.uAdd.value = this.additive ? 1 : 0;
+    this.mat.blendDst = dark && this.additive ? THREE.OneFactor : THREE.OneMinusSrcAlphaFactor;
+    this.mat.needsUpdate = true;
+  }
+  begin() { this.n = 0; }
+  add(x, y, z, c, size, alpha) {
+    if (this.n >= this.max || alpha <= 0.002) return;
+    const i = this.n++, j = i * 3;
+    this.pos[j] = x; this.pos[j + 1] = y; this.pos[j + 2] = z;
+    this.col[j] = c.r; this.col[j + 1] = c.g; this.col[j + 2] = c.b;
+    this.siz[i] = size; this.alp[i] = alpha;
+  }
+  end() {
+    const g = this.geo;
+    g.setDrawRange(0, this.n);
+    for (const k of ['position', 'color', 'size', 'alpha']) g.attributes[k].needsUpdate = true;
+  }
+}
+class LineCloud {
+  constructor(max, parent, additive = true) {
+    this.max = max; this.n = 0; this.additive = additive;
+    this.pos = new Float32Array(max * 6); this.col = new Float32Array(max * 8);
+    const g = (this.geo = new THREE.BufferGeometry());
+    g.setAttribute('position', new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage));
+    g.setAttribute('color', new THREE.BufferAttribute(this.col, 4).setUsage(THREE.DynamicDrawUsage));
+    this.mat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+    this.obj = new THREE.LineSegments(g, this.mat);
+    this.obj.frustumCulled = false;
+    this.obj.renderOrder = 4;
+    parent.add(this.obj);
+    LINE_SYSTEMS.push(this);
+    this.setTheme(themeState.dark);
+  }
+  setTheme(dark) { this.mat.blending = dark && this.additive ? THREE.AdditiveBlending : THREE.NormalBlending; this.mat.needsUpdate = true; }
+  begin() { this.n = 0; }
+  seg(ax, ay, az, bx, by, bz, c, a0, a1) {
+    if (this.n >= this.max) return;
+    const i = this.n++, p = i * 6, q = i * 8;
+    this.pos[p] = ax; this.pos[p + 1] = ay; this.pos[p + 2] = az; this.pos[p + 3] = bx; this.pos[p + 4] = by; this.pos[p + 5] = bz;
+    this.col[q] = c.r; this.col[q + 1] = c.g; this.col[q + 2] = c.b; this.col[q + 3] = a0;
+    this.col[q + 4] = c.r; this.col[q + 5] = c.g; this.col[q + 6] = c.b; this.col[q + 7] = a1;
+  }
+  end() {
+    this.geo.setDrawRange(0, this.n * 2);
+    this.geo.attributes.position.needsUpdate = true;
+    this.geo.attributes.color.needsUpdate = true;
+  }
+}
+
+
+// ---- models.js ----
+
+// =====================================================================
+// Models: materials, the LCQ cabinet (metres) and the ion path assembly (millimetres, ion axis = +x)
+// =====================================================================
+const MAT = {};
+function std(color, roughness, metalness = 0, extra = {}) {
+  return new THREE.MeshStandardMaterial({ color, roughness, metalness, ...extra });
+}
+function initMaterials() {
+  MAT.shell = new THREE.MeshPhysicalMaterial({ color: '#e8e7e2', roughness: 0.4, clearcoat: 0.35, clearcoatRoughness: 0.45 });
+  MAT.inset = std('#c3c9ce', 0.55);
+  MAT.housing = std('#9da6ae', 0.38, 0.55);
+  MAT.accent = std('#2a9a94', 0.42, 0.05);
+  MAT.steel = std('#b4bbc2', 0.32, 1);
+  MAT.steelCut = std('#a3abb3', 0.6, 0.3);
+  MAT.steelDark = std('#7a838c', 0.4, 1);
+  MAT.chamber = std('#4a5158', 0.62, 0.45);
+  MAT.alu = std('#7d868f', 0.5, 0.85);
+  MAT.aluCut = std('#9aa2aa', 0.65, 0.2);
+  MAT.dark = std('#262b31', 0.5, 0.35);
+  MAT.black = std('#131518', 0.42, 0.2);
+  MAT.ceramic = std('#eeebe3', 0.38);
+  MAT.ceramicCut = std('#faf9f5', 0.5);
+  MAT.quartz = new THREE.MeshPhysicalMaterial({ color: '#cfeaf0', roughness: 0.06, transparent: true, opacity: 0.45, clearcoat: 1, depthWrite: false });
+  MAT.glass = new THREE.MeshPhysicalMaterial({ color: '#8fb6c4', roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.4, clearcoat: 1 });
+  MAT.cream = std('#e0d7c4', 0.5);
+  MAT.peek = std('#c7a979', 0.48);
+  MAT.polyimide = std('#9a4e1c', 0.38);
+  MAT.leadGlass = std('#3d2e27', 0.22, 0.25);
+  MAT.rubber = std('#2a2e33', 0.75);
+  MAT.yellow = std('#f0bf2b', 0.5);
+  MAT.blue = std('#2e7ed4', 0.42);
+  MAT.green = std('#2d6b49', 0.6);
+  MAT.pcb = std('#25553b', 0.55, 0.1);
+  MAT.heater = std('#6a391f', 0.45, 0.5, { emissive: new THREE.Color('#ff5a1a'), emissiveIntensity: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
+  MAT.ghost = new THREE.MeshStandardMaterial({ color: '#cfd4d9', metalness: 0.7, roughness: 0.35, transparent: true, opacity: 0.16, depthWrite: false });
+  // electrode materials whose emissive glow shows the RF / AC voltages
+  for (const k of ['rodA', 'rodB', 'ring', 'capIn', 'capOut']) {
+    MAT[k] = MAT.steel.clone();
+    MAT[k].emissive = new THREE.Color('#000000');
+  }
+  for (const k of ['ring', 'capIn', 'capOut']) { MAT[k].roughness = 0.52; MAT[k].metalness = 0.85; }
+  MAT.ghostA = MAT.ghost.clone(); MAT.ghostB = MAT.ghost.clone();
+  for (const m of [MAT.ghostA, MAT.ghostB]) m.emissive = new THREE.Color('#000000');
+}
+
+// ---------- geometry helpers ----------
+function signedArea(pts) {
+  let s = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length];
+    s += x1 * y2 - x2 * y1;
+  }
+  return s / 2;
+}
+// faces: polylines in (r, axial) whose joined outline is closed; each face is smooth, corners between faces stay sharp.
+// cut = keep only the back half (z <= 0) and close the section with flat caps facing +z.
+function latheSolid(faces, { seg = 72, cut = true, mat = MAT.steel, cap = MAT.steelCut, shadow = true } = {}) {
+  let F = faces.map((f) => f.map(([r, y]) => [Math.max(0, r), y]));
+  let outline = [];
+  for (const f of F) for (let i = 0; i < f.length - 1; i++) outline.push(f[i]);
+  if (signedArea(outline) < 0) {
+    F = F.slice().reverse().map((f) => f.slice().reverse());
+    outline = [];
+    for (const f of F) for (let i = 0; i < f.length - 1; i++) outline.push(f[i]);
+  }
+  const phi0 = cut ? Math.PI / 2 : 0, phiL = cut ? Math.PI : Math.PI * 2;
+  const geos = F.filter((f) => !f.every((p) => p[0] < 1e-6)).map((f) =>
+    new THREE.LatheGeometry(f.map(([r, y]) => new THREE.Vector2(r, y)), seg, phi0, phiL));
+  const g = new THREE.Group();
+  const m = new THREE.Mesh(mergeGeometries(geos), mat);
+  m.castShadow = shadow; m.receiveShadow = true;
+  g.add(m);
+  g.userData.surface = m;
+  if (cut) {
+    const sA = new THREE.Shape(outline.map(([r, y]) => new THREE.Vector2(r, y)));
+    const sB = new THREE.Shape(outline.map(([r, y]) => new THREE.Vector2(-r, y)));
+    const c = new THREE.Mesh(mergeGeometries([new THREE.ShapeGeometry(sA), new THREE.ShapeGeometry(sB)]), cap);
+    c.receiveShadow = true;
+    g.add(c);
+    g.userData.cap = c;
+  }
+  return g;
+}
+const ring2 = (r0, r1, y0, y1) => [[[r0, y0], [r1, y0]], [[r1, y0], [r1, y1]], [[r1, y1], [r0, y1]], [[r0, y1], [r0, y0]]];
+const cyl2 = (r, y0, y1) => [[[0, y0], [r, y0]], [[r, y0], [r, y1]], [[r, y1], [0, y1]]];
+function axisX(o) { o.rotation.z = -Math.PI / 2; return o; } // lathe axis (y) -> +x
+function mesh(geo, mat, cast = true) {
+  const m = new THREE.Mesh(geo, mat);
+  m.castShadow = cast; m.receiveShadow = true;
+  return m;
+}
+function tube(points, r, mat, seg = 64) {
+  const curve = new THREE.CatmullRomCurve3(points.map((p) => new THREE.Vector3(...p)));
+  return mesh(new THREE.TubeGeometry(curve, seg, r, 12, false), mat);
+}
+function canvasTex(w, h, draw) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+// plate in the y-z plane (z <= 0 half) spanning x0..x1 with a half-circle notch around the axis
+function plateX(x0, x1, y0, y1, zBack, notchR, notchY, mat) {
+  const s = new THREE.Shape();
+  const U = -zBack;
+  s.moveTo(0, y0); s.lineTo(U, y0); s.lineTo(U, y1); s.lineTo(0, y1); s.lineTo(0, notchY + notchR);
+  s.absarc(0, notchY, notchR, Math.PI / 2, -Math.PI / 2, true);
+  s.lineTo(0, y0);
+  const g = new THREE.ExtrudeGeometry(s, { depth: x1 - x0, bevelEnabled: false, curveSegments: 32 });
+  g.applyMatrix4(new THREE.Matrix4().set(0, 0, 1, x0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 1));
+  return mesh(g, mat);
+}
+
+// =====================================================================
+// Cabinet: W 79 cm x H 56 cm x D 76 cm (LCQ Deca XP Plus data sheet), origin at floor centre, front = +z
+// =====================================================================
+const CAB = { W: 0.79, H: 0.56, D: 0.76 };
+function buildCabinet() {
+  const { W, H, D } = CAB;
+  const g = new THREE.Group();
+  g.name = 'cabinet';
+  const P = { leds: [] };
+  const front = D / 2 - 0.03; // body front plane; doors sit in front of it
+  const rb = (w, h, d, r, mat) => mesh(new RoundedBoxGeometry(w, h, d, 3, r), mat);
+
+  const body = new THREE.Group();
+  g.add(body);
+  const side = (x) => { const m = rb(0.014, H - 0.035, D - 0.03, 0.006, MAT.shell); m.position.set(x, (H - 0.035) / 2 + 0.014, -0.015); body.add(m); };
+  side(-W / 2 + 0.007); side(W / 2 - 0.007);
+  const back = rb(W, H - 0.035, 0.014, 0.006, MAT.shell); back.position.set(0, (H - 0.035) / 2 + 0.014, -D / 2 + 0.007); body.add(back);
+  const bottom = mesh(new THREE.BoxGeometry(W - 0.01, 0.012, D - 0.02), MAT.shell); bottom.position.set(0, 0.02, -0.01); body.add(bottom);
+  for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+    const f = mesh(new THREE.CylinderGeometry(0.022, 0.024, 0.014, 24), MAT.black);
+    f.position.set(x * (W / 2 - 0.06), 0.007, z * (D / 2 - 0.07)); body.add(f);
+  }
+  // side vents (left side)
+  for (let i = 0; i < 9; i++) {
+    const v = mesh(new THREE.BoxGeometry(0.004, 0.006, 0.16), MAT.dark, false);
+    v.position.set(-W / 2 - 0.0005, 0.12 + i * 0.016, -0.18); body.add(v);
+  }
+
+  // top cover (lifts off)
+  const cover = new THREE.Group();
+  const coverMesh = rb(W + 0.004, 0.024, D + 0.004, 0.009, MAT.shell);
+  coverMesh.position.y = H - 0.012;
+  cover.add(coverMesh);
+  g.add(cover);
+  P.cover = cover;
+
+  // ----- left door: API source bay, Ion Max style housing, divert valve, badge
+  const doorL = new THREE.Group();
+  doorL.position.set(-W / 2, 0, front);
+  const dlW = 0.385;
+  const dl = rb(dlW, H - 0.045, 0.028, 0.008, MAT.shell); dl.position.set(dlW / 2, (H - 0.045) / 2 + 0.016, 0.014); doorL.add(dl);
+  const bay = rb(0.296, 0.196, 0.012, 0.02, MAT.inset); bay.position.set(0.194, 0.33, 0.031); doorL.add(bay);
+  const housing = rb(0.12, 0.15, 0.115, 0.012, MAT.housing); housing.position.set(0.194, 0.33, 0.028 + 0.0575); doorL.add(housing);
+  const win = mesh(new THREE.PlaneGeometry(0.074, 0.084), MAT.glass, false); win.position.set(0.194, 0.335, 0.028 + 0.1155); doorL.add(win);
+  const winGlow = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.08), new THREE.MeshBasicMaterial({ color: '#7fd8ff', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+  winGlow.position.set(0.194, 0.335, 0.028 + 0.1152); doorL.add(winGlow); P.winGlow = winGlow;
+  for (const s of [-1, 1]) {
+    const lever = rb(0.03, 0.012, 0.016, 0.004, MAT.black); lever.position.set(0.194 + s * 0.042, 0.33 + 0.081, 0.028 + 0.095); doorL.add(lever);
+  }
+  const tri = new THREE.Shape(); tri.moveTo(-0.009, 0); tri.lineTo(0.009, 0); tri.lineTo(0, 0.015); tri.lineTo(-0.009, 0);
+  const hv = mesh(new THREE.ShapeGeometry(tri), MAT.yellow, false); hv.position.set(0.152, 0.27, 0.028 + 0.1157); doorL.add(hv);
+  // divert / inject valve with its two LEDs and push button
+  const valve = mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.018, 40), MAT.steel); valve.rotation.x = Math.PI / 2; valve.position.set(0.072, 0.335, 0.04); doorL.add(valve);
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 + Math.PI / 6;
+    const fit = mesh(new THREE.CylinderGeometry(0.0042, 0.0042, 0.016, 12), MAT.steelDark); fit.rotation.x = Math.PI / 2;
+    fit.position.set(0.072 + Math.cos(a) * 0.014, 0.335 + Math.sin(a) * 0.014, 0.055); doorL.add(fit);
+  }
+  for (const [dx, c] of [[-0.008, '#58e07a'], [0.008, '#ffc443']]) {
+    const led = new THREE.Mesh(new THREE.SphereGeometry(0.0028, 12, 8), new THREE.MeshStandardMaterial({ color: '#202020', emissive: new THREE.Color(c), emissiveIntensity: 1.6 }));
+    led.position.set(0.072 + dx, 0.385, 0.038); doorL.add(led);
+  }
+  const btn = mesh(new THREE.CapsuleGeometry(0.004, 0.012, 4, 12), MAT.blue); btn.rotation.z = Math.PI / 2; btn.position.set(0.072, 0.4, 0.038); doorL.add(btn);
+  const drain = tube([[0.2, 0.255, 0.07], [0.2, 0.2, 0.08], [0.21, 0.12, 0.06], [0.22, 0.06, 0.05]], 0.0035, MAT.glass); doorL.add(drain);
+  const badgeTex = canvasTex(512, 96, (c, w, h) => {
+    c.clearRect(0, 0, w, h);
+    c.fillStyle = '#5c6f86';
+    c.font = 'italic 700 58px "Noto Sans TC", "Microsoft JhengHei", sans-serif';
+    c.textBaseline = 'middle';
+    c.fillText('LCQ DECA XP', 10, h / 2 + 2);
+  });
+  const badge = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 0.0225), new THREE.MeshStandardMaterial({ map: badgeTex, transparent: true, roughness: 0.5 }));
+  badge.position.set(0.085, H - 0.062, 0.0285); doorL.add(badge);
+  g.add(doorL);
+  P.doorL = doorL;
+
+  // ----- right door: LED oval, latch, syringe pump shelf, teal accent strip
+  const doorR = new THREE.Group();
+  doorR.position.set(W / 2, 0, front);
+  const drW = 0.398;
+  const dr = rb(drW, H - 0.045, 0.028, 0.008, MAT.shell); dr.position.set(-drW / 2, (H - 0.045) / 2 + 0.016, 0.014); doorR.add(dr);
+  const ledCx = 0.125 - W / 2;
+  const oval = rb(0.25, 0.034, 0.006, 0.016, MAT.dark); oval.position.set(ledCx, 0.423, 0.029); doorR.add(oval);
+  const ledNames = ['Power', 'Vacuum', 'Comm.', 'System', 'Scan'];
+  const ledTex = canvasTex(1024, 64, (c, w, h) => {
+    c.clearRect(0, 0, w, h);
+    c.fillStyle = 'rgba(220,226,232,0.85)';
+    c.font = '500 30px "IBM Plex Mono", monospace';
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    ledNames.forEach((n, i) => c.fillText(n, ((i + 0.5) / 5) * w, h / 2));
+  });
+  const ledLab = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.0137), new THREE.MeshBasicMaterial({ map: ledTex, transparent: true, toneMapped: false }));
+  ledLab.position.set(ledCx, 0.4155, 0.0325); doorR.add(ledLab);
+  ledNames.forEach((n, i) => {
+    const m = new THREE.MeshStandardMaterial({ color: '#1a1a1a', emissive: new THREE.Color('#5cff86'), emissiveIntensity: 2.2 });
+    const led = new THREE.Mesh(new THREE.SphereGeometry(0.0034, 14, 10), m);
+    led.position.set(ledCx - 0.11 + ((i + 0.5) / 5) * 0.22, 0.4305, 0.0325); doorR.add(led);
+    P.leds.push(m);
+  });
+  const latch = mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.012, 20), MAT.black); latch.rotation.x = Math.PI / 2; latch.position.set(0.0237 - W / 2 + 0.005, 0.336, 0.034); doorR.add(latch);
+  const shelfCx = 0.18 - W / 2 + 0.005;
+  const shelf = rb(0.37, 0.15, 0.1, 0.012, MAT.shell); shelf.position.set(shelfCx, 0.152, 0.028 + 0.05); doorR.add(shelf);
+  const syr = new THREE.Group(); syr.position.set(shelfCx, 0.236, 0.075); doorR.add(syr);
+  const barrel = mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.095, 24), MAT.glass); barrel.rotation.z = Math.PI / 2; syr.add(barrel);
+  const plunger = mesh(new THREE.CylinderGeometry(0.0025, 0.0025, 0.07, 10), MAT.steel); plunger.rotation.z = Math.PI / 2; plunger.position.x = 0.075; syr.add(plunger);
+  const pusher = rb(0.022, 0.03, 0.03, 0.004, MAT.blue); pusher.position.set(0.112, 0, 0); syr.add(pusher);
+  for (const dx of [-0.03, 0.03]) { const cl = rb(0.012, 0.026, 0.026, 0.003, MAT.blue); cl.position.set(dx, -0.002, 0); syr.add(cl); }
+  const ndl = mesh(new THREE.CylinderGeometry(0.0007, 0.0007, 0.03, 6), MAT.steel); ndl.rotation.z = Math.PI / 2; ndl.position.x = -0.062; syr.add(ndl);
+  const union = mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.012, 12), MAT.steelDark); union.rotation.z = Math.PI / 2; union.position.x = -0.082; syr.add(union);
+  const runBtn = mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.006, 20), MAT.blue); runBtn.rotation.x = Math.PI / 2; runBtn.position.set(shelfCx + 0.15, 0.12, 0.131); doorR.add(runBtn);
+  // accent strip: narrow at the top, widening toward the bottom
+  const st = new THREE.Shape();
+  const top = H - 0.03, bot = 0.02;
+  st.moveTo(0, top); st.lineTo(-0.024, top);
+  st.bezierCurveTo(-0.024, 0.28, -0.03, 0.12, -0.088, bot);
+  st.lineTo(0, bot); st.lineTo(0, top);
+  const ribTex = canvasTex(64, 512, (c, w, h) => {
+    c.fillStyle = '#808080'; c.fillRect(0, 0, w, h);
+    for (let y = 0; y < h; y += 16) { c.fillStyle = '#ffffff'; c.fillRect(0, y, w, 9); }
+  });
+  ribTex.colorSpace = THREE.NoColorSpace;
+  ribTex.wrapS = ribTex.wrapT = THREE.RepeatWrapping;
+  const stripGeo = new THREE.ExtrudeGeometry(st, { depth: 0.005, bevelEnabled: true, bevelSize: 0.002, bevelThickness: 0.002, bevelSegments: 2 });
+  const stripMat = MAT.accent.clone();
+  stripMat.bumpMap = ribTex; stripMat.bumpScale = 1.2;
+  const pos = stripGeo.attributes.position, uv = stripGeo.attributes.uv;
+  for (let i = 0; i < pos.count; i++) uv.setXY(i, pos.getX(i) * 10, pos.getY(i) * 8);
+  const strip = mesh(stripGeo, stripMat); strip.position.set(-0.004, 0, 0.026); doorR.add(strip);
+  g.add(doorR);
+  P.doorR = doorR;
+
+  // ----- interior seen when the cover is off (schematic)
+  const inside = new THREE.Group();
+  const box = (w, h, d, x, y, z, m) => { const b = mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); inside.add(b); return b; };
+  box(0.27, 0.2, 0.24, 0.2, 0.14, 0.19, MAT.dark);           // embedded computer
+  box(0.25, 0.36, 0.28, 0.22, 0.2, -0.17, MAT.steelDark);    // electronics tower
+  box(0.3, 0.012, 0.26, 0.21, 0.42, -0.14, MAT.pcb);          // PCBs on top
+  box(0.22, 0.012, 0.2, 0.2, 0.36, 0.17, MAT.pcb);
+  box(0.11, 0.11, 0.13, 0.03, 0.43, -0.25, MAT.alu);          // RF coil box
+  box(0.06, 0.08, 0.05, -0.06, 0.46, 0.06, MAT.dark);         // vent valve, gauge
+  for (let i = 0; i < 2; i++) { const fan = mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.025, 32), MAT.black); fan.rotation.x = Math.PI / 2; fan.position.set(-0.25 + i * 0.13, 0.4, -D / 2 + 0.03); inside.add(fan); }
+  g.add(inside);
+  P.inside = inside;
+
+  // materials that fade when the instrument is taken apart
+  const fadeMats = new Set();
+  g.traverse((o) => { if (o.isMesh) { const ms = Array.isArray(o.material) ? o.material : [o.material]; ms.forEach((m) => fadeMats.add(m)); } });
+  const own = new Map();
+  for (const m of fadeMats) {
+    const c = m.clone();
+    c.userData.baseOpacity = m.transparent ? m.opacity : 1;
+    c.userData.baseTransparent = m.transparent;
+    own.set(m, c);
+  }
+  g.traverse((o) => { if (o.isMesh) o.material = Array.isArray(o.material) ? o.material.map((m) => own.get(m)) : own.get(o.material); });
+  P.ledMats = P.leds.map((m) => own.get(m));
+  P.fadeMats = [...own.values()];
+  P.winGlow.material = P.winGlow.material; // basic additive, controlled separately
+
+  const anchors = {
+    source: V3(-W / 2 + 0.194, 0.42, front + 0.12),
+    syringe: V3(W / 2 - 0.22, 0.26, front + 0.09),
+    leds: V3(ledCx + W / 2 - 0.004 + 0.0, 0.445, front + 0.035),
+    valve: V3(-W / 2 + 0.072, 0.36, front + 0.06),
+  };
+  anchors.leds.x = W / 2 + ledCx;
+  return { group: g, P, anchors };
+}
+function setCabinetFade(cab, a) {
+  for (const m of cab.P.fadeMats) {
+    const base = m.userData.baseOpacity;
+    const want = a < 0.999 || m.userData.baseTransparent;
+    if (m.transparent !== want) { m.transparent = want; m.needsUpdate = true; }
+    m.opacity = base * a;
+    m.depthWrite = a > 0.98 && !m.userData.baseTransparent;
+  }
+  cab.group.visible = a > 0.01;
+}
+
+// =====================================================================
+// Ion path assembly, millimetres. Ion axis = +x, up = +y, cut face toward the viewer (+z).
+// =====================================================================
+const IP = {
+  capY: 1.5, needle: V3(-12, 10, 0), coneTip: V3(-5.5, 1.5, 0),
+  capIn: -3.2, capOut: 107, tubeLens: [108, 116], skimTip: 119.5,
+  quad: [136, 187], wall2: [190, 194], octa: [196, 247], trapX: 266,
+  lensIn: -13.0, lensOut: 13.0,
+  dynode: V3(298, -19.5, 0), multMouth: V3(298, 10, 0), multTop: V3(298, 42, 0),
+  mf: { x0: 100, x1: 330, y0: -46, y1: 55, zb: -42 },
+};
+function buildAssembly() {
+  const A = new THREE.Group();
+  A.name = 'assembly';
+  const P = {};
+  const C = IP.capY;
+
+  // ---------- atmospheric side: spray chamber, probe, cones
+  const api = new THREE.Group(); A.add(api); P.api = api;
+  api.add(axisX(latheSolid(ring2(46, 48.5, -58, 0), { mat: MAT.chamber, cap: MAT.steelCut })));
+  api.add(axisX(latheSolid(ring2(12.6, 48.5, 0, 4.5), { mat: MAT.chamber, cap: MAT.steelCut })));
+  const boss = latheSolid(ring2(9.6, 13, 44, 50), { mat: MAT.steelDark }); boss.position.x = -12; api.add(boss);
+  const drainT = latheSolid(ring2(3.2, 4.6, -66, -47), { mat: MAT.steelDark }); drainT.position.x = -22; api.add(drainT);
+  const cones = new THREE.Group(); cones.position.y = C; api.add(cones);
+  cones.add(axisX(latheSolid([[[2.0, -5.4], [2.7, -6.0]], [[2.7, -6.0], [13.2, 3.8]], [[13.2, 3.8], [12.4, 4.5]], [[12.4, 4.5], [2.0, -5.4]]], { mat: MAT.steel })));
+  cones.add(axisX(latheSolid([[[0.85, -3.1], [1.45, -3.6]], [[1.45, -3.6], [10.6, 3.8]], [[10.6, 3.8], [9.8, 4.5]], [[9.8, 4.5], [0.85, -3.1]]], { mat: MAT.steelDark })));
+  P.cones = cones;
+
+  // probe (vertical, sprays downward across the inlet)
+  const probe = new THREE.Group(); probe.position.set(IP.needle.x, 0, 0); api.add(probe); P.probe = probe;
+  probe.add(latheSolid(cyl2(9, 28, 96), { cut: false, mat: MAT.cream }));
+  probe.add(latheSolid([[[0, 18.5], [2.6, 18.5]], [[2.6, 18.5], [9, 28]], [[9, 28], [0, 28]]], { cut: false, mat: MAT.steel }));
+  probe.add(latheSolid(cyl2(0.26, IP.needle.y, 19), { cut: false, mat: MAT.steel, seg: 16 }));
+  probe.add(latheSolid(cyl2(3.6, 96, 105), { cut: false, mat: MAT.peek }));
+  for (const [y, m] of [[64, MAT.green], [76, MAT.blue]]) {
+    const f = mesh(new THREE.CylinderGeometry(2.2, 2.2, 9, 16), m); f.rotation.x = Math.PI / 2; f.position.set(0, y, -12); probe.add(f);
+  }
+  probe.add(tube([[0, 105, 0], [0, 118, 0], [6, 132, -6], [22, 140, -18]], 0.9, MAT.peek));
+  probe.add(tube([[4, 92, -6], [10, 104, -16], [24, 112, -30], [44, 116, -40]], 2.6, MAT.black));
+  // Taylor cone / jet at the needle tip (animated in sim)
+  const liquid = new THREE.MeshPhysicalMaterial({ color: '#cfe9ff', roughness: 0.04, transparent: true, opacity: 0.7, clearcoat: 1, emissive: new THREE.Color('#2f8fff'), emissiveIntensity: 0.55 });
+  const taylor = new THREE.Group(); taylor.position.set(0, IP.needle.y, 0); probe.add(taylor); P.taylor = taylor;
+  const tc = new THREE.Mesh(new THREE.ConeGeometry(0.3, 1.1, 32, 1, true), liquid); tc.rotation.x = Math.PI; tc.position.y = -0.55; taylor.add(tc);
+  const jet = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.05, 1.6, 10), liquid); jet.position.y = -1.85; taylor.add(jet);
+
+  // ---------- ion transfer capillary, heater, extension mount
+  const capG = new THREE.Group(); capG.position.y = C; A.add(capG); P.capillary = capG;
+  capG.add(axisX(latheSolid(ring2(0.225, 0.8, IP.capIn, IP.capOut), { mat: MAT.steel, seg: 40 })));
+  const heater = axisX(latheSolid(ring2(1.6, 12, 12, 72), { mat: MAT.alu, cap: MAT.aluCut })); capG.add(heater); P.heater = heater;
+  for (const s of [-1, 1]) {
+    const cart = axisX(latheSolid(cyl2(2.3, 16, 68), { mat: MAT.heater, cap: MAT.heater, seg: 24 }));
+    cart.position.y = s * 6.8; capG.add(cart);
+  }
+  capG.add(axisX(latheSolid(ring2(3.4, 6.6, 72, 100), { mat: MAT.steelDark })));
+
+  // ---------- vacuum manifold (back half), baffles, top cover plate
+  const mf = new THREE.Group(); A.add(mf); P.manifold = mf;
+  const { x0, x1, y0, y1, zb } = IP.mf;
+  const mfMats = [MAT.alu, MAT.alu, MAT.alu, MAT.alu, MAT.aluCut, MAT.alu];
+  const slab = (ax, bx, ay, by, az, bz) => { const m = mesh(new THREE.BoxGeometry(bx - ax, by - ay, bz - az), mfMats); m.position.set((ax + bx) / 2, (ay + by) / 2, (az + bz) / 2); mf.add(m); return m; };
+  mf.add(plateX(x0, x0 + 6, y0, y1, zb, 6.8, C, MAT.alu));        // front wall, capillary passes
+  slab(x1 - 6, x1, y0, y1, zb, 0);                                  // back wall
+  slab(x0, x1, y0, y0 + 6, zb, 0);                                  // bottom
+  slab(x0, x1, y0, y1, zb, zb + 6);                                 // rear (z) wall
+  const plate = slab(x0 - 6, x1 + 6, y1, y1 + 6, zb - 4, 0);        // removable top cover plate
+  P.topPlate = plate;
+  for (const hx of [150, 285]) {
+    const h = tube([[hx - 10, y1 + 6, -16], [hx - 8, y1 + 16, -16], [hx + 8, y1 + 16, -16], [hx + 10, y1 + 6, -16]], 2.2, MAT.steelDark, 24); mf.add(h);
+  }
+  mf.add(plateX(128, 132, y0 + 6, y1, zb + 6, 9.2, 0, MAT.alu));    // baffle 1 (skimmer)
+  mf.add(plateX(190, 194, y0 + 6, y1, zb + 6, 7.0, 0, MAT.alu));    // baffle 2 (interoctapole lens)
+
+  // ---------- capillary-skimmer region
+  const tl = axisX(latheSolid(ring2(2.4, 7, IP.tubeLens[0], IP.tubeLens[1]), { mat: MAT.steel })); tl.position.y = C; A.add(tl); P.tubeLens = tl;
+  const sk = new THREE.Group(); A.add(sk); P.skimmer = sk;
+  sk.add(axisX(latheSolid([[[0.35, 119.8], [0.55, 119.4]], [[0.55, 119.4], [8.6, 127]], [[8.6, 127], [7.9, 127]], [[7.9, 127], [0.35, 119.8]]], { mat: MAT.steel })));
+  sk.add(axisX(latheSolid(ring2(7.9, 15, 127, 128.6), { mat: MAT.steel })));
+
+  // ---------- square quadrupole (RF only), interoctapole lens, octapole
+  const quad = new THREE.Group(); A.add(quad); P.quad = quad;
+  const qL = IP.quad[1] - IP.quad[0], qx = (IP.quad[0] + IP.quad[1]) / 2, qs = 3.0, qc = 2.4 + qs / 2;
+  [[0, qc, 0, 'A'], [0, -qc, 0, 'A'], [0, 0, -qc, 'B'], [0, 0, qc, 'B']].forEach(([, y, z, ph]) => {
+    const front = z > 0.5;
+    const m = mesh(new THREE.BoxGeometry(qL, qs, qs), front ? (ph === 'A' ? MAT.ghostA : MAT.ghostB) : ph === 'A' ? MAT.rodA : MAT.rodB, !front);
+    m.position.set(qx, y, z); quad.add(m);
+  });
+  for (const x of [IP.quad[0] + 1.5, IP.quad[1] - 1.5]) quad.add(axisX(latheSolid(ring2(5.9, 9.5, x - 1.5, x + 1.5), { mat: MAT.ceramic, cap: MAT.ceramicCut })));
+  const inter = axisX(latheSolid(ring2(0.8, 6.8, 191.4, 192.6), { mat: MAT.steel })); A.add(inter); P.inter = inter;
+  const octa = new THREE.Group(); A.add(octa); P.octa = octa;
+  const oL = IP.octa[1] - IP.octa[0], ox = (IP.octa[0] + IP.octa[1]) / 2;
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2;
+    const y = Math.cos(a) * 3.6, z = Math.sin(a) * 3.6, front = z > 0.5, ph = k % 2 ? 'B' : 'A';
+    const m = mesh(new THREE.CylinderGeometry(0.8, 0.8, oL, 20), front ? (ph === 'A' ? MAT.ghostA : MAT.ghostB) : ph === 'A' ? MAT.rodA : MAT.rodB, !front);
+    m.rotation.z = -Math.PI / 2; m.position.set(ox, y, z); octa.add(m);
+  }
+  for (const x of [IP.octa[0] + 1.5, IP.octa[1] - 1.5]) octa.add(axisX(latheSolid(ring2(5.0, 8.5, x - 1.5, x + 1.5), { mat: MAT.ceramic, cap: MAT.ceramicCut })));
+
+  // ---------- the ion trap: entrance endcap, ring, exit endcap (hyperbolic), quartz spacers, lenses
+  const trap = new THREE.Group(); trap.position.x = IP.trapX; A.add(trap); P.trap = trap;
+  const { r0, z0 } = PHYS;
+  const ringInner = []; for (let i = 0; i <= 40; i++) { const y = 6.86 - (i / 40) * 13.72; ringInner.push([Math.sqrt(r0 * r0 + 2 * y * y), y]); }
+  const ringFaces = [[[ringInner[40][0], -6.86], [19, -6.86]], [[19, -6.86], [19, 6.86]], [[19, 6.86], [ringInner[0][0], 6.86]], ringInner];
+  const ring = axisX(latheSolid(ringFaces, { mat: MAT.ring, seg: 96 })); trap.add(ring);
+  const hyp = []; for (let i = 0; i <= 40; i++) { const r = 0.75 + (i / 40) * (12 - 0.75); hyp.push([r, Math.sqrt(z0 * z0 + (r * r) / 2)]); }
+  const yFlat = hyp[40][1];
+  const capFaces = [hyp, [[12, yFlat], [19, yFlat]], [[19, yFlat], [19, 14.6]], [[19, 14.6], [7.5, 14.6]], [[7.5, 14.6], [7.5, 12.6]], [[7.5, 12.6], [0.75, 12.6]], [[0.75, 12.6], [0.75, hyp[0][1]]]];
+  const mirror = (faces) => faces.slice().reverse().map((f) => f.slice().reverse().map(([r, y]) => [r, -y]));
+  const capOut = new THREE.Group(); capOut.add(axisX(latheSolid(capFaces, { mat: MAT.capOut, seg: 96 }))); trap.add(capOut);
+  const capIn = new THREE.Group(); capIn.add(axisX(latheSolid(mirror(capFaces), { mat: MAT.capIn, seg: 96 }))); trap.add(capIn);
+  const spOut = axisX(latheSolid(ring2(14.6, 17.6, 6.9, yFlat), { mat: MAT.quartz, cap: MAT.quartz, shadow: false })); trap.add(spOut);
+  const spIn = axisX(latheSolid(ring2(14.6, 17.6, -yFlat, -6.9), { mat: MAT.quartz, cap: MAT.quartz, shadow: false })); trap.add(spIn);
+  const lensOut = new THREE.Group(); trap.add(lensOut);
+  lensOut.add(axisX(latheSolid(ring2(0.75, 6.4, 12.65, 13.5), { mat: MAT.steel })));
+  lensOut.add(axisX(latheSolid(ring2(6.6, 7.4, 12.6, 14.6), { mat: MAT.steelDark })));
+  const lensIn = new THREE.Group(); trap.add(lensIn);
+  lensIn.add(axisX(latheSolid(ring2(0.75, 6.4, -13.5, -12.65), { mat: MAT.steel })));
+  lensIn.add(axisX(latheSolid(ring2(6.6, 7.4, -14.6, -12.6), { mat: MAT.steelDark })));
+  const he = new THREE.Group(); capOut.add(he);
+  he.add(latheSolid(ring2(0.6, 1.5, 18.5, 29), { mat: MAT.steel, seg: 24 })); he.position.set(10.5, 0, -2);
+  he.add(tube([[0, 29, 0], [0, 40, 0], [-6, 48, -4], [-14, 55, -8]], 0.45, MAT.polyimide, 32));
+  for (const s of [-1, 1]) {
+    const post = mesh(new THREE.CylinderGeometry(1.5, 1.5, 34, 16), MAT.ceramic); post.rotation.z = Math.PI / 2; post.position.set(0, s * 16.5, -12.5); trap.add(post);
+  }
+  P.ring = ring; P.capIn = capIn; P.capOut = capOut; P.spIn = spIn; P.spOut = spOut; P.lensIn = lensIn; P.lensOut = lensOut; P.he = he;
+
+  // ---------- detection: conversion dynode below the axis, electron multiplier above it
+  const det = new THREE.Group(); A.add(det); P.detector = det;
+  const dyn = new THREE.Group(); dyn.position.set(IP.dynode.x, 0, 0); det.add(dyn);
+  const cupTop = []; for (let i = 0; i <= 24; i++) { const r = 6.2 * (1 - i / 24); cupTop.push([r, -17.8 - 2.2 * (1 - (r / 6.2) ** 2)]); }
+  dyn.add(latheSolid([[[0, -23], [6.8, -23]], [[6.8, -23], [6.8, -17.8]], [[6.8, -17.8], [6.2, -17.8]], cupTop], { mat: MAT.steel }));
+  const rod = mesh(new THREE.CylinderGeometry(1.3, 1.3, 36, 16), MAT.steelDark); rod.rotation.x = Math.PI / 2; rod.position.set(0, -22, -18); dyn.add(rod);
+  dyn.add(latheSolid(ring2(3.2, 4.2, -26, -24.4), { mat: MAT.steelDark }));
+  const shieldDisk = latheSolid(ring2(0, 12, -29, -28), { mat: MAT.steelDark }); dyn.add(shieldDisk);
+  const mult = new THREE.Group(); mult.position.set(IP.multMouth.x, 0, 0); det.add(mult); P.mult = mult;
+  const yb = IP.multMouth.y, yt = IP.multTop.y;
+  const rIn = (y) => 1.0 + 5.0 * Math.exp(-(y - yb) / 6.5), rOut = (y) => rIn(y) + 0.9;
+  const outer = [], inner = [];
+  for (let i = 0; i <= 30; i++) { const y = yb + (i / 30) * (yt - yb); outer.push([rOut(y), y]); }
+  for (let i = 0; i <= 30; i++) { const y = yt - (i / 30) * (yt - yb); inner.push([rIn(y), y]); }
+  mult.add(latheSolid([outer, [[rOut(yt), yt], [rIn(yt), yt]], inner, [[rIn(yb), yb], [rOut(yb), yb]]], { mat: MAT.leadGlass, cap: MAT.steelCut }));
+  mult.add(latheSolid(ring2(6.3, 7.6, yb - 1.4, yb + 0.6), { mat: MAT.steel }));
+  mult.add(latheSolid(cyl2(2.4, yt + 1, yt + 4.5), { mat: MAT.steel }));
+  mult.add(latheSolid(cyl2(0.9, yt + 4.5, IP.mf.y1), { mat: MAT.steelDark, seg: 16 }));
+  mult.add(latheSolid(ring2(10, 10.6, yb - 2, yt + 3), { mat: MAT.steelDark, cap: MAT.steelCut }));
+  // glowing cascade band inside the funnel
+  const glowPts = []; for (let i = 0; i <= 30; i++) { const y = yb + (i / 30) * (yt - yb); glowPts.push(new THREE.Vector2(rIn(y) * 0.92, y)); }
+  const glowMat = new THREE.ShaderMaterial({
+    uniforms: { uP: { value: new Float32Array(8).fill(-10) }, uT: { value: 0 }, uC: { value: new THREE.Color('#9fd8ff') } },
+    vertexShader: 'varying float vY; void main(){ vY = position.y; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+    fragmentShader: `uniform float uP[8]; uniform float uT; uniform vec3 uC; varying float vY;
+      void main(){ float s = 0.0; float yn = (vY - ${yb.toFixed(1)}) / ${(yt - yb).toFixed(1)};
+        for (int i = 0; i < 8; i++){ float age = uT - uP[i]; if (age < 0.0 || age > 0.6) continue; float front = age / 0.45;
+          s += exp(-pow((yn - front) * 9.0, 2.0)) * (0.4 + front) * (1.0 - age / 0.6); }
+        gl_FragColor = vec4(uC * s * 1.5, s); }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+  const glow = new THREE.Mesh(new THREE.LatheGeometry(glowPts, 48, Math.PI / 2, Math.PI), glowMat); glow.renderOrder = 6; mult.add(glow); P.multGlow = glowMat;
+
+  // ---------- turbomolecular pump below the analyzer region, ducts and forepump line
+  const turbo = new THREE.Group(); turbo.position.set(252, 0, -2); A.add(turbo); P.turbo = turbo;
+  turbo.add(latheSolid(ring2(43, 46.5, -168, -52), { mat: MAT.steel }));
+  turbo.add(latheSolid(ring2(36, 53, -52, y0), { mat: MAT.steelDark }));
+  turbo.add(latheSolid(cyl2(46.5, -182, -168), { mat: MAT.dark, cap: MAT.dark }));
+  const rotorGeos = [];
+  for (let k = 0; k < 9; k++) {
+    const yk = -64 - k * 11.5;
+    const hub = new THREE.CylinderGeometry(11, 11, 3.2, 32); hub.translate(0, yk, 0); rotorGeos.push(hub);
+    for (let b = 0; b < 22; b++) {
+      const bl = new THREE.BoxGeometry(30, 0.9, 6);
+      bl.rotateX(0.5); bl.translate(25, 0, 0); bl.rotateY((b / 22) * Math.PI * 2 + k * 0.13); bl.translate(0, yk, 0);
+      rotorGeos.push(bl);
+    }
+  }
+  const shaft = new THREE.CylinderGeometry(6, 6, 104, 24); shaft.translate(0, -114, 0); rotorGeos.push(shaft);
+  const rotor = mesh(mergeGeometries(rotorGeos.map((gg) => gg.toNonIndexed())), MAT.steel); turbo.add(rotor); P.rotor = rotor;
+  A.add(tube([[160, y0, -16], [160, y0 - 34, -16], [176, y0 - 52, -16], [204, y0 - 54, -16]], 9, MAT.alu, 48));
+  A.add(tube([[117, y0, -16], [117, y0 - 40, -16], [108, y0 - 80, -14], [90, y0 - 112, -10]], 7, MAT.rubber, 48));
+
+  // anchors for labels (assembly coordinates)
+  const anchors = {
+    probe: V3(-12, 84, 0), needle: V3(-12, 9.6, 0), spray: V3(-14, -14, 0), chamber: V3(-40, 44, -12),
+    cone: V3(-5.5, C, 0), capillary: V3(84, C + 1, 0), heater: V3(40, C + 12, 0),
+    tubeLens: V3(112, C + 7, 0), skimmer: V3(124, 8.5, 0), quad: V3(160, 4.4, 0), inter: V3(192, 6.8, 0), octa: V3(222, 4.4, 0),
+    trap: V3(266, 19, 0), ring: V3(266, 12, 0), capIn: V3(253.5, 15, 0), capOut: V3(278.5, 15, 0), spacer: V3(275, 17.5, 0),
+    he: V3(276.5, 29, -2), lensIn: V3(253, 6, 0), cavity: V3(266, 0, 0),
+    dynode: V3(298, -20, 0), mult: V3(298, 26, 0), turbo: V3(252, -100, 0), fore: V3(104, -142, -10),
+    reg0: V3(-30, -30, 0), reg1: V3(117, 32, -10), reg2: V3(161, 32, -10), reg3: V3(240, 40, -10),
+  };
+  return { group: A, P, anchors };
+}
+
+
+// ---- sim.js ----
+
+// =====================================================================
+// Simulations (assembly coordinates, mm; visual time, seconds)
+// The real instrument runs ~10^4 to 10^5 times faster; ratios (q, beta, order of ejection) are kept.
+// =====================================================================
+const _c = new THREE.Color();
+const _c2 = new THREE.Color();
+const WHITE = new THREE.Color('#ffffff');
+const COL = {
+  ion: new THREE.Color('#7fe0ff'), neutral: new THREE.Color('#8b96a3'), gas: new THREE.Color('#9aa6b4'),
+  he: new THREE.Color('#a9d4ff'), electron: new THREE.Color('#cfe8ff'), sheath: new THREE.Color('#b8dcff'),
+  drop: new THREE.Color('#d5ebff'), dropHot: new THREE.Color('#79c8ff'),
+};
+
+// ---------- current sample ----------
+const sampleState = { key: 'cal', list: SAMPLES.cal, cols: [] };
+function setSample(key) {
+  sampleState.key = key;
+  sampleState.list = SAMPLES[key];
+  sampleState.cols = sampleState.list.map((s) => colorForMz(s.mz));
+}
+setSample('cal');
+function pickSpecies(r) {
+  const L = sampleState.list;
+  let tot = 0; for (const s of L) tot += s.ab;
+  let u = r() * tot;
+  for (let i = 0; i < L.length; i++) { u -= L[i].ab; if (u <= 0) return i; }
+  return L.length - 1;
+}
+
+// ---------- ESI: droplets shrink, split, release ions ----------
+class EsiSim {
+  constructor(parent) {
+    this.dropMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 16, 12),
+      new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0.08, transparent: true, opacity: 0.62, clearcoat: 1, emissive: new THREE.Color('#1d5f9a'), emissiveIntensity: 0.5 }), 320);
+    this.dropMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    this.dropMesh.frustumCulled = false;
+    this.dropMesh.count = 0;
+    parent.add(this.dropMesh);
+    this.pts = new PointCloud(1600, parent);
+    this.reset(1);
+  }
+  reset(seed) {
+    this.r = makeRng(seed);
+    this.drops = []; this.kids = []; this.sheath = []; this.acc = 0; this.t = 0;
+    for (let i = 0; i < 140; i++) this.sheath.push(this.newSheath(true));
+  }
+  newSheath(initial) {
+    const r = this.r, a = r() * Math.PI * 2, rad = 2.4 + r() * 3.5;
+    return { x: IP.needle.x + Math.cos(a) * rad * 0.5, y: initial ? 18 - r() * 40 : 18 + r() * 2, z: Math.sin(a) * rad * 0.5, a, rad, v: 55 + r() * 30 };
+  }
+  step(dt, ctl, onIon) {
+    const r = this.r;
+    this.t += dt;
+    if (ctl.spray > 0) {
+      this.acc += dt * 24 * ctl.spray;
+      while (this.acc >= 1) {
+        this.acc -= 1;
+        if (this.drops.length >= 300) break;
+        const rad = 0.26 + r() * 0.14;
+        this.drops.push({ x: IP.needle.x + gauss(r) * 0.12, y: IP.needle.y - 2.6, z: gauss(r) * 0.12,
+          vx: gauss(r) * 6, vy: -(20 + r() * 9), vz: gauss(r) * 6, rad, rad0: rad, q: 1, fis: 0, age: 0 });
+      }
+    }
+    // droplets
+    for (let i = this.drops.length - 1; i >= 0; i--) {
+      const d = this.drops[i];
+      d.age += dt;
+      d.x += d.vx * dt; d.y += d.vy * dt; d.z += d.vz * dt;
+      d.vx *= 1 - 0.4 * dt; d.vz *= 1 - 0.4 * dt;
+      d.rad = Math.max(0.06, d.rad - dt * 0.15 * (0.5 + 0.5 * d.rad / d.rad0));
+      const density = d.q / (d.rad * d.rad);
+      if (density > 17 && d.fis < 3) {
+        d.fis++;
+        const n = 3 + Math.floor(r() * 3);
+        for (let k = 0; k < n; k++) {
+          const dir = V3(gauss(r), gauss(r) * 0.6 - 0.2, gauss(r)).normalize();
+          this.kids.push({ x: d.x, y: d.y, z: d.z, vx: d.vx + dir.x * 14 + 4, vy: d.vy * 0.6 + dir.y * 10, vz: d.vz + dir.z * 12,
+            life: 0, max: 0.35 + r() * 0.4, sp: pickSpecies(r) });
+        }
+        d.q *= 0.82; d.rad *= 0.97;
+      }
+      if (d.y < -44 || d.age > 4) this.drops.splice(i, 1);
+    }
+    // offspring droplets -> ion evaporation
+    for (let i = this.kids.length - 1; i >= 0; i--) {
+      const k = this.kids[i];
+      k.life += dt;
+      k.x += k.vx * dt; k.y += k.vy * dt; k.z += k.vz * dt;
+      k.vx *= 1 - 1.2 * dt; k.vy *= 1 - 1.2 * dt; k.vz *= 1 - 1.2 * dt;
+      if (k.life >= k.max) {
+        if (onIon && r() < 0.5) onIon(k.x, k.y, k.z, k.sp);
+        this.kids.splice(i, 1);
+      }
+    }
+    // sheath gas streaks around the needle
+    for (const s of this.sheath) {
+      s.y -= s.v * dt * (ctl.spray > 0 ? 1 : 0.3);
+      s.rad += dt * 4;
+      s.x = IP.needle.x + Math.cos(s.a) * s.rad; s.z = Math.sin(s.a) * s.rad * 0.7;
+      if (s.y < -24) Object.assign(s, this.newSheath(false));
+    }
+  }
+  draw(vis) {
+    const m = this.dropMesh, mat4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3();
+    let n = 0;
+    if (vis > 0.01) {
+      for (const d of this.drops) {
+        if (n >= 320) break;
+        const fade = sstep(-44, -34, d.y) * vis;
+        if (fade <= 0.02) continue;
+        sc.setScalar(d.rad * fade); p.set(d.x, d.y, d.z + 0.4);
+        mat4.compose(p, q, sc); m.setMatrixAt(n, mat4);
+        const dens = clamp((d.q / (d.rad * d.rad) - 6) / 11, 0, 1);
+        m.setColorAt(n, _c.copy(COL.drop).lerp(COL.dropHot, dens));
+        n++;
+      }
+    }
+    m.count = n;
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+    const P = this.pts;
+    P.begin();
+    if (vis > 0.01) {
+      for (const k of this.kids) P.add(k.x, k.y, k.z + 0.4, _c.copy(COL.dropHot).lerp(WHITE, 0.4), 0.55, 0.9 * vis * (1 - k.life / k.max * 0.5));
+      for (const s of this.sheath) P.add(s.x, s.y, s.z, COL.sheath, 0.5, 0.16 * vis * sstep(-24, -6, s.y) * (1 - sstep(10, 18, s.y)));
+    }
+    P.end();
+  }
+}
+
+// ---------- transport: cone -> capillary -> skimmer -> quadrupole -> octapole -> trap ----------
+const TRANSPORT_SPEED = (x) => (x < -3.2 ? 22 : x < 107 ? 95 : x < 136 ? 42 : x < 187 ? 36 : x < 196 ? 30 : x < 247 ? 36 : 24);
+class TransportSim {
+  constructor(parent) {
+    this.pts = new PointCloud(1400, parent);
+    this.reset(2);
+  }
+  reset(seed) { this.r = makeRng(seed); this.ions = []; this.neutrals = []; this.free = []; this.accN = 0; this.feedAcc = 0; }
+  // ion released by ESI, drifts to the inlet
+  addFree(x, y, z, sp) { if (this.free.length < 260) this.free.push({ x, y, z, vx: 0, vy: 0, vz: 0, sp, age: 0 }); }
+  // ion placed directly on the path (used when ESI is off screen)
+  addPath(x, sp) {
+    const r = this.r;
+    this.ions.push({ x, sp, ph: r() * 6.283, ph2: r() * 6.283, amp: 0.4 + r() * 0.6, wob: 1.6 + r() * 0.8, alpha: 1, blocked: 0, off: gauss(r) * 0.12 });
+  }
+  centerY(x) { return x < 107 ? IP.capY : x < 119.5 ? lerp(IP.capY, 0, smooth((x - 107) / 12.5)) : 0; }
+  step(dt, ctl, toTrap) {
+    const r = this.r;
+    // free ions pulled by the field toward the cone opening
+    for (let i = this.free.length - 1; i >= 0; i--) {
+      const f = this.free[i];
+      f.age += dt;
+      const dx = IP.coneTip.x - f.x, dy = IP.coneTip.y - f.y, dz = -f.z;
+      const dist = Math.hypot(dx, dy, dz) + 1e-6;
+      const acc = 1400 / (dist + 2.5);
+      f.vx += (dx / dist) * acc * dt; f.vy += (dy / dist) * acc * dt; f.vz += (dz / dist) * acc * dt;
+      f.vx *= 1 - 3.2 * dt; f.vy *= 1 - 3.2 * dt; f.vz *= 1 - 3.2 * dt;
+      f.x += f.vx * dt; f.y += f.vy * dt; f.z += f.vz * dt;
+      if (dist < 1.6) { this.free.splice(i, 1); this.addPath(-5, f.sp); }
+      else if (f.age > 4) this.free.splice(i, 1);
+    }
+    // feed ions directly into the path when the source is not simulated
+    if (ctl.feed > 0) {
+      this.feedAcc += dt * ctl.feed;
+      while (this.feedAcc >= 1) { this.feedAcc -= 1; this.addPath(ctl.feedFrom ?? -5, pickSpecies(r)); }
+    }
+    for (let i = this.ions.length - 1; i >= 0; i--) {
+      const o = this.ions[i];
+      if (o.blocked > 0) {
+        o.blocked += dt; o.alpha = 1 - o.blocked / 0.6;
+        o.x -= dt * 6;
+        if (o.alpha <= 0) this.ions.splice(i, 1);
+        continue;
+      }
+      const nx = o.x + TRANSPORT_SPEED(o.x) * dt * (ctl.speed ?? 1);
+      if (!ctl.gateOpen && o.x < 189.5 && nx >= 189.5) { o.blocked = 0.0001; continue; }
+      o.x = nx;
+      if (o.x >= 252) {
+        this.ions.splice(i, 1);
+        if (toTrap) toTrap(o.sp);
+      }
+    }
+    // neutral gas and clusters leaving the capillary: straight on, hit the offset skimmer
+    if (ctl.neutrals > 0) {
+      this.accN += dt * 30 * ctl.neutrals;
+      while (this.accN >= 1) { this.accN -= 1; this.neutrals.push({ x: 107, y: IP.capY + gauss(r) * 0.15, z: gauss(r) * 0.15, vx: 70 + r() * 30, vy: gauss(r) * 2, vz: gauss(r) * 2, hit: 0, life: 0 }); }
+    }
+    for (let i = this.neutrals.length - 1; i >= 0; i--) {
+      const n = this.neutrals[i];
+      n.life += dt;
+      n.x += n.vx * dt; n.y += n.vy * dt; n.z += n.vz * dt;
+      const rr = Math.hypot(n.y, n.z);
+      if (!n.hit && n.x > 119.4 && rr > 0.4 && rr < 0.55 + (n.x - 119.4) * 1.06) {
+        n.hit = 1; n.vx = -12 - r() * 10; n.vy = -14 - r() * 18; n.vz = gauss(r) * 10;
+      }
+      if (n.life > 1.6 || n.x > 135) this.neutrals.splice(i, 1);
+    }
+  }
+  pos(o, t) {
+    let y = this.centerY(o.x), z = 0;
+    const inQ = o.x > 136 && o.x < 187, inO = o.x > 196 && o.x < 247;
+    if (inQ || inO) {
+      const damp = inQ ? 1 - 0.6 * (o.x - 136) / 51 : 0.5 - 0.25 * (o.x - 196) / 51;
+      const w = o.wob * Math.PI * 2;
+      y += Math.sin(w * t + o.ph) * o.amp * damp * (1 + 0.25 * Math.sin(17 * t + o.ph2));
+      z += Math.cos(w * 0.83 * t + o.ph2) * o.amp * damp;
+    } else if (o.x < 107) {
+      y += o.off; z += o.off * 0.6;
+    }
+    return [o.x, y, z + (o.x < 107 && o.x > -3 ? 0.35 : 0)];
+  }
+  draw(vis, t) {
+    const P = this.pts;
+    P.begin();
+    if (vis > 0.01) {
+      const cols = sampleState.cols;
+      for (const f of this.free) P.add(f.x, f.y, f.z + 0.4, cols[f.sp] || COL.ion, 0.75, vis);
+      for (const o of this.ions) { const [x, y, z] = this.pos(o, t); P.add(x, y, z, cols[o.sp] || COL.ion, 0.75, vis * o.alpha); }
+      for (const n of this.neutrals) P.add(n.x, n.y, n.z + 0.3, COL.neutral, 0.55, vis * 0.85 * (1 - n.life / 1.6));
+    }
+    P.end();
+  }
+}
+
+// ---------- background gas: shows how empty each region is ----------
+class GasSim {
+  constructor(parent) {
+    this.pts = new PointCloud(800, parent);
+    const r = makeRng(77);
+    this.p = [];
+    const box = (n, x0, x1, y0, y1, zr, kind) => { for (let i = 0; i < n; i++) this.p.push({ x: lerp(x0, x1, r()), y: lerp(y0, y1, r()), z: -r() * zr, kind, ph: r() * 10, b: [x0, x1, y0, y1, zr] }); };
+    box(330, -54, -4, -40, 40, 40, 0);   // 760 Torr
+    box(46, 108, 126, -36, 50, 34, 1);   // ~1 Torr
+    box(7, 134, 188, -36, 50, 34, 1);    // ~1e-3 Torr
+    box(2, 196, 322, -36, 50, 34, 1);    // ~2e-5 Torr
+    for (let i = 0; i < 26; i++) { const a = r() * 6.283, rr = Math.sqrt(r()) * 7.5; this.p.push({ x: IP.trapX + (r() - 0.5) * 12, y: Math.cos(a) * rr, z: -Math.abs(Math.sin(a) * rr), kind: 2, ph: r() * 10, b: null }); }
+  }
+  draw(vis, he, t) {
+    const P = this.pts;
+    P.begin();
+    if (vis > 0.01 || he > 0.01) {
+      for (const g of this.p) {
+        const k = g.kind;
+        const a = k === 2 ? he : vis;
+        if (a <= 0.01) continue;
+        const j = k === 2 ? 0.8 : 2.2;
+        const x = g.x + Math.sin(t * 1.3 + g.ph) * j, y = g.y + Math.cos(t * 1.1 + g.ph * 1.7) * j, z = g.z + Math.sin(t * 0.9 + g.ph * 2.3) * j * 0.5;
+        P.add(x, y, Math.min(-0.3, z), k === 2 ? COL.he : COL.gas, k === 2 ? 0.9 : 1.1, a * (k === 2 ? 0.75 : 0.42));
+      }
+    }
+    P.end();
+  }
+}
+
+// ---------- the trap: envelope model of the Mathieu motion + resonance ejection ----------
+const TRAP = {
+  fV: 7,                // visual RF frequency (Hz); the real one is 760 kHz
+  gammaHe: 0.9,         // helium damping of the oscillation amplitude (1/s)
+  wRes: 0.035,          // relative width of the resonance
+  gain: 9.5,            // amplitude growth at exact resonance (mm/s)
+  zEject: 7.6,          // |z| at which the ion leaves through the endcap hole (z0 = 7.85 mm)
+};
+const OMEGA_V = 2 * Math.PI * TRAP.fV;
+class TrapSim {
+  constructor(parent) {
+    this.pts = new PointCloud(900, parent, false);
+    this.lines = new LineCloud(9000, parent, false);
+    this.det = new PointCloud(700, parent);
+    this.reset(3);
+  }
+  reset(seed) {
+    this.r = makeRng(seed);
+    this.ions = []; this.flights = []; this.sec = []; this.cas = [];
+    this.t = 0; this.V = 500; this.ac = 0; this.events = []; this.pulses = [];
+    this.excite = null; // {sp, q} resonance excitation for CID
+    this.tracer = [];   // per species: recent axial positions for the oscilloscope
+  }
+  // put a cooled cloud in the trap at once
+  fill(perSpecies = 26, weights = null) {
+    const L = sampleState.list;
+    L.forEach((s, i) => {
+      const n = Math.round(perSpecies * (weights ? weights[i] : s.ab));
+      for (let k = 0; k < n; k++) this.addIon(i, false);
+    });
+  }
+  addIon(sp, injected = true, mzOverride = null) {
+    const r = this.r;
+    const ion = {
+      sp, mz: mzOverride ?? sampleState.list[sp].mz, ph: r() * 6.283,
+      A: injected ? 7.2 : 1.3 + r() * 0.6, Ath: 1.2 + r() * 0.7, th: injected ? Math.PI : r() * 6.283,
+      Ar1: injected ? 0.6 : 0.35 + r() * 0.35, Ar2: 0.35 + r() * 0.35, thr1: r() * 6.283, thr2: r() * 6.283,
+      x: 0, y: 0, z: 0, state: 'trap', trail: [], col: null, born: this.t,
+    };
+    ion.col = colorForMz(ion.mz).clone();
+    if (injected) ion.ph = 0;
+    this.ions.push(ion);
+    return ion;
+  }
+  clear() { this.ions.length = 0; this.flights.length = 0; }
+  q(ion) { return qOf(this.V, ion.mz); }
+  step(dt, ctl) {
+    this.t += dt;
+    const t = this.t, r = this.r;
+    const Phi = OMEGA_V * t;
+    const acOn = this.ac > 0;
+    for (let i = this.ions.length - 1; i >= 0; i--) {
+      const o = this.ions[i];
+      const q = qOf(this.V, o.mz);
+      if (q >= PHYS.qMax) {
+        // outside the stability region: the amplitude grows without limit
+        o.A += dt * (20 + o.A * 30);
+        o.th += OMEGA_V * 0.5 * dt;
+      } else {
+        const b = betaOf(q), br = betaOf(q / 2);
+        o.th += (b * OMEGA_V / 2) * dt;
+        o.thr1 += (br * OMEGA_V / 2) * dt;
+        o.thr2 += (br * OMEGA_V / 2) * dt * 1.09;
+        o.A += -TRAP.gammaHe * (o.A - o.Ath) * dt;
+        o.Ar1 += -TRAP.gammaHe * 0.8 * (o.Ar1 - 0.45) * dt;
+        if (acOn) {
+          const d = (b - BETA_EJECT) / BETA_EJECT;
+          o.A += TRAP.gain * this.ac * dt / (1 + (d / TRAP.wRes) ** 2);
+        }
+        if (this.excite && Math.abs(o.mz - this.excite.mz) < 1.5) {
+          const bt = betaOf(this.excite.q), d = (b - bt) / bt;
+          o.A += this.excite.amp * dt / (1 + (d / 0.05) ** 2);
+          o.heat = (o.heat || 0) + dt * this.excite.amp / (1 + (d / 0.05) ** 2);
+        }
+      }
+      const z = o.A * Math.cos(o.th + o.ph) * (1 - 0.5 * Math.min(q, 0.95) * Math.cos(Phi));
+      const yr = o.Ar1 * Math.cos(o.thr1) * (1 + 0.25 * Math.min(q, 0.95) * Math.cos(Phi));
+      const zr = o.Ar2 * Math.sin(o.thr2) * (1 + 0.25 * Math.min(q, 0.95) * Math.cos(Phi));
+      o.x = IP.trapX + z; o.y = yr; o.z = zr;
+      o.trail.push(o.x, o.y, o.z);
+      if (o.trail.length > 3 * 22) o.trail.splice(0, 3);
+      if (Math.abs(z) > TRAP.zEject) {
+        this.ions.splice(i, 1);
+        const dir = Math.sign(z), qe = qOf(this.V, o.mz), edge = this.labMap && qe > 0.89;
+        this.flights.push({ ion: o, dir, t0: t, x0: o.x, y0: o.y, z0: o.z, V: this.V, mzMeas: edge ? this.V / (PHYS.kV * PHYS.qEject) : o.mz, wide: edge });
+      }
+      if (o.cid && o.heat > o.cid.need) {
+        // dissociation: precursor replaced by its product ions
+        this.ions.splice(i, 1);
+        for (const pr of o.cid.products) if (r() < pr.p) { const n = this.addIon(o.sp, false, pr.mz); n.A = 2.5; n.x = o.x; }
+      }
+    }
+    // flights to the detector (exit side) or back toward the octapole (entrance side)
+    for (let i = this.flights.length - 1; i >= 0; i--) {
+      const f = this.flights[i], age = t - f.t0;
+      if (f.dir > 0) {
+        if (age >= 0.3) {
+          this.flights.splice(i, 1);
+          for (let k = 0; k < 3; k++) this.sec.push({ t0: t, x: IP.dynode.x + gauss(r) * 1.2, z: gauss(r) * 1.2, col: f.ion.col });
+          this.pulses.push(t);
+          this.events.push({ t, mz: f.mzMeas + gauss(r) * (f.wide ? 0.004 * f.mzMeas : 0.16), V: f.V, sp: f.ion.sp, col: f.ion.col });
+          if (ctl && ctl.onDetect) ctl.onDetect(f.ion);
+        }
+      } else if (age > 0.7) this.flights.splice(i, 1);
+    }
+    for (let i = this.sec.length - 1; i >= 0; i--) {
+      const s = this.sec[i];
+      if (t - s.t0 > 0.24) { this.sec.splice(i, 1); for (let k = 0; k < 4; k++) this.cas.push({ t0: t, a: r() * 6.283, s: 0.4 + r() * 0.6 }); }
+    }
+    for (let i = this.cas.length - 1; i >= 0; i--) if (t - this.cas[i].t0 > 0.5) this.cas.splice(i, 1);
+    // oscilloscope tracers: one representative ion per species
+    const L = sampleState.list;
+    for (let k = 0; k < L.length; k++) {
+      if (!this.tracer[k]) this.tracer[k] = [];
+      const o = this.ions.find((io) => io.sp === k && io.mz === L[k].mz);
+      const tk = this.tracer[k];
+      tk.push(t, o ? o.x - IP.trapX : NaN);
+      while (tk.length > 2 && tk[0] < t - 4.2) tk.splice(0, 2);
+    }
+  }
+  flightPos(f, t) {
+    const age = t - f.t0;
+    if (f.dir > 0) {
+      const u = clamp(age / 0.3, 0, 1);
+      const p0 = [f.x0, f.y0, f.z0], p1 = [IP.dynode.x - 4, 0, 0], p2 = [IP.dynode.x, IP.dynode.y + 2, 0];
+      const a = (1 - u) * (1 - u), b = 2 * u * (1 - u), c = u * u;
+      return [a * p0[0] + b * p1[0] + c * p2[0], a * p0[1] + b * p1[1] + c * p2[1], a * p0[2] + b * p1[2] + c * p2[2], 1];
+    }
+    return [f.x0 - age * 70, f.y0, f.z0, 1 - age / 0.7];
+  }
+  draw(vis, trails, t) {
+    const P = this.pts, Ln = this.lines, D = this.det;
+    P.begin(); Ln.begin(); D.begin();
+    if (vis > 0.01) {
+      for (const o of this.ions) {
+        P.add(o.x, o.y, o.z + 0.2, o.col, 0.6, vis * 0.95);
+        if (trails > 0.01) {
+          const tr = o.trail, n = tr.length / 3;
+          for (let k = 1; k < n; k++) {
+            const a0 = ((k - 1) / n) * 0.42 * trails * vis, a1 = (k / n) * 0.42 * trails * vis;
+            Ln.seg(tr[(k - 1) * 3], tr[(k - 1) * 3 + 1], tr[(k - 1) * 3 + 2] + 0.2, tr[k * 3], tr[k * 3 + 1], tr[k * 3 + 2] + 0.2, o.col, a0, a1);
+          }
+        }
+      }
+      for (const f of this.flights) { const [x, y, z, a] = this.flightPos(f, t); P.add(x, y, z + 0.2, f.ion.col, 0.75, vis * a); }
+      for (const s of this.sec) {
+        const u = clamp((t - s.t0) / 0.24, 0, 1);
+        D.add(lerp(s.x, IP.multMouth.x, u), lerp(IP.dynode.y + 1.5, IP.multMouth.y + 1, u), s.z * (1 - u) + 0.3, COL.electron, 0.55, vis);
+      }
+      for (const c of this.cas) {
+        const u = clamp((t - c.t0) / 0.5, 0, 1);
+        const y = lerp(IP.multMouth.y + 1, IP.multTop.y, u);
+        const rr = (1.0 + 5.0 * Math.exp(-(y - IP.multMouth.y) / 6.5)) * 0.6 * c.s;
+        D.add(IP.multMouth.x + Math.cos(c.a + u * 9) * rr, y, Math.min(-0.2, -Math.abs(Math.sin(c.a + u * 9) * rr)), COL.electron, 0.45 + u * 0.4, vis * (1 - u * 0.5));
+      }
+    }
+    P.end(); Ln.end(); D.end();
+  }
+}
+
+// ---------- the flipping saddle (ball on the quadrupole potential) ----------
+class SaddleSim {
+  constructor(parent) {
+    this.group = new THREE.Group();
+    this.group.position.set(IP.trapX, 150, -6);
+    parent.add(this.group);
+    const geo = new THREE.PlaneGeometry(72, 72, 96, 96);
+    geo.rotateX(-Math.PI / 2);
+    this.mat = new THREE.ShaderMaterial({
+      uniforms: { uS: { value: 1 }, uMix: { value: 0 }, uK: { value: 12 / (36 * 36 * 2) }, uKe: { value: 0.0034 }, uA: { value: 1 }, uLight: { value: 0 } },
+      vertexShader: `uniform float uS, uMix, uK, uKe; varying float vH; varying vec2 vP;
+        void main(){ vec3 p = position; float u = p.x, w = p.z;
+          float hs = uK * uS * (w * w - 2.0 * u * u);
+          float he = uKe * (4.0 * u * u + w * w) - 9.0;
+          p.y = mix(hs, he, uMix); vH = p.y; vP = vec2(u, w);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); }`,
+      fragmentShader: `uniform float uA, uLight; varying float vH; varying vec2 vP;
+        void main(){ vec2 g = abs(fract(vP / 6.0 + 0.5) - 0.5) / fwidth(vP / 6.0); float line = 1.0 - min(min(g.x, g.y), 1.0);
+          float edge = smoothstep(33.0, 36.0, max(abs(vP.x), abs(vP.y)));
+          vec3 lo = vec3(0.16, 0.55, 1.0), hi = vec3(1.0, 0.52, 0.22);
+          vec3 c = mix(lo, hi, smoothstep(-10.0, 10.0, vH));
+          vec3 col = c * (0.18 + 1.1 * line) + c * edge * 0.8;
+          float a = uA * (0.28 + 0.6 * line + 0.4 * edge);
+          if (uLight > 0.5) { col = c * 0.62 * (0.75 + 0.25 * line); a = uA * (0.2 + 0.75 * line + 0.4 * edge); }
+          gl_FragColor = vec4(col * a, a); }`,
+      transparent: true, depthWrite: false, side: THREE.DoubleSide,
+      blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+      extensions: { derivatives: true },
+    });
+    this.surface = new THREE.Mesh(geo, this.mat);
+    this.surface.renderOrder = 3;
+    this.group.add(this.surface);
+    this.ballMat = new THREE.MeshStandardMaterial({ color: '#7fe0ff', emissive: new THREE.Color('#2aa8ff'), emissiveIntensity: 1.6, roughness: 0.3 });
+    this.ball = new THREE.Mesh(new THREE.SphereGeometry(2.2, 32, 20), this.ballMat);
+    this.group.add(this.ball);
+    this.trail = new LineCloud(200, this.group);
+    this.reset(4);
+  }
+  reset(seed) { this.r = makeRng(seed); this.u = 0.6; this.w = 0.4; this.vu = 0; this.vw = 0; this.ph = 0; this.hist = []; this.off = 0; this.offT = 0; }
+  height(u, w, S, mix) { const k = this.mat.uniforms.uK.value, ke = this.mat.uniforms.uKe.value; return lerp(k * S * (w * w - 2 * u * u), ke * (4 * u * u + w * w) - 9, mix); }
+  step(dt, ctl) {
+    // ctl: { omega (rad/s, 0 = frozen), mix (0 saddle .. 1 effective bowl) }
+    const gk = 5.7;
+    this.ph += ctl.omega * dt;
+    const S = ctl.omega > 0 ? Math.cos(this.ph) : 1;
+    this.S = S;
+    const sub = 8, h = dt / sub;
+    for (let i = 0; i < sub; i++) {
+      // saddle force (Mathieu) blended with the bowl force (pseudopotential) and light damping
+      const fu = lerp(4 * gk * S * this.u, -8 * gk * 0.18 * this.u, ctl.mix);
+      const fw = lerp(-2 * gk * S * this.w, -2 * gk * 0.18 * this.w, ctl.mix);
+      this.vu += (fu - 0.15 * this.vu) * h; this.vw += (fw - 0.15 * this.vw) * h;
+      this.u += this.vu * h; this.w += this.vw * h;
+    }
+    if (Math.abs(this.u) > 36 || Math.abs(this.w) > 36) {
+      this.off += dt;
+      if (this.off > 0.7) { this.u = 0.5 + this.r() * 0.4; this.w = 0.3; this.vu = 0; this.vw = 0; this.off = 0; this.hist.length = 0; }
+    } else this.off = 0;
+  }
+  draw(vis, mix, light) {
+    const g = this.group;
+    g.visible = vis > 0.01;
+    if (!g.visible) return;
+    this.mat.uniforms.uS.value = this.S ?? 1;
+    this.mat.uniforms.uMix.value = mix;
+    this.mat.uniforms.uA.value = vis;
+    this.mat.uniforms.uLight.value = light ? 1 : 0;
+    const out = Math.abs(this.u) > 36 || Math.abs(this.w) > 36;
+    const uu = clamp(this.u, -40, 40), ww = clamp(this.w, -40, 40);
+    const hy = out ? this.height(clamp(uu, -36, 36), clamp(ww, -36, 36), this.S ?? 1, mix) - this.off * 40 : this.height(uu, ww, this.S ?? 1, mix);
+    this.ball.position.set(uu, hy + 2.2, ww);
+    this.ball.material.opacity = vis;
+    this.ball.material.transparent = vis < 1;
+    this.hist.push(uu, hy + 2.2, ww);
+    if (this.hist.length > 3 * 60) this.hist.splice(0, 3);
+    const T = this.trail;
+    T.begin();
+    const n = this.hist.length / 3;
+    for (let k = 1; k < n; k++) T.seg(this.hist[k * 3 - 3], this.hist[k * 3 - 2], this.hist[k * 3 - 1], this.hist[k * 3], this.hist[k * 3 + 1], this.hist[k * 3 + 2], COL.ion, (k - 1) / n * 0.7 * vis, k / n * 0.7 * vis);
+    T.end();
+  }
+}
+
+// ---------- spectrum accumulator ----------
+class Spectrum {
+  constructor() { this.reset(); }
+  reset() { this.peaks = []; this.max = 1; }
+  add(mz, w, col) {
+    // events closer than the peak width join one peak; s2 keeps the spread (Welford)
+    const near = Math.max(0.6, 0.008 * mz);
+    let p = this.peaks.find((pp) => Math.abs(pp.mz - mz) < near);
+    if (!p) { p = { mz, w: 0, col: col || colorForMz(mz).clone(), n: 0, s2: 0 }; this.peaks.push(p); }
+    p.n++;
+    const d = mz - p.mz;
+    p.mz += d / p.n;
+    p.s2 += d * (mz - p.mz);
+    p.w += w;
+    this.max = Math.max(this.max, p.w);
+    return p;
+  }
+  set(list) { this.reset(); for (const [mz, w] of list) this.add(mz, w); }
+}
+
+
+// ---- overlay.js ----
+
+// =====================================================================
+// Overlay drawn on a 2D canvas: captions, labels, instrument panels. Everything here also ends up in the recorded video.
+// =====================================================================
+const OV = { cv: $('#ov'), ctx: null, W: 1, H: 1, U: 1, pr: 1, bottom: 0, C: null };
+OV.ctx = OV.cv.getContext('2d');
+const OV_COL = {
+  dark: { text: '#eaf0f5', sub: '#9eb0c1', faint: 'rgba(234,240,245,0.42)', panel: 'rgba(9,13,18,0.76)', line: 'rgba(255,255,255,0.12)',
+    grid: 'rgba(255,255,255,0.07)', accent: '#3cc3bc', warn: '#ffb547', band0: 'rgba(4,7,10,0)', band1: 'rgba(4,7,10,0.72)', shadow: 'rgba(0,0,0,0.55)' },
+  light: { text: '#15202b', sub: '#556575', faint: 'rgba(21,32,43,0.42)', panel: 'rgba(255,255,255,0.88)', line: 'rgba(21,32,43,0.12)',
+    grid: 'rgba(21,32,43,0.07)', accent: '#0b8580', warn: '#c27400', band0: 'rgba(240,244,247,0)', band1: 'rgba(240,244,247,0.82)', shadow: 'rgba(255,255,255,0.7)' },
+};
+OV.C = OV_COL.dark;
+function ovResize(w, h, pr, bottomCss) {
+  OV.pr = pr;
+  OV.cv.width = Math.round(w * pr);
+  OV.cv.height = Math.round(h * pr);
+  OV.W = OV.cv.width; OV.H = OV.cv.height;
+  OV.U = Math.max(Math.min(OV.W / 1920, OV.H / 1080), 0.74 * pr);
+  OV.bottom = (bottomCss || 0) * pr;
+}
+function ovTheme(dark) { OV.C = dark ? OV_COL.dark : OV_COL.light; }
+const FONT_SANS = '"Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif';
+const FONT_MONO = '"IBM Plex Mono", Consolas, monospace';
+const fnt = (w, s, mono) => `${w} ${Math.round(s)}px ${mono ? FONT_MONO : FONT_SANS}`;
+function rrect(g, x, y, w, h, r) {
+  g.beginPath();
+  g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+}
+const fmtV = (v) => Math.round(v).toLocaleString('en-US');
+
+// ---------- rich text: **term** -> accent, {195|text} -> colour of m/z 195 ----------
+function parseRich(src) {
+  const out = [];
+  const re = /\*\*(.+?)\*\*|\{([\d.]+)\|(.+?)\}/g;
+  let last = 0, m;
+  while ((m = re.exec(src))) {
+    if (m.index > last) out.push({ s: src.slice(last, m.index) });
+    if (m[1]) out.push({ s: m[1], em: true });
+    else out.push({ s: m[3], mz: parseFloat(m[2]) });
+    last = re.lastIndex;
+  }
+  if (last < src.length) out.push({ s: src.slice(last) });
+  return out;
+}
+const NO_START = '，。、;:;:!?!?)」』》〉%,.°⁺⁻²³';
+function layoutRich(g, runs, font, maxW) {
+  g.font = font;
+  const toks = [];
+  for (const r of runs) {
+    const re = /[A-Za-z0-9.\-+−=/×%°₀₁₂³⁺⁻⁰¹²⁴⁵⁶⁷⁸⁹()[\]]+|\s+|./gu;
+    let m;
+    while ((m = re.exec(r.s))) toks.push({ s: m[0], run: r });
+  }
+  const lines = [[]];
+  let w = 0;
+  for (let i = 0; i < toks.length; i++) {
+    const t = toks[i];
+    t.w = g.measureText(t.s).width;
+    const isSpace = /^\s+$/.test(t.s);
+    if (w + t.w > maxW && w > 0 && !isSpace && !NO_START.includes(t.s[0])) { lines.push([]); w = 0; }
+    if (isSpace && w === 0) continue;
+    lines[lines.length - 1].push(t);
+    w += t.w;
+  }
+  return lines.map((l) => ({ toks: l, w: l.reduce((s, t) => s + t.w, 0) }));
+}
+function drawRichLines(g, lines, x, y, lh, align, alpha, baseCol) {
+  const C = OV.C;
+  lines.forEach((ln, i) => {
+    let cx = align === 'center' ? x - ln.w / 2 : x;
+    for (const t of ln.toks) {
+      g.fillStyle = t.run.em ? C.accent : t.run.mz ? cssForMz(t.run.mz) : baseCol || C.text;
+      g.globalAlpha = alpha;
+      g.fillText(t.s, cx, y + i * lh);
+      cx += t.w;
+    }
+  });
+  g.globalAlpha = 1;
+}
+
+// ---------- 3D anchored labels ----------
+const _pv = new THREE.Vector3();
+function projectPx(world) {
+  _pv.copy(world).project(camera);
+  return [(_pv.x * 0.5 + 0.5) * OV.W, (-_pv.y * 0.5 + 0.5) * OV.H, _pv.z];
+}
+const _lw = new THREE.Vector3();
+function drawLabel(g, L) {
+  const { U, C } = OV;
+  const [ax, ay, az] = projectPx(L.world || L.obj.localToWorld(_lw.copy(L.local)));
+  if (az > 1 || L.a <= 0.01) return;
+  const dx = (L.dx ?? 60) * U, dy = (L.dy ?? -50) * U;
+  const lx = ax + dx, ly = ay + dy;
+  g.globalAlpha = L.a;
+  g.strokeStyle = C.text; g.lineWidth = 1.4 * U;
+  g.beginPath(); g.moveTo(ax, ay); g.lineTo(lx, ly); g.stroke();
+  g.fillStyle = C.accent;
+  g.beginPath(); g.arc(ax, ay, 3.6 * U, 0, Math.PI * 2); g.fill();
+  g.font = fnt(500, 21 * U);
+  const tw = g.measureText(L.text).width;
+  g.font = fnt(400, 15 * U, true);
+  const sw = L.sub ? g.measureText(L.sub).width : 0;
+  const bw = Math.max(tw, sw) + 22 * U, bh = (L.sub ? 56 : 34) * U;
+  let right = dx >= 0;
+  if (right && lx + bw > OV.W - 12 * U) right = false;
+  else if (!right && lx - bw < 12 * U) right = true;
+  const bx = right ? lx : lx - bw, by = clamp(ly - bh / 2, 10 * U, OV.H - bh - 10 * U);
+  g.fillStyle = C.panel;
+  rrect(g, bx, by, bw, bh, 7 * U); g.fill();
+  g.strokeStyle = C.line; g.lineWidth = 1 * U; g.stroke();
+  g.fillStyle = C.text; g.font = fnt(500, 21 * U); g.textBaseline = 'middle';
+  g.fillText(L.text, bx + 11 * U, by + (L.sub ? 19 : 17) * U);
+  if (L.sub) { g.fillStyle = C.sub; g.font = fnt(400, 15 * U, true); g.fillText(L.sub, bx + 11 * U, by + 40 * U); }
+  g.textBaseline = 'alphabetic';
+  g.globalAlpha = 1;
+}
+
+// ---------- panels ----------
+function panelBox(g, x, y, w, h, title, a, right) {
+  const { U, C } = OV;
+  g.globalAlpha = a;
+  g.fillStyle = C.panel;
+  rrect(g, x, y, w, h, 12 * U); g.fill();
+  g.strokeStyle = C.line; g.lineWidth = 1 * U; g.stroke();
+  g.fillStyle = C.sub; g.font = fnt(500, 16 * U);
+  g.fillText(title, x + 18 * U, y + 30 * U);
+  if (right) { g.textAlign = 'right'; g.font = fnt(400, 14 * U, true); g.fillText(right, x + w - 18 * U, y + 30 * U); g.textAlign = 'left'; }
+}
+function drawRF(g, x, y, w, a, V, note) {
+  const { U, C } = OV;
+  const h = 112 * U;
+  panelBox(g, x, y, w, h, '環形電極射頻振幅(零到峰值)', a, '760 kHz');
+  g.fillStyle = C.text; g.font = fnt(600, 42 * U, true);
+  g.fillText(`${fmtV(V)} V`, x + 18 * U, y + 84 * U);
+  const bx = x + 250 * U, bw = w - 270 * U, byy = y + 70 * U;
+  g.fillStyle = C.grid; rrect(g, bx, byy, bw, 8 * U, 4 * U); g.fill();
+  g.fillStyle = C.accent; rrect(g, bx, byy, Math.max(8 * U, (bw * V) / PHYS.Vmax), 8 * U, 4 * U); g.fill();
+  g.fillStyle = C.sub; g.font = fnt(400, 13 * U, true);
+  g.fillText('0', bx, byy + 30 * U); g.textAlign = 'right'; g.fillText('8500 V', bx + bw, byy + 30 * U); g.textAlign = 'left';
+  if (note) { g.fillStyle = C.faint; g.font = fnt(400, 12.5 * U); g.textAlign = 'right'; g.fillText(note, x + w - 18 * U, y + 52 * U); g.textAlign = 'left'; }
+  g.globalAlpha = 1;
+  return h;
+}
+function drawQ(g, x, y, w, a, V, species, hidden) {
+  const { U, C } = OV;
+  const h = 150 * U;
+  panelBox(g, x, y, w, h, 'q 值:同一個電壓下,質荷比越小 q 越大', a);
+  const ax0 = x + 26 * U, ax1 = x + w - 26 * U, ay = y + 104 * U;
+  const qx = (q) => ax0 + (ax1 - ax0) * clamp(q / 0.95, 0, 1);
+  // stable band, ejection point, boundary
+  g.fillStyle = C.grid; g.fillRect(ax0, ay - 5 * U, qx(PHYS.qMax) - ax0, 10 * U);
+  g.fillStyle = 'rgba(255,90,90,0.25)'; g.fillRect(qx(PHYS.qMax), ay - 5 * U, ax1 - qx(PHYS.qMax), 10 * U);
+  g.strokeStyle = C.warn; g.lineWidth = 2 * U; g.setLineDash([5 * U, 4 * U]);
+  g.beginPath(); g.moveTo(qx(PHYS.qEject), ay - 34 * U); g.lineTo(qx(PHYS.qEject), ay + 12 * U); g.stroke(); g.setLineDash([]);
+  g.fillStyle = C.warn; g.font = fnt(500, 13 * U); g.textAlign = 'right';
+  g.fillText('共振推出 0.83', qx(PHYS.qEject) - 6 * U, ay - 22 * U);
+  g.textAlign = 'left'; g.fillStyle = C.sub; g.fillText('0.908', qx(PHYS.qMax) + 4 * U, ay - 22 * U);
+  g.fillStyle = C.sub; g.font = fnt(400, 13 * U, true);
+  for (const q of [0, 0.2, 0.4, 0.6]) { g.fillText(q.toFixed(1), qx(q) - 8 * U, ay + 30 * U); g.fillRect(qx(q), ay + 6 * U, 1 * U, 6 * U); }
+  // species dots
+  const placed = [];
+  for (const s of species) {
+    if (hidden && hidden(s)) continue;
+    const q = qOf(V, s.mz);
+    const px = qx(q);
+    let lift = 0;
+    for (const p of placed) if (Math.abs(p - px) < 46 * U) lift += 1;
+    placed.push(px);
+    g.fillStyle = cssForMz(s.mz);
+    g.beginPath(); g.arc(px, ay, 7.5 * U, 0, Math.PI * 2); g.fill();
+    g.font = fnt(600, 13 * U, true); g.textAlign = 'center';
+    g.fillText(Math.round(s.mz), px, ay - 14 * U - lift * 15 * U);
+    g.textAlign = 'left';
+  }
+  g.globalAlpha = 1;
+  return h;
+}
+function drawScope(g, x, y, w, a, trap, species, acOn) {
+  const { U, C } = OV;
+  const rows = species.length + 1, rh = 42 * U;
+  const h = (52 + 8) * U + rows * rh;
+  panelBox(g, x, y, w, h, '示波器:沿軸向的位置', a, '最近 4 秒');
+  const x0 = x + 112 * U, x1 = x + w - 16 * U;
+  const tr = trap.tracer;
+  for (let k = 0; k < rows; k++) {
+    const cy = y + 62 * U + k * rh + rh / 2;
+    g.strokeStyle = C.grid; g.lineWidth = 1 * U;
+    g.beginPath(); g.moveTo(x0, cy); g.lineTo(x1, cy); g.stroke();
+    if (k === 0) {
+      g.fillStyle = C.warn; g.font = fnt(500, 13 * U); g.fillText('端帽交流', x + 18 * U, cy + 5 * U);
+      if (acOn > 0.01) {
+        g.strokeStyle = C.warn; g.lineWidth = 1.6 * U; g.globalAlpha = a * acOn;
+        g.beginPath();
+        const wAC = (BETA_EJECT * OMEGA_V) / 2;
+        for (let i = 0; i <= 240; i++) {
+          const tt = trap.t - (240 - i) / 60;
+          const px = x0 + ((x1 - x0) * i) / 240, py = cy - Math.sin(wAC * tt) * rh * 0.32;
+          i ? g.lineTo(px, py) : g.moveTo(px, py);
+        }
+        g.stroke(); g.globalAlpha = a;
+      }
+      continue;
+    }
+    const s = species[k - 1], col = cssForMz(s.mz);
+    g.fillStyle = col; g.font = fnt(600, 14 * U, true); g.fillText(`m/z ${Math.round(s.mz)}`, x + 18 * U, cy + 5 * U);
+    // endcap lines (+/- z0)
+    g.strokeStyle = C.faint; g.setLineDash([3 * U, 4 * U]);
+    for (const sgn of [-1, 1]) { const yy = cy - sgn * rh * 0.46; g.beginPath(); g.moveTo(x0, yy); g.lineTo(x1, yy); g.stroke(); }
+    g.setLineDash([]);
+    const arr = tr[k - 1];
+    if (!arr) continue;
+    g.strokeStyle = col; g.lineWidth = 1.8 * U;
+    g.beginPath();
+    let pen = false;
+    for (let i = 0; i < arr.length; i += 2) {
+      const ts = arr[i], v = arr[i + 1], age = trap.t - ts;
+      if (!Number.isFinite(v) || age > 4) { pen = false; continue; }
+      const px = x1 - (age / 4) * (x1 - x0), py = cy - clamp(v / PHYS.z0, -1.15, 1.15) * rh * 0.46;
+      pen ? g.lineTo(px, py) : g.moveTo(px, py);
+      pen = true;
+    }
+    g.stroke();
+  }
+  g.globalAlpha = 1;
+  return h;
+}
+function drawSpectrum(g, x, y, w, a, spec, view) {
+  const { U, C } = OV;
+  const h = (view.h ?? 250) * U;
+  panelBox(g, x, y, w, h, view.title || '質譜:偵測器訊號', a, view.right || '');
+  const px0 = x + 26 * U, px1 = x + w - 22 * U, top = y + 92 * U, base = y + h - 46 * U;
+  const { lo, hi } = view;
+  const mx = (mz) => px0 + ((mz - lo) / (hi - lo)) * (px1 - px0);
+  // top axis: RF amplitude at which this m/z is ejected
+  g.strokeStyle = C.line; g.lineWidth = 1 * U;
+  g.beginPath(); g.moveTo(px0, base); g.lineTo(px1, base); g.stroke();
+  g.fillStyle = C.sub; g.font = fnt(400, 12.5 * U, true);
+  const step = view.step || 200;
+  for (let m = Math.ceil(lo / step) * step; m <= hi; m += step) {
+    const xx = mx(m);
+    g.fillRect(xx, base, 1 * U, 6 * U);
+    g.textAlign = 'center'; g.fillText(String(m), xx, base + 22 * U);
+    if (view.vAxis) { g.fillStyle = C.faint; g.fillText(`${fmtV(vEjectOf(m))}`, xx, top - 22 * U); g.fillStyle = C.sub; }
+  }
+  g.textAlign = 'left';
+  g.fillText('m/z', px1 - 26 * U, base + 40 * U);
+  if (view.vAxis) { g.fillStyle = C.faint; g.fillText('排出時的射頻振幅(V)', px0, top - 40 * U); }
+  // peaks
+  const max = view.norm || spec.max || 1;
+  for (const p of spec.peaks) {
+    const hh = (base - top - 18 * U) * clamp(p.w / max, 0, 1);
+    if (hh < 0.5) continue;
+    const xx = mx(p.mz);
+    if (xx < px0 - 4 || xx > px1 + 4) continue;
+    const col = '#' + p.col.getHexString();
+    g.fillStyle = col;
+    const sig = p.n > 1 ? Math.sqrt(p.s2 / p.n) : 0;
+    const hw = Math.max(2.2 * U, (sig / (hi - lo)) * (px1 - px0) * 1.2);
+    g.beginPath(); g.moveTo(xx - hw * 2.2, base); g.quadraticCurveTo(xx - hw * 0.6, base - hh * 0.15, xx, base - hh); g.quadraticCurveTo(xx + hw * 0.6, base - hh * 0.15, xx + hw * 2.2, base); g.closePath(); g.fill();
+    if (p.w / max > 0.08 && !p.noLabel) { g.font = fnt(600, 13 * U, true); g.textAlign = 'center'; g.fillText(p.mz.toFixed(1), xx, base - hh - 8 * U); g.textAlign = 'left'; }
+  }
+  // scan cursor
+  if (view.cursor != null && view.cursor > lo && view.cursor < hi) {
+    const xx = mx(view.cursor);
+    g.strokeStyle = C.accent; g.lineWidth = 1.5 * U; g.globalAlpha = a * 0.9;
+    g.beginPath(); g.moveTo(xx, top - 10 * U); g.lineTo(xx, base); g.stroke();
+    g.globalAlpha = a;
+  }
+  g.globalAlpha = 1;
+  return h;
+}
+function drawWell(g, x, y, w, a, V, species) {
+  const { U, C } = OV;
+  const h = 232 * U;
+  panelBox(g, x, y, w, h, '平均下來的位能井(軸向剖面)', a, `V = ${fmtV(V)} V`);
+  const cx = x + w * 0.42, top = y + 64 * U, bottom = y + h - 26 * U, half = w * 0.3;
+  const depths = species.map((s) => { const q = qOf(V, s.mz); return (q * V) / 8; });
+  const dmax = Math.max(...depths);
+  const ly = [];
+  species.forEach((s, i) => {
+    const d = depths[i] / dmax, depthPx = (bottom - top) * d;
+    let yl = top + depthPx;
+    for (const p of ly) if (Math.abs(p - yl) < 34 * U) yl = p - 34 * U;
+    ly.push(yl);
+    g.strokeStyle = cssForMz(s.mz); g.lineWidth = 2.4 * U;
+    g.beginPath();
+    for (let k = 0; k <= 60; k++) { const u = (k / 30 - 1), px = cx + u * half, py = top + depthPx * (1 - u * u); k ? g.lineTo(px, py) : g.moveTo(px, py); }
+    g.stroke();
+    g.fillStyle = cssForMz(s.mz); g.font = fnt(600, 14 * U, true);
+    g.fillText(`m/z ${Math.round(s.mz)}`, cx + half + 18 * U, yl - 4 * U);
+    g.fillStyle = C.sub; g.font = fnt(400, 12.5 * U, true);
+    g.fillText(`深約 ${depths[i].toFixed(0)} V`, cx + half + 18 * U, yl + 14 * U);
+  });
+  g.globalAlpha = 1;
+  return h;
+}
+function drawSteps(g, x, y, w, a, steps, cur, prog) {
+  const { U, C } = OV;
+  const h = 70 * U + steps.length * 40 * U;
+  panelBox(g, x, y, w, h, '串聯質譜:同一個阱,按時間先後', a);
+  steps.forEach((s, i) => {
+    const yy = y + 66 * U + i * 40 * U;
+    const on = i === cur, done = i < cur;
+    g.fillStyle = on ? C.accent : done ? C.sub : C.grid;
+    g.beginPath(); g.arc(x + 32 * U, yy, 11 * U, 0, Math.PI * 2); g.fill();
+    g.fillStyle = on ? (themeState.dark ? '#03201e' : '#ffffff') : C.text; g.font = fnt(700, 13 * U, true); g.textAlign = 'center';
+    g.fillText(String(i + 1), x + 32 * U, yy + 5 * U); g.textAlign = 'left';
+    g.fillStyle = on ? C.text : C.sub; g.font = fnt(on ? 700 : 500, 17 * U);
+    g.fillText(s, x + 56 * U, yy + 6 * U);
+    if (on) { g.fillStyle = C.accent; g.fillRect(x + 56 * U, yy + 14 * U, (w - 80 * U) * clamp(prog, 0, 1), 3 * U); }
+  });
+  g.globalAlpha = 1;
+  return h;
+}
+
+// ---------- full overlay frame ----------
+const OVS = {
+  title: 0, endCard: 0, caption: null, labels: [], hud: {}, hudA: 0, recap: 0, banner: null, scale: null,
+};
+function drawOverlay(story) {
+  const g = OV.ctx, { W, H, U, C } = OV;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.clearRect(0, 0, W, H);
+  g.textBaseline = 'alphabetic';
+  const landscape = W / H >= 1.15;
+  const hudW = 470 * U, hudX = W - hudW - 34 * U;
+  const hudOn = OVS.hudA > 0.01;
+  // labels
+  for (const L of OVS.labels) drawLabel(g, L);
+  // scale bar
+  if (OVS.scale && OVS.scale.a > 0.01) {
+    const s = OVS.scale;
+    const [x0, y0] = projectPx(s.obj.localToWorld(_lw.copy(s.p0))), [x1, y1] = projectPx(s.obj.localToWorld(_lw.copy(s.p1)));
+    g.globalAlpha = s.a; g.strokeStyle = C.text; g.lineWidth = 2 * U;
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.moveTo(x0, y0 - 6 * U); g.lineTo(x0, y0 + 6 * U); g.moveTo(x1, y1 - 6 * U); g.lineTo(x1, y1 + 6 * U); g.stroke();
+    g.fillStyle = C.text; g.font = fnt(500, 15 * U, true); g.textAlign = 'center'; g.fillText(s.text, (x0 + x1) / 2, Math.min(y0, y1) - 10 * U); g.textAlign = 'left';
+    g.globalAlpha = 1;
+  }
+  // instrument panels
+  if (hudOn) {
+    const a = OVS.hudA, hd = OVS.hud;
+    let y = 34 * U;
+    const x = landscape ? hudX : 16 * U, w = landscape ? hudW : W - 32 * U;
+    const U0 = OV.U;
+    if (!landscape) OV.U = U0 * 0.8;
+    const gap = 14 * U;
+    if (hd.rf > 0.01) y += drawRF(g, x, y, w, a * hd.rf, hd.V, hd.rfNote) + gap;
+    if (hd.q > 0.01) y += drawQ(g, x, y, w, a * hd.q, hd.V, hd.species, hd.hide) + gap;
+    if (hd.well > 0.01) y += drawWell(g, x, y, w, a * hd.well, hd.V, hd.species) + gap;
+    if (hd.steps > 0.01) y += drawSteps(g, x, y, w, a * hd.steps, hd.stepList, hd.step, hd.stepProg) + gap;
+    if (hd.scope > 0.01) y += drawScope(g, x, y, w, a * hd.scope, hd.trap, hd.species, hd.ac) + gap;
+    if (hd.spec > 0.01) y += drawSpectrum(g, x, y, w, a * hd.spec, hd.spectrum, hd.specView) + gap;
+    OV.U = U0;
+  }
+  // captions
+  const cap = OVS.caption;
+  const areaW = hudOn && landscape ? hudX - 30 * U : W;
+  if (cap && cap.a > 0.01) {
+    const font = fnt(500, 30 * U);
+    const maxW = Math.min(areaW - 120 * U, 1020 * U);
+    const lines = layoutRich(g, parseRich(cap.text), font, maxW);
+    const lh = 47 * U;
+    const blockH = lines.length * lh + 40 * U;
+    const baseY = H - OV.bottom - 58 * U - (lines.length - 1) * lh;
+    const grad = g.createLinearGradient(0, H - OV.bottom - blockH - 120 * U, 0, H);
+    grad.addColorStop(0, C.band0); grad.addColorStop(0.55, C.band1); grad.addColorStop(1, C.band1);
+    g.globalAlpha = Math.min(1, cap.a * 1.4) * (cap.band ?? 1);
+    g.fillStyle = grad; g.fillRect(0, H - OV.bottom - blockH - 120 * U, W, blockH + 120 * U + OV.bottom);
+    g.globalAlpha = 1;
+    const cx = areaW / 2;
+    if (cap.tag) {
+      g.font = fnt(600, 17 * U); g.fillStyle = C.accent; g.globalAlpha = cap.tagA ?? cap.a; g.textAlign = 'center';
+      g.fillText(cap.tag, cx, baseY - 44 * U); g.textAlign = 'left'; g.globalAlpha = 1;
+    }
+    g.font = font;
+    drawRichLines(g, lines, cx, baseY, lh, 'center', cap.a);
+  }
+  // title card
+  if (OVS.title > 0.01) {
+    const a = OVS.title;
+    g.globalAlpha = a; g.textAlign = 'center';
+    const ty = H * 0.2, maxW = W - 64 * U;
+    g.shadowColor = C.shadow; g.shadowBlur = 24 * U;
+    g.fillStyle = C.text;
+    fitText(g, 'Ion Trap MS', 600, 96 * U, true, W / 2, ty, maxW);
+    const t2 = fitText(g, '離子阱質譜原理', 700, 46 * U, false, W / 2, ty + 80 * U, maxW);
+    drawWrapped(g, '以 Thermo Finnigan LCQ Deca XP 為例', fnt(400, 24 * U), W / 2, ty + 80 * U + t2 * 0.6 + 34 * U, Math.min(maxW, 980 * U), 36 * U, a, C.sub);
+    g.shadowBlur = 0;
+    g.textAlign = 'left'; g.globalAlpha = 1;
+  }
+  if (OVS.banner && OVS.banner.a > 0.01) {
+    const b = OVS.banner, bf = fnt(600, 26 * U);
+    const lines = layoutRich(g, parseRich(b.text), bf, Math.max(160 * U, areaW - 120 * U));
+    const tw = Math.max(...lines.map((l) => l.w)), lh = 38 * U;
+    const bx = areaW / 2 - tw / 2 - 26 * U, by = landscape ? 46 * U : H * 0.56;
+    g.globalAlpha = b.a; g.fillStyle = C.panel; rrect(g, bx, by, tw + 52 * U, lines.length * lh + 20 * U, 12 * U); g.fill();
+    g.strokeStyle = C.accent; g.lineWidth = 1.5 * U; g.stroke();
+    g.font = bf; drawRichLines(g, lines, areaW / 2, by + 38 * U, lh, 'center', b.a);
+    g.globalAlpha = 1;
+  }
+  if (OVS.recap > 0.01) drawRecap(g, OVS.recap, OVS.recapLines || [], OVS.recapReveal || 99);
+  if (OVS.endCard > 0.01) drawEndCard(g, OVS.endCard);
+}
+function drawEndCard(g, a) {
+  const { W, H, U, C } = OV;
+  g.globalAlpha = a * 0.82; g.fillStyle = themeState.dark ? '#05080c' : '#eef2f5'; g.fillRect(0, 0, W, H);
+  g.globalAlpha = a;
+  const maxW = W - 64 * U, y0 = H * 0.4;
+  g.fillStyle = C.text;
+  fitText(g, 'Ion Trap MS', 600, 84 * U, true, W / 2, y0, maxW);
+  fitText(g, '離子阱質譜原理', 700, 40 * U, false, W / 2, y0 + 70 * U, maxW);
+  g.fillStyle = C.sub;
+  fitText(g, '以 Thermo Finnigan LCQ Deca XP 為例', 400, 22 * U, false, W / 2, y0 + 112 * U, maxW);
+  let yy = y0 + 170 * U;
+  yy += drawWrapped(g, '數值取自 Finnigan LCQ Series Hardware Manual、LCQ Deca Hardware Manual、LCQ Deca XP Plus 規格表、March (1997) 與 Wong & Cooks (1997)。', fnt(400, 19 * U), W / 2, yy, Math.min(maxW, 1300 * U), 30 * U, a, C.sub);
+  drawWrapped(g, '毛細管長度、桿子尺寸與偵測器幾何為示意;液滴、離子雲與振盪幅度已放大,時間也放慢了很多倍。', fnt(400, 19 * U), W / 2, yy + 4 * U, Math.min(maxW, 1300 * U), 30 * U, a, C.sub);
+  g.globalAlpha = 1;
+}
+function drawRecap(g, a, lines, reveal) {
+  const { W, H, U, C } = OV;
+  const bw = Math.min(W - 40 * U, 1180 * U), pad = Math.min(48 * U, bw * 0.06), font = fnt(500, 29 * U), lh = 42 * U;
+  const lays = lines.map((ln) => layoutRich(g, parseRich(ln), font, bw - pad * 2 - 50 * U));
+  const bh = 110 * U + lays.reduce((s, L) => s + L.length * lh + 30 * U, 0);
+  const bx = (W - bw) / 2, by = Math.max(20 * U, (H - bh) / 2 - 30 * U);
+  g.globalAlpha = a * 0.92; g.fillStyle = C.panel;
+  rrect(g, bx, by, bw, bh, 18 * U); g.fill();
+  g.strokeStyle = C.line; g.lineWidth = 1 * U; g.stroke();
+  g.globalAlpha = a;
+  g.fillStyle = C.accent; g.font = fnt(700, 20 * U); g.fillText('為什麼分得出不同的質荷比', bx + pad, by + 60 * U);
+  let yy = by + 116 * U;
+  lays.forEach((L, i) => {
+    const la = a * clamp(reveal - i, 0, 1);
+    if (la > 0) {
+      g.globalAlpha = la;
+      g.fillStyle = C.accent; g.font = fnt(600, 30 * U, true); g.fillText(String(i + 1), bx + pad, yy);
+      g.font = font;
+      drawRichLines(g, L, bx + pad + 48 * U, yy, lh, 'left', la);
+    }
+    yy += L.length * lh + 30 * U;
+  });
+  g.globalAlpha = 1;
+}
+// one line of text, shrunk to fit; returns the font size used
+function fitText(g, text, weight, size, mono, cx, y, maxW) {
+  let s = size;
+  g.font = fnt(weight, s, mono);
+  const w = g.measureText(text).width;
+  if (w > maxW) { s = (size * maxW) / w; g.font = fnt(weight, s, mono); }
+  g.textAlign = 'center'; g.fillText(text, cx, y); g.textAlign = 'left';
+  return s;
+}
+function drawWrapped(g, text, font, cx, y, maxW, lh, alpha, col) {
+  const L = layoutRich(g, parseRich(text), font, maxW);
+  g.font = font;
+  drawRichLines(g, L, cx, y, lh, 'center', alpha, col);
+  return L.length * lh;
+}
+
+
+// ---- story.js ----
+
+// =====================================================================
+// Story: chapters, camera paths, captions, and what every system does at each moment
+// =====================================================================
+const DIO = { pos: V3(-0.42, 0.66, 0), s: 0.003 };
+const CABPOSE = { pos: V3(-0.2, 0.33, 0.4), s: 0.001 };
+const D = (x, y = 0, z = 0) => V3(DIO.pos.x + x * DIO.s, DIO.pos.y + y * DIO.s, DIO.pos.z + z * DIO.s);
+const K = (t, l, off, o = {}) => ({ t, l, p: l.clone().add(V3(...off)), fov: o.fov ?? 30, sx: o.sx ?? 0, sy: o.sy ?? 0.04 });
+const KP = (t, p, l, o = {}) => ({ t, l, p, fov: o.fov ?? 30, sx: o.sx ?? 0, sy: o.sy ?? 0.04 });
+const HUDX = 0.17;
+
+// frame state written by chapters every frame, read by the renderer
+const F = {};
+function resetF() {
+  Object.assign(F, {
+    cab: 1, cabSlide: 0, cover: 0, door: 0, pose: 0, spray: 0, sprayVis: 0, feed: 0, feedFrom: -5, gateOpen: true, neutrals: 0,
+    transVis: 0, transSpeed: 1, gas: 0, he: 0, heater: 0, rfGuide: 0, trapVis: 0, trails: 0, ring: 0, acGlow: 0, explode: 0,
+    saddle: 0, saddleMix: 0, saddleOmega: 0, scanLed: 0, winGlow: 0, detVis: 1, acquire: false, trapAccept: false,
+  });
+  Object.assign(OVS, { title: 0, endCard: 0, caption: null, labels: [], hud: {}, hudA: 0, recap: 0, banner: null, scale: null });
+}
+resetF();
+
+// label helpers: [anchor, text, sub, t0, t1, dx, dy]
+function labels(ST, t, list) {
+  const out = [];
+  for (const [at, text, sub, t0, t1, dx, dy] of list) {
+    const a = win(t, t0, t1, 0.5);
+    if (a <= 0.01) continue;
+    const cabA = at.startsWith('cab:');
+    out.push({ obj: cabA ? ST.cab.group : ST.asm.group, local: (cabA ? ST.cab.anchors : ST.asm.anchors)[at.slice(4)], text, sub, a, dx, dy });
+  }
+  return out;
+}
+function caption(ch, t, idx) {
+  const cues = ch.cues;
+  let k = -1;
+  for (let i = 0; i < cues.length; i++) if (t >= cues[i][0]) k = i;
+  if (k < 0) return null;
+  const t0 = cues[k][0], t1 = k + 1 < cues.length ? cues[k + 1][0] : ch.dur;
+  const a = Math.min(sstep(t0, t0 + 0.45, t), 1 - sstep(t1 - 0.35, t1 - 0.02, t));
+  return { text: cues[k][1], a, tag: `${String(idx).padStart(2, '0')}  ${ch.title}`, tagA: Math.min(sstep(0, 0.5, t), 1 - sstep(ch.dur - 0.4, ch.dur, t)) };
+}
+// scan cursor m*(t): fast between species, slow while a species passes the ejection point
+function warpScan(t, keys) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    if (t <= keys[i][0]) {
+      const [ta, ma] = keys[i - 1], [tb, mb] = keys[i];
+      const u = (t - ta) / (tb - ta);
+      return lerp(ma, mb, keys[i][2] ? smooth(u) : u);
+    }
+  }
+  return keys[keys.length - 1][1];
+}
+function scanKeys(t0, list, m0, mEnd, tail = 2, fast = 3.4, slow = 4.6) {
+  // for each species: fast up to 0.93 m, then 4.5 s through 0.93 m .. 1.025 m
+  const keys = [[t0, m0, 0]];
+  let t = t0;
+  for (const m of list) {
+    t += fast; keys.push([t, 0.93 * m, 1]);
+    t += slow; keys.push([t, 1.025 * m, 0]);
+  }
+  keys.push([t + tail, mEnd, 1]);
+  return keys;
+}
+
+const CAL = () => SAMPLES.cal;
+const CHAPTERS = [
+  {
+    key: 'intro', title: '開場', dur: 7,
+    start: KP(0, V3(2.3, 1.4, 3.3), V3(0, 0.32, 0), { sy: -0.13 }),
+    cam: [KP(7, V3(1.55, 0.98, 2.35), V3(0, 0.3, 0), { sy: -0.1 })],
+    cues: [],
+    update(ST, t) { OVS.title = win(t, 0.8, 6.6, 0.9); F.scanLed = 1; F.winGlow = 0.6; },
+  },
+  {
+    key: 'outside', title: '質譜儀在做什麼', dur: 11,
+    cam: [KP(4.5, V3(0.33, 0.72, 1.92), V3(-0.02, 0.31, 0.3)), KP(11, V3(-0.62, 0.64, 1.16), V3(-0.2, 0.33, 0.4))],
+    cues: [
+      [0.4, '質譜儀做三件事:把分子變成帶電的**離子**、依**質荷比**把離子分開、再把離子數出來。下面打開機器,沿著離子走的路看一遍。'],
+    ],
+    update(ST, t) {
+      F.scanLed = 1; F.winGlow = 0.6;
+      OVS.labels = labels(ST, t, [
+        ['cab:source', '離子源', '樣品從這裡進去', 2, 10.6, -70, -70],
+      ]);
+    },
+  },
+  {
+    key: 'open', title: '拆開來看', dur: 16,
+    cam: [KP(4.2, V3(0.95, 1.55, 1.95), V3(-0.1, 0.38, 0.1)), KP(10.8, V3(0.05, 0.98, 2.15), V3(-0.04, 0.6, 0)), KP(16, V3(0.13, 0.93, 2.02), V3(-0.04, 0.6, 0))],
+    cues: [
+      [0.3, '打開上蓋,離子走的路在左半邊:從前門的離子源一路往機器後方,走到最裡面的偵測器。'],
+      [8.4, '沿途分成四段氣壓:大氣壓 760 Torr、1 Torr、10⁻³ Torr,分析區只剩 2×10⁻⁵ Torr。越往裡面越空,離子才不會一路撞上氣體分子。'],
+    ],
+    update(ST, t) {
+      F.cover = sstep(0.4, 3.0, t); F.door = sstep(1.4, 4.2, t);
+      F.pose = ease(clamp((t - 4.4) / 6.4, 0, 1));
+      F.cab = 1 - sstep(6.2, 10.4, t); F.cabSlide = sstep(5.5, 10.5, t);
+      F.gas = sstep(8.6, 10.5, t); F.scanLed = 1;
+      OVS.labels = labels(ST, t, [
+        ['asm:reg0', '大氣壓', '760 Torr', 9.2, 16, -40, 80],
+        ['asm:reg1', '1 Torr', '前級幫浦抽氣', 9.8, 16, -50, -120],
+        ['asm:reg2', '10⁻³ Torr', '渦輪分子幫浦', 10.4, 16, 20, -120],
+        ['asm:reg3', '2×10⁻⁵ Torr', '分析區', 11, 16, 50, -110],
+      ]);
+    },
+  },
+  {
+    key: 'esi', title: '電灑游離', dur: 30, prewarm: 0,
+    cam: [K(3.5, D(-12, 6, 0), [0.04, 0.012, 0.12], { fov: 28 }), K(9.2, D(-11, 2, 0), [0.04, 0.014, 0.15], { fov: 28 }),
+      K(16.2, D(-10, -5, 0), [0.05, 0.03, 0.26]), K(24.2, D(-8, -3, 0), [0.06, 0.03, 0.27]), K(30, D(-5, -1, 0), [0.08, 0.035, 0.28])],
+    cues: [
+      [0.3, '樣品溶液從噴針流出,噴針加了約 **+4.5 kV** 的高壓。液面被電場拉成尖錐,也就是**泰勒錐**,尖端噴出帶正電的細小液滴。'],
+      [8.2, '**鞘氣**(氮氣)把液滴吹散。溶劑一路蒸發,液滴越縮越小,表面的電荷越擠越密。'],
+      [14.4, '電荷擠到極限,液滴就噴出一串更小的子液滴,把電荷分走;縮到只剩幾奈米時,離子直接從表面脫離。分析物在酸性溶液裡多半已帶上一個質子,所以出來的是 **[M+H]⁺**。'],
+      [22.6, '沒蒸發完的大液滴被氣流帶開,從底部的廢液口排掉;離子被電場拉向入口,連同氣體一起被吸進毛細管。'],
+    ],
+    update(ST, t) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1;
+      F.spray = sstep(0.6, 1.6, t); F.sprayVis = 1; F.transVis = 1; F.gas = 1 - sstep(0, 2, t);
+      OVS.labels = labels(ST, t, [
+        ['asm:needle', '噴針', '常用 +4.5 kV', 0.8, 8.0, -60, -70],
+        ['asm:spray', '液滴(放大示意)', '實際只有幾微米', 8.6, 14.2, -70, 60],
+        ['asm:cone', '離子入口', '毛細管前端', 22.8, 30, 60, -70],
+      ]);
+    },
+  },
+  {
+    key: 'vacuum', title: '進入真空', dur: 18, prewarm: 4,
+    cam: [K(5, D(40, 1.5, 0), [0.04, 0.09, 0.36]), K(9.4, D(108, 1, 0), [0.02, 0.05, 0.2]), K(14, D(118, 0, 0), [0.03, 0.035, 0.13]), K(18, D(124, 0, 0), [0.05, 0.04, 0.15])],
+    cues: [
+      [0.3, '入口是一根內徑 **0.45 mm** 的不鏽鋼毛細管,外面套著加熱塊,溫度 200 到 350 °C,把殘留的溶劑烤乾。'],
+      [8.8, '毛細管出口後方的**截取錐**,小孔刻意和毛細管錯開約 1.5 mm。離子被**管狀透鏡**的電場導進小孔,中性分子直直撞上錐面,被前級幫浦抽走。'],
+    ],
+    update(ST, t) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1;
+      F.spray = 1; F.sprayVis = 1; F.transVis = 1; F.heater = sstep(0, 1.5, t); F.neutrals = sstep(8, 9.5, t);
+      F.gas = sstep(9, 10.5, t) * 0.8;
+      OVS.labels = labels(ST, t, [
+        ['asm:capillary', '離子傳輸毛細管', '內徑 0.45 mm', 0.8, 8.6, 30, -80],
+        ['asm:heater', '加熱塊', '200～350 °C', 1.8, 8.6, -60, -80],
+        ['asm:tubeLens', '管狀透鏡', '聚焦,兼當閘門', 9.2, 18, -70, -80],
+        ['asm:skimmer', '截取錐', '接地,錯開約 1.5 mm(推定)', 9.8, 18, 60, -90],
+      ]);
+    },
+  },
+  {
+    key: 'guides', title: '離子導引', dur: 17, prewarm: 7,
+    cam: [K(5, D(162, 0, 0), [0.02, 0.08, 0.25]), K(10, D(200, 0, 0), [0.0, 0.07, 0.24]), K(17, D(230, 0, 0), [0.03, 0.06, 0.22])],
+    cues: [
+      [0.3, '接著是**方形四極桿**和**八極桿**。桿子上加 2.45 MHz 的射頻電壓,把一大段質荷比範圍的離子都約束在中心線附近,讓它們沿著桿子往前飛。'],
+      [8.6, '兩組桿子中間的透鏡兼當閘門:要裝離子時打開,裝夠了就升到 **+130 V** 把後面的離子擋住。裝多少,由**自動增益控制**先做一次預掃描決定。'],
+    ],
+    update(ST, t) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1;
+      F.spray = 1; F.transVis = 1; F.rfGuide = 1; F.neutrals = 0.3;
+      F.gateOpen = !(t > 11 && t < 15.8);
+      OVS.labels = labels(ST, t, [
+        ['asm:quad', '方形四極桿', '2.45 MHz,400 V p-p', 0.8, 8.4, -40, -90],
+        ['asm:octa', '八極桿', '2.45 MHz', 2, 8.4, 40, -90],
+        ['asm:inter', F.gateOpen ? '多極桿間透鏡:打開' : '多極桿間透鏡:關閉', F.gateOpen ? '傳輸時 ±20 V 以內' : '+130 V,擋住離子', 9, 17, -40, -100],
+      ]);
+    },
+  },
+  {
+    key: 'trap', title: '離子阱', dur: 25,
+    cam: [K(3, D(266, 0, 0), [0.06, 0.07, 0.24]), K(9.5, D(266, 2, 0), [0.03, 0.05, 0.23]), K(15.5, D(262, 0, 0), [0.02, 0.03, 0.17]), K(25, D(266, 0, 0), [0.02, 0.025, 0.15])],
+    cues: [
+      [0.3, '質量分析器就是這組**離子阱**:中間一圈**環形電極**,前後各一片**端帽電極**,內面都是雙曲面,彼此用石英環隔開;中間的空腔只有約 1.4 公分寬、1.6 公分長。'],
+      [8.8, '環形電極接 **760 kHz** 的射頻電壓,振幅可以從 0 調到 **8500 V**。阱的空腔裡另外通進約 10⁻³ Torr 的**氦氣**(比外面的分析區濃得多),從出口端帽上的小管送進來。'],
+      [16.6, '離子從入口端帽中心的小孔進來,一路和氦原子碰撞、失去動能,最後聚在離中心約 1 mm 以內的一小團裡。'],
+    ],
+    enter(ST) { ST.trap.reset(31); ST.trap.V = 500; setSample('cal'); },
+    update(ST, t) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1; F.rfGuide = 0.5;
+      F.explode = sstep(1.2, 4.2, t) * (1 - sstep(8.4, 10.8, t));
+      F.he = sstep(9.4, 11.4, t); F.ring = sstep(8.8, 10.2, t) * 0.5; F.trapVis = 1; F.trails = sstep(17, 19, t) * 0.5;
+      F.transVis = 1; F.spray = 0; F.feed = t > 16.4 && t < 19.8 ? 16 : 0; F.feedFrom = 222; F.trapAccept = t > 16.2 && t < 21.5;
+      OVS.labels = labels(ST, t, [
+        ['asm:capIn', '入口端帽電極', '中心有小孔', 2.4, 8.6, -50, -110],
+        ['asm:ring', '環形電極', 'r₀ = 7.07 mm', 2.8, 8.6, 30, -125],
+        ['asm:capOut', '出口端帽電極', '', 3.2, 8.6, 60, -95],
+        ['asm:spacer', '石英間隔環', '絕緣兼定位', 3.6, 8.6, 70, 40],
+        ['asm:he', '氦氣入口', '約 1 mL/min', 10, 16.4, 50, -70],
+      ]);
+      OVS.scale = { obj: ST.asm.group, p0: V3(252, -24, 0), p1: V3(262, -24, 0), text: '10 mm', a: win(t, 2, 16.4, 0.6) };
+    },
+  },
+  {
+    key: 'saddle', title: '為什麼困得住', dur: 32,
+    cam: [K(1.6, D(266, 50, 0), [0.0, 0.1, 0.5]), K(4, D(266, 140, -6), [0.0, 0.2, 0.42]), K(12, D(266, 140, -6), [0.11, 0.17, 0.4]), K(21.6, D(266, 140, -6), [0.05, 0.15, 0.43]),
+      K(32, D(266, 140, -6), [0.03, 0.12, 0.45], { sx: 0.13 })],
+    cues: [
+      [0.3, '環形電極和端帽之間的電位分布像一個**馬鞍面**:某一瞬間沿軸向往中心推、沿半徑往外拉,下一瞬間剛好反過來。'],
+      [6.6, '放一顆球在靜止的馬鞍上,它一定會滾下去;翻轉得太慢,也一樣留不住。'],
+      [11.6, '翻得夠快,球還沒滾遠就被推回來。環形電極的電壓每秒正負來回 76 萬次,離子就是這樣被困在中心。'],
+      [16.8, '而且往中心推的那半週,球剛好離中心比較遠、受力比較大,所以平均下來,淨力朝向中心。'],
+      [21.8, '平均下來,離子像待在碗底;同樣的電壓下,質荷比越小,碗越深。'],
+      [25.6, '但質荷比太小時,電場對它來說翻得太慢,平均的碗就不成立,離子留不住,這叫**低質量截止**;用下一段的參數來說,就是 q 超過 0.908。'],
+    ],
+    enter(ST, cont) { ST.saddle.reset(7); ST._sr1 = ST._sr2 = 0; if (!cont || ST.trap.ions.length < 10) { ST.trap.reset(32); ST.trap.V = 500; setSample('cal'); ST.trap.fill(14); } },
+    update(ST, t) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1; F.trapVis = 1; F.he = 1; F.ring = 0.5;
+      F.saddle = sstep(0.2, 1.4, t);
+      F.saddleOmega = t < 6.4 ? 0 : t < 11.4 ? 2 * Math.PI * 0.42 : 2 * Math.PI * 1.6;
+      F.saddleMix = sstep(21.8, 24.6, t);
+      if (t > 5.9 && t < 6.5 && !ST._sr1) { ST.saddle.reset(8); ST._sr1 = 1; }
+      if (t > 11.4 && t < 12 && !ST._sr2) { ST.saddle.reset(9); ST._sr2 = 1; }
+      OVS.hudA = sstep(22.8, 23.8, t);
+      OVS.hud = { well: 1, V: 400, species: CAL() };
+    },
+  },
+  {
+    key: 'rhythm', title: '每種質荷比都有自己的節奏', dur: 24,
+    cam: [K(2.2, D(266, 30, 0), [0.02, 0.06, 0.42], { sx: HUDX }), K(4.6, D(266, 0, 0), [0.015, 0.022, 0.135], { sx: HUDX }), K(24, D(266, 0, 0), [0.03, 0.026, 0.13], { sx: HUDX })],
+    cues: [
+      [0.3, '現在阱裡同時關著三種離子:{195|咖啡因 m/z 195}、{524|MRFA m/z 524}、{1222|Ultramark m/z 1222}。三種混在同一團裡,位置上分不開。'],
+      [8.4, '分得開的是節奏。每種離子沿軸向來回振盪的頻率由 **q** 決定:q = 8eV / [m(r₀² + 2z₀²)Ω²],同樣的電壓下跟質荷比成反比。'],
+      [16.6, '所以質荷比小的振得快,質荷比大的振得慢。示波器把三種離子的軸向位置各畫成一條線,儀器就是靠這個頻率差來分辨質荷比。'],
+    ],
+    enter(ST) { ST.trap.reset(33); ST.trap.V = 500; setSample('cal'); ST.trap.fill(22); ST.spectrum.reset(); },
+    update(ST, t) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1; F.trapVis = 1; F.he = 0.6; F.ring = 0.5; F.trails = 1;
+      F.saddle = 1 - sstep(0, 1.4, t); F.saddleMix = 1;
+      OVS.hudA = sstep(0.4, 1.4, t);
+      OVS.hud = { rf: 1, q: 1, scope: sstep(8.4, 9.4, t), V: ST.trap.V, species: CAL(), trap: ST.trap, ac: 0, hide: (s) => !ST.counts[s.mz] };
+      OVS.labels = labels(ST, t, [['asm:cavity', '三種離子混在同一團', '振幅已放大,方便看出節奏', 1, 8, -70, -90]]);
+    },
+  },
+  {
+    key: 'scan', title: '掃描排出', dur: 42,
+    cam: [K(4, D(279, -4, 0), [0.03, 0.04, 0.235], { sx: HUDX }), K(42, D(281, -4, 0), [0.045, 0.045, 0.245], { sx: HUDX })],
+    cues: [
+      [0.3, '端帽上另外加一個小小的交流電壓,頻率固定在約 **280 kHz**,等於離子在 q = 0.83 時的振盪頻率。它只推得動頻率對上的離子,就像照固定節拍推鞦韆。'],
+      [8.6, '接著把環形電極的射頻振幅以固定速率往上調。所有離子的 q 和振盪頻率一起變大,質荷比最小的{195|咖啡因}最先走到 **q = 0.83**,對上節拍。'],
+      [16.2, '對上節拍的離子越盪越大,很快就從端帽中心的小孔飛出去。把離子送出去的是共振;射頻變大本身不會推出離子,阱反而抓得更緊。'],
+      [23.4, '接著輪到 {524|MRFA},最後是 {1222|Ultramark}。排序看的是質荷比,不是質量:帶兩個電荷的離子,會落在質量一半的位置。'],
+      [31.6, '排出時的射頻振幅和質荷比成正比,m/z 每多 1 約高 4.25 V(依文獻尺寸計算):{195|m/z 195} 約在 830 V、{524|524} 約 2230 V、{1222|1222} 約 5190 V。'],
+    ],
+    enter(ST, cont) {
+      if (!cont) { ST.trap.reset(34); ST.trap.V = 500; setSample('cal'); ST.trap.fill(22); }
+      ST.spectrum.reset();
+      ST.scan = scanKeys(9, CAL().map((s) => s.mz), 500 / (PHYS.kV * PHYS.qEject), 1320, 3);
+    },
+    update(ST, t) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1; F.trapVis = 1; F.he = 0.5; F.trails = 1; F.scanLed = t > 9 ? 1 : 0; F.acquire = t > 9;
+      const ac = sstep(1.6, 3.2, t);
+      ST.trap.ac = ac;
+      const m = warpScan(t, ST.scan);
+      ST.trap.V = m * PHYS.kV * PHYS.qEject;
+      F.ring = 0.35 + 0.65 * ST.trap.V / 6000; F.acGlow = ac;
+      OVS.hudA = 1;
+      OVS.hud = { rf: 1, q: 1, scope: 1, spec: sstep(8.6, 9.6, t), V: ST.trap.V, species: CAL(), trap: ST.trap, ac, spectrum: ST.spectrum, rfNote: t > 9 ? '動畫在兩種離子之間快轉' : '',
+        specView: { lo: 100, hi: 1400, step: 200, vAxis: true, cursor: t > 9 ? m : null }, hide: (s) => !ST.counts[s.mz] };
+      OVS.labels = labels(ST, t, [
+        ['asm:capIn', '端帽交流電壓', '約 280 kHz(計算值)', 1.4, 8.4, -40, -120],
+        ['asm:capOut', '兩片端帽反相', '相差 180°', 2.2, 8.4, 50, -105],
+      ]);
+    },
+  },
+  {
+    key: 'detect', title: '偵測與質譜', dur: 26,
+    cam: [K(4, D(296, -4, 0), [0.035, 0.025, 0.25], { sx: HUDX }), K(10, D(292, -3, 0), [0.045, 0.03, 0.26], { sx: HUDX }),
+      K(17.5, D(280, 0, 0), [0.05, 0.05, 0.27], { sx: HUDX }), K(26, D(250, -8, 0), [0.1, 0.12, 0.62], { sx: HUDX })],
+    cues: [
+      [0.3, '從出口端帽出去的離子被 **−15 kV** 的**轉換二次發射電極**吸過去,撞出電子和負離子;這些二次粒子進入**電子倍增器**,沿著管壁一路倍增約 30 萬倍。'],
+      [8.8, '偵測器本身分不出質荷比,只記錄每個時刻收到多少電荷。電腦知道那一刻的射頻振幅,再依質量校正換算成 m/z,訊號對時間的曲線就成了質譜。'],
+      [17.2, '往另一側端帽飛出的離子收不到,大約只有一半進到偵測器。實際的掃描每秒約掃過 5,500 個 m/z 單位,從 150 掃到 2000 只要 0.34 秒。'],
+    ],
+    enter(ST) {
+      ST.trap.reset(35); ST.trap.V = 500; setSample('cal'); ST.trap.fill(26); ST.spectrum.reset();
+      ST.scan = scanKeys(1.2, CAL().map((s) => s.mz), 500 / (PHYS.kV * PHYS.qEject), 1320, 2, 2.0, 3.6);
+    },
+    update(ST, t) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1; F.trapVis = 1; F.he = 0.5; F.trails = 0.6; F.scanLed = 1; F.acquire = true;
+      ST.trap.ac = 1; F.acGlow = 1;
+      const m = warpScan(t, ST.scan);
+      ST.trap.V = m * PHYS.kV * PHYS.qEject; F.ring = 0.35 + 0.65 * ST.trap.V / 6000;
+      OVS.hudA = 1;
+      OVS.hud = { rf: 1, spec: 1, V: ST.trap.V, spectrum: ST.spectrum, rfNote: '動畫在兩種離子之間快轉', specView: { lo: 100, hi: 1400, step: 200, vAxis: true, cursor: m < 1310 ? m : null } };
+      OVS.labels = labels(ST, t, [
+        ['asm:dynode', '轉換二次發射電極', '−15 kV(正離子模式)', 0.8, 8.6, 70, 10],
+        ['asm:mult', '電子倍增器', '增益約 3×10⁵', 1.6, 8.6, 70, -40],
+      ]);
+      OVS.banner = { text: '實際速度:m/z 150 掃到 2000 只要 0.34 秒', a: win(t, 19.6, 26, 0.5) };
+    },
+  },
+  {
+    key: 'msms', title: '串聯質譜 MS/MS', dur: 34,
+    cam: [K(3, D(266, 0, 0), [0.015, 0.02, 0.15], { sx: HUDX }), K(34, D(272, -2, 0), [0.03, 0.03, 0.17], { sx: HUDX })],
+    cues: [
+      [0.3, '同一個離子阱還能做**串聯質譜**。以{611|蘆丁 [M+H]⁺ m/z 611}當前驅物離子:先用一段寬頻波形把其他離子全部排掉,只留下 611。'],
+      [8.6, '再把射頻振幅調到讓 611 停在 **q = 0.25**,用它自己的振盪頻率輕輕推 30 ms。離子和氦原子一次次碰撞,累積能量後斷鍵。'],
+      [16.8, '失去一個鼠李糖基(146)得到 {465|m/z 465},失去整個芸香糖基(308)就是{303|槲皮素苷元 m/z 303}。最後照樣掃描排出,得到產物離子譜圖。'],
+      [27.6, 'MS/MS 不需要第二個分析器,每一步都在同一個阱裡按時間先後完成;這台儀器最多可以做到 MS¹⁰。'],
+    ],
+    enter(ST) {
+      ST.trap.reset(36); ST.trap.V = 500; setSample('np'); ST.trap.fill(18); ST.spectrum.reset();
+      ST.iso = 0; ST.act = 0;
+      ST.scan = scanKeys(17.4, [303.05, 465.10, 611.16], 782 / (PHYS.kV * PHYS.qEject), 700, 1, 1.6, 3.6);
+    },
+    update(ST, t, dt) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1; F.trapVis = 1; F.he = 0.6; F.trails = 0.8; F.ring = 0.45;
+      const tr = ST.trap, rut = 611.16;
+      // 1) isolation: broadband waveform kicks out everything except m/z 611
+      if (t > 2.2 && t < 7.5) {
+        for (const o of tr.ions) if (Math.abs(o.mz - rut) > 1 && !o.kick) { o.kick = 1; o.kickAt = 2.4 + tr.r() * 4.2; }
+        for (const o of tr.ions) if (o.kick && t > o.kickAt) o.A += dt * 26;
+        F.acGlow = 0.6;
+      }
+      // 2) move 611 to q = 0.25
+      if (t >= 7.5 && t < 17.4) tr.V = lerp(500, 782, sstep(7.6, 9.4, t));
+      // 3) resonance excitation at the secular frequency of 611
+      if (t > 10 && t < 16.2) {
+        tr.excite = { mz: rut, q: 0.25, amp: 2.6 };
+        for (const o of tr.ions) if (Math.abs(o.mz - rut) < 1 && !o.cid) {
+          const pick = tr.r() < 0.55 ? 465.10 : 303.05;
+          o.cid = { need: 1.6 + tr.r() * 3.4, products: [{ mz: pick, p: 1 }] };
+        }
+        F.acGlow = 0.4 + 0.3 * Math.sin(t * 9);
+      } else tr.excite = null;
+      // 4) scan out the products
+      let m = null;
+      if (t >= 17.4) {
+        tr.ac = sstep(17.4, 18, t); F.acGlow = tr.ac; F.acquire = true;
+        m = warpScan(t, ST.scan);
+        tr.V = m * PHYS.kV * PHYS.qEject;
+      } else tr.ac = 0;
+      const step = t < 2.2 ? 0 : t < 8.6 ? 1 : t < 16.8 ? 2 : 3;
+      const stepT = [[0, 2.2], [2.2, 8.6], [8.6, 16.8], [16.8, 34]][step];
+      OVS.hudA = 1;
+      OVS.hud = { q: 1, steps: 1, stepList: ['裝入離子', '隔離 m/z 611', '共振激發,碰撞誘發解離', '掃描排出產物離子'], step, stepProg: (t - stepT[0]) / (stepT[1] - stepT[0]),
+        spec: sstep(17, 18, t), V: tr.V, species: ST.speciesNow(), spectrum: ST.spectrum,
+        specView: { lo: 150, hi: 700, step: 100, cursor: m, title: '產物離子譜圖:m/z 611 的碎片', right: 'MS²' }, hide: (s) => !ST.counts[s.mz] };
+    },
+  },
+  {
+    key: 'recap', title: '重點整理', dur: 17,
+    cam: [KP(8, V3(0.12, 1.0, 2.25), V3(-0.04, 0.6, 0)), KP(17, V3(0.26, 1.04, 2.34), V3(-0.04, 0.6, 0))],
+    cues: [],
+    enter(ST) { ST.trap.reset(37); setSample('cal'); ST.trap.fill(10); ST.trap.V = 500; },
+    update(ST, t) {
+      F.pose = 1; F.cab = 0; F.cabSlide = 1; F.trapVis = 1; F.gas = 0.6;
+      OVS.recap = win(t, 0.6, 13.4, 0.8);
+      OVS.recapReveal = (t - 1.0) / 1.6;
+      OVS.recapLines = [
+        '同樣的射頻電壓下,每種質荷比的 **q** 不同,振盪頻率也不同。',
+        '端帽上固定頻率的交流電壓,只推得動頻率對上的那一種離子。',
+        '射頻振幅等速上升,離子依質荷比由小到大,輪流對上節拍被排出。',
+        '排出的時刻對應射頻振幅,射頻振幅對應 **m/z**,這就是質譜的橫軸。',
+      ];
+      OVS.endCard = win(t, 13.4, 17.2, 0.8);
+    },
+  },
+];
+let acc = 0;
+for (const ch of CHAPTERS) { ch.t0 = acc; acc += ch.dur; }
+const TOTAL = acc;
+function chapterAt(t) {
+  for (let i = CHAPTERS.length - 1; i >= 0; i--) if (t >= CHAPTERS[i].t0) return i;
+  return 0;
+}
+function lastKey(i) { const ch = CHAPTERS[i]; return ch.cam.length ? ch.cam[ch.cam.length - 1] : ch.start; }
+const _camOut = { p: V3(), l: V3(), fov: 30, sx: 0, sy: 0.04 };
+function storyCamera(i, t) {
+  const ch = CHAPTERS[i];
+  const keys = [i === 0 ? ch.start : { ...lastKey(i - 1), t: 0 }, ...ch.cam];
+  let a = keys[0], b = keys[keys.length - 1];
+  for (let k = 1; k < keys.length; k++) if (t <= keys[k].t) { a = keys[k - 1]; b = keys[k]; break; }
+  const u = b.t > a.t ? ease(clamp((t - a.t) / (b.t - a.t), 0, 1)) : 1;
+  _camOut.p.copy(a.p).lerp(b.p, u);
+  _camOut.l.copy(a.l).lerp(b.l, u);
+  _camOut.fov = lerp(a.fov, b.fov, u);
+  _camOut.sx = lerp(a.sx, b.sx, u);
+  _camOut.sy = lerp(a.sy, b.sy, u);
+  return _camOut;
+}
+
+
+// ---- app.js ----
+
+// =====================================================================
+// App: scene assembly, main loop, player controls, sandbox, recording
+// =====================================================================
+initMaterials();
+const cab = buildCabinet();
+scene.add(cab.group);
+const asm = buildAssembly();
+scene.add(asm.group);
+const esi = new EsiSim(asm.group);
+const trans = new TransportSim(asm.group);
+const gas = new GasSim(asm.group);
+const trap = new TrapSim(asm.group);
+const saddle = new SaddleSim(asm.group);
+const spectrum = new Spectrum();
+const ST = {
+  cab, asm, esi, trans, gas, trap, saddle, spectrum, counts: {}, scan: null,
+  speciesNow() {
+    const seen = new Map();
+    for (const o of trap.ions) if (!seen.has(o.mz)) seen.set(o.mz, { mz: o.mz });
+    return [...seen.values()].sort((a, b) => a.mz - b.mz);
+  },
+};
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.enabled = false;
+
+const APP = { mode: 'story', playing: false, t: 0, chapter: 0, userCam: false, blend: 1, blendFrom: null, simT: 0, hintTimer: 0 };
+const qCab = new THREE.Quaternion().setFromAxisAngle(V3(0, 1, 0), Math.PI / 2), qDio = new THREE.Quaternion();
+const mobile = () => OV.W / OV.H < 1.15;
+
+// ---------- simulation step shared by story, sandbox and recording ----------
+function simStep(dt) {
+  APP.simT += dt;
+  esi.step(dt, { spray: F.spray }, (x, y, z, sp) => trans.addFree(x, y, z, sp));
+  trans.step(dt, { feed: F.feed, feedFrom: F.feedFrom, gateOpen: F.gateOpen, neutrals: F.neutrals }, (sp) => { if (F.trapAccept) trap.addIon(sp, true); });
+  trap.step(dt, {});
+  if (trap.events.length) {
+    if (F.acquire) for (const e of trap.events) spectrum.add(e.mz, 1, e.col);
+    trap.events.length = 0;
+  }
+  saddle.step(dt, { omega: F.saddleOmega, mix: F.saddleMix });
+  const c = (ST.counts = {});
+  for (const o of trap.ions) c[o.mz] = (c[o.mz] || 0) + 1;
+}
+function storyUpdate(dt) {
+  const i = APP.chapter, ch = CHAPTERS[i], lt = APP.t - ch.t0;
+  resetF();
+  ch.update(ST, lt, dt);
+  OVS.caption = caption(ch, lt, i);
+}
+function storyStep(dt) {
+  const next = Math.min(TOTAL, APP.t + dt);
+  const i = chapterAt(next);
+  if (i !== APP.chapter) { APP.chapter = i; APP.t = CHAPTERS[i].t0; if (CHAPTERS[i].enter) CHAPTERS[i].enter(ST, true); }
+  APP.t = next;
+  storyUpdate(dt);
+  simStep(dt);
+  if (APP.t >= TOTAL - 1e-6) setPlaying(false);
+}
+function seek(t, keepPlay = true) {
+  t = clamp(t, 0, TOTAL - 0.01);
+  const i = chapterAt(t), ch = CHAPTERS[i];
+  esi.reset(11 + i); trans.reset(12 + i); trap.reset(13 + i); saddle.reset(14 + i); spectrum.reset(); setSample('cal');
+  APP.chapter = i; APP.t = ch.t0;
+  if (ch.enter) ch.enter(ST, false);
+  const h = 1 / 30;
+  for (let s = 0; s < (ch.prewarm || 0); s += h) { storyUpdate(h); simStep(h); }
+  APP.t = ch.t0;
+  while (APP.t < t - 1e-6) { const d = Math.min(h, t - APP.t); APP.t += d; storyUpdate(d); simStep(d); }
+  storyUpdate(0);
+  APP.userCam = false;
+  if (!keepPlay) setPlaying(false);
+  updateBar(true);
+}
+
+// ---------- apply frame state to the scene ----------
+const TEAL = new THREE.Color('#1fb5ae'), AMBER = new THREE.Color('#ff9a2e'), RINGC = new THREE.Color('#9cc8ff');
+const _q = new THREE.Quaternion();
+function applyFrame(tVis) {
+  setCabinetFade(cab, F.cab);
+  const sl = ease(F.cabSlide);
+  cab.group.position.set(0, -0.08 * sl, -1.5 * sl);
+  cab.P.cover.position.set(0, 0.34 * ease(F.cover), -0.22 * ease(F.cover));
+  cab.P.cover.rotation.x = -0.12 * ease(F.cover);
+  cab.P.doorL.rotation.y = -1.7 * ease(F.door);
+  cab.P.ledMats.forEach((m, k) => { m.emissiveIntensity = k === 4 ? (F.scanLed ? (Math.sin(tVis * 18) > 0 ? 2.4 : 0.25) : 0.25) : 2.2; });
+  cab.P.winGlow.material.opacity = F.winGlow * (0.22 + 0.06 * Math.sin(tVis * 3)) * F.cab;
+  // assembly pose: inside the cabinet (1:1) -> floating diorama (3:1)
+  const e = F.pose;
+  asm.group.position.lerpVectors(CABPOSE.pos, DIO.pos, e);
+  asm.group.position.y += 0.22 * Math.sin(Math.PI * e);
+  asm.group.quaternion.copy(_q.copy(qCab).slerp(qDio, e));
+  asm.group.scale.setScalar(lerp(CABPOSE.s, DIO.s, e));
+  // electrode glows
+  MAT.heater.emissiveIntensity = F.heater * (2.4 + 0.4 * Math.sin(tVis * 2.2));
+  const rfa = F.rfGuide * (0.5 + 0.5 * Math.sin(tVis * 9)), rfb = F.rfGuide * (0.5 - 0.5 * Math.sin(tVis * 9));
+  MAT.rodA.emissive.copy(TEAL).multiplyScalar(rfa * 0.3); MAT.rodB.emissive.copy(TEAL).multiplyScalar(rfb * 0.3);
+  MAT.ghostA.emissive.copy(TEAL).multiplyScalar(rfa * 0.45); MAT.ghostB.emissive.copy(TEAL).multiplyScalar(rfb * 0.45);
+  MAT.ring.emissive.copy(RINGC).multiplyScalar(F.ring * (0.05 + 0.02 * Math.sin(tVis * 6)));
+  const wac = (BETA_EJECT * OMEGA_V) / 2, ac = Math.sin(wac * trap.t);
+  MAT.capIn.emissive.copy(AMBER).multiplyScalar(F.acGlow * 0.42 * (0.5 + 0.5 * ac));
+  MAT.capOut.emissive.copy(AMBER).multiplyScalar(F.acGlow * 0.42 * (0.5 - 0.5 * ac));
+  const ex = ease(F.explode), P = asm.P;
+  P.capIn.position.x = -11 * ex; P.capOut.position.x = 11 * ex; P.spIn.position.x = -5.5 * ex; P.spOut.position.x = 5.5 * ex;
+  P.lensIn.position.x = -17 * ex; P.lensOut.position.x = 17 * ex;
+  const rf = 1 - 0.88 * ex;
+  for (const m of [MAT.rodA, MAT.rodB]) { const tr = rf < 0.999; if (m.transparent !== tr) { m.transparent = tr; m.needsUpdate = true; } m.opacity = rf; m.depthWrite = !tr; }
+  MAT.ghostA.opacity = MAT.ghostB.opacity = 0.16 * rf;
+  P.rotor.rotation.y = tVis * 7;
+  P.taylor.visible = F.spray > 0.05;
+  P.taylor.scale.set(1, 0.3 + 0.7 * F.spray, 1);
+  // particles
+  esi.draw(F.sprayVis * F.spray > 0 ? F.sprayVis : 0);
+  trans.draw(F.transVis, APP.simT);
+  gas.draw(F.gas, F.he, APP.simT);
+  trap.draw(F.trapVis, F.trails, trap.t);
+  saddle.draw(F.saddle, F.saddleMix, !themeState.dark);
+  const pulses = trap.pulses.slice(-8);
+  const u = P.multGlow.uniforms.uP.value;
+  for (let k = 0; k < 8; k++) u[k] = k < pulses.length ? pulses[pulses.length - 1 - k] : -10;
+  P.multGlow.uniforms.uT.value = trap.t;
+  if (trap.pulses.length > 64) trap.pulses.splice(0, trap.pulses.length - 16);
+}
+
+// ---------- camera ----------
+const _blendP = V3(), _blendL = V3();
+// narrow screens keep the horizontal coverage of a 16:9 frame
+function adjFov(f) {
+  const asp = view.w / view.h;
+  return asp < 1.6 ? Math.min(78, (2 * Math.atan((Math.tan((f * Math.PI) / 360) * 16) / 9 / asp) * 180) / Math.PI) : f;
+}
+function updateCamera(dt) {
+  if (APP.mode === 'lab' || (APP.userCam && !APP.playing)) {
+    if (APP.mode === 'lab') camera.fov = adjFov(30);
+    controls.update();
+    view.shiftX = APP.mode === 'lab' && !mobile() ? 0.12 : 0; view.shiftY = 0.03;
+    applyViewOffset();
+    return;
+  }
+  const c = storyCamera(APP.chapter, APP.t - CHAPTERS[APP.chapter].t0);
+  let p = c.p, l = c.l;
+  const drift = APP.simT;
+  _blendP.copy(p).add(V3(Math.sin(drift * 0.21) * 0.004, Math.sin(drift * 0.17) * 0.003, 0).multiplyScalar(p.distanceTo(l)));
+  p = _blendP;
+  if (APP.blend < 1 && APP.blendFrom) {
+    APP.blend = Math.min(1, APP.blend + dt / 1.2);
+    const u = ease(APP.blend);
+    p = V3().lerpVectors(APP.blendFrom.p, p, u);
+    l = _blendL.lerpVectors(APP.blendFrom.l, l, u);
+  }
+  camera.position.copy(p);
+  camera.fov = adjFov(c.fov);
+  camera.lookAt(l);
+  controls.target.copy(l);
+  if (mobile()) { view.shiftX = 0; view.shiftY = c.sx > 0 ? -0.1 : c.sy; } else { view.shiftX = c.sx; view.shiftY = c.sy; }
+  applyViewOffset();
+}
+
+// ---------- render ----------
+let aoRadius = 0;
+function renderFrame() {
+  const dist = camera.position.distanceTo(controls.target);
+  camera.near = clamp(dist * 0.02, 0.002, 0.08);
+  camera.far = 60;
+  applyViewOffset();
+  const r = clamp(dist * 0.14, 0.008, 0.3);
+  if (Math.abs(r - aoRadius) / r > 0.08) { aoRadius = r; gtao.updateGtaoMaterial({ radius: r }); }
+  gtao.enabled = view.ao;
+  const P11 = camera.projectionMatrix.elements[5], pxH = view.h * view.pr, ws = asm.group.scale.x;
+  for (const s of POINT_SYSTEMS) s.mat.uniforms.uScale.value = ws * pxH * 0.5 * P11;
+  finish.uniforms.uTime.value = APP.simT;
+  composer.render();
+  drawOverlay();
+}
+
+// ---------- main loop ----------
+let last = performance.now(), slow = 0, frames = 0;
+function loop(now) {
+  const dt = clamp((now - last) / 1000, 0, 0.05);
+  last = now;
+  if (APP.rec) return;
+  if (APP.mode === 'lab') labStep(dt);
+  else if (APP.playing) storyStep(dt);
+  applyFrame(APP.simT);
+  updateCamera(dt);
+  renderFrame();
+  updateBar(false);
+  // simple quality governor
+  frames++;
+  if (dt > 0.034) slow++;
+  if (frames === 90) { if (slow > 45) { if (view.ao) view.ao = false; else if (view.pr > 1) resize(1); } frames = 0; slow = 0; }
+}
+
+// ---------- player bar ----------
+const rail = $('#rail'), playBtn = $('#play'), timeEl = $('#time'), tip = $('#tip');
+const segs = CHAPTERS.map((ch, i) => {
+  const s = document.createElement('div');
+  s.className = 'seg';
+  s.style.flex = String(ch.dur);
+  s.dataset.i = i;
+  s.innerHTML = '<i></i>';
+  rail.appendChild(s);
+  return s;
+});
+const fmtT = (t) => `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+let lastBar = -1;
+function updateBar(force) {
+  const t = APP.t;
+  if (!force && Math.abs(t - lastBar) < 0.05) return;
+  lastBar = t;
+  segs.forEach((s, i) => {
+    const ch = CHAPTERS[i];
+    s.firstChild.style.width = `${clamp((t - ch.t0) / ch.dur, 0, 1) * 100}%`;
+    s.classList.toggle('cur', i === APP.chapter);
+  });
+  timeEl.textContent = `${fmtT(t)} / ${fmtT(TOTAL)}`;
+  rail.setAttribute('aria-valuenow', String(Math.round((t / TOTAL) * 100)));
+  rail.setAttribute('aria-valuetext', `${CHAPTERS[APP.chapter].title},${fmtT(t)}`);
+}
+function railTime(clientX) {
+  for (const s of segs) {
+    const r = s.getBoundingClientRect();
+    if (clientX <= r.right + 1.5) { const ch = CHAPTERS[+s.dataset.i]; return ch.t0 + clamp((clientX - r.left) / r.width, 0, 1) * ch.dur; }
+  }
+  return TOTAL - 0.01;
+}
+rail.addEventListener('pointerdown', (e) => {
+  if (APP.mode === 'lab') exitLab();
+  rail.setPointerCapture(e.pointerId);
+  const was = APP.playing;
+  seek(railTime(e.clientX));
+  const move = (ev) => seek(railTime(ev.clientX));
+  const up = () => { rail.removeEventListener('pointermove', move); rail.removeEventListener('pointerup', up); setPlaying(was); };
+  rail.addEventListener('pointermove', move);
+  rail.addEventListener('pointerup', up);
+});
+rail.addEventListener('pointermove', (e) => {
+  const t = railTime(e.clientX), ch = CHAPTERS[chapterAt(t)];
+  tip.textContent = `${ch.title}  ${fmtT(t)}`;
+  tip.style.display = 'block';
+  const r = tip.getBoundingClientRect();
+  tip.style.left = `${clamp(e.clientX - r.width / 2, 8, innerWidth - r.width - 8)}px`;
+  tip.style.top = `${rail.getBoundingClientRect().top - r.height - 10}px`;
+});
+rail.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
+rail.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') { jumpChapter(1); e.preventDefault(); }
+  if (e.key === 'ArrowLeft') { jumpChapter(-1); e.preventDefault(); }
+});
+function jumpChapter(d) {
+  if (APP.mode === 'lab') exitLab();
+  const lt = APP.t - CHAPTERS[APP.chapter].t0;
+  const i = clamp(APP.chapter + (d < 0 && lt > 2 ? 0 : d), 0, CHAPTERS.length - 1);
+  seek(CHAPTERS[i].t0 + 0.01);
+}
+function setPlaying(p) {
+  if (p && APP.t >= TOTAL - 0.02) seek(0);
+  if (p && APP.userCam) { APP.blendFrom = { p: camera.position.clone(), l: controls.target.clone() }; APP.blend = 0; APP.userCam = false; }
+  APP.playing = p;
+  controls.enabled = !p || APP.mode === 'lab';
+  $('#playIcon').setAttribute('d', p ? 'M7 5h4v14H7zm6 0h4v14h-4z' : 'M8 5v14l11-7z');
+  playBtn.setAttribute('aria-label', p ? '暫停' : '播放');
+  if (!p && APP.mode === 'story') showHint('暫停中:拖曳畫面可以旋轉視角,按空白鍵繼續');
+}
+function showHint(text) {
+  const h = $('#hint');
+  h.textContent = text; h.classList.add('show');
+  clearTimeout(APP.hintTimer);
+  APP.hintTimer = setTimeout(() => h.classList.remove('show'), 3200);
+}
+playBtn.addEventListener('click', () => { if (APP.mode === 'lab') exitLab(); setPlaying(!APP.playing); });
+controls.addEventListener('start', () => { if (!APP.playing) APP.userCam = true; });
+addEventListener('keydown', (e) => {
+  if (e.target.closest('input, select, textarea, dialog[open]')) return;
+  if (e.code === 'Space') { e.preventDefault(); if (APP.mode === 'lab') exitLab(); setPlaying(!APP.playing); }
+  else if (e.key === 'ArrowRight') jumpChapter(1);
+  else if (e.key === 'ArrowLeft') jumpChapter(-1);
+  else if (e.key === 'f' || e.key === 'F') toggleFs();
+});
+function toggleFs() { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); }
+$('#fsBtn').addEventListener('click', toggleFs);
+$('#themeBtn').addEventListener('click', () => {
+  const next = themeState.dark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('lcq-theme', next); } catch (err) { /* private mode */ }
+  applyTheme();
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => applyTheme());
+function onThemeChanged(dark) { ovTheme(dark); }
+const about = $('#about');
+$('#infoBtn').addEventListener('click', () => { if (APP.playing) setPlaying(false); about.showModal(); });
+$('#aboutClose').addEventListener('click', () => about.close());
+
+// ---------- sandbox: drive the trap yourself ----------
+const labEl = $('#lab'), labBtn = $('#labBtn'), labV = $('#labV'), labVOut = $('#labVOut'), labAC = $('#labAC'), labSample = $('#labSample'), labRead = $('#labRead');
+const LAB = { auto: false, m: 0 };
+function labFill() {
+  setSample(labSample.value);
+  // ions are loaded at a low storage voltage, as on the instrument
+  labV.value = '500'; LAB.auto = false;
+  trap.reset(99); trap.V = 500; trap.fill(22); spectrum.reset();
+  trap.labMap = true;
+}
+function enterLab() {
+  APP.mode = 'lab'; APP.playing = false;
+  labEl.hidden = false; labBtn.classList.add('on'); labBtn.setAttribute('aria-pressed', 'true');
+  $('#playIcon').setAttribute('d', 'M8 5v14l11-7z');
+  esi.reset(91); trans.reset(92); saddle.reset(93);
+  labV.value = '500'; LAB.auto = false;
+  labFill();
+  controls.enabled = true;
+  controls.target.copy(D(272, -2, 0));
+  camera.position.copy(D(272, -2, 0)).add(V3(0.04, 0.035, 0.2));
+  camera.fov = 30;
+  controls.update();
+}
+function exitLab() {
+  if (APP.mode !== 'lab') return;
+  APP.mode = 'story';
+  labEl.hidden = true; labBtn.classList.remove('on'); labBtn.setAttribute('aria-pressed', 'false');
+  LAB.auto = false;
+  trap.labMap = false;
+  seek(APP.t, false);
+}
+labBtn.addEventListener('click', () => (APP.mode === 'lab' ? exitLab() : enterLab()));
+labSample.addEventListener('change', labFill);
+$('#labInject').addEventListener('click', () => { LAB.auto = false; labFill(); });
+$('#labScan').addEventListener('click', () => {
+  if (LAB.auto) { LAB.auto = false; return; }
+  if (!trap.ions.length) labFill();
+  spectrum.reset();
+  LAB.auto = true; LAB.m = trap.V / (PHYS.kV * PHYS.qEject);
+  labAC.checked = true;
+});
+labV.addEventListener('input', () => { LAB.auto = false; });
+function labStep(dt) {
+  resetF();
+  Object.assign(F, { pose: 1, cab: 0, cabSlide: 1, trapVis: 1, he: 0.5, trails: 1, acquire: true });
+  if (LAB.auto) {
+    const hiW = labAC.checked ? 1.03 : 1.12;
+    const near = sampleState.list.some((s) => trap.ions.some((o) => o.mz === s.mz) && LAB.m / s.mz > 0.91 && LAB.m / s.mz < hiW);
+    LAB.m += dt * LAB.m * (near ? 0.022 : 0.2);
+    const v = LAB.m * PHYS.kV * PHYS.qEject;
+    if (v >= PHYS.Vmax) { LAB.auto = false; labV.value = String(PHYS.Vmax); } else labV.value = String(Math.round(v));
+  }
+  const target = +labV.value;
+  trap.V += (target - trap.V) * Math.min(1, dt * 6);
+  trap.ac = labAC.checked ? 1 : 0;
+  F.acGlow = trap.ac; F.ring = 0.35 + 0.65 * trap.V / 8500;
+  simStep(dt);
+  labVOut.textContent = `${fmtV(trap.V)} V`;
+  $('#labScan').textContent = LAB.auto ? '停止掃描' : '自動掃描';
+  const L = sampleState.list;
+  labRead.innerHTML = L.map((s) => {
+    const q = qOf(trap.V, s.mz), n = ST.counts[s.mz] || 0;
+    const state = n ? (q >= PHYS.qMax ? '不穩定' : `q ${q.toFixed(3)}`) : '已排出';
+    return `<span style="color:${cssForMz(s.mz)}">●</span> m/z ${s.mz.toFixed(1)}  ${state}`;
+  }).join('<br>') + `<br>低質量截止 m/z ${(trap.V / (PHYS.kV * PHYS.qMax)).toFixed(0)}`;
+  const lo = L[0].mz < 200 ? 100 : 150, hi = sampleState.key === 'np' ? 700 : 1400;
+  OVS.hudA = 1;
+  OVS.hud = { rf: 1, q: 1, scope: 1, spec: 1, V: trap.V, species: L, trap, ac: trap.ac, spectrum, hide: (s) => !ST.counts[s.mz],
+    specView: { lo, hi, step: hi > 1000 ? 200 : 100, vAxis: true, cursor: trap.V / (PHYS.kV * PHYS.qEject) } };
+  OVS.caption = null;
+}
+
+// ---------- size ----------
+function resize(prOverride) {
+  const w = innerWidth, h = innerHeight;
+  let pr = prOverride ?? Math.min(devicePixelRatio || 1, 2);
+  if (w * h * pr * pr > 3.4e6) pr = Math.sqrt(3.4e6 / (w * h));
+  setRenderSize(w, h, pr);
+  const barH = $('#bar').getBoundingClientRect().height + 22;
+  ovResize(w, h, pr, barH);
+}
+addEventListener('resize', () => { if (!APP.rec) resize(); });
+
+// ---------- recording to MP4 (WebCodecs + mp4-muxer) ----------
+const yieldTask = () => new Promise((r) => { const ch = new MessageChannel(); ch.port1.onmessage = () => r(); ch.port2.postMessage(0); });
+async function record(opt = {}) {
+  const fps = opt.fps || 30, w = opt.width || 1920, h = opt.height || 1080, from = opt.from ?? 0, to = Math.min(opt.to ?? TOTAL, TOTAL);
+  const state = (APP.rec = { progress: 0, done: false, error: null, bytes: 0 });
+  const recState = $('#recState');
+  try {
+    const { Muxer, ArrayBufferTarget } = await import('https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.1/+esm');
+    if (APP.mode === 'lab') exitLab();
+    document.body.classList.add('rec');
+    setRenderSize(w, h, 1);
+    ovResize(w, h, 1, 0);
+    view.ao = true;
+    const grain = finish.uniforms.uGrain.value;
+    finish.uniforms.uGrain.value = 0;
+    state.restoreGrain = grain;
+    const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: 'avc', width: w, height: h, frameRate: fps }, fastStart: 'in-memory' });
+    const enc = new VideoEncoder({ output: (chunk, meta) => muxer.addVideoChunk(chunk, meta), error: (e) => { state.error = String(e); } });
+    enc.configure({ codec: 'avc1.640028', width: w, height: h, bitrate: opt.bitrate || 7e6, framerate: fps, latencyMode: 'quality' });
+    state.t0 = performance.now();
+    const rc = document.createElement('canvas');
+    rc.width = w; rc.height = h;
+    const rg = rc.getContext('2d');
+    seek(from);
+    APP.playing = true;
+    const N = Math.round((to - from) * fps), dt = 1 / fps;
+    for (let i = 0; i < N; i++) {
+      if (state.error || state.cancel) break;
+      if (i > 0) storyStep(dt);
+      applyFrame(APP.simT);
+      updateCamera(dt);
+      renderFrame();
+      rg.drawImage(renderer.domElement, 0, 0, w, h);
+      rg.drawImage(OV.cv, 0, 0, w, h);
+      const vf = new VideoFrame(rc, { timestamp: Math.round((i * 1e6) / fps), duration: Math.round(1e6 / fps) });
+      enc.encode(vf, { keyFrame: i % (fps * 2) === 0 });
+      vf.close();
+      while (enc.encodeQueueSize > 8) await new Promise((r) => enc.addEventListener('dequeue', r, { once: true }));
+      if (i % 30 === 0) {
+        state.progress = i / N;
+        state.fps = i / ((performance.now() - state.t0) / 1000);
+        if (recState) recState.textContent = `錄製中 ${Math.round(state.progress * 100)}%`;
+        await yieldTask();
+      }
+    }
+    await enc.flush();
+    muxer.finalize();
+    const buf = muxer.target.buffer;
+    state.bytes = buf.byteLength;
+    if (opt.upload) {
+      const res = await fetch(opt.upload, { method: 'POST', body: buf });
+      state.uploaded = await res.text();
+    } else {
+      const url = URL.createObjectURL(new Blob([buf], { type: 'video/mp4' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = 'ion-trap-ms.mp4';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }
+    if (recState) recState.textContent = `完成,${(buf.byteLength / 1e6).toFixed(0)} MB`;
+  } catch (e) {
+    state.error = String(e && e.stack || e);
+    if (recState) recState.textContent = '錄製失敗:' + (e && e.message || e);
+  } finally {
+    state.done = true;
+    if (state.restoreGrain != null) finish.uniforms.uGrain.value = state.restoreGrain;
+    APP.rec = null;
+    APP.playing = false;
+    document.body.classList.remove('rec');
+    resize();
+    seek(APP.t, false);
+    window.__lastRec = state;
+  }
+  return state;
+}
+$('#recBtn').addEventListener('click', () => { if (!APP.rec) record(); });
+
+// ---------- visitor counter: Abacus (free counter API), one count per browser, only on the published site ----------
+async function loadVisits() {
+  const el = $('#visits'), num = $('#visitsN');
+  const online = /\.github\.io$/.test(location.hostname);
+  let seen = false;
+  try { seen = localStorage.getItem('lcq-visited') === '1'; } catch (err) { /* storage blocked */ }
+  const op = online && !seen ? 'hit' : 'get';
+  try {
+    const ctl = new AbortController();
+    const to = setTimeout(() => ctl.abort(), 6000);
+    const res = await fetch(`https://abacus.jasoncameron.dev/${op}/tung-beauregard-github-io/instrument-principles`, { signal: ctl.signal, cache: 'no-store' });
+    clearTimeout(to);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!Number.isFinite(data.value)) return;
+    if (op === 'hit') { try { localStorage.setItem('lcq-visited', '1'); } catch (err) { /* ignore */ } }
+    num.textContent = data.value.toLocaleString('en-US');
+    el.hidden = false;
+  } catch (err) { /* offline or service down: keep it hidden */ }
+}
+
+// ---------- boot ----------
+async function boot() {
+  applyTheme();
+  resize();
+  const src = [...document.scripts].map((s) => s.textContent).join('');
+  const cjk = [...new Set(src.match(/[\u{2000}-\u{206f}\u{3000}-\u{9fff}\u{ff00}-\u{ffef}·°µ±×⁰-⁹₀-₉]/gu) || [])].join('');
+  const fontLoads = [400, 500, 700].map((wt) => document.fonts.load(`${wt} 30px "Noto Sans TC"`, cjk + 'LCQ'))
+    .concat([400, 500, 600].map((wt) => document.fonts.load(`${wt} 30px "IBM Plex Mono"`, '0123456789.,:/V kHzm/zLCQ Deca XP')));
+  await Promise.race([Promise.all(fontLoads), new Promise((r) => setTimeout(r, 7000))]);
+  seek(0);
+  applyFrame(0);
+  updateCamera(0);
+  $('#loading').classList.add('done');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setPlaying(!reduce && !new URLSearchParams(location.search).has('paused'));
+  renderer.setAnimationLoop(loop);
+  loadVisits();
+}
+// development helper: render one frame at a fixed size and post it to the local server
+async function shot(t, name, w = 1280, h = 720) {
+  if (t != null) seek(t, false);
+  setRenderSize(w, h, 1);
+  ovResize(w, h, 1, 0);
+  applyFrame(APP.simT); updateCamera(0); renderFrame();
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const g = c.getContext('2d');
+  g.drawImage(renderer.domElement, 0, 0, w, h);
+  g.drawImage(OV.cv, 0, 0, w, h);
+  const blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.88));
+  resize();
+  if (location.protocol.startsWith('http')) await fetch(`/save?name=${encodeURIComponent(name)}`, { method: 'POST', body: blob });
+  return blob.size;
+}
+// development helper: play continuously (no seeking) up to time t1 with a fixed step
+function run(t1, fps = 30) {
+  const t0 = performance.now();
+  while (APP.t < t1 - 1e-6) storyStep(Math.min(1 / fps, t1 - APP.t));
+  return Math.round(performance.now() - t0);
+}
+window.lcq = { record, seek, setPlaying, shot, run, APP, TOTAL, CHAPTERS, trap, spectrum, view, ST, lab: { enterLab, exitLab, labStep } };
+boot();
+
+
+</script>
+</body>
+</html>

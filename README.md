@@ -1,64 +1,70 @@
-# 儀器原理
+# 儀器原理｜W AI Studio
 
-用互動 3D 動畫說明實驗室儀器的原理。
+以互動 3D 教材認識分析儀器。入口頁延續 W AI Studio 的品牌風格，整理已開放與即將加入的教材。
 
-## 離子阱質譜原理(以 LCQ Deca XP 為例)
+- [儀器入口](https://tung-beauregard.github.io/instrument-principles/)
+- [離子阱質譜](https://tung-beauregard.github.io/instrument-principles/lcq/)
+- [UV-Vis 分光光度計](https://tung-beauregard.github.io/instrument-principles/uv-vis/)
+- [GC-MS](https://tung-beauregard.github.io/instrument-principles/gc-ms/)
+- [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-網頁:https://tung-beauregard.github.io/instrument-principles/
+目前共有三份教材：離子阱質譜、GC-MS、UV-Vis 分光光度計。儀器型號與規格以各教材的來源說明為準。
 
-沿著離子走的路徑看一遍離子阱質譜儀的硬體:電灑游離、加熱毛細管、截取錐、四極桿與八極桿、離子阱、偵測器。後半段說明離子阱怎麼依質荷比把離子分開,最後示範 MS/MS。範例儀器是 Thermo Finnigan LCQ Deca XP。
+## 專案結構
 
-- 打開就自動播放,附中文字幕,共 13 章,約 5 分鐘
-- 暫停後可以拖曳旋轉視角;空白鍵播放或暫停,左右方向鍵切換章節
-- 「自己操作」可以自己調射頻振幅、做掃描
-- 說明視窗裡可以把整段動畫錄成 1080p 的 MP4
+```text
+index.html                 儀器入口；含完整靜態備援內容
+assets/
+  styles.css               入口頁樣式與響應式版面
+  app.js                   教材清單載入、首頁動畫控制
+  *.svg                    品牌與儀器概念示意
+content/
+  instruments.json         儀器清單、順序、介紹、狀態與連結
+lcq/index.html             原本根目錄的離子阱教材
+gc-ms/index.html           GC-MS 教材
+uv-vis/index.html          UV-Vis 分光光度計教材
+scripts/check-site.mjs     資料、相對連結與靜態備援檢查
+.nojekyll                  GitHub Pages 靜態網站設定
+README.md                  專案導覽與預覽方式
+INSTRUMENTS.md             各儀器功能、數據與示意說明
+AGENTS.md                  未來開發與維護規則
+```
 
-### 數值與示意
+根目錄現在是入口頁；原本位於根目錄的離子阱教學移至 `lcq/`。GC-MS 網址維持 `gc-ms/`，三份教材都能返回入口並互相切換。教材本身的模型、科學計算與原有控制功能保留。
 
-主要數值取自 Finnigan LCQ Series Hardware Manual、LCQ Deca Hardware Manual、LCQ Deca XP Plus 規格表、March (1997) 與 Wong & Cooks (1997)。約 280 kHz 的端帽交流頻率與每 m/z 約 4.25 V 是依這些數值計算的,手冊沒有直接寫。
+## 維護內容
 
-毛細管長度、桿子尺寸與偵測器幾何是示意;液滴、離子雲與振盪幅度已放大,時間也放慢了很多倍。
+HTTP 網站會載入 `content/instruments.json`；此檔是儀器卡片文案的主要來源。排列順序就是陣列順序。入口用安全 DOM API 填入純文字，資料載入失敗時保留 HTML 的完整卡片與連結。
 
-### 技術
+- `status: "ready"`：教材已完成，必須填入有效相對網址 `href`。
+- `status: "upcoming"`：僅顯示準備中狀態，不產生可點擊的教材連結。
+- `theme`：`mint`、`blue` 或 `lavender`。
+- `image`：本站 SVG 或其他靜態圖片相對路徑。
+- 修改資料後，同步更新 `index.html` 的靜態備援卡片、數量及相關介紹。執行檢查避免兩份文案不一致。
 
-單一 HTML 檔,用 three.js 繪圖,不需要建置。底部的到站人數由免費的 Abacus 計數服務記錄,同一台裝置只算一次。
+新增教材時，先以 `upcoming` 建立項目；完成獨立教材頁面並驗證後，更新標題、標籤、連結與狀態。同時更新入口靜態備援，以及 W AI Studio 的卡片與介紹彈窗。
 
-## GC-MS 氣相層析質譜
+## 本機預覽與檢查
 
-網頁:https://tung-beauregard.github.io/instrument-principles/gc-ms/
+網站不需要 npm 套件或編譯。用任一靜態 HTTP 伺服器服務此目錄；例如已有 Python 時：
 
-把 ALS 自動進樣器、氣相層析儀與四極桿質譜儀拆開來看,跟著一針精油樣品走一趟:進樣、在 30 m 管柱裡依滯留因子 k 分開,再進質譜帶電、碎裂、按質荷比篩選。
+```sh
+python -m http.server 8000
+```
 
-- 「導覽」讓鏡頭跟著一個成分的分子走完 8 站:進樣、進樣口、管柱、傳輸線、離子源、四極桿、偵測器、完成
-- 放大鏡:在管柱內部看分子在液膜與載氣之間進出;暫停在峰上會切到離子源,示範 M⁺• 怎麼形成、怎麼斷成碎片
-- 質譜面板的「四極桿」檢視畫出 Mathieu 穩定圖,可以把四極桿固定在某個 m/z
-- 可切換升溫速率(3、5、10 °C/min)、拆開儀器,播放速度有 0.1× 與 0.5× 慢動作
-- 層析圖可拖曳捲動、點峰追蹤、點質譜線抽出 EIC;峰表附用正烷烴換算的 KI
+瀏覽 `http://localhost:8000/`。直接開啟 `index.html` 也可看到入口靜態內容；HTTP 預覽才能驗證 JSON 載入。3D 教材透過 CDN 載入 three.js 與字型，需要網路與支援 WebGL 的瀏覽器。
 
-### 數值與示意
+如已安裝 Node.js，可執行不需第三方套件的檢查：
 
-管柱 HP-5MS 30 m × 0.25 mm × 0.25 μm、He 1.0 mL/min、柱溫 60 °C 起以 3、5 或 10 °C/min 升到 220 °C 後保持 3 min。各成分的滯留由非極性管柱的 KI 值換算(簡化的熱力學模型),峰寬以約 7 萬理論板數估算。樣品是虛構的示範組成;質譜只取主要離子,強度為概略值,只供說明,不可拿來鑑定。儀器外觀與尺寸是示意。
+```sh
+node scripts/check-site.mjs
+node --check assets/app.js
+```
 
-### 技術
+另需實際檢查：桌面與手機入口排版、三個教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
 
-單一 HTML 檔(gc-ms/index.html),用 three.js 繪圖,不需要建置。
+## 品牌與資料來源
 
-## UV-Vis 分光光度計
+品牌色與 W 標誌沿用 [w-studio](https://github.com/Tung-Beauregard/w-studio) 的 `brand-guide.md`：背景 `#0B1111`、薄荷綠 `#A5F3CD`、主字色 `#F0F3EE`。入口插圖是結構或概念示意，不是儀器照片、真實量測訊號或精確光學配置。
 
-網頁:https://tung-beauregard.github.io/instrument-principles/uv-vis/
-
-把雙光束、雙單色器的紫外可見光分光光度計拆開來看,跟著光從燈走到偵測器:氘燈與鹵素燈、換燈鏡、前置光柵與中間狹縫、主光柵與出口狹縫、分光鏡、參考槽與樣品槽,最後是兩個 Peltier 致冷的光二極體。
-
-- 「導覽」自動播一遍,附中文字幕,共 8 章,約 1 分半
-- 拖曳主光柵或波長滑桿改變波長(190 到 1100 nm),光路顏色、光柵角度與換燈鏡跟著變
-- 樣品可選 DPPH、福林酚呈色液、葉綠素萃取液與氧化鈥標準溶液;頻寬可選 0.2、0.5、1、2、4 nm
-- 「掃描」量出整條吸收光譜;換頻寬再掃一次,上一條會留著比較,頻寬越寬峰越矮也越寬
-- 可切換組裝與展開兩種外觀
-
-### 數值與示意
-
-規格取自原廠技術資料(2020 年 4 月版):190 到 1100 nm、頻寬 0.2 到 4 nm、220 nm 的雜散光 ≤0.005 %T、換燈點可設在 300 到 450 nm 之間(這裡用 320 nm)、兩個 Peltier 致冷的光二極體偵測器。機內元件的位置、角度與數量是示意;光柵轉角用每毫米 1200 條、夾角 20° 的光柵方程估算。光譜是依文獻吸收峰位置組合的模擬曲線,雜訊依通過的光量估算,不是實測數據。
-
-### 技術
-
-單一 HTML 檔(uv-vis/index.html),用 three.js 繪圖,不需要建置。
+教材來源及模擬限制見 [INSTRUMENTS.md](./INSTRUMENTS.md)。未來的維護約定見 [AGENTS.md](./AGENTS.md)。
