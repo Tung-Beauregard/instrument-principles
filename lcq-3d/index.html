@@ -178,20 +178,52 @@ button { font: inherit; color: inherit; }
 .tool svg { width: 15px; height: 15px; flex: none; }
 .tool.rec svg { color: var(--stop); }
 
-/* ---------- 下方:穩定圖與質譜 ---------- */
-.hud {
-  position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
-  display: flex; gap: 10px; align-items: flex-end; pointer-events: none;
-  max-width: calc(100% - 32px);
+/* ---------- 下方:穩定圖與質譜(各自獨立,可拖動、可縮放) ---------- */
+.hud { position: absolute; inset: 0; pointer-events: none; --scope-w: 352px; --scope-h: 205px; }
+.scope {
+  position: absolute; bottom: 16px; border-radius: 14px; padding: 8px 10px 9px;
+  pointer-events: auto; touch-action: none; cursor: move;
 }
-.scope { border-radius: 14px; padding: 8px 10px 9px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.scope header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
-.scope header b { font: 600 12px/1 var(--f-zh); color: var(--fg); letter-spacing: 0.04em; }
-.scope header i { font: 500 10px/1 var(--f-mono); color: var(--fg-3); font-style: normal; letter-spacing: 0.06em; white-space: nowrap; }
+#pStab { left: calc(50% - var(--scope-w) - 5px); }
+#pSpec { left: calc(50% + 5px); }
 .scope canvas { display: block; width: 330px; height: 186px; max-width: 100%; border-radius: 8px; }
 
+/* ---------- 導覽字幕(只在網頁上播放導覽時出現;錄影另外畫在畫面上) ---------- */
+.cap {
+  position: absolute; left: 50%; bottom: 26px; --tx: -50%; z-index: 9;
+  width: max-content; max-width: min(820px, calc(100% - 32px));
+  border-radius: 16px; padding: 14px 28px 16px; background: rgba(9, 13, 24, 0.76);
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+  pointer-events: auto; touch-action: none; cursor: move;
+}
+.cap i { font: 500 12px/1.2 var(--f-mono); letter-spacing: 0.12em; color: var(--ion); font-style: normal; }
+.cap b { font: 500 clamp(17px, 1.9vw, 26px)/1.45 var(--f-zh); color: var(--fg); text-wrap: balance; }
+.cap span { font: 400 clamp(13px, 1.2vw, 17px)/1.6 var(--f-zh); color: var(--fg-2); text-wrap: pretty; }
+.cap span:empty { display: none; }
+
+/* ---------- 浮動資訊框:拖動(上緣把手或框面)與縮放(右下角) ---------- */
+:where(.fp) { --fs: 1; --tx: 0px; --to: 0 0; }
+.fp { box-sizing: border-box; transform: translateX(var(--tx)) scale(var(--fs)); transform-origin: var(--to); }
+.fp-grip {
+  position: absolute; top: 1px; left: 50%; width: 44px; height: 14px; margin-left: -22px; padding: 0;
+  border: 0; background: none; cursor: move; pointer-events: auto; touch-action: none; z-index: 3; opacity: 0.4;
+}
+.fp-grip::before { content: ""; position: absolute; left: 10px; right: 10px; top: 5px; height: 3px; border-radius: 2px; background: var(--fg-2); }
+.fp-size {
+  position: absolute; right: 1px; bottom: 1px; width: 18px; height: 18px; padding: 0; border: 0; border-radius: 0 0 10px 0;
+  background:
+    linear-gradient(135deg, transparent 52%, var(--fg-2) 52%, var(--fg-2) 60%, transparent 60%, transparent 70%, var(--fg-2) 70%, var(--fg-2) 78%, transparent 78%);
+  cursor: nwse-resize; pointer-events: auto; touch-action: none; z-index: 3; opacity: 0.35;
+}
+.fp:hover .fp-grip, .fp:hover .fp-size, .fp-grip:focus-visible, .fp-size:focus-visible, .fp.dragging .fp-grip, .fp.scaling .fp-size { opacity: 1; }
+.fp-grip:focus-visible, .fp-size:focus-visible { outline: 2px solid var(--ion); outline-offset: 1px; }
+.fp.dragging, .fp.scaling { transition: none; user-select: none; }
+.side .brand, .side .stats, .side .why { pointer-events: auto; touch-action: none; cursor: move; }
+.ctl { cursor: move; touch-action: none; }
+.ctl button, .ctl input, .ctl output { cursor: pointer; }
+
 .hint {
-  position: absolute; left: 20px; bottom: 18px; pointer-events: none;
+  position: absolute; left: 20px; bottom: 18px; pointer-events: none; max-width: 300px;
   font: 400 11.5px/1.5 var(--f-zh); color: var(--fg-3);
 }
 
@@ -252,18 +284,28 @@ button { font: inherit; color: inherit; }
 .toast.show { opacity: 1; }
 
 /* 導覽或錄影時把介面收起來,只留畫面 */
-#app.cine .side, #app.cine .hud, #app.cine .hint { opacity: 0; pointer-events: none; }
-#app.cine .ctl { opacity: 0.18; transition: opacity 0.3s; }
-#app.cine .ctl:hover { opacity: 1; }
-.side, .hud, .hint { transition: opacity 0.4s; }
+#app.cine .side, #app.cine .hint { opacity: 0; pointer-events: none; }
+#app.cine .side .brand, #app.cine .side .stats, #app.cine .side .why, #app.cine .side .fp-grip, #app.cine .side .fp-size { pointer-events: none; }
+/* 導覽時控制面板只留一列按鈕,兩個示波窗預設排在右側,不和控制面板重疊 */
+#app.cine .ctl .row:not(.tools) { display: none; }
+#app.cine .hud { display: block; }
+#app.cine #pStab { left: auto; right: 18px; top: 82px; bottom: auto; --to: 100% 0; }
+#app.cine #pSpec { left: auto; right: 18px; top: calc(82px + (var(--scope-h) + 10px) * var(--fs)); bottom: auto; --to: 100% 0; }
+.side, .hint, .scope, .cap { transition: opacity 0.4s; }
 
 /* ---------- 窄螢幕 ---------- */
 @media (max-width: 1100px) {
   .scope canvas { width: 270px; height: 152px; }
+  .hud { --scope-w: 292px; --scope-h: 171px; }
   .hint { display: none; }
+}
+/* 視窗矮(例如瀏覽器放大)時,導覽中的示波窗預設縮小一點 */
+@media (max-height: 760px) {
+  #app.cine .scope { --fs: 0.8; }
 }
 @media (max-width: 860px) {
   .hud { display: none; }
+  #app.cine .scope { --fs: 0.62; }
 }
 @media (max-width: 760px) {
   .side { top: 12px; left: 16px; right: 16px; width: auto; gap: 8px; }
@@ -277,12 +319,13 @@ button { font: inherit; color: inherit; }
   .row { gap: 10px; }
   .seg button { padding: 0 8px; font-size: 12px; }
   .slide input[type="range"] { min-width: 0; }
+  #app.cine .cap { bottom: 114px; padding: 10px 16px 12px; }
 }
 @media (max-width: 420px) {
   .why { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .why, .toast, .side, .hud, .hint { transition: none; }
+  .why, .toast, .side, .hud, .hint, .scope, .cap { transition: none; }
 }
 
 /* 只用在「儀器原理」網站版:左上角的教材分頁列,其他元件往下讓位 */
@@ -309,6 +352,7 @@ button { font: inherit; color: inherit; }
   .ctl { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: none; }
   .hud { display: none; }
   .hint { display: none; }
+  #app.cine .cap { bottom: 90px; }
 }
 @media (max-width: 760px) {
   .side { top: 58px; }
@@ -362,14 +406,16 @@ button { font: inherit; color: inherit; }
       <button class="tool" id="tourBtn" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><span id="tourTxt">播放導覽</span></button>
       <button class="tool rec" id="recBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5" fill="currentColor"/></svg>錄成影片</button>
       <button class="tool" id="helpBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.4c-.7.3-1 .8-1 1.5v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>原理</button>
+      <button class="tool" id="layoutBtn" title="把所有資訊框放回預設的位置與大小"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg>重設版面</button>
     </div>
   </section>
 
   <div class="hud">
-    <section class="scope glass"><header><b>穩定圖</b><i>q<sub>z</sub> ・ a<sub>z</sub></i></header><canvas id="cvStab" width="660" height="372"></canvas></section>
-    <section class="scope glass"><header><b id="specTitle">質譜</b><i id="specSub">Full MS ・ m/z 150 至 2000</i></header><canvas id="cvSpec" width="660" height="372"></canvas></section>
+    <section class="scope glass" id="pStab" aria-label="穩定圖"><canvas id="cvStab" width="660" height="372"></canvas></section>
+    <section class="scope glass" id="pSpec" aria-label="質譜"><canvas id="cvSpec" width="660" height="372"></canvas></section>
   </div>
-  <div class="hint">拖曳旋轉,滾輪縮放,點零件看說明。按 C 播放導覽。</div>
+  <section class="cap glass" id="pCap" hidden aria-live="polite"><i id="capChap"></i><b id="capMain"></b><span id="capSub"></span></section>
+  <div class="hint">拖曳旋轉,滾輪縮放,點零件看說明。按 C 播放導覽。資訊框可拖曳移動,右下角拖曳縮放。</div>
 
   <div class="modal" id="help" hidden>
     <div class="card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
@@ -2839,6 +2885,7 @@ function stopTour() {
   if (!TOUR.on) return;
   TOUR.on = false;
   app.classList.remove('cine');
+  clearTourDom();
   $('#tourBtn').classList.remove('on'); $('#tourBtn').setAttribute('aria-pressed', 'false');
   $('#tourTxt').textContent = '播放導覽';
   CY.scripted = false; CY.durOv = null;
@@ -3026,6 +3073,7 @@ function bindUI() {
     syncAuto();
   };
   $('#tourBtn').onclick = () => (TOUR.on ? stopTour() : startTour());
+  $('#layoutBtn').onclick = resetAllFloats;
   $('#helpBtn').onclick = openHelp;
   $('#helpX').onclick = closeHelp;
   $('#help').addEventListener('click', (e) => { if (e.target.id === 'help') closeHelp(); });
@@ -3068,7 +3116,6 @@ function bindUI() {
 function syncModeButtons() {
   $('#mFull').classList.toggle('on', CY.mode === 'full'); $('#mFull').setAttribute('aria-pressed', String(CY.mode === 'full'));
   $('#mMS2').classList.toggle('on', CY.mode === 'msms'); $('#mMS2').setAttribute('aria-pressed', String(CY.mode === 'msms'));
-  $('#specSub') && ($('#specSub').textContent = '');
 }
 function syncAuto() { const b = $('#auto'); b.classList.toggle('on', CY.auto); b.setAttribute('aria-pressed', String(CY.auto)); }
 
@@ -3130,11 +3177,11 @@ function drawUIOverlay() {
   ovCtx.clearRect(0, 0, W, H);
   drawLabels(ovCtx, W, H, dpr, UI.hover);
   if (TOUR.on) {
+    // 字幕與示波窗改用可拖動的 DOM 資訊框;畫布上只畫左上角標題
     const s = dpr * clamp(H / dpr / 1080, 0.62, 1.3) * 1.75;
     const st = tourState();
-    drawScopes(ovCtx, W, H, s, st.hudStab, st.hudSpec);
     drawBug(ovCtx, W, H, s, st.bug);
-    drawCaption(ovCtx, W, H, s, st.cap, st.capA);
+    updateTourDom(st);
   }
 }
 function frame(now) {
@@ -3162,6 +3209,7 @@ function prewarm() {
 function boot() {
   registerPicks();
   bindUI();
+  initFloating();
   onResize();
   setView(QUERY.get('view') || 'asm');
   VS.explode = VS.explodeT; VS.cab = VS.cabT;
@@ -3175,6 +3223,159 @@ function boot() {
   });
   if (QUERY.has('tour')) startTour();
   if (QUERY.has('render') && typeof autoRender === 'function') autoRender();
+}
+
+// ==== 91_float.js ====
+// ================================================================ 可拖動、可縮放的資訊框
+// 每個資訊框預設用 CSS 排版;使用者第一次拖動或縮放時才「釘住」成固定座標,
+// 狀態 {x, y, s, w} 存在這台瀏覽器的 localStorage,「重設版面」或雙擊上緣把手可以還原。
+const FLOAT_KEY = 'lcq3d-panels-v1';
+const FLOATS = new Map();
+let floatState = {};
+function loadFloatState() {
+  try { floatState = JSON.parse(localStorage.getItem(FLOAT_KEY) || '{}') || {}; } catch (e) { floatState = {}; }
+}
+function saveFloatState() {
+  try { localStorage.setItem(FLOAT_KEY, JSON.stringify(floatState)); } catch (e) { /* 無法儲存時只在這次瀏覽有效 */ }
+}
+function applyFloat(id) {
+  const f = FLOATS.get(id);
+  if (!f) return;
+  const el = f.el, st = floatState[id];
+  if (!st) {
+    el.classList.remove('pinned');
+    for (const k of ['left', 'top', 'right', 'bottom', 'width']) el.style[k] = '';
+    for (const k of ['--tx', '--fs', '--to']) el.style.removeProperty(k);
+    return;
+  }
+  el.classList.add('pinned');
+  const a = app.getBoundingClientRect();
+  el.style.left = `${st.x}px`; el.style.top = `${st.y}px`;
+  el.style.right = 'auto'; el.style.bottom = 'auto';
+  if (st.w) el.style.width = `${Math.min(st.w, Math.max(160, a.width - 32))}px`;
+  el.style.setProperty('--tx', '0px');
+  el.style.setProperty('--to', '0 0');
+  el.style.setProperty('--fs', String(st.s));
+}
+// 把目前看到的位置與大小寫成固定座標(畫面不會跳)
+function pinFloat(id) {
+  const f = FLOATS.get(id), r = f.el.getBoundingClientRect(), a = app.getBoundingClientRect();
+  const s = parseFloat(getComputedStyle(f.el).getPropertyValue('--fs')) || 1;
+  // 固定寬度,避免改用左上角定位後內容重新換行;字幕內容會換,所以不固定
+  const w = f.fixWidth ? Math.ceil(r.width / s) + 1 : 0;
+  floatState[id] = { x: r.left - a.left, y: r.top - a.top, s, w };
+  applyFloat(id);
+}
+// 至少留一角在畫面內,上緣把手一定拿得到
+function clampFloat(id) {
+  const f = FLOATS.get(id), st = floatState[id];
+  if (!f || !st) return;
+  const r = f.el.getBoundingClientRect(), a = app.getBoundingClientRect();
+  st.x = clamp(st.x, 56 - r.width, a.width - 56);
+  st.y = clamp(st.y, 0, a.height - 32);
+  applyFloat(id);
+}
+function makeFloating(el, id, name, surfaces = [el], fixWidth = true) {
+  if (!el) return;
+  FLOATS.set(id, { el, name, fixWidth });
+  el.classList.add('fp');
+  const grip = document.createElement('button');
+  grip.type = 'button'; grip.className = 'fp-grip';
+  grip.title = `拖曳移動${name};方向鍵微調,雙擊還原`;
+  grip.setAttribute('aria-label', `移動${name}`);
+  const size = document.createElement('button');
+  size.type = 'button'; size.className = 'fp-size';
+  size.title = `拖曳縮放${name};也可以用 + 和 − 鍵`;
+  size.setAttribute('aria-label', `縮放${name}`);
+  el.append(grip, size);
+  const isControl = (t) => t.closest('button:not(.fp-grip), input, a, select, textarea, output, [role="slider"]');
+  const follow = (onMove, cls) => {
+    el.classList.add(cls);
+    const up = () => {
+      el.classList.remove(cls);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+      saveFloatState();
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+  };
+  const startDrag = (e) => {
+    if (e.button !== 0 || (e.currentTarget !== grip && isControl(e.target))) return;
+    e.preventDefault(); e.stopPropagation();
+    if (!floatState[id]) pinFloat(id);
+    const st = floatState[id], x0 = e.clientX, y0 = e.clientY, sx = st.x, sy = st.y;
+    follow((ev) => { st.x = sx + ev.clientX - x0; st.y = sy + ev.clientY - y0; clampFloat(id); }, 'dragging');
+  };
+  grip.addEventListener('pointerdown', startDrag);
+  for (const s of surfaces) s && s.addEventListener('pointerdown', startDrag);
+  size.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    if (!floatState[id]) pinFloat(id);
+    const st = floatState[id], r = el.getBoundingClientRect(), x0 = e.clientX, y0 = e.clientY, s0 = st.s;
+    follow((ev) => {
+      const k = ((r.width + ev.clientX - x0) / r.width + (r.height + ev.clientY - y0) / r.height) / 2;
+      st.s = clamp(s0 * k, 0.5, 2.2);
+      applyFloat(id); clampFloat(id);
+    }, 'scaling');
+  });
+  grip.addEventListener('keydown', (e) => {
+    const d = e.shiftKey ? 40 : 10;
+    const v = { ArrowLeft: [-d, 0], ArrowRight: [d, 0], ArrowUp: [0, -d], ArrowDown: [0, d] }[e.key];
+    if (!v) return;
+    e.preventDefault();
+    if (!floatState[id]) pinFloat(id);
+    floatState[id].x += v[0]; floatState[id].y += v[1];
+    clampFloat(id); saveFloatState();
+  });
+  size.addEventListener('keydown', (e) => {
+    const k = ['+', '=', 'ArrowUp', 'ArrowRight'].includes(e.key) ? 1.1 : ['-', '_', 'ArrowDown', 'ArrowLeft'].includes(e.key) ? 1 / 1.1 : 0;
+    if (!k) return;
+    e.preventDefault();
+    if (!floatState[id]) pinFloat(id);
+    floatState[id].s = clamp(floatState[id].s * k, 0.5, 2.2);
+    applyFloat(id); clampFloat(id); saveFloatState();
+  });
+  grip.addEventListener('dblclick', () => resetFloat(id));
+  applyFloat(id);
+}
+function resetFloat(id) { delete floatState[id]; applyFloat(id); saveFloatState(); }
+function resetAllFloats() { floatState = {}; for (const id of FLOATS.keys()) applyFloat(id); saveFloatState(); }
+function initFloating() {
+  loadFloatState();
+  makeFloating($('.side'), 'side', '標題與說明', [$('.side .brand'), $('.side .stats'), $('#why')]);
+  makeFloating($('.ctl'), 'ctl', '控制面板');
+  makeFloating($('#pStab'), 'stab', '穩定圖');
+  makeFloating($('#pSpec'), 'spec', '質譜');
+  makeFloating($('#pCap'), 'cap', '字幕', [$('#pCap')], false);
+  window.addEventListener('resize', () => { for (const id of FLOATS.keys()) clampFloat(id); });
+}
+
+// 網頁上播放導覽時,字幕與兩個示波窗用這些 DOM 資訊框顯示(錄影時另外畫在畫面上)
+let capShown = null;
+function updateTourDom(st) {
+  const show = (el, a) => { el.style.opacity = a.toFixed(3); el.style.visibility = a < 0.02 ? 'hidden' : 'visible'; };
+  show($('#pStab'), st.hudStab);
+  show($('#pSpec'), st.hudSpec);
+  if (st.cap !== capShown) {
+    capShown = st.cap;
+    if (st.cap) {
+      $('#capChap').textContent = st.cap.chap;
+      $('#capMain').textContent = st.cap.main;
+      $('#capSub').textContent = st.cap.sub || '';
+    }
+  }
+  const cap = $('#pCap');
+  cap.hidden = !st.cap;
+  show(cap, st.capA);
+}
+function clearTourDom() {
+  for (const el of [$('#pStab'), $('#pSpec'), $('#pCap')]) { el.style.opacity = ''; el.style.visibility = ''; }
+  $('#pCap').hidden = true;
+  capShown = null;
 }
 
 // ==== 95_export.js ====
@@ -3218,6 +3419,7 @@ async function exportVideo({ w = 1920, h = 1080, fps = 30, seconds = TOUR_DUR, o
   await loadFonts();
   EXPORT.active = true; EXPORT.cancel = false;
   if (TOUR.on) stopTour();
+  clearTourDom();
   app.classList.add('cine');
   const muxer = new Muxer({ target: new ArrayBufferTarget(), video: { codec: 'avc', width: w, height: h, frameRate: fps }, fastStart: 'in-memory', firstTimestampBehavior: 'offset' });
   let encErr = null;

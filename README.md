@@ -31,6 +31,11 @@ scripts/check-site.mjs     資料、相對連結與靜態備援檢查
 README.md                  專案導覽與預覽方式
 INSTRUMENTS.md             各儀器功能、數據與示意說明
 AGENTS.md                  未來開發與維護規則
+CLAUDE.md                  Claude Code 載入入口，引用 AGENTS.md
+docs/
+  HANDOFF.md               交接紀錄：最近變更、驗證結果、缺口與下一步
+  VALIDATION.md            檢查命令與各教材的操作步驟、預期結果
+  AI-MAINTENANCE-PROMPT.md 給其他 AI 的維護資料更新提示詞
 ```
 
 根目錄現在是入口頁；原本位於根目錄的離子阱教學移至 `lcq/`。GC-MS 網址維持 `gc-ms/`，四份教材都能返回入口並互相切換。教材本身的模型、科學計算與原有控制功能保留。
@@ -79,4 +84,4 @@ node --check assets/app.js
 
 所有 AI 接手時遵循 [AGENTS.md](./AGENTS.md) 第 0 節的流程；第 8 節定義維護資料的內容、文件分工與更新責任。[CLAUDE.md](./CLAUDE.md) 引用同一份規則。
 
-目前的文件缺口與交接狀態見 [docs/HANDOFF.md](./docs/HANDOFF.md)。要請 Claude 或其他 AI 首次補齊、或依最新程式更新維護資料，可直接使用 [文件更新提示詞](./docs/AI-MAINTENANCE-PROMPT.md)。
+目前的文件缺口與交接狀態見 [docs/HANDOFF.md](./docs/HANDOFF.md)，檢查方法見 [docs/VALIDATION.md](./docs/VALIDATION.md)。要請 Claude 或其他 AI 首次補齊、或依最新程式更新維護資料，可直接使用 [文件更新提示詞](./docs/AI-MAINTENANCE-PROMPT.md)。
