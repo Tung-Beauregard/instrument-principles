@@ -1,6 +1,6 @@
-# 儀器框
+# 儀器原理
 
-互動儀器教材入口。頁面只保留「儀器框」、儀器圖與名稱連結、返回主頁及到站人數，色彩延續 W AI Studio。
+互動儀器教材入口。頁面只保留「儀器原理」、儀器圖與名稱連結、返回主頁及到站人數，色彩延續 W AI Studio。
 
 - [儀器入口](https://tung-beauregard.github.io/instrument-principles/)
 - [離子阱質譜](https://tung-beauregard.github.io/instrument-principles/lcq/)
