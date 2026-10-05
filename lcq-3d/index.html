@@ -362,6 +362,7 @@ button { font: inherit; color: inherit; }
 }
 
 </style>
+<link rel="stylesheet" href="../assets/render-quality.css">
 </head>
 <body>
 <main id="app">
@@ -448,6 +449,8 @@ button { font: inherit; color: inherit; }
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"}}
 </script>
 <script type="module">
+import { createQualityControls } from '../assets/render-quality.js';
+const quality = createQualityControls({ host: '.ctl', onChange: () => onResize() });
 const BUILD = {"target":"site","canExport":true};
 // ==== 00_core.js ====
 import * as THREE from 'three';
@@ -612,7 +615,8 @@ function setRenderSize(w, h, dpr) {
 }
 function fitToWindow() {
   const r = app.getBoundingClientRect();
-  setRenderSize(Math.max(1, r.width), Math.max(1, r.height), Math.min(window.devicePixelRatio || 1, 1.5));
+  quality.configure(renderer, composer, bloom);
+  setRenderSize(Math.max(1, r.width), Math.max(1, r.height), quality.pixelRatio(r.width, r.height, 1.5));
 }
 
 // ---------------------------------------------------------------- 燈光
@@ -2310,50 +2314,62 @@ function panelBg(g, w, h, title, sub) {
 const cvStab = $('#cvStab'), cvSpec = $('#cvSpec');
 const gStab = cvStab.getContext('2d'), gSpec = cvSpec.getContext('2d');
 const trapCounts = new Map();
+const stabBackground = document.createElement('canvas');
+let stabBackgroundValid = false;
+document.fonts?.ready.then(() => { stabBackgroundValid = false; });
 function drawStab() {
-  const g = gStab, w = cvStab.width, h = cvStab.height;
-  panelBg(g, w, h, '穩定圖', 'a = 0 的軸上操作');
+  const w = cvStab.width, h = cvStab.height;
+  let g = gStab;
   const L = 70, R = 24, T = 62, B = 58;
   const pw = w - L - R, ph = h - T - B;
   const X = (q) => L + ((q - STAB.Q[0]) / (STAB.Q[1] - STAB.Q[0])) * pw;
   const Y = (a) => T + (1 - (a - STAB.A[0]) / (STAB.A[1] - STAB.A[0])) * ph;
-  // 穩定區塊
-  const { NX, NY, f } = STAB.grid;
-  g.save();
-  g.beginPath(); g.rect(L, T, pw, ph); g.clip();
-  g.fillStyle = 'rgba(127,227,255,0.13)';
-  const cw = pw / NX, ch = ph / NY;
-  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
-    if (f[j * (NX + 1) + i] > 0) g.fillRect(L + i * cw, T + (NY - j - 1) * ch, cw + 0.6, ch + 0.6);
+  // 靜態背景只在尺寸或字型變更時繪製，避免逐格走訪 15,000 個格子。
+  if (!stabBackgroundValid || stabBackground.width !== w || stabBackground.height !== h) {
+    stabBackground.width = w; stabBackground.height = h;
+    g = stabBackground.getContext('2d');
+    panelBg(g, w, h, '穩定圖', 'a = 0 的軸上操作');
+    const { NX, NY, f } = STAB.grid;
+    g.save();
+    g.beginPath(); g.rect(L, T, pw, ph); g.clip();
+    g.fillStyle = 'rgba(127,227,255,0.13)';
+    const cw = pw / NX, ch = ph / NY;
+    for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+      if (f[j * (NX + 1) + i] > 0) g.fillRect(L + i * cw, T + (NY - j - 1) * ch, cw + 0.6, ch + 0.6);
+    }
+    g.strokeStyle = 'rgba(127,227,255,0.85)'; g.lineWidth = 2.2;
+    g.beginPath();
+    for (let k = 0; k < STAB.segs.length; k += 2) {
+      const [x0, y0] = STAB.segs[k], [x1, y1] = STAB.segs[k + 1];
+      g.moveTo(L + x0 * pw, T + (1 - y0) * ph); g.lineTo(L + x1 * pw, T + (1 - y1) * ph);
+    }
+    g.stroke();
+    g.restore();
+    // 座標軸
+    g.strokeStyle = 'rgba(195,202,220,0.35)'; g.lineWidth = 1.5;
+    g.beginPath(); g.moveTo(L, T); g.lineTo(L, T + ph); g.lineTo(L + pw, T + ph); g.stroke();
+    g.setLineDash([6, 6]); g.strokeStyle = 'rgba(238,242,250,0.45)';
+    g.beginPath(); g.moveTo(L, Y(0)); g.lineTo(L + pw, Y(0)); g.stroke(); g.setLineDash([]);
+    g.fillStyle = COL.fg3; g.font = `500 17px ${FONT.mono}`; g.textAlign = 'center';
+    for (const q of [0, 0.5, 1.0, 1.5]) { g.fillText(q.toFixed(1), X(q), T + ph + 26); }
+    g.textAlign = 'right';
+    for (const a of [-0.6, -0.3, 0, 0.3]) g.fillText(a.toFixed(1), L - 10, Y(a) + 6);
+    g.textAlign = 'left'; g.fillStyle = COL.fg2; g.font = `500 18px ${FONT.mono}`;
+    g.fillText('q', L + pw - 14, T + ph - 10);
+    g.fillText('a', L + 8, T + 20);
+    // 共振射出點 0.83、穩定邊界 0.908、活化點 0.25
+    g.font = `500 16px ${FONT.mono}`; g.textAlign = 'center';
+    g.strokeStyle = 'rgba(255,122,107,0.95)'; g.lineWidth = 2.4;
+    g.beginPath(); g.moveTo(X(TRAP.qEject), Y(0) - 24); g.lineTo(X(TRAP.qEject), Y(0) + 24); g.stroke();
+    g.fillStyle = '#ff9a8d'; g.fillText('0.83', X(TRAP.qEject) - 6, Y(0) + 44);
+    g.strokeStyle = 'rgba(238,242,250,0.5)'; g.lineWidth = 1.5;
+    g.beginPath(); g.moveTo(X(TRAP.qEdge), Y(0) - 14); g.lineTo(X(TRAP.qEdge), Y(0) + 14); g.stroke();
+    g.fillStyle = COL.fg3; g.fillText('0.908', X(TRAP.qEdge) + 10, Y(0) - 22);
+    stabBackgroundValid = true;
   }
-  g.strokeStyle = 'rgba(127,227,255,0.85)'; g.lineWidth = 2.2;
-  g.beginPath();
-  for (let k = 0; k < STAB.segs.length; k += 2) {
-    const [x0, y0] = STAB.segs[k], [x1, y1] = STAB.segs[k + 1];
-    g.moveTo(L + x0 * pw, T + (1 - y0) * ph); g.lineTo(L + x1 * pw, T + (1 - y1) * ph);
-  }
-  g.stroke();
-  g.restore();
-  // 座標軸
-  g.strokeStyle = 'rgba(195,202,220,0.35)'; g.lineWidth = 1.5;
-  g.beginPath(); g.moveTo(L, T); g.lineTo(L, T + ph); g.lineTo(L + pw, T + ph); g.stroke();
-  g.setLineDash([6, 6]); g.strokeStyle = 'rgba(238,242,250,0.45)';
-  g.beginPath(); g.moveTo(L, Y(0)); g.lineTo(L + pw, Y(0)); g.stroke(); g.setLineDash([]);
-  g.fillStyle = COL.fg3; g.font = `500 17px ${FONT.mono}`; g.textAlign = 'center';
-  for (const q of [0, 0.5, 1.0, 1.5]) { g.fillText(q.toFixed(1), X(q), T + ph + 26); }
-  g.textAlign = 'right';
-  for (const a of [-0.6, -0.3, 0, 0.3]) g.fillText(a.toFixed(1), L - 10, Y(a) + 6);
-  g.textAlign = 'left'; g.fillStyle = COL.fg2; g.font = `500 18px ${FONT.mono}`;
-  g.fillText('q', L + pw - 14, T + ph - 10);
-  g.fillText('a', L + 8, T + 20);
-  // 共振射出點 0.83、穩定邊界 0.908、活化點 0.25
+  g = gStab;
+  g.clearRect(0, 0, w, h); g.drawImage(stabBackground, 0, 0);
   g.font = `500 16px ${FONT.mono}`; g.textAlign = 'center';
-  g.strokeStyle = 'rgba(255,122,107,0.95)'; g.lineWidth = 2.4;
-  g.beginPath(); g.moveTo(X(TRAP.qEject), Y(0) - 24); g.lineTo(X(TRAP.qEject), Y(0) + 24); g.stroke();
-  g.fillStyle = '#ff9a8d'; g.fillText('0.83', X(TRAP.qEject) - 6, Y(0) + 44);
-  g.strokeStyle = 'rgba(238,242,250,0.5)'; g.lineWidth = 1.5;
-  g.beginPath(); g.moveTo(X(TRAP.qEdge), Y(0) - 14); g.lineTo(X(TRAP.qEdge), Y(0) + 14); g.stroke();
-  g.fillStyle = COL.fg3; g.fillText('0.908', X(TRAP.qEdge) + 10, Y(0) - 22);
   if (CY.mode === 'msms') {
     g.strokeStyle = 'rgba(255,180,84,0.8)'; g.lineWidth = 2;
     g.beginPath(); g.moveTo(X(TRAP.qAct), Y(0) - 18); g.lineTo(X(TRAP.qAct), Y(0) + 18); g.stroke();
@@ -2486,8 +2502,10 @@ function drawTune(time) {
 consoleScreen('tune', -21.5, 8.6, 6.15, cvTune);
 consoleScreen('stab', -9.8, 8.6, 4.85, cvStab);
 consoleScreen('spec', 1.6, 8.6, 4.85, cvSpec);
-let tuneDrawn = 0;
+let tuneDrawn = 0, panelsDrawn = -Infinity, panelsMode = null;
 function updatePanels(time) {
+  if (!EXPORT.active && CY.mode === panelsMode && time >= panelsDrawn && time - panelsDrawn < 1 / 30) return;
+  panelsDrawn = time; panelsMode = CY.mode;
   drawStab();
   drawSpec();
   if (time - tuneDrawn > 1 || tuneDrawn === 0) { drawTune(time); tuneDrawn = time || 0.001; consoleScreens.tune.tex.needsUpdate = true; }
@@ -3186,7 +3204,9 @@ function drawUIOverlay() {
 }
 function frame(now) {
   requestAnimationFrame(frame);
-  if (EXPORT.active) { lastNow = now; return; }
+  if (EXPORT.active || document.hidden) { lastNow = now; return; }
+  if (!quality.shouldRender(now)) return;
+  quality.observe(now);
   const dt = Math.min(0.05, Math.max(0, (now - lastNow) / 1000));
   lastNow = now;
   if (dt <= 0) return;
@@ -3430,6 +3450,7 @@ async function exportVideo({ w = 1920, h = 1080, fps = 30, seconds = TOUR_DUR, o
   const ov = document.createElement('canvas'); ov.width = w; ov.height = h;
   const og = ov.getContext('2d');
   const saved = { fov: camera.fov, pos: camera.position.clone(), target: controls.target.clone() };
+  quality.configure(renderer, composer, bloom, { recording: true });
   setRenderSize(w, h, 1);
   resetForTour();
   TOUR.on = true; controls.enabled = false;

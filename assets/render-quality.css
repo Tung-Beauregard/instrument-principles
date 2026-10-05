@@ -1,0 +1,7 @@
+.quality-control{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;font:12px/1.4 system-ui,sans-serif;white-space:nowrap;pointer-events:auto;color:inherit}
+.quality-control select{font:inherit;color:inherit;background:var(--panel,#111d24);border:1px solid var(--line,#53636b);border-radius:7px;min-height:32px;padding:3px 6px;max-width:110px;cursor:pointer}
+.quality-control select:focus-visible{outline:2px solid #a5f3cd;outline-offset:2px}
+.quality-control option{background:#111d24;color:#f0f3ee}
+#render-performance{position:fixed;z-index:1000;left:8px;bottom:8px;max-width:calc(100vw - 16px);padding:4px 8px;background:#0b1111ed;color:#a5f3cd;font:11px/1.4 monospace;pointer-events:none;overflow-wrap:anywhere}
+body.rec .quality-control,html.film .quality-control,#app.cine .quality-control{display:none}
+#sitenav > .quality-control{position:absolute;top:calc(100% + 8px);right:0;background:var(--panel,#111d24);padding:4px 7px;border:1px solid var(--line,#53636b);border-radius:8px}

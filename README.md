@@ -18,6 +18,8 @@ index.html                 儀器入口；含完整靜態備援內容
 assets/
   styles.css               入口頁樣式與響應式版面
   app.js                   教材清單載入、到站人數
+  render-quality.js        教材共用畫質、幀率上限與可選效能顯示
+  render-quality.css       畫質選單
   *.svg                    品牌與儀器概念示意
 content/
   instruments.json         儀器名稱、順序、圖片、狀態與連結
@@ -70,9 +72,20 @@ python -m http.server 8000
 ```sh
 node scripts/check-site.mjs
 node --check assets/app.js
+node scripts/check-render-quality.mjs
 ```
 
 另需實際檢查：桌面與手機入口排版、四個教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
+
+## 3D 畫質與效能
+
+發布沿用 `main` 的 GitHub Pages；推送後確認 Actions 的 `pages build and deployment` 成功，再開啟正式網址驗證。發布前先取得遠端最新版本，保留其他工作目錄的未提交變更，不使用強制推送。
+
+四份教材提供「自動／流暢／完整」畫質，選擇保存在同一瀏覽器。自動模式先減少後製負擔，連續掉幀時切到流暢；完整模式保留陰影、4 倍 MSAA 與後製。即時播放上限為 60 FPS，背景分頁不執行場景更新。畫質設定不改變科學公式、粒子數量或影片匯出的指定幀率。
+
+教材網址加上 `?perf=1` 可查看 FPS、繪圖比例與瀏覽器回報的繪圖裝置；資料僅顯示在本頁，不上傳。例如 `lcq-3d/?perf=1`。若顯示軟體繪圖，先檢查瀏覽器圖形加速與顯示驅動；畫質模式不保證特定裝置的幀率。
+
+維護索引：[離子阱](./lcq/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[離子之旅](./lcq-3d/MAINTENANCE.md)。
 
 ## 品牌與資料來源
 

@@ -168,6 +168,7 @@ html.rec *{transition:none!important;animation:none!important}
   "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
 }}
 </script>
+<link rel="stylesheet" href="../assets/render-quality.css">
 </head>
 <body>
 <div id="stage"></div>
@@ -240,6 +241,8 @@ html.rec *{transition:none!important;animation:none!important}
 <button class="btn" id="tourExit">結束導覽</button>
 
 <script type="module">
+import { createQualityControls } from '../assets/render-quality.js';
+const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -339,8 +342,8 @@ const css = (rgb, a = 1) => `rgba(${rgb.map(v => Math.round(v * 255)).join(',')}
 const C_H = lin([1, .84, .6]), C_D2 = lin([.8, .74, 1]);
 
 // ================= 場景 =================
-const DPR = REC ? 1 : Math.min(devicePixelRatio, 1.5);
-const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: REC, powerPreference: 'high-performance' });
+let DPR = REC ? 1 : quality.pixelRatio(innerWidth, innerHeight, 1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: REC, powerPreference: 'high-performance' });
 renderer.setPixelRatio(DPR);
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -701,7 +704,7 @@ const rayMat = new THREE.ShaderMaterial({
   transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
 });
 const rays = new THREE.LineSegments(rayGeo, rayMat); rays.frustumCulled = false; scene.add(rays);
-let rn = 0;
+let rn = 0, raysKey = '';
 function seg(a, b, c, k, d0) {
   if (rn + 2 > RMAX) return d0;
   const i = rn * 3, L = a.distanceTo(b);
@@ -719,6 +722,9 @@ function facePts(key, us, vs) {
 const lens9 = [[0, 0], [1.1, 0], [-1.1, 0], [0, 1.1], [0, -1.1], [.78, .78], [-.78, -.78], [.78, -.78], [-.78, .78]];
 
 function buildRays(W) {
+  const key = `${W.lambda}|${W.flick}|${W.sbw}|${W.T}`;
+  if (key === raysKey) return;
+  raysKey = key;
   rn = 0;
   const l = W.lambda, d2 = l < SWITCH, f = W.flick, K = 2.4;
   const white = d2 ? C_D2 : C_H, mono = lin(wlColor(l));
@@ -1052,7 +1058,12 @@ function updateDOM() {
 // ---------- 光譜圖 ----------
 const plot = el('plot'), tip = el('tip');
 let hoverL = null;
+let previewKey = '', previewValues = [];
+let plotDrawnAt = -Infinity;
 function drawPlot() {
+  const now = performance.now();
+  if (!REC && now - plotDrawnAt < 1000 / 30) return;
+  plotDrawnAt = now;
   const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = plot.clientWidth, h = plot.clientHeight;
   if (!w) return;
   if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
@@ -1084,7 +1095,12 @@ function drawPlot() {
   // 預覽(目前頻寬下的理論曲線)
   if (!W.scan && !W.ghost) {
     c.setLineDash([2, 4]); c.strokeStyle = 'rgba(168,188,198,.55)'; c.beginPath();
-    for (let i = 0; i <= pw; i++) { const l = x0 + i / pw * (x1 - x0), y = Y(absorbAt(sm, l, W.sbw)); i ? c.lineTo(Lp + i, y) : c.moveTo(Lp + i, y); }
+    const key = `${W.sample}|${W.sbw}|${pw}`;
+    if (key !== previewKey) {
+      previewKey = key; previewValues = [];
+      for (let i = 0; i <= pw; i++) previewValues.push(absorbAt(sm, x0 + i / pw * (x1 - x0), W.sbw));
+    }
+    for (let i = 0; i < previewValues.length; i++) { const y = Y(previewValues[i]); i ? c.lineTo(Lp + i, y) : c.moveTo(Lp + i, y); }
     c.stroke(); c.setLineDash([]);
   }
   const drawTrace = (sc, style, lw, dash) => {
@@ -1215,6 +1231,9 @@ function interactive(dt, now) {
 function render() { composer.render(); labelR.render(scene, camera); }
 function resize() {
   const w = innerWidth, h = innerHeight;
+  DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);
+  quality.configure(renderer, composer, bloom, { recording: REC });
+  renderer.setPixelRatio(DPR);
   camera.aspect = w / h; camera.updateProjectionMatrix();
   renderer.setSize(w, h); composer.setPixelRatio(DPR); composer.setSize(w, h); bloom.setSize(w * DPR, h * DPR); labelR.setSize(w, h);
   pMat.uniforms.uScale.value = h * DPR / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
@@ -1234,15 +1253,28 @@ if (REC) {
   window.__ready = true;
 } else {
   let last = performance.now() / 1000;
-  const filmStart = last - (+Q.get('t') || 0);
+  let filmStart = last - (+Q.get('t') || 0), hiddenAt = null;
+  document.addEventListener('visibilitychange', () => {
+    const now = performance.now() / 1000;
+    if (document.hidden) hiddenAt = now;
+    else if (hiddenAt !== null) {
+      const gap = now - hiddenAt; filmStart += gap;
+      if (tour.on) tour.t0 += gap;
+      if (S.scanning) S.scanT0 += gap;
+      last = now; hiddenAt = null;
+    }
+  });
   const loop = () => {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    if (!quality.shouldRender(performance.now())) return;
+    quality.observe(performance.now());
     const now = performance.now() / 1000, dt = Math.min(.05, now - last); last = now;
     if (FILM) film((now - filmStart) % FILM_DUR);
     else if (tour.on) { const t = now - tour.t0; if (t >= FILM_DUR) endTour(); else film(t); }
     if (!FILM && !tour.on) { interactive(dt, now); controls.update(); }
     frameCommon(FILM ? (now - filmStart) % FILM_DUR : tour.on ? now - tour.t0 : now);
     render();
-    requestAnimationFrame(loop);
   };
   loop();
   el('load').classList.add('done');

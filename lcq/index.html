@@ -147,6 +147,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
   }
 }
 </script>
+<link rel="stylesheet" href="../assets/render-quality.css">
 </head>
 <body>
 <div id="stage" aria-label="離子阱質譜原理的立體解說動畫,以 LCQ Deca XP 為例">
@@ -217,6 +218,8 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
 <div id="loading"><div class="box"><b>離子阱質譜原理</b><span>正在載入立體模型</span><div class="bar"><i></i></div></div></div>
 
 <script type="module">
+import { createQualityControls } from '../assets/render-quality.js';
+const quality = createQualityControls({ host: '#sitenav', onChange: () => resize() });
 // ---- core.js ----
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -2576,21 +2579,19 @@ function renderFrame() {
 }
 
 // ---------- main loop ----------
-let last = performance.now(), slow = 0, frames = 0;
+let last = performance.now();
 function loop(now) {
+  if (APP.rec || document.hidden) { last = now; return; }
+  if (!quality.shouldRender(now)) return;
   const dt = clamp((now - last) / 1000, 0, 0.05);
   last = now;
-  if (APP.rec) return;
+  quality.observe(now);
   if (APP.mode === 'lab') labStep(dt);
   else if (APP.playing) storyStep(dt);
   applyFrame(APP.simT);
   updateCamera(dt);
   renderFrame();
   updateBar(false);
-  // simple quality governor
-  frames++;
-  if (dt > 0.034) slow++;
-  if (frames === 90) { if (slow > 45) { if (view.ao) view.ao = false; else if (view.pr > 1) resize(1); } frames = 0; slow = 0; }
 }
 
 // ---------- player bar ----------
@@ -2768,7 +2769,9 @@ function labStep(dt) {
 // ---------- size ----------
 function resize(prOverride) {
   const w = innerWidth, h = innerHeight;
-  let pr = prOverride ?? Math.min(devicePixelRatio || 1, 2);
+  quality.configure(renderer, composer, bloom, { ao: gtao });
+  view.ao = gtao.enabled;
+  let pr = prOverride ?? quality.pixelRatio(w, h, 2);
   if (w * h * pr * pr > 3.4e6) pr = Math.sqrt(3.4e6 / (w * h));
   setRenderSize(w, h, pr);
   const barH = $('#bar').getBoundingClientRect().height + 22;
@@ -2788,6 +2791,7 @@ async function record(opt = {}) {
     document.body.classList.add('rec');
     setRenderSize(w, h, 1);
     ovResize(w, h, 1, 0);
+    quality.configure(renderer, composer, bloom, { recording: true, ao: gtao });
     view.ao = true;
     const grain = finish.uniforms.uGrain.value;
     finish.uniforms.uGrain.value = 0;
