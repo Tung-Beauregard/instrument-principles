@@ -18,13 +18,19 @@
 
 ## 下一步
 
-- 確認 GitHub Pages 部署後的正式網址（NMR 教材與五份教材的視角操作）。
 - 用真實的觸控板與觸控螢幕試視角操作，特別是觸控板與滑鼠滾輪的判斷。
 - 使用 [維護資料更新提示詞](./AI-MAINTENANCE-PROMPT.md)，補齊 `lcq/`、`gc-ms/`、`uv-vis/` 維護文件中已列明的缺口。
 - 決定是否在 `w-studio` 加入 LCQ 離子之旅與 NMR 核磁共振的卡片與介紹。
 - 若取得 LCQ Deca XP 原廠資料，核對噴灑角度與 `INSTRUMENTS.md` 的來源頁碼。
 
 ## 更新紀錄
+
+### 2026-10-07：推送與部署確認
+
+- 提交 `7a04904`（NMR 教材）與 `3a06f8c`（其他教材的視角操作），以 fast-forward 推送到 `main`（基準 `3a10539`，推送前 `git fetch` 確認遠端沒有新提交）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功（27 秒）。
+- 通過：以無頭 Edge 走一遍正式網址：入口顯示五張卡片；`lcq/`、`gc-ms/`、`uv-vis/`、`lcq-3d/`、`nmr/` 都能載入，分頁列都有六個連結且目前頁正確，視角操作都有載入，console 沒有錯誤；最後回到入口。
+- 未執行：Safari、Firefox 與真實觸控裝置的實機測試。
 
 ### 2026-10-07：五份 3D 教材加入共用的視角操作
 
