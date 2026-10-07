@@ -7,9 +7,10 @@
 - [UV-Vis 分光光度計](https://tung-beauregard.github.io/instrument-principles/uv-vis/)
 - [GC-MS](https://tung-beauregard.github.io/instrument-principles/gc-ms/)
 - [LCQ 離子之旅](https://tung-beauregard.github.io/instrument-principles/lcq-3d/)
+- [NMR 核磁共振](https://tung-beauregard.github.io/instrument-principles/nmr/)
 - [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-目前共有四份教材：離子阱質譜、GC-MS、UV-Vis 分光光度計、LCQ 離子之旅。儀器型號與規格以各教材的來源說明為準。
+目前共有五份教材：離子阱質譜、GC-MS、UV-Vis 分光光度計、LCQ 離子之旅、NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。
 
 ## 專案結構
 
@@ -28,6 +29,8 @@ gc-ms/index.html           GC-MS 教材
 uv-vis/index.html          UV-Vis 分光光度計教材
 lcq-3d/index.html          LCQ 離子之旅；LCQ Deca XP 拆解式 3D 導覽
 lcq-3d/MAINTENANCE.md      LCQ 離子之旅的程式結構與修改方式
+nmr/index.html             NMR 核磁共振；以 Bruker AVANCE III 500 為例，跟著訊號走一圈
+nmr/MAINTENANCE.md         NMR 教材的程式結構與修改方式
 scripts/check-site.mjs     資料、相對連結與靜態備援檢查
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
@@ -40,7 +43,7 @@ docs/
   AI-MAINTENANCE-PROMPT.md 給其他 AI 的維護資料更新提示詞
 ```
 
-根目錄現在是入口頁；原本位於根目錄的離子阱教學移至 `lcq/`。GC-MS 網址維持 `gc-ms/`，四份教材都能返回入口並互相切換。教材本身的模型、科學計算與原有控制功能保留。
+根目錄現在是入口頁；原本位於根目錄的離子阱教學移至 `lcq/`。GC-MS 網址維持 `gc-ms/`，各教材都能返回入口並互相切換。教材本身的模型、科學計算與原有控制功能保留。
 
 ## 維護內容
 
@@ -75,17 +78,17 @@ node --check assets/app.js
 node scripts/check-render-quality.mjs
 ```
 
-另需實際檢查：桌面與手機入口排版、四個教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
+另需實際檢查：桌面與手機入口排版、每份教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
 
 ## 3D 畫質與效能
 
 發布沿用 `main` 的 GitHub Pages；推送後確認 Actions 的 `pages build and deployment` 成功，再開啟正式網址驗證。發布前先取得遠端最新版本，保留其他工作目錄的未提交變更，不使用強制推送。
 
-四份教材提供「自動／流暢／完整」畫質，選擇保存在同一瀏覽器。自動模式先減少後製負擔，連續掉幀時切到流暢；完整模式保留陰影、4 倍 MSAA 與後製。即時播放上限為 60 FPS，背景分頁不執行場景更新。畫質設定不改變科學公式、粒子數量或影片匯出的指定幀率。
+各教材提供「自動／流暢／完整」畫質，選擇保存在同一瀏覽器。自動模式先減少後製負擔，連續掉幀時切到流暢；完整模式保留陰影、4 倍 MSAA 與後製。即時播放上限為 60 FPS，背景分頁不執行場景更新。畫質設定不改變科學公式、粒子數量或影片匯出的指定幀率。
 
 教材網址加上 `?perf=1` 可查看 FPS、繪圖比例與瀏覽器回報的繪圖裝置；資料僅顯示在本頁，不上傳。例如 `lcq-3d/?perf=1`。若顯示軟體繪圖，先檢查瀏覽器圖形加速與顯示驅動；畫質模式不保證特定裝置的幀率。
 
-維護索引：[離子阱](./lcq/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[離子之旅](./lcq-3d/MAINTENANCE.md)。
+維護索引：[離子阱](./lcq/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[離子之旅](./lcq-3d/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)。
 
 ## 品牌與資料來源
 

@@ -35,6 +35,15 @@
       "image": "./assets/lcq-3d.svg",
       "imageAlt": "離子沿著導軌穿過毛細管、多極柱與離子阱的概念示意",
       "href": "./lcq-3d/"
+    },
+    {
+      "id": "nmr",
+      "name": "NMR 核磁共振",
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/nmr.svg",
+      "imageAlt": "剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意",
+      "href": "./nmr/"
     }
   ]
 }
