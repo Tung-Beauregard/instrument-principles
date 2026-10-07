@@ -12,12 +12,31 @@
 node scripts/check-site.mjs
 node --check assets/app.js
 node scripts/check-render-quality.mjs
+node scripts/check-camera-nav.mjs
 ```
 
+- `check-camera-nav.mjs` 檢查共用視角操作 `assets/camera-nav.js` 的滾輪判斷（滑鼠滾輪、觸控板滑動、捏合、同一串事件沿用第一下），以及五份教材都載入這個檔、建立視角操作並每格呼叫 `nav.step(dt)`。
 - `check-site.mjs` 檢查教材清單與入口靜態備援是否一致、本機資源與相對連結是否存在、每份教材是否有「← 儀器入口」。
 - 教材頁的 JavaScript 內嵌在 `index.html` 的 `<script type="module">` 裡，`check-site.mjs` 不檢查語法。修改後可把該段內容另存成暫存的 `.mjs` 檔，用 `node --check` 檢查後刪除暫存檔。
 
 ## 網站走查
+
+### 視角操作（2026-10-07）
+
+五份教材共用 `assets/camera-nav.js`（參考 The Plane of Focus）。逐頁檢查：
+
+| 操作 | 預期結果 |
+| --- | --- |
+| 滑鼠拖曳、右鍵或 Shift 拖曳、滾輪 | 旋轉、平移、縮放（縮放有上下限）。 |
+| 觸控板雙指滑動、兩指捏合 | 平移、縮放。 |
+| 觸控螢幕單指、雙指 | 旋轉；雙指平移與捏合縮放。 |
+| 按住方向鍵或 W A S D | 左右平移、沿著看的方向前後移動；按住 Shift 加快。 |
+| 按住 + − | 縮放。 |
+| Q E、R | NMR、UV-Vis、離子阱：Q E 轉向，R 回到預設視角（離子阱故事模式回到動畫的鏡頭）。GC-MS 的 Q 是質譜面板、R 是原有的重設視角；離子之旅的 E 是組裝與展開，R 回到預設視角。 |
+| 焦點在滑桿、輸入欄或資訊框把手 | 方向鍵與 + − 照原本調整該元件，不動相機。 |
+| 導覽、錄影、說明視窗 | NMR、UV-Vis、離子之旅：導覽中不作用。GC-MS：操作會接手鏡頭並結束導覽（和拖曳相同）。離子阱：播放中方向鍵切換章節，暫停或「自己操作」時才移動視角。 |
+
+2026-10-07 在作者電腦以無頭 Edge 的 DevTools Protocol 送出滑鼠滾輪、觸控板滾動與捏合（帶 Ctrl 的滾輪）、方向鍵、WASD、Q、+ −、Shift、R、右鍵與 Shift 拖曳、觸控雙指平移與捏合，五份教材的相機與觀察點都照上表移動；GC-MS 的 Q、R，離子之旅的 E、C 與資訊框把手，離子阱播放中的章節切換都照舊；console 沒有錯誤。真實觸控板與觸控螢幕尚未實機測試。
 
 ### 畫質與效能回歸（2026-10-05）
 

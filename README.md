@@ -21,6 +21,7 @@ assets/
   app.js                   教材清單載入、到站人數
   render-quality.js        教材共用畫質、幀率上限與可選效能顯示
   render-quality.css       畫質選單
+  camera-nav.js            教材共用的視角操作：滾輪、觸控板、方向鍵與 WASD
   *.svg                    品牌與儀器概念示意
 content/
   instruments.json         儀器名稱、順序、圖片、狀態與連結
@@ -32,6 +33,7 @@ lcq-3d/MAINTENANCE.md      LCQ 離子之旅的程式結構與修改方式
 nmr/index.html             NMR 核磁共振；以 Bruker AVANCE III 500 為例，跟著訊號走一圈
 nmr/MAINTENANCE.md         NMR 教材的程式結構與修改方式
 scripts/check-site.mjs     資料、相對連結與靜態備援檢查
+scripts/check-camera-nav.mjs  共用視角操作的滾輪判斷與各教材接線檢查
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
 INSTRUMENTS.md             各儀器功能、數據與示意說明
@@ -76,6 +78,7 @@ python -m http.server 8000
 node scripts/check-site.mjs
 node --check assets/app.js
 node scripts/check-render-quality.mjs
+node scripts/check-camera-nav.mjs
 ```
 
 另需實際檢查：桌面與手機入口排版、每份教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
@@ -87,6 +90,8 @@ node scripts/check-render-quality.mjs
 各教材提供「自動／流暢／完整」畫質，選擇保存在同一瀏覽器。自動模式先減少後製負擔，連續掉幀時切到流暢；完整模式保留陰影、4 倍 MSAA 與後製。即時播放上限為 60 FPS，背景分頁不執行場景更新。畫質設定不改變科學公式、粒子數量或影片匯出的指定幀率。
 
 教材網址加上 `?perf=1` 可查看 FPS、繪圖比例與瀏覽器回報的繪圖裝置；資料僅顯示在本頁，不上傳。例如 `lcq-3d/?perf=1`。若顯示軟體繪圖，先檢查瀏覽器圖形加速與顯示驅動；畫質模式不保證特定裝置的幀率。
+
+五份 3D 教材共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
 
 維護索引：[離子阱](./lcq/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[離子之旅](./lcq-3d/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)。
 

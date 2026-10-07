@@ -416,7 +416,7 @@ button { font: inherit; color: inherit; }
     <section class="scope glass" id="pSpec" aria-label="質譜"><canvas id="cvSpec" width="660" height="372"></canvas></section>
   </div>
   <section class="cap glass" id="pCap" hidden aria-live="polite"><i id="capChap"></i><b id="capMain"></b><span id="capSub"></span></section>
-  <div class="hint">拖曳旋轉,滾輪縮放,點零件看說明。按 C 播放導覽。資訊框可拖曳移動,右下角拖曳縮放。</div>
+  <div class="hint">拖曳旋轉,右鍵平移,滾輪縮放,方向鍵移動,點零件看說明。按 C 播放導覽。資訊框可拖曳移動,右下角拖曳縮放。</div>
 
   <div class="modal" id="help" hidden>
     <div class="card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
@@ -450,6 +450,7 @@ button { font: inherit; color: inherit; }
 </script>
 <script type="module">
 import { createQualityControls } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
 const quality = createQualityControls({ host: '.ctl', onChange: () => onResize() });
 const BUILD = {"target":"site","canExport":true};
 // ==== 00_core.js ====
@@ -2946,6 +2947,9 @@ const HELP_HTML = `
 <h3>偵測</h3>
 <p>射出的離子撞上離軸、與離子束成直角的轉換打拿極(正離子用 −15 kV),打出二次粒子,再由連續式電子倍增管(−0.8 至 −2.5 kV,增益約 3×10⁵)放大成電流。三維離子阱是往兩個端蓋同時射出,只有往出口端蓋那一側的離子會打到偵測器。</p>
 
+<h3>視角操作</h3>
+<p>滑鼠:拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;點零件鏡頭會靠過去。觸控板:雙指滑動平移、兩指捏合縮放。觸控螢幕:單指旋轉、雙指平移與縮放。鍵盤:方向鍵或 W A S D 移動(左右平移、上下前後),+ − 縮放,按住 Shift 加快,R 回到預設視角;C 播放導覽,E 切換組裝與展開。</p>
+
 <h3>常用數值</h3>
 <div class="tbl"><table>
 <tr><td>質量範圍</td><td class="n">m/z 15 至 200、50 至 2000、100 至 4000</td></tr>
@@ -3071,6 +3075,7 @@ function updateStats(t) {
   $('#rfOut').textContent = `m/z ${Math.round(CY.auto ? CY.M : CY.manualM)}`;
 }
 
+let nav = null;
 function bindUI() {
   $('#mFull').onclick = () => { setMode('full'); syncModeButtons(); };
   $('#mMS2').onclick = () => { setMode('msms'); syncModeButtons(); };
@@ -3100,6 +3105,13 @@ function bindUI() {
     if (!BUILD.canExport || typeof VideoEncoder === 'undefined') recBtn.hidden = true;
     else recBtn.onclick = openRec;
   }
+  // 視角操作(共用的 ../assets/camera-nav.js):滑鼠滾輪縮放,觸控板雙指平移、捏合縮放,方向鍵或 WASD 移動、+/− 縮放、R 回到預設視角。
+  // E 已經是組裝與展開的切換,所以不開 Q/E 轉向
+  nav = createCameraNav({
+    camera, controls, turn: false, radius: 60,
+    active: () => !TOUR.on && !EXPORT.active && $('#help').hidden,
+    onInput: () => { FLY.on = false; },
+  });
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' && e.key !== 'Escape') return;
     if (e.key === 'Escape') { closeHelp(); if (TOUR.on) stopTour(); }
@@ -3212,7 +3224,7 @@ function frame(now) {
   if (dt <= 0) return;
   tick(dt);
   if (!TOUR.on) camera.fov = fitFov(30);
-  if (!TOUR.on && !FLY.on) controls.update();
+  if (!TOUR.on && !FLY.on) { nav?.step(dt); controls.update(); }
   renderScene();
   drawUIOverlay();
   updateStats(simTime);

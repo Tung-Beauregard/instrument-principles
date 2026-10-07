@@ -424,9 +424,12 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
         <span class="kbd">I</span><span>重新進樣</span>
         <span class="kbd">C</span><span>導覽:鏡頭跟著一個成分的分子走完全程(用「追蹤成分」先選要跟哪一個);N 跳到下一站,Esc 結束</span>
         <span class="kbd">Q</span><span>質譜面板切換譜圖與四極桿穩定圖</span>
+        <span class="kbd">方向鍵 W A S D</span><span>移動視角:左右平移、上下前後;按住 Shift 加快</span>
+        <span class="kbd">+ −</span><span>縮放</span>
         <span class="kbd">R</span><span>重設視角</span>
         <span class="kbd">/</span><span>隱藏介面</span>
-        <span class="kbd">滑鼠</span><span>拖曳旋轉,右鍵拖曳平移,滾輪縮放;在層析圖上拖曳可捲動時間,點峰可追蹤該成分</span>
+        <span class="kbd">滑鼠</span><span>拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;在層析圖上拖曳可捲動時間,點峰可追蹤該成分</span>
+        <span class="kbd">觸控板</span><span>雙指滑動平移,兩指捏合縮放;觸控螢幕:單指旋轉,雙指平移與縮放</span>
       </div>
 
       <h3>數字從哪來</h3>
@@ -436,6 +439,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 </div>
 <script type="module">
 import { createQualityControls } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
 const quality = createQualityControls({ host: '.ctl', onChange: () => resize3D() });
 /* =========================================================
    GC-MS 拆開來看:資料、滯留模型、圖表與介面
@@ -1733,6 +1737,14 @@ async function init3D() {
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
   Object.assign(G, { renderer, scene, camera, controls, composer, bloom });
+  // 視角操作(共用的 ../assets/camera-nav.js):方向鍵或 WASD 移動、+/− 縮放,觸控板雙指平移、捏合縮放。
+  // Q 與 R 維持本頁原有的功能(質譜面板切換、重設視角),所以不開 Q/E 轉向,也不接管 R;使用者一操作就和拖曳一樣接手鏡頭
+  G.nav = createCameraNav({
+    camera, controls, turn: false, reset: false, radius: 380,
+    home: { p: camera.position.clone(), t: new THREE.Vector3(...DEF_VIEW.tgt) },
+    active: () => G.ready && E.help.hidden,
+    onInput: () => { G.fly = null; G.userMoved = true; G.injCam = false; userTakesOver(); },
+  });
   // 儀器這一組整體左右鏡像:質譜在左、GC 在右、氦氣鋼瓶在最右邊。
   // 組內仍沿用原本的座標(GC 在 x<0),要換成世界座標一律經過 G.world.localToWorld
   G.world = new THREE.Group(); G.world.scale.x = -1; scene.add(G.world); G.world.updateMatrixWorld(true);
@@ -2556,6 +2568,7 @@ function update3D(dt, now) {
       G.camera.position.lerpVectors(G.fly.p0, G.fly.p1, k); G.controls.target.lerpVectors(G.fly.t0, G.fly.t1, k);
       if (k >= 1) G.fly = null;
     }
+    G.nav.step(dt);
   }
   if (S.inj) G.lastInj = S.inj;
   G.controls.update();

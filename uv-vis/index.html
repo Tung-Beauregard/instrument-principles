@@ -214,7 +214,9 @@ html.rec *{transition:none!important;animation:none!important}
 <div class="help panel" id="help">
   <b>操作</b>
   <ul>
-    <li>拖曳畫面旋轉視角;滾輪縮放;右鍵拖曳平移</li>
+    <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
+    <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
+    <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
     <li>拖曳主光柵,或用波長滑桿,改變波長</li>
     <li>「掃描」:光柵從長波長一路轉到短波長,量出整條光譜;換頻寬再掃一次,上一條會留著比較</li>
     <li>「導覽」:自動播一遍,內容和影片相同;按 Esc 結束</li>
@@ -242,6 +244,7 @@ html.rec *{transition:none!important;animation:none!important}
 
 <script type="module">
 import { createQualityControls } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
 const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -1199,7 +1202,7 @@ const tour = { on: false, t0: 0, saved: null };
 function startTour() {
   stopScan(); el('help').classList.remove('show');
   tour.saved = { sample: S.sample, lambda: S.lambda, sbw: S.sbw, explode: S.explode, scan: S.scan, ghost: S.ghost, cp: camera.position.clone(), ct: controls.target.clone() };
-  tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false;
+  tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false; nav.cancel();
 }
 function endTour() {
   if (!tour.on) return;
@@ -1212,6 +1215,10 @@ function endTour() {
 el('btnTour').addEventListener('click', startTour);
 el('tourExit').addEventListener('click', endTour);
 addEventListener('keydown', e => { if (e.key === 'Escape') endTour(); });
+
+// ---------- 視角操作 ----------
+// 共用的 ../assets/camera-nav.js:滑鼠滾輪縮放,觸控板雙指平移、捏合縮放,方向鍵或 WASD 移動、Q/E 轉向、+/− 縮放、R 回到預設視角
+const nav = createCameraNav({ camera, controls, active: () => !FILM && !tour.on, radius: 120 });
 
 // ================= 迴圈 =================
 function interactive(dt, now) {
@@ -1272,7 +1279,7 @@ if (REC) {
     const now = performance.now() / 1000, dt = Math.min(.05, now - last); last = now;
     if (FILM) film((now - filmStart) % FILM_DUR);
     else if (tour.on) { const t = now - tour.t0; if (t >= FILM_DUR) endTour(); else film(t); }
-    if (!FILM && !tour.on) { interactive(dt, now); controls.update(); }
+    if (!FILM && !tour.on) { interactive(dt, now); nav.step(dt); controls.update(); }
     frameCommon(FILM ? (now - filmStart) % FILM_DUR : tour.on ? now - tour.t0 : now);
     render();
   };

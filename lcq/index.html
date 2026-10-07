@@ -187,7 +187,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
   </div>
   <div class="read" id="labRead"></div>
   <p class="hint">關掉端帽交流電壓,離子要到 q = 0.908 才會被甩出;照 0.83 換算,質荷比會多算約 9%,峰也比較寬。</p>
-  <p class="hint">拖曳畫面旋轉視角,滾輪或雙指縮放。</p>
+  <p class="hint">拖曳旋轉視角,右鍵平移,滾輪縮放;方向鍵或 WASD 移動,R 回到預設視角。</p>
 </aside>
 
 <dialog id="about">
@@ -196,8 +196,9 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
     <p>這是離子阱質譜原理的解說動畫,以 Thermo Finnigan LCQ Deca XP 為例。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比把離子分開。</p>
     <h3>操作</h3>
     <ul>
-      <li>空白鍵播放或暫停,左右方向鍵切換章節。</li>
-      <li>暫停時可以拖曳畫面旋轉視角。</li>
+      <li>空白鍵播放或暫停;播放中左右方向鍵切換章節,時間軸取得焦點時也可以用方向鍵切換。</li>
+      <li>暫停或「自己操作」時可以改變視角:滑鼠拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;觸控板雙指滑動平移、兩指捏合縮放;觸控螢幕單指旋轉、雙指平移與縮放。</li>
+      <li>鍵盤:方向鍵或 W A S D 移動(左右平移、上下前後),Q E 轉向,+ − 縮放,按住 Shift 加快;R 回到動畫的鏡頭(操作台則回到預設視角)。</li>
       <li>「自己操作」會開啟離子阱操作台,可以自己調射頻振幅、做掃描。</li>
     </ul>
     <h3>數值與示意</h3>
@@ -219,6 +220,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
 
 <script type="module">
 import { createQualityControls } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
 const quality = createQualityControls({ host: '#sitenav', onChange: () => resize() });
 // ---- core.js ----
 import * as THREE from 'three';
@@ -2537,6 +2539,7 @@ function adjFov(f) {
 function updateCamera(dt) {
   if (APP.mode === 'lab' || (APP.userCam && !APP.playing)) {
     if (APP.mode === 'lab') camera.fov = adjFov(30);
+    nav.step(dt);
     controls.update();
     view.shiftX = APP.mode === 'lab' && !mobile() ? 0.12 : 0; view.shiftY = 0.03;
     applyViewOffset();
@@ -2663,7 +2666,7 @@ function setPlaying(p) {
   controls.enabled = !p || APP.mode === 'lab';
   $('#playIcon').setAttribute('d', p ? 'M7 5h4v14H7zm6 0h4v14h-4z' : 'M8 5v14l11-7z');
   playBtn.setAttribute('aria-label', p ? '暫停' : '播放');
-  if (!p && APP.mode === 'story') showHint('暫停中:拖曳畫面可以旋轉視角,按空白鍵繼續');
+  if (!p && APP.mode === 'story') showHint('暫停中:拖曳或用方向鍵改變視角,按空白鍵繼續');
 }
 function showHint(text) {
   const h = $('#hint');
@@ -2673,11 +2676,23 @@ function showHint(text) {
 }
 playBtn.addEventListener('click', () => { if (APP.mode === 'lab') exitLab(); setPlaying(!APP.playing); });
 controls.addEventListener('start', () => { if (!APP.playing) APP.userCam = true; });
+// 視角操作(共用的 ../assets/camera-nav.js):暫停或「自己操作」時,滑鼠滾輪縮放,觸控板雙指平移、捏合縮放,
+// 方向鍵或 WASD 移動、Q/E 轉向、+/− 縮放;R 在故事模式回到動畫的鏡頭,在操作台回到預設視角。播放中方向鍵仍是切換章節
+const camFree = () => APP.mode === 'lab' || !APP.playing;
+const nav = createCameraNav({
+  camera, controls, radius: 2, minDistance: 0.03, maxDistance: 6,
+  home: { p: V3(2.3, 1.4, 3.3), t: V3(0, 0.32, 0) },
+  active: () => camFree() && !document.body.classList.contains('rec'),
+  onInput: () => { if (APP.mode !== 'lab') APP.userCam = true; },
+  reset: () => {
+    if (APP.mode === 'lab') { const t = D(272, -2, 0); nav.flyTo(t.clone().add(V3(0.04, 0.035, 0.2)), t); return; }
+    APP.blendFrom = { p: camera.position.clone(), l: controls.target.clone() }; APP.blend = 0; APP.userCam = false;
+  },
+});
 addEventListener('keydown', (e) => {
   if (e.target.closest('input, select, textarea, dialog[open]')) return;
   if (e.code === 'Space') { e.preventDefault(); if (APP.mode === 'lab') exitLab(); setPlaying(!APP.playing); }
-  else if (e.key === 'ArrowRight') jumpChapter(1);
-  else if (e.key === 'ArrowLeft') jumpChapter(-1);
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { if (!e.defaultPrevented && !camFree()) jumpChapter(e.key === 'ArrowRight' ? 1 : -1); }
   else if (e.key === 'f' || e.key === 'F') toggleFs();
 });
 function toggleFs() { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); }

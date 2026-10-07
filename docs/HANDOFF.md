@@ -18,12 +18,27 @@
 
 ## 下一步
 
-- 確認 GitHub Pages 部署後的正式網址（NMR 教材）。
+- 確認 GitHub Pages 部署後的正式網址（NMR 教材與五份教材的視角操作）。
+- 用真實的觸控板與觸控螢幕試視角操作，特別是觸控板與滑鼠滾輪的判斷。
 - 使用 [維護資料更新提示詞](./AI-MAINTENANCE-PROMPT.md)，補齊 `lcq/`、`gc-ms/`、`uv-vis/` 維護文件中已列明的缺口。
 - 決定是否在 `w-studio` 加入 LCQ 離子之旅與 NMR 核磁共振的卡片與介紹。
 - 若取得 LCQ Deca XP 原廠資料，核對噴灑角度與 `INSTRUMENTS.md` 的來源頁碼。
 
 ## 更新紀錄
+
+### 2026-10-07：五份 3D 教材加入共用的視角操作
+
+- 執行者：Claude，在作者電腦上工作；與 NMR 教材同在分支 `nmr-lesson`（基準 `3a10539`，當天 `git fetch` 確認遠端沒有新提交）。
+- 起因：使用者要求參考 [The Plane of Focus](https://sael.net/plane-of-focus/) 的基本操作（例如雙指平移、方向鍵平移），先做在 NMR，再要求其他教材一起加。原作的操作：拖曳旋轉、右鍵平移、滾輪縮放、WASD 與方向鍵移動、Q E 轉向、+ − 縮放、Shift 加快、R 重設、觸控雙指平移與捏合。
+- 完成：
+  - 新增 `assets/camera-nav.js`（不依賴 three.js 的共用模組）：滑鼠滾輪縮放；觸控板雙指滑動平移、捏合縮放（原作的觸控板滑動是縮放，雙指平移是依使用者要求另加）；方向鍵或 WASD 移動、Q E 轉向、+ − 縮放、Shift 加快、R 回到預設視角。拖曳、右鍵與觸控仍由 `OrbitControls` 處理。
+  - `nmr/`、`uv-vis/`、`lcq-3d/`、`gc-ms/`、`lcq/` 接上這個模組，並更新各頁的操作說明與 `MAINTENANCE.md`。和既有快捷鍵衝突的地方保留原功能：GC-MS 的 Q（質譜面板）與 R（重設視角）、離子之旅的 E（組裝與展開）不改；離子阱播放中方向鍵仍切換章節，暫停或「自己操作」時才移動視角，R 在故事模式回到動畫的鏡頭。
+  - 順帶修正：離子阱的時間軸取得焦點時按方向鍵，原本會被時間軸與全域鍵盤處理各切換一次章節（跳兩章），現在只切一章。
+  - 新增 `scripts/check-camera-nav.mjs`；`README.md`、`docs/VALIDATION.md` 補上說明。
+- 驗證：
+  - 通過：`node scripts/check-site.mjs`、`node scripts/check-render-quality.mjs`、`node scripts/check-camera-nav.mjs`、`git diff --check`。
+  - 通過：五份教材以無頭 Edge 的 DevTools Protocol 送出滑鼠滾輪、觸控板滾動與捏合、方向鍵、WASD、Q、+ −、Shift、R、右鍵與 Shift 拖曳、觸控雙指平移與捏合，相機與觀察點照預期移動；既有的 GC-MS Q、R，離子之旅 E、C 與資訊框把手，離子阱播放中的章節切換與空白鍵都照舊；GC-MS 導覽中操作會結束導覽；console 沒有錯誤。
+  - 未執行：真實觸控板、觸控螢幕與 Safari、Firefox。GitHub Pages 的部署結果在推送後補記。
 
 ### 2026-10-06 至 10-07：新增 NMR 核磁共振（nmr）
 
