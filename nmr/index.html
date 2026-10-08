@@ -200,14 +200,14 @@ html.rec *{transition:none!important;animation:none!important}
 <div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
 
 <header class="hud">
-  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="./" aria-current="page">NMR</a></nav>
+  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="./" aria-current="page">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a></nav>
   <span class="k">NMR 核磁共振儀</span>
   <span class="big">訊號怎麼來</span>
-  <p class="lede">一台 500 MHz 的核磁共振儀,剖開來看。樣品在 11.7 T 的磁場裡,氫原子核像一群會轉的小磁鐵;打一個射頻脈衝,收它們送回來的訊號,做傅立葉轉換,就是一張氫譜。拖曳脈衝角,看磁化向量倒下多少。</p>
+  <p class="lede">一台 500 MHz 的核磁共振儀,剖開來看。樣品在 11.7 T 的強磁場裡,氫原子核像一群會轉的小磁鐵;用一陣很短的無線電波(脈衝)把它們翻倒,收它們送回來的訊號,拆成各種頻率,就是一張氫譜。拖曳「翻倒角度」,看它們合起來的磁性 M 倒下多少。</p>
   <div class="chips">
-    <div class="chip panel"><small>脈衝角</small><b id="cP">90°</b></div>
-    <div class="chip panel"><small>線寬</small><b id="cW">0.6 Hz</b></div>
-    <div class="chip panel"><small>訊雜比</small><b id="cS">—</b></div>
+    <div class="chip panel"><small>翻倒角度</small><b id="cP">90°</b></div>
+    <div class="chip panel"><small>峰寬</small><b id="cW">0.6 Hz</b></div>
+    <div class="chip panel"><small>訊號÷雜訊</small><b id="cS">—</b></div>
   </div>
   <div class="note panel" id="note"></div>
 </header>
@@ -216,10 +216,10 @@ html.rec *{transition:none!important;animation:none!important}
   <div class="grp"><h6>樣品</h6>
     <div class="seg" id="segSample"><button data-v="van" class="on">香草醛</button><button data-v="ea">乙酸乙酯</button></div>
   </div>
-  <div class="grp slider"><h6>脈衝角 <span id="pv">90°</span></h6>
-    <input type="range" id="flip" min="0" max="360" step="1" value="90" aria-label="脈衝角">
+  <div class="grp slider"><h6>翻倒角度 <span id="pv">90°</span></h6>
+    <input type="range" id="flip" min="0" max="360" step="1" value="90" aria-label="翻倒角度">
   </div>
-  <div class="grp"><h6>勻場(線寬 Hz)</h6>
+  <div class="grp"><h6>調勻磁場(峰寬 Hz)</h6>
     <div class="seg mono" id="segLw"><button data-v="0.6" class="on">0.6</button><button data-v="1.5">1.5</button><button data-v="4">4</button><button data-v="10">10</button></div>
   </div>
   <div class="grp"><h6>累加次數</h6>
@@ -241,8 +241,8 @@ html.rec *{transition:none!important;animation:none!important}
     <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
     <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
     <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
-    <li>脈衝角:射頻脈衝把磁化向量翻倒幾度;90° 線圈收到的訊號最大,180° 收不到</li>
-    <li>「收訊」:依累加次數打脈衝、收 FID、做傅立葉轉換;換條件再收一次,上一張譜會留著比較</li>
+    <li>翻倒角度:無線電脈衝把 M(全部氫核合起來的磁性)翻倒幾度;90° 時線圈收到的訊號最大,180° 收不到</li>
+    <li>「收訊」:依累加次數打脈衝、收 FID(慢慢變弱的訊號),再拆成各種頻率得到譜;換條件再收一次,上一張譜會留著比較</li>
     <li>點下方的譜可以一步步放大;「導覽」自動播一遍,內容和影片相同,按 Esc 結束</li>
   </ul>
   <p class="fine">示意圖,不是依某一台實際儀器建模;以 AVANCE III 500 主控台搭配 Ascend 500 磁鐵與 5 mm BBO 探頭為例。中心磁場 11.74 T、¹H 500.13 MHz、氘鎖場 76.77 MHz 與磁鐵外形尺寸取自原廠手冊;杜瓦瓶內部、探頭與主控台的形狀和位置都是示意。譜是依文獻化學位移與偶合常數模擬的,雜訊經過放大,不是實測數據。</p>
@@ -253,9 +253,9 @@ html.rec *{transition:none!important;animation:none!important}
   <div class="con-body">
     <div class="plotwrap"><canvas id="plot" title="點一下放大,再點一下放大更多,第三下回到整張譜"></canvas><div class="tip" id="tip"></div></div>
     <div class="meters">
-      <div class="m"><div class="t">Mz 縱向<b id="vZ">100%</b></div><div class="bar"><i id="mZ"></i></div></div>
-      <div class="m"><div class="t">Mxy 橫向<b id="vX">0%</b></div><div class="bar"><i id="mX"></i></div></div>
-      <div class="m big"><div class="t" id="bigT">訊雜比 S/N</div><b class="n" id="vS">—</b></div>
+      <div class="m"><div class="t">M 上下分量<b id="vZ">100%</b></div><div class="bar"><i id="mZ"></i></div></div>
+      <div class="m"><div class="t">M 水平分量<b id="vX">0%</b></div><div class="bar"><i id="mX"></i></div></div>
+      <div class="m big"><div class="t" id="bigT">訊號是雜訊的幾倍</div><b class="n" id="vS">—</b></div>
     </div>
   </div>
 </section>
@@ -423,7 +423,7 @@ const SAMPLES = {
     // 譜的放大:整張 → 芳香區 → H-2 與 H-6
     zooms: [[10.6, -0.4], [7.52, 6.98], [7.452, 7.402]],
     // [群組, ppm, 名稱, 水平位移, 窄的圖上省略]
-    marks: [['cho', 9.83, 'CHO'], ['h6', 7.43, 'H-2・H-6', -6], ['h5', 7.04, 'H-5', 0, true], ['oh', 6.2, 'OH', 0, true], ['ome', 3.96, 'OCH₃'], [null, 0, 'TMS']],
+    marks: [['cho', 9.83, 'CHO'], ['h6', 7.43, 'H-2・H-6', -6], ['h5', 7.04, 'H-5', 0, true], ['oh', 6.2, 'OH', 0, true], ['ome', 3.96, 'OCH₃'], [null, 0, '基準']],
     structAt: 2.0, // 結構式畫在譜的哪裡(ppm),找沒有大峰的地方
   },
   ea: {
@@ -435,7 +435,7 @@ const SAMPLES = {
     ],
     J: { et: 7.1 },
     zooms: [[10.6, -0.4], [4.24, 4.0], [1.37, 1.15]],
-    marks: [['och2', 4.12, 'OCH₂'], ['ac', 2.05, 'CH₃CO'], ['me', 1.26, 'CH₃'], [null, 7.26, 'CHCl₃', 0, true], [null, 0, 'TMS']],
+    marks: [['och2', 4.12, 'OCH₂'], ['ac', 2.05, 'CH₃CO'], ['me', 1.26, 'CH₃'], [null, 7.26, '溶劑殘留', 0, true], [null, 0, '基準']],
     structAt: 8.0,
   },
 };
@@ -624,21 +624,21 @@ function screenTex(kind) {
       c.beginPath(); c.moveTo(cx - 12, 76); c.lineTo(cx, 58); c.lineTo(cx + 12, 76); c.stroke();
       c.lineWidth = 3; c.beginPath(); c.ellipse(cx, 115, 70, 18, 0, 0, TAU); c.stroke();
       c.lineWidth = 5; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + 62, 120); c.stroke();
-      c.font = `600 30px ${MONO}`; c.fillText('B₀', cx + 44, 74);
-      c.font = `600 34px ${MONO}`; c.fillText('ν = γB₀ / 2π', w / 2, 330);
+      c.font = `600 30px ${SANS}`; c.fillText('磁場', cx + 44, 74);
+      c.font = `600 34px ${SANS}`; c.fillText('磁場越強,轉得越快', w / 2, 330);
     } else if (kind === 1) {
       // 一個脈衝,接著衰減的 FID
       c.lineWidth = 4; c.beginPath(); c.moveTo(40, 200); c.lineTo(80, 200); c.lineTo(80, 110); c.lineTo(110, 110); c.lineTo(110, 200); c.stroke();
       c.beginPath();
       for (let i = 0; i <= 420; i++) { const u = i / 420; c.lineTo(140 + i * 1.1, 200 - 95 * Math.exp(-u * 3.4) * Math.cos(u * 90)); }
       c.stroke();
-      c.fillText('90° → FID', w / 2, 330);
+      c.font = `600 34px ${SANS}`; c.fillText('翻倒 90°,訊號慢慢變弱', w / 2, 330);
     } else {
       // 傅立葉轉換之後的譜
       c.lineWidth = 3; c.beginPath(); c.moveTo(40, 250); c.lineTo(600, 250); c.stroke();
       c.lineWidth = 4;
       for (const [x, hh] of [[80, 70], [250, 120], [262, 120], [300, 60], [330, 40], [470, 190], [580, 50]]) { c.beginPath(); c.moveTo(x, 250); c.lineTo(x, 250 - hh); c.stroke(); }
-      c.font = `600 30px ${MONO}`; c.fillText('δ = (ν − ν_TMS) / ν₀ × 10⁶', w / 2, 320);
+      c.font = `600 34px ${SANS}`; c.fillText('拆成頻率,就是氫譜', w / 2, 320);
     }
   });
 }
@@ -1378,7 +1378,7 @@ BUB.g.add(bubBack, bubShell);
 const bubLight = new THREE.PointLight(0xdff4ff, 0, 80, 1.6); bubLight.position.set(10, 18, 18); BUB.g.add(bubLight);
 // 箭頭旁的字:B₀、M、B₁
 const BLBL = {};
-for (const [k, txt, col] of [['b0', 'B₀', '#74e4ff'], ['m', 'M', '#ffffff'], ['b1', 'B₁', '#ffc261']]) {
+for (const [k, txt, col] of [['b0', '主磁場', '#74e4ff'], ['m', 'M', '#ffffff'], ['b1', '電波磁場', '#ffc261']]) {
   const d = document.createElement('div'); d.className = 'blbl'; d.textContent = txt; d.style.color = col;
   const o = new CSS2DObject(d); BUB.g.add(o); BLBL[k] = { o, d, op: -1 };
 }
@@ -1532,25 +1532,25 @@ const P3 = (p) => [p.x, p.y, p.z];
   const shellPt = (phi, y, r = R) => [Math.sin(phi) * r, y, Math.cos(phi) * r];
   label('mag', shellPt(-0.55, 150), shellPt(-0.75, 168, R + 24), '超導磁鐵', '11.7 T');
   label('turret', P3(MAGNET.turretTop.heFill), P3(MAGNET.turretTop.heFill.clone().add(v3(-10, 14, 6))), '液氦注入口', null);
-  label('gauss', [52, 1, 30], [86, 46, 40], '5 高斯線', '0.6 m');
+  label('gauss', [52, 1, 30], [86, 46, 40], '5 高斯警戒線', '0.6 m');
   label('vac', cf(36.6, 152, 0.22), cf(46, 162, 0.3), '真空層', '隔熱');
   label('n2', cf(32.2, 140, 0.16), cf(46, 146, 0.24), '液態氮', '77 K');
   label('he', cf(20, 136, 0.08), cf(30, 128, 0.18), '液態氦', '4.2 K');
-  label('coil', cf(8.6, yc + 14), cf(14, yc + 27, 0.12), '超導線圈', 'Nb₃Sn + NbTi');
-  label('scoil', cf(23.8, yc - 8), cf(33, yc - 2, 0.16), '屏蔽線圈', '反向電流');
-  label('b0', [0, yc + 30, 0], [0, yc + 44, 0], 'B₀', '11.7 T');
+  label('coil', cf(8.6, yc + 14), cf(14, yc + 27, 0.12), '超導線圈', '鈮錫、鈮鈦合金');
+  label('scoil', cf(23.8, yc - 8), cf(33, yc - 2, 0.16), '屏蔽線圈', '減少磁場外洩');
+  label('b0', [0, yc + 30, 0], [0, yc + 44, 0], '主磁場', '11.7 T');
   label('bore', [Math.sin(CUT_CENTER - 1.4) * MAG.rBore, MAG.y1 - 3, Math.cos(CUT_CENTER - 1.4) * MAG.rBore], [-6, MAG.y1 + 10, 8], '室溫孔道', '54 mm');
   label('upper', [3.4, BORE.upper.y1 - 4, 0], [9, BORE.upper.y1 + 6, 3], '樣品升降管', '氣墊');
   label('sample', [0.25, BORE.tube.bottom + 9, 0.1], [2.4, BORE.tube.bottom + 13, 1.2], '樣品管', '5 mm · 0.6 mL', SAMPLE3D.g);
-  label('sol', [0.22, yc - 0.6, 0.2], [-1.6, yc - 0.2, 1.4], '溶液', 'CDCl₃', SAMPLE3D.g);
-  label('rfcoil', [0.66, yc + 0.6, 0.25], [2.0, yc + 1.6, 1.0], '射頻線圈', '發射也接收');
+  label('sol', [0.22, yc - 0.6, 0.2], [-1.6, yc - 0.2, 1.4], '溶液', '含氘的氯仿', SAMPLE3D.g);
+  label('rfcoil', [0.66, yc + 0.6, 0.25], [2.0, yc + 1.6, 1.0], '電波線圈', '發射也接收');
   label('shim', [Math.sin(CUT_CENTER + 0.95) * 2.5, yc + 4.6, Math.cos(CUT_CENTER + 0.95) * 2.5], [Math.sin(CUT_CENTER + 0.95) * 4.8, yc + 5.6, Math.cos(CUT_CENTER + 0.95) * 4.8], '勻場線圈', '30 多組');
   label('probe', [5.6, 40, 1], [16, 50, 6], '探頭', null);
-  label('sgu', P3(wpt(CON.g, 0, 116, 43.5)), P3(wpt(CON.g, 8, 136, 52)), '訊號產生', 'SGU · 500.13 MHz');
-  label('bla', P3(wpt(CON.g, 0, 60, 43.5)), P3(wpt(CON.g, 40, 76, 50)), '功率放大', 'BLA');
-  label('rx', P3(wpt(CON.g, 0, 84, 43.5)), P3(wpt(CON.g, 44, 100, 50)), '接收與數位化', 'DRU');
-  label('bsms', P3(wpt(CON.g, 0, 27, 43.5)), P3(wpt(CON.g, 40, 40, 50)), '鎖場與勻場', `²H ${NMR.fD.toFixed(2)} MHz`);
-  label('pre', P3(wpt(PRE.g, 0, 36, 0)), P3(wpt(PRE.g, 0, 52, 4)), '前置放大器', '約 30 dB');
+  label('sgu', P3(wpt(CON.g, 0, 116, 43.5)), P3(wpt(CON.g, 8, 136, 52)), '產生電波', '500.13 MHz');
+  label('bla', P3(wpt(CON.g, 0, 60, 43.5)), P3(wpt(CON.g, 40, 76, 50)), '功率放大', '把電波加強');
+  label('rx', P3(wpt(CON.g, 0, 84, 43.5)), P3(wpt(CON.g, 44, 100, 50)), '接收與數位化', '轉成數字');
+  label('bsms', P3(wpt(CON.g, 0, 27, 43.5)), P3(wpt(CON.g, 40, 40, 50)), '穩住並調勻磁場', `氘 ${NMR.fD.toFixed(2)} MHz`);
+  label('pre', P3(wpt(PRE.g, 0, 36, 0)), P3(wpt(PRE.g, 0, 52, 4)), '前置放大器', '先放大微弱訊號');
 }
 const LBL_KEYS = Object.keys(LBL);
 // 互動模式下顯示哪些標籤(依外殼狀態)
@@ -1590,20 +1590,20 @@ const CAMK = [
 ];
 const CAPS = [
   [5.9, 12.6, '01 · 剖開', '500 MHz 的核磁共振儀,中心磁場 11.7 T。剖開磁鐵,跟著訊號從主控台走到樣品,再走回來。'],
-  [13.2, 18.6, '02 · 超導磁鐵', '線圈泡在 4.2 K 的液態氦裡,外面依序是輻射屏蔽、77 K 的液態氮與真空層。'],
-  [18.8, 24.4, '02 · 超導磁鐵', '超導線圈沒有電阻,電流在封閉的線圈裡一直流;孔道中央的磁場又強又均勻。'],
-  [24.9, 29.8, '03 · 放入樣品', '樣品管從頂端放進去,在氣墊上慢慢降到探頭的射頻線圈中央。'],
-  [30.0, 34.6, '03 · 鎖場與勻場', '先鎖住溶劑氘的訊號穩住磁場,再用勻場線圈把這一小段磁場修到十億分之幾的均勻。'],
-  [35.2, 40.6, '04 · 自旋', '每個氫原子核都是一個小磁鐵,繞著磁場進動,每秒約 5 億圈,這就是 500 MHz。'],
-  [40.8, 46.4, '04 · 自旋', '順著與逆著磁場的氫核數量只差約十萬分之四;全部加起來,才有一個朝上的淨磁化 M。'],
-  [46.8, 52.2, '05 · 射頻脈衝', '主控台產生 500.13 MHz 的射頻,放大後沿著電纜送進探頭的線圈。'],
-  [52.6, 58.4, '05 · 射頻脈衝', '在跟著 500 MHz 一起轉的座標裡看:B₁ 只開約 10 µs,就把 M 翻倒 90°。'],
-  [58.8, 64.0, '06 · 自由感應衰減', '倒下的 M 繼續進動,在同一個線圈裡感應出微弱的訊號,送回主控台數位化。'],
-  [64.2, 69.9, '06 · 自由感應衰減', '各種氫的頻率不同,磁場也不完全均勻,向量彼此散開,訊號跟著衰減:這就是 FID。'],
-  [70.6, 76.0, '07 · 傅立葉轉換', '把 FID 拆成一個個頻率,就是氫譜;峰的面積和氫的數目成正比。'],
-  [76.4, 82.2, '07 · 累加', '同樣的實驗做 16 次加起來:訊號變 16 倍,雜訊只變 4 倍,訊雜比提高 4 倍。'],
-  [82.8, 87.4, '08 · 勻場', '放大芳香區:磁場不夠均勻時,峰變寬,偶合也分不出來。'],
-  [87.6, 93.4, '08 · 勻場', '勻場調好再收:H-5 的 8.5 Hz 二重峰,和 H-2 與 H-6 之間 1.8 Hz 的分裂都看得清楚。'],
+  [13.2, 18.6, '02 · 超導磁鐵', '線圈泡在 4.2 K 的液態氦裡,外面依序是擋熱輻射的屏蔽、77 K 的液態氮與真空層。'],
+  [18.8, 24.4, '02 · 超導磁鐵', '超導線圈沒有電阻,電流在封閉的線圈裡一直流;中間圓孔裡的磁場又強又均勻。'],
+  [24.9, 29.8, '03 · 放入樣品', '樣品管從頂端放進去,在氣墊上慢慢降到探頭的線圈中央。'],
+  [30.0, 34.6, '03 · 穩住並調勻磁場', '先盯住溶劑中氘的訊號來穩住磁場,再用勻場線圈把這一小段磁場調勻到只差十億分之幾。'],
+  [35.2, 40.6, '04 · 氫核小磁鐵', '每個氫原子核都是一個小磁鐵,像陀螺般繞著磁場轉,每秒約 5 億圈,這就是 500 MHz。'],
+  [40.8, 46.4, '04 · 氫核小磁鐵', '順著與逆著磁場的氫核數量只差約十萬分之四;多出來的這一點合起來,才有朝上的磁性 M。'],
+  [46.8, 52.2, '05 · 無線電脈衝', '主控台產生 500.13 MHz 的無線電波,放大後沿著電纜送進探頭的線圈。'],
+  [52.6, 58.4, '05 · 無線電脈衝', '我們也跟著每秒轉 5 億圈來看:電波的磁場只開約 10 µs,就把 M 翻倒 90°。'],
+  [58.8, 64.0, '06 · 訊號慢慢變弱', '倒下的 M 繼續轉,像發電機般在同一個線圈裡感應出微弱訊號,送回主控台數位化。'],
+  [64.2, 69.9, '06 · 訊號慢慢變弱', '各種氫轉的快慢不同,磁場也不完全均勻,箭頭彼此散開,訊號跟著變弱:這就是 FID。'],
+  [70.6, 76.0, '07 · 拆成頻率', '把 FID 拆成一個個頻率,就是氫譜;峰的面積和氫的數目成正比。'],
+  [76.4, 82.2, '07 · 累加', '同樣的實驗做 16 次加起來:訊號變 16 倍,雜訊只變 4 倍,訊號÷雜訊變成 4 倍。'],
+  [82.8, 87.4, '08 · 調勻磁場', '放大苯環的氫:磁場不均勻時峰變寬,峰的分裂也看不出來。'],
+  [87.6, 93.4, '08 · 調勻磁場', '磁場調勻再收:H-5 分成相距 8.5 Hz 的兩根,H-2 與 H-6 互相影響的 1.8 Hz 分裂也看得到。'],
 ];
 const LBL_WIN = [
   [6.6, 12.8, ['mag', 'gauss']], [13, 18.7, ['vac', 'n2', 'he']], [18.7, 24.6, ['coil', 'scoil', 'b0']],
@@ -1825,11 +1825,11 @@ const pctS = (v) => `${v < 0 ? '−' : ''}${Math.round(Math.abs(v) * 100)}%`;
 let lastNote = '', lastLegend = '', lastCap = '', lastTitle = '', lastHead = '';
 function noteHTML() {
   const sm = SAMPLES[S.sample], th = S.flip, s = Math.sin((th * Math.PI) / 180), cz = Math.cos((th * Math.PI) / 180);
-  let txt = `射頻脈衝把磁化向量 M 從 z 軸翻倒 <em class="a">${th}°</em>:縱向剩 <em class="c">${pctS(cz)}</em>、橫向 <em class="g">${pctS(Math.abs(s))}</em>。`;
-  if (Math.abs(s) < 0.05) txt += '幾乎沒有橫向分量,線圈收不到訊號。';
-  else if (Math.abs(s) > 0.98) txt += '橫向分量最大,線圈收到的訊號最強。';
-  else txt += '線圈只收得到橫向分量。';
-  txt += ` 勻場後線寬 <em class="c">${fmtLw(S.lw)} Hz</em>,累加 ${S.ns} 次,${sm.name}的訊雜比約 <em class="c">${fmtSn(snr(sm, S.ns, th, S.lw))}</em>。`;
+  let txt = `無線電脈衝把 M(全部氫核合起來的磁性)從朝上翻倒 <em class="a">${th}°</em>:上下分量剩 <em class="c">${pctS(cz)}</em>、水平分量 <em class="g">${pctS(Math.abs(s))}</em>。`;
+  if (Math.abs(s) < 0.05) txt += '幾乎沒有水平分量,線圈收不到訊號。';
+  else if (Math.abs(s) > 0.98) txt += '水平分量最大,線圈收到的訊號最強。';
+  else txt += '線圈只收得到水平分量:只有它繞著磁場轉,才能在線圈裡感應出訊號。';
+  txt += ` 磁場調勻後峰寬 <em class="c">${fmtLw(S.lw)} Hz</em>,累加 ${S.ns} 次,${sm.name}的訊號約是雜訊的 <em class="c">${fmtSn(snr(sm, S.ns, th, S.lw))}</em> 倍。`;
   return txt;
 }
 function updateDOM(t, M) {
@@ -1845,14 +1845,14 @@ function updateDOM(t, M) {
   el('vX').textContent = pctS(mxy); el('mX').style.width = `${mxy * 100}%`; el('mX').style.background = 'var(--mint)';
   el('vS').textContent = sn == null ? '—' : fmtSn(sn);
   // 螢幕標題與圖例
-  const head = W.conMode === 'fid' ? 'FID 自由感應衰減' : '氫譜';
+  const head = W.conMode === 'fid' ? 'FID 慢慢變弱的訊號' : '氫譜';
   if (head !== lastHead) { lastHead = head; el('conTitle').textContent = head; }
   el('conSample').textContent = sm.full;
   let lg = '';
   if (W.conMode === 'fid' && W.fid) lg = `<span><i style="border-top:2px solid var(--mint)"></i>${W.runInfo ? `收訊中 · 第 ${W.runInfo.k} / ${W.runInfo.n} 次` : `第 ${W.fid.scans} 次`}</span>`;
   else {
-    if (W.spec) lg += `<span><i style="border-top:2px solid var(--cyan)"></i>本次 NS ${W.spec.ns} · ${fmtLw(W.spec.lw)} Hz</span>`;
-    if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>上一次 NS ${W.ghost.ns} · ${fmtLw(W.ghost.lw)} Hz</span>`;
+    if (W.spec) lg += `<span><i style="border-top:2px solid var(--cyan)"></i>本次 累加 ${W.spec.ns} 次 · ${fmtLw(W.spec.lw)} Hz</span>`;
+    if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>上一次 累加 ${W.ghost.ns} 次 · ${fmtLw(W.ghost.lw)} Hz</span>`;
     if (!W.spec && !W.ghost) lg = '<span><i style="border-top:1px dashed var(--ink-2)"></i>預覽;按「收訊」收一張譜</span>';
   }
   if (lg !== lastLegend) { lastLegend = lg; el('legend').innerHTML = lg; }
@@ -1872,8 +1872,8 @@ function updateDOM(t, M) {
     if (tk !== lastTitle) {
       lastTitle = tk;
       const tx = tk === 't'
-        ? ['NMR 核磁共振儀', '訊號怎麼來', '超導磁鐵、射頻脈衝與自由感應衰減,剖開來看', '']
-        : ['NMR 核磁共振儀', '11.7 T · 500.13 MHz', '超導磁鐵 · 射頻脈衝 · 自由感應衰減 · 傅立葉轉換', 'NMR 原理,以 Bruker AVANCE III 500 MHz 為例;示意動畫,磁鐵外形依原廠手冊,內部結構與譜圖為示意。'];
+        ? ['NMR 核磁共振儀', '訊號怎麼來', '超導磁鐵、無線電脈衝與慢慢變弱的訊號,剖開來看', '']
+        : ['NMR 核磁共振儀', '11.7 T · 500.13 MHz', '超導磁鐵 · 無線電脈衝 · 訊號慢慢變弱 · 拆成頻率', 'NMR 原理,以 Bruker AVANCE III 500 MHz 為例;示意動畫,磁鐵外形依原廠手冊,內部結構與譜圖為示意。'];
       ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => { el(id).textContent = tx[i]; });
     }
     document.querySelector('.hud').style.opacity = W.chips;
@@ -2059,15 +2059,15 @@ function drawSpecPlot(c, w, h) {
 }
 // 放大後要標的峰:[群組, ppm, 名稱, 說明, 找峰頂的半寬 Hz, 第幾段放大, 標籤 x, 標籤 y(圖框的比例), 對齊]
 SAMPLES.van.notes = [
-  ['h2', 7.42, 'H-2', 'd · 1.8 Hz', 1.4, 1, 0.27, 0.04, 'left'],
-  ['h6', 7.43 + 8.5 / 2 / NMR.SF, 'H-6', 'dd · 8.5 與 1.8 Hz', 2.4, 1, 0.27, 0.36, 'left'],
-  ['h5', 7.04, 'H-5', 'd · 8.5 Hz', 6, 1, 0.8, 0.3, 'right'],
-  ['h6', 7.43 + 8.5 / 2 / NMR.SF, 'H-6', 'dd · 8.5 與 1.8 Hz', 2.4, 2, 0.03, 0.12, 'left'],
-  ['h2', 7.42, 'H-2', 'd · 1.8 Hz', 1.4, 2, 0.57, 0.06, 'right'],
+  ['h2', 7.42, 'H-2', '兩根 · 1.8 Hz', 1.4, 1, 0.27, 0.04, 'left'],
+  ['h6', 7.43 + 8.5 / 2 / NMR.SF, 'H-6', '四根 · 8.5 與 1.8 Hz', 2.4, 1, 0.27, 0.36, 'left'],
+  ['h5', 7.04, 'H-5', '兩根 · 8.5 Hz', 6, 1, 0.8, 0.3, 'right'],
+  ['h6', 7.43 + 8.5 / 2 / NMR.SF, 'H-6', '四根 · 8.5 與 1.8 Hz', 2.4, 2, 0.03, 0.12, 'left'],
+  ['h2', 7.42, 'H-2', '兩根 · 1.8 Hz', 1.4, 2, 0.57, 0.06, 'right'],
 ];
 SAMPLES.ea.notes = [
-  ['och2', 4.12, 'OCH₂', 'q · 7.1 Hz', 12, 1, 0.04, 0.1, 'left'],
-  ['me', 1.26, 'CH₃', 't · 7.1 Hz', 8, 2, 0.04, 0.1, 'left'],
+  ['och2', 4.12, 'OCH₂', '四根 · 7.1 Hz', 12, 1, 0.04, 0.1, 'left'],
+  ['me', 1.26, 'CH₃', '三根 · 7.1 Hz', 8, 2, 0.04, 0.1, 'left'],
 ];
 plot.addEventListener('pointermove', (e) => {
   const m = plot._map; if (!m) return;
@@ -2075,7 +2075,7 @@ plot.addEventListener('pointermove', (e) => {
   if (px < m.Lp || px > m.Lp + m.pw) { tip.style.display = 'none'; return; }
   const v = m.x0 + ((px - m.Lp) / m.pw) * (m.x1 - m.x0);
   tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${e.clientY - r.top}px`;
-  tip.textContent = m.mode === 'fid' ? `t ${v.toFixed(2)} s` : `δ ${v.toFixed(Math.abs(m.x0 - m.x1) < 0.2 ? 4 : Math.abs(m.x0 - m.x1) < 2 ? 3 : 2)} ppm`;
+  tip.textContent = m.mode === 'fid' ? `t ${v.toFixed(2)} s` : `${v.toFixed(Math.abs(m.x0 - m.x1) < 0.2 ? 4 : Math.abs(m.x0 - m.x1) < 2 ? 3 : 2)} ppm`;
 });
 plot.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
 plot.addEventListener('click', () => { if (FILM || tour.on) return; S.zoomT = (Math.round(S.zoomT) + 1) % 3; });

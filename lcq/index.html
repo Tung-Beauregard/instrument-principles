@@ -47,7 +47,8 @@ button,select,input{font:inherit;color:inherit}
 body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!important}
 /* 網站分頁:離子阱質譜、GC-MS、UV-Vis 三頁互相切換 */
 #sitenav{position:fixed;left:16px;top:16px;z-index:11;display:flex;gap:2px;padding:3px;border-radius:11px;background:var(--panel);border:1px solid var(--line);
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow);max-width:calc(100vw - 32px);overflow-x:auto;scrollbar-width:none}
+#sitenav::-webkit-scrollbar{display:none}
 #sitenav a{padding:5px 12px;border-radius:8px;font-size:13px;font-weight:500;line-height:1.5;color:var(--ink2);text-decoration:none;white-space:nowrap}
 #sitenav a:hover{background:var(--hover);color:var(--ink)}
 #sitenav a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
@@ -131,7 +132,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
   .icon{width:34px;height:34px}
   #labBtn{padding:0 10px}
   #lab{left:8px;right:8px;top:auto;bottom:66px;width:auto;max-height:46%}
-  #sitenav{left:8px;top:8px}
+  #sitenav{left:8px;top:8px;max-width:calc(100vw - 16px)}
   #hint{top:56px}
 }
 @media (prefers-reduced-motion: reduce){
@@ -154,7 +155,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
   <canvas id="ov"></canvas>
 </div>
 
-<nav id="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="./" aria-current="page">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a></nav>
+<nav id="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="./" aria-current="page">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a></nav>
 <div id="bar">
   <button id="play" class="icon" aria-label="播放"><svg viewBox="0 0 24 24"><path id="playIcon" d="M8 5v14l11-7z"/></svg></button>
   <div id="rail" role="slider" tabindex="0" aria-label="章節與時間" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
@@ -170,15 +171,15 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
 
 <aside id="lab" hidden aria-label="離子阱操作台">
   <h2>離子阱操作台</h2>
-  <p class="sub">調高環形電極的射頻振幅,看哪一種離子先對上端帽的節拍、先被排出。</p>
+  <p class="sub">調高環形電極電壓的振幅,看哪一種離子先對上端帽的節拍、先被排出。</p>
   <label>樣品
     <select id="labSample">
       <option value="cal">校正液:咖啡因 195、MRFA 524、Ultramark 1222</option>
       <option value="np">天然物:檜木醇 165、兒茶素 291、槲皮素 303、扁柏脂素 355、蘆丁 611</option>
     </select>
   </label>
-  <div class="row"><span>環形電極射頻振幅</span><output id="labVOut">500 V</output></div>
-  <input type="range" id="labV" min="0" max="8500" step="1" value="500" aria-label="環形電極射頻振幅">
+  <div class="row"><span>環形電極電壓振幅</span><output id="labVOut">500 V</output></div>
+  <input type="range" id="labV" min="0" max="8500" step="1" value="500" aria-label="環形電極電壓振幅">
   <div class="scale"><span>0 V</span><span>8500 V</span></div>
   <label class="chk"><input type="checkbox" id="labAC" checked>端帽交流電壓(約 280 kHz)</label>
   <div class="btns">
@@ -186,25 +187,25 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #sitenav{display:none!import
     <button id="labScan" class="main">自動掃描</button>
   </div>
   <div class="read" id="labRead"></div>
-  <p class="hint">關掉端帽交流電壓,離子要到 q = 0.908 才會被甩出;照 0.83 換算,質荷比會多算約 9%,峰也比較寬。</p>
+  <p class="hint">關掉端帽交流電壓,離子要等到 q = 0.908 留不住時才被甩出;儀器仍照 0.83 換算,算出的質荷比會偏大約 9%,峰也比較寬。</p>
   <p class="hint">拖曳旋轉視角,右鍵平移,滾輪縮放;方向鍵或 WASD 移動,R 回到預設視角。</p>
 </aside>
 
 <dialog id="about">
   <div class="in">
     <h2>關於這段動畫</h2>
-    <p>這是離子阱質譜原理的解說動畫,以 Thermo Finnigan LCQ Deca XP 為例。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比把離子分開。</p>
+    <p>這是離子阱質譜原理的解說動畫,以 Thermo Finnigan LCQ Deca XP 為例。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比(質量除以電荷,m/z)把離子分開。</p>
     <h3>操作</h3>
     <ul>
       <li>空白鍵播放或暫停;播放中左右方向鍵切換章節,時間軸取得焦點時也可以用方向鍵切換。</li>
       <li>暫停或「自己操作」時可以改變視角:滑鼠拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;觸控板雙指滑動平移、兩指捏合縮放;觸控螢幕單指旋轉、雙指平移與縮放。</li>
       <li>鍵盤:方向鍵或 W A S D 移動(左右平移、上下前後),Q E 轉向,+ − 縮放,按住 Shift 加快;R 回到動畫的鏡頭(操作台則回到預設視角)。</li>
-      <li>「自己操作」會開啟離子阱操作台,可以自己調射頻振幅、做掃描。</li>
+      <li>「自己操作」會開啟離子阱操作台,可以自己調環形電極的電壓振幅、做掃描。</li>
     </ul>
     <h3>數值與示意</h3>
     <p>射頻頻率 760 kHz、振幅 0 至 8500 V(零到峰值)、掃描速率每秒約 5,500 個 m/z 單位、氦氣約 10⁻³ Torr、轉換二次發射電極 ±15 kV、倍增器增益約 3×10⁵、各區氣壓等數值取自 Finnigan LCQ Series Hardware Manual(LCQ Deca XP MAX)與 LCQ Deca Hardware Manual。離子阱尺寸 r₀ = 7.07 mm、z₀ = 7.85 mm 取自 March(1997);排出點 q = 0.83 取自 Wong 與 Cooks(1997)。約 280 kHz 的端帽交流頻率與每 m/z 約 4.25 V 是依上述數值計算的,手冊沒有直接寫;實機的對應關係由質量校正決定。</p>
     <p>機身尺寸與 MSⁿ 取自 LCQ Deca XP Plus 規格表;噴針約 4.5 kV、毛細管最高 350 °C 取自 Thermo 應用報告 315;活化 q = 0.25、30 ms 取自已發表的 Deca XP Plus 方法。蘆丁的碎片是黃酮苷常見的裂解方式,不是這台儀器的實測。截取錐錯開約 1.5 mm 是從零件標示推定的。</p>
-    <p>為什麼停在 q = 0.83 而不是穩定邊界 0.908:共振推出的峰比較窄;而且在 0.908 才排出的話,8500 V 只掃得到約 m/z 1830,用 0.83 才到得了 2000。</p>
+    <p>為什麼在 q = 0.83 就用共振推出,而不等到留不住的邊界 0.908:這樣推出的峰比較窄;而且在 0.908 才排出的話,8500 V 只掃得到約 m/z 1830,用 0.83 才到得了 2000。</p>
     <p>毛細管長度、桿子粗細、孔徑、偵測器尺寸等手冊沒有寫的部分是示意。離子源畫成探針由上方噴入;XP Plus 的正交離子源是從側面水平噴入,XP MAX 的 Ion Max 離子源約 60 度,原理相同。液滴、離子雲和振盪幅度都放大過,時間也放慢了很多倍,才看得到。</p>
     <h3>錄成影片</h3>
     <p>可以把整段動畫錄成 1920×1080 的 MP4,沿用目前的深色或淺色模式。錄製時畫面會逐格算圖,通常一到幾分鐘。</p>
@@ -1692,7 +1693,7 @@ function panelBox(g, x, y, w, h, title, a, right) {
 function drawRF(g, x, y, w, a, V, note) {
   const { U, C } = OV;
   const h = 112 * U;
-  panelBox(g, x, y, w, h, '環形電極射頻振幅(零到峰值)', a, '760 kHz');
+  panelBox(g, x, y, w, h, '環形電極電壓的振幅(零到峰值)', a, '760 kHz');
   g.fillStyle = C.text; g.font = fnt(600, 42 * U, true);
   g.fillText(`${fmtV(V)} V`, x + 18 * U, y + 84 * U);
   const bx = x + 250 * U, bw = w - 270 * U, byy = y + 70 * U;
@@ -1716,7 +1717,7 @@ function drawQ(g, x, y, w, a, V, species, hidden) {
   g.strokeStyle = C.warn; g.lineWidth = 2 * U; g.setLineDash([5 * U, 4 * U]);
   g.beginPath(); g.moveTo(qx(PHYS.qEject), ay - 34 * U); g.lineTo(qx(PHYS.qEject), ay + 12 * U); g.stroke(); g.setLineDash([]);
   g.fillStyle = C.warn; g.font = fnt(500, 13 * U); g.textAlign = 'right';
-  g.fillText('共振推出 0.83', qx(PHYS.qEject) - 6 * U, ay - 22 * U);
+  g.fillText('對上節拍 0.83', qx(PHYS.qEject) - 6 * U, ay - 22 * U);
   g.textAlign = 'left'; g.fillStyle = C.sub; g.fillText('0.908', qx(PHYS.qMax) + 4 * U, ay - 22 * U);
   g.fillStyle = C.sub; g.font = fnt(400, 13 * U, true);
   for (const q of [0, 0.2, 0.4, 0.6]) { g.fillText(q.toFixed(1), qx(q) - 8 * U, ay + 30 * U); g.fillRect(qx(q), ay + 6 * U, 1 * U, 6 * U); }
@@ -1742,7 +1743,7 @@ function drawScope(g, x, y, w, a, trap, species, acOn) {
   const { U, C } = OV;
   const rows = species.length + 1, rh = 42 * U;
   const h = (52 + 8) * U + rows * rh;
-  panelBox(g, x, y, w, h, '示波器:沿軸向的位置', a, '最近 4 秒');
+  panelBox(g, x, y, w, h, '示波器:在端帽間的位置', a, '最近 4 秒');
   const x0 = x + 112 * U, x1 = x + w - 16 * U;
   const tr = trap.tracer;
   for (let k = 0; k < rows; k++) {
@@ -1807,7 +1808,7 @@ function drawSpectrum(g, x, y, w, a, spec, view) {
   }
   g.textAlign = 'left';
   g.fillText('m/z', px1 - 26 * U, base + 40 * U);
-  if (view.vAxis) { g.fillStyle = C.faint; g.fillText('排出時的射頻振幅(V)', px0, top - 40 * U); }
+  if (view.vAxis) { g.fillStyle = C.faint; g.fillText('排出時的電壓振幅(V)', px0, top - 40 * U); }
   // peaks
   const max = view.norm || spec.max || 1;
   for (const p of spec.peaks) {
@@ -1835,7 +1836,7 @@ function drawSpectrum(g, x, y, w, a, spec, view) {
 function drawWell(g, x, y, w, a, V, species) {
   const { U, C } = OV;
   const h = 232 * U;
-  panelBox(g, x, y, w, h, '平均下來的位能井(軸向剖面)', a, `V = ${fmtV(V)} V`);
+  panelBox(g, x, y, w, h, '平均下來的「碗」:沿中心軸的位能', a, `V = ${fmtV(V)} V`);
   const cx = x + w * 0.42, top = y + 64 * U, bottom = y + h - 26 * U, half = w * 0.3;
   const depths = species.map((s) => { const q = qOf(V, s.mz); return (q * V) / 8; });
   const dmax = Math.max(...depths);
@@ -2101,12 +2102,12 @@ const CHAPTERS = [
     key: 'outside', title: '質譜儀在做什麼', dur: 11,
     cam: [KP(4.5, V3(0.33, 0.72, 1.92), V3(-0.02, 0.31, 0.3)), KP(11, V3(-0.62, 0.64, 1.16), V3(-0.2, 0.33, 0.4))],
     cues: [
-      [0.4, '質譜儀做三件事:把分子變成帶電的**離子**、依**質荷比**把離子分開、再把離子數出來。下面打開機器,沿著離子走的路看一遍。'],
+      [0.4, '質譜儀做三件事:讓分子帶電成為**離子**、依**質荷比**(m/z,質量除以電荷)分開、再把離子數出來。下面打開機器,跟著離子走一遍。'],
     ],
     update(ST, t) {
       F.scanLed = 1; F.winGlow = 0.6;
       OVS.labels = labels(ST, t, [
-        ['cab:source', '離子源', '樣品從這裡進去', 2, 10.6, -70, -70],
+        ['cab:source', '離子源', '樣品在這裡變成離子', 2, 10.6, -70, -70],
       ]);
     },
   },
@@ -2136,8 +2137,8 @@ const CHAPTERS = [
       K(16.2, D(-10, -5, 0), [0.05, 0.03, 0.26]), K(24.2, D(-8, -3, 0), [0.06, 0.03, 0.27]), K(30, D(-5, -1, 0), [0.08, 0.035, 0.28])],
     cues: [
       [0.3, '樣品溶液從噴針流出,噴針加了約 **+4.5 kV** 的高壓。液面被電場拉成尖錐,也就是**泰勒錐**,尖端噴出帶正電的細小液滴。'],
-      [8.2, '**鞘氣**(氮氣)把液滴吹散。溶劑一路蒸發,液滴越縮越小,表面的電荷越擠越密。'],
-      [14.4, '電荷擠到極限,液滴就噴出一串更小的子液滴,把電荷分走;縮到只剩幾奈米時,離子直接從表面脫離。分析物在酸性溶液裡多半已帶上一個質子,所以出來的是 **[M+H]⁺**。'],
+      [8.2, '噴針外圈的氮氣(**鞘氣**)把液滴吹散。溶劑蒸發,液滴越縮越小,表面電荷越擠越密。'],
+      [14.4, '電荷擠到極限,液滴就噴出一串更小的液滴,把電荷分走;縮到只剩幾奈米時,離子直接從表面脫離。要測的分子 M 在酸性溶液裡多半已多帶一個 H⁺,所以出來的是 **[M+H]⁺**。'],
       [22.6, '沒蒸發完的大液滴被氣流帶開,從底部的廢液口排掉;離子被電場拉向入口,連同氣體一起被吸進毛細管。'],
     ],
     update(ST, t) {
@@ -2155,7 +2156,7 @@ const CHAPTERS = [
     cam: [K(5, D(40, 1.5, 0), [0.04, 0.09, 0.36]), K(9.4, D(108, 1, 0), [0.02, 0.05, 0.2]), K(14, D(118, 0, 0), [0.03, 0.035, 0.13]), K(18, D(124, 0, 0), [0.05, 0.04, 0.15])],
     cues: [
       [0.3, '入口是一根內徑 **0.45 mm** 的不鏽鋼毛細管,外面套著加熱塊,溫度 200 到 350 °C,把殘留的溶劑烤乾。'],
-      [8.8, '毛細管出口後方的**截取錐**,小孔刻意和毛細管錯開約 1.5 mm。離子被**管狀透鏡**的電場導進小孔,中性分子直直撞上錐面,被前級幫浦抽走。'],
+      [8.8, '毛細管後方是錐形擋板(**截取錐**),頂端小孔刻意和毛細管錯開約 1.5 mm。離子被**管狀透鏡**的電場導進小孔,中性分子直直撞上錐面,被前級幫浦抽走。'],
     ],
     update(ST, t) {
       F.pose = 1; F.cab = 0; F.cabSlide = 1;
@@ -2173,17 +2174,17 @@ const CHAPTERS = [
     key: 'guides', title: '離子導引', dur: 17, prewarm: 7,
     cam: [K(5, D(162, 0, 0), [0.02, 0.08, 0.25]), K(10, D(200, 0, 0), [0.0, 0.07, 0.24]), K(17, D(230, 0, 0), [0.03, 0.06, 0.22])],
     cues: [
-      [0.3, '接著是**方形四極桿**和**八極桿**。桿子上加 2.45 MHz 的射頻電壓,把一大段質荷比範圍的離子都約束在中心線附近,讓它們沿著桿子往前飛。'],
-      [8.6, '兩組桿子中間的透鏡兼當閘門:要裝離子時打開,裝夠了就升到 **+130 V** 把後面的離子擋住。裝多少,由**自動增益控制**先做一次預掃描決定。'],
+      [0.3, '接著是**方形四極桿**和**八極桿**:四根、八根金屬桿圍成通道,桿上電壓每秒正負來回 245 萬次,把各種質荷比的離子都約束在中心線附近,沿桿子往前送。'],
+      [8.6, '兩組桿子中間的透鏡兼當閘門:要裝離子時打開,裝夠了就升到 **+130 V** 把後面的離子擋住。裝多少,由儀器先快速試掃一次再決定(**自動增益控制**)。'],
     ],
     update(ST, t) {
       F.pose = 1; F.cab = 0; F.cabSlide = 1;
       F.spray = 1; F.transVis = 1; F.rfGuide = 1; F.neutrals = 0.3;
       F.gateOpen = !(t > 11 && t < 15.8);
       OVS.labels = labels(ST, t, [
-        ['asm:quad', '方形四極桿', '2.45 MHz,400 V p-p', 0.8, 8.4, -40, -90],
+        ['asm:quad', '方形四極桿', '2.45 MHz,峰到谷 400 V', 0.8, 8.4, -40, -90],
         ['asm:octa', '八極桿', '2.45 MHz', 2, 8.4, 40, -90],
-        ['asm:inter', F.gateOpen ? '多極桿間透鏡:打開' : '多極桿間透鏡:關閉', F.gateOpen ? '傳輸時 ±20 V 以內' : '+130 V,擋住離子', 9, 17, -40, -100],
+        ['asm:inter', F.gateOpen ? '桿間透鏡(閘門):打開' : '桿間透鏡(閘門):關閉', F.gateOpen ? '傳輸時 ±20 V 以內' : '+130 V,擋住離子', 9, 17, -40, -100],
       ]);
     },
   },
@@ -2191,8 +2192,8 @@ const CHAPTERS = [
     key: 'trap', title: '離子阱', dur: 25,
     cam: [K(3, D(266, 0, 0), [0.06, 0.07, 0.24]), K(9.5, D(266, 2, 0), [0.03, 0.05, 0.23]), K(15.5, D(262, 0, 0), [0.02, 0.03, 0.17]), K(25, D(266, 0, 0), [0.02, 0.025, 0.15])],
     cues: [
-      [0.3, '質量分析器就是這組**離子阱**:中間一圈**環形電極**,前後各一片**端帽電極**,內面都是雙曲面,彼此用石英環隔開;中間的空腔只有約 1.4 公分寬、1.6 公分長。'],
-      [8.8, '環形電極接 **760 kHz** 的射頻電壓,振幅可以從 0 調到 **8500 V**。阱的空腔裡另外通進約 10⁻³ Torr 的**氦氣**(比外面的分析區濃得多),從出口端帽上的小管送進來。'],
+      [0.3, '分開離子的**質量分析器**就是這組**離子阱**:中間一圈**環形電極**,前後各一片**端帽電極**,內面都是雙曲面,用石英環隔開;空腔只有約 1.4 公分寬、1.6 公分長。'],
+      [8.8, '環形電極接上 **760 kHz** 的交流電壓(每秒正負來回 76 萬次),振幅可以從 0 調到 **8500 V**。阱裡另外通進約 10⁻³ Torr 的**氦氣**(比外面濃得多),從出口端帽的小管送進來。'],
       [16.6, '離子從入口端帽中心的小孔進來,一路和氦原子碰撞、失去動能,最後聚在離中心約 1 mm 以內的一小團裡。'],
     ],
     enter(ST) { ST.trap.reset(31); ST.trap.V = 500; setSample('cal'); },
@@ -2203,7 +2204,7 @@ const CHAPTERS = [
       F.transVis = 1; F.spray = 0; F.feed = t > 16.4 && t < 19.8 ? 16 : 0; F.feedFrom = 222; F.trapAccept = t > 16.2 && t < 21.5;
       OVS.labels = labels(ST, t, [
         ['asm:capIn', '入口端帽電極', '中心有小孔', 2.4, 8.6, -50, -110],
-        ['asm:ring', '環形電極', 'r₀ = 7.07 mm', 2.8, 8.6, 30, -125],
+        ['asm:ring', '環形電極', '內半徑 7.07 mm', 2.8, 8.6, 30, -125],
         ['asm:capOut', '出口端帽電極', '', 3.2, 8.6, 60, -95],
         ['asm:spacer', '石英間隔環', '絕緣兼定位', 3.6, 8.6, 70, 40],
         ['asm:he', '氦氣入口', '約 1 mL/min', 10, 16.4, 50, -70],
@@ -2216,7 +2217,7 @@ const CHAPTERS = [
     cam: [K(1.6, D(266, 50, 0), [0.0, 0.1, 0.5]), K(4, D(266, 140, -6), [0.0, 0.2, 0.42]), K(12, D(266, 140, -6), [0.11, 0.17, 0.4]), K(21.6, D(266, 140, -6), [0.05, 0.15, 0.43]),
       K(32, D(266, 140, -6), [0.03, 0.12, 0.45], { sx: 0.13 })],
     cues: [
-      [0.3, '環形電極和端帽之間的電位分布像一個**馬鞍面**:某一瞬間沿軸向往中心推、沿半徑往外拉,下一瞬間剛好反過來。'],
+      [0.3, '環形電極和端帽之間的電位分布像一個**馬鞍面**:某一瞬間在端帽方向往中心推、在環的方向往外拉,下一瞬間剛好反過來。'],
       [6.6, '放一顆球在靜止的馬鞍上,它一定會滾下去;翻轉得太慢,也一樣留不住。'],
       [11.6, '翻得夠快,球還沒滾遠就被推回來。環形電極的電壓每秒正負來回 76 萬次,離子就是這樣被困在中心。'],
       [16.8, '而且往中心推的那半週,球剛好離中心比較遠、受力比較大,所以平均下來,淨力朝向中心。'],
@@ -2239,9 +2240,9 @@ const CHAPTERS = [
     key: 'rhythm', title: '每種質荷比都有自己的節奏', dur: 24,
     cam: [K(2.2, D(266, 30, 0), [0.02, 0.06, 0.42], { sx: HUDX }), K(4.6, D(266, 0, 0), [0.015, 0.022, 0.135], { sx: HUDX }), K(24, D(266, 0, 0), [0.03, 0.026, 0.13], { sx: HUDX })],
     cues: [
-      [0.3, '現在阱裡同時關著三種離子:{195|咖啡因 m/z 195}、{524|MRFA m/z 524}、{1222|Ultramark m/z 1222}。三種混在同一團裡,位置上分不開。'],
-      [8.4, '分得開的是節奏。每種離子沿軸向來回振盪的頻率由 **q** 決定:q = 8eV / [m(r₀² + 2z₀²)Ω²],同樣的電壓下跟質荷比成反比。'],
-      [16.6, '所以質荷比小的振得快,質荷比大的振得慢。示波器把三種離子的軸向位置各畫成一條線,儀器就是靠這個頻率差來分辨質荷比。'],
+      [0.3, '現在阱裡同時關著校正液裡的三種離子:{195|咖啡因 m/z 195}、{524|MRFA m/z 524}、{1222|Ultramark m/z 1222}。三種混在同一團裡,位置上分不開。'],
+      [8.4, '分得開的是節奏。每種離子在兩片端帽之間來回振盪,快慢由一個叫 **q** 的數值決定:q 跟電壓成正比、跟質荷比成反比。'],
+      [16.6, '所以質荷比小的振得快,質荷比大的振得慢。示波器把三種離子在端帽間的位置各畫成一條線,儀器就是靠這個頻率差來分辨質荷比。'],
     ],
     enter(ST) { ST.trap.reset(33); ST.trap.V = 500; setSample('cal'); ST.trap.fill(22); ST.spectrum.reset(); },
     update(ST, t) {
@@ -2257,10 +2258,10 @@ const CHAPTERS = [
     cam: [K(4, D(279, -4, 0), [0.03, 0.04, 0.235], { sx: HUDX }), K(42, D(281, -4, 0), [0.045, 0.045, 0.245], { sx: HUDX })],
     cues: [
       [0.3, '端帽上另外加一個小小的交流電壓,頻率固定在約 **280 kHz**,等於離子在 q = 0.83 時的振盪頻率。它只推得動頻率對上的離子,就像照固定節拍推鞦韆。'],
-      [8.6, '接著把環形電極的射頻振幅以固定速率往上調。所有離子的 q 和振盪頻率一起變大,質荷比最小的{195|咖啡因}最先走到 **q = 0.83**,對上節拍。'],
-      [16.2, '對上節拍的離子越盪越大,很快就從端帽中心的小孔飛出去。把離子送出去的是共振;射頻變大本身不會推出離子,阱反而抓得更緊。'],
+      [8.6, '接著把環形電極電壓的振幅以固定速率往上調。所有離子的 q 和振盪頻率一起變大,質荷比最小的{195|咖啡因}最先走到 **q = 0.83**,對上節拍。'],
+      [16.2, '對上節拍的離子越盪越大,很快就從端帽中心的小孔飛出去。把離子送出去的是共振;電壓變大本身不會推出離子,阱反而抓得更緊。'],
       [23.4, '接著輪到 {524|MRFA},最後是 {1222|Ultramark}。排序看的是質荷比,不是質量:帶兩個電荷的離子,會落在質量一半的位置。'],
-      [31.6, '排出時的射頻振幅和質荷比成正比,m/z 每多 1 約高 4.25 V(依文獻尺寸計算):{195|m/z 195} 約在 830 V、{524|524} 約 2230 V、{1222|1222} 約 5190 V。'],
+      [31.6, '排出時的電壓振幅和質荷比成正比,m/z 每多 1 約高 4.25 V(依文獻尺寸計算):{195|m/z 195} 約在 830 V、{524|524} 約 2230 V、{1222|1222} 約 5190 V。'],
     ],
     enter(ST, cont) {
       if (!cont) { ST.trap.reset(34); ST.trap.V = 500; setSample('cal'); ST.trap.fill(22); }
@@ -2279,7 +2280,7 @@ const CHAPTERS = [
         specView: { lo: 100, hi: 1400, step: 200, vAxis: true, cursor: t > 9 ? m : null }, hide: (s) => !ST.counts[s.mz] };
       OVS.labels = labels(ST, t, [
         ['asm:capIn', '端帽交流電壓', '約 280 kHz(計算值)', 1.4, 8.4, -40, -120],
-        ['asm:capOut', '兩片端帽反相', '相差 180°', 2.2, 8.4, 50, -105],
+        ['asm:capOut', '兩片端帽一推一拉', '相差 180°', 2.2, 8.4, 50, -105],
       ]);
     },
   },
@@ -2288,8 +2289,8 @@ const CHAPTERS = [
     cam: [K(4, D(296, -4, 0), [0.035, 0.025, 0.25], { sx: HUDX }), K(10, D(292, -3, 0), [0.045, 0.03, 0.26], { sx: HUDX }),
       K(17.5, D(280, 0, 0), [0.05, 0.05, 0.27], { sx: HUDX }), K(26, D(250, -8, 0), [0.1, 0.12, 0.62], { sx: HUDX })],
     cues: [
-      [0.3, '從出口端帽出去的離子被 **−15 kV** 的**轉換二次發射電極**吸過去,撞出電子和負離子;這些二次粒子進入**電子倍增器**,沿著管壁一路倍增約 30 萬倍。'],
-      [8.8, '偵測器本身分不出質荷比,只記錄每個時刻收到多少電荷。電腦知道那一刻的射頻振幅,再依質量校正換算成 m/z,訊號對時間的曲線就成了質譜。'],
+      [0.3, '從出口端帽出去的離子被 **−15 kV** 的**轉換二次發射電極**吸過去,撞出電子和負離子;它們進入**電子倍增器**,電子每撞一次管壁就變多,共放大約 30 萬倍。'],
+      [8.8, '偵測器本身分不出質荷比,只記錄每個時刻收到多少電荷。電腦知道那一刻的電壓振幅,再照校正液定好的關係換算成 m/z,訊號對時間的曲線就成了質譜。'],
       [17.2, '往另一側端帽飛出的離子收不到,大約只有一半進到偵測器。實際的掃描每秒約掃過 5,500 個 m/z 單位,從 150 掃到 2000 只要 0.34 秒。'],
     ],
     enter(ST) {
@@ -2304,8 +2305,8 @@ const CHAPTERS = [
       OVS.hudA = 1;
       OVS.hud = { rf: 1, spec: 1, V: ST.trap.V, spectrum: ST.spectrum, rfNote: '動畫在兩種離子之間快轉', specView: { lo: 100, hi: 1400, step: 200, vAxis: true, cursor: m < 1310 ? m : null } };
       OVS.labels = labels(ST, t, [
-        ['asm:dynode', '轉換二次發射電極', '−15 kV(正離子模式)', 0.8, 8.6, 70, 10],
-        ['asm:mult', '電子倍增器', '增益約 3×10⁵', 1.6, 8.6, 70, -40],
+        ['asm:dynode', '轉換二次發射電極', '−15 kV,吸引正離子', 0.8, 8.6, 70, 10],
+        ['asm:mult', '電子倍增器', '放大約 30 萬倍', 1.6, 8.6, 70, -40],
       ]);
       OVS.banner = { text: '實際速度:m/z 150 掃到 2000 只要 0.34 秒', a: win(t, 19.6, 26, 0.5) };
     },
@@ -2314,10 +2315,10 @@ const CHAPTERS = [
     key: 'msms', title: '串聯質譜 MS/MS', dur: 34,
     cam: [K(3, D(266, 0, 0), [0.015, 0.02, 0.15], { sx: HUDX }), K(34, D(272, -2, 0), [0.03, 0.03, 0.17], { sx: HUDX })],
     cues: [
-      [0.3, '同一個離子阱還能做**串聯質譜**。以{611|蘆丁 [M+H]⁺ m/z 611}當前驅物離子:先用一段寬頻波形把其他離子全部排掉,只留下 611。'],
-      [8.6, '再把射頻振幅調到讓 611 停在 **q = 0.25**,用它自己的振盪頻率輕輕推 30 ms。離子和氦原子一次次碰撞,累積能量後斷鍵。'],
-      [16.8, '失去一個鼠李糖基(146)得到 {465|m/z 465},失去整個芸香糖基(308)就是{303|槲皮素苷元 m/z 303}。最後照樣掃描排出,得到產物離子譜圖。'],
-      [27.6, 'MS/MS 不需要第二個分析器,每一步都在同一個阱裡按時間先後完成;這台儀器最多可以做到 MS¹⁰。'],
+      [0.3, '同一個離子阱還能做**串聯質譜**:挑一種離子撞碎再量碎片。先用混了多種頻率的電壓,把{611|蘆丁 [M+H]⁺ m/z 611}以外的離子都甩出去。'],
+      [8.6, '再把電壓振幅調到讓 611 停在 **q = 0.25**,照它自己的振盪頻率輕輕推 30 ms。離子和氦原子一次次碰撞,累積能量後斷鍵、裂成碎片。'],
+      [16.8, '掉了末端的鼠李糖(少 146)得到 {465|m/z 465},整個芸香糖(雙糖,少 308)都掉了,剩下{303|槲皮素 m/z 303}。最後照樣掃描排出,得到碎片的質譜。'],
+      [27.6, 'MS/MS 不需要第二個分析器,每一步都在同一個阱裡按時間先後完成;碎片還能再挑出來拆,最多做到 MS¹⁰。'],
     ],
     enter(ST) {
       ST.trap.reset(36); ST.trap.V = 500; setSample('np'); ST.trap.fill(18); ST.spectrum.reset();
@@ -2354,9 +2355,9 @@ const CHAPTERS = [
       const step = t < 2.2 ? 0 : t < 8.6 ? 1 : t < 16.8 ? 2 : 3;
       const stepT = [[0, 2.2], [2.2, 8.6], [8.6, 16.8], [16.8, 34]][step];
       OVS.hudA = 1;
-      OVS.hud = { q: 1, steps: 1, stepList: ['裝入離子', '隔離 m/z 611', '共振激發,碰撞誘發解離', '掃描排出產物離子'], step, stepProg: (t - stepT[0]) / (stepT[1] - stepT[0]),
+      OVS.hud = { q: 1, steps: 1, stepList: ['裝入離子', '只留下 m/z 611', '照節拍輕推,撞氦氣碎裂', '掃描排出碎片離子'], step, stepProg: (t - stepT[0]) / (stepT[1] - stepT[0]),
         spec: sstep(17, 18, t), V: tr.V, species: ST.speciesNow(), spectrum: ST.spectrum,
-        specView: { lo: 150, hi: 700, step: 100, cursor: m, title: '產物離子譜圖:m/z 611 的碎片', right: 'MS²' }, hide: (s) => !ST.counts[s.mz] };
+        specView: { lo: 150, hi: 700, step: 100, cursor: m, title: '碎片的質譜:m/z 611 撞碎後', right: 'MS²' }, hide: (s) => !ST.counts[s.mz] };
     },
   },
   {
@@ -2369,10 +2370,10 @@ const CHAPTERS = [
       OVS.recap = win(t, 0.6, 13.4, 0.8);
       OVS.recapReveal = (t - 1.0) / 1.6;
       OVS.recapLines = [
-        '同樣的射頻電壓下,每種質荷比的 **q** 不同,振盪頻率也不同。',
+        '同樣的電壓下,每種質荷比的 **q** 不同,振盪頻率也不同。',
         '端帽上固定頻率的交流電壓,只推得動頻率對上的那一種離子。',
-        '射頻振幅等速上升,離子依質荷比由小到大,輪流對上節拍被排出。',
-        '排出的時刻對應射頻振幅,射頻振幅對應 **m/z**,這就是質譜的橫軸。',
+        '電壓振幅等速上升,離子依質荷比由小到大,輪流對上節拍被排出。',
+        '排出的時刻對應電壓振幅,電壓振幅對應 **m/z**,這就是質譜的橫軸。',
       ];
       OVS.endCard = win(t, 13.4, 17.2, 0.8);
     },
@@ -2771,9 +2772,9 @@ function labStep(dt) {
   const L = sampleState.list;
   labRead.innerHTML = L.map((s) => {
     const q = qOf(trap.V, s.mz), n = ST.counts[s.mz] || 0;
-    const state = n ? (q >= PHYS.qMax ? '不穩定' : `q ${q.toFixed(3)}`) : '已排出';
+    const state = n ? (q >= PHYS.qMax ? '留不住' : `q ${q.toFixed(3)}`) : '已排出';
     return `<span style="color:${cssForMz(s.mz)}">●</span> m/z ${s.mz.toFixed(1)}  ${state}`;
-  }).join('<br>') + `<br>低質量截止 m/z ${(trap.V / (PHYS.kV * PHYS.qMax)).toFixed(0)}`;
+  }).join('<br>') + `<br>留得住的最小 m/z ${(trap.V / (PHYS.kV * PHYS.qMax)).toFixed(0)}`;
   const lo = L[0].mz < 200 ? 100 : 150, hi = sampleState.key === 'np' ? 700 : 1400;
   OVS.hudA = 1;
   OVS.hud = { rf: 1, q: 1, scope: 1, spec: 1, V: trap.V, species: L, trap, ac: trap.ac, spectrum, hide: (s) => !ST.counts[s.mz],

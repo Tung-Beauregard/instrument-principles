@@ -32,10 +32,13 @@
 - 「導覽」讓鏡頭跟著一個成分的分子走完 8 站:進樣、進樣口、管柱、傳輸線、離子源、四極桿、偵測器、完成
 - 放大鏡:在管柱內部看分子在液膜與載氣之間進出;暫停在峰上會切到離子源,示範 M⁺• 怎麼形成、怎麼斷成碎片
 - 質譜面板的「四極桿」檢視畫出 Mathieu 穩定圖,可以把四極桿固定在某個 m/z
+- 動畫說明(控制列的「動畫」、說明視窗、牆上的四張說明圖):走走停停、保留指數 KI、電子撞擊游離、四極桿(翻轉的馬鞍)
 - 可切換升溫速率(3、5、10 °C/min)、拆開儀器,播放速度有 0.1× 與 0.5× 慢動作
 - 層析圖可拖曳捲動、點峰追蹤、點質譜線抽出 EIC;峰表附用正烷烴換算的 KI
 
 ### 數值與示意
+
+動畫說明的數字:走走停停的 k = 1 與 3 是為了說明挑的整數,每次停留取平均值上下 30%(真的分子每秒進出液膜非常多次,峰才窄;畫面放慢後若照完全隨機的停留時間,一團分子會散得太開);保留指數的時間與 KI 直接取本頁的滯留模型(每分鐘 3 °C:C9 4.68、C10 7.48、α-Pinene 5.64 分,KI 934;每分鐘 10 °C:C9 3.52、C10 4.78、α-Pinene 3.98 分,KI 937);電子撞擊游離的斷法與質譜取本頁 α-Pinene 的資料(136、121、93,主要離子相對強度 6% 以上);四極桿那段的物理見下方「質譜儀-不同分析器比較」的電場形狀,三顆球用 α-Pinene 的碎片 77、93、136,「每秒掃 3、4 次」取本頁的掃描間隔 0.0048 分。
 
 管柱 HP-5MS 30 m × 0.25 mm × 0.25 μm、He 1.0 mL/min、柱溫 60 °C 起以 3、5 或 10 °C/min 升到 220 °C 後保持 3 min。各成分的滯留由非極性管柱的 KI 值換算(簡化的熱力學模型),峰寬以約 7 萬理論板數估算。樣品是虛構的示範組成;質譜只取主要離子,強度為概略值,只供說明,不可拿來鑑定。儀器外觀與尺寸是示意。
 
@@ -173,3 +176,102 @@
 - 氫譜參數的實際資料列印(5 mm PABBO 探頭):https://isomerdesign.com/bitnest/www.policija.si/m/Isopropylphenidate-ID-1171-15-report_final.pdf
 
 頁碼:Ascend 500 外觀尺寸與冷凍劑在附錄 A(手冊第 70 至 81 頁);5 高斯線在站位規劃第 36 至 37 頁;勻場管尺寸在 Probes 手冊第 15 頁;鎖場頻率在 BSMS 手冊表 16.4(第 117 頁);IPSO、SGU/2、BLA、HPPR/2、RXAD、DRU 在硬體手冊第 12 至 191 頁的各章。
+
+## 質譜儀-不同分析器比較(四極柱、離子阱、飛行時間、Orbitrap)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/mass-analyzers/
+
+不是依某一台實際儀器建模。中央的電灑游離源把同一組離子(咖啡因、阿魏酸與 MRFA 的 [M+H]⁺)分成四路,送進四種質量分析器,比較它們怎麼依 m/z 分開離子,以及解析度、質量誤差與收一張譜的時間。數值參考的代表機型只寫在右下角小字、說明視窗與片尾小字:四極柱 Agilent 5977 系列單四極、離子阱 Thermo LCQ Fleet(3D 離子阱)、飛行時間 Agilent 6546(正交加速加反射鏡)、Orbitrap Thermo Q Exactive。版型和 UV-Vis、NMR 頁相同。
+
+- 選分析器,鏡頭移過去;「收譜」依各自的方式收一張譜:四極柱掃描電壓、離子阱關住再掃射頻、飛行時間推一次、Orbitrap 收集注入再收暫態並做傅立葉轉換
+- 每種分析器一組設定:四極柱篩得多細(一般、更細)、離子阱的掃描速度(一般、慢一點更細)、飛行時間的反射鏡(開、關)、Orbitrap 記錄多久(64、128、256、512 ms)
+- 左欄的簡圖用白話標出離子從哪裡進來、怎麼走、在哪裡被量到,和 3D 同方向、同步動(窄螢幕按「簡圖」打開);下方主控台是譜,換一種再收時上一張以虛線留著比較
+- 點譜可放大兩段:m/z 195(咖啡因與阿魏酸只差 0.0225)、MRFA 的 M+2 精細結構;第三下回到整張
+- 讀值:能分開的差距(m/z 195 能分開的最小 m/z 差,等於 195 ÷ 解析度)、量到的偏差、量一張譜要多久,以及咖啡因和阿魏酸分不分得開
+- 「導覽」自動播放約 142 秒,15 段字幕,內容與影片相同
+- 文字以台灣高中畢業看得懂為準:專有名詞換成白話或當場解釋,規格與型號留在說明視窗的小字
+- 視角操作與其他 3D 教材相同(共用 assets/camera-nav.js)
+
+### 數值與示意
+
+離子(計算):
+
+- [M+H]⁺ 的單一同位素 m/z = PubChem 的單一同位素質量 + 質子質量 1.00727647 u:咖啡因 C₈H₁₁N₄O₂⁺ 195.08765(CID 2519)、阿魏酸 C₁₀H₁₁O₄⁺ 195.06519(CID 445858)、MRFA C₂₃H₃₈N₇O₅S⁺ 524.26496(CID 9914740)。咖啡因與阿魏酸相差 0.02246,峰寬要小於這個值(m/z 195 的解析度高於約 8,700)才分得開。
+- 同位素峰由元素的同位素組成計算(`isoPattern()`)。MRFA 的 M+2(相對單一同位素):³⁴S 526.26076(4.47%)、¹³C¹⁵N 526.26535(0.64%)、¹⁸O 526.26921(1.03%)、¹³C₂ 526.27167(2.96%)。
+- 三種化合物的相對量(1.0、0.62、0.8)是示意。
+
+四極柱:
+
+- 原理:兩對桿子加 ±(U − V cos Ωt),a = 8zeU/(m r₀²Ω²)、q = 4zeV/(m r₀²Ω²)(Syed 等 2013,式 4、5;Paul 以兩對桿子之間的電壓定義,係數各差一半,a/q 相同)。第一穩定區頂點 (q, a) = (0.706, 0.237);掃描時 U/V 固定,a/q = 2U/V 與質量無關,掃描線越靠近頂點,能通過的 m/z 範圍越窄、離子也越少(Paul 1989)。
+- 原廠資料(Agilent 5977 系列):單位解析;自動調諧的峰寬目標為半高寬 0.5 u(Concepts Guide 第 32 頁),化學游離自動調諧預設 0.6(Operating Manual 表 13);較早的 HP 5972A 是 0.55 u,0.45 到 0.65 可接受(第 77 至 78 頁)。最高掃描速度 12,500 u/s(不鏽鋼離子源)或 20,000 u/s(Inert Plus Extractor 或 HES),速度越快靈敏度越低、解析度可能變差(5977A、5977B 規格表)。質量軸穩定度優於 0.10 u / 48 小時;校正在 ±0.2 u 以內。
+- 教材取值:峰寬 0.6 u(m/z 195 的解析度約 330);一張譜 = 500 u ÷ 12,500 u/s = 40 ms(推估,未計切換時間);質量誤差 +0.07 u(示意,在上面的穩定度之內)。
+- 「更細」(峰寬 0.3 u、穿透率三成)是示意的對照設定,不是 5977 的規格。
+
+離子阱(3D Paul 阱):
+
+- 原理:q_z = 8zeV/(mΩ²(r₀² + 2z₀²)),和射頻振幅成正比、和 m/z 成反比;穩定邊界 q_z = 0.908(Schleicher 等 2022)。質量選擇不穩定掃描:把射頻振幅往上掃,m/z 小的先變得不穩定、依序射出(Stafford 等 1984);商用離子阱在邊界之前用共振激發把離子甩出。
+- 原廠資料(Finnigan LCQ Series Hardware Manual):環電極射頻 0.76 MHz、振幅 0 到 8500 V(零到峰)(第 2-18 頁);掃描約 5,500 u/s;端蓋隔離波形 5 到 380 kHz(第 2-19 頁);氦氣約 0.1 Pa(第 2-20 頁);ZoomScan 是 10 u 寬的高解析掃描(第 1-9 頁)。
+- 教材的峰寬、掃描速度與質量誤差取自 LCQ Fleet 規格表(表 1,m/z 50 到 2,000):一般掃描 12,500 Da/s、半高寬 0.7;加強掃描 5,000 Da/s、0.45;質量準確度 0.15 Da。實驗室的 LCQ Deca XP 是同系列較早的機型,手冊沒有對應的解析度表。
+- 教材取值:m/z 195 能分開的差距約 0.7(一般)與 0.45(慢一點、更細),即解析度約 280 與 430;質量誤差 −0.09 與 −0.05 u(示意,在 0.15 Da 之內);一張譜 = 30 ms(離子累積與冷卻,示意)+ 500 u ÷ 掃描速度,即 70 與 130 ms。
+- 示意:動畫的共振射出點畫在 q_z = 0.83,接近穩定邊界,是教學設定;環電極與端蓋的比例取文獻常引用的 LCQ 尺寸 r₀ 0.707 cm、z₀ 0.785 cm(原廠文件未確認;以 0.76 MHz、8500 V 推算,q_z 0.83 對應 m/z 約 2,000,和 m/z 50 到 2,000 的範圍一致)。冷卻後的 8 字形刻意畫大。
+
+飛行時間(正交加速、反射鏡):
+
+- 原理:所有離子拿到相同動能 zeU = ½mv²,t = L·√(m/(2zeU)),t ∝ √(m/z);解析度 R = t/(2Δt)。反射鏡讓能量稍多的離子鑽得深、多走一段路,和能量少的一起抵達(Mamyrin 等 1973:當時一般飛行時間的解析度只有數百,反射式達 3,500)。正交加速:推出方向和離子束垂直,入射速度對飛行時間的影響降到最小(Dawson & Guilhaus 1989;Agilent Concepts Guide 第 27 頁)。
+- 原廠資料(Agilent 技術文件):飛行管約 1 m,兩段式反射鏡讓路徑變成約 2 m;飛行管與偵測器前端約 −6,500 V;偵測器是微通道板、閃爍體與光電倍增管;每秒累加約 1 萬個暫態;m/z 200 的暫態約 25 µs、每秒 4 萬次(5990-9207EN 第 2 至 7 頁;5989-0373EN 第 4 至 7 頁)。
+- 原廠資料(Agilent 6546 規格表):解析度 m/z 118 > 30,000、m/z 2,722 > 60,000(半高寬);以內標校正的質量誤差 < 0.8 ppm RMS;最高每秒 50 張譜(MS)。
+- 教材取值:m/z 195 的解析度 30,000(能分開的差距約 0.0065)、質量誤差 +0.7 ppm(約 +0.0001)、一張譜 20 ms。
+- 計算推估:L = 2 m、U = 6.5 kV 時,咖啡因 [M+H]⁺ 飛 24.94 µs、MRFA 40.89 µs;咖啡因與阿魏酸只差 1.44 ns。簡圖下方的抵達時間刻度用這組數值(`TOF_US195`)。動畫裡反射鏡的平均鑽入深度取漂移長度的四分之一(`FD.d0`),是單段均勻減速場一階能量聚焦的條件。
+- 示意:反射鏡關掉的直線模式(解析度 3,000、誤差 8 ppm)是假設的對照,商用正交加速飛行時間都帶反射鏡;動畫的能量差(±6%)、飛行速度與推的間隔都經過調整。
+
+Orbitrap:
+
+- 原理(Makarov 2000):電位 U(r, z) = (k/2)(z² − r²/2) + (k/2)Rm²·ln(r/Rm) + C;軸向振盪 ω = √(k·ze/m),只和 m/z 有關,和離子的能量與位置無關;外電極分成兩半量感應電流,差動放大後做傅立葉轉換;M/ΔM = ½(ω/Δω)。
+- 電極外形依等位面 z² = r²/2 − R²/2 + Rm²·ln(R/r) 繪製;R₁ = 6、R₂ = 15 取標準型 Orbitrap 的 6 mm、15 mm(Scheltema 等 2014),Rm = 22 是示意值。
+- 原廠與文獻(Q Exactive):m/z 200 的解析度 17,500、35,000、70,000、140,000,對應暫態 64、128、256、512 ms;解析度和 √(m/z) 成反比;速度從 12 Hz(17,500)到 1.5 Hz(140,000)(Michalski 等 2011,表 I 與內文);內標 < 1 ppm RMS、外部校正 < 3 ppm RMS;中心電極 5 kV;C-trap 充氮(規格表)。MRFA 在 512 ms 暫態實測解析度 > 90,000(m/z 524,eFT)。
+- 教材取值:質量誤差 −0.4 ppm(約 −0.0001);一張譜 83、167、333、667 ms(兩端取自上面的 12 Hz 與 1.5 Hz,中間兩檔依每檔減半推估)。
+- 計算推估:Wörner 等 2022 對 Q Exactive UHMR(中心電極 5 kV、標準型電極)用 f ≈ 0.26055 × (m/z ÷ 1000)^−½ MHz。假設同樣適用於 Q Exactive:m/z 200 約 583 kHz、咖啡因 590 kHz、MRFA 360 kHz;咖啡因與阿魏酸相差約 34 Hz,拍頻週期約 29 ms。簡圖狀態列寫的「m/z 195 每秒來回約 59 萬次」用這組推估(`ORB_F200`)。m/z 526 在 512 ms 的解析度約 86,000(140,000 × √(200/526)),所以 MRFA 的 M+2 只有 ³⁴S 與 ¹³C₂ 勉強分開。
+- 示意:動畫裡離子的轉速、振幅與注入過程大幅放慢;C-trap 與偏折透鏡的形狀是示意。
+
+教學示意(四台共通):
+
+- 四台的外形、尺寸、電壓、離子速度與時間尺度都經過調整;離子數量與軌跡大小放大。
+- 譜由理論質量、同位素比例、高斯峰形與各分析器的峰寬算出,加上上述的系統誤差;雜訊經過放大;不是實測數據,不可用於實樣鑑定。
+
+電場形狀(四極柱與離子阱的簡圖切換;GC-MS 的四極桿動畫共用 `assets/saddle-field.js`):
+
+- 小球照 Mathieu 方程式逐步積分(步長 1/600 秒),不是事先畫好的路徑;曲面是同一個電位的示意,高低經過縮放。翻轉放慢到每秒 1.6 次、太慢的一段每秒 0.42 次,和 lcq/ 第 07 段相同。電壓固定時翻得越慢 q 越大,所以「太慢」那段的 q 約 6.5,一定不穩定。
+- 離子阱(環電極加交流、端蓋接地):a = 0;軸向 q_z、徑向 q_r = −q_z/2。主角 q_z 0.45(穩定),較重的約 0.25,太輕的 1.15(超過 0.908,留不住)。翻得夠快之後加一點阻尼代表氦氣冷卻(示意值 0.22 s⁻¹)。收譜那段把 q 每秒調高 14%,三顆球在 q_z 0.908 依序沿軸向射出;本頁 3D 的共振射出點畫在 0.83,這裡畫的是沒有共振射出時的穩定邊界,兩者都是示意。「每秒正負翻轉 76 萬次」取上方 Finnigan LCQ Series Hardware Manual 的 0.76 MHz。
+- 四極柱:x 那一對桿子加 +(U − V cos Ωt)、y 那一對加相反的電壓;直流與交流的比例固定在 a = 0.3 q(U/V = 0.15)。用 Mathieu 特徵曲線 a₀(q) 與 b₁(q) 的級數算出這條線上的穩定範圍約 q 0.625 到 0.725,要的那種離子放在中間(0.675),較輕與較重的 m/z 比是 0.82 與 1.46:較輕的超過右邊界、沿 x(交流)方向越擺越大,較重的低於下邊界、沿 y(直流)方向慢慢被拉走。掃描時 U、V 一起從 0.74 倍調到 1.62 倍,三種依序落進窗口。「篩得更細」就是讓窗口更窄(提高 U/V,往穩定區頂點靠),這裡沒有另外畫。
+
+### 技術
+
+單一 HTML 檔(mass-analyzers/index.html),用 three.js 0.183.2 繪圖,不需要建置,不使用到站人數計數。程式分區與修改方式見 mass-analyzers/MAINTENANCE.md。
+
+### 來源連結
+
+- Syed 等 2013, Quadrupole Mass Filter: Design and Performance for Operation in Stability Zone 3, J. Am. Soc. Mass Spectrom. 24:1493(doi:10.1007/s13361-013-0704-z):https://www.liverpool.ac.uk/media/livacuk/massspectrometry/pdfs/Quadrupole,mass,filter,design,and,performance,for,operation,in,stability,zone,3.pdf
+- Paul 1989 諾貝爾演講 Electromagnetic traps for charged and neutral particles(第 604 至 606 頁):https://www.nobelprize.org/uploads/2018/06/paul-lecture.pdf
+- Agilent 5977B GC/MSD 規格表(5991-6352EN):https://research.njit.edu/york/sites/research.york/files/5977B_data_sheet1785.pdf
+- Agilent 5977A GC/MSD 規格表(5991-1837EN):https://agilent.com/cs/library/technicaloverviews/public/Copy(1)%20of%20Agilent%205977A%20Series%20GCMSD%20System%20Data%20Sheet%205991-1837EN.pdf
+- Agilent 5977 Series MSD System Concepts Guide(G7077-90036):https://www.agilent.com/cs/library/usermanuals/public/user-manual-msd-system-5977-concept-guide-G7077-90036-en-agilent.pdf
+- Agilent 5977B Series MSD Operating Manual(G7077-90034):https://www.agilent.com/cs/library/usermanuals/public/user-manual-gc-msd-system-operating-5977B-series-G7077-90034-en-agilent.pdf
+- HP 5972A MSD Hardware Manual(05972-90026):https://www.bodc.ac.uk/data/documents/nodb/pdf/agilent_5972A_msd_manual.pdf
+- Finnigan LCQ Series Hardware Manual(97345-97003 Rev A):https://conquerscientific.com/wp-content/uploads/2022/10/thermo-finnigan-lcq-series_hardware-manual.pdf
+- Thermo LCQ Fleet 規格表(PS63262-EN):https://assets.thermofisher.cn/TFS-Assets/CMD/Specification-Sheets/PS-63262-LCQ-Fleet-Ion-Trap-LC-MSn-PS63262-EN.pdf
+- Schleicher 等 2022, Anal. Bioanal. Chem. 414:1279:https://pmc.ncbi.nlm.nih.gov/articles/PMC8724165/
+- Stafford 等 1984, Int. J. Mass Spectrom. Ion Processes 60:85(doi:10.1016/0168-1176(84)80077-4)
+- Mamyrin 等 1973, Sov. Phys. JETP 37:45:http://www.jetp.ras.ru/cgi-bin/dn/e_037_01_0045.pdf
+- Dawson & Guilhaus 1989, Rapid Commun. Mass Spectrom. 3:155(doi:10.1002/rcm.1290030511)
+- Agilent Time-of-Flight Mass Spectrometry 技術文件(5990-9207EN):https://www.agilent.com/cs/library/technicaloverviews/public/5990-9207EN.pdf
+- Agilent Time-of-Flight Mass Spectrometry 技術文件(5989-0373EN):https://www.agilent.com/Library/technicaloverviews/Public/5989-0373EN%2011-Dec-2003.pdf
+- Agilent 6200 Series TOF and 6500 Series Q-TOF Concepts Guide(G3335-90231):https://www.agilent.com/cs/library/usermanuals/public/G3335-90231_TOF_Q-TOF_Concepts.pdf
+- Agilent 6546 LC/Q-TOF 規格表(5994-0609EN):http://www.dsp-c.co.rs/files/Agilent_6546_Product_Data_Sheet_5994-0609EN.pdf
+- Makarov 2000, Electrostatic Axially Harmonic Orbital Trapping, Anal. Chem. 72:1156(doi:10.1021/ac991131p):https://masspec.scripps.edu/learn/ms/pdf/2000_Makarov.pdf
+- Michalski 等 2011, Mol. Cell. Proteomics 10:M111.011015:https://pmc.ncbi.nlm.nih.gov/articles/PMC3284220/
+- Thermo Q Exactive 規格表(PS30223_E):https://www.pragolab.cz/documents/QExactive_PS.pdf
+- Scheltema 等 2014, Mol. Cell. Proteomics 13:3698:https://pmc.ncbi.nlm.nih.gov/articles/PMC4256516/
+- Wörner 等 2022, Nat. Chem. 14:515:https://pmc.ncbi.nlm.nih.gov/articles/PMC9068510/
+- PubChem:https://pubchem.ncbi.nlm.nih.gov/compound/2519、https://pubchem.ncbi.nlm.nih.gov/compound/445858、https://pubchem.ncbi.nlm.nih.gov/compound/9914740
+
+部分規格表是第三方網站保存的副本(NJIT、dsp-c.co.rs、pragolab.cz、conquerscientific.com、assets.thermofisher.cn);Stafford 1984 與 Dawson & Guilhaus 1989 只核對了書目,沒有讀到全文。原廠沒有公開 5977 的射頻頻率與 r₀、6546 的推斥頻率與飛行長度,以及 Q Exactive 的軸向頻率;上面用到的這幾類數值都標為推估或示意。

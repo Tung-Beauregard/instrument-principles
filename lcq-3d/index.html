@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>LCQ Deca XP 離子之旅</title>
-<meta name="description" content="把 LCQ Deca XP 離子阱質譜儀拆開來看:從電灑噴針、加熱毛細管、多極柱到離子阱與偵測器,一路追著離子變成質譜。">
+<meta name="description" content="把 LCQ Deca XP 離子阱質譜儀拆開來看:從噴出帶電液滴的噴針、加熱的毛細管、送離子前進的金屬柱,到關住離子的離子阱與偵測器,一路追著離子變成質譜。">
 <meta name="theme-color" content="#070a12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -366,7 +366,7 @@ button { font: inherit; color: inherit; }
 </head>
 <body>
 <main id="app">
-  <nav id="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="./" aria-current="page">離子之旅</a><a href="../nmr/">NMR</a></nav>
+  <nav id="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="./" aria-current="page">離子之旅</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a></nav>
   <canvas id="gl" aria-label="LCQ Deca XP 的 3D 模型,可拖曳旋轉、滾輪縮放"></canvas>
   <canvas id="ov" aria-hidden="true"></canvas>
   <div class="vignette"></div>
@@ -374,12 +374,12 @@ button { font: inherit; color: inherit; }
   <aside class="side">
     <div class="brand">
       <h1><span>LCQ DECA XP</span><b>離子之旅</b></h1>
-      <p>一滴樣品溶液從噴針出來,最後變成質譜上的一根峰。把離子阱質譜儀拆開,沿著離子走的路線,看它經過的每個零件,以及壓力從一大氣壓一路降到 10⁻⁵ Torr。</p>
+      <p>一滴樣品溶液從噴針出來,最後變成質譜上的一根峰;質譜就是把離子依 m/z(質量除以電荷)排開的圖。把離子阱質譜儀拆開,沿著離子走的路線,看它經過的每個零件,以及壓力從一大氣壓一路降到 10⁻⁵ Torr(約一億分之一大氣壓)。</p>
     </div>
     <div class="stats">
       <div class="stat glass"><i><em>階段</em>STEP</i><b id="stPhase"><span class="dot"></span>注入</b></div>
       <div class="stat glass hot"><i><em>射出點</em>m/z</i><b id="stMz">50.0</b></div>
-      <div class="stat glass"><i><em>m/z 524 的</em>q<sub>z</sub></i><b id="stQ">0.087</b></div>
+      <div class="stat glass"><i><em>m/z 524 的</em>q 值</i><b id="stQ">0.087</b></div>
     </div>
     <p class="why glass" id="why" aria-live="polite"></p>
   </aside>
@@ -398,8 +398,8 @@ button { font: inherit; color: inherit; }
       </div>
     </div>
     <div class="row">
-      <div class="grp slide-g"><span class="lab"><em>RF 振幅</em>EJECT m/z</span>
-        <div class="slide"><input type="range" id="rf" min="0" max="1000" value="0" aria-label="RF 振幅,對應目前射出的 m/z"><output id="rfOut" for="rf">m/z 50</output></div>
+      <div class="grp slide-g"><span class="lab"><em>交流電壓</em>EJECT m/z</span>
+        <div class="slide"><input type="range" id="rf" min="0" max="1000" value="0" aria-label="交流電壓大小,對應目前射出的 m/z"><output id="rfOut" for="rf">m/z 50</output></div>
       </div>
       <button class="chip on" id="auto" aria-pressed="true"><span class="led"></span>自動循環</button>
     </div>
@@ -2106,7 +2106,7 @@ const SEQ = {
 };
 const RANGE = { full: [150, 2000], msms: [50, 210] };
 const PHASE_NAME = {
-  agc: 'AGC 預掃描', inject: '注入', cool: '冷卻', isolate: '隔離', cool2: '冷卻', activate: '活化', cool3: '冷卻',
+  agc: '估算離子量', inject: '注入', cool: '冷卻', isolate: '隔離', cool2: '冷卻', activate: '活化', cool3: '冷卻',
   scan: '掃描', hold: '完成', manual: '手動',
 };
 
@@ -2329,7 +2329,7 @@ function drawStab() {
   if (!stabBackgroundValid || stabBackground.width !== w || stabBackground.height !== h) {
     stabBackground.width = w; stabBackground.height = h;
     g = stabBackground.getContext('2d');
-    panelBg(g, w, h, '穩定圖', 'a = 0 的軸上操作');
+    panelBg(g, w, h, '穩定圖', '藍色區內留得住');
     const { NX, NY, f } = STAB.grid;
     g.save();
     g.beginPath(); g.rect(L, T, pw, ph); g.clip();
@@ -2404,7 +2404,7 @@ function drawStab() {
 function drawSpec() {
   const g = gSpec, w = cvSpec.width, h = cvSpec.height;
   const [m0, m1] = RANGE[SPEC.mode];
-  panelBg(g, w, h, SPEC.mode === 'full' ? '質譜 Full MS' : '質譜 MS/MS 195', `m/z ${m0} 至 ${m1}`);
+  panelBg(g, w, h, SPEC.mode === 'full' ? '質譜:全掃描' : '質譜:195 的碎片', `m/z ${m0} 至 ${m1}`);
   const L = 70, R = 24, T = 62, B = 58;
   const pw = w - L - R, ph = h - T - B;
   const X = (mz) => L + ((mz - m0) / (m1 - m0)) * pw;
@@ -2488,7 +2488,7 @@ const TUNE_ROWS = [
 ];
 function drawTune(time) {
   const g = gTune, w = cvTune.width, h = cvTune.height;
-  panelBg(g, w, h, '調諧參數', 'ESI+ 示例值');
+  panelBg(g, w, h, '儀器設定', '正離子示例值');
   g.font = `400 16px ${FONT.mono}`;
   TUNE_ROWS.forEach(([k, v, u], i) => {
     const y = 76 + i * 27;
@@ -2529,25 +2529,25 @@ function addLabel(id, compId, local, name, val, opt = {}) {
   addLabel('R1', null, MANI.regions[0].top, '第一區', '≈ 1 Torr', { dx: -30, dy: -40, sets: ['asm'], kind: 'region' });
   addLabel('R2', null, MANI.regions[1].top, '第二區', '≈ 10⁻³ Torr', { dx: 10, dy: -52, sets: ['asm'], kind: 'region' });
   addLabel('R3', null, MANI.regions[2].top.clone().add(V3(-2, 0, 0)), '分析區', '≈ 10⁻⁵ Torr', { dx: 30, dy: -44, sets: ['asm'], kind: 'region' });
-  addLabel('probe', 'source', pi(V3(0, 1.4, 0)), 'ESI 噴灑針', '+4.5 kV', { dx: -110, dy: -40, sets: ['asm', 'exp'] });
-  addLabel('n2', 'source', pi(V3(0.42, 3.2, 0)), '氮氣', '鞘氣・輔助氣', { dx: -96, dy: -18, sets: ['exp'] });
+  addLabel('probe', 'source', pi(V3(0, 1.4, 0)), '電灑噴針', '+4.5 kV', { dx: -110, dy: -40, sets: ['asm', 'exp'] });
+  addLabel('n2', 'source', pi(V3(0.42, 3.2, 0)), '氮氣', '吹散液滴', { dx: -96, dy: -18, sets: ['exp'] });
   addLabel('syringe', null, V3(12.6, 2.6, 6.4), '注射幫浦', '樣品溶液', { dx: 30, dy: -50, sets: ['exp', 'ext'] });
   addLabel('cap', 'cap', V3(5.6, AX + 1.0, 0), '加熱毛細管', '275 °C', { dx: 20, dy: -58, sets: ['asm', 'exp'] });
-  addLabel('tube', 'tube', V3(0, AX + 0.8, 0), '管透鏡', '', { dx: -22, dy: -64, sets: ['exp'] });
-  addLabel('skim', 'skim', V3(0.6, AX + 1.2, 0), '截取錐', '', { dx: 6, dy: -86, sets: ['exp'] });
-  addLabel('mp1', 'mp1', V3(0, AX + 0.6, 0), '四極柱', 'RF 導引', { dx: 0, dy: -70, sets: ['exp'] });
+  addLabel('tube', 'tube', V3(0, AX + 0.8, 0), '管透鏡', '推回中心', { dx: -22, dy: -64, sets: ['exp'] });
+  addLabel('skim', 'skim', V3(0.6, AX + 1.2, 0), '截取錐', '只讓中間過', { dx: 6, dy: -86, sets: ['exp'] });
+  addLabel('mp1', 'mp1', V3(0, AX + 0.6, 0), '四極柱', '四根柱送離子', { dx: 0, dy: -70, sets: ['exp'] });
   addLabel('lens1', 'lens1', V3(0, AX + 1.6, 0), '透鏡', '隔開兩區', { dx: 6, dy: -46, sets: ['exp'] });
-  addLabel('mp2', 'mp2', V3(0, AX + 0.5, 0), '八極柱', 'RF 導引', { dx: 0, dy: -72, sets: ['exp'] });
-  addLabel('ent', 'ent', V3(0, AX + 1.55, 0), '入口透鏡', '', { dx: -24, dy: -54, sets: ['exp'], dyn: () => (CY.gate ? '開' : '關') });
-  addLabel('ring', 'trap', V3(0, AX + 2.3, 0), '環電極', 'RF', { dx: 12, dy: -60, sets: ['asm', 'exp'] });
+  addLabel('mp2', 'mp2', V3(0, AX + 0.5, 0), '八極柱', '八根柱送離子', { dx: 0, dy: -72, sets: ['exp'] });
+  addLabel('ent', 'ent', V3(0, AX + 1.55, 0), '入口閘門', '', { dx: -24, dy: -54, sets: ['exp'], dyn: () => (CY.gate ? '開' : '關') });
+  addLabel('ring', 'trap', V3(0, AX + 2.3, 0), '環電極', '交流高壓', { dx: 12, dy: -60, sets: ['asm', 'exp'] });
   addLabel('capIn', 'trap', V3(-1.9, AX - 1.4, 0.6), '入口端蓋', '', { dx: -70, dy: 50, sets: ['exp'] });
   addLabel('capOut', 'trap', V3(1.9, AX - 1.4, 0.6), '出口端蓋', '', { dx: 40, dy: 56, sets: ['exp'] });
   addLabel('he', 'trap', V3(-1.6, AX + 5.4, -2.3), '氦氣', '≈ 1 mTorr', { dx: -80, dy: -24, sets: ['exp'] });
-  addLabel('dyn', 'det', V3(0.3, AX - 2.25, 0.5), '轉換打拿極', '−15 kV', { dx: 46, dy: 40, sets: ['asm', 'exp'] });
-  addLabel('em', 'det', V3(0.1, AX + 3.4, -0.6), '電子倍增管', '', { dx: 46, dy: -40, sets: ['asm', 'exp'] });
-  addLabel('turbo', null, V3(3.0, 6.7, -5.6), '渦輪分子幫浦', '分流式', { dx: 60, dy: -36, sets: ['asm'] });
+  addLabel('dyn', 'det', V3(0.3, AX - 2.25, 0.5), '轉換電極', '−15 kV', { dx: 46, dy: 40, sets: ['asm', 'exp'] });
+  addLabel('em', 'det', V3(0.1, AX + 3.4, -0.6), '電子倍增管', '放大訊號', { dx: 46, dy: -40, sets: ['asm', 'exp'] });
+  addLabel('turbo', null, V3(3.0, 6.7, -5.6), '渦輪幫浦', '一台抽兩區', { dx: 60, dy: -36, sets: ['asm'] });
   addLabel('fore', null, V3(15.4, 3.6, -5.9), '機械幫浦', '迴轉式', { dx: 50, dy: -40, sets: [] });
-  addLabel('cabSrc', null, V3(LAY.inlet - 1.2, AX + 3.5, 4.4), '離子源', '', { dx: -60, dy: -50, sets: ['ext'] });
+  addLabel('cabSrc', null, V3(LAY.inlet - 1.2, AX + 3.5, 4.4), '離子源', '讓分子帶電', { dx: -60, dy: -50, sets: ['ext'] });
   addLabel('cabLed', null, V3(9.2, 16.4, 4.4), '狀態燈', 'POWER・VACUUM・SCAN', { dx: -40, dy: -46, sets: ['ext'] });
 }
 const LABEL_BY_ID = Object.fromEntries(LABELS.map((l) => [l.id, l]));
@@ -2753,43 +2753,43 @@ const SHOTS = [
 // 分段:每段的機身狀態、標籤、示波窗與字幕
 const SCENES = [
   { t: 0, view: 'ext', labels: ['cabSrc', 'cabLed', 'syringe'], hud: [0, 0], bug: 1,
-    caps: [{ t: 0.8, chap: 'LCQ DECA XP', main: '一台三維離子阱質譜儀,把它拆開來看', sub: '樣品溶液從前面的離子源進去,出來的是一張質譜。我們跟著離子走完全程。' }] },
+    caps: [{ t: 0.8, chap: 'LCQ DECA XP', main: '一台離子阱質譜儀,我們把它拆開來看', sub: '樣品溶液從前面的離子源進去,出來的是依質量排開的質譜。跟著離子走完全程。' }] },
   { t: 7, view: 'asm', labels: ['R0', 'R1', 'R2', 'R3', 'turbo', 'fore'], hud: [0, 0], bug: 1,
-    caps: [{ t: 7.6, chap: '01 ・ 四個壓力區', main: '從一大氣壓到 10⁻⁵ Torr,壓力差了將近一億倍', sub: '兩台迴轉式機械幫浦和一台分流式渦輪分子幫浦,一段一段把壓力降下來。' }] },
+    caps: [{ t: 7.6, chap: '01 ・ 四個壓力區', main: '從一大氣壓到 10⁻⁵ Torr,壓力差了將近一億倍', sub: '兩台機械幫浦和一台渦輪幫浦分段抽氣;1 Torr 約等於 1 mmHg。' }] },
   { t: 14.5, view: 'asm', labels: ['probe'], hud: [0, 0], bug: 0,
     caps: [
-      { t: 15, chap: '02 ・ 電灑游離 ESI', main: '噴針加上約 4.5 kV,液面被拉成泰勒錐,噴出帶電液滴', sub: '注射幫浦把樣品慢慢推進噴針,氮氣鞘氣幫忙霧化。' },
-      { t: 21.5, chap: '02 ・ 電灑游離 ESI', main: '液滴邊飛邊蒸發,電荷越擠越密,超過瑞利極限就分裂', sub: '一再分裂之後,離子脫離液滴進入氣相。這裡畫的是正交噴灑,大液滴直直落下,離子被電場拉向毛細管入口。' },
+      { t: 15, chap: '02 ・ 電灑游離 ESI', main: '噴針加上約 4.5 kV 高壓,液面被拉成尖錐,噴出帶電液滴', sub: '注射幫浦把樣品慢慢推進噴針,外圈的氮氣幫忙吹散。' },
+      { t: 21.5, chap: '02 ・ 電灑游離 ESI', main: '液滴邊飛邊蒸發,電荷越擠越密,斥力大過表面張力就裂開', sub: '一再分裂之後,離子脫離液滴,飛進氣體中。這裡噴的方向和入口垂直,大液滴直直落下,離子被電場拉向毛細管入口。' },
     ] },
   { t: 28.5, view: 'asm', labels: ['cap'], hud: [0, 0], bug: 0,
     caps: [{ t: 29, chap: '03 ・ 加熱毛細管', main: '離子和殘餘的小液滴被吸進加熱的不鏽鋼毛細管', sub: '溶劑在管內蒸乾。出口那一端,壓力只剩約 1 Torr。' }] },
   { t: 38.5, view: 'asm', labels: ['tube', 'skim'], hud: [0, 0], bug: 0,
-    caps: [{ t: 39, chap: '04 ・ 管透鏡與截取錐', main: '氣體衝出毛細管後膨脹,管透鏡把離子推回中心', sub: '截取錐只讓中央的離子束通過,大部分中性氣體被機械幫浦抽走。' }] },
+    caps: [{ t: 39, chap: '04 ・ 管透鏡與截取錐', main: '氣體衝出毛細管後膨脹,管透鏡把離子推回中心', sub: '截取錐的小孔只讓中央的離子通過,不帶電的氣體大多被幫浦抽走。' }] },
   { t: 49, view: 'exp', labels: ['mp1', 'lens1', 'mp2', 'tube', 'skim', 'ent'], hud: [0, 0], bug: 0,
     caps: [
       { t: 49.5, chap: '05 ・ 展開', main: '把零件沿著導軌拉開', sub: '實際上它們緊密排在真空腔裡,這裡拉開才看得清楚。' },
-      { t: 55.5, chap: '05 ・ 四極柱與八極柱', main: '加上 RF 電壓的多極柱,把離子約束在軸線附近往前送', sub: '中間的透鏡也是隔板,前面約 10⁻³ Torr,後面約 10⁻⁵ Torr。' },
+      { t: 55.5, chap: '05 ・ 四極柱與八極柱', main: '這些金屬柱的電壓快速正負交替,把離子圈在中線上往前送', sub: '中間的透鏡也是隔板,前面約 10⁻³ Torr,後面約 10⁻⁵ Torr。' },
     ] },
   { t: 62.5, view: 'exp', labels: ['ent', 'ring', 'he', 'capIn', 'capOut'], hud: [0, 0], bug: 0,
-    caps: [{ t: 63, chap: '06 ・ 注入離子阱', main: '入口透鏡打開,離子進入離子阱', sub: '先用 AGC 預掃描估計離子量,決定要收多久。阱內約 1 mTorr 的氦氣讓離子慢下來、聚到中心。' }] },
+    caps: [{ t: 63, chap: '06 ・ 注入離子阱', main: '入口閘門打開,離子進入離子阱', sub: '先試收一次估計離子量(AGC),決定要收多久。阱內約 1 mTorr 的稀薄氦氣讓離子慢下來、聚到中心。' }] },
   { t: 72, view: 'exp', labels: ['ring'], hud: [1, 0], bug: 0,
-    caps: [{ t: 72.5, chap: '07 ・ 穩定圖', main: '離子在阱裡繞著中心做 8 字形的振盪', sub: '它的 q 值和 RF 電壓成正比、和 m/z 成反比。輕的離子 q 大,重的離子 q 小,只要都在穩定區內就會被留住。' }] },
+    caps: [{ t: 72.5, chap: '07 ・ 穩定圖', main: '離子在阱裡繞著中心,來回畫著 8 字形', sub: 'q 值是離子被電場甩動的強弱:交流電壓越大、m/z(質量除以電荷)越小,q 越大。圖上的點落在藍色區內,離子就留得住。' }] },
   { t: 84, view: 'exp', labels: ['capOut'], hud: [1, 1], bug: 0,
     caps: [
-      { t: 84.5, chap: '08 ・ 質量選擇不穩定掃描', main: 'RF 電壓往上升,離子依 m/z 由小到大輪流被射出', sub: 'q 到達 0.83 時,端蓋上的共振電壓把離子振出阱外。實機的掃描速度約每秒 5500 u。' },
-      { t: 91.5, chap: '09 ・ 偵測', main: '離子撞上 −15 kV 的轉換打拿極,打出二次粒子', sub: '連續式電子倍增管把訊號放大數十萬倍。依射出的先後,排成一張質譜。' },
+      { t: 84.5, chap: '08 ・ 由輕到重依序射出', main: '交流電壓往上升,離子依 m/z 由小到大輪流被射出', sub: 'q 到 0.83 時,離子的擺動和端蓋上的小電壓合拍,被推出阱外。實機每秒約掃 5500 u。' },
+      { t: 91.5, chap: '09 ・ 偵測', main: '離子撞上 −15 kV 的轉換電極,撞出電子等粒子', sub: '電子倍增管讓電子越撞越多,訊號放大數十萬倍。依射出先後排成質譜。' },
     ] },
   { t: 101, view: 'asm', labels: [], hud: [0, 1], bug: 0,
     caps: [{ t: 101.5, chap: '10 ・ 一張質譜', main: '這是 LCQ 的正離子校正液', sub: '咖啡因 m/z 195、胜肽 MRFA m/z 524,以及 Ultramark 1621 一整排相隔 100 的峰。峰高為示意。' }] },
   { t: 111, view: 'exp', labels: [], hud: [1, 1], bug: 0,
     caps: [
-      { t: 111.5, chap: '11 ・ MS/MS', main: '串聯質譜,只留下 m/z 195,再把它打碎', sub: '同一個離子阱裡,依時間順序完成隔離、活化與掃描。' },
-      { t: 116.5, chap: '11 ・ MS/MS 隔離', main: '寬頻激發電壓把 m/z 195 以外的離子都趕出去', sub: '頻率在 m/z 195 的位置留一個缺口,只有它不受影響。' },
-      { t: 119.5, chap: '11 ・ MS/MS 活化', main: 'm/z 195 被放在 q = 0.25 輕推,反覆撞上氦氣後斷裂', sub: '咖啡因失去 CH₃NCO(57 u),變成碎片 m/z 138。' },
-      { t: 124.5, chap: '11 ・ MS/MS 掃描', main: '碎片比前驅離子輕,先被射出', sub: '低於前驅離子 m/z 約 27% 的碎片留不住,這就是離子阱的三分之一規則。' },
+      { t: 111.5, chap: '11 ・ MS/MS', main: '只留下 m/z 195,把它撞碎,再量碎片', sub: '同一個離子阱裡,依時間順序完成隔離、活化與掃描。' },
+      { t: 116.5, chap: '11 ・ MS/MS 隔離', main: '多種頻率的電壓,把 m/z 195 以外的離子都趕出去', sub: '電壓裡唯獨缺了 m/z 195 擺動的頻率,只有它不被推出去。' },
+      { t: 119.5, chap: '11 ・ MS/MS 活化', main: 'm/z 195 在 q = 0.25 被輕推,反覆撞氦氣、累積能量後斷裂', sub: '咖啡因失去 CH₃NCO(57 u),變成碎片 m/z 138。' },
+      { t: 124.5, chap: '11 ・ MS/MS 掃描', main: '碎片比原本的離子輕,先被射出', sub: 'm/z 不到原本約 27% 的碎片留不住,也就是離子阱的「三分之一規則」。' },
     ] },
   { t: 133, view: 'asm', labels: [], hud: [0, 0], bug: 1,
-    caps: [{ t: 133.5, chap: 'LCQ DECA XP', main: '游離、傳輸、捕捉、掃描、偵測', sub: '實機一輪不到一秒,一張接一張記錄下來。' }] },
+    caps: [{ t: 133.5, chap: 'LCQ DECA XP', main: '帶電、傳輸、關住、放出、偵測', sub: '實機一輪不到一秒,一張接一張記錄下來。' }] },
 ];
 // 每段要不要顯示幫浦、真空腔玻璃的濃淡(拉近時淡掉,畫面乾淨)
 const SCENE_FX = [[1, 1], [1, 1], [0, 0.25], [0, 0.25], [0, 0.2], [0, 1], [0, 1], [0, 1], [0, 1], [1, 1], [0, 1], [1, 1]];
@@ -2923,29 +2923,29 @@ function stopTour() {
 // ================================================================ 「原理」視窗的內容
 const HELP_HTML = `
 <h2 id="helpTitle">離子阱質譜儀怎麼把分子變成一張譜</h2>
-<p>LCQ Deca XP 是三維四極離子阱質譜儀。樣品溶液在大氣壓下被電灑成離子,經過四個壓力越來越低的區域,在離子阱裡先存起來,再依質荷比 (m/z) 一種一種射到偵測器上。</p>
+<p>LCQ Deca XP 是一種離子阱質譜儀(正式名稱是三維四極離子阱質譜儀)。樣品溶液在大氣壓下被噴成帶電的小液滴,再變成離子,經過四個壓力越來越低的區域,在離子阱裡先存起來,再依 m/z(離子的質量除以電荷,又叫質荷比)一種一種射到偵測器上。</p>
 
 <h3>一條路,四個壓力區</h3>
-<p>離子源在一大氣壓 (760 Torr)。毛細管出口到截取錐之間約 <b>1 Torr</b>,由迴轉式機械幫浦抽(實機有兩台)。四極柱所在的區域約 <b>10⁻³ Torr</b>,接渦輪分子幫浦的中段口;離子阱與偵測器所在的分析區約 <b>2×10⁻⁵ Torr</b>,接同一台分流式渦輪幫浦的主口。阱內另外通入約 1 mL/min 的氦氣,局部壓力約 1 mTorr。</p>
+<p>離子源在一大氣壓 (760 Torr;Torr 是壓力單位,1 Torr 約等於 1 mmHg)。毛細管出口到截取錐之間約 <b>1 Torr</b>,由迴轉式機械幫浦抽(實機有兩台)。四極柱所在的區域約 <b>10⁻³ Torr</b>,接渦輪分子幫浦(高速旋轉的葉片把氣體分子打走)中段的抽氣口;離子阱與偵測器所在的分析區約 <b>2×10⁻⁵ Torr</b>,接同一台渦輪幫浦的主抽氣口,一台抽兩區。阱內另外通入約 1 mL/min 的氦氣,阱內的壓力約 1 mTorr(千分之一 Torr)。</p>
 
 <h3>電灑游離 (ESI)</h3>
-<p>噴針加上約 4.5 至 5 kV 的電壓,液面被拉成泰勒錐並噴出帶電液滴。液滴蒸發變小,表面電荷密度升高,超過瑞利極限就分裂成更小的液滴,一再重複後離子進入氣相。氮氣鞘氣與輔助氣幫助霧化與去溶劑。</p>
-<p>各代 LCQ Deca 的離子源幾何不同,例如 XP Plus 是正交噴灑,XP MAX 的 Ion Max 源約 60°。這裡以正交噴灑示意。</p>
+<p>噴針加上約 4.5 至 5 kV 的電壓,液面被電場拉成尖錐(泰勒錐),尖端噴出帶電液滴。液滴蒸發變小,表面的電荷越擠越密,電荷互斥的力大過表面張力(瑞利極限)就裂成更小的液滴;一再重複後,離子脫離液滴,單獨飛在氣體裡。噴針外圈吹出的氮氣(鞘氣與輔助氣)幫忙把溶液吹散成霧、讓溶劑蒸發。</p>
+<p>各代 LCQ Deca 的離子源擺放角度不同,例如 XP Plus 是正交噴灑(噴的方向和毛細管入口垂直),XP MAX 的 Ion Max 源約 60°。這裡以正交噴灑示意。</p>
 
 <h3>把離子送進真空</h3>
-<p>加熱毛細管(ESI 常用 200 至 350 °C)把離子帶進第一個真空區。管透鏡把衝出毛細管的離子推回中心,接地的截取錐只讓中央的離子束通過;毛細管的孔和截取錐刻意錯開一點,減少中性液滴直接進入。接著是<b>方柱四極柱</b>、多極柱間透鏡與<b>八極柱</b>,都加上約 2.45 MHz、400 Vp-p 的 RF 電壓,把離子約束在軸線上送到入口透鏡。多極柱間透鏡同時是兩個真空區之間的隔板。</p>
+<p>加熱毛細管(ESI 常用 200 至 350 °C)把離子帶進第一個真空區。管透鏡(加上電壓的金屬管)把衝出毛細管的離子推回中心,接地的截取錐(尖端開小孔的金屬錐)只讓中央的離子束通過;毛細管的孔和截取錐刻意錯開一點,減少不帶電的液滴直接進入。接著是<b>方柱四極柱</b>、多極柱間透鏡與<b>八極柱</b>。兩組多極柱分別是四根與八根平行的金屬柱,加上約 2.45 MHz、400 Vp-p(最高與最低相差 400 V)的快速交流電壓(RF,射頻),把離子圈在中線上送到入口閘門(入口透鏡)。多極柱間透鏡是中間開孔的金屬片,同時是兩個真空區之間的隔板。</p>
 
 <h3>離子阱怎麼篩選質量</h3>
-<p>離子阱由一個環電極和兩個端蓋組成,內面都是雙曲面,r₀ = 0.707 cm、z₀ = 0.785 cm。環電極加上 0.76 MHz 的 RF,振幅最高約 8500 V。離子的運動由 Mathieu 方程描述,參數 q<sub>z</sub> = 8eV / [m (r₀² + 2z₀²) Ω²],和 RF 振幅 V 成正比、和 m/z 成反比。</p>
-<p>只要 q<sub>z</sub> 小於 0.908(a = 0 時的穩定邊界),離子就會被留住。掃描時 RF 振幅線性上升,m/z 小的離子先到達 <b>q<sub>z</sub> = 0.83</b>,這時端蓋上加的共振電壓把它振出阱外。以最大振幅計算,0.83 正好對應 m/z 約 2000。掃描速度約每秒 5500 u。</p>
-<p>注入前先做 <b>AGC</b> 預掃描,量出離子流有多強,再決定注入時間,讓阱內的離子數接近設定值。離子太多會互相排斥(空間電荷效應),讓峰變寬、質量偏移。</p>
+<p>離子阱由一個環電極和兩個端蓋組成,內面都是雙曲面(雙曲線轉一圈形成的曲面),環的內半徑 r₀ = 0.707 cm,中心到端蓋 z₀ = 0.785 cm。環電極加上 0.76 MHz 的交流電壓(RF),振幅最高約 8500 V。離子在阱裡的運動可以用 Mathieu 方程描述,其中參數 q<sub>z</sub> = 8eV / [m (r₀² + 2z₀²) Ω²] 代表離子被電場甩動的強弱:和電壓振幅 V 成正比、和 m/z 成反比(Ω 是交流電壓的角頻率)。</p>
+<p>只要 q<sub>z</sub> 小於 0.908,離子就會被留住,這是穩定圖藍色區在 a = 0 這條線上的右邊界(縱軸 a 和直流電壓有關,這台離子阱的環電極不加直流,所以 a = 0)。掃描時交流電壓的振幅等速上升,m/z 小的離子先到達 <b>q<sub>z</sub> = 0.83</b>;這時端蓋上一個小交流電壓和它的擺動合拍(共振),像順著節奏推鞦韆一樣越擺越大,把它推出阱外。以最大振幅計算,0.83 正好對應 m/z 約 2000。掃描速度約每秒 5500 u(u 是原子質量單位)。</p>
+<p>注入前先做 <b>AGC</b>(自動增益控制)試量:短暫收一點離子,量出離子流有多強,再決定注入時間,讓阱內的離子數接近設定值。離子太多會互相排斥(空間電荷效應),讓峰變寬、量到的質量偏掉。</p>
 
-<h3>MS/MS</h3>
-<p>隔離:端蓋加上一組 5 至 380 kHz 的寬頻激發電壓,只在前驅離子的頻率留一個缺口,其他離子都被趕出去。活化:把前驅離子放在 q = 0.25(預設 Activation Q),以它的長期振盪頻率激發約 30 ms,它和氦氣反覆碰撞、累積內能後斷裂。最後再掃描出碎片。</p>
-<p>活化時 q = 0.25,穩定邊界 0.908 對應前驅離子 m/z 的 0.25 / 0.908 ≈ 27%,更輕的碎片留不住,這就是離子阱的「三分之一規則」。畫面中的例子是咖啡因 m/z 195 失去 CH₃NCO (57 u),得到碎片 m/z 138。</p>
+<h3>MS/MS:撞碎再量</h3>
+<p>MS/MS 又叫串聯質譜:先只留下一種離子(前驅離子),把它撞碎,再量碎片。隔離:每種離子在阱裡擺動的頻率不同,端蓋加上一組混合 5 至 380 kHz 各種頻率的電壓(寬頻激發),唯獨缺前驅離子的頻率,其他離子都被趕出去。活化:把前驅離子放在 q = 0.25(預設 Activation Q),用和它擺動同頻率的小電壓輕推約 30 ms,它和氦氣反覆碰撞、累積內能後斷裂。最後再掃描出碎片。</p>
+<p>活化時前驅離子在 q = 0.25;碎片越輕 q 越大,m/z 低於前驅離子的 0.25 / 0.908 ≈ 27% 時,q 會超過 0.908,碎片就留不住。這就是離子阱的「三分之一規則」。畫面中的例子是咖啡因 m/z 195 失去 CH₃NCO (57 u),得到碎片 m/z 138。</p>
 
 <h3>偵測</h3>
-<p>射出的離子撞上離軸、與離子束成直角的轉換打拿極(正離子用 −15 kV),打出二次粒子,再由連續式電子倍增管(−0.8 至 −2.5 kV,增益約 3×10⁵)放大成電流。三維離子阱是往兩個端蓋同時射出,只有往出口端蓋那一側的離子會打到偵測器。</p>
+<p>射出的離子撞上擺在一旁、與離子束成直角的轉換電極(轉換打拿極,正離子用 −15 kV),撞出電子等帶電粒子(二次粒子);這些粒子進入電子倍增管(−0.8 至 −2.5 kV),每撞一次管壁就放出更多電子,總共放大約 3×10⁵ 倍,變成電流。離子阱會同時往兩個端蓋射出離子,只有往出口端蓋那一側的離子會打到偵測器。</p>
 
 <h3>視角操作</h3>
 <p>滑鼠:拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;點零件鏡頭會靠過去。觸控板:雙指滑動平移、兩指捏合縮放。觸控螢幕:單指旋轉、雙指平移與縮放。鍵盤:方向鍵或 W A S D 移動(左右平移、上下前後),+ − 縮放,按住 Shift 加快,R 回到預設視角;C 播放導覽,E 切換組裝與展開。</p>
@@ -2953,16 +2953,16 @@ const HELP_HTML = `
 <h3>常用數值</h3>
 <div class="tbl"><table>
 <tr><td>質量範圍</td><td class="n">m/z 15 至 200、50 至 2000、100 至 4000</td></tr>
-<tr><td>離子阱 RF</td><td class="n">0.76 MHz,0 至 8500 V (0-p)</td></tr>
-<tr><td>共振射出點</td><td class="n">q<sub>z</sub> = 0.83</td></tr>
-<tr><td>多極柱 RF</td><td class="n">2.45 MHz,400 Vp-p</td></tr>
+<tr><td>離子阱交流電壓</td><td class="n">0.76 MHz,0 至 8500 V (0-p)</td></tr>
+<tr><td>射出點</td><td class="n">q<sub>z</sub> = 0.83</td></tr>
+<tr><td>多極柱交流電壓</td><td class="n">2.45 MHz,400 Vp-p</td></tr>
 <tr><td>噴灑電壓</td><td class="n">±4.5 至 ±5 kV</td></tr>
 <tr><td>氦氣</td><td class="n">約 1 mL/min,阱內約 1 mTorr</td></tr>
-<tr><td>轉換打拿極</td><td class="n">±15 kV</td></tr>
+<tr><td>轉換電極</td><td class="n">±15 kV</td></tr>
 <tr><td>MS/MS 預設</td><td class="n">Activation Q 0.25,30 ms</td></tr>
 </table></div>
 
-<p class="note">畫面說明:示範樣品是 LCQ 正離子校正液(咖啡因、MRFA、Ultramark 1621),峰高為示意。零件尺寸與時間尺度經過放大,實機一輪掃描不到一秒。顏色代表 m/z,由綠青(輕)到琥珀(重)。主控台上的調諧參數是文獻中常見的示例值。資料來源:Thermo Finnigan LCQ Deca 與 LCQ Series Hardware Manual、LCQ Deca XP Plus 規格表、Wong 與 Cooks (Current Separations 16:3)。</p>
+<p class="note">畫面說明:示範樣品是 LCQ 正離子校正液(咖啡因、MRFA、Ultramark 1621),峰高為示意。零件尺寸與時間尺度經過放大,實機一輪掃描不到一秒。顏色代表 m/z,由綠青(輕)到琥珀(重)。主控台上的儀器設定是文獻中常見的示例值。資料來源:Thermo Finnigan LCQ Deca 與 LCQ Series Hardware Manual、LCQ Deca XP Plus 規格表、Wong 與 Cooks (Current Separations 16:3)。</p>
 `;
 
 // ==== 90_main.js ====
@@ -3029,28 +3029,28 @@ function animateProps(dt, t) {
 
 // ================================================================ 說明文字
 const PHASE_WHY = {
-  agc: '<span class="k">AGC</span><b>自動增益控制</b>:先短暫收一點離子做預掃描,量出離子流有多強,再決定這一輪要收多久。離子太多會互相排斥(空間電荷效應),讓質量跑掉。',
-  inject: '<span class="k">INJECT</span><b>注入</b>:入口透鏡打開,離子流進離子阱。阱裡有約 1 mTorr 的<span class="c">氦氣</span>,離子和氦原子碰撞後慢下來,留在阱的中央。',
-  cool: '<span class="k">COOL</span><b>冷卻</b>:入口透鏡關上。每個離子在 RF 電場裡繞著中心做 8 字形的振盪,和氦氣碰撞後振幅越來越小。',
-  isolate: '<span class="k">ISOLATE</span><b>隔離</b>:端蓋加上一組寬頻激發電壓,頻率只在 m/z 195 的位置留一個缺口,其他離子都被趕出阱外。',
-  activate: '<span class="k">ACTIVATE</span><b>活化</b>:把 m/z 195 放在 <span class="a">q = 0.25</span>,用它自己的振盪頻率輕推約 30 ms,讓它反覆撞上氦氣、累積能量後斷成碎片 <span class="c">m/z 138</span>。',
-  scan: '<span class="k">SCAN</span><b>掃描</b>:環電極的 RF 電壓往上升,每種離子的 q 跟著變大。m/z 小的離子先碰到 <span class="a">q = 0.83</span> 的共振射出點,從出口端蓋的小孔飛向偵測器。',
-  hold: '<span class="k">DONE</span><b>完成一張譜</b>:RF 電壓降回起點、阱內清空,下一輪重新注入。實機一張全掃描只要零點幾秒,這裡放慢了約 20 倍。',
-  manual: '<span class="k">MANUAL</span><b>手動掃描</b>:滑桿就是環電極上的 RF 振幅。往右推,射出點的 m/z 跟著上升,離子依序被射出;拉回最左邊,入口透鏡打開重新收集。',
+  agc: '<span class="k">AGC</span><b>估算離子量</b>:先短暫收一點離子試量一次,看離子流有多強,再決定這一輪要收多久(正式名稱是自動增益控制)。離子太多會互相排斥,讓量到的質量跑掉。',
+  inject: '<span class="k">INJECT</span><b>注入</b>:入口閘門打開,離子流進離子阱。阱裡有少量<span class="c">氦氣</span>(約 1 mTorr),離子撞上氦原子後慢下來,留在阱的中央。',
+  cool: '<span class="k">COOL</span><b>冷卻</b>:入口閘門關上。每個離子在快速正負交替的電場裡繞著中心畫 8 字形,一再撞上氦氣,擺動越來越小,也就是越動越慢。',
+  isolate: '<span class="k">ISOLATE</span><b>隔離</b>:每種離子擺動的頻率不同。端蓋加上一組混合多種頻率的電壓,唯獨缺 m/z 195 的頻率,其他離子都被趕出阱外,只留下 195。',
+  activate: '<span class="k">ACTIVATE</span><b>活化</b>:把 m/z 195 放在 <span class="a">q = 0.25</span>(q 越大,被電場甩得越用力),用和它擺動同拍的小電壓輕推約 30 ms,像順著節奏推鞦韆,讓它反覆撞上氦氣、累積能量後斷成碎片 <span class="c">m/z 138</span>。',
+  scan: '<span class="k">SCAN</span><b>掃描</b>:環電極的交流電壓往上升,每種離子的 q 值(被電場甩動的強弱)跟著變大。m/z 小的離子先到 <span class="a">q = 0.83</span>,這時它的擺動和端蓋上的小電壓合拍,越擺越大,從出口端蓋的小孔飛向偵測器。',
+  hold: '<span class="k">DONE</span><b>完成一張譜</b>:交流電壓降回起點、阱內清空,下一輪重新注入。譜的橫軸是 m/z,峰越高代表那種離子越多。實機量一張完整的譜只要零點幾秒,這裡放慢了約 20 倍。',
+  manual: '<span class="k">MANUAL</span><b>手動掃描</b>:滑桿就是環電極上交流電壓的大小。往右推,射出點的 m/z 跟著上升,離子依序被射出;拉回最左邊,入口閘門打開重新收集。',
 };
 PHASE_WHY.cool2 = PHASE_WHY.cool;
 PHASE_WHY.cool3 = PHASE_WHY.cool;
 const COMP_WHY = {
-  source: '<span class="k">ESI SOURCE</span><b>電灑游離源</b>:樣品溶液流過噴針,針尖加上約 4.5 kV 的高壓,液面被拉成泰勒錐,噴出帶電的小液滴。氮氣鞘氣幫忙霧化。液滴一邊蒸發一邊分裂,最後放出氣相離子。',
+  source: '<span class="k">ESI SOURCE</span><b>電灑離子源</b>:樣品溶液流過噴針,針尖加上約 4.5 kV 的高壓,液面被電場拉成尖錐(泰勒錐),噴出帶電的小液滴;外圈的氮氣幫忙吹散。液滴一邊蒸發一邊裂開,最後放出單獨飛行的離子。',
   cap: '<span class="k">ION TRANSFER CAPILLARY</span><b>加熱毛細管</b>:不鏽鋼細管把大氣壓下的離子帶進真空。加熱讓殘餘的溶劑蒸乾,管上的小電壓幫離子通過。',
-  tube: '<span class="k">TUBE LENS</span><b>管透鏡</b>:毛細管出口的氣體以超音速膨脹,管透鏡的電壓把離子往中心推,對準截取錐的小孔。',
-  skim: '<span class="k">SKIMMER</span><b>截取錐</b>:接地的錐形小孔,只讓氣流中央的離子進到下一區,大部分氣體被機械幫浦抽走。毛細管的孔和它刻意錯開一點,減少中性液滴直接衝進去。',
-  mp1: '<span class="k">SQUARE QUADRUPOLE</span><b>方柱四極柱</b>:四根方形電極加上約 2.45 MHz 的 RF 電壓,在中心形成把離子推回軸線的場,帶著離子穿過約 10⁻³ Torr 的區域。',
-  lens1: '<span class="k">INTERMULTIPOLE LENS</span><b>多極柱間透鏡</b>:既是隔開兩個真空區的隔板,也能加上阻擋電壓當作閘門。',
-  mp2: '<span class="k">OCTAPOLE</span><b>八極柱</b>:八根圓柱電極的 RF 導引,把離子送到離子阱門口。',
-  ent: '<span class="k">ENTRANCE LENS</span><b>入口透鏡</b>:離子阱的閘門。注入時打開,冷卻與掃描時加上阻擋電壓,把後面來的離子擋在外面。',
-  trap: '<span class="k">ION TRAP</span><b>三維四極離子阱</b>:一個環電極夾在兩個端蓋中間,內面都是雙曲面,r₀ = 0.707 cm。環電極加上 0.76 MHz 的 RF,振幅最高約 8500 V。阱內充約 1 mTorr 的氦氣。',
-  det: '<span class="k">DETECTOR</span><b>偵測系統</b>:離子撞上 <span class="a">−15 kV</span> 的轉換打拿極,打出二次粒子,再由連續式電子倍增管放大數十萬倍,變成可以量測的電流。',
+  tube: '<span class="k">TUBE LENS</span><b>管透鏡</b>:毛細管出口的氣體以超音速向外衝散。管透鏡是加上電壓的金屬管,像透鏡把光聚攏一樣把離子往中心推,對準截取錐的小孔。',
+  skim: '<span class="k">SKIMMER</span><b>截取錐</b>:接地、尖端開小孔的金屬錐,只讓氣流中央的離子進到下一區,大部分氣體被機械幫浦抽走。毛細管的孔和它刻意錯開一點,減少不帶電的液滴直接衝進去。',
+  mp1: '<span class="k">SQUARE QUADRUPOLE</span><b>方柱四極柱</b>:四根方形金屬柱,加上約 2.45 MHz 的快速交流電壓,在中間形成把離子推回中線的電場,帶著離子穿過約 10⁻³ Torr 的區域。',
+  lens1: '<span class="k">INTERMULTIPOLE LENS</span><b>多極柱間透鏡</b>:兩組金屬柱之間、中間開孔的金屬片。既是隔開兩個真空區的隔板,也能加上擋住離子的電壓當作閘門。',
+  mp2: '<span class="k">OCTAPOLE</span><b>八極柱</b>:八根圓柱形金屬柱,同樣靠快速交流電壓把離子圈在中線上,送到離子阱門口。',
+  ent: '<span class="k">ENTRANCE LENS</span><b>入口閘門</b>:正式名稱是入口透鏡。注入時打開讓離子進阱;冷卻與掃描時加上擋住離子的電壓,把後面來的離子擋在外面。',
+  trap: '<span class="k">ION TRAP</span><b>離子阱</b>:正式名稱是三維四極離子阱。一個環電極夾在兩個端蓋中間,內面都是雙曲面,環的內半徑 r₀ = 0.707 cm。環電極加上 0.76 MHz 的交流電壓,振幅最高約 8500 V,把離子關在中間。阱內充約 1 mTorr 的氦氣。',
+  det: '<span class="k">DETECTOR</span><b>偵測系統</b>:離子撞上 <span class="a">−15 kV</span> 的轉換電極(轉換打拿極),撞出電子等帶電粒子;這些粒子進入電子倍增管,一路撞出越來越多電子,放大數十萬倍,變成可以量測的電流。',
 };
 
 // ================================================================ 介面
@@ -3425,7 +3425,7 @@ const yieldNow = () => new Promise((r) => { _mcRes = r; _mc.port2.postMessage(0)
 // 錄影前把所有會用到的字都載入,避免前幾格用到備用字型
 async function loadFonts() {
   if (!document.fonts) return;
-  const texts = [HELP_HTML.replace(/<[^>]+>/g, ''), ...SCENES.flatMap((s) => s.caps.flatMap((c) => [c.chap, c.main, c.sub])), ...LABELS.flatMap((l) => [l.name, l.val]), '穩定圖質譜調諧參數示意動畫零件尺寸與時間尺度經過調整離子之旅開關'].join('');
+  const texts = [HELP_HTML.replace(/<[^>]+>/g, ''), ...SCENES.flatMap((s) => s.caps.flatMap((c) => [c.chap, c.main, c.sub])), ...LABELS.flatMap((l) => [l.name, l.val]), '穩定圖質譜調諧參數儀器設定全掃描的碎片藍色區內留得住正離子示例值示意動畫零件尺寸與時間尺度經過調整離子之旅開關'].join('');
   const uniq = [...new Set(texts)].join('');
   const jobs = [];
   for (const w of [400, 500, 700, 900]) jobs.push(document.fonts.load(`${w} 24px "Noto Sans TC"`, uniq));

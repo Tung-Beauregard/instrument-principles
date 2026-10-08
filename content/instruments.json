@@ -44,6 +44,15 @@
       "image": "./assets/nmr.svg",
       "imageAlt": "剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意",
       "href": "./nmr/"
+    },
+    {
+      "id": "mass-analyzers",
+      "name": "質譜儀-不同分析器比較",
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/mass-analyzers.svg",
+      "imageAlt": "質譜儀的四種分析器:四極柱、離子阱、飛行時間與 Orbitrap 的概念示意",
+      "href": "./mass-analyzers/"
     }
   ]
 }

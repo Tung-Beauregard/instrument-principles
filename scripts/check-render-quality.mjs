@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { RenderBudget, FramePacer } from '../assets/render-quality.js';
 
-for (const lesson of ['lcq', 'gc-ms', 'uv-vis', 'lcq-3d', 'nmr']) {
+const LESSONS = ['lcq', 'gc-ms', 'uv-vis', 'lcq-3d', 'nmr', 'mass-analyzers'];
+for (const lesson of LESSONS) {
   const html = readFileSync(new URL(`../${lesson}/index.html`, import.meta.url), 'utf8');
   for (const [, code] of html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)) {
     const result = spawnSync(process.execPath, ['--input-type=module', '--check'], { input: code, encoding: 'utf8' });
@@ -40,4 +41,4 @@ for (const hz of [60, 120, 144, 240]) {
   for (let i = 0; i < hz * 10; i++) frames += Number(p.ready(i * 1000 / hz));
   assert.ok(Math.abs(frames - 600) <= 1, `${hz} Hz should render about 600 frames / 10s: ${frames}`);
 }
-console.log('PASS: five lesson module syntaxes; frame adaptation, explicit quality, background gaps and pixel budgets.');
+console.log(`PASS: ${LESSONS.length} lesson module syntaxes; frame adaptation, explicit quality, background gaps and pixel budgets.`);

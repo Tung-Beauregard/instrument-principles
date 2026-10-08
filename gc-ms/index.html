@@ -62,7 +62,8 @@ button{font:inherit;color:inherit}
 /* 左欄不超出自己的格子;放不下時只有說明框縮短、在框內捲動,導覽按鈕不會被下方控制台蓋住 */
 .brief{grid-area:brief;align-self:start;display:flex;flex-direction:column;gap:12px;max-height:100%;min-height:0}
 /* 網站分頁(只在 GitHub Pages 版出現) */
-.sitenav{display:inline-flex;align-self:flex-start;gap:2px;padding:3px;border-radius:10px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.sitenav{display:inline-flex;align-self:flex-start;gap:2px;padding:3px;border-radius:10px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);max-width:100%;overflow-x:auto;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
 .sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
 .sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
 .sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
@@ -174,9 +175,19 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 .tag em{font:400 10.5px/1.2 var(--f-mono);font-style:normal;color:var(--muted)}
 .tag.band{border-color:rgba(255,255,255,.4)}
 .tag.part{background:rgba(7,11,19,.7);font-size:11px}
+.tag.zoomable{cursor:pointer}
+.tag.zoomable:hover{border-color:var(--accent)}
 .tag.part i{background:var(--ink-2);box-shadow:none}
 .tag.neutral{border-color:rgba(160,190,240,.2)}
 .tag.neutral i{background:var(--muted);box-shadow:none}
+/* 放大鏡的開關:收起時是角落的小按鈕,打開時變成放大鏡右上角的 × */
+.lens-btn{position:fixed;left:0;top:0;z-index:2;display:inline-flex;align-items:center;gap:6px;padding:5px 12px 5px 9px;border-radius:999px;background:rgba(7,11,19,.86);border:1px solid var(--line-2);color:var(--ink);font:600 12px/1.3 var(--f-body);cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.lens-btn:hover{border-color:var(--accent)}
+.lens-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lens-btn svg{width:14px;height:14px;display:block;color:var(--accent)}
+.lens-btn.x{padding:5px;border-radius:50%}
+.lens-btn.x span{display:none}
+.app.bare .lens-btn{display:none}
 
 .tip{position:fixed;z-index:30;left:0;top:0;pointer-events:none;background:var(--glass-2);border:1px solid var(--line-2);border-radius:8px;padding:6px 10px;font-size:12px;line-height:1.55;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.45);max-width:260px}
 .tip .num{color:var(--ink-2)}
@@ -189,6 +200,20 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 .modal p{margin:0 0 8px;color:var(--ink-2);font-size:14px;line-height:1.8;max-width:64ch}
 .modal b{color:var(--ink);font-weight:600}
 .modal .x{position:absolute;right:16px;top:16px}
+/* 動畫說明視窗 */
+.xp-card{width:min(880px,100%)}
+.xp-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 44px 12px 0}
+.xp-tabs button{border:1px solid var(--line);background:rgba(255,255,255,.05);cursor:pointer;border-radius:999px;padding:4px 12px;font-size:12.5px;color:var(--ink-2)}
+.xp-tabs button:hover{color:var(--ink);background:rgba(255,255,255,.1)}
+.xp-tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600}
+#xpCv{display:block;width:100%;aspect-ratio:600/340;background:#0b1220;border:1px solid var(--line);border-radius:12px}
+.modal p.xp-cap{min-height:5.4em;margin:12px 0 10px;color:var(--ink);font-size:15px;line-height:1.8;max-width:none}
+.xp-bar{display:flex;align-items:center;gap:8px}
+.xp-bar .mini{padding:4px 12px;font-size:12.5px}
+.xp-prog{position:relative;flex:1;height:8px;border-radius:4px;background:rgba(160,190,240,.16);cursor:pointer}
+.xp-prog i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--accent)}
+.xp-prog b{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:rgba(160,190,240,.5)}
+.modal .xp-open{margin:2px 0 10px}
 .keys{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px;color:var(--ink-2);margin-top:4px}
 .kbd{font:500 11.5px/1.6 var(--f-mono);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:0 6px;color:var(--ink);white-space:nowrap}
 
@@ -270,17 +295,18 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 <div class="app" id="app">
   <canvas id="gl" tabindex="-1" aria-label="ALS 自動進樣器、氣相層析儀與質譜儀的 3D 模型,可拖曳旋轉"></canvas>
   <div class="tags" id="tags" aria-hidden="true"></div>
+  <button class="lens-btn" id="lensBtn" type="button" hidden><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.8" cy="6.8" r="4.6"/><path d="M10.3 10.3l4 4"/></svg><span>放大鏡</span></button>
   <div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
 
   <div class="hud" id="hud">
     <header class="brief">
-      <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="./" aria-current="page">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a></nav>
+      <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="./" aria-current="page">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a></nav>
       <h1 class="ttl"><span class="ttl-a">GC-MS</span><span class="ttl-b">拆開來看</span></h1>
-      <p class="lede">層析圖上的每一支峰,都來自同一針樣品。它們一起被打進管柱,出來時卻相隔好幾分鐘。按「導覽」,鏡頭會跟著一個成分的分子,從進樣、30&nbsp;m 的管柱,一路走進質譜。</p>
+      <p class="lede">GC 先在 30&nbsp;m 長的細管(管柱)裡把成分分開,MS(質譜)再量出它們的質量。同一針樣品的成分一起出發,出來時卻相隔好幾分鐘,在層析圖上排成一支支峰。按「導覽」,鏡頭會跟著一個成分的分子走一趟。</p>
       <div class="chips">
         <div class="chip lead"><span class="chip-k">時間</span><span class="chip-v" id="chipT">0.00 min</span></div>
-        <div class="chip"><span class="chip-k">柱溫</span><span class="chip-v" id="chipOven">60.0 °C</span></div>
-        <div class="chip"><span class="chip-k" id="chipKk">滯留因子 k</span><span class="chip-v" id="chipK">4.60</span></div>
+        <div class="chip"><span class="chip-k">管柱溫度</span><span class="chip-v" id="chipOven">60.0 °C</span></div>
+        <div class="chip"><span class="chip-k" id="chipKk">停留倍數 k</span><span class="chip-v" id="chipK">4.60</span></div>
       </div>
       <p class="story" id="story" aria-live="polite"></p>
       <div class="tourbar" id="tourbar" hidden>
@@ -313,9 +339,9 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
         <div class="ctl-g">
           <span class="ctl-k">升溫速率</span>
           <div class="seg" id="segRate" role="group" aria-label="升溫速率">
-            <button type="button" data-rate="3" aria-pressed="true">3 °C/min<small>56 min</small></button>
-            <button type="button" data-rate="5" aria-pressed="false">5 °C/min<small>35 min</small></button>
-            <button type="button" data-rate="10" aria-pressed="false">10 °C/min<small>19 min</small></button>
+            <button type="button" data-rate="3" aria-pressed="true">3 °C/min<small>共 56 min</small></button>
+            <button type="button" data-rate="5" aria-pressed="false">5 °C/min<small>共 35 min</small></button>
+            <button type="button" data-rate="10" aria-pressed="false">10 °C/min<small>共 19 min</small></button>
           </div>
         </div>
         <div class="ctl-g">
@@ -328,6 +354,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
         <div class="ico-row">
           <button class="ico" id="btnInj" type="button" title="重新進樣 (I)" aria-label="重新進樣"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v3M6 4.5h4M7 4.5v6.5l1 2.5 1-2.5V4.5"/><path d="M5.2 8h1.8M5.2 10h1.8"/></svg></button>
           <button class="ico ico-txt" id="btnTour" type="button" title="導覽:鏡頭跟著一個成分的分子走一趟 (C)" aria-pressed="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="3.5" cy="12.5" r="1.7"/><circle cx="12.5" cy="3.5" r="1.7"/><path d="M5.3 12.5h4.4a2.4 2.4 0 0 0 0-4.8H6.3a2.4 2.4 0 0 1 0-4.8h4.4"/></svg>導覽</button>
+          <button class="ico ico-txt" id="btnXp" type="button" title="動畫說明:走走停停、保留指數、電子撞擊游離、四極桿"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="1.8" y="2.8" width="12.4" height="10.4" rx="2"/><path d="M6.6 5.8v4.4L10.4 8z" fill="currentColor"/></svg>動畫</button>
           <button class="ico" id="btnHelp" type="button" title="原理說明 (H)" aria-label="原理說明"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5.8 5.8a2.3 2.3 0 1 1 3.2 2.1c-.6.3-1 .8-1 1.5v.4"/><circle cx="8" cy="12.6" r=".5" fill="currentColor"/></svg></button>
         </div>
       </div>
@@ -337,7 +364,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 
     <section class="panel console" id="console" aria-label="主控台" data-tab="chrom">
       <div class="cs cs-oven">
-        <div class="cs-h"><span class="cs-t">柱溫箱</span></div>
+        <div class="cs-h"><span class="cs-t">管柱烘箱</span></div>
         <div class="oven-T"><span id="ovenT">60.0</span><small>°C</small></div>
         <div class="oven-p" id="ovenP">60 → 220 °C · 3 °C/min<br>保持 3 min</div>
         <canvas class="cv" id="cvOven" aria-label="升溫程式"></canvas>
@@ -345,11 +372,11 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
       <div class="cs cs-chrom">
         <div class="cs-h">
           <div class="seg tabs" id="segTab" role="group" aria-label="切換圖表"><button type="button" data-tab="chrom" aria-pressed="true">層析圖</button><button type="button" data-tab="ms" aria-pressed="false">質譜</button></div>
-          <span class="cs-t no-m">總離子層析圖 TIC</span>
+          <span class="cs-t no-m">層析圖:每一刻的離子總數</span>
           <div class="legend" id="legend"></div>
           <span class="cs-sp"></span>
           <button class="mini eic" id="btnEic" type="button" hidden></button>
-          <button class="mini no-m" id="btnTable" type="button" aria-pressed="false">峰表</button>
+          <button class="mini no-m" id="btnTable" type="button" aria-pressed="false">成分表</button>
           <button class="mini play" id="btnPlay" type="button"></button>
           <select class="mini sel" id="speedSel" aria-label="播放速度" title="播放速度:0.1×、0.5× 是慢動作,3× 只加快時間軸"><option value="0.1">0.1×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="3">3×</option></select>
           <button class="mini btn-sheet" id="btnSheet" type="button" aria-haspopup="true">設定</button>
@@ -367,12 +394,13 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
         </div>
         <div class="ms-hit" id="msHit"></div>
         <canvas class="cv" id="cvMS" aria-label="目前時間的質譜,點一根質譜線可抽出該離子的層析圖"></canvas>
-        <div class="foot" id="msFoot">點一根質譜線,可在層析圖上抽出該離子(EIC);暫停在峰上可看碎片怎麼來</div>
+        <div class="foot" id="msFoot">點一根質譜線,層析圖下方會多一條只看這種離子的曲線;暫停在峰上可看碎片怎麼來</div>
         <div class="qctl" id="qctl" hidden>
           <label for="qSlider">固定 m/z</label>
           <input type="range" id="qSlider" min="40" max="230" step="1" value="93">
           <span class="num" id="qVal">掃描中</span>
           <button class="mini" id="btnScan" type="button" aria-pressed="true">自動掃描</button>
+          <button class="mini" id="btnQuadXp" type="button" title="翻轉馬鞍的動畫:為什麼一次只放行一種 m/z">電場動畫</button>
         </div>
       </div>
     </section>
@@ -385,37 +413,41 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
       <button class="ico x" id="helpX" type="button" aria-label="關閉說明"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
       <h2 id="helpTitle">一支峰是怎麼來的</h2>
-      <p>這個頁面把一針精油從進樣到出圖譜的過程拆開來看。管柱裡的色帶、底下的層析圖和質譜,都是同一個模型即時算出來的,所以拖動時間、改升溫速率,三者會一起變。</p>
+      <p>這個頁面把一針精油從進樣到出圖譜的過程拆開來看。GC(氣相層析儀)先用細長的管柱把成分分開,MS(質譜儀)再讓分子帶電、量出質量。管柱裡的色帶(每個成分一條)、底下的層析圖(一個成分流出來就是一支峰)和質譜,都是同一個模型即時算出來的,所以拖動時間、改升溫速率,三者會一起變。精油的成分大多是萜類:單萜以 10 個碳為骨架,倍半萜是 15 個碳;圖例裡的「烯」只含碳和氫,「含氧」的多了氧原子。</p>
 
-      <h3>進樣:ALS 與進樣口</h3>
-      <p>ALS 先用溶劑洗針,再從樣品瓶抽 <b>1 μL</b>,穿過隔墊打進 <b>250 °C</b> 的玻璃襯管。液體瞬間氣化,體積脹大兩三百倍。分流模式下大部分蒸氣從分流出口排掉,只有一小部分被載氣(He)帶進管柱。ALS 在推下活塞的同一刻送出開始訊號,GC 從這一刻開始計時。</p>
+      <h3>進樣:自動進樣器與進樣口</h3>
+      <p>自動進樣器(ALS)先用溶劑洗針,再從樣品瓶抽 <b>1 μL</b>,刺穿橡膠隔墊打進 <b>250 °C</b> 的玻璃襯管。液體瞬間氣化,體積脹大兩三百倍。這裡用「分流」:大部分蒸氣從分流出口排掉,只有一小部分被載氣(推著樣品前進的氦氣 He)帶進管柱。進樣器在推下活塞的同一刻送出開始訊號,GC 從這一刻開始計時。</p>
 
       <h3>分開的原理:液膜與載氣</h3>
-      <p>HP-5MS 管柱內壁塗了一層 <b>0.25 μm</b> 的液膜(5% 苯基聚矽氧烷)。分子不停在載氣和液膜之間進出:溶在液膜裡的時候停住不動,回到載氣裡才往前走。<b>k 值</b>就是「在液膜裡的量 ÷ 在載氣裡的量」,所以一個成分的前進速度是載氣的 <b>1/(1+k)</b>。k 越大,出來得越晚。角落的放大鏡畫的就是這件事,分子停在金色液膜裡的比例就是 k/(1+k)。</p>
+      <p>管柱(HP-5MS)內壁塗了一層 <b>0.25 μm</b> 厚的液膜,是一種耐高溫、像矽油的高分子(5% 苯基聚矽氧烷)。分子不停在載氣和液膜之間進出:溶在液膜裡的時候停住不動,回到載氣裡才往前走。<b>k 值</b>就是「在液膜裡的量 ÷ 在載氣裡的量」,也就是停住的時間是前進時間的幾倍,所以一個成分的前進速度是載氣的 <b>1/(1+k)</b>。k 越大,出來得越晚。按角落的「放大鏡」打開來看,畫的就是這件事:分子停在金色液膜裡的比例就是 k/(1+k)。</p>
+      <button class="mini xp-open" type="button" data-xp="part">▶ 看動畫:走走停停</button>
 
-      <h3>升溫程式</h3>
+      <h3>升溫程式:邊分析邊加熱</h3>
       <p>k 會隨溫度急速下降。60 °C 時 (E)-Caryophyllene 的 k 將近 300,幾乎黏在管柱入口不動;升到 130 °C 左右 k 降到 4 上下,它才真正開始跑。升溫讓每個成分在各自合適的溫度離開,前面的峰不會擠成一團,後面的峰也不會拖成又寬又矮的小丘。</p>
-      <p>升溫越快,分析越短,但相鄰成分之間的距離縮得比峰寬還快。Limonene 和 1,8-Cineole 在 3 °C/min 時 Rs 約 0.9,看得到兩支峰中間的凹谷;10 °C/min 時只剩 0.7,幾乎併成一支。</p>
+      <p>升溫越快,分析越短,但相鄰成分之間的距離縮得比峰寬還快。Limonene 和 1,8-Cineole 在 3 °C/min 時分離度 Rs 約 0.9(1.5 以上才算完全分開),看得到兩支峰中間的凹谷;10 °C/min 時只剩 0.7,幾乎併成一支。</p>
 
       <h3>質譜:為什麼量得到質量</h3>
-      <p>分子不帶電,電場推不動它,所以第一步是讓它帶電。管柱出口經過 250 °C 的傳輸線,直接伸進真空中的離子源。燈絲放出的電子被加速到 <b>70 eV</b>,撞上分子,把分子的一個電子撞掉,分子就變成帶一個正電的<b>分子離子 M⁺•</b>。電子的質量只有質子的 1/1836,少一個電子幾乎不影響質量,電荷又是 +1,所以 M⁺• 的 m/z 就等於分子量。</p>
-      <p>帶電之後,推斥極和透鏡用電場把離子推進<b>四極桿</b>。四根桿子兩兩相對,加上直流電壓 U 和射頻電壓 V。離子一邊前進一邊被來回推拉,能不能穩定穿過只看 m/z:太輕的離子跟著射頻擺動,擺幅越來越大,撞上桿子;太重的離子跟不上射頻,被直流慢慢拉向桿子。U 和 V 依固定比例一起往上掃,能通過的 m/z 就從 40 一路掃到 400。質譜面板切到「四極桿」,可以看到每個離子在 Mathieu 穩定圖上的位置:越重越靠左,只有落進頂端窄窄窗口的那一個能通過。</p>
-      <p>穿過四極桿的離子撞上<b>高能倍增極</b>,轉成電子,再經電子倍增器放大十萬倍以上,變成量得到的電流。記下每個 m/z 收到多少離子就是質譜;同一次掃描的離子全部加起來,就是 TIC 上的一個點。整個過程在高真空裡進行,離子才不會在半路撞上空氣分子;中性的分子電場推不動,直接被渦輪分子泵抽走。</p>
+      <p>分子不帶電,電場推不動它,所以第一步是讓它帶電。管柱出口經過 250 °C 的傳輸線(加熱的套管),直接伸進真空中的離子源(讓分子帶電的地方)。燈絲放出的電子被加速到 <b>70 eV</b>,撞上分子,把分子的一個電子撞掉,分子就變成帶一個正電的<b>分子離子 M⁺•</b>(⁺ 代表正電,• 代表留下一個落單的電子)。電子的質量只有質子的 1/1836,少一個電子幾乎不影響質量,電荷又是 +1,所以 M⁺• 的 m/z(質量除以電荷)就等於分子量。</p>
+      <p>帶電之後,推斥極和透鏡用電場把離子推進<b>四極桿</b>,它的作用像篩子。四根金屬桿兩兩相對,加上直流電壓 U 和快速正負交替的射頻電壓 V。離子一邊前進一邊被來回推拉,能不能穩定穿過只看 m/z:太輕的離子跟著射頻擺動,擺幅越來越大,撞上桿子;太重的離子跟不上射頻,被直流慢慢拉向桿子。U 和 V 依固定比例一起調高,能通過的 m/z 就從 40 一路掃到 400。質譜面板切到「四極桿」,可以看到每個離子在穩定圖(由 Mathieu 方程式算出)上的位置:越重越靠左,只有落進頂端窄窄窗口的那一個能通過。</p>
+      <button class="mini xp-open" type="button" data-xp="quad">▶ 看動畫:翻轉的馬鞍</button>
+      <p>穿過四極桿的離子撞上<b>高能倍增極</b>,轉成電子,再經電子倍增器放大十萬倍以上,變成量得到的電流。記下每個 m/z 收到多少離子就是質譜;同一次掃描的離子全部加起來,就是層析圖上的一個點(所以這張圖又叫總離子層析圖,TIC)。整個過程在高真空裡進行,離子才不會在半路撞上空氣分子;中性的分子電場推不動,直接被渦輪分子泵(高速旋轉的真空泵)抽走。</p>
 
       <h3>為什麼會有碎片</h3>
-      <p>把分子的電子撞掉只需要大約 8 到 10 eV,70 eV 的電子帶來的能量多得多,多出來的部分留在 M⁺• 裡,讓它劇烈振動,比較弱的鍵就斷了。斷開時一邊帶著正電,另一邊是中性的自由基或小分子。只有帶電的那一邊會被電場推進四極桿;中性的那一邊推不動,被真空泵抽走,所以在質譜上看不到它。</p>
+      <p>把分子的電子撞掉只需要大約 8 到 10 eV,70 eV 的電子帶來的能量多得多,多出來的部分留在 M⁺• 裡,讓它劇烈振動,比較弱的鍵就斷了。斷開時一邊帶著正電,另一邊是中性的自由基(帶落單電子的碎片)或小分子。只有帶電的那一邊會被電場推進四極桿;中性的那一邊推不動,被真空泵抽走,所以在質譜上看不到它。</p>
+      <button class="mini xp-open" type="button" data-xp="ei">▶ 看動畫:電子撞擊游離</button>
       <p>因此質譜上的每一根線都是「帶電的那一塊」,兩根線的差就是失去的中性碎片。α-Pinene 的 136 → 121 差 15,是失去甲基 CH₃•;136 → 93 差 43,是失去異丙基 C₃H₇•。醇類容易失去水(差 18),乙酸酯會失去乙酸(差 60)。有些分子離子不穩定到幾乎看不到,例如 Linalool 的 154 只剩約 1%,這時要靠碎片和 KI 判斷。</p>
-      <p>同一個分子在 70 eV 下的斷法很固定,碎片分布可以當指紋,拿去和 NIST 等資料庫比對;大家都用 70 eV,不同儀器的質譜才能互相比較。暫停在任一支峰上,放大鏡會切到離子源,一步一步示範這個成分的分子怎麼帶電、怎麼斷開,譜圖上也會圈出正在示範的那一根。</p>
+      <p>同一個分子在 70 eV 下的斷法很固定,碎片分布可以當指紋,拿去和美國 NIST 等機構整理的質譜資料庫比對;大家都用 70 eV,不同儀器的質譜才能互相比較。暫停在任一支峰上,再打開角落的放大鏡,會看到離子源裡一步一步示範這個成分的分子怎麼帶電、怎麼斷開,譜圖上也會圈出正在示範的那一根。</p>
 
       <h3>Limonene 和 1,8-Cineole</h3>
-      <p>兩者的 KI 只差 2,在 HP-5MS 上常疊成一支峰。可是碎片完全不同:Limonene 的基峰是 m/z 68,1,8-Cineole 是 m/z 43、81、108。在質譜上點 m/z 68,層析圖會抽出這個離子的 EIC,只剩 Limonene 那一支。峰正中間的質譜相似度會偏低,也是因為兩者的碎片混在一起。</p>
+      <p>兩者的 KI 只差 2,在 HP-5MS 管柱上常疊成一支峰。可是碎片完全不同:Limonene 最強的一根(基峰)是 m/z 68,1,8-Cineole 是 m/z 43、81、108。在質譜上點 m/z 68,層析圖下方會多畫一條只看這種離子的曲線(EIC),只剩 Limonene 那一支。峰正中間的質譜和資料庫比對的相似度會偏低,也是因為兩者的碎片混在一起。</p>
 
-      <h3>KI 為什麼比滯留時間可靠</h3>
-      <p>改升溫速率,所有峰的滯留時間都會跟著變;用前後兩支正烷烴換算的 KI 卻只差一兩個單位。峰表裡的 KI 就是用同一個模型跑一組 C7 到 C18 正烷烴換算出來的,可以切換升溫速率比較看看。</p>
+      <h3>KI 為什麼比流出時間可靠</h3>
+      <p>改升溫速率,所有峰的流出時間(滯留時間)都會跟著變。KI(保留指數)改用直鏈烷類(正烷烴)當尺:7 個碳的烷類記 700、8 個碳的記 800,依此類推,成分夾在哪兩支烷類之間、離哪一支多近,就換算成多少。這樣算出的 KI 換了升溫速率也只差一兩個單位。成分表裡的 KI 就是用同一個模型跑一組 C7 到 C18 直鏈烷類換算出來的,可以切換升溫速率比較看看。</p>
+      <button class="mini xp-open" type="button" data-xp="ki">▶ 看動畫:用烷類當尺</button>
 
       <h3>操作</h3>
       <div class="keys">
-        <span class="kbd">空白鍵</span><span>播放或暫停,出峰時會自動放慢</span>
+        <span class="kbd">空白鍵</span><span>播放或暫停,有成分流出時會自動放慢</span>
         <span class="kbd">, .</span><span>播放速度變慢或變快。0.1× 和 0.5× 是慢動作:時間軸和進樣、分子、碎裂、離子這些動畫一起放慢;3× 只加快時間軸</span>
         <span class="kbd">[ ]</span><span>時間往前或往後 0.1 min,按住 Shift 為 1 min</span>
         <span class="kbd">0 1 2 3</span><span>自動追蹤,或追蹤 α-Pinene、Limonene、Caryophyllene</span>
@@ -428,7 +460,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
         <span class="kbd">+ −</span><span>縮放</span>
         <span class="kbd">R</span><span>重設視角</span>
         <span class="kbd">/</span><span>隱藏介面</span>
-        <span class="kbd">滑鼠</span><span>拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;在層析圖上拖曳可捲動時間,點峰可追蹤該成分</span>
+        <span class="kbd">滑鼠</span><span>拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;點一下儀器的部件或它的標籤,鏡頭會飛過去放大那一區;牆上的說明圖點一下會播動畫;放大鏡平常收起,按角落的「放大鏡」打開、按 × 收起,打開後可以拖到別的地方,雙擊回到原位;在層析圖上拖曳可捲動時間,點峰可追蹤該成分</span>
         <span class="kbd">觸控板</span><span>雙指滑動平移,兩指捏合縮放;觸控螢幕:單指旋轉,雙指平移與縮放</span>
       </div>
 
@@ -436,10 +468,27 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
       <p>管柱 HP-5MS 30 m × 0.25 mm × 0.25 μm,He 定流 1.0 mL/min(死時間約 1.4 min),柱溫 60 °C 起以 3、5 或 10 °C/min 升到 220 °C 後保持 3 min,溶劑延遲 3 min;進樣口與傳輸線 250 °C、離子源 230 °C。各成分的滯留由 KI 值換算(簡化的熱力學模型),峰寬以約 7 萬理論板數估算。樣品是虛構的示範組成;質譜只取主要離子,強度為概略值,只供說明,不可拿來鑑定。</p>
     </div>
   </div>
+
+  <div class="modal" id="xp" hidden>
+    <div class="modal-card xp-card" role="dialog" aria-modal="true" aria-labelledby="xpTitle">
+      <button class="ico x" id="xpX" type="button" aria-label="關閉動畫"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+      <div class="xp-tabs" id="xpTabs" role="tablist" aria-label="動畫說明"><button type="button" role="tab" data-k="part">走走停停</button><button type="button" role="tab" data-k="ki">保留指數 KI</button><button type="button" role="tab" data-k="ei">電子撞擊游離</button><button type="button" role="tab" data-k="quad">四極桿</button></div>
+      <h2 id="xpTitle"></h2>
+      <canvas id="xpCv" role="img"></canvas>
+      <p class="xp-cap" id="xpCap" aria-live="polite"></p>
+      <div class="xp-bar">
+        <button class="mini" id="xpPrev" type="button" aria-label="上一段">‹ 上一段</button>
+        <button class="mini" id="xpPlay" type="button">暫停</button>
+        <button class="mini" id="xpNext" type="button" aria-label="下一段">下一段 ›</button>
+        <div class="xp-prog" id="xpProg" title="點一下跳到那裡"><i></i></div>
+      </div>
+    </div>
+  </div>
 </div>
 <script type="module">
 import { createQualityControls } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
+import { createSaddleDemo } from '../assets/saddle-field.js';
 const quality = createQualityControls({ host: '.ctl', onChange: () => resize3D() });
 /* =========================================================
    GC-MS 拆開來看:資料、滯留模型、圖表與介面
@@ -522,7 +571,7 @@ const FRAG = {
   apin: { f: 'C10H16', ch: [
     { mz: 136 },
     { mz: 121, ion: 'C9H13', loss: 'CH3', note: '失去一個甲基' },
-    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '四員環打開後失去異丙基,剩下的 C₇H₉⁺ 很穩定,是基峰' }] },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '四員環打開後失去異丙基,剩下的 C₇H₉⁺ 很穩定,是最強的一根(基峰)' }] },
   camph: { f: 'C10H16', ch: [
     { mz: 136 },
     { mz: 121, ion: 'C9H13', loss: 'CH3', note: '失去一個甲基,在 Camphene 特別明顯' },
@@ -534,27 +583,27 @@ const FRAG = {
   myrc: { f: 'C10H16', ch: [
     { mz: 136, note: '鏈狀,分子離子很弱' },
     { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '失去 C₃H₇•' },
-    { mz: 69, ion: 'C5H9', loss: 'C5H7', note: '烯丙位的鍵斷開,得到穩定的異戊烯基離子 C₅H₉⁺' }] },
+    { mz: 69, ion: 'C5H9', loss: 'C5H7', note: '離雙鍵隔一個碳的鍵斷開(烯丙位斷裂),得到很穩定的異戊烯基離子 C₅H₉⁺' }] },
   cym: { f: 'C10H14', ch: [
     { mz: 134, note: '苯環讓分子離子比較穩定,看得到不少' },
-    { mz: 119, ion: 'C9H11', loss: 'CH3', note: '苯甲位的鍵斷開、失去甲基,留下很穩定的離子,是基峰' },
-    { mz: 91, ion: 'C7H7', loss: 'C3H7', lossTxt: 'CH₃• + C₂H₄', note: '再失去 C₂H₄,變成七員環的卓鎓離子 C₇H₇⁺' }] },
+    { mz: 119, ion: 'C9H11', loss: 'CH3', note: '緊鄰苯環的碳斷掉一個甲基(苯甲位斷裂),留下很穩定的離子,是最強的一根(基峰)' },
+    { mz: 91, ion: 'C7H7', loss: 'C3H7', lossTxt: 'CH₃• + C₂H₄', note: '再失去 C₂H₄,重排成很穩定的七員環離子 C₇H₇⁺(卓鎓離子)' }] },
   lim: { f: 'C10H16', ch: [
     { mz: 136 },
     { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '失去 C₃H₇•' },
-    { mz: 68, ion: 'C5H8', ionRad: true, loss: 'C5H8', lossMol: true, note: '逆 Diels-Alder:六員環一分為二,帶電的一半是 m/z 68,另一半是中性的異戊二烯;這是 Limonene 的基峰' }] },
+    { mz: 68, ion: 'C5H8', ionRad: true, loss: 'C5H8', lossMol: true, note: '六員環從中間一分為二(逆 Diels-Alder 反應):帶電的一半是 m/z 68,另一半是中性的異戊二烯;這是 Limonene 最強的一根(基峰)' }] },
   cin: { f: 'C10H18O', ch: [
     { mz: 154, note: '醚類,分子離子看得到' },
     { mz: 139, ion: 'C9H15O', loss: 'CH3', note: '失去一個甲基' },
-    { mz: 43, ion: 'C3H7', loss: 'C7H11O', note: '很小的碎片離子;整數質量 43 也可能是 C₂H₃O⁺,要靠高解析質譜才分得出來' }] },
+    { mz: 43, ion: 'C3H7', loss: 'C7H11O', note: '很小的碎片離子;只看整數的話,質量 43 也可能是 C₂H₃O⁺,要用量到小數點後好幾位的高解析質譜才分得出來' }] },
   lin: { f: 'C10H18O', ch: [
     { mz: 154, note: '只剩約 1%:醇類的分子離子很容易斷' },
     { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: '失去一分子水,醇類的特徵' },
-    { mz: 71, ion: 'C4H7O', loss: 'C6H11', note: 'α 斷裂:接著 OH 的碳旁邊的鍵斷開,帶走 C₆H₁₁•,留下含氧的 C₄H₇O⁺,是基峰' }] },
+    { mz: 71, ion: 'C4H7O', loss: 'C6H11', note: '接著 OH 的那個碳,旁邊的鍵斷開(α 斷裂),帶走 C₆H₁₁•,留下含氧的 C₄H₇O⁺,是最強的一根(基峰)' }] },
   camphor: { f: 'C10H16O', ch: [
     { mz: 152, note: '酮類,分子離子看得到約三成' },
-    { mz: 108, ion: 'C8H12', ionRad: true, loss: 'C2H4O', lossMol: true, note: '重排後失去 C₂H₄O' },
-    { mz: 95, ion: 'C7H11', loss: 'C3H5O', note: '環斷開、經過幾步之後失去含氧的 C₃H₅O,留下 C₇H₁₁⁺;Camphor 和 Borneol 的基峰都是它' }] },
+    { mz: 108, ion: 'C8H12', ionRad: true, loss: 'C2H4O', lossMol: true, note: '原子先挪了位置(重排),再失去 C₂H₄O' },
+    { mz: 95, ion: 'C7H11', loss: 'C3H5O', note: '環斷開、經過幾步之後失去含氧的 C₃H₅O,留下 C₇H₁₁⁺;Camphor 和 Borneol 最強的一根(基峰)都是它' }] },
   born: { f: 'C10H18O', ch: [
     { mz: 154, note: '醇類,分子離子很弱' },
     { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: '失去一分子水' },
@@ -570,11 +619,11 @@ const FRAG = {
   caryo: { f: 'C15H24', ch: [
     { mz: 204, note: '倍半萜 C₁₅H₂₄,分子量 204' },
     { mz: 161, ion: 'C12H17', loss: 'C3H7', note: '失去 C₃H₇•' },
-    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: '分子裂成大小兩塊,小的那塊 C₇H₉⁺ 帶電,是基峰' }] },
+    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: '分子裂成大小兩塊,小的那塊 C₇H₉⁺ 帶電,是最強的一根(基峰)' }] },
   hum: { f: 'C15H24', ch: [
     { mz: 204 },
     { mz: 147, ion: 'C11H15', loss: 'C4H9', note: '失去 C₄H₉•' },
-    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: '小的那塊 C₇H₉⁺ 帶電,是基峰' }] },
+    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: '小的那塊 C₇H₉⁺ 帶電,是最強的一根(基峰)' }] },
   cox: { f: 'C15H24O', ch: [
     { mz: 220, note: '環氧化物,分子離子很弱' },
     { mz: 205, ion: 'C14H21O', loss: 'CH3', note: '失去一個甲基' },
@@ -699,13 +748,13 @@ const RUNS = new Map();
 function getRun(rate) { if (!RUNS.has(rate)) RUNS.set(rate, simulate(rate)); return RUNS.get(rate); }
 
 const INJ_STEPS = [
-  { k: 'turn1', d: 1.0, txt: 'ALS 轉動樣品盤,把樣品瓶轉到注射針正下方。' },
+  { k: 'turn1', d: 1.0, txt: '自動進樣器轉動樣品盤,把樣品瓶轉到注射針正下方。' },
   { k: 'dip', d: 0.7, txt: '注射針往下插進樣品瓶。' },
   { k: 'draw', d: 1.5, txt: '活塞上下抽動幾次排掉氣泡,再抽進 <span class="hl">1 μL</span> 樣品。' },
   { k: 'lift', d: 0.6, txt: '針頭退出樣品瓶。' },
   { k: 'turn2', d: 0.8, txt: '樣品盤轉開,讓出通往進樣口的空位。' },
-  { k: 'down', d: 0.7, txt: '注射針穿過隔墊,伸進 <span class="hl">250 °C</span> 的玻璃襯管。' },
-  { k: 'push', d: 0.35, txt: '活塞一推到底,樣品瞬間氣化;GC 在這一刻開始計時。' },
+  { k: 'down', d: 0.7, txt: '注射針刺穿橡膠隔墊,伸進 <span class="hl">250 °C</span> 的玻璃襯管。' },
+  { k: 'push', d: 0.35, txt: '活塞一推到底,樣品瞬間氣化;儀器從這一刻開始計時。' },
   { k: 'up', d: 0.8, txt: '' },
 ];
 const INJ_TOTAL = INJ_STEPS.reduce((a, s) => a + s.d, 0);
@@ -753,38 +802,38 @@ function selectiveIon(c, o) {
 const elutingWin = p => 2.5 * p.sig + 2 * p.tau;
 function columnText(c, p, t, T) {
   const z = zAt(p, t), k = kOf(c, T), pct = Math.round(z * 100), fs = k / (1 + k), v = 100 / (1 + k);
-  if (k > 40) return `${dot(c)} 幾乎整個溶在液膜裡(k ≈ <span class="num">${Math.round(k)}</span>,${(fs * 100).toFixed(1)}% 的時間不動),還停在管柱的 <span class="num">${pct}%</span> 處。等柱溫升上來 k 變小,它才開始跑;預計 <span class="num">${f2(p.tR)} min</span> 流出。`;
+  if (k > 40) return `${dot(c)} 幾乎整個溶在液膜裡(k ≈ <span class="num">${Math.round(k)}</span>,${(fs * 100).toFixed(1)}% 的時間不動),還停在管柱的 <span class="num">${pct}%</span> 處。等溫度升上來、k 變小,它才開始跑;預計 <span class="num">${f2(p.tR)} min</span> 流出。`;
   return `${dot(c)} 走到管柱的 <span class="num">${pct}%</span>。在 <span class="num">${f1(T)} °C</span> 下 k = <span class="num">${f2(k)}</span>:它有 ${Math.round(fs * 100)}% 的時間溶在液膜裡,只用載氣 ${v < 10 ? v.toFixed(1) : Math.round(v)}% 的速度前進,預計 <span class="num">${f2(p.tR)} min</span> 流出。`;
 }
 function coeluteText(c) {
   const pr = partner(c); if (!pr) return '';
   const ion = selectiveIon(c, pr.o);
-  return ` 它和 ${dot(pr.o)} 只差 <span class="num">${(pr.dt * 60).toFixed(1)}</span> 秒(Rs <span class="num">${f2(pr.rs)}</span>),TIC 上疊成一支;在質譜上點 m/z <span class="num">${ion}</span> 可以把 ${c.label} 單獨抽出來。`;
+  return ` 它和 ${dot(pr.o)} 只差 <span class="num">${(pr.dt * 60).toFixed(1)}</span> 秒(分離度 <span class="num">${f2(pr.rs)}</span>),在層析圖上疊成一支;在質譜上點 m/z <span class="num">${ion}</span> 可以把 ${c.label} 單獨抽出來。`;
 }
 function msStory(c) {
   const F = FRAG[c.id], list = F.ch.map(h => h.mz).join('、');
-  return `${dot(c)}(${fmtF(F.f)},分子量 <span class="num">${c.mw}</span>)在離子源被 70 eV 的電子撞掉一個電子,變成帶正電的 M⁺•。多出來的能量讓鍵斷開:帶正電的那一塊被電場推往四極桿,中性的那一塊電場推不動,被真空泵抽走。所以質譜上看到的是 <span class="num">${list}</span> 這些帶電的碎片,兩根之間的差就是失去的中性碎片。`;
+  return `${dot(c)}(${fmtF(F.f)},分子量 <span class="num">${c.mw}</span>)在離子源被 70 eV 的電子撞掉一個電子,變成帶正電的分子離子 M⁺•。多出來的能量讓鍵斷開:帶正電的那一塊被電場推往四極桿,中性的那一塊推不動,被真空泵抽走。所以質譜上看到的是 m/z(質量 ÷ 電荷)<span class="num">${list}</span> 這些帶電的碎片,兩根之間的差就是失去的中性碎片。`;
 }
 function storyHTML() {
   if (S.tour && S.tour.on) return tourStory();
   if (S.inj && (!S.injected || S.t < 0.25)) { const st = injStepAt(S.inj.el); if (st && INJ_STEPS[st.i].txt) return INJ_STEPS[st.i].txt; return INJ_STEPS[6].txt; }
-  if (!S.injected) return '按下播放,ALS 會先抽 1 μL 樣品打進進樣口,GC 才開始計時。或按「導覽」,跟著一個成分的分子一站一站走。';
+  if (!S.injected) return '按下播放,自動進樣器會先抽 1 μL 樣品打進進樣口,儀器才開始計時。或按「導覽」,跟著一個成分的分子一站一站走。';
   const run = S.run, t = S.t, T = ovenT(t, run.rate);
   const id = S.trackId;
-  if (t < 0.06) return '樣品在 250 °C 的襯管裡氣化,載氣把蒸氣推進管柱;所有成分這時都擠在管柱入口。';
+  if (t < 0.06) return '樣品在 250 °C 的襯管裡氣化,載氣(氦氣)把蒸氣推進管柱;所有成分這時都擠在管柱入口。';
   if (!id) {
-    if (S.track === 'auto') return `所有成分都已流出。柱溫升到 <span class="num">220 °C</span> 再保持 3 min,把殘留的重成分烤出管柱,準備下一針。`;
+    if (S.track === 'auto') return `所有成分都已流出。管柱溫度升到 <span class="num">220 °C</span> 再保持 3 min,把殘留的重成分烤出管柱,準備下一針。`;
     return '';
   }
   const c = BYID.get(id), p = run.sp.get(id), z = zAt(p, t), k = kOf(c, T);
   if (c.solvent) {
-    if (z < 1) return `溶劑跑在最前面:它幾乎不溶進液膜(k ≈ <span class="num">${f2(k)}</span>),跟著載氣直接衝過 30 m。這時質譜還在<span class="hl">溶劑延遲</span>,燈絲關著,免得大量溶劑燒壞燈絲。`;
+    if (z < 1) return `溶劑跑在最前面:它幾乎不溶進管壁的液膜(k ≈ <span class="num">${f2(k)}</span>),跟著載氣(氦氣)衝過 30 m。這時質譜還在<span class="hl">溶劑延遲</span>:燈絲先關著,免得大量溶劑燒壞燈絲。`;
     return `溶劑已在 <span class="num">${f2(p.tR)} min</span> 流出;質譜要到 <span class="num">${f1(PROG.delay)} min</span> 才打開燈絲。`;
   }
   if (S.msFocus === id) return msStory(c) + coeluteText(c);
   const d = t - p.tR;
   if (z < 1 && d < -2.5 * p.sig) return columnText(c, p, t, T);
-  if (Math.abs(d) <= elutingWin(p)) return `${dot(c)} 正在離開管柱(<span class="num">${f2(p.tR)} min</span>,<span class="num">${f1(p.Te)} °C</span>,KI <span class="num">${Math.round(p.kiCalc)}</span>)。暫停在這支峰上,放大鏡會切到離子源,示範它的分子怎麼帶電、怎麼斷成碎片。` + coeluteText(c);
+  if (Math.abs(d) <= elutingWin(p)) return `${dot(c)} 正在離開管柱(<span class="num">${f2(p.tR)} min</span>,<span class="num">${f1(p.Te)} °C</span>,烷類刻度 KI <span class="num">${Math.round(p.kiCalc)}</span>)。${S.lensOpen ? '暫停在這支峰上,放大鏡會切到離子源,示範它的分子怎麼帶電、怎麼斷成碎片。' : '暫停在這支峰上,再按角落的「放大鏡」,可以看它的分子怎麼帶電、怎麼斷成碎片。'}` + coeluteText(c);
   return `${dot(c)} 已在 <span class="num">${f2(p.tR)} min</span> 流出(<span class="num">${f1(p.Te)} °C</span>,KI <span class="num">${Math.round(p.kiCalc)}</span>)。`;
 }
 // 質譜放大鏡要示範哪個成分:暫停在出峰上,或指定追蹤的成分已經流出
@@ -859,13 +908,13 @@ function tourStory() {
   const T = S.tour, c = BYID.get(T.cid), p = S.run.sp.get(T.cid), k = TOUR[T.i].k;
   switch (k) {
     case 'als': { const st = S.inj && injStepAt(S.inj.el); const txt = st && INJ_STEPS[st.i].txt; return `跟著 ${dot(c)} 的分子走一趟。` + (txt || INJ_STEPS[6].txt); }
-    case 'inlet': return `1 μL 在 250 °C 的玻璃襯管裡瞬間氣化,脹成幾百倍體積的蒸氣。分流模式下大部分從分流出口排掉,只有一小部分被氦氣推進管柱,${dot(c)} 的分子也在裡面。`;
-    case 'column': return columnText(c, p, S.t, ovenT(S.t, S.run.rate)) + ' 放大鏡裡:分子溶進金色液膜時停住,回到載氣才往前走。';
-    case 'xfer': return `${dot(c)} 走到管柱末端,經過 250 °C 的傳輸線,直接伸進質譜的真空腔;管柱出口就在離子源旁邊。`;
+    case 'inlet': return `1 μL 在 250 °C 的玻璃襯管裡瞬間氣化,脹成幾百倍體積的蒸氣。大部分從旁邊的出口排掉(這叫分流),只有一小部分被載氣(氦氣)推進管柱,${dot(c)} 的分子也在裡面。`;
+    case 'column': return columnText(c, p, S.t, ovenT(S.t, S.run.rate)) + ' 放大鏡裡:分子溶進管壁上的金色液膜時停住,回到載氣才往前走。';
+    case 'xfer': return `${dot(c)} 走到管柱末端。管柱穿過 250 °C 的加熱管(傳輸線)伸進質譜的真空裡,出口就在離子源旁邊。`;
     case 'source': return msStory(c);
-    case 'quad': return `帶正電的離子被推進四極桿。四根桿子加上直流電壓 U 和射頻電壓 V,離子一邊前進一邊被來回推拉:太輕的被射頻甩出去,太重的被直流拉向桿子,只有一種 m/z 能穩定穿過。底下的質譜面板換成穩定圖:${c.label} 的每個碎片是掃描線上的一個點,U、V 一起往上掃,點就往右滑,落進頂端窗口的那一個才通過。`;
-    case 'det': return `穿過四極桿的離子撞上高能倍增極,轉成電子,電子倍增器再放大十萬倍以上,變成量得到的電流。四極桿每掃一次,就記下每個 m/z 收到多少離子:這就是 ${dot(c)} 的質譜,分子離子 m/z <span class="num">${c.mw}</span>,最強的是 m/z <span class="num">${c.baseMz}</span>;同一次掃描全部加起來,就是 TIC 上的一個點。`;
-    default: return `導覽結束。${dot(c)} 在 <span class="num">${f2(p.tR)} min</span> 被偵測到,KI <span class="num">${Math.round(p.kiCalc)}</span>。按播放繼續看其他成分,或在「追蹤成分」換一個再按一次導覽。`;
+    case 'quad': return `帶正電的離子被推進四極桿,它像篩子:四根金屬桿加上直流電壓 U 和快速正負交替的射頻電壓 V,離子一邊前進一邊被來回推拉。太輕的被射頻甩出去,太重的被直流拉向桿子,只有一種 m/z 能穩定穿過。底下的質譜面板換成穩定圖:${c.label} 的每個碎片是斜線上的一個點,U、V 一起調高,點就往右滑,落進頂端窗口的那一個才通過。`;
+    case 'det': return `穿過四極桿的離子撞上高能倍增極,轉成電子,電子倍增器再放大十萬倍以上,變成量得到的電流。四極桿每掃一次,就記下每個 m/z 收到多少離子:這就是 ${dot(c)} 的質譜,沒斷的分子離子在 m/z <span class="num">${c.mw}</span>,最強的是 m/z <span class="num">${c.baseMz}</span>;同一次掃描全部加起來,就是層析圖上的一個點。`;
+    default: return `導覽結束。${dot(c)} 在 <span class="num">${f2(p.tR)} min</span> 被偵測到,烷類刻度 KI <span class="num">${Math.round(p.kiCalc)}</span>。按播放繼續看其他成分,或在「追蹤成分」換一個再按一次導覽。`;
   }
 }
 
@@ -1020,7 +1069,7 @@ function drawChrom() {
   if (hasE) {
     ctx.strokeStyle = COLORS.axis; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pl, pt + phT + .5); ctx.lineTo(w - pr, pt + phT + .5); ctx.stroke();
     ctx.font = FONT_LB; ctx.fillStyle = COLORS.ink2; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-    ctx.fillText(`EIC m/z ${S.eic}`, pl + 6, eTop + 11);
+    ctx.fillText(`只看 m/z ${S.eic}`, pl + 6, eTop + 11);
   }
 
   // 峰名(依峰高排序,撞到就往上一層,再撞到就不標)
@@ -1077,8 +1126,8 @@ function chromTip(x, y) {
   let html = `<span class="num">${f2(t)} min · ${f1(ovenT(t, run.rate))} °C</span>`;
   if (t < PROG.delay) return html + '<br>溶劑延遲,質譜還沒開始收訊號';
   const tot = ticClean(run, t);
-  html += `<br>TIC <span class="num">${(tot / 1e6).toFixed(3)}×10⁶</span>`;
-  if (S.eic) { let e = 0; for (const c of CPDS) { const p = run.sp.get(c.id); e += p.A * shape(p, t) * c.frac[S.eic - MZ0]; } html += `<br>EIC m/z ${S.eic} <span class="num">${(e / 1e6).toFixed(3)}×10⁶</span>`; }
+  html += `<br>離子總數 <span class="num">${(tot / 1e6).toFixed(3)}×10⁶</span>`;
+  if (S.eic) { let e = 0; for (const c of CPDS) { const p = run.sp.get(c.id); e += p.A * shape(p, t) * c.frac[S.eic - MZ0]; } html += `<br>m/z ${S.eic} 離子 <span class="num">${(e / 1e6).toFixed(3)}×10⁶</span>`; }
   const parts = [];
   for (const c of CPDS) { const p = run.sp.get(c.id); const v = p.A * shape(p, t); if (v > tot * 0.04 && v > 2e4) parts.push([c, v]); }
   parts.sort((a, b) => b[1] - a[1]);
@@ -1234,16 +1283,16 @@ function msTip(m) {
   const parts = [];
   for (const [c, a] of sp.contrib) { const x = a * c.frac[i]; if (x > sp.out[i] * 0.05) parts.push([c, x]); }
   for (const [c, x] of parts.slice(0, 3)) html += `<br><i style="background:${COLORS[c.cls]}"></i>${c.name} <span class="num">${Math.round(x / sp.out[i] * 100)}%</span>`;
-  if (!parts.length && v > 0.004) html += '<br>背景離子(空氣、管柱流失)';
+  if (!parts.length && v > 0.004) html += '<br>背景離子(空氣、液膜受熱分解)';
   // 這一根是怎麼來的
   const fc = msFocusCpd(sp);
   if (fc) {
     const ch = FRAG[fc.id].ch.find(h => h.mz === m);
     if (ch && !ch.ion) html += `<br><b>M⁺•</b>:${fc.label} 撞掉一個電子後沒有斷,m/z ${m} 就是分子量${ch.note ? ';' + ch.note : ''}`;
-    else if (ch) html += `<br><b>${ionTxt(ch)}</b>:M⁺• 失去 ${lossTxt(ch)}(${nominal(ch.loss)})後留下的帶電碎片;${ch.note}。中性的 ${lossTxt(ch)} 電場推不動,所以譜上看不到它`;
+    else if (ch) html += `<br><b>${ionTxt(ch)}</b>:M⁺• 失去 ${lossTxt(ch)}(質量 ${nominal(ch.loss)})後留下的帶電碎片;${ch.note}。中性的 ${lossTxt(ch)} 電場推不動,所以譜上看不到它`;
     else if (m === fc.mw) html += `<br><b>M⁺•</b>:分子離子,m/z 就是分子量`;
   }
-  html += `<br><span style="color:var(--muted)">點一下抽出 m/z ${m} 的層析圖</span>`;
+  html += `<br><span style="color:var(--muted)">點一下,另畫只看 m/z ${m} 的層析圖</span>`;
   return html;
 }
 
@@ -1326,11 +1375,11 @@ function quadTip(x, y) {
     const px = QP.pl + q / QZ.qMax * pw, py = QP.pt + ph - Math.min(QZ.lam * q, QZ.aMax) / QZ.aMax * ph;
     const d = Math.hypot(px - x, py - y); if (d < 12 && (!best || d < best.d)) best = { o, s, d };
   }
-  if (!best) return `四極桿設定在 m/z <span class="num">${Math.round(set)}</span>。每個點是一種離子,越重越靠左;U、V 一起往上掃,所有點一起往右滑,滑進頂端窗口的那一個才穩定。`;
+  if (!best) return `四極桿設定在 m/z <span class="num">${Math.round(set)}</span>。每個點是一種離子,越重越靠左;兩種電壓 U、V 一起調高,所有點一起往右滑,滑進頂端窗口的那一個才能通過。`;
   const { o, s } = best;
   if (s.pass) return `m/z <span class="num">${o.mz}</span> 在穩定區內:在桿子之間來回擺動但擺幅有限,可以一路穿過四極桿打到偵測器。`;
-  if (s.heavy) return `m/z <span class="num">${o.mz}</span> 對目前的設定太重(q 太小,位在穩定區左上方):射頻推不太動它,直流把它慢慢拉向負極的桿子,撞上去就不見了。`;
-  return `m/z <span class="num">${o.mz}</span> 對目前的設定太輕(q 太大):它跟著射頻劇烈擺動,擺幅越來越大,撞上桿子。`;
+  if (s.heavy) return `m/z <span class="num">${o.mz}</span> 對目前的設定太重(q 太小,位在穩定區左上方):快速交替的射頻電壓推不太動它,直流電壓把它慢慢拉向負極的桿子,撞上去就不見了。`;
+  return `m/z <span class="num">${o.mz}</span> 對目前的設定太輕(q 太大):它跟著快速交替的射頻電壓劇烈擺動,擺幅越來越大,撞上桿子。`;
 }
 
 /* ---------- 升溫程式小圖 ---------- */
@@ -1357,7 +1406,7 @@ function buildTable() {
     const p = run.sp.get(c.id);
     return `<tr data-id="${c.id}"><td class="n">${i + 1}</td><td><i style="background:${COLORS[c.cls]}"></i>${c.name}</td><td class="n">${f2(p.tR)}</td><td class="n">${Math.round(p.kiCalc)}</td><td class="n">${c.ki}</td><td class="n">${(c.amt / total * 100).toFixed(1)}</td><td>${CLS[c.cls].name}</td></tr>`;
   }).join('');
-  E.ptable.innerHTML = `<table><thead><tr><th class="n">#</th><th>成分</th><th class="n">RT (min)</th><th class="n">KI(本次)</th><th class="n">KI(資料庫)</th><th class="n">面積 %</th><th>類別</th></tr></thead><tbody>${rows}</tbody></table>`;
+  E.ptable.innerHTML = `<table><thead><tr><th class="n">#</th><th>成分</th><th class="n">流出時間 (min)</th><th class="n">KI(本次)</th><th class="n">KI(資料庫)</th><th class="n">峰面積 %</th><th>類別</th></tr></thead><tbody>${rows}</tbody></table>`;
   syncTable();
 }
 function syncTable() { if (E.ptable.hidden) return; for (const tr of E.ptable.querySelectorAll('tbody tr')) tr.classList.toggle('on', tr.dataset.id === S.trackId); }
@@ -1437,7 +1486,7 @@ function openHelp(open) {
 }
 
 function initUI() {
-  for (const id of ['story', 'chipT', 'chipOven', 'chipK', 'chipKk', 'tSlider', 'tSliderV', 'segTrack', 'segRate', 'segX', 'segTab', 'btnInj', 'btnTour', 'btnHelp', 'btnPlay', 'speedSel', 'btnTable', 'btnEic', 'btnSheet', 'btnSheetX', 'cvChrom', 'cvOver', 'cvMS', 'cvOven', 'ovenT', 'ovenP', 'msTime', 'msHit', 'msFoot', 'segMsView', 'qctl', 'qSlider', 'qVal', 'btnScan', 'tourbar', 'tourStep', 'tourDots', 'tourNext', 'tourEnd', 'ptable', 'tip', 'help', 'helpX', 'legend', 'console', 'app', 'hole', 'load', 'tags', 'hud'])
+  for (const id of ['story', 'chipT', 'chipOven', 'chipK', 'chipKk', 'tSlider', 'tSliderV', 'segTrack', 'segRate', 'segX', 'segTab', 'btnInj', 'btnTour', 'btnHelp', 'btnPlay', 'speedSel', 'btnTable', 'btnEic', 'btnSheet', 'btnSheetX', 'cvChrom', 'cvOver', 'cvMS', 'cvOven', 'ovenT', 'ovenP', 'msTime', 'msHit', 'msFoot', 'segMsView', 'qctl', 'qSlider', 'qVal', 'btnScan', 'tourbar', 'tourStep', 'tourDots', 'tourNext', 'tourEnd', 'ptable', 'tip', 'help', 'helpX', 'xp', 'xpX', 'xpTabs', 'xpTitle', 'xpCv', 'xpCap', 'xpPrev', 'xpPlay', 'xpNext', 'xpProg', 'btnQuadXp', 'btnXp', 'lensBtn', 'legend', 'console', 'app', 'hole', 'load', 'tags', 'hud'])
     E[id] = document.getElementById(id);
   const map = { ink: '--ink', ink2: '--ink-2', muted: '--muted', accent: '--accent', accentInk: '--accent-ink', solv: '--c-solv', warm: '--warn' };
   for (const [k, v] of Object.entries(map)) COLORS[k] = cssv(v);
@@ -1470,6 +1519,23 @@ function initUI() {
   E.btnHelp.addEventListener('click', () => openHelp(true));
   E.helpX.addEventListener('click', () => openHelp(false));
   E.help.addEventListener('click', e => { if (e.target === E.help) openHelp(false); });
+  // 動畫說明:四極桿面板的按鈕、說明視窗裡的「看動畫」;牆上的說明圖在 zoomAt 裡處理
+  E.btnQuadXp.addEventListener('click', () => openXP('quad', E.btnQuadXp));
+  E.btnXp.addEventListener('click', () => openXP(xp.k || 'part', E.btnXp));
+  for (const b of $$('.xp-open')) b.addEventListener('click', () => openXP(b.dataset.xp, b));
+  E.xpX.addEventListener('click', closeXP);
+  E.xp.addEventListener('click', e => { if (e.target === E.xp) closeXP(); });
+  E.xpTabs.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setXPTopic(b.dataset.k); });
+  E.xpPlay.addEventListener('click', xpToggle);
+  E.xpPrev.addEventListener('click', () => xpJump(-1));
+  E.xpNext.addEventListener('click', () => xpJump(1));
+  E.xpProg.addEventListener('click', e => { const r = E.xpProg.getBoundingClientRect(); xpSeek((e.clientX - r.left) / r.width * XP[xp.k].dur); });
+  // 放大鏡平常收起;導覽講到管柱與離子源時自動打開,按 × 只收起這一站
+  E.lensBtn.addEventListener('click', () => {
+    const open = E.lensBtn.classList.contains('x');
+    if (tourOn()) G.lensTourOff = open ? S.tour.i : -1; else S.lensOpen = !open;
+    markDirty();
+  });
   E.btnTable.addEventListener('click', () => { S.table = !S.table; E.ptable.hidden = !S.table; E.btnTable.setAttribute('aria-pressed', String(S.table)); syncTable(); });
   E.ptable.addEventListener('click', e => { const tr = e.target.closest('tr[data-id]'); if (!tr) return; jumpToPeak(tr.dataset.id); });
   E.btnEic.addEventListener('click', () => { S.eic = null; markDirty(); });
@@ -1535,6 +1601,13 @@ function initUI() {
   addEventListener('keydown', e => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const tg = e.target, inField = tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA');
+    if (!E.xp.hidden) {
+      if (e.key === 'Escape') closeXP();
+      else if (e.key === ' ' && !(tg && tg.tagName === 'BUTTON')) { e.preventDefault(); xpToggle(); }
+      else if (e.key === 'ArrowLeft') xpJump(-1);
+      else if (e.key === 'ArrowRight') xpJump(1);
+      return;
+    }
     if (!E.help.hidden) { if (e.key === 'Escape') openHelp(false); return; }
     if (e.key === 'Escape' && S.sheet) { S.sheet = false; E.app.classList.remove('sheet'); return; }
     if (e.key === 'Escape' && tourOn()) { setTour(false); return; }
@@ -1635,7 +1708,7 @@ function tick(dt, now) {
       E.tSlider.value = S.t.toFixed(2);
       E.tSlider.style.setProperty('--p', (S.t / run.tEnd * 100).toFixed(2) + '%');
       const c = S.trackId ? BYID.get(S.trackId) : null;
-      E.chipKk.innerHTML = c ? `k<span class="kname"> · ${c.solvent ? '溶劑' : c.label}</span>` : '滯留因子 k';
+      E.chipKk.innerHTML = c ? `k<span class="kname"> · ${c.solvent ? '溶劑' : c.label}</span>` : '停留倍數 k';
       E.chipK.textContent = c ? (() => { const k = kOf(c, T); return k >= 100 ? Math.round(k) + '' : k >= 10 ? f1(k) : f2(k); })() : '無';
       syncTable();
     }
@@ -1646,13 +1719,13 @@ function tick(dt, now) {
     if (S.msView === 'quad') hit = S.simMz != null ? `固定在 m/z <b>${S.simMz}</b>:只有這個 m/z 穿得過四極桿` : `掃描中,現在只放行 m/z <span class="num">${Math.round(S.sweep)}</span>;點一個離子可以固定`;
     else if (S.msFocus && L && L.cid === S.msFocus) {
       const ch = FRAG[L.cid].ch[L.i];
-      hit = ch.ion ? `放大鏡:m/z <b>${ch.mz}</b> 是 ${ionTxt(ch)},M⁺• 失去 ${lossTxt(ch)}(${nominal(ch.loss)})` : `放大鏡:M⁺• 沒有斷,m/z <b>${ch.mz}</b> 就是分子量`;
+      hit = ch.ion ? `放大鏡:m/z <b>${ch.mz}</b> 是 ${ionTxt(ch)},M⁺• 失去 ${lossTxt(ch)}(質量 ${nominal(ch.loss)})` : `放大鏡:M⁺• 沒有斷,m/z <b>${ch.mz}</b> 就是分子量`;
     }
     else if (!sp) hit = S.injected && S.t >= S.run.tEnd ? '分析結束' : '質譜尚未收訊號';
-    else if (sp.total < 5e4) hit = '只有背景離子(空氣、管柱流失),沒有可比對的成分';
+    else if (sp.total < 5e4) hit = '只有背景離子(空氣、液膜受熱分解),沒有可比對的成分';
     else hit = `最佳比對 <b>${sp.hit.c.name}</b> · 相似度 <span class="num">${Math.min(99, Math.floor(sp.hit.s * 100))}</span>`;
     if (E.msHit.innerHTML !== hit) E.msHit.innerHTML = hit;
-    const eicTxt = S.eic ? `EIC m/z <b>${S.eic}</b> ✕` : '';
+    const eicTxt = S.eic ? `只看 m/z <b>${S.eic}</b> ✕` : '';
     if (E.btnEic.hidden !== !S.eic) E.btnEic.hidden = !S.eic;
     if (S.eic && E.btnEic.innerHTML !== eicTxt) { E.btnEic.innerHTML = eicTxt; E.btnEic.setAttribute('aria-label', `清除 m/z ${S.eic} 的抽取離子層析圖`); }
   }
@@ -1742,12 +1815,14 @@ async function init3D() {
   G.nav = createCameraNav({
     camera, controls, turn: false, reset: false, radius: 380,
     home: { p: camera.position.clone(), t: new THREE.Vector3(...DEF_VIEW.tgt) },
-    active: () => G.ready && E.help.hidden,
+    active: () => G.ready && E.help.hidden && E.xp.hidden,
     onInput: () => { G.fly = null; G.userMoved = true; G.injCam = false; userTakesOver(); },
   });
   // 儀器這一組整體左右鏡像:質譜在左、GC 在右、氦氣鋼瓶在最右邊。
   // 組內仍沿用原本的座標(GC 在 x<0),要換成世界座標一律經過 G.world.localToWorld
   G.world = new THREE.Group(); G.world.scale.x = -1; scene.add(G.world); G.world.updateMatrixWorld(true);
+  initPointerTools(canvas);
+  window.GCMS = { G, S, TAGS, xp: { open: openXP, seek: xpSeek } };   // 除錯與自動測試用
 
   // 光(跟著鏡像換邊)
   scene.add(new THREE.HemisphereLight(0xc2d4ff, 0x1a1510, 0.32));
@@ -1873,6 +1948,8 @@ function canvasTex(w, h) {
 }
 
 /* ---------- 房間 ---------- */
+// 牆上說明圖的位置(x)與中心高度:放低一點,預設視角裡比較不會被上方的面板切掉
+const POSTER_X = [[-205, 'part'], [-45, 'ki'], [115, 'ei'], [275, 'quad']], POSTER_Y = 80;
 function buildRoom() {
   const { c, g, t } = canvasTex(512, 512);
   g.fillStyle = '#0d121b'; g.fillRect(0, 0, 512, 512);
@@ -1887,18 +1964,19 @@ function buildRoom() {
   // 牆上的燈條
   const strip = new THREE.Mesh(new THREE.BoxGeometry(1400, 0.8, 0.8), new THREE.MeshBasicMaterial({ color: new THREE.Color(0x7fe3ff).multiplyScalar(0.9) }));
   strip.position.set(0, 210, -174); G.scene.add(strip);
-  // 掛在牆上的三張說明圖
-  G.posters = [];
-  [[-205, 'part'], [-45, 'ki'], [115, 'ei']].forEach(([x, kind]) => {
+  // 掛在牆上的四張說明圖,點一下播動畫(XP)
+  G.posters = []; G.posterMeshes = [];
+  POSTER_X.forEach(([x, kind]) => {
     const tex = canvasTex(1024, 680);
-    const frame = boxAt(M.panel, x - 51, x + 51, 72, 142, -174, -171, 1.2); G.scene.add(frame);
+    const frame = boxAt(M.panel, x - 51, x + 51, POSTER_Y - 35, POSTER_Y + 35, -174, -171, 1.2); G.scene.add(frame);
     const face = new THREE.Mesh(new THREE.PlaneGeometry(98, 65.1), new THREE.MeshBasicMaterial({ map: tex.t, color: new THREE.Color(0.85, 0.85, 0.85), toneMapped: false }));
-    face.position.set(x, 107, -170.9); G.scene.add(face);
+    face.position.set(x, POSTER_Y, -170.9); G.scene.add(face);
+    face.userData.xp = kind; G.posterMeshes.push(face);
     G.posters.push({ kind, ...tex });
   });
 }
 async function drawPosters() {
-  try { await Promise.race([Promise.all(['900 64px "Noto Sans TC"', '500 30px "Noto Sans TC"', '600 30px "IBM Plex Mono"'].map(f => document.fonts.load(f, '分配保留指數電子撞擊游離前進速度載氣液膜換升溫率幾乎不變碎片質譜指紋'))), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* 字型載不到就用系統字 */ }
+  try { await Promise.race([Promise.all(['900 64px "Noto Sans TC"', '500 30px "Noto Sans TC"', '600 30px "IBM Plex Mono"'].map(f => document.fonts.load(f, '分配保留指數電子撞擊游離前進速度載氣液膜換升溫率幾乎不變碎片質譜指紋四極桿直流加上快速翻轉的交讓一種穿過點一下看動畫電場像個來去馬鞍太輕被甩出重拉走只有留得住'))), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* 字型載不到就用系統字 */ }
   for (const P of G.posters) {
     const g = P.g, W = 1024, H = 680;
     g.fillStyle = '#0b1322'; g.fillRect(0, 0, W, H);
@@ -1908,7 +1986,7 @@ async function drawPosters() {
     const title = (t, s) => { g.fillStyle = '#eaf5ff'; g.font = '900 66px "Noto Sans TC", sans-serif'; g.fillText(t, 64, 122); g.fillStyle = '#8fb3d6'; g.font = '500 30px "Noto Sans TC", sans-serif'; g.fillText(s, 66, 172); };
     g.textBaseline = 'alphabetic'; g.textAlign = 'left';
     if (P.kind === 'part') {
-      title('分配', 'k = 溶在液膜的量 ÷ 在載氣中的量');
+      title('走走停停', 'k = 溶在液膜的量 ÷ 在載氣中的量');
       const y0 = 250, y1 = 470;
       g.fillStyle = 'rgba(255,181,71,.28)'; g.fillRect(70, y0, 884, 30); g.fillRect(70, y1 - 30, 884, 30);
       g.strokeStyle = '#5c7da3'; g.lineWidth = 5; g.beginPath(); g.moveTo(70, y0); g.lineTo(954, y0); g.moveTo(70, y1); g.lineTo(954, y1); g.stroke();
@@ -1921,9 +1999,9 @@ async function drawPosters() {
         g.beginPath(); g.moveTo(x + 70, y); g.lineTo(x + 60, y - 7); g.lineTo(x + 60, y + 7); g.closePath(); g.fillStyle = 'rgba(127,227,255,.6)'; g.fill();
       }
       g.fillStyle = '#cfe6ff'; g.font = '600 34px "Noto Sans TC", sans-serif'; g.fillText('前進速度 = 載氣速度 × 1 / (1 + k)', 64, 560);
-      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('金色是液膜(固定相),藍色是正在載氣裡前進的分子', 64, 612);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('金色是管壁上的液膜,藍色是正在載氣裡前進的分子', 64, 612);
     } else if (P.kind === 'ki') {
-      title('保留指數 KI', '用前後兩支正烷烴把滯留時間換成刻度');
+      title('保留指數 KI', '用前後兩支直鏈烷類當尺,把流出時間換成刻度');
       const base = 470, X = t => 90 + t * 820;
       g.strokeStyle = '#5c7da3'; g.lineWidth = 3; g.beginPath(); g.moveTo(70, base); g.lineTo(954, base); g.stroke();
       const pk = (t, hgt, col, lab) => {
@@ -1933,7 +2011,14 @@ async function drawPosters() {
       };
       pk(0.1, 150, '#8fa3bd', 'C10'); pk(0.9, 140, '#8fa3bd', 'C11'); pk(0.42, 190, '#7fe3ff', 'x');
       g.fillStyle = '#cfe6ff'; g.font = '600 32px "IBM Plex Mono", monospace'; g.fillText('KI = 100 × [ n + (tx − tn) / (tn+1 − tn) ]', 64, 560);
-      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('換升溫速率,滯留時間會變,KI 幾乎不變', 64, 612);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('換升溫速率,流出時間會變,KI 幾乎不變', 64, 612);
+    } else if (P.kind === 'quad') {
+      title('四極桿', '直流加上快速翻轉的交流,只讓一種 m/z 穿過');
+      const d = createSaddleDemo('quad', { font: '"Noto Sans TC", sans-serif' }); d.seek(13.3);   // 太輕的正要被甩出去、太重的往旁邊滑、要的那種留在中間
+      g.save(); g.translate(150, 170); g.scale(1.22, 1.22); d.draw(g, { bare: true }); g.restore();
+      g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+      g.fillStyle = '#cfe6ff'; g.font = '600 34px "Noto Sans TC", sans-serif'; g.fillText('電場像一個翻來翻去的馬鞍', 64, 560);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('太輕的被甩出去,太重的被拉走,只有一種留得住', 64, 612);
     } else {
       title('電子撞擊游離', '70 eV 電子撞掉一個電子,分子帶正電後斷成碎片');
       const cx = 230, cy = 360;
@@ -1947,6 +2032,11 @@ async function drawPosters() {
       g.fillStyle = '#cfe6ff'; g.font = '600 32px "Noto Sans TC", sans-serif'; g.fillText('M + e⁻ → M⁺• + 2e⁻ → 碎片離子', 64, 560);
       g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('碎片的 m/z 分布就是質譜,也是比對用的指紋', 64, 612);
     }
+    // 右上角:點一下看動畫
+    g.fillStyle = 'rgba(127,227,255,.14)'; g.strokeStyle = '#7fe3ff'; g.lineWidth = 3;
+    g.beginPath(); if (g.roundRect) g.roundRect(706, 46, 270, 64, 32); else g.rect(706, 46, 270, 64); g.fill(); g.stroke();
+    g.fillStyle = '#7fe3ff'; g.beginPath(); g.moveTo(738, 62); g.lineTo(738, 94); g.lineTo(764, 78); g.closePath(); g.fill();
+    g.font = '700 30px "Noto Sans TC", sans-serif'; g.textBaseline = 'middle'; g.fillText('點一下看動畫', 780, 79); g.textBaseline = 'alphabetic';
     P.t.needsUpdate = true;
   }
 }
@@ -1970,7 +2060,8 @@ function buildGC() {
   g.add(boxAt(M.shell, x0, o.x0, o.y0, o.y1, z0, z1, 0.4));
   g.add(boxAt(M.shell, o.x1, x1, o.y0, o.y1, z0, z1, 0.6));
   g.add(boxAt(M.shell, o.x0, o.x1, o.y0, o.y1, z0, o.z0, 0.3));
-  const cav = new THREE.Mesh(new THREE.BoxGeometry(o.x1 - o.x0, o.y1 - o.y0, o.z1 - o.z0), M.cavity);
+  // 爐腔四壁往內縮 0.15:和外殼內側同一個平面的話,兩個面會搶著顯示,斜看時變成閃爍的條紋
+  const cav = new THREE.Mesh(new THREE.BoxGeometry(o.x1 - o.x0 - 0.3, o.y1 - o.y0 - 0.3, o.z1 - o.z0 - 0.3), M.cavity);
   cav.position.set((o.x0 + o.x1) / 2, (o.y0 + o.y1) / 2, (o.z0 + o.z1) / 2); cav.receiveShadow = true; g.add(cav);
   // 柱溫箱後方的風扇與加熱圈
   const fan = new THREE.Group(); fan.position.set(-65.5, 25, -21.2);
@@ -2082,7 +2173,8 @@ function buildMSD() {
   g.add(boxAt(M.shell, x0, x0 + 2.5, 3, y1 - 3, z0, z1, 0.4));
   g.add(boxAt(M.shell, x1 - 2.5, x1, 3, y1 - 3, z0, z1, 0.4));
   g.add(boxAt(M.shell, x0, x1, 3, y1 - 3, z0, z0 + 2, 0.3));
-  const cav = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0 - 5, y1 - 6, z1 - z0 - 4), M.cavityDark);
+  // 內腔四壁同樣往內縮 0.15,不和外殼內側重疊
+  const cav = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0 - 5.3, y1 - 6.3, z1 - z0 - 4.3), M.cavityDark);
   cav.position.set((x0 + x1) / 2, y1 / 2, (z0 + z1) / 2); cav.receiveShadow = true; g.add(cav);
   const top = new THREE.Group(); g.add(top); G.msTop = top;
   top.add(boxAt(M.shell, x0, x1, y1 - 3, y1, z0, z1, 1.4));
@@ -2094,7 +2186,7 @@ function buildMSD() {
   front.add(boxAt(M.shellFade, 40, x1, 12, 38, z1 - 2, z1, 0.4));
   G.msWin = new THREE.Mesh(new THREE.PlaneGeometry(46, 26), glassMat(0x8fb2d4, 0.07, 0.38)); G.msWin.position.set(17, 25, z1 - 1); front.add(G.msWin);
   const disp = canvasTex(256, 160); G.msDisp = disp;
-  const scr = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 3.4), new THREE.MeshBasicMaterial({ map: disp.t, toneMapped: false })); scr.position.set(44, 33, z1 + 0.06); scr.scale.x = -1; front.add(scr);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 3.4), new THREE.MeshBasicMaterial({ map: disp.t, toneMapped: false })); scr.position.set(44, 33, z1 + 0.06); scr.scale.x = -1; front.add(scr); G.msScr = scr; scr.material.transparent = true;
   front.add(boxAt(M.panel, 41, 47, 31, 35, z1 - 0.2, z1 + 0.02, 0.3));
   const pb = cyl(0.9, 0.9, 0.6, M.blue, 20).rotateX(Math.PI / 2); pb.position.set(44, 16, z1 + 0.25); front.add(pb);
 
@@ -2401,14 +2493,14 @@ function buildTags() {
   const obj = (o, x, y, z) => { const v = new THREE.Vector3(); return () => o.localToWorld(v.set(-x, y, z)); };
   const ex = () => S.explode > 0.5, always = () => true, m = L.mag;
   tag('ALS 自動進樣器', () => S.inj ? '進樣中' : '待命', obj(G.als, 5.6, 104, 2.6));
-  tag('進樣口', () => '250 °C · 分流', obj(G.inlet, 4.2, 6, 2.5));
-  tag('柱溫箱', () => f1(ovenT(S.injected ? S.t : 0, S.run.rate)) + ' °C', W(47, 47.5, 29));
-  tag('管柱 HP-5MS', () => '30 m × 0.25 mm', () => G.coilGrp.localToWorld(new THREE.Vector3(-55, 14.5, 13)));
+  tag('進樣口', () => '250 °C,少量進管柱', obj(G.inlet, 4.2, 6, 2.5));
+  tag('管柱烘箱', () => f1(ovenT(S.injected ? S.t : 0, S.run.rate)) + ' °C', W(47, 47.5, 29));
+  tag('管柱(分離用細管)', () => '30 m × 0.25 mm', () => G.coilGrp.localToWorld(new THREE.Vector3(-55, 14.5, 13)));
   tag('傳輸線', () => '250 °C', W(12, 27.4, 1.5));
-  tag('質譜儀', () => S.msOn ? 'EI 70 eV · 掃描中' : '燈絲關閉', () => G.msd.localToWorld(new THREE.Vector3(46, 47, 26)), '', always, Infinity, 150);
-  tag('離子源', () => S.msOn ? 'EI 70 eV · 230 °C' : '燈絲關閉', obj(G.src, 0, 5.6, 0), '', always, 150);
+  tag('質譜儀', () => S.msOn ? '70 eV 電子 · 掃描中' : '燈絲關閉', () => G.msd.localToWorld(new THREE.Vector3(46, 47, 26)), '', always, Infinity, 150);
+  tag('離子源', () => S.msOn ? '70 eV 電子 · 230 °C' : '燈絲關閉', obj(G.src, 0, 5.6, 0), '', always, 150);
   tag('四極桿', () => S.simMz != null ? '固定 m/z ' + S.simMz : S.msOn ? 'm/z ' + Math.round(S.sweep) : 'm/z 40–400', obj(G.quad, 0, 4.2, 0), '', always, 150);
-  tag('偵測器', () => '電子倍增器', obj(G.det, 0, 8.8, 0), '', always, 150);
+  tag('偵測器', () => '數有多少離子', obj(G.det, 0, 8.8, 0), '', always, 150);
   tag('載氣 He', () => '1.0 mL/min', () => G.heAnchor);
   const lens = (x, y, z) => { const v = new THREE.Vector3(); return () => G.mag.visible ? G.mag.localToWorld(v.set(x, y, z)) : null; };
   const lensAt = fn => { const v = new THREE.Vector3(); return () => { const q = G.mag.visible ? fn() : null; return q ? G.lensMS.localToWorld(v.copy(q)) : null; }; };
@@ -2425,7 +2517,7 @@ function buildTags() {
   tag('← 往四極桿', null, lensMSAt(21, -7.6, 0), 'part', isMS);
   for (let i = nLens0; i < TAGS.length; i++) TAGS[i].lens = true;   // 放大鏡上的標籤
   G.bandTag = tag('', () => G.bandSub || '', () => G.bandPos, 'band', () => !!G.bandPos);
-  tag('隔墊', null, obj(G.septum, 2, 10, 1), 'part', ex);
+  tag('橡膠隔墊', null, obj(G.septum, 2, 10, 1), 'part', ex);
   tag('玻璃襯管', null, obj(G.liner, 1.4, 6, 1.2), 'part', ex);
   tag('注射針 10 μL', null, obj(G.syringe, 1.6, 15, 0.8), 'part', ex);
   tag('樣品盤', null, obj(G.turret, 8.8, 1.5, 3), 'part', ex);
@@ -2433,8 +2525,34 @@ function buildTags() {
   tag('燈絲', null, obj(G.src, 1.2, 3.4, 1), 'part', ex, 170);
   tag('離子透鏡', null, obj(G.lens, 3.7, -2.9, 2), 'part', ex, 170);
   tag('高能倍增極', null, obj(G.det, 1.4, 5.8, 1), 'part', ex, 170);
-  tag('渦輪分子泵', null, W(-23.5, 12, 6), 'part', ex);
+  tag('渦輪真空泵', null, W(-23.5, 12, 6), 'part', ex);
   tag('加熱圈與風扇', null, () => G.gc.localToWorld(new THREE.Vector3(-55, 14, -20)), 'part', ex);
+  // 點部件或它的標籤時的取景(世界座標;質譜裡的零件從正面窗口看進去)
+  const V = (x, y, z) => new THREE.Vector3(x, y, z), wp = o => o.getWorldPosition(new THREE.Vector3());
+  const view = (tgt, off) => ({ tgt, pos: tgt.clone().add(off) });
+  const ZOOM = {
+    'ALS 自動進樣器': () => viewFor(SHOTS[1]),
+    '進樣口': () => ({ pos: V(50, 77, 52), tgt: V(74, 58, 6) }),
+    '管柱烘箱': () => view(V(65, 26, 2), V(-12, 30, 120)),
+    '管柱(分離用細管)': () => view(V(66, 25, 4), V(-10, 22, 95)),
+    '加熱圈與風扇': () => view(V(66, 25, 4), V(-10, 22, 95)),
+    '傳輸線': () => view(V(27, 24, 0), V(-6, 20, 70)),
+    '質譜儀': () => view(V(-19, 22, 0), V(4, 34, 125)),
+    '離子源': () => view(wp(G.src), V(4, 12, 46)), '推斥極': () => view(wp(G.src), V(4, 12, 46)), '燈絲': () => view(wp(G.src), V(4, 12, 46)), '離子透鏡': () => view(wp(G.src), V(4, 12, 46)),
+    '四極桿': () => view(wp(G.quad), V(-4, 14, 52)),
+    '偵測器': () => { const d = wp(G.det); d.y -= 2; return view(d, V(10, 14, 52)); }, '高能倍增極': () => { const d = wp(G.det); d.y -= 2; return view(d, V(10, 14, 52)); },
+    '渦輪真空泵': () => view(V(-17, 12, 0), V(0, 16, 62)),
+    '載氣 He': () => view(G.heAnchor.clone(), V(-10, 14, 80)),
+  };
+  G.ZOOM = ZOOM;
+  for (const t of TAGS) {
+    if (t.lens || t === G.bandTag) continue;
+    const name = t.lastTxt;
+    t.zoom = ZOOM[name] || (t.el.classList.contains('part') ? () => { const q = t.pos(); return q ? view(q.clone(), V(-6, 12, 40)) : viewFor(null); } : null);
+    if (!t.zoom) continue;
+    t.el.classList.add('zoomable'); t.el.title = '點一下放大這一區';
+    t.el.addEventListener('click', () => zoomTo(t.zoom()));
+  }
 }
 const _v = { p: null };
 // 介面面板的位置(標籤落在面板上就不畫)
@@ -2444,28 +2562,165 @@ function refreshPanelRects() {
     .map(el => el.getBoundingClientRect()).filter(r => r.width > 0 && r.height > 0);
   G.holeRect = E.hole.getBoundingClientRect();
 }
-// 放大鏡固定在可視區的角落:寬的版面管柱模式放左下、離子源模式放右下(靠近各自的儀器),窄的版面放右上
-const _lens = { v: null };
-function placeLens(mode, show, dt) {
-  const r = G.holeRect, cam = G.camera, m = L.mag;
+// 放大鏡:預設放在可視區的角落(寬版管柱模式右下、離子源模式左下;窄版放上方),蓋到鏡頭正在看的地方就換一個角落;
+// 導覽中四個角落都會蓋到(手機這類小可視區)時,放大鏡留在第一個角落,改把畫面往旁邊平移,讓觀察點露在放大鏡旁邊的空地。
+// 使用者拖過就留在拖到的地方(記成可視區裡的比例,雙擊放大鏡回到自動位置),這時畫面不平移。
+// 放大鏡是跟著鏡頭的 3D 物件,深度依鏡頭和觀察點的距離調整:鏡頭靠近儀器時它也靠近鏡頭,不會插進儀器裡造成破圖
+const _lens = { v: null, f: null };
+// 觀察點要移多少才不被放大鏡蓋到:放大鏡左右或上下的空地裡挑移動最少的,空地都太窄就回傳 null
+function lensDodge(r, lr, fx, fy) {
+  let best = null;
+  const side = (f, lo, hi, axis) => {
+    if (hi - lo < 40) return;
+    const p = Math.min(70, (hi - lo) / 2), d = clamp(f, lo + p, hi - p) - f;
+    if (!best || Math.abs(d) < Math.abs(best[2])) best = axis === 'x' ? [d, 0, d] : [0, d, d];
+  };
+  side(fx, r.left + 12, lr.left - 12, 'x'); side(fx, lr.right + 12, r.right - 12, 'x');
+  side(fy, r.top + 12, lr.top - 12, 'y'); side(fy, lr.bottom + 12, r.bottom - 12, 'y');
+  return best;
+}
+function placeLens(mode, show, dt, touring) {
+  const r = G.holeRect, cam = G.camera, m = L.mag, VS = G.viewShift || (G.viewShift = { x: 0, y: 0 });
   G.mag.visible = !!(show && r && r.width > 10);
   G.lensGC.visible = mode !== 'ms'; G.lensMS.visible = mode === 'ms';
-  if (!G.mag.visible) { G.lensPos = null; G.lensRect = null; return; }
-  if (!_lens.v) _lens.v = new THREE.Vector3();
-  const W = innerWidth, H = innerHeight, wide = r.width / Math.max(1, r.height) > 1.45;
-  const ms = mode === 'ms', wPx = clamp(r.width * (wide ? (ms ? 0.46 : 0.27) : (ms ? 0.86 : 0.5)), 170, ms ? 560 : 430), hPx = wPx * (ms ? 30 / 58 : 2 * m.R / m.len);
-  // 寬版:管柱放大鏡在右下(靠近 GC),離子源放大鏡在左下(靠近質譜);窄版放在上方質譜那一側
-  const cx = !wide ? (ms ? r.left + r.width / 2 : r.left + wPx * 0.56 + 12) : ms ? r.left + wPx / 2 + 22 : r.right - wPx / 2 - 18;
-  const cy = wide ? r.bottom - hPx / 2 - (ms ? 14 : 6) : r.top + hPx / 2 + (ms ? 24 : 44);
-  const D = 90, v = _lens.v.set(cx / W * 2 - 1, 1 - cy / H * 2, 0.5).applyMatrix4(cam.projectionMatrixInverse);
+  if (!_lens.v) { _lens.v = new THREE.Vector3(); _lens.f = new THREE.Vector3(); }
+  const W = innerWidth, H = innerHeight, ms = mode === 'ms', aspect = ms ? 30 / 58 : 2 * m.R / m.len;
+  let cx = 0, cy = 0, wPx = 0, dodge = null;
+  if (G.mag.visible) {
+    const wide = r.width / Math.max(1, r.height) > 1.45;
+    wPx = clamp(r.width * (wide ? (ms ? 0.46 : 0.27) : (ms ? 0.86 : 0.5)), 170, ms ? 560 : 430);
+    const fit = (x, y, w) => [clamp(x, r.left + w / 2 + 8, Math.max(r.left + w / 2 + 8, r.right - w / 2 - 8)), clamp(y, r.top + w * aspect / 2 + 26, Math.max(r.top + w * aspect / 2 + 26, r.bottom - w * aspect / 2 - 6))];
+    if (G.lensUser) [cx, cy] = fit(r.left + G.lensUser.fx * r.width, r.top + G.lensUser.fy * r.height, wPx);
+    else {
+      const h = wPx * aspect, L0 = r.left + wPx / 2 + 22, R0 = r.right - wPx / 2 - 22, B0 = r.bottom - h / 2 - 14, T0 = r.top + h / 2 + 30;
+      const cands = wide ? (ms ? [[L0, B0], [R0, B0], [L0, T0], [R0, T0]] : [[R0, B0 + 8], [L0, B0 + 8], [R0, T0], [L0, T0]])
+        : [[ms ? r.left + r.width / 2 : r.left + wPx * 0.56 + 12, r.top + h / 2 + (ms ? 24 : 44)], [ms ? r.left + r.width / 2 : r.left + wPx * 0.56 + 12, r.bottom - h / 2 - 10]];
+      // 鏡頭正在看的點(觀察點投影到畫面,扣掉目前的平移)周圍留 70 px
+      const f = _lens.f.copy(G.controls.target).project(cam), fx = (f.x + 1) / 2 * W - VS.x, fy = (1 - f.y) / 2 * H - VS.y, pad = 70;
+      const clear = ([x, y]) => fx < x - wPx / 2 - pad || fx > x + wPx / 2 + pad || fy < y - h / 2 - 18 - pad || fy > y + h / 2 + pad;
+      const pick = cands.find(clear);
+      if (pick) [cx, cy] = fit(pick[0], pick[1], wPx);
+      else {
+        [cx, cy] = fit(cands[0][0], cands[0][1], wPx);
+        if (touring) dodge = lensDodge(r, { left: cx - wPx / 2, right: cx + wPx / 2, top: cy - h / 2 - 18, bottom: cy + h / 2 }, fx, fy);
+        if (!dodge) { wPx *= 0.7; [cx, cy] = fit(cands[0][0], cands[0][1], wPx); }
+      }
+    }
+  }
+  // 畫面平移慢慢跟上(只改投影的中心,鏡頭與觀察點都不動)
+  const tx = dodge ? dodge[0] : 0, ty = dodge ? dodge[1] : 0;
+  if (Math.abs(tx - VS.x) > 0.05 || Math.abs(ty - VS.y) > 0.05) {
+    const b = REDUCED ? 1 : 1 - Math.exp(-dt * 3);
+    VS.x += (tx - VS.x) * b; VS.y += (ty - VS.y) * b;
+    if (Math.abs(tx - VS.x) <= 0.05 && Math.abs(ty - VS.y) <= 0.05) { VS.x = tx; VS.y = ty; }
+    updateViewOffset(r);
+  }
+  if (!G.mag.visible) { G.lensC = null; G.lensRect = null; return; }
+  const Dt = clamp(cam.position.distanceTo(G.controls.target) * 0.35, 6, 90);
+  const a = !G.lensC || REDUCED || G.lensDrag ? 1 : 1 - Math.exp(-dt * 7);
+  if (!G.lensC) G.lensC = { x: cx, y: cy, w: wPx, D: Dt };
+  else { const C = G.lensC; C.x += (cx - C.x) * a; C.y += (cy - C.y) * a; C.w += (wPx - C.w) * a; C.D += (Dt - C.D) * a; }
+  const C = G.lensC, D = C.D, w = C.w, hh = w * aspect;
+  const v = _lens.v.set(C.x / W * 2 - 1, 1 - C.y / H * 2, 0.5).applyMatrix4(cam.projectionMatrixInverse);
   v.multiplyScalar(-D / v.z);
-  if (!G.lensPos || REDUCED) G.lensPos = v.clone(); else G.lensPos.lerp(v, 1 - Math.exp(-dt * 7));
-  G.mag.position.copy(G.lensPos);
-  G.lensRect = { left: cx - wPx / 2, right: cx + wPx / 2, top: cy - hPx / 2 - 18, bottom: cy + hPx / 2 };
-  G.mag.scale.setScalar(wPx * 2 * D * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) / H / (ms ? 58 : m.len + 1));
+  G.mag.position.copy(v);
+  G.lensRect = { left: C.x - w / 2, right: C.x + w / 2, top: C.y - hh / 2 - 18, bottom: C.y + hh / 2 };
+  G.mag.scale.setScalar(w * 2 * D * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) / H / (ms ? 58 : m.len + 1));
   if (ms) G.mag.rotation.set(0.06, -0.12, 0); else G.mag.rotation.set(0.2, -0.28, 0.02);
   cam.updateMatrixWorld(true);
 }
+// 放大鏡的開關:收起時放在放大鏡會出現的角落,打開時變成放大鏡右上角的 ×
+function placeLensBtn(mode, want, open) {
+  const b = E.lensBtn, r = G.holeRect, show = !!(want && r && r.width > 10 && !S.bare);
+  if (b.hidden === show) b.hidden = !show;
+  if (!show) return;
+  const st = open ? 'x' : mode;
+  if (b.dataset.st !== st) {
+    b.dataset.st = st; b.classList.toggle('x', open);
+    const name = mode === 'ms' ? '放大鏡:離子源' : '放大鏡:管柱內部';
+    b.querySelector('span').textContent = name;
+    b.setAttribute('aria-label', open ? '收起放大鏡' : '打開' + name); b.title = open ? '收起放大鏡' : '打開' + name;
+    b.style.transform = ''; b._w = b.offsetWidth; b._h = b.offsetHeight;
+  }
+  let x, y;
+  if (open && G.lensRect) { x = G.lensRect.right - b._w + 6; y = G.lensRect.top - b._h + 10; }
+  else {
+    const wide = r.width / Math.max(1, r.height) > 1.45;
+    x = mode === 'ms' || !wide ? r.left + 22 : r.right - 22 - b._w;
+    y = wide ? r.bottom - 14 - b._h : r.top + 30;
+  }
+  b.style.transform = `translate(${Math.round(x)}px,${Math.round(y)}px)`;
+}
+/* ---------- 拖放大鏡、點部件放大 ---------- */
+const lensHit = (x, y) => !!(G.mag && G.mag.visible && G.lensRect && G.lensC && x >= G.lensRect.left && x <= G.lensRect.right && y >= G.lensRect.top && y <= G.lensRect.bottom);
+function initPointerTools(canvas) {
+  let click = null;
+  // 捕獲階段先處理:按在放大鏡上就拖放大鏡,不交給 OrbitControls 轉動視角
+  canvas.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    if (lensHit(e.clientX, e.clientY)) {
+      e.stopImmediatePropagation(); e.preventDefault();
+      G.lensDrag = { id: e.pointerId, dx: e.clientX - G.lensC.x, dy: e.clientY - G.lensC.y };
+      canvas.setPointerCapture(e.pointerId); canvas.style.cursor = 'grabbing'; click = null; return;
+    }
+    click = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now() };
+  }, true);
+  canvas.addEventListener('pointermove', (e) => {
+    const d = G.lensDrag;
+    if (d && e.pointerId === d.id) {
+      const r = G.holeRect;
+      G.lensUser = { fx: (e.clientX - d.dx - r.left) / r.width, fy: (e.clientY - d.dy - r.top) / r.height };
+      e.stopImmediatePropagation(); markDirty(); return;
+    }
+    if (!e.buttons) canvas.style.cursor = lensHit(e.clientX, e.clientY) ? 'grab' : posterAt(e.clientX, e.clientY) ? 'pointer' : '';
+  }, true);
+  const up = (e) => {
+    const d = G.lensDrag;
+    if (d && e.pointerId === d.id) { G.lensDrag = null; canvas.style.cursor = 'grab'; e.stopImmediatePropagation(); return; }
+    const c = click; click = null;
+    // 沒拖動的單擊:點到哪個部件就飛過去
+    if (e.type === 'pointerup' && c && c.id === e.pointerId && performance.now() - c.t < 450 && Math.hypot(e.clientX - c.x, e.clientY - c.y) < 6) zoomAt(e.clientX, e.clientY);
+  };
+  canvas.addEventListener('pointerup', up, true);
+  canvas.addEventListener('pointercancel', up, true);
+  canvas.addEventListener('dblclick', (e) => { if (lensHit(e.clientX, e.clientY)) { G.lensUser = null; markDirty(); } });
+}
+const _ray = { r: null, v: null };
+function aimRay(x, y) {
+  if (!_ray.r) { _ray.r = new THREE.Raycaster(); _ray.v = new THREE.Vector2(); }
+  _ray.r.setFromCamera(_ray.v.set(x / innerWidth * 2 - 1, 1 - y / innerHeight * 2), G.camera);
+  return _ray.r;
+}
+// 滑鼠底下的牆上說明圖(只看說明圖本身,游標用)
+function posterAt(x, y) { if (!G.ready || !G.posterMeshes) return null; const h = aimRay(x, y).intersectObjects(G.posterMeshes, false)[0]; return h ? h.object.userData.xp : null; }
+function zoomAt(x, y) {
+  if (!G.ready) return;
+  aimRay(x, y);
+  const ph = G.posterMeshes ? _ray.r.intersectObjects(G.posterMeshes, false)[0] : null;
+  let hit = null;
+  for (const h of _ray.r.intersectObject(G.world, true)) {
+    const o = h.object; if (!o.isMesh) continue;
+    let vis = true; for (let q = o; q; q = q.parent) if (!q.visible) { vis = false; break; }
+    const mt = Array.isArray(o.material) ? o.material[0] : o.material;
+    if (!vis || (mt && mt.transparent && (mt.isShaderMaterial || mt.opacity < 0.35))) continue;   // 玻璃與淡出的外殼不算
+    hit = h; break;
+  }
+  // 點到牆上的說明圖(前面沒有儀器擋著):播那一段動畫
+  if (ph && (!hit || ph.distance < hit.distance)) { openXP(ph.object.userData.xp); return; }
+  if (!hit) return;
+  // 找最近的部件標籤,用它的取景;離標籤都太遠就沿目前的方向往點到的地方拉近
+  let best = null, bd = Infinity;
+  for (const t of TAGS) { if (!t.zoom || t.lens) continue; const q = t.pos(); if (!q) continue; const d = q.distanceTo(hit.point); if (d < bd) { bd = d; best = t; } }
+  if (best && bd < 28) { zoomTo(best.zoom()); return; }
+  // 點到外殼或從窗口點到裡面的牆:放大整台儀器
+  for (let q = hit.object; q; q = q.parent) {
+    const name = q === G.msd ? '質譜儀' : q === G.gc ? '管柱烘箱' : q === G.als ? 'ALS 自動進樣器' : null;
+    if (name && G.ZOOM && G.ZOOM[name]) { zoomTo(G.ZOOM[name]()); return; }
+  }
+  const dir = G.camera.position.clone().sub(G.controls.target).normalize(), dist = clamp(G.camera.position.distanceTo(G.controls.target) * 0.5, 45, 160);
+  zoomTo({ tgt: hit.point.clone(), pos: hit.point.clone().addScaledVector(dir, dist) });
+}
+function zoomTo(v) { userTakesOver(); G.injCam = false; G.userMoved = true; flyTo(v, 1.2); markDirty(); }
 // 導覽時的鏡頭:每一站有自己的取景,管柱和傳輸線兩站跟著色帶走
 const _tc = { follow: null, init: false, stage: -1 };
 function tourCamera(dt) {
@@ -2482,14 +2737,14 @@ function tourCamera(dt) {
   }
   else if (k === 'source') { const s = G.src.getWorldPosition(new THREE.Vector3()); want = { tgt: s, pos: s.clone().add(V3(4, 12, 46)) }; }
   else if (k === 'quad') { const x = lerp(L.q0 - 2, L.q1 + 2, smooth01(T.t / 10)), t = G.world.localToWorld(V3(x, L.ax.y, L.ax.z)); want = { tgt: t, pos: t.clone().add(V3(-6, 14, 50)) }; }
-  else if (k === 'det') { const d = G.det.getWorldPosition(new THREE.Vector3()); d.y -= 2; want = { tgt: d, pos: d.clone().add(V3(-12, 12, 34)) }; }
+  else if (k === 'det') { const d = G.det.getWorldPosition(new THREE.Vector3()); d.y -= 2; want = { tgt: d, pos: d.clone().add(V3(10, 14, 52)) }; }   // 世界座標左右鏡像:往 +x 才離開顯示幕,從正面窗口看進去
   else want = viewFor(null);
   const a = REDUCED ? 1 : 1 - Math.exp(-dt * 2.0);
   G.camera.position.lerp(want.pos, a); G.controls.target.lerp(want.tgt, a);
 }
 function onTourChange(on, byUser) {
   if (!G.ready) return;
-  G.fly = null; G.injCam = false; _tc.stage = -1;
+  G.fly = null; G.injCam = false; _tc.stage = -1; G.lensTourOff = -1;
   if (on) G.userMoved = false;
   else if (!byUser) resetView(false);
 }
@@ -2512,7 +2767,7 @@ function updateTags() {
     // 整個標籤框(從錨點往右延伸)碰到面板就不畫
     const rects = !t.lens && G.lensRect ? [...panelRects, G.lensRect] : panelRects;
     if (show && !S.bare) for (const r of rects) if (x - 9 < r.right + 6 && x - 9 + t.w > r.left - 6 && y - t.h / 2 < r.bottom + 6 && y + t.h / 2 > r.top - 6) { show = false; break; }
-    if (t.vis !== (show ? 1 : 0)) { t.el.style.opacity = show ? '1' : '0'; t.vis = show ? 1 : 0; }
+    if (t.vis !== (show ? 1 : 0)) { t.el.style.opacity = show ? '1' : '0'; t.vis = show ? 1 : 0; if (t.zoom) t.el.style.pointerEvents = show ? 'auto' : 'none'; }
     if (!show) continue;
     t.el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-9px,-50%)`;
     if (t.txtFn) { const s = t.txtFn(); if (s !== t.lastTxt) { t.lastTxt = s; t.span.textContent = s; t.w = 0; } }
@@ -2521,10 +2776,11 @@ function updateTags() {
 }
 
 /* ---------- 視角 ---------- */
-function updateViewOffset() {
+// 觀察點投影在可視區(面板之間的空地)正中央,再加上放大鏡避讓的平移
+function updateViewOffset(rect) {
   if (!G.camera) return;
-  const r = E.hole.getBoundingClientRect(), W = innerWidth, H = innerHeight;
-  const cx = r.width > 40 ? r.left + r.width / 2 : W / 2, cy = r.height > 40 ? r.top + r.height / 2 : H / 2;
+  const r = rect || E.hole.getBoundingClientRect(), W = innerWidth, H = innerHeight, VS = G.viewShift || { x: 0, y: 0 };
+  const cx = (r.width > 40 ? r.left + r.width / 2 : W / 2) + VS.x, cy = (r.height > 40 ? r.top + r.height / 2 : H / 2) + VS.y;
   G.camera.setViewOffset(W, H, -(cx - W / 2), -(cy - H / 2), W, H);
   G.camera.updateProjectionMatrix();
 }
@@ -2575,11 +2831,14 @@ function update3D(dt, now) {
   G.camera.updateMatrixWorld(true);
   if (!G.holeRect) refreshPanelRects();
   // 放大鏡:管柱模式或離子源模式;導覽時由每一站決定
-  let lensMode = S.msFocus ? 'ms' : 'gc', lensShow;
-  if (tk) { lensMode = tk === 'source' ? 'ms' : 'gc'; lensShow = tk === 'column' || tk === 'xfer' || tk === 'source'; }
-  else lensShow = !S.bare && G.camera.position.distanceTo(G.controls.target) > (lensMode === 'ms' ? 70 : 105);
+  // lensWant:這個時候放大鏡派得上用場;平常收起,按角落的按鈕才打開,導覽講到管柱與離子源時自動打開
+  let lensMode = S.msFocus ? 'ms' : 'gc', lensWant;
+  if (tk) { lensMode = tk === 'source' ? 'ms' : 'gc'; lensWant = tk === 'column' || tk === 'xfer' || tk === 'source'; }
+  else lensWant = !S.bare && G.camera.position.distanceTo(G.controls.target) > (lensMode === 'ms' ? 70 : 105);
+  const lensShow = lensWant && (tk ? G.lensTourOff !== S.tour.i : !!S.lensOpen);
   G.lensMode = lensMode;
-  placeLens(lensMode, lensShow, dt);
+  placeLens(lensMode, lensShow, dt, !!tk);
+  placeLensBtn(lensMode, lensWant, G.mag.visible);
   if (lensMode === 'ms' && G.mag.visible) updateLensMS(sdt); else { S.lensCh = null; if (lensMode !== 'ms') G.lensLab = null; }
 
   // 拆開
@@ -2590,10 +2849,19 @@ function update3D(dt, now) {
     G.als.position.y = 12 * k;
     G.septumNut.position.y = 15 * k; G.septum.position.y = 9.5 * k; G.liner.position.y = 4.5 * k;
     G.msTop.position.y = 18 * k; G.msFront.position.z = 16 * k;
-    M.shellFade.opacity = 1 - k; M.shellFade.depthWrite = k < 0.5; G.msFront.visible = k < 0.98;
-    G.msWin.material.uniforms.uFade.value = 1 - k;
     G.src.position.x = L.src - 6 * k; G.lens.position.x = L.src - 2.5 * k; G.det.position.x = L.det + 7 * k;
     if (Math.abs(G.colK - k) > 1e-4) rebuildColumn(k);
+  }
+  // 質譜正面的外殼、窗與顯示幕:拆開時淡出;鏡頭靠近正面(18 單位內)時也自動淡出,不會擋住裡面的零件
+  {
+    const lp = G.msd.worldToLocal((G._fp || (G._fp = new THREE.Vector3())).copy(G.camera.position));
+    const inside = lp.x > L.ms.x0 - 8 && lp.x < L.ms.x1 + 8 && lp.y > -4 && lp.y < L.ms.y1 + 10 && lp.z > L.ms.z0;
+    const f = Math.max(easeIO(S.explode), inside ? 1 - smooth01((lp.z - (L.ms.z1 + 4)) / 14) : 0);
+    if (Math.abs(f - (G.frontFade ?? -1)) > 1e-3) {
+      G.frontFade = f;
+      M.shellFade.opacity = 1 - f; M.shellFade.depthWrite = f < 0.5; G.msFront.visible = f < 0.98;
+      G.msWin.material.uniforms.uFade.value = 1 - f; G.msScr.material.opacity = 1 - f;
+    }
   }
 
   // 柱溫箱:加熱圈、風扇、指示燈、顯示幕
@@ -2908,6 +3176,404 @@ function resize3D() {
   for (const pts of [G.fx, G.vap, G.gasPts, G.lFlash]) pts.material.uniforms.uScale.value = sc;
 }
 
+/* ---------- 動畫說明:牆上的四張說明圖、四極桿面板、說明視窗都能打開 ----------
+   每段動畫都是時間的函數(四極桿那段由 assets/saddle-field.js 從頭算到指定的時間),所以能暫停、跳段、重播。
+   畫在 600 × 340 的虛擬座標裡;視窗開著時主畫面的 3D 暫停繪製 */
+const XF = '"Noto Sans TC","Outfit",system-ui,sans-serif', XM = '"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace';
+const XC = { ink: '#eef3fb', ink2: '#b9c4d8', muted: '#8290aa', accent: '#7fe3ff', warn: '#ffcf70', gold: '#d9a441', blue: '#5aa2ff', orange: '#ff9b4a', metal: '#8ea2ae', elec: '#ffe28a', carbon: '#a3aec0' };
+function xText(c, s, x, y, o = {}) {
+  c.font = `${o.w || 500} ${o.size || 14}px ${o.mono ? XM : XF}`; c.fillStyle = o.color || XC.ink2;
+  c.textAlign = o.align || 'left'; c.textBaseline = 'middle'; c.fillText(s, x, y);
+}
+function xArrow(c, x0, y0, x1, y1, col, w = 2) {
+  const a = Math.atan2(y1 - y0, x1 - x0), L = 9;
+  c.strokeStyle = col; c.fillStyle = col; c.lineWidth = w;
+  c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1 - Math.cos(a) * L * 0.6, y1 - Math.sin(a) * L * 0.6); c.stroke();
+  c.beginPath(); c.moveTo(x1, y1); c.lineTo(x1 - L * Math.cos(a - 0.45), y1 - L * Math.sin(a - 0.45)); c.lineTo(x1 - L * Math.cos(a + 0.45), y1 - L * Math.sin(a + 0.45)); c.closePath(); c.fill();
+}
+function xDot(c, x, y, r, col, a = 1, glow = 0.25) {
+  if (a <= 0.01) return;
+  c.fillStyle = col;
+  if (glow) { c.globalAlpha = glow * a; c.beginPath(); c.arc(x, y, r * 2.2, 0, Math.PI * 2); c.fill(); }
+  c.globalAlpha = a; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); c.globalAlpha = 1;
+}
+function xRng(seed) { let s = seed >>> 0; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+const XP = {};
+
+// ---------- 走走停停:管柱怎麼把成分分開 ----------
+XP.part = (() => {
+  const X0 = 64, X1 = 532, YT = 64, YB = 176, FT = 11, V = 84, T0 = 3, TG = 0.36, DUR = 32, SIG = 0.35, NV = 16, NH = 120;
+  const sets = [{ k: 1, col: XC.blue }, { k: 3, col: XC.orange }];
+  const r = xRng(11), mols = [];
+  for (const s of sets) for (let i = 0; i < NH; i++) {
+    // 交替停留:在載氣裡平均 TG 秒、在液膜裡平均 k × TG 秒,所以平均前進速度是載氣的 1/(1+k)。
+    // 每次停留取平均值上下 30%:真的分子每秒進出液膜非常多次,峰才會窄;畫面上放慢之後若用完全隨機的停留時間,一團分子會散得太開
+    const seg = []; let tt = 0, gas = r() < 1 / (1 + s.k), g = 0, first = true;
+    while (tt < DUR) {
+      const d = (gas ? TG : TG * s.k) * (0.7 + 0.6 * r()) * (first ? r() : 1); first = false;
+      seg.push({ t0: tt, gas, g0: g, y: gas ? 92 + r() * 56 : (r() < 0.5 ? YT + FT / 2 : YB - FT / 2) });
+      if (gas) g += d; tt += d; gas = !gas;
+    }
+    const need = (X1 - X0) / V; let arr = Infinity;
+    for (let j = 0; j < seg.length; j++) { const q = seg[j], t1 = j + 1 < seg.length ? seg[j + 1].t0 : DUR; if (q.gas && q.g0 + (t1 - q.t0) >= need) { arr = q.t0 + need - q.g0; break; } }
+    mols.push({ s, seg, arr: arr + T0, dx: (r() - 0.5) * 12, vis: i < NV });
+  }
+  const at = (m, tau) => { let q = m.seg[0]; for (const z of m.seg) { if (z.t0 > tau) break; q = z; } return [X0 + m.dx + V * (q.g0 + (q.gas ? tau - q.t0 : 0)), q]; };
+  // 層析圖:每顆分子抵達偵測器的時間疊成峰
+  const CX0 = 64, CX1 = 532, CY = 300, CH = 62, xOfT = (t) => CX0 + (t - T0) / (DUR - T0) * (CX1 - CX0);
+  const dens = (s, tt) => { let v = 0; for (const m of mols) if (m.s === s && Math.abs(tt - m.arr) < 4 * SIG) v += Math.exp(-0.5 * ((tt - m.arr) / SIG) ** 2); return v; };
+  // 層析圖預先算好(每 0.1 秒一點),畫的時候只畫到目前的時間
+  const CURVE = sets.map((s) => { const a = []; for (let tt = T0; tt <= DUR + 1e-6; tt += 0.1) a.push([tt, dens(s, tt)]); return a; });
+  const dmax = Math.max(1, ...CURVE.flat().map(([, v]) => v));
+  return {
+    title: '走走停停:管柱怎麼把成分分開', dur: DUR,
+    cues: [
+      [0, '管柱是一條很細、很長的管子,內壁塗著一層薄薄的液膜(金色)。載氣(氦氣)一直從左往右吹。'],
+      [5, '分子一下子溶進液膜、停在原地,一下子又跑回載氣、被吹著往前走。'],
+      [11, 'k 是「停在液膜的時間 ÷ 在載氣裡跑的時間」。藍色 k = 1:一半的時間在跑,速度是載氣的 1/2;橙色 k = 3:只有四分之一的時間在跑,速度是 1/4。'],
+      [19, '一起打進去的兩種分子,走同樣長的管子,到出口時已經分開:先到的先出峰,層析圖上就是兩支峰。'],
+      [27, '溫度升高,分子比較不愛待在液膜裡,k 變小,大家都跑快一點。所以 GC 會一邊分析一邊升溫。'],
+    ],
+    draw(c, t) {
+      // 管壁、液膜、偵測器
+      c.fillStyle = 'rgba(217,164,65,.32)'; c.fillRect(X0 - 30, YT, X1 - X0 + 30, FT); c.fillRect(X0 - 30, YB - FT, X1 - X0 + 30, FT);
+      c.strokeStyle = XC.metal; c.lineWidth = 3;
+      c.beginPath(); c.moveTo(X0 - 30, YT - 1.5); c.lineTo(X1, YT - 1.5); c.moveTo(X0 - 30, YB + 1.5); c.lineTo(X1, YB + 1.5); c.stroke();
+      c.strokeStyle = 'rgba(217,164,65,.8)'; c.lineWidth = 1.2;
+      c.beginPath(); c.moveTo(X0 - 30, YT + FT); c.lineTo(X1, YT + FT); c.moveTo(X0 - 30, YB - FT); c.lineTo(X1, YB - FT); c.stroke();
+      c.fillStyle = 'rgba(142,162,174,.25)'; c.strokeStyle = XC.metal; c.lineWidth = 1.5;
+      c.fillRect(X1 + 2, YT - 3, 46, YB - YT + 6); c.strokeRect(X1 + 2, YT - 3, 46, YB - YT + 6);
+      xText(c, '偵測器', X1 + 25, YB + 18, { align: 'center', size: 13 });
+      xText(c, '金色:管壁上的液膜', X0 - 30, YT - 16, { color: XC.gold, size: 13, w: 600 });
+      // 載氣的流動
+      c.strokeStyle = 'rgba(185,196,216,.22)'; c.lineWidth = 1.6;
+      for (let i = 0; i < 16; i++) {
+        const span = X1 - X0 + 30, x = X0 - 30 + ((t * V * 1.15 + i * 41) % span), y = 88 + ((i * 23) % 64);
+        c.beginPath(); c.moveTo(x, y); c.lineTo(Math.min(X1, x + 16), y); c.stroke();
+      }
+      xText(c, '載氣 →', X0 - 26, (YT + YB) / 2, { color: XC.muted, size: 12.5 });
+      // 分子
+      if (t >= T0) {
+        const tau = t - T0, sums = sets.map(() => [0, 0]);
+        for (const m of mols) {
+          if (!m.vis || m.arr <= t) continue;
+          const [x, q] = at(m, tau), k = sets.indexOf(m.s);
+          sums[k][0] += x; sums[k][1]++;
+          xDot(c, x, q.y, q.gas ? 5.5 : 5, m.s.col, q.gas ? 1 : 0.75, q.gas ? 0.25 : 0);
+          if (!q.gas) { c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = 1; c.beginPath(); c.arc(x, q.y, 6.5, 0, Math.PI * 2); c.stroke(); }
+        }
+        // 兩團分子的速度
+        if (t >= 11) sets.forEach((s, k) => {
+          if (!sums[k][1]) return;
+          const x = clamp(sums[k][0] / sums[k][1], X0 + 40, X1 - 60);
+          c.globalAlpha = smooth01((t - 11) / 0.8);
+          xText(c, `k = ${s.k}:速度 1/${1 + s.k}`, x, k ? YB + 18 : YT - 34, { color: s.col, size: 13.5, w: 700, align: 'center' });
+          c.globalAlpha = 1;
+        });
+      } else xText(c, '分子從這裡打進來', X0 - 26, YB + 18, { color: XC.muted, size: 12.5 });
+      // 層析圖
+      xText(c, '層析圖:偵測器收到的量', CX0, CY - CH - 14, { color: XC.ink2, size: 13, w: 600 });
+      c.strokeStyle = XC.muted; c.lineWidth = 1.2; c.beginPath(); c.moveTo(CX0, CY); c.lineTo(CX1, CY); c.stroke();
+      xText(c, '時間 →', CX1, CY + 14, { color: XC.muted, size: 12, align: 'right' });
+      sets.forEach((s, k) => {
+        c.beginPath(); c.moveTo(CX0, CY);
+        for (const [tt, v] of CURVE[k]) { if (tt > t) break; c.lineTo(xOfT(tt), CY - CH * v / dmax); }
+        c.lineTo(xOfT(Math.max(T0, t)), CY); c.closePath();
+        c.fillStyle = s.col; c.globalAlpha = 0.3; c.fill(); c.globalAlpha = 1;
+        c.strokeStyle = s.col; c.lineWidth = 1.6; c.stroke();
+      });
+      if (t > T0) { c.strokeStyle = 'rgba(127,227,255,.5)'; c.lineWidth = 1; c.beginPath(); c.moveTo(xOfT(t), CY - CH - 4); c.lineTo(xOfT(t), CY); c.stroke(); }
+      if (t >= 27) {
+        c.globalAlpha = smooth01((t - 27) / 0.8);
+        xText(c, '升溫 → k 變小 → 每個成分都跑快一點', 586, 22, { color: XC.warn, size: 14, w: 700, align: 'right' });
+        c.globalAlpha = 1;
+      }
+    },
+  };
+})();
+
+// ---------- 保留指數 KI:用烷類當尺 ----------
+XP.ki = (() => {
+  const N = [8, 9, 10, 11], X0 = 56, X1 = 572, BASE = 238, TMAX = 12.4;
+  const data = () => {
+    const r3 = getRun(3), r10 = getRun(10), a3 = new Map(r3.alk), a10 = new Map(r10.alk), p3 = r3.sp.get('apin'), p10 = r10.sp.get('apin');
+    return { a3, a10, t3: p3.tR, t10: p10.tR, k3: p3.kiCalc, k10: p10.kiCalc };
+  };
+  const xOf = (t) => X0 + t / TMAX * (X1 - X0);
+  const peak = (c, x, h, col, w = 2.2) => {
+    c.strokeStyle = col; c.lineWidth = w; c.beginPath();
+    for (let i = -30; i <= 30; i++) { const xx = x + i * 0.7, y = BASE - h * Math.exp(-0.5 * (i / 7) ** 2); i === -30 ? c.moveTo(xx, y) : c.lineTo(xx, y); }
+    c.stroke();
+  };
+  return {
+    title: '保留指數 KI:用烷類當尺', dur: 30,
+    get cues() {
+      const d = data(), f = Math.round(d.k3 - 900);
+      return [
+        [0, '同一個成分什麼時候流出來(滯留時間),會隨條件改變:管柱長短、載氣快慢、升溫快慢都有影響。'],
+        [7, '所以拿一組直鏈烷類一起跑,當作一把尺:8 個碳的記 800、9 個碳的記 900、10 個碳的記 1000,依此類推。'],
+        [14, `α-Pinene 落在 9 碳和 10 碳之間,走了這一格的 ${f}%:900 再加 ${f},KI 就是 ${Math.round(d.k3)}。`],
+        [21, `升溫改成每分鐘 10 °C:所有的峰都提早出來,α-Pinene 從 ${f2(d.t3)} 分變成 ${f2(d.t10)} 分。可是尺也跟著一起縮,它還是落在差不多的位置,KI 是 ${Math.round(d.k10)},幾乎不變。`],
+      ];
+    },
+    draw(c, t) {
+      const d = data(), m = smooth01((t - 21.6) / 2.6);
+      const tAlk = (n) => lerp(d.a3.get(n), d.a10.get(n), m), tA = lerp(d.t3, d.t10, m);
+      const tc = t < 6 ? t / 6 * TMAX : TMAX;    // 一開始游標由左往右掃,畫出層析圖
+      // 時間軸
+      c.strokeStyle = XC.muted; c.lineWidth = 1.2; c.beginPath(); c.moveTo(X0, BASE); c.lineTo(X1, BASE); c.stroke();
+      for (let mm = 0; mm <= 12; mm += 2) { const x = xOf(mm); c.beginPath(); c.moveTo(x, BASE); c.lineTo(x, BASE + 5); c.stroke(); xText(c, String(mm), x, BASE + 15, { color: XC.muted, size: 12, mono: true, align: 'center' }); }
+      xText(c, '流出時間(分)', X1, BASE + 34, { color: XC.muted, size: 12, align: 'right' });
+      xText(c, m < 0.5 ? '升溫:每分鐘 3 °C' : '升溫:每分鐘 10 °C', 20, 22, { color: m < 0.5 ? XC.accent : XC.warn, size: 15, w: 800 });
+      // 峰
+      c.save(); c.beginPath(); c.rect(0, 0, xOf(tc), 340); c.clip();
+      for (const n of N) { const x = xOf(tAlk(n)); peak(c, x, 92, '#8fa3bd'); xText(c, `C${n}`, x, BASE - 106, { color: '#8fa3bd', size: 13, mono: true, w: 600, align: 'center' }); }
+      const xa = xOf(tA); peak(c, xa, 128, XC.accent, 2.6);
+      xText(c, 'α-Pinene', xa, BASE - 142, { color: XC.accent, size: 13.5, w: 700, align: 'center' });
+      if (m < 0.05) xText(c, `${f2(tA)} 分`, xa + 12, BASE - 70, { color: XC.accent, size: 11.5, mono: true });
+      c.restore();
+      if (t < 6) { c.strokeStyle = 'rgba(127,227,255,.6)'; c.beginPath(); c.moveTo(xOf(tc), 40); c.lineTo(xOf(tc), BASE); c.stroke(); }
+      // 尺
+      const ra = smooth01((t - 7) / 1.2);
+      if (ra > 0) {
+        c.globalAlpha = ra;
+        const YR = 58, xs = N.map((n) => xOf(tAlk(n)));
+        c.strokeStyle = XC.ink2; c.lineWidth = 2; c.beginPath(); c.moveTo(xs[0], YR); c.lineTo(xs[xs.length - 1], YR); c.stroke();
+        N.forEach((n, i) => {
+          c.setLineDash([3, 4]); c.strokeStyle = 'rgba(143,163,189,.55)'; c.lineWidth = 1; c.beginPath(); c.moveTo(xs[i], YR); c.lineTo(xs[i], BASE - 118); c.stroke(); c.setLineDash([]);
+          c.strokeStyle = XC.ink2; c.lineWidth = 2; c.beginPath(); c.moveTo(xs[i], YR - 6); c.lineTo(xs[i], YR + 6); c.stroke();
+          xText(c, String(n * 100), xs[i], YR - 16, { color: XC.ink, size: 13, mono: true, w: 600, align: 'center' });
+        });
+        c.globalAlpha = 1;
+        // α-Pinene 在尺上的位置
+        const ha = smooth01((t - 14) / 1.2);
+        if (ha > 0) {
+          c.globalAlpha = ha;
+          const x9 = xOf(tAlk(9)), x10 = xOf(tAlk(10)), ki = 900 + 100 * (tA - tAlk(9)) / (tAlk(10) - tAlk(9));
+          c.strokeStyle = XC.accent; c.lineWidth = 4; c.beginPath(); c.moveTo(x9, YR); c.lineTo(xa, YR); c.stroke();
+          c.setLineDash([3, 4]); c.lineWidth = 1.2; c.beginPath(); c.moveTo(xa, YR); c.lineTo(xa, BASE - 150); c.stroke(); c.setLineDash([]);
+          xDot(c, xa, YR, 5, XC.accent);
+          xText(c, `KI ${Math.round(ki)}`, xa + 8, YR + 18, { color: XC.accent, size: 14, mono: true, w: 700 });
+          xText(c, `${Math.round(ki - 900)}%`, (x9 + xa) / 2, YR + 18, { color: XC.accent, size: 12.5, mono: true, align: 'center' });
+          void x10;
+          xText(c, `KI = 900 + 100 × (${f2(tA)} − ${f2(tAlk(9))}) ÷ (${f2(tAlk(10))} − ${f2(tAlk(9))}) = ${Math.round(ki)}`, X0, 296, { color: XC.ink, size: 13.5, mono: true, w: 600 });
+          c.globalAlpha = 1;
+        }
+      }
+      if (t >= 21) {
+        c.globalAlpha = smooth01((t - 21) / 0.8);
+        xText(c, `每分鐘 3 °C:${f2(d.t3)} 分,KI ${Math.round(d.k3)}`, X0, 322, { color: XC.accent, size: 13, mono: true });
+        xText(c, `每分鐘 10 °C:${f2(d.t10)} 分,KI ${Math.round(d.k10)}`, X1, 322, { color: XC.warn, size: 13, mono: true, align: 'right' });
+        c.globalAlpha = 1;
+      }
+    },
+  };
+})();
+
+// ---------- 電子撞擊游離:分子怎麼帶電、怎麼斷 ----------
+XP.ei = (() => {
+  // α-Pinene 的碳骨架(簡化成平面):六員環 + 帶甲基的雙鍵碳 + 上方的橋與兩個甲基;B 是之後斷開帶走的 C₃H₇
+  const AT = [[0, -16], [15, -8], [15, 8], [0, 16], [-15, 8], [-15, -8], [29, -16], [-11, -30], [-26, -38], [3, -44]];
+  const BONDS = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [1, 6], [0, 7], [5, 7], [7, 8], [7, 9]];
+  const PIECE_B = { 93: [7, 8, 9], 121: [9], 136: [] };
+  const SPEC = Object.entries(CPDS.find((c) => c.id === 'apin').ms).map(([m, v]) => [+m, v]).filter(([, v]) => v >= 6);
+  const CH = { x0: 110, x1: 440, y0: 66, y1: 262 }, BEAM = 262, EXIT = [440, 164];
+  const hash1 = (i) => { let x = Math.imul((i | 0) ^ 0x2545f491, 0x9e3779b1); x ^= x >>> 15; return (x >>> 0) / 4294967295; };
+  // 一顆分子的一生:漂進來 → 被撞掉一個電子 → 抖動 → 斷開(或不斷)→ 帶電的那塊被推往出口,中性的那塊飄走
+  function mol(c, t, ev) {
+    const { t0, tIon, tVib, tBrk, out, s, y, v, label } = ev;
+    if (t < t0) return;
+    const xIn = 40 + Math.min(t - t0, (BEAM - 40) / v) * v;
+    const charged = t >= tIon, broken = t >= tBrk && out !== 136;
+    const vib = t >= tVib && t < tBrk + 0.05 ? (t - tVib) / Math.max(0.1, tBrk - tVib) : 0;
+    const lose = new Set(PIECE_B[out]);
+    // 帶電的那塊被電場往右推(等加速),中性的那塊照原來的慢速度往左下飄,逐漸淡出
+    const tb = Math.max(0, t - tBrk), dA = t >= tBrk ? 0.5 * (ev.acc || 90) * tb * tb : 0, fadeA = clamp(1 - (xIn + dA - EXIT[0]) / 120, 0, 1);
+    const offB = [-16 * tb, 13 * tb], fadeB = clamp(1 - tb / 3.5, 0, 1);
+    const pos = AT.map(([ax, ay], i) => {
+      const j = vib ? Math.sin(t * 47 + i * 2.1) * 2.6 * vib : 0, b = broken && lose.has(i);
+      return [xIn + ax * s + (b ? offB[0] : dA) + j, y + ay * s + (b ? offB[1] : (t >= tBrk ? (EXIT[1] - y) * smooth01(tb / 1.6) : 0)) + j * 0.6, b];
+    });
+    // 鍵
+    c.lineWidth = 2.4 * s;
+    for (const [a, b] of BONDS) {
+      if (broken && pos[a][2] !== pos[b][2]) continue;
+      const fa = pos[a][2] ? fadeB : fadeA; if (fa <= 0.01) continue;
+      c.strokeStyle = `rgba(163,174,192,${0.8 * fa})`; c.beginPath(); c.moveTo(pos[a][0], pos[a][1]); c.lineTo(pos[b][0], pos[b][1]); c.stroke();
+    }
+    // 帶電的那塊:一圈淡淡的青光,加一個 + 號
+    if (charged && fadeA > 0.01) {
+      let cx = 0, cy = 0, n = 0;
+      for (const [x, yy, b] of pos) if (!b) { cx += x; cy += yy; n++; }
+      cx /= n; cy /= n;
+      const R = 34 * s, gr = c.createRadialGradient(cx, cy, R * 0.2, cx, cy, R);
+      gr.addColorStop(0, `rgba(127,227,255,${0.28 * fadeA})`); gr.addColorStop(1, 'rgba(127,227,255,0)');
+      c.fillStyle = gr; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.fill();
+      c.globalAlpha = fadeA; xText(c, '+', cx + 26 * s, cy - 26 * s, { color: XC.accent, size: 18 * s, w: 800, align: 'center' }); c.globalAlpha = 1;
+    }
+    for (const [x, yy, b] of pos) {
+      const a = b ? fadeB : fadeA; if (a <= 0.01) continue;
+      xDot(c, x, yy, 5.2 * s, b ? '#6d7891' : charged ? '#bfefff' : XC.carbon, a, 0);
+    }
+    // 被撞出去的那個電子
+    if (t >= tIon && t < tIon + 1.2) { const k = (t - tIon) / 1.2; xDot(c, xIn + 10 + 120 * k, y - 20 - 90 * k, 3.4, XC.elec, 1 - k, 0.4); if (label && k < 0.8) xText(c, 'e⁻', xIn + 22 + 120 * k, y - 34 - 90 * k, { color: XC.elec, size: 12, mono: true }); }
+    if (t >= tIon && t < tIon + 0.35) { const k = (t - tIon) / 0.35; c.globalAlpha = 1 - k; c.strokeStyle = XC.elec; c.lineWidth = 2; c.beginPath(); c.arc(xIn, y, 14 + 26 * k, 0, Math.PI * 2); c.stroke(); c.globalAlpha = 1; }
+    if (!label) { if (charged && fadeA > 0.2 && t >= tBrk) xText(c, String(out), xIn + dA + 20 * s, (pos[0][1] + pos[3][1]) / 2 - 16 * s, { color: XC.accent, size: 12, mono: true, w: 700 }); return; }
+    // 標籤(第一顆分子才標)
+    const lx = xIn + dA;
+    if (t >= tIon && !broken && fadeA > 0.3) xText(c, 'M⁺•  m/z 136', lx + 42, y - 46, { color: XC.accent, size: 14, mono: true, w: 700 });
+    if (!charged) xText(c, 'α-Pinene(中性)', lx + 34, y + 30, { color: XC.ink2, size: 13 });
+    if (broken) {
+      if (fadeA > 0.3) { xText(c, 'C₇H₉⁺  m/z 93,帶正電', 296, 100, { color: XC.accent, size: 13, w: 700 }); xText(c, '被電場推往四極桿', 296, 119, { color: XC.accent, size: 12.5 }); }
+      if (fadeB > 0.3) xText(c, 'C₃H₇•(43):中性,電場推不動', 134, 240, { color: XC.muted, size: 12.5 });
+    }
+  }
+  const MAIN = { t0: 0.6, v: 40, tIon: 7.4, tVib: 13, tBrk: 15.6, out: 93, s: 1.15, y: 182, label: true };
+  const SEQ = [93, 136, 93, 121, 93, 93, 121, 93];
+  const STREAM = SEQ.map((out, i) => { const t0 = 21 + i * 1.3, v = 140; return { t0, v, acc: 220, tIon: t0 + (BEAM - 40) / v - 0.05, tVib: t0 + (BEAM - 40) / v + 0.12, tBrk: t0 + (BEAM - 40) / v + 0.45, out, s: 0.7, y: 184 + (hash1(i) - 0.5) * 22 }; });
+  return {
+    title: '電子撞擊游離:分子怎麼帶電、怎麼斷', dur: 32,
+    cues: [
+      [0, '離子源裡,燒熱的燈絲放出電子,電子被加速到 70 eV,由上往下飛過。從管柱出來的分子從左邊飄進來。'],
+      [6, '電子擦過分子,把分子的一個電子撞出去。分子少了一個電子、帶一個正電,叫分子離子 M⁺•;電子很輕,質量幾乎不變,所以 m/z 就是分子量 136。'],
+      [13, '多出來的能量讓分子劇烈振動,比較弱的鍵就斷了:帶正電的那一塊(m/z 93)被電場推往四極桿;不帶電的那一塊(43)電場推不動,被真空泵抽走。'],
+      [21, '每顆分子斷的方式不一定一樣:有的沒斷(136)、有的掉一個甲基(121)、有的掉一塊 C₃H₇(93)。同一種分子各種碎片的比例固定,依 m/z 排起來就是質譜,可以拿去和資料庫比對,像指紋一樣。'],
+    ],
+    draw(c, t) {
+      // 離子源的腔體、燈絲、推斥極、出口
+      c.strokeStyle = 'rgba(142,162,174,.6)'; c.lineWidth = 2; c.strokeRect(CH.x0, CH.y0, CH.x1 - CH.x0, CH.y1 - CH.y0);
+      c.fillStyle = 'rgba(11,18,32,.6)'; c.fillRect(CH.x0 + 1, CH.y0 + 1, CH.x1 - CH.x0 - 2, CH.y1 - CH.y0 - 2);
+      // 燈絲(線圈)與電子束
+      const fx = BEAM, glow = 0.6 + 0.4 * Math.sin(t * 9);
+      c.strokeStyle = `rgba(255,150,70,${0.75 + 0.25 * glow})`; c.lineWidth = 2.2; c.beginPath();
+      for (let i = 0; i <= 60; i++) { const x = fx - 26 + i * 52 / 60, y = 50 + 5 * Math.sin(i / 60 * Math.PI * 12); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+      c.stroke();
+      xText(c, '燈絲(燒熱放出電子)', fx + 34, 50, { color: '#ffb27a', size: 12.5 });
+      for (let i = 0; i < 26; i++) {
+        const k = ((t * 1.1 + i / 26) % 1), y = 58 + k * (CH.y1 - 58), x = fx + (hash1(i) - 0.5) * 16;
+        xDot(c, x, y, 2.3, XC.elec, 0.85 * Math.min(1, (1 - k) * 4), 0.35);
+      }
+      xText(c, '電子 70 eV ↓', fx - 34, 92, { color: XC.elec, size: 12, align: 'right' });
+      c.fillStyle = 'rgba(142,162,174,.7)'; c.fillRect(fx - 22, CH.y1 - 2, 44, 5);
+      // 推斥極(左)與出口透鏡(右)
+      c.fillStyle = 'rgba(255,138,107,.75)'; c.fillRect(CH.x0 + 10, 96, 6, 58);
+      xText(c, '推斥極 +', CH.x0 + 13, 84, { color: '#ff8a6b', size: 12, align: 'center' });
+      c.fillStyle = 'rgba(142,162,174,.8)'; c.fillRect(EXIT[0] - 3, CH.y0, 6, EXIT[1] - 18 - CH.y0); c.fillRect(EXIT[0] - 3, EXIT[1] + 18, 6, CH.y1 - EXIT[1] - 18);
+      xArrow(c, EXIT[0] + 14, EXIT[1], EXIT[0] + 66, EXIT[1], XC.accent, 2.2);
+      xText(c, '往四極桿', EXIT[0] + 40, EXIT[1] + 18, { color: XC.accent, size: 12.5, align: 'center' });
+      // 入口與真空泵
+      c.fillStyle = 'rgba(217,164,65,.35)'; c.fillRect(20, 178, CH.x0 - 20, 12);
+      xText(c, '從管柱來', 22, 206, { color: XC.muted, size: 12 });
+      xArrow(c, 160, CH.y1 + 6, 132, CH.y1 + 44, XC.muted, 1.6);
+      xText(c, '真空泵抽走中性的碎片', 120, CH.y1 + 58, { color: XC.muted, size: 12, align: 'center' });
+      // 分子
+      mol(c, t, MAIN);
+      for (const ev of STREAM) mol(c, t, ev);
+      // 質譜:跟著越來越多的離子長出來
+      const k = smooth01((t - 21.5) / 8);
+      if (k > 0) {
+        const X0 = 470, X1 = 590, Y0 = 318, HH = 70, xm = (m) => X0 + (m - 40) / 100 * (X1 - X0);
+        c.globalAlpha = Math.min(1, k * 3);
+        xText(c, '質譜(α-Pinene)', X1, Y0 - HH - 16, { color: XC.ink2, size: 12.5, w: 700, align: 'right' });
+        c.strokeStyle = XC.muted; c.lineWidth = 1; c.beginPath(); c.moveTo(X0, Y0); c.lineTo(X1, Y0); c.stroke();
+        for (const [m, v] of SPEC) { const h = HH * v / 100 * k; c.fillStyle = m === 93 || m === 136 || m === 121 ? XC.accent : '#5d7894'; c.fillRect(xm(m) - 1.6, Y0 - h, 3.2, h); }
+        for (const m of [93, 136]) xText(c, String(m), xm(m), Y0 + 12, { color: XC.accent, size: 11, mono: true, align: 'center' });
+        xText(c, '121', xm(121), Y0 - HH * 0.1 * k - 10, { color: XC.accent, size: 11, mono: true, align: 'center' });
+        xText(c, 'm/z', X0 - 4, Y0 + 12, { color: XC.muted, size: 11, mono: true, align: 'right' });
+        c.globalAlpha = 1;
+      }
+    },
+  };
+})();
+
+// ---------- 四極桿:翻轉的馬鞍(和「質譜儀-不同分析器比較」共用 assets/saddle-field.js) ----------
+XP.quad = (() => {
+  let demo = null;
+  const get = () => demo || (demo = createSaddleDemo('quad', {
+    font: XF,
+    cues: [
+      [0, '四極桿是四根平行的金屬桿,中間的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。不動的話,離子(球)一定會滾下去。'],
+      [5, '桿子上加了快速正負交替的電壓,馬鞍跟著翻來翻去。翻得夠快,球還沒滾遠就被推回來,離子就能沿著中間一路往前走。'],
+      [11, '再加上一個不變的直流電壓,馬鞍往一邊偏。這時只有一種 m/z 留得住:α-Pinene 的碎片裡,77 太輕,跟著翻轉越擺越大,被甩出去;136 太重,反應太慢,被直流慢慢拉走;只有 93 穿得過去。'],
+      [22, '把兩種電壓按固定比例一起調高,留得住的 m/z 就往上換:77、93、136 輪流通過。這台每秒從 m/z 40 掃到 400 三、四次,每掃一次就是一張質譜。'],
+    ],
+  }));
+  return {
+    title: '四極桿:為什麼一次只放行一種 m/z',
+    get dur() { return get().dur; }, get cues() { return get().cues; },
+    draw(c, t) { const d = get(); d.seek(t); d.draw(c); },
+  };
+})();
+
+const XP_KEYS = ['part', 'ki', 'ei', 'quad'];
+const xp = { k: null, t: 0, playing: true, last: 0, raf: 0, opener: null, cue: -1, cues: null, was: false };
+function xpCueIndex(t) { let k = 0; xp.cues.forEach(([at], i) => { if (t >= at - 1e-6) k = i; }); return k; }
+function openXP(k, opener) {
+  if (!XP[k]) return;
+  const first = E.xp.hidden;
+  if (first) {
+    xp.opener = opener || document.activeElement;
+    xp.was = S.playing; S.playing = false;
+    if (tourOn()) { xp.tourWas = S.tour.paused; S.tour.paused = true; }
+    E.xp.hidden = false;
+  }
+  setXPTopic(k);
+  if (first) E.xpX.focus();
+  if (!xp.raf) { xp.last = performance.now(); xp.raf = requestAnimationFrame(xpFrame); }
+}
+function closeXP() {
+  if (E.xp.hidden) return;
+  E.xp.hidden = true; cancelAnimationFrame(xp.raf); xp.raf = 0;
+  if (xp.was) S.playing = true;
+  if (tourOn()) S.tour.paused = !!xp.tourWas;
+  const o = xp.opener; xp.opener = null;
+  if (o && typeof o.focus === 'function' && document.contains(o)) o.focus();
+  markDirty();
+}
+function setXPTopic(k) {
+  const T = XP[k];
+  xp.k = k; xp.t = 0; xp.playing = !REDUCED; xp.cue = -1; xp.cues = T.cues;
+  E.xpTitle.textContent = T.title;
+  for (const b of E.xpTabs.querySelectorAll('button')) b.setAttribute('aria-selected', String(b.dataset.k === k));
+  E.xpProg.innerHTML = '<i></i>' + xp.cues.slice(1).map(([at]) => `<b style="left:${(at / T.dur * 100).toFixed(2)}%"></b>`).join('');
+  E.xpCv.setAttribute('aria-label', T.title + '的動畫');
+  if (REDUCED) xp.t = xp.cues[0][0];
+  xpDraw();
+}
+function xpSeek(t) { const T = XP[xp.k]; xp.t = clamp(t, 0, T.dur); xpDraw(); }
+function xpJump(dir) {
+  const i = xpCueIndex(xp.t), at = xp.cues[i][0];
+  if (dir < 0) xpSeek(xp.t - at > 1.5 || i === 0 ? at : xp.cues[i - 1][0]);
+  else xpSeek(i + 1 < xp.cues.length ? xp.cues[i + 1][0] : XP[xp.k].dur);
+}
+function xpToggle() {
+  const T = XP[xp.k];
+  if (xp.t >= T.dur - 1e-3) { xp.t = 0; xp.playing = true; } else xp.playing = !xp.playing;
+  xpDraw();
+}
+function xpFrame(now) {
+  xp.raf = requestAnimationFrame(xpFrame);
+  const dt = Math.min(0.1, Math.max(0, (now - xp.last) / 1000)); xp.last = now;
+  const T = XP[xp.k];
+  if (xp.playing) { xp.t = Math.min(T.dur, xp.t + dt); if (xp.t >= T.dur) xp.playing = false; }
+  xpDraw();
+}
+function xpDraw() {
+  const T = XP[xp.k], cv = E.xpCv, w = cv.clientWidth, h = cv.clientHeight;
+  if (w && h) {
+    const dpr = Math.min(devicePixelRatio || 1, 2), W = Math.round(w * dpr), H = Math.round(h * dpr);
+    if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+    const c = cv.getContext('2d'), k = W / 600;
+    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, H); c.setTransform(k, 0, 0, k, 0, 0);
+    T.draw(c, xp.t);
+  }
+  const ci = xpCueIndex(xp.t);
+  if (ci !== xp.cue) { xp.cue = ci; E.xpCap.textContent = xp.cues[ci][1]; }
+  E.xpProg.firstChild.style.width = `${(xp.t / T.dur * 100).toFixed(2)}%`;
+  const lab = xp.playing ? '暫停' : xp.t >= T.dur - 1e-3 ? '重播' : '播放';
+  if (E.xpPlay.textContent !== lab) E.xpPlay.textContent = lab;
+}
+
 /* ---------- 啟動 ---------- */
 initUI();
 S.run = getRun(S.rate);
@@ -2937,7 +3603,7 @@ function step(dt, now) {
 }
 function frame(now) {
   requestAnimationFrame(frame);
-  if (document.hidden) { lastFrame = now; return; }
+  if (document.hidden || !E.xp.hidden) { lastFrame = now; return; }   // 動畫說明開著時 3D 不畫
   if (!quality.shouldRender(now)) return;
   const dt = Math.min(0.05, Math.max(0, (now - lastFrame) / 1000)); lastFrame = now;
   if (G.ready) quality.observe(now);

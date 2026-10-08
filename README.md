@@ -8,9 +8,10 @@
 - [GC-MS](https://tung-beauregard.github.io/instrument-principles/gc-ms/)
 - [LCQ 離子之旅](https://tung-beauregard.github.io/instrument-principles/lcq-3d/)
 - [NMR 核磁共振](https://tung-beauregard.github.io/instrument-principles/nmr/)
+- [質譜儀-不同分析器比較](https://tung-beauregard.github.io/instrument-principles/mass-analyzers/)
 - [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-目前共有五份教材：離子阱質譜、GC-MS、UV-Vis 分光光度計、LCQ 離子之旅、NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。
+目前共有六份教材：離子阱質譜、GC-MS、UV-Vis 分光光度計、LCQ 離子之旅、NMR 核磁共振、質譜儀-不同分析器比較。儀器型號與規格以各教材的來源說明為準。
 
 ## 專案結構
 
@@ -22,6 +23,7 @@ assets/
   render-quality.js        教材共用畫質、幀率上限與可選效能顯示
   render-quality.css       畫質選單
   camera-nav.js            教材共用的視角操作：滾輪、觸控板、方向鍵與 WASD
+  saddle-field.js          四極柱與離子阱共用的「翻轉的馬鞍」電場示意（GC-MS 與質譜儀-不同分析器比較）
   *.svg                    品牌與儀器概念示意
 content/
   instruments.json         儀器名稱、順序、圖片、狀態與連結
@@ -32,8 +34,12 @@ lcq-3d/index.html          LCQ 離子之旅；LCQ Deca XP 拆解式 3D 導覽
 lcq-3d/MAINTENANCE.md      LCQ 離子之旅的程式結構與修改方式
 nmr/index.html             NMR 核磁共振；以 Bruker AVANCE III 500 為例，跟著訊號走一圈
 nmr/MAINTENANCE.md         NMR 教材的程式結構與修改方式
+mass-analyzers/index.html  質譜儀-不同分析器比較；四極柱、離子阱、飛行時間與 Orbitrap 的原理比較
+mass-analyzers/MAINTENANCE.md  質譜儀-不同分析器比較教材的程式結構與修改方式
 scripts/check-site.mjs     資料、相對連結與靜態備援檢查
+scripts/check-render-quality.mjs  各教材的 module 語法與畫質、幀率邏輯檢查
 scripts/check-camera-nav.mjs  共用視角操作的滾輪判斷與各教材接線檢查
+scripts/check-saddle.mjs   馬鞍電場示意的穩定條件與兩份教材的接線檢查
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
 INSTRUMENTS.md             各儀器功能、數據與示意說明
@@ -79,6 +85,7 @@ node scripts/check-site.mjs
 node --check assets/app.js
 node scripts/check-render-quality.mjs
 node scripts/check-camera-nav.mjs
+node scripts/check-saddle.mjs
 ```
 
 另需實際檢查：桌面與手機入口排版、每份教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
@@ -91,9 +98,9 @@ node scripts/check-camera-nav.mjs
 
 教材網址加上 `?perf=1` 可查看 FPS、繪圖比例與瀏覽器回報的繪圖裝置；資料僅顯示在本頁，不上傳。例如 `lcq-3d/?perf=1`。若顯示軟體繪圖，先檢查瀏覽器圖形加速與顯示驅動；畫質模式不保證特定裝置的幀率。
 
-五份 3D 教材共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
+六份 3D 教材共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
 
-維護索引：[離子阱](./lcq/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[離子之旅](./lcq-3d/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)。
+維護索引：[離子阱](./lcq/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[離子之旅](./lcq-3d/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)。
 
 ## 品牌與資料來源
 

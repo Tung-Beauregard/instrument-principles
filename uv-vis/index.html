@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UV-Vis 分光光度計 光怎麼走</title>
-<meta name="description" content="用 3D 模型拆開雙光束、雙單色器的紫外可見光分光光度計,跟著光從燈、兩片光柵與狹縫走到樣品和偵測器,看它怎麼選出一個波長、怎麼量出吸光度。">
+<meta name="description" content="用 3D 模型拆開一台紫外光與可見光的分光光度計,跟著光從燈、兩片光柵與狹縫走到樣品和偵測器,看它怎麼選出一個波長、再分兩路量出樣品吸收多少光。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -42,7 +42,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)}
 
 /* 網站分頁(和離子阱質譜、GC-MS 兩頁共用) */
-.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto}
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
 .sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
 .sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
 .sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
@@ -175,13 +176,13 @@ html.rec *{transition:none!important;animation:none!important}
 <div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
 
 <header class="hud">
-  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="./" aria-current="page">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a></nav>
+  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="./" aria-current="page">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a></nav>
   <span class="k">UV-Vis 分光光度計</span>
   <span class="big">光怎麼走</span>
-  <p class="lede">一台雙光束、雙單色器的紫外可見光分光光度計,打開來看。光從燈出發,經過兩片光柵挑出一個波長,再分成兩路穿過樣品與空白。拖曳主光柵或波長滑桿,看它怎麼選。</p>
+  <p class="lede">UV 是紫外光、Vis 是可見光;這台儀器量樣品在每個波長吸收多少光。打開來看:光從燈出發,經過兩片光柵(像光碟片那樣把光依波長散開)挑出一個波長,再分兩路,一路穿過樣品,一路穿過只裝溶劑的參考槽。拖曳主光柵或波長滑桿,看它怎麼選。</p>
   <div class="chips">
     <div class="chip panel"><small>波長</small><b id="cL">517 nm</b></div>
-    <div class="chip panel"><small>頻寬</small><b id="cB">1 nm</b></div>
+    <div class="chip panel"><small>波長寬度</small><b id="cB">1 nm</b></div>
     <div class="chip panel"><small>吸光度</small><b id="cA">0.000</b></div>
   </div>
   <div class="note panel" id="note"></div>
@@ -196,7 +197,7 @@ html.rec *{transition:none!important;animation:none!important}
   <div class="grp"><h6>波長 <span id="lv">517 nm</span></h6>
     <input type="range" id="lam" min="190" max="1100" step="1" value="517" aria-label="波長">
   </div>
-  <div class="grp"><h6>頻寬(nm)</h6>
+  <div class="grp"><h6>波長寬度(nm)</h6>
     <div class="seg mono" id="segBw">
       <button data-v="0.2">0.2</button><button data-v="0.5">0.5</button><button data-v="1" class="on">1</button><button data-v="2">2</button><button data-v="4">4</button>
     </div>
@@ -218,7 +219,7 @@ html.rec *{transition:none!important;animation:none!important}
     <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
     <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
     <li>拖曳主光柵,或用波長滑桿,改變波長</li>
-    <li>「掃描」:光柵從長波長一路轉到短波長,量出整條光譜;換頻寬再掃一次,上一條會留著比較</li>
+    <li>「掃描」:光柵從長波長一路轉到短波長,把每個波長的吸光度連成整條光譜;換一個波長寬度(常稱頻寬)再掃一次,上一條會留著比較</li>
     <li>「導覽」:自動播一遍,內容和影片相同;按 Esc 結束</li>
   </ul>
   <p class="fine">示意圖。規格取自原廠技術資料(2020 年 4 月版);機內元件的位置、角度與數量都是示意,不是實際機構。換燈點可在 300 到 450 nm 之間設定,這裡用 320 nm。光譜是依文獻吸收峰位置模擬的,不是實測數據。</p>
@@ -229,9 +230,9 @@ html.rec *{transition:none!important;animation:none!important}
   <div class="con-body">
     <div class="plotwrap"><canvas id="plot"></canvas><div class="tip" id="tip"></div></div>
     <div class="meters">
-      <div class="m"><div class="t">I 參考<b id="vR">100%</b></div><div class="bar"><i id="mR"></i></div></div>
-      <div class="m"><div class="t">I 樣品<b id="vS">0%</b></div><div class="bar"><i id="mS"></i></div></div>
-      <div class="m big"><div class="t">A = log(I參考 ÷ I樣品)</div><b class="n" id="vA">0.000</b></div>
+      <div class="m"><div class="t">參考光<b id="vR">100%</b></div><div class="bar"><i id="mR"></i></div></div>
+      <div class="m"><div class="t">樣品光<b id="vS">0%</b></div><div class="bar"><i id="mS"></i></div></div>
+      <div class="m big"><div class="t">吸光度 = log(參考光 ÷ 樣品光)</div><b class="n" id="vA">0.000</b></div>
     </div>
   </div>
 </section>
@@ -283,7 +284,7 @@ const SWITCH = 320;   // 換燈點(原廠可設 300 到 450 nm)
 const SAMPLES = {
   dpph: { name:'DPPH', full:'DPPH 甲醇溶液', peak:517, range:[200,800], step:.5, liquid:0x6b2c91, lop:.82,
           bands:[[517,.92,44],[328,.66,27],[237,.40,16]], tail:[1.4,190,11] },
-  fc:   { name:'福林酚', full:'福林酚(總酚)呈色液', peak:765, range:[400,1000], step:.5, liquid:0x2756c4, lop:.8,
+  fc:   { name:'福林酚', full:'福林酚呈色液(測總酚)', peak:765, range:[400,1000], step:.5, liquid:0x2756c4, lop:.8,
           bands:[[765,.62,118],[880,.16,80]], tail:[2.0,300,48] },
   chl:  { name:'葉綠素', full:'葉綠素 a 丙酮溶液', peak:663, range:[350,750], step:.5, liquid:0x2f8a3a, lop:.74,
           bands:[[430,1.02,13],[410,.52,14],[470,.22,16],[535,.04,14],[580,.06,11],[615,.13,11],[663,.84,10.5],[330,.18,24]], tail:[1.2,190,26] },
@@ -424,12 +425,12 @@ function screenTex(kind) {
     } else if (kind === 1) {
       c.lineWidth = 4; c.strokeRect(250, 70, 140, 150); c.globalAlpha = .35; c.fillRect(256, 110, 128, 106); c.globalAlpha = 1;
       c.beginPath(); c.moveTo(250, 240); c.lineTo(250, 252); c.lineTo(390, 252); c.lineTo(390, 240); c.stroke();
-      c.fillText('b', 320, 290 - 4); c.fillText('A = ε · b · c', w / 2, 330);
+      c.fillText('長度', 320, 290 - 4); c.fillText('A ∝ 濃度 × 長度', w / 2, 330);
     } else {
       c.lineWidth = 4; c.beginPath(); for (let i = 0; i < 9; i++) { c.moveTo(120 + i * 22, 250); c.lineTo(138 + i * 22, 232); c.lineTo(142 + i * 22, 250); } c.stroke();
       c.lineWidth = 3; c.beginPath(); c.moveTo(60, 80); c.lineTo(220, 240); c.stroke();
       ['#8a63ff', '#3fa8ff', '#3fe08a', '#ffe45c', '#ff8a3d', '#ff3b3b'].forEach((col, i) => { c.strokeStyle = col; c.beginPath(); c.moveTo(220, 240); c.lineTo(420 + i * 32, 70 + i * 14); c.stroke(); });
-      c.fillStyle = 'rgba(200,244,255,.95)'; c.fillText('mλ = d(sin α + sin β)', w / 2, 320);
+      c.fillStyle = 'rgba(200,244,255,.95)'; c.fillText('光柵把光依波長散開', w / 2, 320);
     }
   });
 }
@@ -872,17 +873,17 @@ function labelOp(key, a) {
 function labelText(key, s) { const L = LBL[key]; if (L.text !== s) { L.text = s; L.span.textContent = s; } }
 label('H', [26, BY + 2.8, -29], [27.5, BY + 6.2, -26.5], '鹵素燈', '可見光 · 近紅外');
 label('D2', [19, BY + 4, -21.5], [20, BY + 8.5, -19.5], '氘燈', '紫外光');
-label('SW', [19, BY + 1.2, -29], [17.5, BY + 5.8, -32], '換燈鏡', `${SWITCH} nm 切換`);
-label('FW', [12, BY + 5.2, -29], [12, BY + 9.5, -29], '濾片輪', '內建氧化鈥濾片');
+label('SW', [19, BY + 1.2, -29], [17.5, BY + 5.8, -32], '換燈鏡', `${SWITCH} nm 以下換燈`);
+label('FW', [12, BY + 5.2, -29], [12, BY + 9.5, -29], '濾光片輪', '含檢查波長的濾片');
 label('S1', [8, BY + 3.4, -29], [7, BY + 6.8, -26.5], '入口狹縫', null);
-label('G1', [-24, BY + 2, -29], [-24, BY + 7.5, -29], '前置光柵', '第一次分光');
+label('G1', [-24, BY + 2, -29], [-24, BY + 7.5, -29], '前置光柵', '先把光散開');
 label('S2', [2, BY + 3.4, -19.5], [2, BY + 7.5, -19.5], '中間狹縫', '只放一段波長');
 label('G2', [24, BY + 2, -11.47], [25, BY + 7.5, -11.47], '主光柵', '拖曳旋轉');
-label('S3', [0, BY + 3.4, -11.47], [0, BY + 7.5, -11.47], '出口狹縫', '頻寬 1 nm');
+label('S3', [0, BY + 3.4, -11.47], [0, BY + 7.5, -11.47], '出口狹縫', '波長寬度 1 nm');
 label('BS', [-24, BY + 1.6, 11], [-25, BY + 6.5, 11], '分光鏡', '一束分兩路');
-label('CR', [-2, BY + 3.1, 11], [-2, BY + 6.8, 9], '參考槽', '溶劑空白');
+label('CR', [-2, BY + 3.1, 11], [-2, BY + 6.8, 9], '參考槽', '只裝溶劑');
 label('CS', [-2, BY + 3.1, 21], [-2, BY + 6.8, 23], '樣品槽', 'DPPH');
-label('DET', [20, BY + 1.8, 21], [21, BY + 8, 16], '偵測器 ×2', 'Peltier 冷卻');
+label('DET', [20, BY + 1.8, 21], [21, BY + 8, 16], '偵測器 ×2', '致冷晶片降溫');
 const LBL_KEYS = Object.keys(LBL);
 
 // ================= 影片腳本(導覽與錄影共用) =================
@@ -912,20 +913,20 @@ const SBWK = [
   [44.2, 44.6, LN(.2), LN(1)], [75.3, 75.6, LN(1), LN(4)], [79.95, 80.3, LN(4), LN(.2)], [87, 87.5, LN(.2), LN(1)],
 ];
 const CAPS = [
-  [5.8, 12.6, '01 · 展開', '雙光束、雙單色器,190 到 1100 nm。拿掉外殼,跟著光從燈走到偵測器。'],
+  [5.8, 12.6, '01 · 展開', '兩次選波長、光分兩路,190 到 1100 nm。拿掉外殼,跟著光從燈走到偵測器。'],
   [13.2, 18.2, '02 · 光源', '兩顆燈分工:氘燈負責紫外光,鹵素燈負責可見光到近紅外。'],
   [18.4, 23.8, '02 · 光源', `波長低於換燈點(這裡設 ${SWITCH} nm)時,換燈鏡切進光路,改由氘燈供光。`],
-  [24.3, 28.7, '03 · 前置單色器', '光穿過入口狹縫打到第一片光柵;光柵把光依波長散開,中間狹縫只放一小段過去。'],
-  [28.9, 33.2, '03 · 前置單色器', '前置光柵讓光散過兩次;220 nm 的雜散光因此可以壓到 0.005 %T 以下。'],
-  [33.7, 37.6, '04 · 主單色器', '主光柵再散一次;轉動光柵,就能選出要量的波長。'],
-  [37.8, 44.4, '04 · 出口狹縫', '狹縫開多寬決定頻寬,0.2 到 4 nm。開得窄,譜峰分得清楚,但通過的光也少。'],
-  [45, 49.3, '05 · 分光', '分光鏡把同一束光分成兩路:一路穿過參考槽(溶劑空白),一路穿過樣品槽。'],
-  [49.5, 55, '05 · 樣品室', '樣品吸收掉一部分光;濃度越高、光徑越長,吸收越多:A = εbc。'],
-  [55.6, 59.2, '06 · 偵測器', '兩個 Peltier 致冷的光二極體,在同一瞬間各讀一路。'],
-  [59.4, 63, '06 · 偵測器', '燈光的起伏兩路同時發生,相除就抵消:A = log(I參考 ÷ I樣品)。'],
-  [63.4, 75, '07 · 掃描', '光柵邊轉邊量,每個波長的吸光度連起來就是光譜;DPPH 在 517 nm 吸收最強。'],
-  [75.5, 80.2, '08 · 頻寬', '換成氧化鈥標準溶液;它的吸收峰很尖,用來檢查波長準不準。先用 4 nm 掃一次。'],
-  [80.4, 86.6, '08 · 頻寬', '收到 0.2 nm 再掃:同樣的峰變得更尖、更高;4 nm 時峰被抹寬、壓低了。'],
+  [24.3, 28.7, '03 · 前置光柵', '光穿過入口狹縫打到第一片光柵;光柵像光碟片把光依波長散開,中間狹縫只放一段過去。'],
+  [28.9, 33.2, '03 · 前置光柵', '前置光柵讓光散開兩次;混進來的其他波長(雜散光)在 220 nm 不到 0.005 %。'],
+  [33.7, 37.6, '04 · 主光柵', '主光柵再散一次;轉動光柵,就能選出要量的波長。'],
+  [37.8, 44.4, '04 · 出口狹縫', '狹縫開多寬,決定光裡有多寬一段波長,0.2 到 4 nm。開得窄,峰分得清楚,但光也少。'],
+  [45, 49.3, '05 · 分兩路', '分光鏡把同一束光分成兩路:一路穿過只裝溶劑的參考槽,一路穿過樣品槽。'],
+  [49.5, 55, '05 · 樣品室', '樣品吸收掉一部分光;吸光度和濃度、光穿過的長度都成正比(比爾定律)。'],
+  [55.6, 59.2, '06 · 偵測器', '兩個用致冷晶片降溫的光二極體,把光變成電流,同一瞬間各量一路。'],
+  [59.4, 63, '06 · 偵測器', '燈光忽強忽弱時兩路一起變,相除就抵消:吸光度 = log(參考光 ÷ 樣品光)。'],
+  [63.4, 75, '07 · 掃描', '光柵邊轉邊量,各波長的吸光度連成光譜;紫色的 DPPH 在 517 nm(綠光)吸收最強。'],
+  [75.5, 80.2, '08 · 波長寬度', '換成氧化鈥標準溶液;它的吸收峰很尖,用來檢查波長準不準。先用寬度 4 nm 掃一次。'],
+  [80.4, 86.6, '08 · 波長寬度', '寬度縮到 0.2 nm 再掃:同樣的峰變得更尖、更高;4 nm 時峰被抹寬、壓低了。'],
 ];
 const LBL_WIN = [[13, 24, ['H', 'D2', 'SW']], [24, 33.5, ['FW', 'S1', 'G1', 'S2']], [33.5, 44.7, ['G2', 'S3']], [44.7, 55.3, ['BS', 'CR', 'CS']], [55.3, 63.2, ['DET']], [75.3, 86.6, ['CS']]];
 function track(t, segs, v0) {
@@ -1001,9 +1002,9 @@ function frameCommon(t) {
   bloom.strength = .32 + .43 * k;   // 外殼蓋著時少一點光暈,白色機殼才不會糊
   // 標籤
   for (const key of LBL_KEYS) labelOp(key, W.labels ? (W.labels[key] || 0) : sstep(.55, .9, W.explode));
-  labelText('S3', `頻寬 ${fmtBw(W.sbw)} nm`);
+  labelText('S3', `波長寬度 ${fmtBw(W.sbw)} nm`);
   labelText('CS', sm.name);
-  labelText('DET', `I參考 ${Math.round(100 * W.flick)}% · I樣品 ${pct(W.T * W.flick)}`);
+  labelText('DET', `參考光 ${Math.round(100 * W.flick)}% · 樣品光 ${pct(W.T * W.flick)}`);
   updateDOM();
 }
 
@@ -1013,10 +1014,10 @@ const cL = el('cL'), cB = el('cB'), cA = el('cA'), lamIn = el('lam'), lv = el('l
 function noteHTML() {
   const l = Math.round(W.lambda), sm = SAMPLES[W.sample];
   const lamp = W.lambda < SWITCH ? '<em class="v">氘燈</em>' : '<em class="a">鹵素燈</em>';
-  let s = `現在由${lamp}供光,兩片光柵轉到讓 <em class="c">${l} nm</em> 剛好落在狹縫上`;
+  let s = `現在由${lamp}供光,兩片光柵轉到讓 <em class="c">${l} nm</em> 的光剛好穿過狹縫`;
   if (W.lambda < 380) s += '(紫外光看不見,這裡用淡紫色畫)';
   else if (W.lambda > 780) s += '(近紅外光看不見,這裡用暗紅色畫)';
-  s += `。穿過${sm.name}之後,樣品光束只剩 <em class="c">${pct(W.T)}</em>,吸光度 <em class="c">${W.A.toFixed(3)}</em>。`;
+  s += `。穿過${sm.name}之後,光只剩參考光的 <em class="c">${pct(W.T)}</em>,吸光度 <em class="c">${W.A.toFixed(3)}</em>(吸光度每多 1,光就少到十分之一)。`;
   return s;
 }
 function updateDOM() {
@@ -1030,8 +1031,8 @@ function updateDOM() {
   const sm = SAMPLES[W.sample];
   el('conSample').textContent = sm.full;
   let lg = '';
-  if (W.scan) lg += `<span><i style="border-top:2px solid var(--cyan)"></i>掃描 ${fmtBw(W.scan.sbw)} nm</span>`;
-  if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>上一次 ${fmtBw(W.ghost.sbw)} nm</span>`;
+  if (W.scan) lg += `<span><i style="border-top:2px solid var(--cyan)"></i>掃描 寬 ${fmtBw(W.scan.sbw)} nm</span>`;
+  if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>上一次 寬 ${fmtBw(W.ghost.sbw)} nm</span>`;
   if (!W.scan && !W.ghost) lg = `<span><i style="border-top:1px dashed var(--ink-2)"></i>預覽;按「掃描」量整條光譜</span>`;
   if (lg !== lastLegend) { lastLegend = lg; el('legend').innerHTML = lg; }
   const con = el('console');
@@ -1050,8 +1051,8 @@ function updateDOM() {
     if (tk !== lastTitle) {
       lastTitle = tk;
       const tx = tk === 't'
-        ? ['UV-Vis 分光光度計', '光怎麼走', '雙光束、雙單色器,打開來看', '']
-        : ['UV-Vis 分光光度計', '雙光束 · 雙單色器', '190 到 1100 nm · 頻寬 0.2 到 4 nm · 兩個 Peltier 致冷偵測器', '示意動畫;規格取自原廠技術資料,機內元件位置與光譜曲線為示意。'];
+        ? ['UV-Vis 分光光度計', '光怎麼走', '量樣品吸收多少光,打開來看', '']
+        : ['UV-Vis 分光光度計', '兩次選波長 · 光分兩路', '190 到 1100 nm · 波長寬度 0.2 到 4 nm · 兩個用致冷晶片降溫的偵測器', '示意動畫;規格取自原廠技術資料,機內元件位置與光譜曲線為示意。'];
       ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => el(id).textContent = tx[i]);
     }
     document.querySelector('.hud').style.opacity = W.chips;
@@ -1092,7 +1093,7 @@ function drawPlot() {
     c.fillStyle = '#71858f'; c.fillText(l, x, Tp + ph + 6);
   }
   c.textAlign = 'left'; c.textBaseline = 'top'; c.fillStyle = '#71858f';
-  c.textAlign = 'right'; c.fillText('A', Lp - 7, 2);
+  c.textAlign = 'right'; c.fillText('吸光度', Lp - 7, 2);
   c.textAlign = 'left'; c.fillText('nm', 2, Tp + ph + 6);
   c.save(); c.beginPath(); c.rect(Lp, Tp - 2, pw, ph + 4); c.clip();
   // 預覽(目前頻寬下的理論曲線)
@@ -1133,7 +1134,7 @@ function valueAt(l) {
   for (const sc of [W.scan, W.ghost]) {
     if (!sc || sc.sample !== W.sample || l > sc.from || l < sc.to) continue;
     const tr = traceCached(sc), i = Math.round((sc.from - l) / sm.step);
-    if (i * 2 + 1 < tr.length) return { a: tr[i * 2 + 1], tag: `${fmtBw(sc.sbw)} nm 掃描` };
+    if (i * 2 + 1 < tr.length) return { a: tr[i * 2 + 1], tag: `寬 ${fmtBw(sc.sbw)} nm 掃描` };
   }
   return { a: absorbAt(sm, l, W.sbw), tag: '預覽' };
 }
@@ -1144,7 +1145,7 @@ plot.addEventListener('pointermove', e => {
   hoverL = m.x0 + (px - m.Lp) / m.pw * (m.x1 - m.x0);
   const v = valueAt(hoverL);
   tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${e.clientY - r.top}px`;
-  tip.textContent = `${hoverL.toFixed(1)} nm · A ${v.a.toFixed(3)} · ${v.tag}`;
+  tip.textContent = `${hoverL.toFixed(1)} nm · 吸光度 ${v.a.toFixed(3)} · ${v.tag}`;
 });
 plot.addEventListener('pointerleave', () => { hoverL = null; tip.style.display = 'none'; });
 
