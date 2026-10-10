@@ -16,6 +16,8 @@ a:focus-visible { outline: 2px solid #a5f3cd; outline-offset: 6px; }
 .site-header { padding-block: 34px; border-bottom: 1px solid #253430; }
 h1 { margin: 0; font-size: 25px; font-weight: 600; letter-spacing: .16em; }
 main { flex: 1; display: flex; align-items: center; padding-block: 76px; }
+.catalogue { width: 100%; display: grid; gap: 52px; }
+.category-title { margin: 0 0 18px; padding-bottom: 12px; border-bottom: 1px solid #253430; color: #a5f3cd; font-size: 14px; font-weight: 600; letter-spacing: .24em; }
 .instrument-grid { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
 .instrument-card { --accent: #a5f3cd; --tint: #14251e; min-width: 0; }
 .instrument-card.blue { --accent: #a4c9ef; --tint: #14212a; }
@@ -24,7 +26,7 @@ main { flex: 1; display: flex; align-items: center; padding-block: 76px; }
 .instrument-card > a:hover { border-color: var(--accent); }
 .instrument-card img { display: block; width: 100%; height: auto; padding: 16px 12px; background: radial-gradient(ellipse at center, var(--tint), #101818); }
 .card-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 22px; border-top: 1px solid #253430; }
-h2 { margin: 0; font-size: 17px; font-weight: 500; line-height: 1.5; }
+.card-label h3 { margin: 0; font-size: 17px; font-weight: 500; line-height: 1.5; }
 .card-label > span { flex-shrink: 0; color: var(--accent); font-size: 20px; }
 .pending .card-label > span { font-size: 12px; color: #9caca5; }
 .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-block: 26px; border-top: 1px solid #253430; color: #9caca5; font-size: 13px; }
@@ -39,7 +41,8 @@ h2 { margin: 0; font-size: 17px; font-weight: 500; line-height: 1.5; }
   .wrap { width: calc(100% - 48px); }
   .instrument-grid { gap: 16px; }
   .card-label { padding: 18px 14px; }
-  h2 { font-size: 15px; }
+  .card-label h3 { font-size: 15px; }
+  .catalogue { gap: 40px; }
 }
 @media (max-width: 620px) {
   .site-header { padding-block: 26px; }
@@ -48,6 +51,6 @@ h2 { margin: 0; font-size: 17px; font-weight: 500; line-height: 1.5; }
   .instrument-grid { grid-template-columns: 1fr; gap: 20px; }
   .instrument-card img { max-height: 200px; object-fit: contain; }
   .card-label { padding: 18px 20px; }
-  h2 { font-size: 17px; }
+  .card-label h3 { font-size: 17px; }
   .site-footer { padding-block: 18px; }
 }

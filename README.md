@@ -9,9 +9,11 @@
 - [LCQ 離子之旅](https://tung-beauregard.github.io/instrument-principles/lcq-3d/)
 - [NMR 核磁共振](https://tung-beauregard.github.io/instrument-principles/nmr/)
 - [質譜儀-不同分析器比較](https://tung-beauregard.github.io/instrument-principles/mass-analyzers/)
+- [層析-GC 與 HPLC](https://tung-beauregard.github.io/instrument-principles/chromatography/)
+- [光譜-光與分子](https://tung-beauregard.github.io/instrument-principles/spectroscopy/)
 - [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-目前共有六份教材：離子阱質譜、GC-MS、UV-Vis 分光光度計、LCQ 離子之旅、NMR 核磁共振、質譜儀-不同分析器比較。儀器型號與規格以各教材的來源說明為準。
+目前共有八份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、LCQ 離子之旅、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。
 
 ## 專案結構
 
@@ -23,7 +25,7 @@ assets/
   render-quality.js        教材共用畫質、幀率上限與可選效能顯示
   render-quality.css       畫質選單
   camera-nav.js            教材共用的視角操作：滾輪、觸控板、方向鍵與 WASD
-  saddle-field.js          四極柱與離子阱共用的「翻轉的馬鞍」電場示意（GC-MS 與質譜儀-不同分析器比較）
+  analyzer-fields.js       四種質量分析器的電場示意：四極柱與離子阱是翻轉的馬鞍、飛行時間是坡道地形、Orbitrap 是紡錘與碗（GC-MS 與質譜儀-不同分析器比較）
   *.svg                    品牌與儀器概念示意
 content/
   instruments.json         儀器名稱、順序、圖片、狀態與連結
@@ -36,10 +38,14 @@ nmr/index.html             NMR 核磁共振；以 Bruker AVANCE III 500 為例�
 nmr/MAINTENANCE.md         NMR 教材的程式結構與修改方式
 mass-analyzers/index.html  質譜儀-不同分析器比較；四極柱、離子阱、飛行時間與 Orbitrap 的原理比較
 mass-analyzers/MAINTENANCE.md  質譜儀-不同分析器比較教材的程式結構與修改方式
+spectroscopy/index.html    光譜-光與分子；無線電波到 X 光、螢光與拉曼，各自讓分子做什麼
+spectroscopy/MAINTENANCE.md  光譜-光與分子教材的程式結構與修改方式
+chromatography/index.html  層析-GC 與 HPLC；從茨維特的色素管柱到氣相與液相層析
+chromatography/MAINTENANCE.md  層析-GC 與 HPLC 教材的程式結構與修改方式
 scripts/check-site.mjs     資料、相對連結與靜態備援檢查
 scripts/check-render-quality.mjs  各教材的 module 語法與畫質、幀率邏輯檢查
 scripts/check-camera-nav.mjs  共用視角操作的滾輪判斷與各教材接線檢查
-scripts/check-saddle.mjs   馬鞍電場示意的穩定條件與兩份教材的接線檢查
+scripts/check-fields.mjs   四種電場示意的物理（穩定條件、射出順序、飛行時間的聚焦、Orbitrap 的頻率）與兩份教材的接線檢查
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
 INSTRUMENTS.md             各儀器功能、數據與示意說明
@@ -60,11 +66,12 @@ HTTP 網站會載入 `content/instruments.json`；此檔是儀器卡片的主要
 - `status: "ready"`：教材已完成，必須填入有效相對網址 `href`。
 - `status: "upcoming"`：僅顯示準備中狀態，不產生可點擊的教材連結。
 - `theme`：`mint`、`blue` 或 `lavender`。
+- `categories`：所屬分類的 `id`，可以填好幾個（GC-MS 同時屬於質譜與層析）。分類本身列在檔案最上方的 `categories`，依那裡的順序分區；同一分類裡依教材陣列的順序。分類裡沒有教材時不顯示那一區。
 - `name`：儀器名稱，也是入口連結文字。
 - `image`：本站 SVG 或其他靜態圖片相對路徑。
 - 修改資料後，同步更新 `index.html` 的靜態備援卡片。執行檢查避免兩份內容不一致。
 
-新增教材時，先以 `upcoming` 建立項目；完成獨立教材頁面並驗證後，更新名稱、連結與狀態。同時更新入口靜態備援，以及 W AI Studio 的卡片與介紹彈窗。
+新增教材時，先以 `upcoming` 建立項目；完成獨立教材頁面並驗證後，更新名稱、連結與狀態。同時更新入口靜態備援（每個分類一區，卡片標題的 `id` 是「分類-教材-title」）。W AI Studio 只有本站入口這一張卡片，不為各教材另加卡片。各教材上方的分頁列也要加上新教材的連結。
 
 到站人數沿用 LCQ 教材的 Abacus 計數與 `lcq-visited` 儲存記錄，避免在入口與 LCQ 間重複計算同一瀏覽器。僅正式網站會新增計數；本機預覽或無法使用儲存空間時只讀取。服務暫時不可用時顯示「—」。清除瀏覽器資料或更換瀏覽器會重新計數，因此不是精確的不重複人數。
 
@@ -85,7 +92,7 @@ node scripts/check-site.mjs
 node --check assets/app.js
 node scripts/check-render-quality.mjs
 node scripts/check-camera-nav.mjs
-node scripts/check-saddle.mjs
+node scripts/check-fields.mjs
 ```
 
 另需實際檢查：桌面與手機入口排版、每份教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
@@ -98,9 +105,9 @@ node scripts/check-saddle.mjs
 
 教材網址加上 `?perf=1` 可查看 FPS、繪圖比例與瀏覽器回報的繪圖裝置；資料僅顯示在本頁，不上傳。例如 `lcq-3d/?perf=1`。若顯示軟體繪圖，先檢查瀏覽器圖形加速與顯示驅動；畫質模式不保證特定裝置的幀率。
 
-六份 3D 教材共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
+八份 3D 教材共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
 
-維護索引：[離子阱](./lcq/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[離子之旅](./lcq-3d/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)。
+維護索引：[離子阱](./lcq/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[離子之旅](./lcq-3d/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)。
 
 ## 品牌與資料來源
 

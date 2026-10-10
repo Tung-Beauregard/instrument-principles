@@ -1,0 +1,1629 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>層析-GC 與 HPLC 的原理</title>
+<meta name="description" content="用 3D 模型看層析怎麼把成分分開:從茨維特的色素管柱開始,氣相層析(GC)用氣體推、液相層析(HPLC)用液體推,為什麼要升溫或慢慢加甲醇,峰為什麼會變寬,怎樣才分得開。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* 版面和 UV-Vis、NMR、質譜儀-不同分析器比較同一套:左上標題與讀值,右上控制,下方是層析圖的螢幕,導覽與影片共用字幕與片頭 */
+:root{
+  --bg:#0a0f13;
+  --panel:rgba(12,18,23,.80);
+  --line:rgba(160,215,235,.14);
+  --line-2:rgba(160,215,235,.30);
+  --ink:#eaf3f6; --ink-2:#a8bcc6; --muted:#71858f;
+  --cyan:#74e4ff; --amber:#ffc261; --violet:#bba6ff; --mint:#5dffb0;
+  --btn:rgba(255,255,255,.05); --btn-on:#eef6f8; --btn-on-ink:#0c1318;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --sans:'Noto Sans TC','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;touch-action:none}
+.labels{position:fixed;inset:0;pointer-events:none;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+/* 左上:標題、數值、說明 */
+.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw - 48px));pointer-events:none}
+.hud::before{content:'';position:absolute;left:-80px;top:-60px;width:620px;height:300px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 25% 35%,rgba(10,15,19,.72),rgba(10,15,19,0) 70%)}
+.hud .k{display:block;font-weight:900;font-size:28px;letter-spacing:.02em;line-height:1.1}
+.hud .big{display:block;font-weight:900;font-size:44px;line-height:1.12;color:var(--cyan);text-shadow:0 0 22px rgba(116,228,255,.35)}
+.lede{margin:10px 0 12px;font-size:13.5px;line-height:1.7;color:var(--ink-2)}
+.chips{display:flex;gap:8px;margin-bottom:10px}
+.chip{padding:7px 12px 8px;min-width:100px}
+.chip small{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.12em}
+.chip b{font-family:var(--mono);font-weight:600;font-size:18px;color:var(--cyan);white-space:nowrap}
+.note{padding:11px 14px;font-size:13px;line-height:1.75}
+.note em{font-style:normal;font-weight:700}
+/* 簡圖:左欄的平面示意 */
+.sketch{padding:10px 12px 9px}
+.sk-head{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.sk-head b{font-size:15px;font-weight:800;color:var(--ink)}
+.sk-head span{font-size:13px;font-weight:700;color:var(--cyan)}
+#sketch{display:block;width:100%;aspect-ratio:600/340}
+.sk-txt{margin:6px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink-2)}
+#btnSketch{display:none}
+.c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)} .g{color:var(--mint)}
+
+/* 網站分頁(各教材共用) */
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
+.sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
+.sitenav a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* 3D 載入中 */
+.load{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:13px;pointer-events:none;transition:opacity .5s}
+.load i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--cyan);animation:spin 1s linear infinite}
+.load.done{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.load i{animation:none}}
+
+/* 右上:控制面板 */
+.ctl{position:fixed;right:20px;top:18px;z-index:6;padding:13px 15px 14px;display:grid;grid-template-columns:auto auto;gap:12px 20px}
+.grp h6{margin:0 0 7px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em;display:flex;justify-content:space-between;gap:8px}
+.grp h6 span{font-family:var(--mono);color:var(--ink-2);letter-spacing:0}
+.grp.wide{grid-column:1 / -1}
+.seg{display:flex;gap:2px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px}
+.seg button,.btn{font:500 12.5px var(--sans);color:var(--ink-2);background:transparent;border:0;border-radius:7px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.seg button:hover,.btn:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.seg button.on{background:var(--btn-on);color:var(--btn-on-ink)}
+.seg.mono button{font-family:var(--mono);padding:6px 9px}
+.seg button:focus-visible,.btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--btn);border:1px solid var(--line);padding:6px 11px}
+.btn.on{background:var(--cyan);color:#062028;border-color:transparent}
+.btn.sq{width:32px;padding:6px 0;text-align:center;font-family:var(--mono)}
+
+.help{position:fixed;right:20px;top:200px;z-index:7;width:350px;padding:14px 16px;font-size:12.5px;line-height:1.7;display:none}
+.help.show{display:block}
+.help b{font-size:13px}
+.help ul{margin:6px 0 8px;padding-left:18px}
+.help .fine{color:var(--muted);font-size:11.5px;margin:0}
+
+/* 底部:譜的螢幕 */
+.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw - 32px));padding:11px 14px 9px}
+/* 寬螢幕:左欄有簡圖,主控台放在左欄右邊那一塊的正中間 */
+@media (min-width:981px){.console{left:calc(50vw + 202px);width:min(800px,calc(100vw - 440px))}}
+.con-head{display:flex;align-items:baseline;gap:10px;font-size:12.5px;margin-bottom:4px;white-space:nowrap}
+.con-head b{font-weight:700}
+.con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.legend{margin-left:auto;display:flex;gap:14px;color:var(--ink-2);font-size:11.5px}
+.legend i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:6px}
+.con-body{display:grid;grid-template-columns:1fr 168px;gap:14px;align-items:stretch}
+.plotwrap{position:relative}
+#plot{width:100%;height:170px;display:block;cursor:zoom-in}
+.meters{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.m .t{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.m .t b{font-family:var(--mono);font-weight:500;color:var(--ink-2)}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;width:50%;border-radius:3px;background:var(--cyan)}
+.m.big .t{margin-bottom:0}
+.m.big b.n{display:block;font-family:var(--mono);font-size:22px;font-weight:600;color:var(--cyan);line-height:1.2}
+.m.big b.n.no{color:var(--amber)}
+.console.cmpmode .con-body{grid-template-columns:1fr}
+.console.cmpmode .meters{display:none}
+.tip{position:absolute;pointer-events:none;padding:4px 8px;border-radius:6px;background:#0d151a;border:1px solid var(--line-2);font:500 11.5px var(--mono);color:var(--ink);white-space:nowrap;display:none;transform:translate(-50%,-120%)}
+
+.foot{position:fixed;left:24px;bottom:14px;z-index:4;max-width:260px;font-size:11px;line-height:1.55;color:var(--muted)}
+
+/* 元件標籤 */
+.lw{pointer-events:none}
+.blbl{font:600 14px/1 var(--mono);text-shadow:0 0 6px rgba(0,0,0,.95),0 0 2px rgba(0,0,0,.95);pointer-events:none;white-space:nowrap}
+.lbl{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:3px 8px 3px 7px;border-radius:6px;background:rgba(9,14,18,.84);border:1px solid rgba(116,228,255,.32);font-size:11.5px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.lbl i{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);flex:none}
+.lbl b{font-weight:700;color:#fff}
+.lbl span{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+
+/* 導覽與影片 */
+.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw - 40px));text-align:center;padding:13px 26px 15px}
+.cap .chap{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.16em;margin-bottom:5px}
+.cap .txt{font-size:18px;line-height:1.6;font-weight:500}
+.titlecard{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,15,19,.66) 0%,rgba(10,15,19,.4) 40%,rgba(10,15,19,0) 70%)}
+.titlecard .t1{font-weight:900;font-size:42px;letter-spacing:.04em}
+.titlecard .t2{font-weight:900;font-size:72px;color:var(--cyan);text-shadow:0 0 30px rgba(116,228,255,.4);line-height:1.15}
+.titlecard.outro .t2{font-size:44px}
+.titlecard .t3{font-size:20px;color:var(--ink-2);margin-top:14px}
+.titlecard .t4{font-size:14px;color:var(--muted);margin-top:22px}
+#tourExit{position:fixed;right:20px;top:18px;z-index:9;display:none}
+html.touring .ctl,html.touring .help,html.touring .lede,html.touring .sk-txt,html.touring .foot{display:none}
+html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
+html.touring .titlecard{display:flex}
+html.touring .cap.withcon{bottom:250px}
+/* 寬螢幕導覽:譜和影片一樣放右上角,鏡頭的構圖才不會被擋住;結束鈕移到上方中間 */
+@media (min-width:1100px) and (min-aspect-ratio:4/3){
+  html.touring .console{left:auto;right:24px;top:20px;bottom:auto;transform:none;width:min(640px,42vw)}
+  html.touring .cap.withcon{bottom:26px}
+  html.touring #tourExit{right:auto;left:50%;transform:translateX(-50%)}
+}
+
+html.film .ctl,html.film .help,html.film .lede,html.film .sk-txt,html.film .foot,html.film #tourExit,html.film .sitenav,html.film .load{display:none}
+html.film .cap{display:block;bottom:56px;max-width:1440px;padding:18px 40px 20px}
+html.film .cap .chap{font-size:16px;margin-bottom:8px}
+html.film .cap .txt{font-size:31px}
+html.film .titlecard{display:flex}
+html.film .titlecard .t1{font-size:56px}
+html.film .titlecard .t2{font-size:104px}
+html.film .titlecard.outro .t2{font-size:72px}
+html.film .titlecard .t3{font-size:28px}
+html.film .titlecard .t4{font-size:19px}
+html.film .hud{left:52px;top:44px;width:600px}
+html.film .hud::before{width:900px;height:420px}
+html.film .hud .k{font-size:34px}
+html.film .hud .big{font-size:54px}
+html.film .chips{margin-top:16px;gap:12px}
+html.film .chip{min-width:150px;padding:10px 16px 11px}
+html.film .chip small{font-size:14px}
+html.film .chip b{font-size:26px}
+html.film .sketch{padding:14px 16px 12px}
+html.film .sk-head{margin-bottom:8px;gap:12px}
+html.film .sk-head b{font-size:24px}
+html.film .sk-head span{font-size:20px}
+html.film .console{left:auto;right:52px;top:48px;bottom:auto;transform:none;width:720px;padding:16px 20px 14px}
+html.film .con-head{font-size:17px;margin-bottom:8px}
+html.film .legend{font-size:15px}
+html.film #plot{height:250px}
+html.film .con-body{grid-template-columns:1fr 200px}
+html.film .m .t{font-size:14px}
+html.film .m.big b.n{font-size:32px}
+html.film .lbl{font-size:17px;padding:5px 12px 5px 10px;border-radius:8px;gap:8px}
+html.film .blbl{font-size:20px}
+html.film .lbl span{font-size:14px}
+html.film .lbl i{width:8px;height:8px}
+html.rec *{transition:none!important;animation:none!important}
+/* 影片最後的比較表 */
+.cmp{position:fixed;left:50%;top:50%;transform:translate(-50%,-56%);z-index:8;display:none;padding:22px 26px 18px;opacity:0}
+html.film .cmp,html.touring .cmp{display:block}
+.cmp table{border-collapse:collapse;font-size:15px}
+.cmp th,.cmp td{padding:9px 18px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--line)}
+.cmp th{font-weight:700;font-size:15px}
+.cmp td:first-child,.cmp th:first-child{text-align:left;color:var(--ink-2);font-weight:500}
+.cmp tr:last-child td{border-bottom:0}
+.cmp td b{font-family:var(--mono);font-weight:600;color:var(--cyan)}
+html.film .cmp{padding:30px 38px 24px}
+html.film .cmp table{font-size:24px}
+html.film .cmp th{font-size:25px}
+html.film .cmp th,html.film .cmp td{padding:14px 30px}
+
+@media (max-width:980px){
+  .lede,.foot{display:none}
+  .ctl{left:12px;right:12px;top:auto;bottom:228px;grid-template-columns:1fr 1fr;gap:8px 12px;padding:10px 12px}
+  .ctl .grp.span2{grid-column:1 / -1}
+  .hud{left:12px;top:12px}
+  .note{display:none}
+  html.sk-open .note{display:block}
+  html.sk-open .chips,html.sk-open .sk-txt,html.sk-open .hud .k,html.sk-open .hud .big{display:none}
+  html.touring .note{display:none}
+  #btnSketch{display:inline-block}
+  .help{left:12px;right:12px;width:auto;top:120px}
+  .chip{min-width:0;flex:1}
+}
+@media (max-width:560px){
+  .ctl{bottom:220px}
+  .con-body{grid-template-columns:1fr 112px;gap:10px}
+  #plot{height:150px}
+  .hud .k{font-size:22px}
+  .hud .big{font-size:34px}
+  .chip{padding:6px 9px 7px}
+  .chip b{font-size:15px}
+  .legend{display:none}
+}
+@media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}}
+
+/* 這一頁:單欄的層析圖螢幕 */
+.ctl{grid-template-columns:auto}
+#plot{height:180px;cursor:default}
+html.film #plot{height:260px}
+.chip b{font-family:var(--sans);font-weight:700;font-size:16px}
+html.film .chip b{font-size:23px}
+/* 窄螢幕:控制面板疊在層析圖上面,不能蓋到層析圖的標題 */
+@media (max-width:980px){.ctl{bottom:252px}}
+@media (max-width:560px){#plot{height:150px}.ctl{bottom:222px;gap:6px 10px}.seg button{padding:5px 8px}}
+/* 簡圖的分頁:互動時用分頁切換,影片與導覽時改成標題 */
+.sk-tabs{display:flex;gap:2px;margin-left:auto;padding:2px;border-radius:8px;background:rgba(255,255,255,.04);pointer-events:auto}
+.sk-tabs button{font:500 12px var(--sans);color:var(--ink-2);background:transparent;border:0;border-radius:6px;padding:3px 9px;cursor:pointer;white-space:nowrap}
+.sk-tabs button:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.sk-tabs button.on{background:var(--btn-on);color:var(--btn-on-ink)}
+.sk-tabs button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+html:not(.film):not(.touring) #skTitle,html:not(.film):not(.touring) #skSub{display:none}
+html.film .sk-tabs,html.touring .sk-tabs{display:none}
+.sk-head span#skSub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+}}
+</script>
+<link rel="stylesheet" href="../assets/render-quality.css">
+</head>
+<body>
+<div id="stage"></div>
+<div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
+
+<header class="hud">
+  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="./" aria-current="page">層析</a></nav>
+  <span class="k">層析</span>
+  <span class="big">把混在一起的成分分開</span>
+  <p class="lede">樣品被一種會流動的東西(氣體或液體)帶著往前走,管子裡另有一種不動的東西會把分子拉住。每種分子被拉住的時間不一樣,走得快慢就不一樣,到出口時已經分開。氣相層析(GC)用氣體推,液相層析(HPLC)用液體推。</p>
+  <div class="chips">
+    <div class="chip panel"><small>推著走的</small><b id="cM">—</b></div>
+    <div class="chip panel"><small>拉住分子的</small><b id="cS">—</b></div>
+    <div class="chip panel"><small>分得開嗎</small><b id="cR">—</b></div>
+  </div>
+  <div class="note panel sketch" id="note">
+    <div class="sk-head"><b id="skTitle">管子裡面</b><span id="skSub"></span><span class="sk-tabs" id="skTabs"><button data-v="micro" class="on">管子裡面</button><button data-v="broad">峰變寬</button><button data-v="rs">分得開嗎</button></span></div>
+    <canvas id="sketch" role="img" aria-label="管子裡面的放大圖:分子在會流動的那一相和不動的那一相之間進出"></canvas>
+    <p class="sk-txt" id="skTxt"></p>
+  </div>
+</header>
+
+<aside class="ctl panel" id="ctl">
+  <div class="grp wide"><h6>儀器</h6>
+    <div class="seg" id="segInst"><button data-v="tsw">茨維特的管柱</button><button data-v="gc" class="on">氣相層析 GC</button><button data-v="lc">液相層析 HPLC</button></div>
+  </div>
+  <div class="grp wide" id="grpCond"><h6 id="condName">溫度</h6>
+    <div class="seg" id="segCond"></div>
+  </div>
+  <div class="grp wide" id="grpPart"><h6>填充顆粒</h6>
+    <div class="seg" id="segPart"><button data-v="5" class="on">5 µm</button><button data-v="1.7">1.7 µm</button></div>
+  </div>
+  <div class="grp wide">
+    <div class="row">
+      <button class="btn" id="btnRun">進樣</button>
+      <button class="btn" id="btnTour">導覽</button>
+      <button class="btn" id="btnSketch">放大圖</button>
+      <button class="btn sq" id="btnHelp" aria-label="說明">?</button>
+    </div>
+  </div>
+</aside>
+
+<div class="help panel" id="help">
+  <b>操作</b>
+  <ul>
+    <li>選一種儀器,鏡頭會移過去;按「進樣」打一針,看各成分在管子裡分開,下面的層析圖一支一支長出來</li>
+    <li>GC 可以比較「恆溫」和「升溫」;HPLC 可以比較「固定比例」和「慢慢加甲醇」,也可以換更細的填充顆粒</li>
+    <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
+    <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
+    <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
+    <li>「導覽」自動播一遍,內容和影片相同,按 Esc 結束</li>
+  </ul>
+  <p class="fine" id="helpFine">示意圖:儀器外觀、管柱長短與流速都經過縮放。GC 的滯留模型和 GC-MS 教材相同(HP-5MS 30 m 管柱,精油成分取其中六種);HPLC 的五種植物酚類在 C18 管柱上的先後與滯留,是依常見的反相層析規律設定的示意值;茨維特色素帶的先後依他 1906 年的論文,速度是示意。來源見 INSTRUMENTS.md。</p>
+</div>
+
+<section class="console panel" id="console">
+  <div class="con-head"><b id="conTitle">層析圖</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
+  <div class="plotwrap"><canvas id="plot"></canvas><div class="tip" id="tip"></div></div>
+</section>
+
+<div class="foot" id="foot">氣相層析與液相層析的原理示意;滯留時間由簡化的模型算出,不是實測數據。</div>
+
+<div class="cap panel" id="cap"><div class="chap" id="chap"></div><div class="txt" id="capTxt"></div></div>
+<div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
+<div class="cmp panel" id="cmp"></div>
+<button class="btn" id="tourExit">結束導覽</button>
+
+<script type="module">
+// ==== 00_core.js ====
+import { createQualityControls } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
+const $ = (s) => document.querySelector(s);
+const el = (id) => document.getElementById(id);
+const Q = new URLSearchParams(location.search);
+const FILM = Q.has('film'), REC = Q.has('rec');
+const root = document.documentElement;
+if (FILM) root.classList.add('film');
+if (REC) root.classList.add('rec');
+window.__err = null;
+addEventListener('error', (e) => { window.__err = String(e.message || e); });
+
+// ================= 小工具 =================
+const TAU = Math.PI * 2;
+const V3 = THREE.Vector3;
+const v3 = (x = 0, y = 0, z = 0) => new V3(x, y, z);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+const approach = (cur, target, rate, dt) => cur + (target - cur) * (1 - Math.exp(-rate * dt));
+const win = (t, a, b, f = 0.4) => sstep(a, a + f, t) * (1 - sstep(b - f, b, t));
+const hash1 = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+// 固定種子的亂數:同一個種子每次都得到同一串,影片任意跳到哪一格都一樣
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const MONO = "'IBM Plex Mono',Consolas,monospace";
+const SANS = "'Noto Sans TC','Microsoft JhengHei',sans-serif";
+const COL = { cyan: '#74e4ff', amber: '#ffc261', mint: '#5dffb0', violet: '#bba6ff', rose: '#ff7a9a', ink: '#eaf3f6', ink2: '#a8bcc6', muted: '#71858f' };
+const f1 = (x) => (Math.round(x * 10) / 10).toFixed(1);
+
+// ================= 三種管柱與它們的成分 =================
+// 每一次分析:各成分沿管柱走了多遠 z(0 是入口,1 是出口)隨時間的變化、抵達出口的時間 tR、峰寬 σ(分鐘)
+// 走的速度 dz/dt = 1 / (tM × (1 + k)):tM 是完全不被拉住的東西走完全程的時間,k 是「被拉住的時間 ÷ 往前走的時間」
+
+// --- GC:和 GC-MS 教材同一個模型(HP-5MS 30 m × 0.25 mm × 0.25 µm,He 1 mL/min);ln k 由保留指數 KI 與溫度算 ---
+const R_GAS = 8.314;
+const lnkGC = (ki, Tc) => { const x = ki / 100, T = Tc + 273.15; return (45000 + 4600 * (x - 10)) / (R_GAS * T) - (14.2 + 0.8 * (x - 10)); };
+const GC_CPDS = [
+  { id: 'apin', name: 'α-蒎烯', ki: 939, amt: 1.0, col: '#5aa2ff' },
+  { id: 'lim', name: '檸檬烯', ki: 1029, amt: 0.7, col: '#5dffb0' },
+  { id: 'cin', name: '1,8-桉葉油醇', ki: 1031, amt: 0.8, col: '#ff7ad1' },
+  { id: 'lin', name: '沉香醇', ki: 1096, amt: 0.6, col: '#ffc261' },
+  { id: 'camphor', name: '樟腦', ki: 1146, amt: 0.75, col: '#ff8a6b' },
+  { id: 'caryo', name: '石竹烯', ki: 1417, amt: 0.55, col: '#bba6ff' },
+];
+const GC_CONDS = {
+  iso100: { label: '恆溫 100 °C', short: '100 °C', T: () => 100, tEnd: 36 },
+  iso140: { label: '恆溫 140 °C', short: '140 °C', T: () => 140, tEnd: 8 },
+  ramp: { label: '升溫', short: '升溫', T: (t) => Math.min(60 + 10 * Math.max(0, t), 220), tEnd: 13 },
+};
+const GC_COL = { tM: 1.37, N: 70000, sig0: 0.0006 };
+
+// --- HPLC:反相 C18 管柱 150 × 4.6 mm,流速 1 mL/min,水與甲醇 ---
+// log k = log kw − S × 甲醇比例(反相層析常見的線性關係);五個成分的 kw 與 S 是依它們在 C18 上的先後順序設的示意值
+const LC_CPDS = [
+  { id: 'gal', name: '沒食子酸', lkw: 1.0, S: 3.5, amt: 0.8, col: '#5aa2ff' },
+  { id: 'cat', name: '兒茶素', lkw: 2.0, S: 4.0, amt: 0.6, col: '#5dffb0' },
+  { id: 'epi', name: '表兒茶素', lkw: 2.3, S: 4.1, amt: 0.5, col: '#bba6ff' },
+  { id: 'fer', name: '阿魏酸', lkw: 2.6, S: 4.2, amt: 1.0, col: '#ffc261' },
+  { id: 'que', name: '槲皮素', lkw: 3.6, S: 4.8, amt: 0.7, col: '#ff8a6b' },
+];
+const LC_CONDS = {
+  iso50: { label: '固定 50% 甲醇', short: '50%', phi: () => 0.5, tEnd: 30 },
+  grad: { label: '甲醇慢慢增加', short: '10→90%', phi: (t) => clamp(0.1 + (0.8 * (t - 0.8)) / 15, 0.1, 0.9), tEnd: 17 },
+};
+// 填充顆粒越細,理論板數越多(峰越窄);同樣的流速下,壓力和粒徑的平方成反比
+// 板數用常見的估法 N ≈ 300 × 管長(mm) ÷ 粒徑(µm) 再取整:150 mm、5 µm 約一萬;壓力是 50% 甲醇的估計(純水大約六成)
+const LC_PART = { 5: { N: 10000, bar: 100 }, 1.7: { N: 29000, bar: 900 } };
+const LC_COL = { tM: 1.5 };
+
+// --- 茨維特的管柱:葉子的色素、碳酸鈣粉、石油醚;速度是示意 ---
+const TSW_CPDS = [
+  { id: 'car', name: '胡蘿蔔素', k: 0.15, amt: 0.8, col: '#ff9d3a' },
+  { id: 'xan', name: '葉黃素', k: 1.0, amt: 0.6, col: '#ffd84a' },
+  { id: 'cha', name: '葉綠素 a', k: 2.0, amt: 1.0, col: '#2fbf8f' },
+  { id: 'chb', name: '葉綠素 b', k: 3.0, amt: 0.7, col: '#9acd32' },
+];
+const TSW = { tM: 1.0, tEnd: 5.2 };
+
+const CPDS_OF = { tsw: TSW_CPDS, gc: GC_CPDS, lc: LC_CPDS };
+const CONDS_OF = { gc: GC_CONDS, lc: LC_CONDS };
+const NAME_OF = { tsw: '茨維特的管柱', gc: '氣相層析 GC', lc: '液相層析 HPLC' };
+
+// 跑一次分析;結果記起來,同一組條件只算一次
+const RUNC = new Map();
+function runOf(inst, cond, part = 5) {
+  const key = inst === 'lc' ? `lc|${cond}|${part}` : `${inst}|${cond}`;
+  if (RUNC.has(key)) return RUNC.get(key);
+  const dt = 0.004, out = { key, inst, cond, part, dt, cpds: [] };
+  if (inst === 'gc') {
+    const C = GC_CONDS[cond]; out.tEnd = C.tEnd; out.tM = GC_COL.tM;
+    const sigL = Math.sqrt(1 / GC_COL.N + GC_COL.sig0 * GC_COL.sig0);
+    for (const c of GC_CPDS) {
+      const zs = [0]; let z = 0, t = 0, tR = null;
+      while (t < C.tEnd + 0.02) { const v = 1 / (GC_COL.tM * (1 + Math.exp(lnkGC(c.ki, C.T(t))))); if (tR === null && z + v * dt >= 1) tR = t + (1 - z) / v; z += v * dt; t += dt; zs.push(z); }
+      const tr = tR ?? C.tEnd + 99, ke = Math.exp(lnkGC(c.ki, C.T(Math.min(tr, C.tEnd))));
+      out.cpds.push({ c, zs, tR: tr, sig: sigL * GC_COL.tM * (1 + ke), kE: ke });
+    }
+  } else if (inst === 'lc') {
+    const C = LC_CONDS[cond]; out.tEnd = C.tEnd; out.tM = LC_COL.tM;
+    const N = LC_PART[part].N;
+    for (const c of LC_CPDS) {
+      // 梯度從入口往出口推進:位置 z 的分子碰到的,是 z × tM 分鐘之前進入管柱的溶劑
+      const kAt = (t, z) => 10 ** (c.lkw - c.S * C.phi(t - z * LC_COL.tM));
+      const zs = [0]; let z = 0, t = 0, tR = null;
+      while (t < C.tEnd + 0.02) { const v = 1 / (LC_COL.tM * (1 + kAt(t, z))); if (tR === null && z + v * dt >= 1) tR = t + (1 - z) / v; z += v * dt; t += dt; zs.push(z); }
+      const tr = tR ?? C.tEnd + 99, ke = kAt(Math.min(tr, C.tEnd), 1);
+      out.cpds.push({ c, zs, tR: tr, sig: (LC_COL.tM * (1 + ke)) / Math.sqrt(N), kE: ke });
+    }
+  } else {
+    out.tEnd = TSW.tEnd; out.tM = TSW.tM;
+    for (const c of TSW_CPDS) {
+      const v = 1 / (TSW.tM * (1 + c.k)), zs = [];
+      for (let t = 0; t <= out.tEnd + 0.02; t += dt) zs.push(v * t);
+      out.cpds.push({ c, zs, tR: TSW.tM * (1 + c.k), sig: 0.045 * (1 + c.k), kE: c.k });
+    }
+  }
+  // 峰高 = 量 ÷ (σ√2π):同樣的量,峰越寬就越矮
+  out.hMax = 0;
+  for (const cp of out.cpds) { cp.h = (cp.c.amt || 1) / (cp.sig * Math.sqrt(TAU)); if (cp.tR <= out.tEnd) out.hMax = Math.max(out.hMax, cp.h); }
+  RUNC.set(key, out);
+  return out;
+}
+// 第 t 分鐘時,這個成分走到哪裡(0 到 1)
+function zAt(r, cp, t) { const i = t / r.dt, j = Math.floor(i); if (j <= 0) return Math.max(0, cp.zs[0]); if (j >= cp.zs.length - 1) return cp.zs[cp.zs.length - 1]; return lerp(cp.zs[j], cp.zs[j + 1], i - j); }
+// 管柱裡色帶的寬度(以管長為 1):一開始就有的寬度,加上越走越散開的部分;GC 與 HPLC 的帶子很窄,畫面上放大 4 倍
+function bandSigZ(r, z) {
+  z = clamp(z, 0, 1);
+  if (r.inst === 'gc') return Math.max(0.006, 4 * Math.sqrt(GC_COL.sig0 ** 2 + z / GC_COL.N));
+  if (r.inst === 'lc') return Math.max(0.006, 4 * Math.sqrt(0.002 ** 2 + z / LC_PART[r.part].N));
+  return Math.sqrt(0.022 ** 2 + z * 0.0011);
+}
+// 偵測器在第 t 分鐘收到的訊號(以這次分析最高的峰為 1,或傳入共同的 hMax)
+function sigAt(r, t, hMax = r.hMax) { let s = 0; for (const cp of r.cpds) { const u = (t - cp.tR) / cp.sig; if (u > -7 && u < 7) s += cp.h * Math.exp(-0.5 * u * u); } return s / hMax; }
+// 相鄰兩支峰的分離度 Rs = 峰頂的距離 ÷ 兩支峰底寬的平均(底寬 = 4σ);傳回最難分開的那一對
+function pairsOf(r, upto = Infinity) {
+  const cs = r.cpds.filter((c) => c.tR <= Math.min(r.tEnd, upto)).sort((a, b) => a.tR - b.tR), out = [];
+  for (let i = 1; i < cs.length; i++) out.push({ a: cs[i - 1], b: cs[i], rs: (cs[i].tR - cs[i - 1].tR) / (2 * (cs[i].sig + cs[i - 1].sig)) });
+  return out;
+}
+function worstRs(r, upto = Infinity) { let w = null; for (const p of pairsOf(r, upto)) if (!w || p.rs < w.rs) w = p; return w; }
+const rsWord = (rs) => (rs < 1 ? '黏在一起' : rs < 1.5 ? '差一點' : '分開了');
+
+// ==== 10_scene.js ====
+// ================= 場景 =================
+// 場景單位約等於公分(管柱的粗細放大過);地面 y = 0。左邊是茨維特的玻璃管柱,中間是 GC,右邊是 HPLC
+let DPR = REC ? 1 : quality.pixelRatio(innerWidth, innerHeight, 1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: REC, powerPreference: 'high-performance' });
+renderer.setPixelRatio(DPR);
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+$('#stage').appendChild(renderer.domElement);
+window.__gl = (() => { try { const gl = renderer.getContext(), x = gl.getExtension('WEBGL_debug_renderer_info'); return x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { return '?'; } })();
+
+const labelR = new CSS2DRenderer();
+labelR.setSize(innerWidth, innerHeight);
+labelR.domElement.className = 'labels';
+document.body.appendChild(labelR.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a1015);
+scene.fog = new THREE.Fog(0x0a1015, 1000, 2600);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.34;
+
+// 三個站的中心
+const ST = { tsw: -300, gc: 0, lc: 300 };
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.5, 4000);
+camera.position.set(60, 226, 700); // 一開始看 GC(和互動模式的 IVIEW.gc 相同)
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 98, -10);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 30; controls.maxDistance = 1400; controls.maxPolarAngle = 1.5;
+// 直式的窄螢幕:下半部被控制面板和層析圖蓋住,鏡頭往後拉、畫面往上移;視窗還沒有大小時不調整
+// kMax:又高又細的東西(茨維特的管柱)不用拉那麼遠
+function fitPortrait(p, q, kMax = 2.4) {
+  const asp = innerWidth / innerHeight;
+  if (!(asp > 0) || asp >= 1.2) return [p, q];
+  const k = clamp(1.3 / asp, 1, kMax), np = q.clone().add(p.clone().sub(q).multiplyScalar(k));
+  const lift = 0.36 * np.distanceTo(q) * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  return [np.setY(np.y - lift), q.clone().setY(q.y - lift)];
+}
+{ const [p, q] = fitPortrait(camera.position.clone(), controls.target.clone()); camera.position.copy(p); controls.target.copy(q); }
+controls.update();
+function fitClip(look) {
+  const d = camera.position.distanceTo(look);
+  camera.near = clamp(d * 0.02, 0.05, 8);
+  camera.far = Math.max(3000, d * 6);
+  camera.updateProjectionMatrix();
+}
+
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.45, 1.3);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.HemisphereLight(0xcfe6ff, 0x1b1712, 0.55));
+const keyL = new THREE.DirectionalLight(0xffffff, 1.3);
+keyL.position.set(160, 520, 380); keyL.castShadow = true;
+keyL.shadow.mapSize.set(2048, 2048);
+Object.assign(keyL.shadow.camera, { left: -480, right: 520, top: 320, bottom: -260, near: 60, far: 1500 });
+keyL.shadow.bias = -0.0004; keyL.shadow.normalBias = 0.6;
+scene.add(keyL);
+keyL.target.position.set(30, 60, 0); scene.add(keyL.target);
+const rimL = new THREE.DirectionalLight(0x74e4ff, 0.3); rimL.position.set(-380, 220, -420); scene.add(rimL);
+
+// ---------- 地台與牆 ----------
+function canvasTex(w, h, draw, repeat) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+  return t;
+}
+const deck = new THREE.Mesh(new THREE.BoxGeometry(2000, 8, 700), new THREE.MeshStandardMaterial({ color: 0x141b20, roughness: 0.58, metalness: 0.1 }));
+deck.position.set(40, -4, 40); deck.receiveShadow = true; scene.add(deck);
+const deckStrip = new THREE.Mesh(new THREE.BoxGeometry(2000, 1.2, 1.4), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.25, 0.85, 1.1) }));
+deckStrip.position.set(40, -1.2, 390.4); scene.add(deckStrip);
+const wallTex = canvasTex(1024, 512, (c, w, h) => {
+  c.fillStyle = '#121a20'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 3;
+  for (let x = 0; x <= w; x += 128) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+  c.beginPath(); c.moveTo(0, 340); c.lineTo(w, 340); c.stroke();
+}, [3, 1]);
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(2000, 760), new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.95 }));
+wall.position.set(40, 330, -300); scene.add(wall);
+
+// ==== 20_parts.js ====
+// ================= 場景裡的東西 =================
+const MAT = {
+  steel: new THREE.MeshStandardMaterial({ color: 0xaab6bf, roughness: 0.28, metalness: 0.85 }),
+  steel2: new THREE.MeshStandardMaterial({ color: 0x9fadb8, roughness: 0.3, metalness: 0.8, side: THREE.DoubleSide }),
+  metal: new THREE.MeshStandardMaterial({ color: 0x8ea2ae, roughness: 0.34, metalness: 0.72 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x1b2329, roughness: 0.62, metalness: 0.3 }),
+  case: new THREE.MeshStandardMaterial({ color: 0x2e3942, roughness: 0.52, metalness: 0.28 }),
+  bezel: new THREE.MeshStandardMaterial({ color: 0x45535e, roughness: 0.45, metalness: 0.32 }),
+  cavity: new THREE.MeshStandardMaterial({ color: 0x5c5852, roughness: 0.5, metalness: 0.62 }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0xcfe9f5, roughness: 0.05, metalness: 0, transmission: 0.6, transparent: true, opacity: 0.26, depthWrite: false, side: THREE.DoubleSide }),
+  poly: new THREE.MeshStandardMaterial({ color: 0xa8682a, roughness: 0.36, metalness: 0.1, emissive: 0x3a1c06 }),
+  peek: new THREE.MeshStandardMaterial({ color: 0xc9b48a, roughness: 0.45, metalness: 0.05 }),
+  he: new THREE.MeshStandardMaterial({ color: 0x6f7c86, roughness: 0.4, metalness: 0.55 }),
+  rubber: new THREE.MeshStandardMaterial({ color: 0x7a2630, roughness: 0.7, metalness: 0 }),
+  cap: new THREE.MeshStandardMaterial({ color: 0x2a4a8a, roughness: 0.5, metalness: 0.1 }),
+  silica: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.62, metalness: 0.05 }),
+};
+function mk(geo, mat, x = 0, y = 0, z = 0, parent = scene, shadow = true) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); if (shadow) { m.castShadow = true; m.receiveShadow = true; } parent.add(m); return m; }
+const box = (w, h, d, mat, x, y, z, p) => mk(new THREE.BoxGeometry(w, h, d), mat, x, y, z, p);
+const cyl = (r0, r1, h, mat, x, y, z, p, seg = 28, open = false) => mk(new THREE.CylinderGeometry(r0, r1, h, seg, 1, open), mat, x, y, z, p);
+function tube(pts, r, mat, p = scene, seg = 64) { const c = new THREE.CatmullRomCurve3(pts.map((q) => v3(...q))); return mk(new THREE.TubeGeometry(c, seg, r, 8, false), mat, 0, 0, 0, p, false); }
+const glowMat = (c = 0x000000) => new THREE.MeshBasicMaterial({ color: c, toneMapped: false });
+const hexRGB = (h) => { const n = parseInt(h.slice(1), 16); return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]; };
+// 發光的小點(層析帶裡的分子群)
+const dotTex = (() => {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 64; const c = cv.getContext('2d');
+  const g = c.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,.6)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  c.fillStyle = g; c.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(cv);
+})();
+// 顏色有第四個分量(透明度):重疊的點不會疊成一片白,還看得出是哪個成分
+function makePoints(n, size, depthTest = true) {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3).setUsage(THREE.DynamicDrawUsage));
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 4), 4).setUsage(THREE.DynamicDrawUsage));
+  const m = new THREE.PointsMaterial({ size, map: dotTex, vertexColors: true, transparent: true, depthWrite: false, depthTest, sizeAttenuation: true, toneMapped: false });
+  const p = new THREE.Points(g, m); p.frustumCulled = false; scene.add(p); return p;
+}
+
+// ---------- 茨維特的玻璃管柱 ----------
+// 碳酸鈣粉從 y = TS.bot 填到 TS.top;色素帶畫在粉柱的貼圖上
+const TS = { top: 192, bot: 64, r: 7.2 }; TS.L = TS.top - TS.bot;
+const TSG = new THREE.Group(); TSG.position.x = ST.tsw; scene.add(TSG);
+box(84, 5, 60, MAT.dark, 0, 2.5, -8, TSG);
+cyl(2.2, 2.2, 240, MAT.steel, -32, 120, -20, TSG, 16);
+for (const y of [200, 80]) {
+  const arm = box(38, 3, 3, MAT.steel, -16, y, -10, TSG); arm.rotation.y = -Math.atan2(20, 32);
+  const ring = mk(new THREE.TorusGeometry(9, 1.2, 8, 28), MAT.steel, 0, y, 0, TSG); ring.rotation.x = Math.PI / 2;
+}
+cyl(8, 8, 170, MAT.glass, 0, 133, 0, TSG, 32, true);
+cyl(8, 1.4, 12, MAT.glass, 0, 42, 0, TSG, 32, true);
+cyl(0.9, 0.9, 12, MAT.glass, 0, 30, 0, TSG, 12, true);
+{ const ck = cyl(1.6, 1.6, 9, MAT.peek, 0, 33, 0, TSG, 12); ck.rotation.z = Math.PI / 2; }
+const tswCv = document.createElement('canvas'); tswCv.width = 4; tswCv.height = 256;
+const tswTex = new THREE.CanvasTexture(tswCv); tswTex.colorSpace = THREE.SRGBColorSpace;
+const packMat = new THREE.MeshStandardMaterial({ map: tswTex, emissiveMap: tswTex, emissive: 0xffffff, emissiveIntensity: 0.2, roughness: 0.92 });
+cyl(TS.r, TS.r, TS.L, packMat, 0, (TS.top + TS.bot) / 2, 0, TSG, 40);
+cyl(TS.r, TS.r, 4, new THREE.MeshStandardMaterial({ color: 0xd9d4c8, roughness: 1 }), 0, TS.bot - 2, 0, TSG, 40);
+cyl(TS.r, TS.r, 16, new THREE.MeshStandardMaterial({ color: 0xbfe6f2, roughness: 0.1, transparent: true, opacity: 0.3, depthWrite: false }), 0, TS.top + 8, 0, TSG, 40);
+cyl(14, 13, 26, MAT.glass, 0, 17, 0, TSG, 36, true);
+const beakMat = new THREE.MeshStandardMaterial({ color: 0xcfe6ee, roughness: 0.15, transparent: true, opacity: 0.55, depthWrite: false });
+const beakLiq = cyl(12.4, 12.1, 1, beakMat, 0, 6, 0, TSG, 36);
+const dropMat = new THREE.MeshStandardMaterial({ color: 0xcfe6ee, roughness: 0.1, transparent: true, opacity: 0.75 });
+const drop = mk(new THREE.SphereGeometry(1.1, 12, 8), dropMat, 0, 22, 0, TSG, false);
+const PAPER = [0.93, 0.915, 0.86];
+const TSW_RGB = TSW_CPDS.map((c) => hexRGB(c.col));
+
+// ---------- GC:氦氣鋼瓶、進樣口、烘箱裡的管柱、偵測器 ----------
+const GCG = new THREE.Group(); GCG.position.x = ST.gc; scene.add(GCG);
+box(214, 12, 112, MAT.case, 19, 6, -12, GCG);
+box(170, 5, 100, MAT.cavity, 0, 14.5, -12, GCG);
+box(170, 5, 100, MAT.case, 0, 139.5, -12, GCG);
+box(5, 130, 100, MAT.case, -82.5, 77, -12, GCG);
+box(5, 130, 100, MAT.case, 82.5, 77, -12, GCG);
+box(170, 130, 5, MAT.cavity, 0, 77, -59.5, GCG);
+// 內襯(和外殼隔開一點,避免兩個面重疊閃爍)
+box(1, 118, 92, MAT.cavity, -79.2, 77, -14, GCG);
+box(1, 118, 92, MAT.cavity, 79.2, 77, -14, GCG);
+box(156, 1, 92, MAT.cavity, 0, 136.2, -14, GCG);
+for (const [w, h, x, y] of [[170, 6, 0, 139], [170, 6, 0, 15], [6, 130, -82, 77], [6, 130, 82, 77]]) box(w, h, 4, MAT.bezel, x, y, 39, GCG);
+// 右邊的控制箱與螢幕
+box(44, 136, 104, MAT.case, 107, 80, -12, GCG);
+mk(new THREE.PlaneGeometry(28, 15), glowMat(new THREE.Color(0.05, 0.22, 0.28)), 107, 116, 40.2, GCG, false);
+for (let i = 0; i < 9; i++) box(5, 3.4, 1.6, MAT.bezel, 98 + (i % 3) * 9, 96 - Math.floor(i / 3) * 7, 40.4, GCG);
+// 烘箱後面的風扇
+for (const r of [22, 15, 8]) mk(new THREE.TorusGeometry(r, 0.7, 6, 40), MAT.metal, 0, 78, -56.6, GCG, false);
+for (let i = 0; i < 3; i++) { const s = box(44, 1.4, 1, MAT.metal, 0, 78, -56.4, GCG); s.rotation.z = (i * Math.PI) / 3; }
+const ovenLight = new THREE.PointLight(0xff8a3a, 0, 260, 1.6); ovenLight.position.set(0, 82, 2); GCG.add(ovenLight);
+// 管柱:30 m 的細管盤成彈簧形(真的管柱是平平的一圈一圈;這裡拉開來比較看得清楚)
+const COIL = { x0: -62, x1: 62, cy: 78, cz: -14, R: 30, turns: 7 };
+const coilPts = [v3(-50, 141, -14), v3(-51, 132, -14), v3(-55, 121, -14)];
+{ const NT = 40 * COIL.turns; for (let i = 0; i <= NT; i++) { const u = i / NT, th = Math.PI / 2 + u * COIL.turns * TAU; coilPts.push(v3(lerp(COIL.x0, COIL.x1, u), COIL.cy + COIL.R * Math.sin(th), COIL.cz + COIL.R * Math.cos(th))); } }
+coilPts.push(v3(55, 121, -14), v3(51, 132, -14), v3(50, 141, -14));
+const coilCurve = new THREE.CatmullRomCurve3(coilPts, false, 'centripetal');
+mk(new THREE.TubeGeometry(coilCurve, 2400, 1.0, 6, false), MAT.poly, 0, 0, 0, GCG, false);
+const COIL_LUT = coilCurve.getSpacedPoints(3000).map((p) => p.add(v3(ST.gc, 0, 0)));
+for (const x of [COIL.x0 - 3, COIL.x1 + 3]) { const r = mk(new THREE.TorusGeometry(COIL.R + 1.5, 0.6, 6, 48), MAT.metal, x, COIL.cy, COIL.cz, GCG, false); r.rotation.y = Math.PI / 2; }
+for (let i = 0; i < 4; i++) { const a = (i * TAU) / 4 + Math.PI / 4; const b = box(COIL.x1 - COIL.x0 + 6, 1, 1, MAT.metal, 0, COIL.cy + (COIL.R + 1.5) * Math.sin(a), COIL.cz + (COIL.R + 1.5) * Math.cos(a), GCG); b.castShadow = false; }
+// 進樣口與針筒
+cyl(8, 8, 16, MAT.metal, -50, 150, -14, GCG);
+cyl(5, 5, 5, MAT.steel, -50, 160.5, -14, GCG, 6);
+cyl(3.4, 3.4, 1, MAT.rubber, -50, 163.5, -14, GCG, 20);
+const SYR = new THREE.Group(); SYR.position.set(-50, 166, -14); SYR.scale.setScalar(0.7); GCG.add(SYR);
+cyl(0.35, 0.35, 24, MAT.steel, 0, 12, 0, SYR, 8);
+cyl(2.4, 2.4, 40, MAT.glass, 0, 44, 0, SYR, 20, true);
+box(11, 1.2, 3.4, MAT.bezel, 0, 64.2, 0, SYR);
+const syrLiq = cyl(1.9, 1.9, 1, new THREE.MeshStandardMaterial({ color: 0xf2c46a, roughness: 0.2, transparent: true, opacity: 0.8 }), 0, 26, 0, SYR, 16);
+// 推桿:前端的黑色活塞在 y = 34,往下推 8 就把樣品打進去
+const PLG = new THREE.Group(); SYR.add(PLG);
+cyl(0.8, 0.8, 40, MAT.steel, 0, 54, 0, PLG, 10);
+cyl(3.4, 3.4, 1.6, MAT.dark, 0, 74.8, 0, PLG, 20);
+cyl(2.1, 2.1, 2, MAT.dark, 0, 34, 0, PLG, 16);
+// 偵測器:成分出來時窗口亮起(顏色和層析圖上的峰一樣)
+box(26, 22, 26, MAT.metal, 50, 153, -14, GCG);
+cyl(4.2, 4.2, 12, MAT.steel, 50, 170, -14, GCG, 16);
+const gcDetWin = mk(new THREE.PlaneGeometry(14, 8), glowMat(), 50, 154, -0.8, GCG, false);
+const gcDetLight = new THREE.PointLight(0xffffff, 0, 120, 1.6); gcDetLight.position.set(50, 160, 10); GCG.add(gcDetLight);
+// 氦氣鋼瓶與管線
+const HEG = new THREE.Group(); HEG.position.set(-150, 0, -50); GCG.add(HEG);
+cyl(14, 14, 150, MAT.he, 0, 75, 0, HEG, 32);
+cyl(14.2, 14.2, 10, new THREE.MeshStandardMaterial({ color: 0x8a6f3a, roughness: 0.45, metalness: 0.4 }), 0, 132, 0, HEG, 32);
+{ const d = mk(new THREE.SphereGeometry(14, 32, 16, 0, TAU, 0, Math.PI / 2), MAT.he, 0, 150, 0, HEG); d.scale.y = 0.55; }
+cyl(4.5, 4.5, 10, MAT.metal, 0, 162, 0, HEG, 16);
+box(9, 8, 9, MAT.steel, 0, 170, 0, HEG);
+{ const rg = cyl(4, 4, 12, MAT.steel, 9, 172, 0, HEG, 16); rg.rotation.z = Math.PI / 2; }
+for (const y of [178, 166]) { const g = cyl(4.6, 4.6, 2, new THREE.MeshStandardMaterial({ color: 0xe8eef2, roughness: 0.5 }), 15, y, 3, HEG, 24); g.rotation.x = Math.PI / 2; }
+tube([[-135, 172, -50], [-116, 178, -44], [-90, 172, -30], [-66, 160, -16], [-58.5, 151, -14]], 0.9, MAT.steel, GCG);
+
+// ---------- HPLC:溶劑瓶、幫浦、自動進樣器、管柱(放大剖開)、偵測器 ----------
+const LCG = new THREE.Group(); LCG.position.x = ST.lc; scene.add(LCG);
+const MODS = [[0, 30], [31, 61], [62, 96], [97, 127]];
+for (const [y0, y1] of MODS) {
+  const h = y1 - y0, cy = (y0 + y1) / 2;
+  box(100, h - 0.6, 72, MAT.case, 80, cy, -36, LCG);
+  box(98, h - 3, 1.2, MAT.bezel, 80, cy, 0.4, LCG);
+  mk(new THREE.SphereGeometry(0.9, 10, 8), glowMat(new THREE.Color(0.3, 1.6, 0.6)), 36, y1 - 5, 1.3, LCG, false);
+}
+box(100, 4, 72, MAT.dark, 80, 129.6, -36, LCG);
+// 幫浦頭與壓力顯示、自動進樣器的窗、偵測器的燈窗
+for (const x of [58, 74]) { const p = cyl(4, 4, 7, MAT.steel, x, 112, 4, LCG, 20); p.rotation.x = Math.PI / 2; }
+mk(new THREE.PlaneGeometry(22, 9), glowMat(new THREE.Color(0.05, 0.22, 0.28)), 108, 114, 1.1, LCG, false);
+mk(new THREE.PlaneGeometry(56, 22), new THREE.MeshStandardMaterial({ color: 0x0d1418, roughness: 0.1, metalness: 0.3 }), 86, 79, 1.1, LCG, false);
+const lcDetWin = mk(new THREE.PlaneGeometry(16, 8), glowMat(), 62, 15, 1.1, LCG, false);
+const lcDetLight = new THREE.PointLight(0xffffff, 0, 110, 1.6); lcDetLight.position.set(62, 22, 16); LCG.add(lcDetLight);
+// 溶劑瓶:A 水、B 甲醇
+const bottleLiq = [];
+for (const [bx, col] of [[62, 0x8fd0ff], [98, 0xe6eefc]]) {
+  cyl(11, 11, 34, MAT.glass, bx, 149, -36, LCG, 28, true);
+  cyl(5.6, 11, 5, MAT.glass, bx, 168.5, -36, LCG, 28, true);
+  cyl(5.6, 5.6, 6, MAT.cap, bx, 174, -36, LCG, 20);
+  bottleLiq.push(cyl(10.3, 10.3, 28, new THREE.MeshStandardMaterial({ color: col, roughness: 0.1, transparent: true, opacity: 0.32, depthWrite: false }), bx, 146, -36, LCG, 28));
+  tube([[bx, 177, -36], [bx, 184, -30], [bx * 0.4 + 18, 182, -4], [36, 150, 3], [36, 118, 3]], 0.7, MAT.peek, LCG, 48);
+}
+// 管柱:150 mm 的不鏽鋼管,前半剖開,看得到裡面塞滿的小顆粒
+const LCC = { x0: -114, x1: 6, y: 72, z: 26, r: 9.5 }; LCC.L = LCC.x1 - LCC.x0; LCC.cx = (LCC.x0 + LCC.x1) / 2;
+{
+  const sh = mk(new THREE.CylinderGeometry(LCC.r, LCC.r, LCC.L, 48, 1, true, 0.42 * Math.PI, 1.16 * Math.PI), MAT.steel2, LCC.cx, LCC.y, LCC.z, LCG); sh.rotation.z = Math.PI / 2;
+  for (const x of [LCC.x0 - 4.5, LCC.x1 + 4.5]) { const n = cyl(12, 12, 9, MAT.steel, x, LCC.y, LCC.z, LCG, 6); n.rotation.z = Math.PI / 2; }
+  for (const x of [LCC.x0 + 0.5, LCC.x1 - 0.5]) { const f = cyl(LCC.r - 0.2, LCC.r - 0.2, 1, new THREE.MeshStandardMaterial({ color: 0x8b949b, roughness: 0.9, metalness: 0.3 }), x, LCC.y, LCC.z, LCG, 32); f.rotation.z = Math.PI / 2; }
+  for (const x of [LCC.x0 + 12, LCC.x1 - 12]) { cyl(2, 2.6, LCC.y - LCC.r, MAT.metal, x, (LCC.y - LCC.r) / 2, LCC.z, LCG, 16); box(14, 2, 14, MAT.dark, x, 1, LCC.z, LCG); }
+  tube([[34, 106, 1.5], [26, 100, 6], [34, 86, 1.5]], 0.7, MAT.peek, LCG, 24);
+  tube([[30, 79, 2], [12, 96, 16], [-60, 99, LCC.z], [-126, 92, LCC.z], [-131, 76, LCC.z], [LCC.x0 - 9, LCC.y, LCC.z]], 0.7, MAT.peek, LCG, 64);
+  tube([[LCC.x1 + 9, LCC.y, LCC.z], [22, 62, 22], [30, 26, 8], [40, 16, 2]], 0.7, MAT.peek, LCG, 48);
+}
+// 填充顆粒:5 µm 與 1.7 µm 兩組,只顯示其中一組;顆粒只填後半,前半是剖開的
+// 每一顆記下它在管柱的哪一段(zs),色帶經過時把顆粒染上顏色(分子黏在顆粒表面)
+const SILICA = [0.5, 0.55, 0.6];
+function packParticles(rp, n, seed) {
+  const R = rng(seed), mesh = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, rp > 1 ? 2 : 1), MAT.silica, n), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), s = v3(rp, rp, rp), col = new THREE.Color();
+  mesh.zs = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const x = lerp(LCC.x0 + 1.5 + rp, LCC.x1 - 1.5 - rp, R()), rho = Math.sqrt(R()) * (LCC.r - 0.8 - rp), ph = lerp(0.5 * Math.PI, 1.5 * Math.PI, R());
+    const sc = rp * lerp(0.85, 1.12, R()); s.set(sc, sc, sc);
+    m4.compose(v3(x, LCC.y + rho * Math.sin(ph), LCC.z + Math.min(0.6, rho * Math.cos(ph))), q, s); mesh.setMatrixAt(i, m4);
+    mesh.zs[i] = (x - LCC.x0) / LCC.L; mesh.setColorAt(i, col.setRGB(...SILICA));
+  }
+  mesh.castShadow = false; mesh.receiveShadow = true; LCG.add(mesh); return mesh;
+}
+const PART5 = packParticles(2.1, 420, 11), PART17 = packParticles(0.72, 2600, 12);
+PART17.visible = false;
+
+// ---------- 層析帶:GC 管柱與 HPLC 管柱裡的分子群(發光的點) ----------
+const NPG = 64, NPL = 240;
+// GC 的分子群在不透明的細管裡面,不做深度測試才看得到(烘箱前面是開的,不會穿幫)
+const gcPts = makePoints(GC_CPDS.length * NPG, 7, false), lcPts = makePoints(LC_CPDS.length * NPL, 4.5);
+// 每個點固定的亂數:沿著管柱的位置(以帶寬為單位)與截面上的位置
+const PU = (() => { const R = rng(7), a = []; for (let i = 0; i < 4000; i++) { let g = 0; for (let k = 0; k < 4; k++) g += R(); g = (g - 2) * 1.73; a.push([clamp(g, -2.6, 2.6), Math.sqrt(R()), R() * TAU]); } return a; })();
+const GC_RGB = GC_CPDS.map((c) => hexRGB(c.col)), LC_RGB = LC_CPDS.map((c) => hexRGB(c.col));
+function coilAt(zc, out) { const f = clamp(zc, 0, 1) * (COIL_LUT.length - 1), i = Math.min(COIL_LUT.length - 2, Math.floor(f)); return out.copy(COIL_LUT[i]).lerp(COIL_LUT[i + 1], f - i); }
+
+// ==== 30_bands.js ====
+// ================= 每一格:色帶、偵測器、烘箱 =================
+const _p = v3();
+// 標準常態分布的累積機率(色帶有多少比例已經流出管柱)
+function ncdf(x) { const t = 1 / (1 + 0.2316419 * Math.abs(x)), d = 0.3989423 * Math.exp((-x * x) / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x > 0 ? 1 - p : p; }
+// 茨維特的粉柱:白色的粉被各色素染上顏色,濃的地方顏色深(色帶越散開越淡)
+let tswKey = '';
+function paintTsw(r, rt) {
+  const key = r && rt > 0 ? rt.toFixed(3) : 'none'; if (key === tswKey) return; tswKey = key;
+  const c = tswCv.getContext('2d'), H = tswCv.height, img = c.createImageData(4, H);
+  const bands = r && rt > 0 ? r.cpds.map((cp, i) => { const z = zAt(r, cp, rt); return { z, s: bandSigZ(r, z), col: TSW_RGB[i], a: cp.c.amt }; }) : [];
+  for (let y = 0; y < H; y++) {
+    const zc = (y + 0.5) / H; let R = PAPER[0], G = PAPER[1], B = PAPER[2];
+    for (const b of bands) {
+      const u = (zc - b.z) / b.s; if (u * u > 30) continue;
+      const d = clamp(1.25 * b.a * (0.022 / b.s) ** 0.7 * Math.exp(-0.5 * u * u), 0, 0.93);
+      R *= 1 - d * (1 - b.col[0]); G *= 1 - d * (1 - b.col[1]); B *= 1 - d * (1 - b.col[2]);
+    }
+    for (let x = 0; x < 4; x++) { const o = (y * 4 + x) * 4; img.data[o] = R * 255; img.data[o + 1] = G * 255; img.data[o + 2] = B * 255; img.data[o + 3] = 255; }
+  }
+  c.putImageData(img, 0, 0); tswTex.needsUpdate = true;
+}
+// 偵測器的燈:跟著出口的訊號亮,顏色是正在出來的成分;峰太窄的時候放寬一點,畫面上才看得到閃一下
+function detGlow(r, rt, rate) {
+  const out = [0, 0, 0, 0]; if (!r || rt <= 0) return out;
+  const RGB = r.inst === 'gc' ? GC_RGB : r.inst === 'lc' ? LC_RGB : TSW_RGB;
+  r.cpds.forEach((cp, i) => {
+    const sv = Math.max(cp.sig, 0.14 * (rate || 1)), u = (rt - cp.tR) / sv; if (u * u > 25) return;
+    const v = Math.exp(-0.5 * u * u) * clamp(0.55 + 0.45 * (cp.h / r.hMax), 0, 1);
+    out[0] += RGB[i][0] * v; out[1] += RGB[i][1] * v; out[2] += RGB[i][2] * v; out[3] = Math.max(out[3], v);
+  });
+  return out;
+}
+function setDet(mesh, light, g, on) {
+  const k = on ? 1.8 : 0;
+  mesh.material.color.setRGB(0.04 + g[0] * k, 0.05 + g[1] * k, 0.06 + g[2] * k);
+  light.intensity = on ? 900 * g[3] : 0;
+  if (g[3] > 0.01) light.color.setRGB(g[0] / g[3], g[1] / g[3], g[2] / g[3]);
+}
+// HPLC 的顆粒:色帶經過的地方染上那個成分的顏色
+const _col = new THREE.Color();
+let tintKey = '';
+function tintParticles(mesh, r, rt) {
+  const key = r && rt > 0 ? `${r.key}|${rt.toFixed(3)}|${mesh.count}` : `none|${mesh.count}`; if (key === tintKey) return; tintKey = key;
+  const B = r && rt > 0 ? r.cpds.map((cp, i) => { const z = zAt(r, cp, rt), s = bandSigZ(r, z); return { z, s, rgb: LC_RGB[i], a: clamp((cp.c.amt || 1) * (0.016 / s) ** 0.45, 0.3, 1.4) }; }) : [];
+  for (let i = 0; i < mesh.count; i++) {
+    const zc = mesh.zs[i]; let R = SILICA[0], G = SILICA[1], Bc = SILICA[2];
+    for (const b of B) { const u = (zc - b.z) / b.s; if (u * u > 16) continue; const d = clamp(1.2 * b.a * Math.exp(-0.5 * u * u), 0, 0.92); R = lerp(R, b.rgb[0] * 1.2, d); G = lerp(G, b.rgb[1] * 1.2, d); Bc = lerp(Bc, b.rgb[2] * 1.2, d); }
+    mesh.setColorAt(i, _col.setRGB(R, G, Bc));
+  }
+  mesh.instanceColor.needsUpdate = true;
+}
+// 管柱裡的分子群
+function placePts(pts, r, rt, n, rgb, at, gain = 1) {
+  const pos = pts.geometry.attributes.position.array, col = pts.geometry.attributes.color.array, cps = r ? r.cpds : [];
+  for (let ci = 0; ci < rgb.length; ci++) {
+    const cp = cps[ci], live = cp && rt > 0, z = live ? zAt(r, cp, rt) : 0, s = live ? bandSigZ(r, z) : 0;
+    // 濃度:一開始擠在一起最濃,散開以後變淡(總量不變)
+    const dens = live ? clamp(0.5 + 0.5 * (cp.c.amt || 1), 0, 1) * clamp((0.016 / s) ** 0.45, 0.35, 1.6) : 0;
+    for (let j = 0; j < n; j++) {
+      const k = ci * n + j, [u, rho, ph] = PU[k], zc = z + u * s, on = live && zc >= 0 && zc <= 1;
+      at(on ? zc : 0, rho, ph, _p);
+      pos[k * 3] = _p.x; pos[k * 3 + 1] = _p.y; pos[k * 3 + 2] = _p.z;
+      const v = on ? clamp(gain * W.bandOp * dens * (0.3 + 0.7 * Math.exp(-0.5 * u * u)), 0, 1) : 0;
+      col[k * 4] = rgb[ci][0] * 1.45; col[k * 4 + 1] = rgb[ci][1] * 1.45; col[k * 4 + 2] = rgb[ci][2] * 1.45; col[k * 4 + 3] = v;
+    }
+  }
+  pts.geometry.attributes.position.needsUpdate = true; pts.geometry.attributes.color.needsUpdate = true;
+}
+const gcAt = (zc, rho, ph, o) => { coilAt(zc, o); o.y += rho * 0.9 * Math.sin(ph); o.z += rho * 0.9 * Math.cos(ph); return o; };
+const lcAt = (zc, rho, ph, o) => o.set(ST.lc + LCC.x0 + 1.2 + zc * (LCC.L - 2.4), LCC.y + rho * 8.2 * Math.sin(ph), LCC.z + rho * 8.2 * Math.cos(ph));
+
+function updateScene(t, dt) {
+  const r = W.run, rt = W.rt;
+  const rTsw = r && r.inst === 'tsw' ? r : null, rGc = r && r.inst === 'gc' ? r : null, rLc = r && r.inst === 'lc' ? r : null;
+  // 茨維特:粉柱的顏色、燒杯裡收集到的液體、出口的液滴
+  paintTsw(rTsw, rt);
+  {
+    let vol = 0, R = 0, G = 0, B = 0, A = 0;
+    if (rTsw && rt > 0) {
+      vol = clamp(rt / rTsw.tEnd, 0, 1);
+      rTsw.cpds.forEach((cp, i) => { const z = zAt(rTsw, cp, rt), f = ncdf((z - 1) / bandSigZ(rTsw, z)) * cp.c.amt; R += TSW_RGB[i][0] * f; G += TSW_RGB[i][1] * f; B += TSW_RGB[i][2] * f; A += f; });
+    }
+    const h = 1.5 + 9 * vol, mix = clamp(A * 0.9, 0, 0.85);
+    beakLiq.scale.y = h; beakLiq.position.y = 4.4 + h / 2;
+    if (A > 0) beakMat.color.setRGB(lerp(0.81, R / A, mix), lerp(0.9, G / A, mix), lerp(0.93, B / A, mix)); else beakMat.color.setRGB(0.81, 0.9, 0.93);
+    const running = rTsw && rt > 0 && rt < rTsw.tEnd, ph = (rt * 3.2) % 1;
+    drop.visible = !!running; drop.position.y = lerp(23.5, 4.6 + h, ph * ph);
+  }
+  const tagOp = rTsw ? W.tags : 0;
+  TSW_CPDS.forEach((c, i) => {
+    const z = rTsw && rt > 0 ? zAt(rTsw, rTsw.cpds[i], rt) : 0, inCol = win(z, 0.06, 0.97, 0.03);
+    TAGS[i].o.position.set(ST.tsw - 11, TS.top - clamp(z, 0, 1) * TS.L, 2);
+    tagOp2(i, tagOp * inCol);
+  });
+  // GC 與 HPLC 管柱裡的分子群
+  placePts(gcPts, rGc, rt, NPG, GC_RGB, gcAt, 0.9);
+  placePts(lcPts, rLc, rt, NPL, LC_RGB, lcAt, 0.75);
+  tintParticles(W.part === 5 ? PART5 : PART17, rLc, rt);
+  // 偵測器
+  setDet(gcDetWin, gcDetLight, detGlow(rGc, rt, W.rate), !!rGc);
+  setDet(lcDetWin, lcDetLight, detGlow(rLc, rt, W.rate), !!rLc);
+  // 烘箱:溫度越高,裡面越亮越紅
+  const T = W.ovenT, heat = clamp((T - 40) / 180, 0, 1);
+  ovenLight.intensity = 140 + 1100 * heat;
+  ovenLight.color.setRGB(1, lerp(0.62, 0.42, heat), lerp(0.36, 0.18, heat));
+  // 針筒:下去、推、上來
+  const sy = W.syr, down = sstep(0, 0.35, sy) * (1 - sstep(0.72, 1, sy)), push = sstep(0.35, 0.68, sy);
+  SYR.position.y = 168 - 18 * down; PLG.position.y = -8 * push;
+  const lq = Math.max(0.01, 9 - 8 * push); syrLiq.scale.y = lq; syrLiq.position.y = 24 + lq / 2;
+  // HPLC 的填充顆粒
+  PART5.visible = W.part === 5; PART17.visible = W.part !== 5;
+}
+
+// ==== 40_labels.js ====
+// ================= 視角操作 =================
+// 共用的 ../assets/camera-nav.js:滑鼠滾輪縮放,觸控板雙指平移、捏合縮放,方向鍵或 WASD 移動、Q/E 轉向、+/− 縮放、R 回到預設視角
+const nav = createCameraNav({ camera, controls, active: () => !FILM && !tour.on, radius: 480, reset: () => flyToInst() });
+// ================= 標籤 =================
+// 和其他教材同一種:標籤框放在 anchor,細線連回零件上的 comp 點
+const LBL = {};
+// filmAnchor:導覽與影片的鏡頭和互動模式不同,有些標籤要放在別的地方才不會被字幕或面板擋住
+function label(key, comp, anchor, title, sub, filmAnchor = null) {
+  const outer = document.createElement('div'); outer.className = 'lw';
+  outer.innerHTML = `<div class="lbl"><i></i><b></b>${sub != null ? '<span></span>' : ''}</div>`;
+  outer.querySelector('b').textContent = title;
+  if (sub != null) outer.querySelector('span').textContent = sub;
+  const o = new CSS2DObject(outer); o.position.copy(anchor); o.center.set(0.5, 1); scene.add(o);
+  const lm = new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: 0.5, depthWrite: false });
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([comp, anchor]), lm);
+  scene.add(line);
+  LBL[key] = { outer, inner: outer.querySelector('.lbl'), line, lm, op: -1, sub: outer.querySelector('span'), o, comp, anchor, fa: filmAnchor };
+}
+let lblFilm = null;
+function setLabelMode(film) {
+  if (film === lblFilm) return; lblFilm = film;
+  for (const L of Object.values(LBL)) if (L.fa) { const p = film ? L.fa : L.anchor; L.o.position.copy(p); L.line.geometry.setFromPoints([L.comp, p]); }
+}
+function labelOp(key, a) {
+  const L = LBL[key]; if (Math.abs(L.op - a) < 0.002) return; L.op = a;
+  L.outer.style.opacity = a; L.outer.style.visibility = a < 0.01 ? 'hidden' : 'visible';
+  L.lm.opacity = 0.5 * a; L.line.visible = a > 0.01 && L.inner.style.visibility !== 'hidden';
+}
+// 標籤超出畫面左右邊緣時往內推(線還是連在原來的位置);碰到面板(控制、標題、簡圖、層析圖、字幕)就先藏起來
+const PANEL_SEL = ['#ctl', '.sitenav', '#console', '#note', '.chips', '.hud .big', '.hud .k', '.lede', '#help', '#cap', '#cmp'];
+function panelRects() {
+  const out = [];
+  for (const sel of PANEL_SEL) {
+    const e = document.querySelector(sel); if (!e) continue;
+    const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05) continue;
+    const r = e.getBoundingClientRect(); if (r.width > 0 && r.height > 0) out.push(r);
+  }
+  return out;
+}
+const hits = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+function keepLabelsOnScreen() {
+  const W0 = innerWidth, P = panelRects();
+  for (const L of Object.values(LBL)) {
+    if (L.op < 0.01) continue;
+    const r = L.outer.getBoundingClientRect(), dx = r.left < 8 ? 8 - r.left : r.right > W0 - 8 ? W0 - 8 - r.right : 0;
+    const s = dx ? `translateX(${Math.round(dx)}px)` : '';
+    if (L.inner.style.transform !== s) L.inner.style.transform = s;
+    const rr = { left: r.left + dx, right: r.right + dx, top: r.top, bottom: r.bottom }, blocked = P.some((p) => hits(rr, p));
+    const v = blocked ? 'hidden' : '';
+    if (L.inner.style.visibility !== v) { L.inner.style.visibility = v; L.line.visible = !blocked; }
+  }
+  for (const T of TAGS) {
+    if (T.op < 0.01) continue;
+    const r = T.d.getBoundingClientRect(), v = P.some((p) => hits(r, p)) ? 'hidden' : '';
+    if (T.d.style.visibility !== v) T.d.style.visibility = v || (T.op < 0.01 ? 'hidden' : 'visible');
+  }
+}
+function labelSub(key, s) { const L = LBL[key]; if (L.sub && L.sub.textContent !== s) L.sub.textContent = s; }
+const X0 = ST.tsw, X2 = ST.lc;
+label('tswCol', v3(X0 + 8, 150, 0), v3(X0 + 58, 214, 10), '玻璃管柱', '裡面塞滿碳酸鈣粉');
+label('tswSolv', v3(X0 - 6, 202, 0), v3(X0 - 52, 238, 10), '溶劑', '從上面一直往下加');
+label('he', v3(-150, 150, -40), v3(-150, 198, -40), '氦氣鋼瓶', '推著樣品走');
+label('inlet', v3(-46, 160, -14), v3(-6, 228, 0), '進樣口', '加熱讓樣品變成氣體');
+label('coil', v3(-40, 52, 12), v3(-60, 40, 46), '管柱', '30 公尺長,內徑 0.25 毫米', v3(-36, 128, 46));
+label('oven', v3(82, 70, 30), v3(140, 34, 56), '烘箱', '100 °C');
+label('det', v3(56, 166, -14), v3(92, 200, 0), '偵測器', '成分出來就有訊號');
+label('bottle', v3(X2 + 80, 176, -36), v3(X2 + 80, 192, -20), '溶劑瓶', 'A 水 · B 甲醇');
+label('pump', v3(X2 + 66, 112, 6), v3(X2 + 44, 122, 22), '幫浦', '加壓推動液體');
+label('as', v3(X2 + 100, 79, 2), v3(X2 + 92, 88, 22), '自動進樣器', '打一針樣品進去');
+label('lcCol', v3(X2 - 60, 81, 26), v3(X2 - 76, 132, 30), '管柱(放大剖開)', '15 公分,塞滿 5 µm 的小顆粒');
+label('lcDet', v3(X2 + 62, 15, 2), v3(X2 + 92, 24, 22), '偵測器', '用紫外光看成分出來');
+const LBL_KEYS = Object.keys(LBL);
+// 茨維特管柱旁邊、跟著色帶走的色素名字
+const TAGS = TSW_CPDS.map((c) => {
+  const d = document.createElement('div'); d.className = 'blbl'; d.textContent = c.name; d.style.color = c.col;
+  const o = new CSS2DObject(d); o.center.set(1, 0.5); scene.add(o); return { o, d, op: -1 };
+});
+function tagOp2(i, a) { const T = TAGS[i]; if (Math.abs(T.op - a) < 0.002) return; T.op = a; T.d.style.opacity = a; T.d.style.visibility = a < 0.01 ? 'hidden' : 'visible'; }
+
+// ==== 50_film.js ====
+// ================= 狀態 =================
+// S:互動模式的設定;W:這一格要畫的樣子(導覽與錄影由 film(t) 從時間算出,互動模式由 interactive() 算)
+const S = {
+  inst: 'gc', cond: { gc: 'ramp', lc: 'grad', tsw: 'x' }, part: 5,
+  run: null, // { r, t0, dur }:t0 是打進去的時間(秒)
+  prev: { tsw: null, gc: null, lc: null }, // 同一台儀器上一次不同條件的結果,畫成灰色對照
+  next: 0, // 自動再打一針的時間
+  sk: 'micro', // 簡圖:管子裡面 / 峰變寬 / 分得開嗎
+};
+const W = {
+  inst: 'gc', run: null, rt: -1, ghost: null, rate: 1, part: 5, syr: 0, ovenT: 60, bandOp: 1, tags: 0,
+  labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1, sk: 'micro', skT: 0, rsPair: null, shift: 0,
+};
+
+// ================= 影片腳本(導覽與錄影共用) =================
+// 腳本以 168 秒寫成;播放與錄影時整體放慢 1.2 倍,留時間看字幕
+const SCRIPT_DUR = 168, FILM_SLOW = 1.2, FILM_DUR = SCRIPT_DUR * FILM_SLOW;
+// 各段的取景:[相機位置, 看的點]
+const VIEW = {
+  all: [[60, 280, 960], [40, 96, 0]],
+  tsw: [[-190, 170, 560], [-300, 118, 0]],
+  tswB: [[-150, 150, 600], [-232, 112, 0]],
+  gc: [[50, 186, 548], [0, 104, -10]],
+  coil: [[22, 108, 216], [0, 82, -14]],
+  lc: [[350, 168, 470], [300, 92, 0]],
+  lcCol: [[262, 98, 176], [244, 76, 20]],
+};
+// 影片裡的每一次進樣:這段時間 [a, b] 對應到分析的第 r0 到 r1 分鐘;ghost 是畫成灰色對照的上一次
+// 新的一針在打針前 2 秒(frunAt)就換過去,所以上一針要在那之前跑完
+const FRUNS = [
+  { inst: 'tsw', cond: 'x', a: 7.6, b: 20.4, r0: 0, r1: 0.6 },
+  { inst: 'tsw', cond: 'x', a: 22.4, b: 36.0, r0: 0.6, r1: 1.05 },
+  { inst: 'tsw', cond: 'x', a: 36.0, b: 43.2, r0: 1.05, r1: 4.4 },
+  { inst: 'gc', cond: 'iso100', a: 52.0, b: 61.0, r0: 0, r1: 36, syr: 50.4 },
+  { inst: 'gc', cond: 'ramp', a: 64.8, b: 75.0, r0: 0, r1: 13, syr: 63.2, ghost: ['gc', 'iso100'] },
+  { inst: 'lc', cond: 'iso50', part: 5, a: 89.6, b: 99.4, r0: 0, r1: 30 },
+  { inst: 'lc', cond: 'grad', part: 5, a: 101.6, b: 110.2, r0: 0, r1: 17, ghost: ['lc', 'iso50', 5] },
+  { inst: 'lc', cond: 'grad', part: 5, a: 112.4, b: 116.4, r0: 0, r1: 10 },
+  { inst: 'lc', cond: 'grad', part: 1.7, a: 118.6, b: 128.0, r0: 0, r1: 17, ghost: ['lc', 'grad', 5] },
+  { inst: 'gc', cond: 'ramp', a: 130.0, b: 130.01, r0: 13, r1: 13 },
+];
+const CAMK = [
+  [0, [60, 330, 1180], [40, 96, 0]], [5.6, ...VIEW.all], [8.6, ...VIEW.tsw], [21.6, ...VIEW.tsw], [24.0, ...VIEW.tswB], [43.2, ...VIEW.tswB],
+  [46.6, ...VIEW.gc], [53.0, ...VIEW.gc], [56.2, ...VIEW.coil], [61.8, ...VIEW.coil], [64.6, ...VIEW.gc], [75.4, ...VIEW.gc],
+  [78.8, ...VIEW.lc], [111.2, ...VIEW.lc], [113.8, ...VIEW.lcCol], [129.2, ...VIEW.lcCol], [132.4, ...VIEW.gc], [147.4, ...VIEW.gc],
+  [150.6, ...VIEW.all], [162, ...VIEW.all], [168, [60, 330, 1180], [40, 96, 0]],
+];
+const CAPS = [
+  [6.0, 13.0, '01 · 茨維特的管子', '1906 年,植物學家茨維特把葉子的色素溶液倒進一支塞滿碳酸鈣粉的玻璃管,再從上面一直加溶劑往下沖。'],
+  [13.2, 21.6, '01 · 茨維特的管子', '原本混在一起的綠色,往下走時分成好幾條顏色不同的帶子。他把這個方法叫做 chromatography,意思是「用顏色寫」;中文叫層析。'],
+  [22.4, 29.0, '02 · 為什麼會分開', '管子裡有兩種東西:會流動的溶劑推著分子往下走(流動相),不會動的粉會把分子拉住一下(固定相)。'],
+  [29.2, 36.0, '02 · 為什麼會分開', '分子一直在兩邊進進出出。在流動相裡大家走得一樣快,差別只在每次被拉住多久:被拉住越久的,平均走得越慢。'],
+  [36.2, 43.6, '02 · 為什麼會分開', '在出口放一個偵測器,成分一出來就記下一支峰。從進樣到出峰的時間叫滯留時間;條件相同時,同一種分子每次都一樣。'],
+  [44.4, 50.6, '03 · 氣相層析 GC', '氣相層析用氦氣推著樣品走。管柱是一條 30 公尺長、內徑只有 0.25 毫米的細管,內壁塗了一層很薄的膜,盤在烘箱裡。'],
+  [50.8, 57.0, '03 · 氣相層析 GC', '樣品在進樣口加熱變成氣體。分子溶進那層膜就停住,回到氣體才往前走;沸點越高、越容易溶進膜裡的,走得越慢。'],
+  [57.2, 63.4, '03 · 氣相層析 GC', '烘箱固定在 100 °C:前面幾個成分 7 分鐘內就出來,石竹烯卻要等到 33 分鐘,峰又矮又寬。'],
+  [63.8, 70.2, '03 · 氣相層析 GC', '改成從 60 °C 開始,每分鐘升高 10 °C:溫度越高,分子越待不住,後面的成分被「趕」出來。'],
+  [70.4, 75.8, '03 · 氣相層析 GC', '13 分鐘就全部跑完,每支峰都又尖又高。先用低溫分開跑得快的,再升溫趕出難跑的,這叫升溫程式。'],
+  [76.4, 82.6, '04 · 液相層析 HPLC', '很多分子一加熱就壞掉,或根本變不成氣體,例如植物裡的酚類、色素、糖和蛋白質。這時候改用液體來推,就是液相層析。'],
+  [82.8, 89.0, '04 · 液相層析 HPLC', '管柱只有 15 公分,塞滿直徑 5 µm 的小顆粒,顆粒表面接了一層像油一樣的長碳鏈(C18)。液體要用幫浦加壓才推得過去。'],
+  [89.2, 95.4, '04 · 液相層析 HPLC', '流動相是水和甲醇。越「油」、越不溶於水的分子,越喜歡黏在 C18 上,走得越慢;甲醇越多,越容易把它們沖下來。'],
+  [95.6, 101.4, '04 · 液相層析 HPLC', '固定用 50% 甲醇:沒食子酸一下子就出來,幾乎沒被拉住;槲皮素卻拖到 25 分鐘,峰又矮又寬。'],
+  [101.8, 106.6, '04 · 液相層析 HPLC', '改成甲醇從 10% 慢慢加到 90%:一開始水多,容易跑的先分開;甲醇越來越多,黏得緊的也被沖下來。'],
+  [106.8, 111.6, '04 · 液相層析 HPLC', '這叫梯度沖提,作用和 GC 的升溫一樣:每個成分都在合適的時候出來,峰也比較窄。'],
+  [112.4, 118.4, '05 · 峰為什麼會變寬', '同一種分子不會同時到出口:有的繞過顆粒走了遠路,有的自己往前後擴散,有的在固定相多待了一下。所以一群分子越走越散開。'],
+  [118.6, 124.4, '05 · 峰為什麼會變寬', '顆粒做得越小,路徑差越小,峰越窄。從 5 µm 換成 1.7 µm,峰寬只剩大約六成。'],
+  [124.6, 129.8, '05 · 峰為什麼會變寬', '代價是阻力變大:要用同樣的流速推過去,壓力從大約 100 bar 升到 900 bar,要用耐超高壓的儀器。'],
+  [130.4, 136.6, '06 · 分得開嗎', '兩支峰分不分得開,看兩件事:峰頂離多遠、峰有多寬。兩者相除叫分離度 Rs;Rs 到 1.5,兩支峰中間就會回到基線。'],
+  [136.8, 142.4, '06 · 分得開嗎', '精油裡的檸檬烯和 1,8-桉葉油醇,在這支 GC 管柱上幾乎同時出來,Rs 只有 0.6 左右;怎麼調溫度都分不開。'],
+  [142.6, 147.8, '06 · 分得開嗎', '要分開,可以讓峰更窄,或換一支拉住分子的方式不一樣的管柱,讓兩者的時間差變大;GC-MS 則是靠質譜認出重疊的兩種分子。'],
+  [148.4, 155.0, '07 · GC 還是 HPLC', '能變成氣體、加熱不會壞的(精油、溶劑、脂肪酸甲酯),用 GC;不容易變成氣體或怕熱的(酚類、色素、糖、蛋白質),用 HPLC。'],
+  [155.2, 161.8, '07 · GC 還是 HPLC', '層析只負責分開;要知道分出來的是什麼,還要靠偵測器。GC 常接火焰離子化偵測器或質譜,HPLC 常接紫外光偵測器或質譜。'],
+];
+const LBL_WIN = [
+  [8.6, 13.6, ['tswCol', 'tswSolv']], [46.6, 52.0, ['he', 'inlet', 'coil', 'oven', 'det']], [52.0, 75.4, ['oven']],
+  [78.8, 89.0, ['bottle', 'pump', 'as', 'lcCol', 'lcDet']], [89.0, 111.2, ['pump']],
+];
+// 各段的主角(哪一台儀器)與簡圖
+const CHAP = [
+  { a: 0, b: 44.0, inst: 'tsw', sk: 'micro' }, { a: 44.0, b: 76.0, inst: 'gc', sk: 'micro' }, { a: 76.0, b: 112.0, inst: 'lc', sk: 'micro' },
+  { a: 112.0, b: 130.0, inst: 'lc', sk: 'broad' }, { a: 130.0, b: 148.0, inst: 'gc', sk: 'rs' }, { a: 148.0, b: 999, inst: 'gc', sk: 'micro' },
+];
+function camAt(t) {
+  const K = CAMK;
+  if (t <= K[0][0]) return [v3(...K[0][1]), v3(...K[0][2])];
+  for (let i = 0; i < K.length - 1; i++) {
+    const [ta, pa, qa] = K[i], [tb, pb, qb] = K[i + 1];
+    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [v3(...pa).lerp(v3(...pb), u), v3(...qa).lerp(v3(...qb), u)]; }
+  }
+  const L = K[K.length - 1]; return [v3(...L[1]), v3(...L[2])];
+}
+// 這個時間點正在顯示哪一次進樣(新的一針在打針前 2 秒就換過去,先畫空的層析圖;接著上一段繼續跑的不提早)
+function frunAt(t) { let f = null; for (const x of FRUNS) if (t >= (x.r0 > 0 ? x.a : (x.syr ?? x.a) - 2)) f = x; return f; }
+
+function film(t) {
+  const ch = CHAP.find((c) => t >= c.a && t < c.b) || CHAP[0];
+  W.inst = ch.inst; W.sk = ch.sk; W.skT = t;
+  const f = frunAt(t);
+  if (f) {
+    W.run = runOf(f.inst, f.cond, f.part || 5);
+    W.rt = t < f.a ? (f.r0 > 0 ? f.r0 : t - f.a) : lerp(f.r0, f.r1, clamp((t - f.a) / (f.b - f.a), 0, 1));
+    W.rate = (f.r1 - f.r0) / Math.max(0.01, f.b - f.a);
+    W.ghost = f.ghost ? runOf(f.ghost[0], f.ghost[1], f.ghost[2] || 5) : null;
+    W.syr = f.syr != null ? clamp((t - f.syr) / 1.6, 0, 1) : 0;
+  } else { W.run = null; W.rt = -1; W.ghost = null; W.syr = 0; }
+  W.part = t >= 117.0 && t < 130.0 ? 1.7 : 5;
+  W.ovenT = W.run && W.run.inst === 'gc' ? GC_CONDS[W.run.cond].T(Math.max(0, W.rt)) : 60;
+  W.bandOp = 1;
+  W.tags = win(t, 12.4, 43.4, 0.8);
+  // 鏡頭
+  const [cp, ct] = fitPortrait(...camAt(t), ch.inst === 'tsw' ? 1.5 : 2.4);
+  camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct);
+  W.labels = {}; for (const [a, b, keys] of LBL_WIN) for (const k of keys) W.labels[k] = Math.max(W.labels[k] || 0, win(t, a, b, 0.5));
+  W.cap = null; for (const c of CAPS) if (t >= c[0] && t < c[1]) W.cap = { chap: c[2], txt: c[3], op: win(t, c[0], c[1], 0.35) };
+  W.title = win(t, 0.2, 5.6, 0.9); W.outro = sstep(162.2, 163.4, t); W.chips = win(t, 5.6, 161.8, 0.8);
+  W.cmp = win(t, 148.6, 161.6, 0.6);
+  W.skOp = win(t, 13.4, 147.8, 0.8);
+  // 層析圖:茨維特那一段開始放偵測器以後才出現;最後的比較表時收起來
+  W.conOp = Math.max(win(t, 35.4, 43.6, 0.6), win(t, 50.2, 75.8, 0.6), win(t, 88.8, 129.6, 0.6), win(t, 130.4, 147.6, 0.6));
+  W.rsPair = null;
+  W.shift = win(t, 13.4, 147.8, 1.6); // 左邊有簡圖、右上有層析圖的時候,3D 往右下讓開
+}
+
+// ==== 60_state.js ====
+// ================= 互動模式 =================
+// 選一種儀器,鏡頭移過去;按「進樣」打一針(換條件也會自動打一針),跑完停 3 秒再自動重打
+// 互動模式的取景(下方有層析圖,左邊有標題與簡圖,所以比影片站得遠一點)
+const IVIEW = {
+  tsw: [[-190, 172, 570], [-300, 104, 0]],
+  gc: [[60, 226, 700], [0, 98, -10]],
+  lc: [[364, 196, 620], [300, 92, 0]],
+};
+const condOf = () => S.cond[S.inst];
+const runDur = (r) => 8 + 0.35 * r.tEnd; // 一次分析在畫面上播幾秒
+function startRun(now) {
+  const r = runOf(S.inst, condOf(), S.part), cur = S.run && S.run.r;
+  // 換了條件:把上一次的結果留著當灰色對照
+  if (cur && cur.inst === r.inst && cur !== r) S.prev[r.inst] = cur;
+  if (S.prev[r.inst] === r) S.prev[r.inst] = null;
+  S.run = { r, t0: now + (r.inst === 'gc' ? 1.6 : 0.6), dur: runDur(r) };
+  S.next = Infinity;
+}
+function interactive(dt, now) {
+  if (now >= S.next) startRun(now);
+  const R = S.run;
+  W.inst = S.inst; W.part = S.part; W.sk = S.sk; W.skT = now;
+  if (R && R.r.inst === S.inst) {
+    W.run = R.r; W.rt = ((now - R.t0) / R.dur) * R.r.tEnd; W.rate = R.r.tEnd / R.dur;
+    W.syr = R.r.inst === 'gc' ? clamp((now - (R.t0 - 1.6)) / 1.6, 0, 1) : 0;
+    W.ghost = S.prev[S.inst];
+    if (W.rt > R.r.tEnd && S.next === Infinity) S.next = now + 3;
+    W.rt = Math.min(W.rt, R.r.tEnd);
+  } else { W.run = null; W.rt = -1; W.ghost = null; W.syr = 0; }
+  W.ovenT = W.run && W.run.inst === 'gc' ? GC_CONDS[W.run.cond].T(Math.max(0, W.rt)) : 60;
+  W.bandOp = 1; W.tags = S.inst === 'tsw' ? 1 : 0;
+  Object.assign(W, { labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1, shift: 0 });
+}
+
+// ==== 65_sketch.js ====
+// ================= 簡圖(左欄的平面圖) =================
+// 管子裡面:放大到看得見分子,兩種分子在流動相與固定相之間進進出出,下方的長條是「走」和「被拉住」的時間比例
+// 峰變寬:同一種分子一起出發,越走越散開;顆粒大小與壓力
+// 分得開嗎:兩支峰放大,量峰頂的距離與峰寬,算出分離度 Rs
+const SKV = { w: 600, h: 340 };
+const skCv = el('sketch');
+let skDrawnAt = -Infinity;
+function lt(c, s, x, y, o = {}) {
+  c.font = `${o.w || 600} ${Math.round((o.size || 15) * 1.35)}px ${o.mono ? MONO : SANS}`; c.fillStyle = o.color || COL.ink2; c.textAlign = o.align || 'left'; c.textBaseline = o.base || 'middle'; c.fillText(s, x, y);
+}
+const MICRO = {
+  tsw: { flow: '溶劑', stat: '碳酸鈣粉', kinds: [{ name: '胡蘿蔔素', k: 0.25, col: '#ff9d3a' }, { name: '葉綠素', k: 2.6, col: '#2fbf8f' }] },
+  gc: { flow: '氦氣', stat: '管壁上的薄膜', kinds: [{ name: '檸檬烯', k: 0.5, col: '#5dffb0' }, { name: '石竹烯', k: 3.0, col: '#bba6ff' }] },
+  lc: { flow: '水和甲醇', stat: '顆粒表面的 C18', kinds: [{ name: '沒食子酸', k: 0.3, col: '#5aa2ff' }, { name: '槲皮素', k: 2.8, col: '#ff8a6b' }] },
+};
+// 每個分子的時間表:「在流動相」與「被拉住」輪流,每一段的長短是亂數,但種子固定(同一個時間永遠同一個位置)
+const TF = 0.5, VFREE = 66, MSCH = {};
+function schedOf(inst) {
+  if (MSCH[inst]) return MSCH[inst];
+  const out = [];
+  MICRO[inst].kinds.forEach((K, kind) => {
+    for (let i = 0; i < 6; i++) {
+      const R = rng(900 + kind * 37 + i * 7 + inst.length * 101), ts = [], fs = [], st = [], sd = [];
+      let t = -3 * R(), F = 0, s = R() < K.k / (1 + K.k) ? 1 : 0;
+      while (t < 1300) {
+        ts.push(t); fs.push(F); st.push(s); sd.push(R() < 0.5 ? 0 : 1);
+        const d = -Math.log(1 - 0.999 * R()) * (s ? K.k * TF : TF);
+        if (!s) F += d; t += d; s = 1 - s;
+      }
+      out.push({ kind, lane: 0, x0: R() * 660, ts, fs, st, sd, i });
+    }
+  });
+  // 跑道:兩種分子交錯排開
+  out.forEach((m, j) => { m.lane = j; });
+  return (MSCH[inst] = out);
+}
+function molAt(m, tau) {
+  let lo = 0, hi = m.ts.length - 1;
+  while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (m.ts[mid] <= tau) lo = mid; else hi = mid - 1; }
+  const s = m.st[lo], din = tau - m.ts[lo];
+  return { F: m.fs[lo] + (s ? 0 : Math.max(0, din)), s, tr: ease(clamp(din / 0.18, 0, 1)), side: m.sd[lo], prev: m.sd[Math.max(0, lo - 1)] };
+}
+// 固定相的形狀:GC 是上下兩片膜;HPLC 與茨維特是上下兩排顆粒
+const GRAIN_R = 56;
+const grainCenters = (side) => { const a = []; for (let i = -1; i <= 6; i++) a.push(side ? [i * 120, 270] : [60 + i * 120, -14]); return a; };
+const GRAINS = [grainCenters(0), grainCenters(1)];
+const grainR = (inst, th, j) => (inst === 'tsw' ? GRAIN_R * (1 + 0.07 * Math.sin(5 * th + j * 1.7) + 0.045 * Math.sin(9 * th + j)) : GRAIN_R);
+function stuckPos(inst, x, ly, side) {
+  if (inst === 'gc') return [x, side ? 216 : 40];
+  const G = GRAINS[side]; let best = G[0], bd = Infinity, bj = 0;
+  G.forEach((g, j) => { const d = Math.abs(g[0] - x); if (d < bd) { bd = d; best = g; bj = j; } });
+  const dx = x - best[0], dy = ly - best[1], L = Math.hypot(dx, dy) || 1, th = Math.atan2(dy, dx), rr = grainR(inst, th, bj) + (inst === 'lc' ? 7 : 4);
+  return [best[0] + (dx / L) * rr, best[1] + (dy / L) * rr];
+}
+function drawMicro(c, inst, t) {
+  const M = MICRO[inst], mols = schedOf(inst), tau = ((t % 1200) + 1200) % 1200 + 20;
+  // 流動相的流線
+  c.strokeStyle = 'rgba(160,215,235,.16)'; c.lineWidth = 2;
+  for (let i = 0; i < 14; i++) { const y = 64 + (i % 7) * 22 + (i > 6 ? 11 : 0), x = ((i * 89 + t * 150) % 720) - 60; c.beginPath(); c.moveTo(x, y); c.lineTo(x + 30, y); c.stroke(); }
+  // 固定相
+  if (inst === 'gc') {
+    for (const [y0, y1, fy0, fy1] of [[14, 30, 30, 48], [208, 226, 226, 242]]) {
+      const top = y0 === 14;
+      c.fillStyle = '#26343d'; c.fillRect(0, top ? y0 : fy1 - 16, 600, 16);
+      c.fillStyle = 'rgba(214,160,72,.42)'; c.fillRect(0, top ? fy0 : y0, 600, 18);
+    }
+    lt(c, '管壁(玻璃)', 590, 22, { size: 11.5, color: COL.ink2, align: 'right', w: 600 });
+    lt(c, '薄膜(固定相)', 590, 40, { size: 11.5, color: '#ffd38a', align: 'right', w: 700 });
+  } else {
+    for (let side = 0; side < 2; side++) GRAINS[side].forEach((g, j) => {
+      c.beginPath();
+      for (let k = 0; k <= 72; k++) { const th = (k / 72) * TAU, r = grainR(inst, th, j), x = g[0] + r * Math.cos(th), y = g[1] + r * Math.sin(th); k ? c.lineTo(x, y) : c.moveTo(x, y); }
+      c.closePath(); c.fillStyle = inst === 'tsw' ? 'rgba(232,226,210,.82)' : 'rgba(150,166,178,.55)'; c.fill();
+      if (inst === 'lc') {
+        // C18 的碳鏈:顆粒表面一根一根短短的毛
+        c.strokeStyle = 'rgba(214,160,72,.75)'; c.lineWidth = 1.6;
+        for (let k = 0; k < 40; k++) { const th = (k / 40) * TAU, x = g[0] + GRAIN_R * Math.cos(th), y = g[1] + GRAIN_R * Math.sin(th); if (y < -4 || y > 344) continue; c.beginPath(); c.moveTo(x, y); c.lineTo(x + 8 * Math.cos(th + 0.25 * Math.sin(k)), y + 8 * Math.sin(th + 0.25 * Math.sin(k))); c.stroke(); }
+      }
+    });
+    { const s = M.stat + '(固定相)'; c.font = `700 ${Math.round(12 * 1.35)}px ${SANS}`; const tw = c.measureText(s).width; c.fillStyle = 'rgba(10,15,19,.62)'; c.fillRect(586 - tw - 8, 14, tw + 12, 26); lt(c, s, 590 - 4, 27, { size: 12, color: inst === 'lc' ? '#ffd38a' : COL.ink, align: 'right', w: 700 }); }
+  }
+  { const s = M.flow + '往右流(流動相)→'; c.font = `600 ${Math.round(12.5 * 1.35)}px ${SANS}`; const tw = c.measureText(s).width; c.fillStyle = 'rgba(10,15,19,.62)'; c.fillRect(8, 116, tw + 12, 26); lt(c, s, 14, 129, { size: 12.5, color: COL.cyan, w: 600 }); }
+  // 分子
+  const laneY = (j) => (inst === 'gc' ? 68 + (j % 12) * 12.6 : 84 + (j % 12) * 8.2);
+  for (const m of mols) {
+    const K = M.kinds[m.kind], p = molAt(m, tau), x = ((m.x0 + VFREE * p.F) % 680) - 40, ly = laneY(m.lane);
+    let X = x, Y = ly;
+    if (p.s) { const [sx, sy] = stuckPos(inst, x, ly, p.side); X = lerp(x, sx, p.tr); Y = lerp(ly, sy, p.tr); }
+    else if (p.tr < 1) { const [sx, sy] = stuckPos(inst, x, ly, p.prev); X = lerp(sx, x, p.tr); Y = lerp(sy, ly, p.tr); }
+    c.fillStyle = K.col; c.shadowColor = K.col; c.shadowBlur = p.s ? 0 : 10;
+    c.beginPath(); c.arc(X, Y, 7, 0, TAU); c.fill(); c.shadowBlur = 0;
+    if (p.s && p.tr > 0.9) { c.strokeStyle = K.col; c.globalAlpha = 0.5; c.lineWidth = 1.5; c.beginPath(); c.arc(X, Y, 11, 0, TAU); c.stroke(); c.globalAlpha = 1; }
+  }
+  // 下方:走與被拉住的時間比例
+  c.fillStyle = 'rgba(10,15,19,.94)'; c.fillRect(0, 246, 600, 94);
+  M.kinds.forEach((K, i) => {
+    const y = 270 + i * 44, free = 1 / (1 + K.k), x0 = 186, bw = 250;
+    c.fillStyle = K.col; c.beginPath(); c.arc(16, y, 7, 0, TAU); c.fill();
+    lt(c, `${K.name} ${free > 0.5 ? '走得快' : '走得慢'}`, 30, y, { size: 13.5, color: K.col, w: 700 });
+    c.fillStyle = K.col; c.fillRect(x0, y - 11, bw * free, 22);
+    c.fillStyle = 'rgba(255,255,255,.12)'; c.fillRect(x0 + bw * free, y - 11, bw * (1 - free), 22);
+    lt(c, `走 ${Math.round(free * 100)}%`, x0 + 6, y, { size: 11, color: '#0a1217', w: 700 });
+    lt(c, `停 ${Math.round((1 - free) * 100)}%`, x0 + bw + 8, y, { size: 11.5, color: COL.ink2, w: 600 });
+  });
+}
+// ---------- 峰為什麼會變寬 ----------
+const BROAD = (() => { const R = rng(41), a = []; for (let i = 0; i < 18; i++) { let g = 0; for (let k = 0; k < 4; k++) g += R(); a.push({ g: (g - 2) * 1.73, y0: 66 + i * 8, w: 0.8 + R() * 0.8, ph: R() * TAU }); } return a; })();
+const BEDG = (() => { const R = rng(43), a = []; for (let row = 0; row < 5; row++) for (let col = 0; col < 9; col++) a.push([22 + col * 44 + (row % 2) * 22 + (R() - 0.5) * 8, 50 + row * 36 + (R() - 0.5) * 6]); return a; })();
+function drawBroad(c, t, part) {
+  const T = Math.min((t % 6.5), 5.4), sp = (tt) => 4 + 13 * tt ** 0.75;
+  c.save(); c.beginPath(); c.rect(0, 30, 376, 190); c.clip();
+  for (const [x, y] of BEDG) { c.fillStyle = 'rgba(150,166,178,.42)'; c.beginPath(); c.arc(x, y, 13, 0, TAU); c.fill(); }
+  const pos = (m, tt) => [28 + 52 * tt + m.g * sp(tt), m.y0 + 9 * Math.sin(1.7 * tt * m.w + m.ph)];
+  // 跑最快與最慢的兩個,畫出走過的路
+  const ord = BROAD.slice().sort((a, b) => a.g - b.g), hi = [ord[0], ord[ord.length - 1]];
+  for (const m of hi) { c.strokeStyle = 'rgba(93,255,176,.35)'; c.lineWidth = 1.6; c.setLineDash([4, 4]); c.beginPath(); for (let k = 0; k <= 30; k++) { const [x, y] = pos(m, (k / 30) * T); k ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke(); c.setLineDash([]); }
+  for (const m of BROAD) { const [x, y] = pos(m, T); c.fillStyle = '#5dffb0'; c.shadowColor = '#5dffb0'; c.shadowBlur = 8; c.beginPath(); c.arc(x, y, 5.5, 0, TAU); c.fill(); c.shadowBlur = 0; }
+  c.restore();
+  // 分子在哪裡的分布(峰的形狀)
+  const mx = 28 + 52 * T, s = sp(T);
+  c.strokeStyle = '#5dffb0'; c.lineWidth = 2.2; c.beginPath();
+  for (let x = 0; x <= 376; x += 3) { const y = 238 - 26 * (6 / s) ** 0.5 * Math.exp(-0.5 * ((x - mx) / s) ** 2); x ? c.lineTo(x, y) : c.moveTo(x, y); }
+  c.stroke(); c.strokeStyle = 'rgba(160,215,235,.25)'; c.lineWidth = 1; c.beginPath(); c.moveTo(0, 238.5); c.lineTo(376, 238.5); c.stroke();
+  lt(c, '一起出發', 8, 18, { size: 11.5, color: COL.muted, w: 500 });
+  lt(c, '越走越散開', 370, 18, { size: 11.5, color: COL.muted, w: 500, align: 'right' });
+  // 右邊:顆粒大小
+  c.strokeStyle = 'rgba(160,215,235,.18)'; c.beginPath(); c.moveTo(392, 14); c.lineTo(392, 240); c.stroke();
+  [[5, 30, 13, 100, 1], [1.7, 134, 4.6, 900, 0.58]].forEach(([p, y0, r, bar, wk]) => {
+    const on = part === p, a = on ? 1 : 0.42;
+    c.globalAlpha = a;
+    lt(c, `${p} µm`, 404, y0 + 12, { size: 13.5, color: on ? COL.cyan : COL.ink2, w: 700, mono: true });
+    const n = Math.floor(60 / (2 * r + 2));
+    for (let i = 0; i < n; i++) for (let j = 0; j < Math.max(1, Math.floor(40 / (2 * r + 2))); j++) { c.fillStyle = 'rgba(150,166,178,.6)'; c.beginPath(); c.arc(408 + r + i * (2 * r + 2), y0 + 36 + r + j * (2 * r + 2), r, 0, TAU); c.fill(); }
+    // 小峰:同樣的量,窄的比較高
+    const cx = 540, w = 24 * wk;
+    c.strokeStyle = on ? COL.cyan : COL.ink2; c.lineWidth = 2; c.beginPath();
+    for (let x = cx - 52; x <= cx + 52; x += 2) { const y = y0 + 80 - (44 / wk) * 0.62 * Math.exp(-0.5 * ((x - cx) / (w * 0.5)) ** 2); x === cx - 52 ? c.moveTo(x, y) : c.lineTo(x, y); }
+    c.stroke();
+    lt(c, `約 ${bar} bar`, 488, y0 + 94, { size: 11.5, color: on ? COL.amber : COL.muted, w: 600, align: 'left', mono: true });
+    c.globalAlpha = 1;
+  });
+  c.fillStyle = 'rgba(10,15,19,.72)'; c.fillRect(0, 252, 600, 88);
+  lt(c, '峰寬:有的繞遠路、有的多待一下,所以散開', 12, 274, { size: 12.5, color: COL.ink, w: 600 });
+  lt(c, '顆粒越小 → 路徑差越小,峰越窄;但縫隙越小,越難推', 12, 312, { size: 12.5, color: COL.ink2, w: 500 });
+}
+// ---------- 分得開嗎 ----------
+function drawRs(c, P) {
+  // P = { a: {t, s, h, name, col}, b: {...} };Rs = (tb − ta) ÷ (2(σa + σb))
+  const { a, b } = P, rs = (b.t - a.t) / (2 * (a.s + b.s));
+  const lo = a.t - 4.2 * a.s, hi = b.t + 4.2 * b.s, X = (v) => 40 + ((v - lo) / (hi - lo)) * 520, Y0 = 214, HH = 150;
+  const hm = Math.max(a.h, b.h), ga = (v) => (a.h / hm) * Math.exp(-0.5 * ((v - a.t) / a.s) ** 2), gb = (v) => (b.h / hm) * Math.exp(-0.5 * ((v - b.t) / b.s) ** 2);
+  c.strokeStyle = 'rgba(160,215,235,.3)'; c.lineWidth = 1; c.beginPath(); c.moveTo(30, Y0 + 0.5); c.lineTo(570, Y0 + 0.5); c.stroke();
+  for (const [f, col] of [[ga, a.col], [gb, b.col]]) {
+    c.strokeStyle = col; c.lineWidth = 1.6; c.setLineDash([5, 4]); c.beginPath();
+    for (let i = 0; i <= 260; i++) { const v = lerp(lo, hi, i / 260), y = Y0 - HH * f(v); i ? c.lineTo(X(v), y) : c.moveTo(X(v), y); }
+    c.stroke(); c.setLineDash([]);
+  }
+  c.strokeStyle = '#ffffff'; c.lineWidth = 2.6; c.beginPath();
+  for (let i = 0; i <= 260; i++) { const v = lerp(lo, hi, i / 260), y = Y0 - HH * (ga(v) + gb(v)); i ? c.lineTo(X(v), y) : c.moveTo(X(v), y); }
+  c.stroke();
+  // 峰頂的距離
+  const yT = Y0 - HH * Math.max(ga(a.t) + gb(a.t), ga(b.t) + gb(b.t)) - 16, xa = X(a.t), xb = X(b.t);
+  c.strokeStyle = COL.amber; c.fillStyle = COL.amber; c.lineWidth = 1.6;
+  c.beginPath(); c.moveTo(xa, yT); c.lineTo(xb, yT); c.stroke();
+  for (const [x, d] of [[xa, 1], [xb, -1]]) { c.beginPath(); c.moveTo(x, yT); c.lineTo(x + 7 * d, yT - 4); c.lineTo(x + 7 * d, yT + 4); c.closePath(); c.fill(); c.setLineDash([2, 3]); c.beginPath(); c.moveTo(x, yT); c.lineTo(x, Y0); c.stroke(); c.setLineDash([]); }
+  lt(c, '峰頂距離', (xa + xb) / 2, yT - 14, { size: 12, color: COL.amber, align: 'center', w: 700 });
+  // 峰寬(底寬 = 4σ)
+  [[a, 228], [b, 240]].forEach(([p, y]) => { const x0 = X(p.t - 2 * p.s), x1 = X(p.t + 2 * p.s); c.strokeStyle = p.col; c.lineWidth = 2; c.beginPath(); c.moveTo(x0, y - 5); c.lineTo(x0, y); c.lineTo(x1, y); c.lineTo(x1, y - 5); c.stroke(); });
+  lt(c, '峰寬', X(b.t + 2 * b.s) + 8, 240, { size: 11.5, color: COL.ink2, w: 600 });
+  c.fillStyle = 'rgba(10,15,19,.72)'; c.fillRect(0, 252, 600, 88);
+  const col = rs < 1 ? COL.rose : rs < 1.5 ? COL.amber : COL.mint;
+  lt(c, 'Rs = 峰頂距離 ÷ 平均峰寬 =', 14, 276, { size: 13.5, color: COL.ink, w: 600 });
+  lt(c, rs.toFixed(rs < 10 ? 2 : 0), 370, 276, { size: 15, color: col, w: 700, mono: true });
+  lt(c, rsWord(rs), 588, 276, { size: 15, color: col, w: 800, align: 'right' });
+  c.fillStyle = a.col; c.beginPath(); c.arc(20, 314, 6, 0, TAU); c.fill(); lt(c, a.name, 32, 314, { size: 12.5, color: a.col, w: 700 });
+  const wa = c.measureText(a.name).width;
+  c.fillStyle = b.col; c.beginPath(); c.arc(62 + wa, 314, 6, 0, TAU); c.fill(); lt(c, b.name, 74 + wa, 314, { size: 12.5, color: b.col, w: 700 });
+  return rs;
+}
+// 影片第 06 段:先用兩支示意的峰說明 Rs(0.6 → 1.0 → 1.5),再看真的例子(檸檬烯與 1,8-桉葉油醇)
+function rsFilmPair(t) {
+  if (t < 136.8) {
+    const u = clamp((t - 131.0) / 5.0, 0, 1), rs = u < 0.5 ? lerp(0.6, 1.0, ease(u * 2)) : lerp(1.0, 1.5, ease(u * 2 - 1));
+    return { a: { t: 0, s: 1, h: 1, name: '成分 A', col: COL.cyan }, b: { t: 4 * rs, s: 1, h: 0.8, name: '成分 B', col: COL.amber } };
+  }
+  return pairFromRun(runOf('gc', 'ramp'), 'lim', 'cin');
+}
+function pairFromRun(r, ida, idb) {
+  const f = (id) => { const cp = r.cpds.find((x) => x.c.id === id); return { t: cp.tR, s: cp.sig, h: cp.h, name: cp.c.name, col: cp.c.col }; };
+  return { a: f(ida), b: f(idb) };
+}
+function rsLivePair() {
+  const r = W.run; if (!r) return null;
+  const w = worstRs(r, W.rt); if (!w) return null;
+  const f = (cp) => ({ t: cp.tR, s: cp.sig, h: cp.h, name: cp.c.name, col: cp.c.col });
+  return { a: f(w.a), b: f(w.b), rs: w.rs };
+}
+function drawSketch(t) {
+  const now = performance.now();
+  if (!REC && now - skDrawnAt < 1000 / 30) return;
+  skDrawnAt = now;
+  const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = skCv.clientWidth, h = skCv.clientHeight;
+  if (!w || !h) return;
+  if (skCv.width !== Math.round(w * dpr) || skCv.height !== Math.round(h * dpr)) { skCv.width = Math.round(w * dpr); skCv.height = Math.round(h * dpr); }
+  const c = skCv.getContext('2d'), k = (w * dpr) / SKV.w;
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, skCv.width, skCv.height);
+  c.setTransform(k, 0, 0, k, 0, 0);
+  const film = FILM || tour.on;
+  if (W.sk === 'broad') drawBroad(c, W.skT, W.part);
+  else if (W.sk === 'rs') {
+    const P = film ? rsFilmPair(W.skT) : rsLivePair();
+    if (P) drawRs(c, P); else lt(c, '等兩支峰都出來,再量它們分不分得開', 300, 150, { size: 13.5, color: COL.muted, align: 'center', w: 500 });
+  } else drawMicro(c, W.inst, W.skT);
+}
+
+// ==== 70_ui.js ====
+// ================= 介面 =================
+// 讀值:推著走的(流動相)、拉住分子的(固定相)、最難分開的一對峰的分離度
+function chipVals() {
+  const inst = W.inst, r = W.run && W.run.inst === inst ? W.run : null;
+  let m = '—', s = '—', rr = '—';
+  if (inst === 'tsw') { m = '石油醚'; s = '碳酸鈣粉'; }
+  else if (inst === 'gc') { m = `氦氣 · ${Math.round(W.ovenT)} °C`; s = '管壁上的薄膜'; }
+  else { const phi = r ? LC_CONDS[r.cond].phi(Math.max(0, W.rt)) : 0.5; m = `水+甲醇 ${Math.round(phi * 100)}%`; s = `C18 · ${W.part} µm`; }
+  if (r) { const w = worstRs(r, W.rt); rr = w ? `Rs ${w.rs < 10 ? w.rs.toFixed(1) : '> 10'} ${rsWord(w.rs)}` : '等出峰'; }
+  return [m, s, rr];
+}
+// 簡圖下方的說明(互動模式)
+function skText() {
+  if (S.sk === 'broad') return '同一種分子也會越走越散開:有的繞遠路,有的往前後擴散,有的在固定相多待一下。顆粒越小,散開得越少,但要的壓力越大。';
+  if (S.sk === 'rs') {
+    const P = rsLivePair(), gcPair = P && /檸檬烯/.test(P.a.name + P.b.name) && /桉葉油醇/.test(P.a.name + P.b.name);
+    return `Rs = 兩支峰頂的距離 ÷ 平均峰寬;到 1.5,兩支峰中間就回到基線。${P ? `這一次最難分的是${P.a.name}和${/^[A-Za-z0-9]/.test(P.b.name) ? ' ' : ''}${P.b.name}${gcPair ? ':在這支管柱上怎麼調溫度都分不開,要換管柱或靠質譜分辨。' : '。'}` : ''}`;
+  }
+  return {
+    tsw: '橘色的胡蘿蔔素幾乎不被碳酸鈣粉拉住,一路往下跑;綠色的葉綠素常被拉住,留在管子上面。',
+    gc: '綠色的檸檬烯很少溶進管壁的薄膜,大部分時間都在往前走;紫色的石竹烯常被薄膜拉住,平均走得慢。溫度越高,大家越待不住。',
+    lc: '藍色的沒食子酸很溶於水,很少黏在 C18 上;橘色的槲皮素比較「油」,常被拉住。甲醇越多,越容易被沖下來。',
+  }[S.inst];
+}
+const SKH = { micro: '管子裡面', broad: '峰為什麼會變寬', rs: '分得開嗎' };
+let lastNote = '', lastCap = '', lastTitle = '', lastCmp = -1, lastChip = '', lastSk = '', lastCon = '';
+function updateDOM(t) {
+  const film = FILM || tour.on;
+  const ch = chipVals(), ck = ch.join('|');
+  if (ck !== lastChip) { lastChip = ck; el('cM').textContent = ch[0]; el('cS').textContent = ch[1]; el('cR').textContent = ch[2]; }
+  // 簡圖
+  const note = el('note'), so = film ? W.skOp : 1; note.style.opacity = so; note.style.visibility = so < 0.01 ? 'hidden' : 'visible';
+  const M = MICRO[W.inst], sub = W.sk === 'micro' ? `流動相:${M.flow} · 固定相:${M.stat}` : W.sk === 'broad' ? '同一種分子,一起出發' : film && W.skT < 136.8 ? '兩支峰的距離與寬度' : '檸檬烯與 1,8-桉葉油醇';
+  const sk = W.sk + '|' + sub;
+  if (sk !== lastSk) { lastSk = sk; el('skTitle').textContent = SKH[W.sk]; el('skSub').textContent = sub; }
+  drawSketch(t);
+  if (!film) { const n = skText(); if (n !== lastNote) { lastNote = n; el('skTxt').textContent = n; } }
+  // 標籤
+  setLabelMode(film);
+  const ph = innerWidth < 980, STL = { tsw: ph ? ['tswCol'] : ['tswCol', 'tswSolv'], gc: ph ? ['coil', 'oven'] : ['he', 'inlet', 'coil', 'oven', 'det'], lc: ph ? ['lcCol'] : ['bottle', 'pump', 'as', 'lcCol', 'lcDet'] };
+  const L = W.labels || Object.fromEntries(STL[W.inst].map((k) => [k, 0.92]));
+  for (const k of LBL_KEYS) labelOp(k, L[k] || 0);
+  labelSub('oven', `${Math.round(W.ovenT)} °C`);
+  { const r = W.run && W.run.inst === 'lc' ? W.run : null, phi = r ? LC_CONDS[r.cond].phi(Math.max(0, W.rt)) : 0.5; labelSub('pump', `壓力約 ${LC_PART[W.part].bar} bar · 甲醇 ${Math.round(phi * 100)}%`); }
+  labelSub('lcCol', `15 公分,塞滿 ${W.part} µm 的小顆粒`);
+  // 層析圖
+  const con = el('console');
+  con.style.opacity = W.conOp; con.style.visibility = W.conOp < 0.01 ? 'hidden' : 'visible';
+  if (W.conOp > 0.01) drawPlot();
+  // 字幕、片頭片尾、比較表
+  if (film) {
+    const cap = el('cap'), c = W.cap;
+    cap.style.opacity = c ? c.op : 0;
+    const k2 = c ? c.chap + c.txt : '';
+    if (k2 !== lastCap && c) { lastCap = k2; el('chap').textContent = c.chap; el('capTxt').textContent = c.txt; }
+    cap.classList.toggle('withcon', W.conOp > 0.01);
+    const tc = el('titlecard'), op = Math.max(W.title, W.outro);
+    tc.style.opacity = op; tc.style.visibility = op < 0.01 ? 'hidden' : 'visible';
+    const tk = W.outro > W.title ? 'o' : 't';
+    if (tk !== lastTitle) {
+      lastTitle = tk;
+      const tx = tk === 't'
+        ? ['層析', '把混在一起的成分分開', '從茨維特的色素管柱,到氣相層析 GC 與液相層析 HPLC', '']
+        : ['層析-GC 與 HPLC 的原理', '推著走 · 拉住 · 分開', '茨維特的管柱 · 升溫程式 · 梯度沖提 · 峰寬與分離度', '層析原理的示意動畫;儀器與管柱經過縮放。GC 的滯留時間和 GC-MS 教材用同一個模型算出,HPLC 與茨維特管柱的數值是依常見規律設定的示意值。'];
+      ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => { el(id).textContent = tx[i]; });
+      el('titlecard').classList.toggle('outro', tk === 'o');
+    }
+    document.querySelector('.hud').style.opacity = W.chips;
+    if (Math.abs(W.cmp - lastCmp) > 0.002) { lastCmp = W.cmp; const cm = el('cmp'); cm.style.opacity = W.cmp; cm.style.visibility = W.cmp < 0.01 ? 'hidden' : 'visible'; }
+  }
+}
+// 比較表(影片最後一段)
+el('cmp').innerHTML = `<table>
+<tr><th></th><th>氣相層析 GC</th><th>液相層析 HPLC</th></tr>
+<tr><td>推著走的(流動相)</td><td>氦氣等氣體</td><td>水、甲醇等液體</td></tr>
+<tr><td>拉住分子的(固定相)</td><td>管壁上的薄膜</td><td>小顆粒表面的 C18</td></tr>
+<tr><td>管柱</td><td><b>30 m × 0.25 mm</b></td><td><b>15 cm × 4.6 mm</b></td></tr>
+<tr><td>怎麼調整出峰</td><td>改溫度(升溫程式)</td><td>改溶劑比例(梯度沖提)</td></tr>
+<tr><td>適合的樣品</td><td>會氣化、耐熱</td><td>不易氣化、怕熱</td></tr>
+<tr><td>常接的偵測器</td><td>火焰離子化偵測器、質譜</td><td>紫外光偵測器、質譜</td></tr>
+</table>`;
+
+// ---------- 層析圖 ----------
+const plot = el('plot'), tip = el('tip');
+let plotDrawnAt = -Infinity;
+const CON = {
+  tsw: { title: '色帶與出口的訊號', sample: () => '葉子的色素 · 碳酸鈣粉 · 石油醚' },
+  gc: { title: '氣相層析圖', sample: (r) => `精油 · ${GC_CONDS[r.cond].label}` },
+  lc: { title: '液相層析圖', sample: (r) => `植物酚類 · ${LC_CONDS[r.cond].label} · 顆粒 ${r.part} µm` },
+};
+const RGB_OF = { tsw: TSW_RGB, gc: GC_RGB, lc: LC_RGB };
+// 一次分析的訊號,每一個像素取一個值;峰頂落在哪一格就補上峰頂的值(很窄的峰才不會被跳過)
+function traceOf(r, tTo, hM, tMax, pw) {
+  const n = Math.max(1, Math.floor((Math.min(tTo, tMax) / tMax) * pw)), v = new Float32Array(n + 1);
+  for (let i = 0; i <= n; i++) v[i] = sigAt(r, (i / pw) * tMax, hM);
+  for (const cp of r.cpds) { if (cp.tR > tTo) continue; const i = Math.round((cp.tR / tMax) * pw); if (i >= 0 && i <= n) v[i] = Math.max(v[i], sigAt(r, cp.tR, hM)); }
+  return v;
+}
+function drawPlot() {
+  const now = performance.now();
+  if (!REC && now - plotDrawnAt < 1000 / 30) return;
+  plotDrawnAt = now;
+  const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = plot.clientWidth, h = plot.clientHeight;
+  if (!w) return;
+  if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
+  const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const r = W.run && W.run.inst === W.inst ? W.run : null, inst = W.inst, g = r && W.ghost && W.ghost.inst === inst ? W.ghost : null, rt = r ? W.rt : -1;
+  const hk = `${inst}|${r ? r.key : ''}|${g ? g.key : ''}`;
+  if (hk !== lastCon) {
+    lastCon = hk; el('conTitle').textContent = CON[inst].title; el('conSample').textContent = r ? CON[inst].sample(r) : '按「進樣」打一針';
+    const prog = !r || inst === 'tsw' ? '' : `<span><i style="border-top:2px dashed #ffc261"></i>${inst === 'gc' ? '溫度' : '甲醇比例'}</span>`;
+    el('legend').innerHTML = (g ? `<span><i style="border-top:2px solid #74e4ff"></i>這一次</span><span><i style="border-top:2px dashed #8a9ba5"></i>上一次:${(CONDS_OF[inst][g.cond] || {}).label || ''}${inst === 'lc' && g.part !== r.part ? ` ${g.part} µm` : ''}</span>` : '') + prog;
+  }
+  const fs = FILM ? 14 : 11, Lp = FILM ? 16 : 12, Rp = inst === 'tsw' ? (FILM ? 14 : 10) : FILM ? 54 : 40, Tp = FILM ? 26 : 20, Bp = FILM ? 34 : 26;
+  const tMax = Math.max(r ? r.tEnd : inst === 'tsw' ? TSW.tEnd : 13, g ? g.tEnd : 0), pw = w - Lp - Rp;
+  let top = Tp;
+  // 茨維特:上面先畫一條橫放的管柱(左邊是頂端),看得到現在的色帶
+  if (inst === 'tsw') {
+    const sh = FILM ? 30 : 22, y0 = Tp - 6;
+    c.fillStyle = `rgb(${PAPER.map((v) => Math.round(v * 255)).join(',')})`; c.fillRect(Lp, y0, pw, sh);
+    if (r && rt > 0) {
+      const bands = r.cpds.map((cp, i) => { const z = zAt(r, cp, rt); return { z, s: bandSigZ(r, z), col: TSW_RGB[i], a: cp.c.amt }; });
+      for (let x = 0; x < pw; x++) {
+        const zc = (x + 0.5) / pw; let R = PAPER[0], G = PAPER[1], B = PAPER[2];
+        for (const b of bands) { const u = (zc - b.z) / b.s; if (u * u > 30) continue; const d = clamp(1.25 * b.a * (0.022 / b.s) ** 0.7 * Math.exp(-0.5 * u * u), 0, 0.93); R *= 1 - d * (1 - b.col[0]); G *= 1 - d * (1 - b.col[1]); B *= 1 - d * (1 - b.col[2]); }
+        c.fillStyle = `rgb(${Math.round(R * 255)},${Math.round(G * 255)},${Math.round(B * 255)})`; c.fillRect(Lp + x, y0, 1.2, sh);
+      }
+    }
+    c.font = `${fs}px ${SANS}`; c.fillStyle = COL.muted; c.textBaseline = 'top';
+    c.textAlign = 'left'; c.fillText('管柱頂端', Lp, y0 + sh + 3); c.textAlign = 'right'; c.fillText('出口 → 偵測器', Lp + pw, y0 + sh + 3);
+    top = y0 + sh + fs + 14;
+  }
+  const ph = h - top - Bp, yb = top + ph, X = (tt) => Lp + (tt / tMax) * pw;
+  // 時間軸
+  c.font = `${fs}px ${MONO}`; c.strokeStyle = 'rgba(160,215,235,.25)'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(Lp, yb + 0.5); c.lineTo(Lp + pw, yb + 0.5); c.stroke();
+  const step = [0.5, 1, 2, 5, 10].find((s) => (s / tMax) * pw >= (FILM ? 58 : 44)) || 10;
+  c.fillStyle = COL.muted; c.textAlign = 'center'; c.textBaseline = 'top';
+  for (let v = 0; v <= tMax + 1e-9; v += step) { const x = X(v); c.strokeStyle = 'rgba(160,215,235,.07)'; c.beginPath(); c.moveTo(Math.round(x) + 0.5, top); c.lineTo(Math.round(x) + 0.5, yb); c.stroke(); if (x < Lp + pw - (FILM ? 86 : 64)) c.fillText(String(v), x, yb + 6); }
+  c.textAlign = 'right'; c.font = `${fs}px ${SANS}`; c.fillText(inst === 'tsw' ? '分鐘(示意)' : '分鐘', Lp + pw, yb + 6);
+  // 溫度或甲醇比例(右邊的軸)
+  if (r && inst !== 'tsw') {
+    const gc = inst === 'gc', lo = gc ? 40 : 0, hi = gc ? 240 : 100, Yp = (v) => yb - ((v - lo) / (hi - lo)) * ph * 0.92;
+    c.font = `${fs - 1}px ${MONO}`; c.fillStyle = 'rgba(255,194,97,.8)'; c.textAlign = 'left'; c.textBaseline = 'middle';
+    for (const v of gc ? [50, 100, 150, 200] : [0, 50, 100]) c.fillText(String(v), Lp + pw + 6, Yp(v));
+    c.textBaseline = 'bottom'; c.fillText(gc ? '°C' : '甲醇%', Lp + pw + 6, top - 2);
+    c.strokeStyle = 'rgba(255,194,97,.75)'; c.lineWidth = 1.4; c.setLineDash([5, 4]); c.beginPath();
+    for (let i = 0; i <= 200; i++) { const tt = (i / 200) * tMax, v = gc ? GC_CONDS[r.cond].T(tt) : LC_CONDS[r.cond].phi(tt) * 100, x = X(tt), y = Yp(v); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.stroke(); c.setLineDash([]);
+  }
+  const hM = Math.max(r ? r.hMax : 1, g ? g.hMax : 0), Y = (v) => yb - ph * 0.86 * Math.min(1.14, v);
+  // 上一次(灰色虛線)
+  if (g) {
+    const v = traceOf(g, g.tEnd, hM, tMax, pw);
+    c.strokeStyle = 'rgba(160,180,190,.55)'; c.lineWidth = 1.3; c.setLineDash([4, 3]); c.beginPath();
+    for (let i = 0; i < v.length; i++) { const x = Lp + i, y = Y(v[i]); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.stroke(); c.setLineDash([]);
+  }
+  if (!r) return;
+  // 這一次:跑到哪裡畫到哪裡
+  if (rt > 0) {
+    const v = traceOf(r, rt, hM, tMax, pw);
+    c.beginPath(); for (let i = 0; i < v.length; i++) { const x = Lp + i, y = Y(v[i]); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.strokeStyle = COL.cyan; c.lineWidth = FILM ? 2 : 1.5; c.stroke();
+    c.lineTo(Lp + v.length - 1, yb); c.lineTo(Lp, yb); c.closePath(); c.fillStyle = 'rgba(116,228,255,.10)'; c.fill();
+  }
+  // 出來的峰標上名字(靠得太近的合在一起)
+  const out = r.cpds.filter((cp) => cp.tR <= rt && cp.tR <= tMax).sort((a, b) => a.tR - b.tR), groups = [];
+  for (const cp of out) { const x = X(cp.tR), G0 = groups[groups.length - 1]; if (G0 && x - G0.x < 9) { G0.cps.push(cp); G0.x = (G0.x + x) / 2; } else groups.push({ x, cps: [cp] }); }
+  c.font = `700 ${fs}px ${SANS}`; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.lineJoin = 'round';
+  let lastR = -Infinity, row = 0;
+  for (const G of groups) {
+    const s = G.cps.map((cp) => cp.c.name).join(' + '), tw = c.measureText(s).width, x = clamp(G.x, Lp + tw / 2, Lp + pw - tw / 2);
+    row = x - tw / 2 < lastR + 4 ? row + 1 : 0; lastR = x + tw / 2;
+    const ya = Math.min(...G.cps.map((cp) => Y(sigAt(r, cp.tR, hM)))), y = Math.max(top + fs + 2, ya - 5 - row * (fs + 3));
+    c.strokeStyle = 'rgba(10,15,19,.9)'; c.lineWidth = 3.5; c.strokeText(s, x, y);
+    c.fillStyle = G.cps.length > 1 ? '#ffffff' : G.cps[0].c.col; c.fillText(s, x, y);
+  }
+  // 現在的時間
+  if (rt > 0 && rt < r.tEnd) { const xm = X(rt); c.strokeStyle = '#fff6c4'; c.lineWidth = 1.2; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(xm, top - 4); c.lineTo(xm, yb); c.stroke(); c.setLineDash([]); }
+  plot._map = { Lp, pw, tMax, r };
+}
+plot.addEventListener('pointermove', (e) => {
+  const m = plot._map; if (!m) return;
+  const rc = plot.getBoundingClientRect(), px = e.clientX - rc.left;
+  if (px < m.Lp || px > m.Lp + m.pw) { tip.style.display = 'none'; return; }
+  const tt = ((px - m.Lp) / m.pw) * m.tMax; let near = '';
+  if (m.r) for (const cp of m.r.cpds) if (Math.abs(cp.tR - tt) < Math.max(4 * cp.sig, (3 / m.pw) * m.tMax) && cp.tR <= W.rt) near += ` · ${cp.c.name} ${cp.tR.toFixed(2)}`;
+  tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${e.clientY - rc.top}px`;
+  tip.textContent = `${tt.toFixed(2)} 分鐘${near}`;
+});
+plot.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
+
+// ---------- 控制 ----------
+function segOn(id, v) { for (const b of el(id).querySelectorAll('button')) b.classList.toggle('on', b.dataset.v === String(v)); }
+function buildCond() {
+  const C = CONDS_OF[S.inst];
+  el('grpCond').style.display = C ? '' : 'none';
+  el('grpPart').style.display = S.inst === 'lc' ? '' : 'none';
+  if (!C) return;
+  el('condName').textContent = S.inst === 'gc' ? '烘箱溫度' : '流動相';
+  el('segCond').innerHTML = Object.entries(C).map(([k, v]) => `<button data-v="${k}"${k === S.cond[S.inst] ? ' class="on"' : ''}>${v.label}</button>`).join('');
+}
+function flyToInst() { const v = IVIEW[S.inst]; const [p, q] = fitPortrait(v3(...v[0]), v3(...v[1]), S.inst === 'tsw' ? 1.5 : 2.4); nav.flyTo(p, q); }
+const nowS = () => performance.now() / 1000;
+el('segInst').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b || b.dataset.v === S.inst) return;
+  S.inst = b.dataset.v; segOn('segInst', S.inst); buildCond(); flyToInst(); S.next = nowS() + 0.9; lastCon = '';
+});
+el('segCond').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.cond[S.inst] = b.dataset.v; segOn('segCond', b.dataset.v); startRun(nowS()); });
+el('segPart').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.part = +b.dataset.v; segOn('segPart', b.dataset.v); if (S.inst === 'lc') startRun(nowS()); });
+el('skTabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.sk = b.dataset.v; segOn('skTabs', S.sk); });
+el('btnRun').addEventListener('click', () => startRun(nowS()));
+el('btnHelp').addEventListener('click', () => el('help').classList.toggle('show'));
+el('btnSketch').addEventListener('click', () => { root.classList.toggle('sk-open'); el('btnSketch').classList.toggle('on', root.classList.contains('sk-open')); });
+buildCond();
+S.next = nowS() + 1.2;
+
+// ---------- 導覽 ----------
+const tour = { on: false, t0: 0, saved: null };
+function startTour() {
+  el('help').classList.remove('show');
+  tour.saved = { cp: camera.position.clone(), ct: controls.target.clone() };
+  tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false; nav.cancel();
+}
+function endTour() {
+  if (!tour.on) return;
+  tour.on = false; root.classList.remove('touring'); controls.enabled = true;
+  const s = tour.saved; camera.position.copy(s.cp); controls.target.copy(s.ct); controls.update();
+  Object.assign(W, { labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1 });
+  el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; el('cmp').style.opacity = 0; el('cmp').style.visibility = 'hidden'; document.querySelector('.hud').style.opacity = 1; lastNote = ''; lastCon = ''; lastSk = '';
+  S.run = null; S.next = nowS() + 0.6;
+}
+el('btnTour').addEventListener('click', startTour);
+el('tourExit').addEventListener('click', endTour);
+addEventListener('keydown', (e) => { if (e.key === 'Escape') endTour(); });
+
+// ==== 80_loop.js ====
+// ================= 迴圈 =================
+// 影片與寬螢幕導覽時,左邊有簡圖、右上有層析圖,把 3D 的投影中心往右下移(鏡頭位置不動)
+// 互動模式在寬螢幕上也移一點:往右避開左欄,往上避開下方的層析圖
+const SHIFT = { x: -0.15, y: -0.08 }, SHIFT_I = { x: -0.08, y: 0.09 };
+function applyShift() {
+  const wide = FILM || (innerWidth >= 1100 && innerWidth / innerHeight >= 4 / 3);
+  const k = !wide ? 0 : FILM || tour.on ? W.shift || 0 : 1, sh = FILM || tour.on ? SHIFT : SHIFT_I;
+  // setViewOffset 會把 aspect 設成 fullWidth / fullHeight,所以要傳真正的畫面大小
+  const w = innerWidth, h = innerHeight;
+  if (k > 0.001) camera.setViewOffset(w, h, sh.x * k * w, sh.y * k * h, w, h);
+  else if (camera.view && camera.view.enabled) camera.clearViewOffset();
+}
+function render() {
+  applyShift();
+  fitClip(controls.target);
+  composer.render(); labelR.render(scene, camera);
+  keepLabelsOnScreen();
+}
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);
+  quality.configure(renderer, composer, bloom, { recording: REC });
+  renderer.setPixelRatio(DPR);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h); composer.setPixelRatio(DPR); composer.setSize(w, h); bloom.setSize(w * DPR, h * DPR); labelR.setSize(w, h);
+}
+addEventListener('resize', resize);
+resize();
+function frame(t, dt) { updateScene(t, dt); updateDOM(t); }
+
+// 字型載入後再畫(畫布上的字要用到)
+await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 3000))]);
+
+if (REC) {
+  window.__dur = FILM_DUR;
+  window.__seek = async (t) => { const ft = t / FILM_SLOW; film(ft); frame(ft, 1 / 30); render(); await Promise.race([new Promise((r) => requestAnimationFrame(() => r())), new Promise((r) => setTimeout(r, 300))]); return true; };
+  await window.__seek(+Q.get('t') || 0);
+  el('load').classList.add('done');
+  window.__ready = true;
+} else {
+  let last = performance.now() / 1000;
+  let filmStart = last - (+Q.get('t') || 0), hiddenAt = null;
+  document.addEventListener('visibilitychange', () => {
+    const now = performance.now() / 1000;
+    if (document.hidden) hiddenAt = now;
+    else if (hiddenAt !== null) {
+      const gap = now - hiddenAt; filmStart += gap;
+      if (tour.on) tour.t0 += gap;
+      if (S.run) S.run.t0 += gap;
+      if (S.next !== Infinity) S.next += gap;
+      last = now; hiddenAt = null;
+    }
+  });
+  const loop = () => {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    if (!quality.shouldRender(performance.now())) return;
+    quality.observe(performance.now());
+    const now = performance.now() / 1000, dt = Math.min(0.05, now - last); last = now;
+    let t = now, ft = null;
+    if (FILM) ft = ((now - filmStart) % FILM_DUR) / FILM_SLOW;
+    else if (tour.on) { const tt = now - tour.t0; if (tt >= FILM_DUR) endTour(); else ft = tt / FILM_SLOW; }
+    if (ft !== null) { film(ft); t = ft; }
+    if (!FILM && !tour.on) { interactive(dt, now); nav.step(dt); controls.update(); }
+    frame(t, dt);
+    render();
+  };
+  loop();
+  el('load').classList.add('done');
+  window.__ready = true;
+}
+// 除錯用
+window.CHX = { THREE, scene, camera, controls, S, W, film, frame, render, tour, nav, runOf, worstRs, pairsOf, gcPts, lcPts, COIL_LUT };
+
+</script>
+</body>
+</html>

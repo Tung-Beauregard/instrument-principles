@@ -1,0 +1,1486 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>光譜-光與分子的交互作用</title>
+<meta name="description" content="用 3D 模型看各種光和分子怎麼互動:無線電波讓原子核翻面(NMR)、微波讓分子轉動、紅外線讓化學鍵振動、紫外光與可見光讓電子跳上去,還有螢光、拉曼與 X 光。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* 版面和 UV-Vis、NMR、質譜儀-不同分析器比較同一套:左上標題與讀值,右上控制,下方是光譜的螢幕,導覽與影片共用字幕與片頭 */
+:root{
+  --bg:#0a0f13;
+  --panel:rgba(12,18,23,.80);
+  --line:rgba(160,215,235,.14);
+  --line-2:rgba(160,215,235,.30);
+  --ink:#eaf3f6; --ink-2:#a8bcc6; --muted:#71858f;
+  --cyan:#74e4ff; --amber:#ffc261; --violet:#bba6ff; --mint:#5dffb0;
+  --btn:rgba(255,255,255,.05); --btn-on:#eef6f8; --btn-on-ink:#0c1318;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --sans:'Noto Sans TC','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;touch-action:none}
+.labels{position:fixed;inset:0;pointer-events:none;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+/* 左上:標題、數值、說明 */
+.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw - 48px));pointer-events:none}
+.hud::before{content:'';position:absolute;left:-80px;top:-60px;width:620px;height:300px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 25% 35%,rgba(10,15,19,.72),rgba(10,15,19,0) 70%)}
+.hud .k{display:block;font-weight:900;font-size:28px;letter-spacing:.02em;line-height:1.1}
+.hud .big{display:block;font-weight:900;font-size:44px;line-height:1.12;color:var(--cyan);text-shadow:0 0 22px rgba(116,228,255,.35)}
+.lede{margin:10px 0 12px;font-size:13.5px;line-height:1.7;color:var(--ink-2)}
+.chips{display:flex;gap:8px;margin-bottom:10px}
+.chip{padding:7px 12px 8px;min-width:100px}
+.chip small{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.12em}
+.chip b{font-family:var(--mono);font-weight:600;font-size:18px;color:var(--cyan);white-space:nowrap}
+.note{padding:11px 14px;font-size:13px;line-height:1.75}
+.note em{font-style:normal;font-weight:700}
+/* 簡圖:左欄的平面示意 */
+.sketch{padding:10px 12px 9px}
+.sk-head{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.sk-head b{font-size:15px;font-weight:800;color:var(--ink)}
+.sk-head span{font-size:13px;font-weight:700;color:var(--cyan)}
+#sketch{display:block;width:100%;aspect-ratio:600/340}
+.sk-txt{margin:6px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink-2)}
+#btnSketch{display:none}
+.c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)} .g{color:var(--mint)}
+
+/* 網站分頁(各教材共用) */
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
+.sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
+.sitenav a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* 3D 載入中 */
+.load{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:13px;pointer-events:none;transition:opacity .5s}
+.load i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--cyan);animation:spin 1s linear infinite}
+.load.done{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.load i{animation:none}}
+
+/* 右上:控制面板 */
+.ctl{position:fixed;right:20px;top:18px;z-index:6;padding:13px 15px 14px;display:grid;grid-template-columns:auto auto;gap:12px 20px}
+.grp h6{margin:0 0 7px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em;display:flex;justify-content:space-between;gap:8px}
+.grp h6 span{font-family:var(--mono);color:var(--ink-2);letter-spacing:0}
+.grp.wide{grid-column:1 / -1}
+.seg{display:flex;gap:2px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px}
+.seg button,.btn{font:500 12.5px var(--sans);color:var(--ink-2);background:transparent;border:0;border-radius:7px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.seg button:hover,.btn:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.seg button.on{background:var(--btn-on);color:var(--btn-on-ink)}
+.seg.mono button{font-family:var(--mono);padding:6px 9px}
+.seg button:focus-visible,.btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--btn);border:1px solid var(--line);padding:6px 11px}
+.btn.on{background:var(--cyan);color:#062028;border-color:transparent}
+.btn.sq{width:32px;padding:6px 0;text-align:center;font-family:var(--mono)}
+
+.help{position:fixed;right:20px;top:200px;z-index:7;width:350px;padding:14px 16px;font-size:12.5px;line-height:1.7;display:none}
+.help.show{display:block}
+.help b{font-size:13px}
+.help ul{margin:6px 0 8px;padding-left:18px}
+.help .fine{color:var(--muted);font-size:11.5px;margin:0}
+
+/* 底部:譜的螢幕 */
+.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw - 32px));padding:11px 14px 9px}
+/* 寬螢幕:左欄有簡圖,主控台放在左欄右邊那一塊的正中間 */
+@media (min-width:981px){.console{left:calc(50vw + 202px);width:min(800px,calc(100vw - 440px))}}
+.con-head{display:flex;align-items:baseline;gap:10px;font-size:12.5px;margin-bottom:4px;white-space:nowrap}
+.con-head b{font-weight:700}
+.con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.legend{margin-left:auto;display:flex;gap:14px;color:var(--ink-2);font-size:11.5px}
+.legend i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:6px}
+.con-body{display:grid;grid-template-columns:1fr 168px;gap:14px;align-items:stretch}
+.plotwrap{position:relative}
+#plot{width:100%;height:170px;display:block;cursor:zoom-in}
+.meters{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.m .t{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.m .t b{font-family:var(--mono);font-weight:500;color:var(--ink-2)}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;width:50%;border-radius:3px;background:var(--cyan)}
+.m.big .t{margin-bottom:0}
+.m.big b.n{display:block;font-family:var(--mono);font-size:22px;font-weight:600;color:var(--cyan);line-height:1.2}
+.m.big b.n.no{color:var(--amber)}
+.console.cmpmode .con-body{grid-template-columns:1fr}
+.console.cmpmode .meters{display:none}
+.tip{position:absolute;pointer-events:none;padding:4px 8px;border-radius:6px;background:#0d151a;border:1px solid var(--line-2);font:500 11.5px var(--mono);color:var(--ink);white-space:nowrap;display:none;transform:translate(-50%,-120%)}
+
+.foot{position:fixed;left:24px;bottom:14px;z-index:4;max-width:260px;font-size:11px;line-height:1.55;color:var(--muted)}
+
+/* 元件標籤 */
+.lw{pointer-events:none}
+.blbl{font:600 14px/1 var(--mono);text-shadow:0 0 6px rgba(0,0,0,.95),0 0 2px rgba(0,0,0,.95);pointer-events:none;white-space:nowrap}
+.lbl{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:3px 8px 3px 7px;border-radius:6px;background:rgba(9,14,18,.84);border:1px solid rgba(116,228,255,.32);font-size:11.5px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.lbl i{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);flex:none}
+.lbl b{font-weight:700;color:#fff}
+.lbl span{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+
+/* 導覽與影片 */
+.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw - 40px));text-align:center;padding:13px 26px 15px}
+.cap .chap{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.16em;margin-bottom:5px}
+.cap .txt{font-size:18px;line-height:1.6;font-weight:500}
+.titlecard{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,15,19,.66) 0%,rgba(10,15,19,.4) 40%,rgba(10,15,19,0) 70%)}
+.titlecard .t1{font-weight:900;font-size:42px;letter-spacing:.04em}
+.titlecard .t2{font-weight:900;font-size:72px;color:var(--cyan);text-shadow:0 0 30px rgba(116,228,255,.4);line-height:1.15}
+.titlecard.outro .t2{font-size:44px}
+.titlecard .t3{font-size:20px;color:var(--ink-2);margin-top:14px}
+.titlecard .t4{font-size:14px;color:var(--muted);margin-top:22px}
+#tourExit{position:fixed;right:20px;top:18px;z-index:9;display:none}
+html.touring .ctl,html.touring .help,html.touring .lede,html.touring .sk-txt,html.touring .foot{display:none}
+html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
+html.touring .titlecard{display:flex}
+html.touring .cap.withcon{bottom:250px}
+/* 寬螢幕導覽:譜和影片一樣放右上角,鏡頭的構圖才不會被擋住;結束鈕移到上方中間 */
+@media (min-width:1100px) and (min-aspect-ratio:4/3){
+  html.touring .console{left:auto;right:24px;top:20px;bottom:auto;transform:none;width:min(640px,42vw)}
+  html.touring .cap.withcon{bottom:26px}
+  html.touring #tourExit{right:auto;left:50%;transform:translateX(-50%)}
+}
+
+html.film .ctl,html.film .help,html.film .lede,html.film .sk-txt,html.film .foot,html.film #tourExit,html.film .sitenav,html.film .load{display:none}
+html.film .cap{display:block;bottom:56px;max-width:1440px;padding:18px 40px 20px}
+html.film .cap .chap{font-size:16px;margin-bottom:8px}
+html.film .cap .txt{font-size:31px}
+html.film .titlecard{display:flex}
+html.film .titlecard .t1{font-size:56px}
+html.film .titlecard .t2{font-size:104px}
+html.film .titlecard.outro .t2{font-size:72px}
+html.film .titlecard .t3{font-size:28px}
+html.film .titlecard .t4{font-size:19px}
+html.film .hud{left:52px;top:44px;width:600px}
+html.film .hud::before{width:900px;height:420px}
+html.film .hud .k{font-size:34px}
+html.film .hud .big{font-size:54px}
+html.film .chips{margin-top:16px;gap:12px}
+html.film .chip{min-width:150px;padding:10px 16px 11px}
+html.film .chip small{font-size:14px}
+html.film .chip b{font-size:26px}
+html.film .sketch{padding:14px 16px 12px}
+html.film .sk-head{margin-bottom:8px;gap:12px}
+html.film .sk-head b{font-size:24px}
+html.film .sk-head span{font-size:20px}
+html.film .console{left:auto;right:52px;top:48px;bottom:auto;transform:none;width:720px;padding:16px 20px 14px}
+html.film .con-head{font-size:17px;margin-bottom:8px}
+html.film .legend{font-size:15px}
+html.film #plot{height:250px}
+html.film .con-body{grid-template-columns:1fr 200px}
+html.film .m .t{font-size:14px}
+html.film .m.big b.n{font-size:32px}
+html.film .lbl{font-size:17px;padding:5px 12px 5px 10px;border-radius:8px;gap:8px}
+html.film .blbl{font-size:20px}
+html.film .lbl span{font-size:14px}
+html.film .lbl i{width:8px;height:8px}
+html.rec *{transition:none!important;animation:none!important}
+/* 影片最後的比較表 */
+.cmp{position:fixed;left:50%;top:50%;transform:translate(-50%,-56%);z-index:8;display:none;padding:22px 26px 18px;opacity:0}
+html.film .cmp,html.touring .cmp{display:block}
+.cmp table{border-collapse:collapse;font-size:15px}
+.cmp th,.cmp td{padding:9px 18px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--line)}
+.cmp th{font-weight:700;font-size:15px}
+.cmp td:first-child,.cmp th:first-child{text-align:left;color:var(--ink-2);font-weight:500}
+.cmp tr:last-child td{border-bottom:0}
+.cmp td b{font-family:var(--mono);font-weight:600;color:var(--cyan)}
+html.film .cmp{padding:30px 38px 24px}
+html.film .cmp table{font-size:24px}
+html.film .cmp th{font-size:25px}
+html.film .cmp th,html.film .cmp td{padding:14px 30px}
+
+@media (max-width:980px){
+  .lede,.foot{display:none}
+  .ctl{left:12px;right:12px;top:auto;bottom:228px;grid-template-columns:1fr 1fr;gap:8px 12px;padding:10px 12px}
+  .ctl .grp.span2{grid-column:1 / -1}
+  .hud{left:12px;top:12px}
+  .note{display:none}
+  html.sk-open .note{display:block}
+  html.sk-open .chips,html.sk-open .sk-txt,html.sk-open .hud .k,html.sk-open .hud .big{display:none}
+  html.touring .note{display:none}
+  #btnSketch{display:inline-block}
+  .help{left:12px;right:12px;width:auto;top:120px}
+  .chip{min-width:0;flex:1}
+}
+@media (max-width:560px){
+  .ctl{bottom:220px}
+  .con-body{grid-template-columns:1fr 112px;gap:10px}
+  #plot{height:150px}
+  .hud .k{font-size:22px}
+  .hud .big{font-size:34px}
+  .chip{padding:6px 9px 7px}
+  .chip b{font-size:15px}
+  .legend{display:none}
+}
+@media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}}
+
+/* 這一頁:調頻率的滑桿、單欄的光譜螢幕 */
+.ctl{grid-template-columns:auto}
+#tune{width:100%;accent-color:var(--cyan);margin:2px 0 0}
+#plot{height:180px;cursor:default}
+html.film #plot{height:260px}
+.legend b{font-weight:600}
+/* 窄螢幕:控制面板疊在光譜螢幕上面,不能蓋到螢幕的標題 */
+@media (max-width:980px){.ctl{bottom:252px}}
+@media (max-width:560px){#plot{height:150px}.ctl{bottom:222px;gap:6px 10px}.seg button{padding:5px 8px}}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+}}
+</script>
+<link rel="stylesheet" href="../assets/render-quality.css">
+</head>
+<body>
+<div id="stage"></div>
+<div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
+
+<header class="hud">
+  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a><a href="./" aria-current="page">光與分子</a><a href="../chromatography/">層析</a></nav>
+  <span class="k">光譜</span>
+  <span class="big">光與分子怎麼互動</span>
+  <p class="lede">光是一份一份的能量,波長越短,一份的能量越大。分子會動的方式有好幾種:原子核翻面、整個分子轉動、化學鍵伸縮、電子跳到高一層。一份光的能量剛好對上其中一種,才會被吸收;不同的光譜,量的就是不同的動作。</p>
+  <div class="chips">
+    <div class="chip panel"><small>光</small><b id="cL">—</b></div>
+    <div class="chip panel"><small>一份光的能量</small><b id="cE">—</b></div>
+    <div class="chip panel"><small>分子在做什麼</small><b id="cM">—</b></div>
+  </div>
+  <div class="note panel sketch" id="note">
+    <div class="sk-head"><b id="skTitle">能量階梯</b><span id="skSub"></span></div>
+    <canvas id="sketch" role="img" aria-label="能量階梯:左邊是各種動作需要的能量,右邊是這一種動作的兩個台階和打進來的那一份光"></canvas>
+    <p class="sk-txt" id="skTxt"></p>
+  </div>
+</header>
+
+<aside class="ctl panel" id="ctl">
+  <div class="grp wide"><h6>光的種類</h6>
+    <div class="seg" id="segBand"><button data-v="radio">無線電波</button><button data-v="micro">微波</button><button data-v="ir" class="on">紅外線</button><button data-v="vis">可見光</button><button data-v="uv">紫外線</button><button data-v="xray">X 光</button></div>
+  </div>
+  <div class="grp wide"><h6>光的其他用法</h6>
+    <div class="seg" id="segMode"><button data-v="abs" class="on">吸收</button><button data-v="fluo">螢光</button><button data-v="raman">拉曼</button></div>
+  </div>
+  <div class="grp wide"><h6><span id="tuneName">調頻率</span><span id="tuneVal">—</span></h6>
+    <input type="range" id="tune" min="0" max="1000" value="500" aria-label="調整光的頻率或波長">
+  </div>
+  <div class="grp wide">
+    <div class="row">
+      <button class="btn" id="btnScan">掃描</button>
+      <button class="btn" id="btnTour">導覽</button>
+      <button class="btn" id="btnSketch">簡圖</button>
+      <button class="btn sq" id="btnHelp" aria-label="說明">?</button>
+    </div>
+  </div>
+</aside>
+
+<div class="help panel" id="help">
+  <b>操作</b>
+  <ul>
+    <li>選一種光,鏡頭會靠近分子;拖曳「調頻率」的滑桿,能量剛好對上某一階時,分子就會動起來,下面的光譜也會出現一個吸收。按「掃描」自動掃過一遍</li>
+    <li>「螢光」:吸收紫外光的分子,放出顏色比較偏紅(能量比較小)的光;「拉曼」:雷射打到分子後彈開的光,極少數顏色變了一點</li>
+    <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
+    <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
+    <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
+    <li>「導覽」自動播一遍,內容和影片相同,按 Esc 結束</li>
+  </ul>
+  <p class="fine" id="helpFine">示意圖:分子、光波與能量階梯的大小都經過縮放,不是照比例。例子是香草醛(核磁共振、紅外光、紫外光、拉曼),螢光用通寧水裡的奎寧,轉動用一氧化碳氣體;譜線位置取自文獻與資料庫,形狀是示意。來源見 INSTRUMENTS.md。</p>
+</div>
+
+<section class="console panel" id="console">
+  <div class="con-head"><b id="conTitle">光譜</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
+  <div class="plotwrap"><canvas id="plot"></canvas><div class="tip" id="tip"></div></div>
+</section>
+
+<div class="foot" id="foot">光和分子的交互作用示意;譜線位置取自文獻,形狀與大小經過縮放。</div>
+
+<div class="cap panel" id="cap"><div class="chap" id="chap"></div><div class="txt" id="capTxt"></div></div>
+<div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
+<div class="cmp panel" id="cmp"></div>
+<button class="btn" id="tourExit">結束導覽</button>
+
+<script type="module">
+// ==== 00_core.js ====
+import { createQualityControls } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
+const $ = (s) => document.querySelector(s);
+const el = (id) => document.getElementById(id);
+const Q = new URLSearchParams(location.search);
+const FILM = Q.has('film'), REC = Q.has('rec');
+const root = document.documentElement;
+if (FILM) root.classList.add('film');
+if (REC) root.classList.add('rec');
+window.__err = null;
+addEventListener('error', (e) => { window.__err = String(e.message || e); });
+
+// ================= 小工具 =================
+const TAU = Math.PI * 2;
+const V3 = THREE.Vector3;
+const v3 = (x = 0, y = 0, z = 0) => new V3(x, y, z);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+const approach = (cur, target, rate, dt) => cur + (target - cur) * (1 - Math.exp(-rate * dt));
+// 時間窗:a 到 b 之間為 1,兩端各用 f 秒淡入淡出
+const win = (t, a, b, f = 0.4) => sstep(a, a + f, t) * (1 - sstep(b - f, b, t));
+const hash1 = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const gauss = (x, x0, w) => { const u = (x - x0) / w; return Math.exp(-0.5 * u * u); };
+const lorentz = (x, x0, w) => { const u = (x - x0) / w; return 1 / (1 + u * u); };
+const MONO = "'IBM Plex Mono',Consolas,monospace";
+const SANS = "'Noto Sans TC','Microsoft JhengHei',sans-serif";
+const _rgb = { r: 0, g: 0, b: 0 };
+const cssCol = (c, a = 1) => { c.getRGB(_rgb, THREE.SRGBColorSpace); return `rgba(${Math.round(_rgb.r * 255)},${Math.round(_rgb.g * 255)},${Math.round(_rgb.b * 255)},${a})`; };
+const COL = { cyan: '#74e4ff', amber: '#ffc261', mint: '#5dffb0', violet: '#bba6ff', rose: '#ff7a9a', ink: '#eaf3f6', ink2: '#a8bcc6', muted: '#71858f' };
+
+// ================= 光的能量 =================
+// 一份光(光子)的能量 E = h·ν = h·c / λ。hc = 1239.84 eV·nm;h = 4.1357e-15 eV·s;1 cm⁻¹ = 1.23984e-4 eV
+const HC = 1239.84198, H_EVS = 4.135667696e-15, EV_PER_CM = 1.23984198e-4;
+const eNm = (nm) => HC / nm, eCm = (cm) => cm * EV_PER_CM, eHz = (hz) => hz * H_EVS;
+// 能量寫成好讀的字串:很小的用 10 的次方
+function fmtE(e) {
+  if (e >= 1000) return `${(e / 1000).toFixed(e >= 1e4 ? 0 : 1)} keV`;
+  if (e >= 0.1) return `${e.toFixed(e >= 10 ? 0 : 2)} eV`;
+  const p = Math.floor(Math.log10(e)), m = e / 10 ** p;
+  return `${m.toFixed(1)}×10${String(p).replace('-', '⁻').replace(/\d/g, (d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d])} eV`;
+}
+// 可見光的顏色(波長 nm → sRGB),用來畫光束與色帶
+function nmColor(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = -(nm - 440) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = -(nm - 510) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = -(nm - 645) / 65; } else { r = 1; }
+  const f = nm < 420 ? 0.35 + 0.65 * (nm - 380) / 40 : nm > 680 ? 0.35 + 0.65 * (720 - nm) / 40 : 1;
+  return [clamp(r * f, 0, 1), clamp(g * f, 0, 1), clamp(b * f, 0, 1)];
+}
+
+// ================= 六種光(加上螢光、拉曼兩種用法) =================
+// lo / hi 是滑桿兩端(照各自光譜習慣的方向:核磁共振 12 到 0 ppm、紅外 4000 到 400 cm⁻¹);energy(x) 傳回 eV
+const BANDS = {
+  radio: { id: 'radio', name: '無線電波', what: '原子核翻面', unit: 'ppm', lo: 12, hi: -0.5,
+    energy: (x) => eHz(500.13e6 * (1 + x * 1e-6)), fmt: (x) => `δ ${x.toFixed(2)}`, color: '#7fb0ff', waveLen: 150, tuneName: '調頻率(在 500 MHz 附近)' },
+  micro: { id: 'micro', name: '微波', what: '整個分子轉動', unit: 'GHz', lo: 40, hi: 500,
+    energy: (x) => eHz(x * 1e9), fmt: (x) => `${x.toFixed(1)} GHz`, color: '#6fe0c8', waveLen: 86, tuneName: '調頻率' },
+  ir: { id: 'ir', name: '紅外線', what: '化學鍵伸縮、彎曲', unit: 'cm⁻¹', lo: 4000, hi: 500,
+    energy: (x) => eCm(x), fmt: (x) => `${Math.round(x)} cm⁻¹`, color: '#ff6f5c', waveLen: 40, tuneName: '調波數(每公分幾個波)' },
+  vis: { id: 'vis', name: '可見光', what: '電子跳上去', unit: 'nm', lo: 400, hi: 700,
+    energy: (x) => eNm(x), fmt: (x) => `${Math.round(x)} nm`, color: '#ffffff', waveLen: 17, tuneName: '調波長' },
+  uv: { id: 'uv', name: '紫外線', what: '電子跳上去', unit: 'nm', lo: 200, hi: 400,
+    energy: (x) => eNm(x), fmt: (x) => `${Math.round(x)} nm`, color: '#a98cff', waveLen: 11, tuneName: '調波長' },
+  xray: { id: 'xray', name: 'X 光', what: '打掉內層電子', unit: 'eV', lo: 150, hi: 700,
+    energy: (x) => x, fmt: (x) => `${Math.round(x)} eV`, color: '#d8f0ff', waveLen: 5, tuneName: '調能量' },
+};
+const BAND_IDS = ['radio', 'micro', 'ir', 'vis', 'uv', 'xray'];
+const MODES = {
+  fluo: { id: 'fluo', name: '螢光', unit: 'nm', lo: 250, hi: 420, fmt: (x) => `激發 ${Math.round(x)} nm`, tuneName: '調激發光的波長', color: '#a98cff' },
+  raman: { id: 'raman', name: '拉曼', unit: 'cm⁻¹', lo: 200, hi: 3400, fmt: (x) => `位移 ${Math.round(x)} cm⁻¹`, tuneName: '看哪一個位移', color: '#5dff8a' },
+};
+
+// ================= 例子:香草醛(4-羥基-3-甲氧基苯甲醛) =================
+// 平面結構的原子座標(Å):苯環中心在原點,醛基朝上(+y)、羥基朝下;甲基的氫上下各一個
+const ATOMS = [
+  ['C', 0, 1.39, 0], ['C', 1.204, 0.695, 0], ['C', 1.204, -0.695, 0], ['C', 0, -1.39, 0], ['C', -1.204, -0.695, 0], ['C', -1.204, 0.695, 0], // 0-5 苯環 C1..C6
+  ['C', 0, 2.87, 0], ['O', 1.06, 3.48, 0], ['H', -0.95, 3.42, 0], // 6 醛基 C、7 醛基 O、8 醛基 H
+  ['H', 2.14, 1.24, 0], // 9 H-2
+  ['O', 2.38, -1.37, 0], ['C', 3.62, -0.64, 0], ['H', 4.47, -1.33, 0], ['H', 3.68, 0.0, 0.89], ['H', 3.68, 0.0, -0.89], // 10 甲氧基 O、11 甲基 C、12-14 甲基 H
+  ['O', 0, -2.75, 0], ['H', 0.88, -3.13, 0], // 15 羥基 O、16 羥基 H
+  ['H', -2.14, -1.24, 0], ['H', -2.14, 1.24, 0], // 17 H-5、18 H-6
+];
+const BONDS = [[0, 1, 2], [1, 2, 1], [2, 3, 2], [3, 4, 1], [4, 5, 2], [5, 0, 1], [0, 6, 1], [6, 7, 2], [6, 8, 1], [1, 9, 1], [2, 10, 1], [10, 11, 1], [11, 12, 1], [11, 13, 1], [11, 14, 1], [3, 15, 1], [15, 16, 1], [4, 17, 1], [5, 18, 1]];
+// 核磁共振:每個氫的化學位移(ppm,CDCl₃,和 NMR 教材同一組數據)
+const NMR_H = [
+  { atom: 8, ppm: 9.83, name: '醛基 H', n: 1 }, { atom: 18, ppm: 7.43, name: 'H-6', n: 1 }, { atom: 9, ppm: 7.42, name: 'H-2', n: 1 },
+  { atom: 17, ppm: 7.04, name: 'H-5', n: 1 }, { atom: 16, ppm: 6.2, name: '羥基 H', n: 1, w: 0.12 }, { atom: 12, ppm: 3.96, name: '甲氧基 H', n: 3, group: [12, 13, 14] },
+];
+// 紅外:振動的鍵、波數(cm⁻¹)、相對吸收強度、寬度;bond 指 BONDS 的索引(畫面上哪一根鍵在伸縮)
+const IR_BANDS = [
+  { cm: 3180, I: 0.55, w: 110, bonds: [16], name: 'O–H 伸縮' },
+  { cm: 3020, I: 0.12, w: 30, bonds: [9, 17, 18], name: '苯環 C–H 伸縮' },
+  { cm: 2940, I: 0.18, w: 30, bonds: [12, 13, 14], name: '甲基 C–H 伸縮' },
+  { cm: 2820, I: 0.15, w: 22, bonds: [8], name: '醛基 C–H 伸縮' },
+  { cm: 1666, I: 1.0, w: 22, bonds: [7], name: 'C=O 伸縮' },
+  { cm: 1590, I: 0.75, w: 16, bonds: [0, 2, 4], name: '苯環伸縮' },
+  { cm: 1510, I: 0.7, w: 16, bonds: [1, 3, 5], name: '苯環伸縮' },
+  { cm: 1265, I: 0.85, w: 20, bonds: [10, 15], name: 'C–O 伸縮' },
+  { cm: 1155, I: 0.8, w: 18, bonds: [11], name: 'C–O–C 伸縮' },
+  { cm: 1030, I: 0.45, w: 16, bonds: [11], name: 'O–CH₃ 伸縮' },
+  { cm: 860, I: 0.3, w: 14, bonds: [9, 17, 18], name: 'C–H 彎曲', bend: true },
+];
+// 紫外光:香草醛的吸收帶(nm)與相對強度
+const UV_BANDS = [{ nm: 231, I: 1.0, w: 13 }, { nm: 279, I: 0.62, w: 12 }, { nm: 308, I: 0.6, w: 16 }];
+// 可見光的對照:β-胡蘿蔔素(三個肩峰)
+const CAROTENE = [{ nm: 425, I: 0.75, w: 14 }, { nm: 450, I: 1.0, w: 14 }, { nm: 478, I: 0.85, w: 13 }];
+// 微波:一氧化碳的轉動譜線 ν = 2B(J+1),B = 57.636 GHz
+const CO_B = 57.6359683;
+const CO_LINES = [0, 1, 2, 3].map((J) => ({ J, ghz: 2 * CO_B * (J + 1) }));
+// X 光:K 殼層(1s)的束縛能(eV)
+const XEDGE = [{ el: 'C', eV: 284.2, atoms: [0, 1, 2, 3, 4, 5, 6, 11] }, { el: 'O', eV: 543.1, atoms: [7, 10, 15] }];
+// 螢光:奎寧(通寧水)的激發與放光
+const QUININE = { ex: [{ nm: 250, I: 1.0, w: 14 }, { nm: 350, I: 0.62, w: 22 }], em: { nm: 450, w: 34 } };
+// 拉曼:香草醛的主要拉曼位移(cm⁻¹)與相對強度
+const RAMAN = [
+  { cm: 3070, I: 0.35, w: 18, bonds: [9, 17, 18] }, { cm: 2940, I: 0.25, w: 20, bonds: [12, 13, 14] }, { cm: 1666, I: 0.55, w: 14, bonds: [7] },
+  { cm: 1590, I: 1.0, w: 12, bonds: [0, 2, 4] }, { cm: 1265, I: 0.45, w: 14, bonds: [10, 15] }, { cm: 1155, I: 0.6, w: 12, bonds: [11] },
+  { cm: 1030, I: 0.3, w: 12, bonds: [11] }, { cm: 800, I: 0.4, w: 12, bonds: [0, 1, 2, 3, 4, 5] },
+];
+const RAMAN_LASER = 532; // nm
+
+// ==== 10_scene.js ====
+// ================= 場景 =================
+// 場景單位:分子以 1 Å = 11 單位畫(放大幾億倍);地面 y = 0。左邊是光源、中間是分子、右邊是偵測器,前方地上是電磁波的色帶
+let DPR = REC ? 1 : quality.pixelRatio(innerWidth, innerHeight, 1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: REC, powerPreference: 'high-performance' });
+renderer.setPixelRatio(DPR);
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+$('#stage').appendChild(renderer.domElement);
+window.__gl = (() => { try { const gl = renderer.getContext(), x = gl.getExtension('WEBGL_debug_renderer_info'); return x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { return '?'; } })();
+
+const labelR = new CSS2DRenderer();
+labelR.setSize(innerWidth, innerHeight);
+labelR.domElement.className = 'labels';
+document.body.appendChild(labelR.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a1015);
+scene.fog = new THREE.Fog(0x0a1015, 900, 2300);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.32;
+
+const MOL_Y = 104; // 分子中心的高度
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.5, 4000);
+camera.position.set(40, 190, 560);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 92, 0);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 30; controls.maxDistance = 1100; controls.maxPolarAngle = 1.5;
+// 直式的窄螢幕:下半部被控制面板和光譜螢幕蓋住,鏡頭往後拉、畫面往上移;視窗還沒有大小時不調整
+function fitPortrait(p, q) {
+  const asp = innerWidth / innerHeight;
+  if (!(asp > 0) || asp >= 1.2) return [p, q];
+  const k = clamp(1.3 / asp, 1, 2.4), np = q.clone().add(p.clone().sub(q).multiplyScalar(k));
+  const lift = 0.36 * np.distanceTo(q) * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  return [np.setY(np.y - lift), q.clone().setY(q.y - lift)];
+}
+{ const [p, q] = fitPortrait(camera.position.clone(), controls.target.clone()); camera.position.copy(p); controls.target.copy(q); }
+controls.update();
+function fitClip(look) {
+  const d = camera.position.distanceTo(look);
+  camera.near = clamp(d * 0.02, 0.05, 8);
+  camera.far = Math.max(3000, d * 6);
+  camera.updateProjectionMatrix();
+}
+
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.55, 0.45, 1.4);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.HemisphereLight(0xcfe6ff, 0x1b1712, 0.5));
+const keyL = new THREE.DirectionalLight(0xffffff, 1.25);
+keyL.position.set(200, 460, 340); keyL.castShadow = true;
+keyL.shadow.mapSize.set(2048, 2048);
+Object.assign(keyL.shadow.camera, { left: -340, right: 340, top: 300, bottom: -200, near: 60, far: 1400 });
+keyL.shadow.bias = -0.0004; keyL.shadow.normalBias = 0.6;
+scene.add(keyL);
+keyL.target.position.set(0, 60, 0); scene.add(keyL.target);
+const rimL = new THREE.DirectionalLight(0x74e4ff, 0.3); rimL.position.set(-380, 220, -420); scene.add(rimL);
+
+// ---------- 地台與牆 ----------
+function canvasTex(w, h, draw, repeat) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+  return t;
+}
+const deck = new THREE.Mesh(new THREE.BoxGeometry(1800, 8, 700), new THREE.MeshStandardMaterial({ color: 0x141b20, roughness: 0.58, metalness: 0.1 }));
+deck.position.set(0, -4, 40); deck.receiveShadow = true; scene.add(deck);
+const deckStrip = new THREE.Mesh(new THREE.BoxGeometry(1800, 1.2, 1.4), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.25, 0.85, 1.1) }));
+deckStrip.position.set(0, -1.2, 390.4); scene.add(deckStrip);
+const wallTex = canvasTex(1024, 512, (c, w, h) => {
+  c.fillStyle = '#121a20'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 3;
+  for (let x = 0; x <= w; x += 128) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+  c.beginPath(); c.moveTo(0, 340); c.lineTo(w, 340); c.stroke();
+}, [3, 1]);
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(1800, 760), new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.95 }));
+wall.position.set(0, 330, -300); scene.add(wall);
+
+// ==== 20_parts.js ====
+// ================= 場景裡的東西 =================
+const AS = 11; // 1 Å 畫成幾個單位
+const MAT = {
+  C: new THREE.MeshStandardMaterial({ color: 0x9aa6b8, roughness: 0.35, metalness: 0.15 }),
+  O: new THREE.MeshStandardMaterial({ color: 0xff6b5b, roughness: 0.35, metalness: 0.1 }),
+  H: new THREE.MeshStandardMaterial({ color: 0xe8eef5, roughness: 0.4, metalness: 0.05 }),
+  bond: new THREE.MeshStandardMaterial({ color: 0x7d8a99, roughness: 0.45, metalness: 0.2 }),
+  metal: new THREE.MeshStandardMaterial({ color: 0x8ea2ae, roughness: 0.32, metalness: 0.75 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x1f2830, roughness: 0.6, metalness: 0.3 }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0xcfe9f5, roughness: 0.05, metalness: 0, transmission: 0.6, transparent: true, opacity: 0.28, depthWrite: false }),
+};
+const RAD = { C: 0.36, O: 0.34, H: 0.24 };
+
+// ---------- 香草醛 ----------
+const MOL = new THREE.Group(); MOL.position.set(0, MOL_Y, 0); scene.add(MOL);
+const MOLI = new THREE.Group(); MOL.add(MOLI); // 轉動、淡入淡出用的內層
+const BASE = ATOMS.map(([, x, y, z]) => v3(x * AS, y * AS, z * AS));
+const POS = BASE.map((p) => p.clone()); // 每一格的位置(加上振動)
+const sphereG = new THREE.SphereGeometry(1, 28, 18);
+const atomMats = ATOMS.map(([e]) => MAT[e].clone());
+const atomMesh = ATOMS.map(([e], i) => { const m = new THREE.Mesh(sphereG, atomMats[i]); m.scale.setScalar(RAD[e] * AS); m.castShadow = true; MOLI.add(m); return m; });
+const cylG = new THREE.CylinderGeometry(1, 1, 1, 14, 1); cylG.translate(0, 0.5, 0);
+// 雙鍵畫成兩根細一點的棍子(在分子平面上錯開)
+const bondMesh = BONDS.map(([a, b, ord]) => {
+  const g = new THREE.Group(), r = ord === 2 ? 0.075 : 0.12, offs = ord === 2 ? [-0.11, 0.11] : [0];
+  for (const o of offs) { const m = new THREE.Mesh(cylG, MAT.bond.clone()); m.userData.off = o; m.userData.r = r; m.castShadow = true; g.add(m); }
+  MOLI.add(g); return g;
+});
+const _ba = v3(), _bb = v3(), _bd = v3(), _bn = v3(), _q = new THREE.Quaternion();
+function placeBonds() {
+  BONDS.forEach(([a, b], i) => {
+    _ba.copy(POS[a]); _bb.copy(POS[b]); _bd.subVectors(_bb, _ba); const len = _bd.length(); _bd.normalize();
+    _q.setFromUnitVectors(UPV, _bd);
+    _bn.set(-_bd.y, _bd.x, 0).normalize(); // 平面上和鍵垂直的方向(雙鍵錯開用)
+    for (const m of bondMesh[i].children) {
+      m.position.copy(_ba).addScaledVector(_bn, m.userData.off * AS);
+      m.quaternion.copy(_q); m.scale.set(m.userData.r * AS, len, m.userData.r * AS);
+    }
+  });
+  atomMesh.forEach((m, i) => m.position.copy(POS[i]));
+}
+const UPV = v3(0, 1, 0);
+placeBonds();
+
+// ---------- 一氧化碳(微波那一段) ----------
+const CO = new THREE.Group(); CO.position.set(0, MOL_Y, 0); scene.add(CO); CO.visible = false;
+const coC = new THREE.Mesh(sphereG, MAT.C.clone()), coO = new THREE.Mesh(sphereG, MAT.O.clone());
+coC.scale.setScalar(9); coO.scale.setScalar(8.6); coC.position.set(-13, 0, 0); coO.position.set(11, 0, 0);
+const coB1 = new THREE.Mesh(cylG, MAT.bond), coB2 = new THREE.Mesh(cylG, MAT.bond), coB3 = new THREE.Mesh(cylG, MAT.bond);
+for (const [m, dy] of [[coB1, 0], [coB2, 2.6], [coB3, -2.6]]) { m.rotation.z = -Math.PI / 2; m.position.set(-13, dy, 0); m.scale.set(1.1, 24, 1.1); }
+CO.add(coC, coO, coB1, coB2, coB3);
+
+// ---------- 電子雲(紫外光、可見光) ----------
+// 平常的 π 電子雲(青色,環的上下兩片),吸收之後跳到 π*(紫色,中間多一道節面,分成好幾瓣)
+const cloudMat = (c) => new THREE.MeshBasicMaterial({ color: new THREE.Color(c), transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+const CLOUD0 = new THREE.Group(), CLOUD1 = new THREE.Group(); MOLI.add(CLOUD0, CLOUD1);
+const c0m = cloudMat('#3fd6ff'), c1m = cloudMat('#b48cff');
+for (const s of [1, -1]) {
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.39 * AS, 0.3 * AS, 16, 48), c0m); ring.position.z = s * 0.55 * AS; ring.scale.z = 0.55; CLOUD0.add(ring);
+  const co = new THREE.Mesh(sphereG, c0m); co.position.set(0.55 * AS, 3.2 * AS, s * 0.55 * AS); co.scale.set(0.9 * AS, 0.55 * AS, 0.35 * AS); CLOUD0.add(co);
+  // π*:六瓣,在苯環與醛基之間
+  for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + 0.5, m = new THREE.Mesh(sphereG, c1m); m.position.set(Math.cos(a) * 1.55 * AS, Math.sin(a) * 1.55 * AS, s * 0.7 * AS); m.scale.set(0.5 * AS, 0.5 * AS, 0.34 * AS); CLOUD1.add(m); }
+  for (const [x, y] of [[-0.2, 2.75], [1.2, 3.6]]) { const m = new THREE.Mesh(sphereG, c1m); m.position.set(x * AS, y * AS, s * 0.65 * AS); m.scale.set(0.5 * AS, 0.5 * AS, 0.36 * AS); CLOUD1.add(m); }
+}
+
+// ---------- 原子核的自旋(核磁共振) ----------
+// 每個氫原子上一根小箭頭:放進磁鐵後朝上(順著磁場)繞著轉,頻率對上就翻成朝下
+const SPIN = [];
+{
+  const shaft = new THREE.CylinderGeometry(0.5, 0.5, 9, 10); shaft.translate(0, 4.5, 0);
+  const head = new THREE.ConeGeometry(1.6, 4, 14); head.translate(0, 11, 0);
+  for (const h of NMR_H) for (const a of h.group || [h.atom]) {
+    const g = new THREE.Group(), mat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffd36b'), transparent: true, opacity: 0, depthWrite: false });
+    g.add(new THREE.Mesh(shaft, mat), new THREE.Mesh(head, mat));
+    MOLI.add(g); SPIN.push({ g, mat, h, atom: a, phase: hash1(a) * TAU });
+  }
+}
+
+// ---------- 磁鐵(核磁共振那一段) ----------
+const MAG = new THREE.Group(); MAG.position.set(0, MOL_Y, 0); scene.add(MAG);
+const magMats = [];
+for (const s of [1, -1]) {
+  const m = new THREE.MeshStandardMaterial({ color: s > 0 ? 0xc0504d : 0x4d7fc0, roughness: 0.4, metalness: 0.5, transparent: true, opacity: 0 });
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(58, 64, 28, 48), m); pole.position.y = s * 98; MAG.add(pole); magMats.push(m);
+}
+const fieldMat = new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: 0, depthWrite: false });
+{
+  const pts = [];
+  for (let i = 0; i < 7; i++) for (let j = 0; j < 3; j++) { const x = -48 + i * 16, z = -28 + j * 28; if (Math.abs(x) < 34 && Math.abs(z) < 4) continue; pts.push(v3(x, -84, z), v3(x, 84, z)); }
+  MAG.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), fieldMat));
+}
+
+// ---------- 光源與偵測器 ----------
+const SRC_X = -270, DET_X = 270;
+const srcBody = new THREE.Mesh(new THREE.CylinderGeometry(20, 24, 56, 32), MAT.dark); srcBody.rotation.z = Math.PI / 2; srcBody.position.set(SRC_X - 6, MOL_Y, 0); srcBody.castShadow = true; scene.add(srcBody);
+const srcLensMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffffff') });
+const srcLens = new THREE.Mesh(new THREE.CircleGeometry(15, 32), srcLensMat); srcLens.rotation.y = Math.PI / 2; srcLens.position.set(SRC_X + 22.2, MOL_Y, 0); scene.add(srcLens);
+const srcStand = new THREE.Mesh(new THREE.CylinderGeometry(4, 6, MOL_Y - 20, 12), MAT.metal); srcStand.position.set(SRC_X - 6, (MOL_Y - 20) / 2, 0); scene.add(srcStand);
+const detBody = new THREE.Mesh(new THREE.BoxGeometry(40, 60, 54), MAT.dark); detBody.position.set(DET_X + 14, MOL_Y, 0); detBody.castShadow = true; scene.add(detBody);
+const detFaceMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.1, 0.35, 0.45) });
+const detFace = new THREE.Mesh(new THREE.PlaneGeometry(30, 40), detFaceMat); detFace.rotation.y = -Math.PI / 2; detFace.position.set(DET_X - 6.2, MOL_Y, 0); scene.add(detFace);
+const detStand = new THREE.Mesh(new THREE.CylinderGeometry(4, 6, MOL_Y - 30, 12), MAT.metal); detStand.position.set(DET_X + 14, (MOL_Y - 30) / 2, 0); scene.add(detStand);
+
+// ---------- 光波:從光源到分子、從分子到偵測器的一條緞帶 ----------
+// 每一格依波長、振幅重算頂點;畫面上的波長只是示意(真的無線電波有好幾公尺長,X 光比原子還小)
+function makeRibbon(n) {
+  const geo = new THREE.BufferGeometry(), pos = new Float32Array(n * 2 * 3), idx = [];
+  for (let i = 0; i < n - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setIndex(idx);
+  const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const mesh = new THREE.Mesh(geo, mat); mesh.frustumCulled = false; scene.add(mesh);
+  return { mesh, mat, pos, n };
+}
+const WAVE_IN = makeRibbon(320), WAVE_OUT = makeRibbon(320);
+function setRibbon(R, x0, x1, lam, amp, t, speed = 70, width = 1.6, y0 = MOL_Y, z0 = 0) {
+  const p = R.pos, k = TAU / lam;
+  for (let i = 0; i < R.n; i++) {
+    const x = lerp(x0, x1, i / (R.n - 1)), env = Math.min(1, (x - x0) / 14, (x1 - x) / 14), y = y0 + amp * env * Math.sin(k * (x - speed * t));
+    p.set([x, y - width, z0, x, y + width, z0], i * 6);
+  }
+  R.mesh.geometry.attributes.position.needsUpdate = true;
+}
+// 雷射(拉曼):一條直直的細光束
+const laserMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.25, 1.6, 0.4), transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+const laser = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 1, 10), laserMat); laser.rotation.z = Math.PI / 2; laser.position.set((SRC_X + 22 - 8) / 2, MOL_Y, 0); laser.scale.y = -(SRC_X + 22) - 8; scene.add(laser);
+
+// ---------- 一顆一顆的光(螢光、拉曼、X 光打出來的電子) ----------
+const PHOTONS = [];
+{
+  const g = new THREE.SphereGeometry(1, 12, 8);
+  for (let i = 0; i < 64; i++) { const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })); m.visible = false; scene.add(m); PHOTONS.push(m); }
+}
+
+// ---------- 比色管與紫外燈(螢光那一段):通寧水裡的奎寧 ----------
+const CUV = new THREE.Group(); CUV.position.set(0, MOL_Y - 6, 0); scene.add(CUV); CUV.visible = false;
+const cuvGlass = new THREE.Mesh(new THREE.BoxGeometry(34, 84, 34), MAT.glass); CUV.add(cuvGlass);
+const cuvLiqMat = new THREE.MeshStandardMaterial({ color: 0x2a3a48, roughness: 0.2, transparent: true, opacity: 0.6, emissive: new THREE.Color(0.12, 0.32, 1.9), emissiveIntensity: 0 });
+const cuvLiq = new THREE.Mesh(new THREE.BoxGeometry(30, 62, 30), cuvLiqMat); cuvLiq.position.y = -9; CUV.add(cuvLiq);
+const cuvCap = new THREE.Mesh(new THREE.BoxGeometry(36, 8, 36), MAT.dark); cuvCap.position.y = 46; CUV.add(cuvCap);
+const cuvStand = new THREE.Mesh(new THREE.CylinderGeometry(22, 26, MOL_Y - 50, 24), MAT.metal); cuvStand.position.y = -(MOL_Y - 50) / 2 - 42; CUV.add(cuvStand);
+
+// ---------- 牆上的電磁波色帶:左邊能量小,右邊能量大 ----------
+const RIB = { x0: -290, x1: 290, y: 176, z: -296 };
+const ribTex = canvasTex(2048, 200, (c, w, h) => {
+  const seg = w / 6, names = ['無線電波', '微波', '紅外線', '可見光', '紫外線', 'X 光'], cols = ['#3b5c8f', '#2e7f72', '#8f3b2e', null, '#5a3b8f', '#7f9fb0'];
+  for (let i = 0; i < 6; i++) {
+    if (cols[i]) { c.fillStyle = cols[i]; c.fillRect(i * seg, 40, seg, 90); }
+    else { for (let x = 0; x < seg; x++) { const [r, g, b] = nmColor(lerp(700, 400, x / seg)); c.fillStyle = `rgb(${r * 255},${g * 255},${b * 255})`; c.fillRect(i * seg + x, 40, 1.5, 90); } }
+    c.fillStyle = '#eaf3f6'; c.font = `700 40px ${SANS}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(names[i], (i + 0.5) * seg, 172);
+  }
+  c.strokeStyle = 'rgba(234,243,246,.55)'; c.lineWidth = 4; c.beginPath(); c.moveTo(40, 20); c.lineTo(w - 60, 20); c.stroke();
+  c.fillStyle = 'rgba(234,243,246,.75)'; c.beginPath(); c.moveTo(w - 40, 20); c.lineTo(w - 70, 8); c.lineTo(w - 70, 32); c.closePath(); c.fill();
+  c.font = `600 26px ${SANS}`; c.textAlign = 'left'; c.fillText('波長越來越短 · 一份光的能量越來越大', 60, 20 + 1);
+});
+const ribbon = new THREE.Mesh(new THREE.PlaneGeometry(RIB.x1 - RIB.x0, 56.6), new THREE.MeshBasicMaterial({ map: ribTex, transparent: true, opacity: 0.95, toneMapped: false }));
+ribbon.position.set(0, RIB.y, RIB.z); scene.add(ribbon);
+// 記號:色帶上一根發亮的直條,上面一個往下指的三角形
+const markMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.5, 0.9) });
+const marker = new THREE.Group();
+{ const bar = new THREE.Mesh(new THREE.BoxGeometry(3, 34, 1.5), markMat); bar.position.y = 8; const tip = new THREE.Mesh(new THREE.ConeGeometry(6, 12, 16), markMat); tip.rotation.x = Math.PI; tip.position.y = 34; marker.add(bar, tip); }
+scene.add(marker);
+// 色帶上的位置:每種光佔一格,格子裡照滑桿的位置
+function ribbonX(band, f) { const i = BAND_IDS.indexOf(band); return RIB.x0 + (RIB.x1 - RIB.x0) * (i + clamp(f, 0, 1)) / 6; }
+
+// ==== 30_respond.js ====
+// ================= 分子怎麼回應 =================
+// 依「哪一種光、調到哪裡」算出每一種動作有多強(0 到 1);3D、能量階梯、讀值與光譜螢幕都用同一組結果
+const IRW = (x) => IR_BANDS.reduce((s, b) => s + b.I * gauss(x, b.cm, b.w), 0);
+const UVA = (nm) => UV_BANDS.reduce((s, b) => s + b.I * gauss(nm, b.nm, b.w), 0);
+const CARA = (nm) => CAROTENE.reduce((s, b) => s + b.I * gauss(nm, b.nm, b.w), 0);
+const QEX = (nm) => QUININE.ex.reduce((s, b) => s + b.I * gauss(nm, b.nm, b.w), 0);
+// 放光的譜往長波長那邊拖一點尾巴
+const QEM = (nm) => 0.85 * gauss(nm, QUININE.em.nm - 5, QUININE.em.w * 0.88) + 0.38 * gauss(nm, QUININE.em.nm + 40, QUININE.em.w * 1.2);
+const RAMW = (cm) => RAMAN.reduce((s, b) => s + b.I * gauss(cm, b.cm, b.w), 0);
+const NMRW = (ppm) => NMR_H.reduce((s, h) => s + h.n * lorentz(ppm, h.ppm, h.w || 0.03), 0);
+const COW = (ghz) => CO_LINES.reduce((s, l) => s + (1 - 0.18 * l.J) * gauss(ghz, l.ghz, 4), 0);
+// X 光:吸收在 K 殼層的束縛能突然變大(吸收邊),之後隨能量慢慢下降
+const XABS = (ev) => 0.08 + XEDGE.reduce((s, e, i) => s + (ev >= e.eV ? [0.55, 0.45][i] * (e.eV / ev) ** 2.2 : 0), 0);
+
+// 這一刻分子在做什麼:{ abs(這份光被吸收多少,0 到 1), what(文字), ...各種動作的強度 }
+function respond(band, mode, x) {
+  const R = { abs: 0, what: '沒有吸收,光直接穿過去', spin: null, rot: 0, vib: null, exc: 0, ion: [0, 0], fluo: 0, raman: 0, ramanBonds: null };
+  if (mode === 'fluo') { const a = clamp(QEX(x), 0, 1); R.fluo = a; R.abs = a; R.what = a > 0.2 ? '吸收紫外光,放出藍光' : '這個波長吸收很少'; return R; }
+  if (mode === 'raman') {
+    const s = RAMW(x); R.raman = clamp(s, 0, 1);
+    let best = null, bw = 0; for (const b of RAMAN) { const w = b.I * gauss(x, b.cm, b.w); if (w > bw) { bw = w; best = b; } }
+    R.ramanBonds = best && bw > 0.15 ? { bonds: best.bonds, a: clamp(bw, 0, 1) } : null;
+    R.what = s > 0.15 ? `彈開的光少了 ${Math.round(x)} cm⁻¹ 的能量` : '這個位移沒有振動';
+    return R;
+  }
+  if (band === 'radio') {
+    R.spin = NMR_H.map((h) => clamp(lorentz(x, h.ppm, (h.w || 0.03) * 3), 0, 1));
+    const k = R.spin.indexOf(Math.max(...R.spin)); R.abs = clamp(Math.max(...R.spin), 0, 1);
+    R.what = R.abs > 0.3 ? `${NMR_H[k].name}翻面` : '頻率沒對上任何氫';
+  } else if (band === 'micro') {
+    let J = 0; for (const l of CO_LINES) if (x >= l.ghz - 2) J = l.J + 1;
+    R.rot = J; R.abs = clamp(COW(x), 0, 1);
+    R.what = R.abs > 0.3 ? `吸收,轉得更快(第 ${J} 階)` : `轉動(第 ${J} 階)`;
+  } else if (band === 'ir') {
+    R.vib = BONDS.map(() => 0);
+    let best = null, bw = 0;
+    for (const b of IR_BANDS) { const w = b.I * gauss(x, b.cm, b.w); for (const k of b.bonds) R.vib[k] = Math.max(R.vib[k], clamp(w * 1.3, 0, 1)); if (w > bw) { bw = w; best = b; } }
+    R.abs = clamp(IRW(x), 0, 1); R.what = bw > 0.12 ? best.name : '沒有吸收,光直接穿過去';
+  } else if (band === 'vis' || band === 'uv') {
+    R.exc = clamp(UVA(x), 0, 1); R.abs = R.exc;
+    R.what = R.exc > 0.2 ? '電子跳到高一層' : band === 'vis' ? '不吸收可見光(白色)' : '沒有吸收,光直接穿過去';
+  } else if (band === 'xray') {
+    R.ion = XEDGE.map((e) => (x >= e.eV ? 1 : 0)); R.abs = clamp(XABS(x), 0, 1);
+    R.what = x >= XEDGE[1].eV ? '打掉碳與氧最內層的電子' : x >= XEDGE[0].eV ? '打掉碳最內層的電子' : '能量不夠,打不掉內層電子';
+  }
+  return R;
+}
+
+// ================= 把狀態畫到 3D 上 =================
+const _sp = { e: new THREE.Euler(), q: new THREE.Quaternion() };
+let coAngle = 0;
+function updateScene(t, dt) {
+  const band = W.band, mode = W.mode, R = W.resp;
+  // 分子、一氧化碳、比色管誰出現
+  const molOp = W.molOp, coOp = W.coOp, cuvOp = W.cuvOp;
+  MOL.visible = molOp > 0.01; CO.visible = coOp > 0.01; CUV.visible = cuvOp > 0.01;
+  for (const m of atomMats) { m.transparent = molOp < 0.99; m.opacity = molOp; }
+  for (const g of bondMesh) for (const m of g.children) { m.material.transparent = molOp < 0.99; m.material.opacity = molOp; }
+  for (const m of [coC.material, coO.material]) { m.transparent = coOp < 0.99; m.opacity = coOp; }
+  MAT.bond.transparent = coOp < 0.99; MAT.bond.opacity = coOp; // 一氧化碳的鍵用這個材質(香草醛的鍵各自複製了一份)
+  cuvGlass.material.opacity = 0.28 * cuvOp; cuvLiqMat.opacity = 0.55 * cuvOp; cuvLiqMat.transparent = true;
+  // 振動:每根鍵依強度沿鍵的方向伸縮(氫幾乎全部是氫在動),彎曲則往側邊擺
+  for (let i = 0; i < POS.length; i++) POS[i].copy(BASE[i]);
+  if (R.vib || (R.ramanBonds && W.ramanVib > 0.01)) {
+    const vib = R.vib || BONDS.map(() => 0);
+    if (R.ramanBonds) for (const k of R.ramanBonds.bonds) vib[k] = Math.max(vib[k], W.ramanVib);
+    BONDS.forEach(([a, b], k) => {
+      const A = vib[k]; if (A < 0.01) return;
+      const ea = ATOMS[a][0], eb = ATOMS[b][0], ma = ea === 'H' ? 1 : 12, mb = eb === 'H' ? 1 : 12;
+      _bd.subVectors(BASE[b], BASE[a]).normalize();
+      const bend = IR_BANDS.some((x) => x.bend && x.bonds.includes(k) && Math.abs(W.x - x.cm) < 60 && band === 'ir');
+      if (bend) _bd.set(-_bd.y, _bd.x, 0);
+      const s = Math.sin(TAU * (bend ? 2.2 : 3.2) * t + k) * A * 0.16 * AS;
+      POS[a].addScaledVector(_bd, -s * mb / (ma + mb)); POS[b].addScaledVector(_bd, s * ma / (ma + mb));
+    });
+  }
+  placeBonds();
+  // 有在振動的鍵亮一點
+  BONDS.forEach((bd, k) => { const A = R.vib ? R.vib[k] : 0, on = Math.max(A, R.ramanBonds && R.ramanBonds.bonds.includes(k) ? W.ramanVib : 0); for (const m of bondMesh[k].children) m.material.emissive.setRGB(0.9 * on, 0.55 * on, 0.15 * on); });
+  // 電子雲
+  const exc = W.exc;
+  c0m.opacity = 0.11 * (1 - exc) * W.cloudOp * molOp; c1m.opacity = 0.22 * exc * W.cloudOp * molOp;
+  CLOUD0.visible = c0m.opacity > 0.002; CLOUD1.visible = c1m.opacity > 0.002;
+  // 原子核自旋:放進磁鐵後朝上繞著轉;頻率對上就翻成朝下
+  const sOp = W.spinOp * molOp;
+  SPIN.forEach((s, i) => {
+    s.g.visible = sOp > 0.01; if (!s.g.visible) return;
+    const k = NMR_H.indexOf(s.h), flip = R.spin ? R.spin[k] : 0;
+    const tilt = lerp(0.42, Math.PI - 0.42, ease(flip)), ph = s.phase + TAU * 0.7 * t;
+    s.g.position.copy(POS[s.atom]).add(v3(0, 0, 3.4));
+    _sp.e.set(0, ph, 0); s.g.quaternion.setFromEuler(_sp.e); _sp.q.setFromAxisAngle(v3(1, 0, 0), tilt); s.g.quaternion.multiply(_sp.q);
+    s.mat.opacity = sOp; s.mat.color.setRGB(1, lerp(0.83, 0.45, flip), lerp(0.42, 0.95, flip));
+    s.g.scale.setScalar(1 + 0.25 * flip);
+  });
+  // 磁鐵
+  for (const m of magMats) m.opacity = W.magnet; MAG.visible = W.magnet > 0.01; fieldMat.opacity = 0.35 * W.magnet;
+  // 微波:一氧化碳轉動,階越高轉越快
+  CO.rotation.set(0.35, W.coAngle, 0.15 * Math.sin(t * 0.7));
+  // 光源與光波
+  const col = W.beamCol;
+  srcLensMat.color.setRGB(col[0] * (0.4 + W.light), col[1] * (0.4 + W.light), col[2] * (0.4 + W.light));
+  const laserOn = mode === 'raman' ? W.light : 0;
+  laserMat.opacity = laserOn * 0.9; laser.visible = laserOn > 0.01;
+  const waveOn = mode === 'raman' ? 0 : W.light;
+  const lam = W.waveLen, amp = 11, inX1 = mode === 'fluo' ? -26 : -46;
+  WAVE_IN.mesh.visible = WAVE_OUT.mesh.visible = waveOn > 0.01;
+  setRibbon(WAVE_IN, SRC_X + 24, inX1, lam, amp, t, 70);
+  const outAmp = amp * (1 - 0.85 * clamp(R.abs, 0, 1));
+  setRibbon(WAVE_OUT, 46, DET_X - 8, lam, mode === 'fluo' ? amp * 0.3 : outAmp, t, 70);
+  WAVE_IN.mat.color.setRGB(col[0], col[1], col[2]); WAVE_OUT.mat.color.setRGB(col[0], col[1], col[2]);
+  WAVE_IN.mat.opacity = 0.85 * waveOn; WAVE_OUT.mat.opacity = 0.85 * waveOn * (mode === 'fluo' ? 0.4 : 1);
+  detFaceMat.color.setRGB(0.08 + 0.4 * col[0] * waveOn * (1 - 0.8 * R.abs), 0.2 + 0.4 * col[1] * waveOn * (1 - 0.8 * R.abs), 0.3 + 0.4 * col[2] * waveOn * (1 - 0.8 * R.abs));
+  // 螢光:比色管發藍光
+  cuvLiqMat.emissiveIntensity = 1.6 * W.fluoGlow * cuvOp;
+  // 色帶上的記號
+  const f = W.band ? clamp((W.x - BANDS[W.band].lo) / (BANDS[W.band].hi - BANDS[W.band].lo), 0, 1) : 0.5;
+  marker.visible = !!W.band && W.ribOp > 0.01; ribbon.material.opacity = 0.95 * W.ribOp;
+  marker.position.set(W.band ? ribbonX(W.band, f) : 0, RIB.y - 8 + 2 * Math.sin(t * 3), RIB.z + 2);
+  // 一顆一顆的光:螢光、拉曼散射、X 光打出來的電子
+  photons(t);
+}
+// 依時間排好的光子事件:每一個都從同一個點出發、方向由編號決定;同一個 t 永遠畫出一樣的畫面
+function photons(t) {
+  let k = 0;
+  const put = (x, y, z, r, c, a) => { if (k >= PHOTONS.length) return; const m = PHOTONS[k++]; m.visible = a > 0.01; m.position.set(x, y, z); m.scale.setScalar(r); m.material.color.setRGB(c[0], c[1], c[2]); m.material.opacity = a; };
+  const dir = (n) => { const u = hash1(n * 3.1) * 2 - 1, a = hash1(n * 7.7) * TAU, s = Math.sqrt(1 - u * u); return [Math.cos(a) * s, u * 0.8, Math.sin(a) * s]; };
+  // 螢光:每 0.12 秒放出一份藍光,往四面八方
+  if (W.mode === 'fluo' && W.fluoGlow > 0.02) {
+    const rate = 0.12, n0 = Math.floor((t - 1.6) / rate);
+    for (let n = n0; n <= Math.floor(t / rate); n++) {
+      if (hash1(n * 1.37) > W.fluoGlow) continue;
+      const age = t - n * rate; if (age < 0 || age > 1.6) continue;
+      const d = dir(n), c = nmColor(440 + 30 * hash1(n));
+      put(CUV.position.x + d[0] * (14 + 110 * age), CUV.position.y - 8 + d[1] * (14 + 110 * age), CUV.position.z + d[2] * (14 + 110 * age), 2.4, [c[0] * 1.6, c[1] * 1.6, c[2] * 2.2], 1 - age / 1.6);
+    }
+  }
+  // 拉曼:每 0.07 秒彈開一份;極少數(畫面上放大到約一成)顏色偏紅一點,鍵跟著振動
+  if (W.mode === 'raman' && W.light > 0.02) {
+    const rate = 0.07, n0 = Math.floor((t - 1.4) / rate), pS = 0.12 * clamp(W.resp.raman, 0, 1);
+    for (let n = n0; n <= Math.floor(t / rate); n++) {
+      const age = t - n * rate; if (age < 0 || age > 1.4) continue;
+      const d = dir(n + 999), shifted = hash1(n * 5.3) < pS, c = shifted ? [1.6, 1.2, 0.2] : [0.3, 1.7, 0.45];
+      put(MOL.position.x + d[0] * (10 + 130 * age), MOL.position.y + d[1] * (10 + 130 * age), MOL.position.z + d[2] * (10 + 130 * age), shifted ? 3 : 1.8, c, (1 - age / 1.4) * W.light);
+    }
+  }
+  // X 光:每 0.45 秒從碳或氧打出一個內層電子
+  if (W.band === 'xray' && W.mode === 'abs' && W.light > 0.02) {
+    const rate = 0.45;
+    for (let n = Math.floor((t - 1.2) / rate); n <= Math.floor(t / rate); n++) {
+      const age = t - n * rate; if (age < 0 || age > 1.2) continue;
+      const which = hash1(n * 2.9) < 0.6 ? 0 : 1; if (!W.resp.ion[which]) continue;
+      const atoms = XEDGE[which].atoms, a = atoms[Math.floor(hash1(n * 4.1) * atoms.length)], d = dir(n + 77);
+      const p = POS[a];
+      put(MOL.position.x + p.x + d[0] * 160 * age, MOL.position.y + p.y + d[1] * 160 * age, MOL.position.z + p.z + 20 + d[2] * 160 * age, 1.6, [1.2, 1.6, 2.2], 1 - age / 1.2);
+      if (age < 0.25) put(MOL.position.x + p.x, MOL.position.y + p.y, MOL.position.z + p.z, 7 * (1 - age / 0.25), [1.5, 1.5, 2.0], 0.5 * (1 - age / 0.25));
+    }
+  }
+  for (; k < PHOTONS.length; k++) PHOTONS[k].visible = false;
+}
+
+// ==== 40_labels.js ====
+// ================= 視角操作 =================
+// 共用的 ../assets/camera-nav.js:滑鼠滾輪縮放,觸控板雙指平移、捏合縮放,方向鍵或 WASD 移動、Q/E 轉向、+/− 縮放、R 回到預設視角
+const nav = createCameraNav({ camera, controls, active: () => !FILM && !tour.on, radius: 420 });
+// ================= 標籤 =================
+// 和其他教材同一種:標籤框放在 anchor,細線連回零件上的 comp 點
+const LBL = {};
+function label(key, comp, anchor, title, sub) {
+  const outer = document.createElement('div'); outer.className = 'lw';
+  outer.innerHTML = `<div class="lbl"><i></i><b></b>${sub != null ? '<span></span>' : ''}</div>`;
+  outer.querySelector('b').textContent = title;
+  if (sub != null) outer.querySelector('span').textContent = sub;
+  const o = new CSS2DObject(outer); o.position.copy(anchor); o.center.set(0.5, 1); scene.add(o);
+  const lm = new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: 0.5, depthWrite: false });
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([comp, anchor]), lm);
+  scene.add(line);
+  LBL[key] = { outer, line, lm, op: -1, sub: outer.querySelector('span') };
+}
+function labelOp(key, a) {
+  const L = LBL[key]; if (Math.abs(L.op - a) < 0.002) return; L.op = a;
+  L.outer.style.opacity = a; L.outer.style.visibility = a < 0.01 ? 'hidden' : 'visible';
+  L.lm.opacity = 0.5 * a; L.line.visible = a > 0.01;
+}
+function labelSub(key, s) { const L = LBL[key]; if (L.sub && L.sub.textContent !== s) L.sub.textContent = s; }
+label('src', v3(SRC_X, MOL_Y + 22, 0), v3(SRC_X + 10, MOL_Y + 62, 10), '光源', '');
+label('det', v3(DET_X + 8, MOL_Y + 32, 0), v3(DET_X - 4, MOL_Y + 66, 10), '偵測器', '量穿過來的光');
+label('mol', v3(-30, MOL_Y + 40, 0), v3(-70, MOL_Y + 76, 16), '香草醛', 'C₈H₈O₃,每一顆球是一個原子');
+label('mag', v3(56, MOL_Y + 104, 0), v3(110, MOL_Y + 132, 0), '強磁鐵', '原子核像小磁針一樣排好');
+label('co', v3(0, MOL_Y + 14, 0), v3(-36, MOL_Y + 52, 14), '一氧化碳', '只有兩個原子的小分子');
+label('cuv', v3(-14, MOL_Y + 26, 14), v3(-60, MOL_Y + 64, 20), '通寧水', '裡面的奎寧會發螢光');
+label('laser', v3(-160, MOL_Y + 2, 0), v3(-160, MOL_Y + 40, 10), '雷射', '532 nm 綠光');
+label('rib', v3(RIB.x0 + 70, RIB.y + 32, RIB.z + 2), v3(RIB.x0 + 60, RIB.y + 66, RIB.z + 10), '電磁波', '左邊能量小,右邊能量大');
+const LBL_KEYS = Object.keys(LBL);
+
+// ==== 50_film.js ====
+// ================= 狀態 =================
+// S:互動模式的設定;W:這一格要畫的樣子(導覽與錄影由 film(t) 從時間算出,互動模式由 interactive() 平滑趨近)
+const S = {
+  band: 'ir', mode: 'abs',
+  x: { radio: 11.2, micro: 70, ir: 2000, vis: 560, uv: 365, xray: 200, fluo: 300, raman: 1000 }, // 每一種光各自記住滑桿位置
+  scan: null, // { key, t0, dur, from, to }
+  shown: {}, // 每一種光的光譜已經掃過的範圍 { key: [lo, hi] }
+};
+const W = {
+  band: 'ir', mode: 'abs', x: 2000, resp: null,
+  molOp: 1, coOp: 0, cuvOp: 0, spinOp: 0, magnet: 0, cloudOp: 0, exc: 0, fluoGlow: 0, ramanVib: 0, ribOp: 1, light: 1,
+  beamCol: [1, 1, 1], waveLen: 40, coAngle: 0, shift: 0,
+  labels: null, conOp: 1, conKey: 'ir', reveal: null, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1,
+};
+const keyOf = (band, mode) => (mode === 'abs' ? band : mode);
+// 光譜螢幕的範圍;可見光與紫外光的那一段影片用 200 到 700 nm 一張圖
+const UVVIS = { lo: 200, hi: 700 };
+const rangeOf = (key) => (key === 'uvvis' ? UVVIS : BANDS[key] || MODES[key]);
+
+// ================= 影片腳本(導覽與錄影共用) =================
+// 腳本以 156 秒寫成;播放與錄影時整體放慢 1.2 倍,留時間看字幕與能量階梯
+const SCRIPT_DUR = 156, FILM_SLOW = 1.2, FILM_DUR = SCRIPT_DUR * FILM_SLOW;
+// 各段的取景:[相機位置, 看的點]
+const VIEW = {
+  all: [[40, 210, 600], [0, 88, 20]],
+  mol: [[50, 156, 270], [0, 110, 0]],
+  radio: [[100, 190, 520], [0, 108, 0]],
+  micro: [[34, 136, 170], [0, 112, 0]],
+  ir: [[40, 150, 270], [0, 114, 0]],
+  uv: [[-50, 158, 290], [0, 114, 0]],
+  fluo: [[60, 150, 260], [-30, 108, 0]],
+  raman: [[30, 170, 360], [-40, 100, 0]],
+  xray: [[50, 150, 250], [0, 114, 0]],
+};
+// 每一段:光的種類與用法、這一段的時間、掃描的時間(滑桿從一端掃到另一端)
+const SEGS = [
+  { k: 'intro', a: 5.6, b: 19.5 },
+  { k: 'radio', band: 'radio', mode: 'abs', a: 19.5, b: 39.5, scan: [23.0, 36.0] },
+  { k: 'micro', band: 'micro', mode: 'abs', a: 39.5, b: 49.2, scan: [41.0, 48.0] },
+  { k: 'ir', band: 'ir', mode: 'abs', a: 49.2, b: 70.0, scan: [51.5, 66.5] },
+  { k: 'uv', band: 'vis', mode: 'abs', a: 70.0, b: 88.2, scan: [72.0, 84.0], from: 700, to: 200 },
+  { k: 'fluo', band: 'uv', mode: 'fluo', a: 88.2, b: 104.2, scan: [90.0, 98.0] },
+  { k: 'raman', band: 'vis', mode: 'raman', a: 104.2, b: 121.2, scan: [107.0, 118.0] },
+  { k: 'xray', band: 'xray', mode: 'abs', a: 121.2, b: 131.2, scan: [122.0, 129.4] },
+  { k: 'other', a: 131.2, b: 138.2 },
+  { k: 'cmp', a: 138.2, b: 150.4 },
+];
+const CAMK = [
+  [0, [80, 260, 760], [0, 90, 20]], [5.6, ...VIEW.all],
+  [12.0, ...VIEW.mol], [19.6, ...VIEW.mol], [21.6, ...VIEW.radio], [38.6, ...VIEW.radio],
+  [40.6, ...VIEW.micro], [48.4, ...VIEW.micro], [50.4, ...VIEW.ir], [69.0, ...VIEW.ir],
+  [71.0, ...VIEW.uv], [87.4, ...VIEW.uv], [89.4, ...VIEW.fluo], [103.4, ...VIEW.fluo],
+  [105.6, ...VIEW.raman], [120.4, ...VIEW.raman], [122.0, ...VIEW.xray], [130.4, ...VIEW.xray],
+  [133.0, ...VIEW.all], [150.4, ...VIEW.all], [156, [80, 260, 760], [0, 90, 20]],
+];
+const CAPS = [
+  [6.0, 12.6, '01 · 光與分子', '光有很多種:無線電波、微波、紅外線、可見光、紫外線、X 光。它們都是電磁波,差別在一份光帶多少能量:波長越短,能量越大。'],
+  [12.8, 19.4, '01 · 光與分子', '分子會動的方式也有好幾種,每一種都像一段階梯。一份光的能量剛好等於某一階,才會被吸收,分子就做那一種動作。'],
+  [20.0, 26.6, '02 · 無線電波', '無線電波的能量非常小,只夠讓原子核翻個面。原子核要先放進很強的磁鐵裡,像小磁針一樣排好方向。'],
+  [26.8, 33.2, '02 · 無線電波', '頻率剛好對上,氫原子核就翻過去。每個氫周圍的電子不一樣,需要的頻率差一點點,所以同一個分子裡的氫出現在不同的位置。'],
+  [33.4, 39.4, '02 · 無線電波', '這就是核磁共振(NMR)的氫譜:香草醛醛基的氫在 9.8,甲氧基的三個氫在 3.9。'],
+  [40.0, 44.4, '03 · 微波', '微波能讓整個分子轉起來。小分子(這裡用一氧化碳氣體)每吸收一份,就轉得更快一階。'],
+  [44.6, 49.0, '03 · 微波', '所以轉動的譜線一條一條、間隔一樣:115、231、346 GHz;大分子在液體裡擠成一片,實驗室很少用。'],
+  [49.6, 55.8, '04 · 紅外線', '紅外線的能量剛好讓化學鍵像彈簧一樣伸縮、彎曲。不同的鍵有自己的頻率,像粗細不一樣的彈簧。'],
+  [56.0, 62.6, '04 · 紅外線', 'O–H 在 3200 附近,C=O 在 1666,苯環在 1590 和 1510;單位 cm⁻¹ 是每公分有幾個波。'],
+  [62.8, 69.6, '04 · 紅外線', '把每個頻率被吸收多少畫出來,就是紅外光譜(FTIR);看哪裡有吸收,就知道分子裡有哪些官能基。'],
+  [70.4, 76.6, '05 · 可見光與紫外光', '能量再大一點,就能讓電子跳到高一層的軌域。香草醛不吸收可見光,所以看起來是白色的。'],
+  [76.8, 82.6, '05 · 可見光與紫外光', '到了紫外光(308、279、231 nm),電子吸收了能量跳上去;紫外光譜(UV-Vis)就是量這些吸收。'],
+  [82.8, 88.0, '05 · 可見光與紫外光', '吸收可見光的分子就有顏色:β-胡蘿蔔素吸收藍光(450 nm),我們看到的是剩下的橘色。'],
+  [88.6, 94.6, '06 · 螢光', '有些分子吸收紫外光之後,先把一點能量變成振動(熱),再放出一份能量小一點的光,這就是螢光。'],
+  [94.8, 100.8, '06 · 螢光', '通寧水裡的奎寧吸收 350 nm 的紫外光,放出 450 nm 左右的藍光:放出來的光能量比較小,所以波長比較長。'],
+  [101.0, 104.0, '06 · 螢光', '螢光光譜儀量的,就是放出來的光有哪些顏色、有多亮。'],
+  [104.6, 110.6, '07 · 拉曼', '拉曼用一道雷射照分子。絕大部分的光彈開之後顏色不變;大約一千萬份裡才有一份,把一點能量留給化學鍵的振動,顏色變了一點。'],
+  [110.8, 116.6, '07 · 拉曼', '變了多少,剛好等於那根鍵的振動頻率。所以拉曼光譜和紅外光譜一樣看得到振動,只是用的是彈開的光。'],
+  [116.8, 121.0, '07 · 拉曼', '有些振動紅外光看得清楚,有些拉曼看得清楚,兩種常常一起用。'],
+  [121.6, 126.4, '08 · X 光', 'X 光的能量大到可以把原子最裡面那一層的電子打出去。每種元素需要的能量不一樣:碳 284 eV、氧 543 eV。'],
+  [126.6, 131.0, '08 · X 光', '所以 X 光看得出樣品裡有哪些元素;晶體繞射則是用 X 光找出原子的排列。'],
+  [131.6, 137.8, '09 · 不是靠光的', '質譜不靠光:它把分子變成離子,再秤離子的重量。層析也不靠光:它先把混在一起的成分分開,再交給偵測器。'],
+  [138.6, 146.6, '10 · 比一比', '光的能量從小到大:原子核翻面、分子轉動、化學鍵振動、電子跳上去、打掉內層電子,各自對應一種光譜儀。'],
+];
+const LBL_WIN = [
+  [6.4, 18.8, ['src', 'det', 'rib']], [12.4, 19.0, ['mol']], [21.0, 38.6, ['mag']], [41.0, 48.4, ['co']],
+  [89.6, 103.4, ['cuv']], [105.4, 112.0, ['laser']],
+];
+function camAt(t) {
+  const K = CAMK;
+  if (t <= K[0][0]) return [v3(...K[0][1]), v3(...K[0][2])];
+  for (let i = 0; i < K.length - 1; i++) {
+    const [ta, pa, qa] = K[i], [tb, pb, qb] = K[i + 1];
+    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [v3(...pa).lerp(v3(...pb), u), v3(...qa).lerp(v3(...qb), u)]; }
+  }
+  const L = K[K.length - 1]; return [v3(...L[1]), v3(...L[2])];
+}
+const segAt = (t) => SEGS.find((s) => t >= s.a && t < s.b) || null;
+// 這一段的滑桿位置:掃描時從一端掃到另一端,掃完停在最後
+function segX(s, t) {
+  const key = keyOf(s.band, s.mode), R = rangeOf(key), from = s.from ?? R.lo, to = s.to ?? R.hi;
+  return lerp(from, to, clamp((t - s.scan[0]) / (s.scan[1] - s.scan[0]), 0, 1));
+}
+// 開場:光從無線電波一路換到 X 光(只換光,分子不做事)
+function introBand(t) { const u = clamp((t - 6.4) / 12, 0, 0.999); return BAND_IDS[Math.floor(u * 6)]; }
+// 微波那一段的轉角:一路積分(掃到第幾條線就轉多快),同一個 t 永遠同一個角度
+function coAngleAt(s, t) {
+  let a = 0; const step = 1 / 60;
+  for (let u = s.a; u < t; u += step) { const R = respond('micro', 'abs', segX(s, u)); a += TAU * 0.22 * (1 + R.rot) * Math.min(step, t - u); }
+  return a;
+}
+
+function film(t) {
+  const s = segAt(t);
+  // 先放預設值,各段再改
+  Object.assign(W, { molOp: 1, coOp: 0, cuvOp: 0, spinOp: 0, magnet: 0, cloudOp: 0, fluoGlow: 0, ramanVib: 0, ribOp: 1, light: 0, conOp: 0, cmp: 0, skOp: 1 });
+  W.mode = 'abs';
+  if (s && s.band) {
+    W.band = s.band; W.mode = s.mode; W.x = segX(s, t);
+    if (s.k === 'uv') W.band = W.x >= 400 ? 'vis' : 'uv'; // 從紅光一路掃到紫外光
+    W.light = win(t, s.a + 0.6, s.b - 0.2, 0.8);
+    W.conOp = win(t, s.a + 1.0, s.b - 0.1, 0.6); W.conKey = s.k === 'uv' ? 'uvvis' : keyOf(s.band, s.mode);
+    // 光譜螢幕:掃過的部分才畫出來
+    const R = rangeOf(keyOf(s.band, s.mode)), from = s.from ?? R.lo; W.reveal = [from, W.x];
+  } else if (s && s.k === 'intro') {
+    W.band = introBand(t); W.x = lerp(BANDS[W.band].lo, BANDS[W.band].hi, 0.5); W.light = win(t, 6.4, 19.0, 0.6); W.reveal = null;
+  } else { W.band = null; W.reveal = null; }
+  W.resp = W.band ? respond(W.band, W.mode, W.x) : respond('ir', 'abs', 1900);
+  if (s && s.k === 'intro') W.resp = respond('ir', 'abs', 1900); // 開場只看光的樣子
+  // 各段的道具
+  W.magnet = win(t, 19.8, 39.2, 1.2); W.spinOp = win(t, 21.0, 39.0, 1.0);
+  W.coOp = win(t, 39.8, 49.0, 0.8); W.molOp = 1 - W.coOp;
+  W.cloudOp = win(t, 70.2, 88.0, 0.8);
+  W.exc = W.cloudOp > 0 ? W.resp.exc : 0;
+  W.cuvOp = win(t, 88.4, 104.0, 0.8); W.molOp *= 1 - W.cuvOp;
+  W.fluoGlow = s && s.k === 'fluo' ? W.resp.fluo * W.light : 0;
+  W.ramanVib = s && s.k === 'raman' && W.resp.ramanBonds ? W.resp.ramanBonds.a * W.light : 0;
+  if (s && s.k === 'micro') W.coAngle = coAngleAt(s, t);
+  // 光束的顏色與波長(畫面上的)
+  setBeam(W.band, W.mode, W.x);
+  // 鏡頭
+  const [cp, ct] = fitPortrait(...camAt(t));
+  camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct);
+  W.labels = {}; for (const [a, b, keys] of LBL_WIN) for (const k of keys) W.labels[k] = Math.max(W.labels[k] || 0, win(t, a, b, 0.5));
+  W.cap = null; for (const c of CAPS) if (t >= c[0] && t < c[1]) W.cap = { chap: c[2], txt: c[3], op: win(t, c[0], c[1], 0.35) };
+  W.title = win(t, 0.2, 5.6, 0.9); W.outro = sstep(150.6, 151.8, t); W.chips = win(t, 5.6, 150.4, 0.8);
+  W.cmp = win(t, 138.4, 150.2, 0.6);
+  W.skOp = win(t, 12.4, 131.0, 0.8);
+  W.shift = win(t, 12.4, 131.6, 1.6); // 有能量階梯的時候,3D 往右下讓開
+  // 牆上的電磁波色帶:開場與最後看整體時清楚,鏡頭靠近分子時淡一點,才不會搶走畫面上方
+  W.ribOp = Math.max(win(t, 0, 20.4, 0.8), win(t, 131.4, 160, 1.0) * (1 - 0.7 * W.cmp), 0.3);
+}
+function setBeam(band, mode, x) {
+  if (mode === 'fluo') { W.beamCol = [0.62, 0.42, 1.6]; W.waveLen = 11; return; }
+  if (mode === 'raman') { W.beamCol = [0.3, 1.6, 0.4]; W.waveLen = 16; return; }
+  if (!band) return;
+  const B = BANDS[band];
+  if (band === 'vis') { const c = nmColor(x); W.beamCol = [c[0] * 1.5, c[1] * 1.5, c[2] * 1.5]; W.waveLen = lerp(13, 21, (x - 400) / 300); return; }
+  const c = new THREE.Color(B.color); W.beamCol = [c.r * 1.3, c.g * 1.3, c.b * 1.3]; W.waveLen = B.waveLen;
+}
+
+// ==== 60_state.js ====
+// ================= 互動模式 =================
+// 選一種光,鏡頭靠近;拖滑桿調頻率,分子照能量對不對得上回應;「掃描」自動掃一遍,光譜螢幕跟著畫出來
+const VIEW_OF = { radio: 'radio', micro: 'micro', ir: 'ir', vis: 'uv', uv: 'uv', xray: 'xray', fluo: 'fluo', raman: 'raman' };
+let coA = 0;
+function curKey() { return keyOf(S.band, S.mode); }
+function startScan(now) {
+  const key = curKey(), R = rangeOf(key);
+  S.shown[key] = null;
+  S.scan = { key, t0: now, dur: key === 'radio' ? 9 : 7, from: R.lo, to: R.hi };
+  el('btnScan').classList.add('on'); el('btnScan').textContent = '停止';
+}
+function stopScan() { if (!S.scan) return; S.scan = null; el('btnScan').classList.remove('on'); el('btnScan').textContent = '掃描'; }
+function interactive(dt, now) {
+  const key = curKey();
+  if (S.scan && S.scan.key !== key) stopScan();
+  if (S.scan) { const u = clamp((now - S.scan.t0) / S.scan.dur, 0, 1); S.x[key] = lerp(S.scan.from, S.scan.to, u); syncTune(); if (u >= 1) stopScan(); }
+  const x = S.x[key];
+  W.band = S.band; W.mode = S.mode; W.x = x;
+  W.resp = respond(S.band, S.mode, x);
+  const r = (cur, tgt, k = 4) => approach(cur, tgt, k, dt), abs = S.mode === 'abs';
+  W.light = 1;
+  W.magnet = r(W.magnet, abs && S.band === 'radio' ? 1 : 0);
+  W.spinOp = r(W.spinOp, abs && S.band === 'radio' ? 1 : 0);
+  W.coOp = r(W.coOp, abs && S.band === 'micro' ? 1 : 0);
+  W.cuvOp = r(W.cuvOp, S.mode === 'fluo' ? 1 : 0);
+  W.molOp = (1 - W.coOp) * (1 - W.cuvOp);
+  W.cloudOp = r(W.cloudOp, abs && (S.band === 'vis' || S.band === 'uv') ? 1 : 0);
+  W.exc = r(W.exc, W.resp.exc, 6);
+  W.fluoGlow = r(W.fluoGlow, S.mode === 'fluo' ? W.resp.fluo : 0, 5);
+  W.ramanVib = r(W.ramanVib, W.resp.ramanBonds ? W.resp.ramanBonds.a : 0, 5);
+  coA += TAU * 0.22 * (1 + (W.resp.rot || 0)) * dt; W.coAngle = coA;
+  setBeam(S.band, S.mode, x);
+  Object.assign(W, { ribOp: 0.55, labels: null, conOp: 1, conKey: key, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1 });
+  // 光譜螢幕:已經掃過或拖過的範圍才畫出來
+  const sh = S.shown[key] || (S.shown[key] = [x, x]);
+  sh[0] = Math.min(sh[0], x); sh[1] = Math.max(sh[1], x);
+  W.reveal = sh;
+}
+
+// ==== 65_ladder.js ====
+// ================= 能量階梯(左欄的平面圖) =================
+// 左半:一條能量的尺(每一格差 100 倍),各種動作需要的能量是一塊一塊;亮線是這一份光的能量。
+// 右半:這一種動作的台階,和打進來的那一份光;剛好對上就畫成往上跳的箭頭
+const SKV = { w: 600, h: 340 };
+const skCv = el('sketch');
+let skDrawnAt = -Infinity;
+const LAD = [
+  { key: 'radio', lo: 1e-7, hi: 1e-5, name: '原子核翻面', col: '#7fb0ff' },
+  { key: 'micro', lo: 3e-5, hi: 5e-3, name: '分子轉動', col: '#6fe0c8' },
+  { key: 'ir', lo: 0.03, hi: 0.5, name: '化學鍵振動', col: '#ff6f5c' },
+  { key: 'uv', lo: 1.5, hi: 7, name: '電子跳上去', col: '#a98cff' },
+  { key: 'xray', lo: 100, hi: 1e4, name: '打掉內層電子', col: '#d8f0ff' },
+];
+const yE = (e) => 312 - ((Math.log10(e) + 7) / 11) * 278;
+function lt(c, s, x, y, o = {}) {
+  c.font = `${o.w || 600} ${Math.round((o.size || 15) * 1.35)}px ${o.mono ? MONO : SANS}`; c.fillStyle = o.color || COL.ink2; c.textAlign = o.align || 'left'; c.textBaseline = 'middle'; c.fillText(s, x, y);
+}
+function arrowV(c, x, y0, y1, col, w = 2.6, wavy = false) {
+  c.strokeStyle = col; c.fillStyle = col; c.lineWidth = w; c.beginPath();
+  if (wavy) { for (let i = 0; i <= 40; i++) { const y = lerp(y0, y1 + 8 * Math.sign(y0 - y1), i / 40), xx = x + 5 * Math.sin(i / 40 * TAU * 3.5); i ? c.lineTo(xx, y) : c.moveTo(xx, y); } }
+  else { c.moveTo(x, y0); c.lineTo(x, y1 + 8 * Math.sign(y0 - y1)); }
+  c.stroke();
+  const d = Math.sign(y1 - y0); c.beginPath(); c.moveTo(x, y1); c.lineTo(x - 6, y1 - 11 * d); c.lineTo(x + 6, y1 - 11 * d); c.closePath(); c.fill();
+}
+function level(c, x0, x1, y, label, col = COL.ink2, dash = null) {
+  c.strokeStyle = col; c.lineWidth = 2.2; if (dash) c.setLineDash(dash); c.beginPath(); c.moveTo(x0, y); c.lineTo(x1, y); c.stroke(); c.setLineDash([]);
+  if (label) lt(c, label, x1 + 6, y, { size: 13, color: col, w: 500 });
+}
+// 這一份光的能量(eV)
+function photonE(band, mode, x) {
+  if (mode === 'fluo') return eNm(x);
+  if (mode === 'raman') return eNm(RAMAN_LASER);
+  return BANDS[band].energy(x);
+}
+function drawLadderLeft(c, E, key) {
+  // 能量的尺
+  c.strokeStyle = 'rgba(160,215,235,.45)'; c.lineWidth = 1.4; c.beginPath(); c.moveTo(58, 26); c.lineTo(58, 318); c.stroke();
+  for (let p = -6; p <= 4; p += 2) { const y = yE(10 ** p); c.beginPath(); c.moveTo(54, y); c.lineTo(62, y); c.stroke(); lt(c, `10${String(p).replace('-', '⁻').replace(/\d/g, (d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d])}`, 50, y, { size: 12, color: COL.muted, align: 'right', mono: true }); }
+  lt(c, 'eV', 50, 316 + 2, { size: 10, color: COL.muted, align: 'right', mono: true });
+  // 各種動作的能量範圍
+  for (const L of LAD) {
+    const on = L.key === key || (key === 'vis' && L.key === 'uv') || (key === 'fluo' && L.key === 'uv') || (key === 'raman' && L.key === 'ir');
+    const y0 = yE(L.hi), y1 = yE(L.lo);
+    c.globalAlpha = on ? 0.95 : 0.4; c.fillStyle = L.col;
+    c.fillRect(66, y0, 10, y1 - y0);
+    lt(c, L.name, 82, (y0 + y1) / 2, { size: 13.5, color: L.col, w: on ? 800 : 600 });
+    c.globalAlpha = 1;
+  }
+  // 這一份光
+  if (E > 0) {
+    const y = yE(E);
+    c.strokeStyle = '#fff6c4'; c.lineWidth = 2; c.beginPath(); c.moveTo(58, y); c.lineTo(206, y); c.stroke();
+    c.fillStyle = '#fff6c4'; c.beginPath(); c.arc(58, y, 4.5, 0, TAU); c.fill();
+    lt(c, `這一份光 ${fmtE(E)}`, 20, 18, { size: 13, color: '#fff6c4', w: 700 });
+  }
+}
+// 右半:台階。A 是吸收的程度(0 到 1),ratio 是光的能量 ÷ 台階的高度
+function drawLadderRight(c, key, R, x) {
+  const X0 = 252, X1 = 470, ax = 330;
+  const res = (A) => A > 0.35;
+  const head = (s, col) => lt(c, s, X0, 26, { size: 16, color: col, w: 800 });
+  if (key === 'fluo') {
+    // S0、S1 各有幾條振動的小台階:吸收(紫)→ 變成熱(灰)→ 放光(藍,比較短)
+    for (let i = 0; i < 4; i++) { level(c, X0, X1, 290 - i * 10, i ? null : '平常', 'rgba(168,188,198,.8)'); level(c, X0, X1, 128 - i * 10, i ? null : '高一層', 'rgba(169,140,255,.9)'); }
+    const A = R.fluo, ex = x;
+    arrowV(c, 300, 290, 128 - 26 * clamp((eNm(ex) - eNm(370)) / 1.5, 0, 1.2), '#b48cff', 2.8, false);
+    lt(c, `吸收 ${Math.round(ex)} nm`, 300, 312, { size: 12.5, color: '#b48cff', align: 'center' });
+    if (A > 0.1) {
+      c.globalAlpha = clamp(A * 1.5, 0, 1);
+      arrowV(c, 360, 128 - 22, 128, 'rgba(168,188,198,.9)', 2, true);
+      lt(c, '變成熱', 360, 92, { size: 12.5, color: COL.ink2, align: 'center' });
+      arrowV(c, 418, 128, 270, '#5aa2ff', 2.8, false);
+      lt(c, '放出 450 nm', 418, 312, { size: 12.5, color: '#5aa2ff', align: 'center' });
+      c.globalAlpha = 1;
+    }
+    head(A > 0.1 ? '吸收紫外光,放出藍光' : '這個波長幾乎不吸收', A > 0.1 ? '#5aa2ff' : COL.muted);
+    return;
+  }
+  if (key === 'raman') {
+    level(c, X0, X1, 290, '平常', 'rgba(168,188,198,.8)'); level(c, X0, X1, 252, '振動一階', '#ffc261'); level(c, X0, X1, 104, '暫時的狀態', 'rgba(160,215,235,.45)', [6, 6]);
+    arrowV(c, 300, 290, 104, '#5dff8a', 2.8);
+    lt(c, '雷射', 300, 312, { size: 12.5, color: '#5dff8a', align: 'center' });
+    arrowV(c, 360, 104, 290, '#5dff8a', 2.2);
+    lt(c, '大部分:顏色不變', 360, 72, { size: 12, color: '#5dff8a', align: 'center' });
+    c.globalAlpha = 0.35 + 0.65 * clamp(R.raman * 1.4, 0, 1);
+    arrowV(c, 424, 104, 252, '#ffd36b', 2.8);
+    lt(c, '極少數:少一點能量', 432, 92, { size: 12, color: '#ffd36b', align: 'center' });
+    c.globalAlpha = 1;
+    head(R.raman > 0.15 ? `少掉的能量 = 一階振動(${Math.round(x)} cm⁻¹)` : '這個位移沒有對應的振動', R.raman > 0.15 ? '#ffd36b' : COL.muted);
+    return;
+  }
+  const band = key, A = R.abs;
+  if (band === 'micro') {
+    // 轉動的台階:能量和 J(J+1) 成正比,越上面間隔越大
+    const yJ = (J) => 296 - 9.5 * J * (J + 1);
+    for (let J = 0; J <= 4; J++) level(c, X0, X1, yJ(J), `第 ${J} 階`, J === R.rot ? '#6fe0c8' : 'rgba(168,188,198,.7)');
+    for (const l of CO_LINES) { const on = Math.abs(x - l.ghz) < 6; c.globalAlpha = on ? 1 : 0.28; arrowV(c, 290 + l.J * 40, yJ(l.J), yJ(l.J + 1), '#6fe0c8', on ? 3 : 1.8); lt(c, `${Math.round(l.ghz)}`, 290 + l.J * 40, yJ(l.J) + 14, { size: 11.5, color: '#6fe0c8', align: 'center', mono: true }); }
+    c.globalAlpha = 1;
+    head(res(A) ? `對上了:吸收,轉到第 ${R.rot} 階` : '對不上:光直接穿過去', res(A) ? '#6fe0c8' : COL.muted);
+    return;
+  }
+  // 其他:兩個台階(要的能量)和打進來的光
+  let lo = 290, hi = 140, loL = '', hiL = '', col = '#a98cff', ratio = 1, name = '';
+  if (band === 'radio') { loL = '順著磁場'; hiL = '翻過來'; col = '#7fb0ff'; lo = 270; hi = 160; const k = R.spin ? R.spin.indexOf(Math.max(...R.spin)) : 0; name = NMR_H[k].name; ratio = 1 + (x - NMR_H[k].ppm) * 0.05; }
+  else if (band === 'ir') {
+    loL = '沒在振動'; hiL = '振動一階'; col = '#ff6f5c';
+    let best = IR_BANDS[0]; for (const b of IR_BANDS) if (Math.abs(b.cm - x) < Math.abs(best.cm - x)) best = b;
+    name = best.name; ratio = x / best.cm;
+  } else if (band === 'vis' || band === 'uv') {
+    loL = '平常的電子'; hiL = '高一層'; col = '#a98cff';
+    let best = UV_BANDS[0]; for (const b of UV_BANDS) if (Math.abs(eNm(b.nm) - eNm(x)) < Math.abs(eNm(best.nm) - eNm(x))) best = b;
+    name = `${best.nm} nm 那一階`; ratio = eNm(x) / eNm(best.nm);
+  } else if (band === 'xray') {
+    loL = '最內層的電子'; hiL = '飛出原子'; col = '#d8f0ff'; lo = 300; hi = 120;
+    const edge = x >= XEDGE[1].eV ? XEDGE[1] : XEDGE[0]; name = `${edge.el === 'C' ? '碳' : '氧'} ${edge.eV} eV`; ratio = x / XEDGE[0].eV;
+  }
+  level(c, X0, X1, lo, loL, 'rgba(168,188,198,.85)'); level(c, X0, X1, hi, hiL, col, band === 'xray' ? [4, 5] : null);
+  if (band === 'xray') { c.fillStyle = 'rgba(216,240,255,.06)'; c.fillRect(X0, 40, X1 - X0, hi - 40); }
+  const ok = band === 'xray' ? x >= XEDGE[0].eV : res(A);
+  const top = ok ? hi : lo - (lo - hi) * clamp(ratio, 0.25, 1.6);
+  arrowV(c, ax, lo, Math.max(44, top), ok ? col : '#fff6c4', ok ? 3 : 2.2, !ok);
+  if (!ok) { c.strokeStyle = 'rgba(255,122,154,.9)'; c.lineWidth = 2.4; const y = Math.max(44, top); c.beginPath(); c.moveTo(ax + 14, y - 8); c.lineTo(ax + 28, y + 6); c.moveTo(ax + 28, y - 8); c.lineTo(ax + 14, y + 6); c.stroke(); }
+  lt(c, ok ? '剛好對上 → 吸收' : ratio < 1 ? '能量不夠' : '能量太多,也對不上', ax + 40, (lo + hi) / 2, { size: 13, color: ok ? col : COL.muted, w: 700 });
+  head(ok ? `對上了:${band === 'radio' ? name + '翻面' : band === 'xray' ? '打掉' + name.split(' ')[0] + '的內層電子' : name}` : '對不上:光直接穿過去', ok ? col : COL.muted);
+}
+function drawLadder(t) {
+  const now = performance.now();
+  if (!REC && now - skDrawnAt < 1000 / 30) return;
+  skDrawnAt = now;
+  const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = skCv.clientWidth, h = skCv.clientHeight;
+  if (!w || !h) return;
+  if (skCv.width !== Math.round(w * dpr) || skCv.height !== Math.round(h * dpr)) { skCv.width = Math.round(w * dpr); skCv.height = Math.round(h * dpr); }
+  const c = skCv.getContext('2d'), k = (w * dpr) / SKV.w;
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, skCv.width, skCv.height);
+  c.setTransform(k, 0, 0, k, 0, 0);
+  if (!W.band && W.mode === 'abs') { drawLadderLeft(c, 0, null); return; }
+  const key = W.mode === 'abs' ? W.band : W.mode, E = photonE(W.band, W.mode, W.x);
+  drawLadderLeft(c, E, key);
+  c.strokeStyle = 'rgba(160,215,235,.18)'; c.lineWidth = 1; c.beginPath(); c.moveTo(226, 20); c.lineTo(226, 320); c.stroke();
+  drawLadderRight(c, key, W.resp, W.x);
+}
+
+// ==== 70_ui.js ====
+// ================= 介面 =================
+// 能量階梯下方的說明(互動模式)
+function ladderText() {
+  const key = curKey(), E = photonE(S.band, S.mode, S.x[key]), R = W.resp;
+  if (S.mode === 'fluo') return `激發光 ${Math.round(S.x.fluo)} nm(一份 ${fmtE(E)})。${R.fluo > 0.1 ? '奎寧吸收之後先變成一點熱,再放出 450 nm 左右的藍光,能量比吸收的小。' : '這個波長奎寧幾乎不吸收,所以不太發光。'}`;
+  if (S.mode === 'raman') return `雷射 532 nm(一份 ${fmtE(E)})。${R.raman > 0.15 ? `彈開的光有極少數少了 ${Math.round(S.x.raman)} cm⁻¹ 的能量,剛好是一根鍵振動一階。` : '在這個位移,沒有哪一種振動對得上。'}`;
+  const hint = { radio: '每個氫翻面需要的頻率差一點點,拖滑桿找找看。', micro: '每吸收一份就轉快一階;往右拖,看它一階一階轉快。', ir: '拖過 3200、1666、1590,看是哪一根鍵在動。', vis: '香草醛不吸收可見光;換到紫外線看看。', uv: '拖到 308、279、231 nm,電子雲會跳到高一層。', xray: '拖過 284 與 543 eV,內層電子被打出來。' }[S.band];
+  return `這一份光 ${fmtE(E)}:${R.what}。${hint}`;
+}
+let lastNote = '', lastCap = '', lastTitle = '', lastCmp = -1, lastChip = '', lastSub = '', lastCon = '';
+function updateDOM(t) {
+  const film = FILM || tour.on;
+  const key = W.mode === 'abs' ? W.band : W.mode;
+  // 讀值
+  const E = key ? photonE(W.band || 'ir', W.mode, W.x) : 0;
+  const chips = key ? [W.mode === 'abs' ? BANDS[W.band].name : MODES[W.mode].name, fmtE(E), W.resp.what.length > 9 ? W.resp.what.replace(',光直接穿過去', '') : W.resp.what] : ['—', '—', '—'];
+  const ck = chips.join('|');
+  if (ck !== lastChip) { lastChip = ck; el('cL').textContent = chips[0]; el('cE').textContent = chips[1]; el('cM').textContent = chips[2]; }
+  // 能量階梯
+  const note = el('note'); note.style.opacity = film ? W.skOp : 1; note.style.visibility = (film ? W.skOp : 1) < 0.01 ? 'hidden' : 'visible';
+  const sub = key ? (W.mode === 'abs' ? `${BANDS[W.band].name}:${BANDS[W.band].what}` : W.mode === 'fluo' ? '螢光:吸收再放光' : '拉曼:彈開的光') : '';
+  if (sub !== lastSub) { lastSub = sub; el('skSub').textContent = sub; }
+  drawLadder(t);
+  if (!film) { const n = ladderText(); if (n !== lastNote) { lastNote = n; el('skTxt').textContent = n; } }
+  // 標籤
+  const L = W.labels || { rib: 0.9, mol: W.molOp, mag: W.magnet, co: W.coOp, cuv: W.cuvOp, laser: W.mode === 'raman' ? 1 : 0 };
+  for (const k of LBL_KEYS) labelOp(k, L[k] || 0);
+  labelSub('src', W.mode === 'fluo' ? '紫外燈' : W.mode === 'raman' ? '雷射' : W.band ? `發出${BANDS[W.band].name}` : '');
+  // 光譜螢幕
+  const con = el('console');
+  con.style.opacity = W.conOp; con.style.visibility = W.conOp < 0.01 ? 'hidden' : 'visible';
+  if (W.conOp > 0.01) drawPlot();
+  if (!film) syncTuneLabel();
+  // 字幕、片頭片尾、比較表
+  if (film) {
+    const cap = el('cap'), c = W.cap;
+    cap.style.opacity = c ? c.op : 0;
+    const k2 = c ? c.chap + c.txt : '';
+    if (k2 !== lastCap && c) { lastCap = k2; el('chap').textContent = c.chap; el('capTxt').textContent = c.txt; }
+    cap.classList.toggle('withcon', W.conOp > 0.01);
+    const tc = el('titlecard'), op = Math.max(W.title, W.outro);
+    tc.style.opacity = op; tc.style.visibility = op < 0.01 ? 'hidden' : 'visible';
+    const tk = W.outro > W.title ? 'o' : 't';
+    if (tk !== lastTitle) {
+      lastTitle = tk;
+      const tx = tk === 't'
+        ? ['光譜', '光與分子怎麼互動', '無線電波、微波、紅外線、可見光、紫外線、X 光,各自讓分子做什麼', '']
+        : ['光譜-光與分子的交互作用', '翻面 · 轉動 · 振動 · 跳上去 · 打出來', 'NMR · 轉動光譜 · 紅外與拉曼 · UV-Vis 與螢光 · X 光', '光與分子交互作用的示意動畫;分子、光波與能量都經過縮放。譜線位置取自文獻與資料庫,例子是香草醛、一氧化碳、奎寧與 β-胡蘿蔔素。'];
+      ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => { el(id).textContent = tx[i]; });
+      el('titlecard').classList.toggle('outro', tk === 'o');
+    }
+    document.querySelector('.hud').style.opacity = W.chips;
+    if (Math.abs(W.cmp - lastCmp) > 0.002) { lastCmp = W.cmp; const cm = el('cmp'); cm.style.opacity = W.cmp; cm.style.visibility = W.cmp < 0.01 ? 'hidden' : 'visible'; }
+  }
+}
+// 比較表(影片最後一段)
+el('cmp').innerHTML = `<table>
+<tr><th>光</th><th>分子怎麼動</th><th>一份光的能量</th><th>對應的光譜儀</th></tr>
+<tr><td>無線電波(在磁鐵裡)</td><td>原子核翻面</td><td><b>約 10⁻⁶ eV</b></td><td>核磁共振 NMR</td></tr>
+<tr><td>微波</td><td>整個分子轉動</td><td><b>約 10⁻⁴ eV</b></td><td>轉動光譜</td></tr>
+<tr><td>紅外線</td><td>化學鍵伸縮、彎曲</td><td><b>0.05 至 0.5 eV</b></td><td>紅外光譜 FTIR、拉曼</td></tr>
+<tr><td>可見光、紫外線</td><td>電子跳到高一層</td><td><b>1.6 至 6 eV</b></td><td>UV-Vis、螢光</td></tr>
+<tr><td>X 光</td><td>打掉最內層的電子</td><td><b>數百 eV 以上</b></td><td>X 光螢光、繞射</td></tr>
+</table>`;
+
+// ---------- 光譜螢幕 ----------
+const plot = el('plot'), tip = el('tip');
+let plotDrawnAt = -Infinity;
+// 每一種光的圖:橫軸範圍(照該光譜的習慣方向)、軸名、標題、曲線
+const PLOTS = {
+  radio: { x0: 12, x1: -0.5, axis: 'δ(ppm)', title: '核磁共振氫譜', sample: '香草醛,500 MHz 磁鐵', y: (x) => NMRW(x) / 3.05, peaks: [[9.83, '醛基'], [7.42, '苯環上的氫'], [6.2, 'OH'], [3.96, 'OCH₃']] },
+  micro: { x0: 40, x1: 500, axis: '頻率(GHz)', title: '轉動光譜', sample: '一氧化碳氣體', y: (x) => COW(x), peaks: CO_LINES.map((l) => [l.ghz, `${Math.round(l.ghz)}`]) },
+  ir: { x0: 4000, x1: 500, axis: '波數(cm⁻¹)', title: '紅外光譜', sample: '香草醛', y: (x) => IRW(x), trans: true, peaks: [[3180, 'O–H'], [1666, 'C=O'], [1590, '苯環'], [1265, 'C–O']] },
+  vis: { x0: 200, x1: 700, axis: '波長(nm)', title: '紫外光與可見光光譜', sample: '香草醛(紫)與 β-胡蘿蔔素(橘,對照)', y: (x) => UVA(x), y2: (x) => CARA(x), rainbow: true, peaks: [[308, '308'], [279, '279'], [231, '231']] },
+  xray: { x0: 150, x1: 700, axis: '光子能量(eV)', title: 'X 光吸收', sample: '香草醛裡的碳與氧', y: (x) => XABS(x), peaks: [[284.2, '碳 284'], [543.1, '氧 543']] },
+  fluo: { x0: 250, x1: 600, axis: '波長(nm)', title: '螢光', sample: '通寧水裡的奎寧', y: (x) => QEX(x), y2: (x) => QEM(x), peaks: [[350, '吸收'], [450, '放光']] },
+  raman: { x0: 200, x1: 3400, axis: '拉曼位移(cm⁻¹)', title: '拉曼光譜', sample: '香草醛,雷射 532 nm', y: (x) => RAMW(x), peaks: [[1590, '苯環'], [1666, 'C=O']] },
+};
+PLOTS.uv = PLOTS.vis; PLOTS.uvvis = PLOTS.vis;
+function drawPlot() {
+  const now = performance.now();
+  if (!REC && now - plotDrawnAt < 1000 / 30) return;
+  plotDrawnAt = now;
+  const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = plot.clientWidth, h = plot.clientHeight;
+  if (!w) return;
+  if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
+  const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const P = PLOTS[W.conKey]; if (!P) return;
+  const ck = W.conKey;
+  if (ck !== lastCon) { lastCon = ck; el('conTitle').textContent = P.title; el('conSample').textContent = P.sample; el('legend').innerHTML = P.y2 ? (ck === 'fluo' ? '<span><i style="border-top:2px solid #b48cff"></i>吸收</span><span><i style="border-top:2px solid #5aa2ff"></i>放光</span>' : '<span><i style="border-top:2px solid #b48cff"></i>香草醛</span><span><i style="border-top:2px dashed #ffb04a"></i>β-胡蘿蔔素</span>') : ''; }
+  const fs = FILM ? 14 : 11, Lp = FILM ? 16 : 12, Rp = FILM ? 14 : 10, Tp = FILM ? 22 : 18, Bp = FILM ? 34 : 26;
+  const pw = w - Lp - Rp, ph = h - Tp - Bp, yb = Tp + ph;
+  const X = (x) => Lp + ((x - P.x0) / (P.x1 - P.x0)) * pw;
+  // 軸與刻度
+  c.font = `${fs}px ${MONO}`; c.strokeStyle = 'rgba(160,215,235,.25)'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(Lp, yb + 0.5); c.lineTo(Lp + pw, yb + 0.5); c.stroke();
+  const span = Math.abs(P.x1 - P.x0), step = [0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000].find((s) => (s / span) * pw >= (FILM ? 70 : 52)) || 1000;
+  c.fillStyle = COL.muted; c.textAlign = 'center'; c.textBaseline = 'top';
+  const lo = Math.min(P.x0, P.x1), hi = Math.max(P.x0, P.x1);
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) { const x = X(v); if (x < Lp + 10 || x > Lp + pw - 40) continue; c.strokeStyle = 'rgba(160,215,235,.08)'; c.beginPath(); c.moveTo(Math.round(x) + 0.5, Tp); c.lineTo(Math.round(x) + 0.5, yb); c.stroke(); c.fillText(String(+v.toFixed(2)), x, yb + 6); }
+  c.textAlign = 'right'; c.fillText(P.axis, Lp + pw, yb + 6 + fs + 2);
+  // 可見光的色帶
+  if (P.rainbow) for (let nm = 400; nm < 700; nm += 2) { const [r, g, b] = nmColor(nm); c.fillStyle = `rgba(${r * 255},${g * 255},${b * 255},.55)`; c.fillRect(X(nm), yb - 4, Math.abs(X(nm + 2) - X(nm)) + 0.5, 4); }
+  // 曲線:只畫掃過的部分
+  const rv = W.reveal, r0 = rv ? Math.min(rv[0], rv[1]) : lo, r1 = rv ? Math.max(rv[0], rv[1]) : hi;
+  const curve = (fn, col, dash, fill, scaleK = 1, full = false) => {
+    c.strokeStyle = col; c.lineWidth = FILM ? 2.2 : 1.6; c.setLineDash(dash || []);
+    c.beginPath(); let started = false, first = null, last = null;
+    for (let i = 0; i <= 600; i++) {
+      const x = lerp(P.x0, P.x1, i / 600); if (!full && (x < r0 || x > r1)) continue;
+      let v = clamp(fn(x) * scaleK, 0, 1.05); if (P.trans) v = clamp(fn(x), 0, 1) * 0.92;
+      const px = X(x), py = P.trans ? Tp + ph * v : yb - ph * 0.92 * v;
+      if (!started) { c.moveTo(px, py); started = true; first = px; } else c.lineTo(px, py);
+      last = px;
+    }
+    c.stroke(); c.setLineDash([]);
+    if (fill && started) { c.lineTo(last, P.trans ? Tp : yb); c.lineTo(first, P.trans ? Tp : yb); c.closePath(); c.fillStyle = fill; c.fill(); }
+  };
+  if (P.trans) { c.fillStyle = COL.muted; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText('100% 穿透', Lp + 4, Tp - fs - 3); }
+  if (ck === 'fluo') {
+    curve(P.y, '#b48cff', null, 'rgba(180,140,255,.12)');
+    const em = clamp(QEX(W.x) * 1.6, 0, 1);
+    curve((x) => P.y2(x) * em, '#5aa2ff', null, 'rgba(90,162,255,.16)', 1, true);
+  } else if (P.y2) {
+    curve(P.y, '#b48cff', null, 'rgba(180,140,255,.12)');
+    curve(P.y2, '#ffb04a', [6, 5], null);
+  } else curve(P.y, ck === 'ir' ? '#ff8a6b' : ck === 'raman' ? '#5dff8a' : ck === 'xray' ? '#d8f0ff' : ck === 'micro' ? '#6fe0c8' : '#74e4ff', null, ck === 'ir' ? null : 'rgba(116,228,255,.10)');
+  // 峰的標示(已經掃過的)
+  c.font = `600 ${fs}px ${SANS}`; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.fillStyle = COL.ink2;
+  for (const [x, s] of P.peaks) { if (x < r0 || x > r1) continue; const v = P.trans ? Tp + ph * 0.92 * clamp(P.y(x), 0, 1) + fs + 6 : yb - ph * 0.92 * clamp(P.y(x) * (ck === 'fluo' && s === '放光' ? 0 : 1), 0, 1.05) - 4; c.fillText(s, X(x), P.trans ? v + 4 : Math.max(Tp + fs, v)); }
+  // 現在的位置
+  const xm = X(W.x);
+  c.strokeStyle = '#fff6c4'; c.lineWidth = 1.4; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(xm, Tp - 6); c.lineTo(xm, yb); c.stroke(); c.setLineDash([]);
+  plot._map = { Lp, pw, x0: P.x0, x1: P.x1, unit: (BANDS[ck] || MODES[ck] || BANDS.vis).unit };
+}
+plot.addEventListener('pointermove', (e) => {
+  const m = plot._map; if (!m) return;
+  const r = plot.getBoundingClientRect(), px = e.clientX - r.left;
+  if (px < m.Lp || px > m.Lp + m.pw) { tip.style.display = 'none'; return; }
+  const v = m.x0 + ((px - m.Lp) / m.pw) * (m.x1 - m.x0);
+  tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${e.clientY - r.top}px`;
+  tip.textContent = `${Math.abs(m.x1 - m.x0) < 20 ? v.toFixed(2) : Math.round(v)} ${m.unit}`;
+});
+plot.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
+
+// ---------- 控制 ----------
+function segOn(id, v) { for (const b of el(id).querySelectorAll('button')) b.classList.toggle('on', b.dataset.v === String(v)); }
+const tune = el('tune');
+function syncTune() { const key = curKey(), R = rangeOf(key); tune.value = String(Math.round(((S.x[key] - R.lo) / (R.hi - R.lo)) * 1000)); syncTuneLabel(); }
+let lastTune = '';
+function syncTuneLabel() { const key = curKey(), R = rangeOf(key), s = R.tuneName + '|' + R.fmt(S.x[key]); if (s !== lastTune) { lastTune = s; el('tuneName').textContent = R.tuneName; el('tuneVal').textContent = R.fmt(S.x[key]); } }
+function flyToKey() { const v = VIEW[VIEW_OF[curKey()]] || VIEW.mol; const [p, q] = fitPortrait(v3(...v[0]), v3(...v[1])); nav.flyTo(p, q); }
+el('segBand').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  stopScan(); S.band = b.dataset.v; S.mode = 'abs'; segOn('segBand', S.band); segOn('segMode', 'abs'); syncTune(); flyToKey();
+});
+el('segMode').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  stopScan(); S.mode = b.dataset.v; if (S.mode === 'fluo') S.band = 'uv'; segOn('segMode', S.mode); segOn('segBand', S.mode === 'abs' ? S.band : ''); syncTune(); flyToKey();
+});
+tune.addEventListener('input', () => { stopScan(); const key = curKey(), R = rangeOf(key); S.x[key] = lerp(R.lo, R.hi, +tune.value / 1000); syncTuneLabel(); });
+el('btnScan').addEventListener('click', () => { if (S.scan) { stopScan(); return; } startScan(performance.now() / 1000); });
+el('btnHelp').addEventListener('click', () => el('help').classList.toggle('show'));
+el('btnSketch').addEventListener('click', () => { root.classList.toggle('sk-open'); el('btnSketch').classList.toggle('on', root.classList.contains('sk-open')); });
+syncTune();
+
+// ---------- 導覽 ----------
+const tour = { on: false, t0: 0, saved: null };
+function startTour() {
+  stopScan(); el('help').classList.remove('show');
+  tour.saved = { band: S.band, mode: S.mode, cp: camera.position.clone(), ct: controls.target.clone() };
+  tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false; nav.cancel();
+}
+function endTour() {
+  if (!tour.on) return;
+  tour.on = false; root.classList.remove('touring'); controls.enabled = true;
+  const s = tour.saved; S.band = s.band; S.mode = s.mode;
+  camera.position.copy(s.cp); controls.target.copy(s.ct); controls.update();
+  Object.assign(W, { labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1 });
+  el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; el('cmp').style.opacity = 0; el('cmp').style.visibility = 'hidden'; document.querySelector('.hud').style.opacity = 1; lastNote = ''; lastCon = '';
+}
+el('btnTour').addEventListener('click', startTour);
+el('tourExit').addEventListener('click', endTour);
+addEventListener('keydown', (e) => { if (e.key === 'Escape') endTour(); });
+
+// ==== 80_loop.js ====
+// ================= 迴圈 =================
+// 影片與寬螢幕導覽時左邊有能量階梯,把 3D 的投影中心往右下移(鏡頭位置不動)
+const SHIFT = { x: -0.15, y: -0.12 };
+function applyShift() {
+  const wide = FILM || (innerWidth >= 1100 && innerWidth / innerHeight >= 4 / 3);
+  const k = (FILM || tour.on) && wide ? W.shift || 0 : 0;
+  // setViewOffset 會把 aspect 設成 fullWidth / fullHeight,所以要傳真正的畫面大小
+  const w = innerWidth, h = innerHeight;
+  if (k > 0.001) camera.setViewOffset(w, h, SHIFT.x * k * w, SHIFT.y * k * h, w, h);
+  else if (camera.view && camera.view.enabled) camera.clearViewOffset();
+}
+function render() {
+  applyShift();
+  fitClip(controls.target);
+  composer.render(); labelR.render(scene, camera);
+}
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);
+  quality.configure(renderer, composer, bloom, { recording: REC });
+  renderer.setPixelRatio(DPR);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h); composer.setPixelRatio(DPR); composer.setSize(w, h); bloom.setSize(w * DPR, h * DPR); labelR.setSize(w, h);
+}
+addEventListener('resize', resize);
+resize();
+function frame(t, dt) { updateScene(t, dt); updateDOM(t); }
+
+// 字型載入後再畫(畫布上的字要用到)
+await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 3000))]);
+
+if (REC) {
+  window.__dur = FILM_DUR;
+  window.__seek = async (t) => { const ft = t / FILM_SLOW; film(ft); frame(ft, 1 / 30); render(); await Promise.race([new Promise((r) => requestAnimationFrame(() => r())), new Promise((r) => setTimeout(r, 300))]); return true; };
+  await window.__seek(+Q.get('t') || 0);
+  el('load').classList.add('done');
+  window.__ready = true;
+} else {
+  let last = performance.now() / 1000;
+  let filmStart = last - (+Q.get('t') || 0), hiddenAt = null;
+  document.addEventListener('visibilitychange', () => {
+    const now = performance.now() / 1000;
+    if (document.hidden) hiddenAt = now;
+    else if (hiddenAt !== null) {
+      const gap = now - hiddenAt; filmStart += gap;
+      if (tour.on) tour.t0 += gap;
+      if (S.scan) S.scan.t0 += gap;
+      last = now; hiddenAt = null;
+    }
+  });
+  const loop = () => {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    if (!quality.shouldRender(performance.now())) return;
+    quality.observe(performance.now());
+    const now = performance.now() / 1000, dt = Math.min(0.05, now - last); last = now;
+    let t = now, ft = null;
+    if (FILM) ft = ((now - filmStart) % FILM_DUR) / FILM_SLOW;
+    else if (tour.on) { const tt = now - tour.t0; if (tt >= FILM_DUR) endTour(); else ft = tt / FILM_SLOW; }
+    if (ft !== null) { film(ft); t = ft; }
+    if (!FILM && !tour.on) { interactive(dt, now); W.shift = 0; nav.step(dt); controls.update(); }
+    frame(t, dt);
+    render();
+  };
+  loop();
+  el('load').classList.add('done');
+  window.__ready = true;
+}
+// 除錯用
+window.SPX = { THREE, scene, camera, controls, S, W, film, frame, render, tour, nav, respond, BANDS, MODES };
+
+</script>
+</body>
+</html>

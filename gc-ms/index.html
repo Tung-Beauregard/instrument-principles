@@ -300,7 +300,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 
   <div class="hud" id="hud">
     <header class="brief">
-      <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="./" aria-current="page">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a></nav>
+      <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="./" aria-current="page">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="../chromatography/">層析</a></nav>
       <h1 class="ttl"><span class="ttl-a">GC-MS</span><span class="ttl-b">拆開來看</span></h1>
       <p class="lede">GC 先在 30&nbsp;m 長的細管(管柱)裡把成分分開,MS(質譜)再量出它們的質量。同一針樣品的成分一起出發,出來時卻相隔好幾分鐘,在層析圖上排成一支支峰。按「導覽」,鏡頭會跟著一個成分的分子走一趟。</p>
       <div class="chips">
@@ -488,7 +488,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 <script type="module">
 import { createQualityControls } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
-import { createSaddleDemo } from '../assets/saddle-field.js';
+import { createFieldDemo } from '../assets/analyzer-fields.js';
 const quality = createQualityControls({ host: '.ctl', onChange: () => resize3D() });
 /* =========================================================
    GC-MS 拆開來看:資料、滯留模型、圖表與介面
@@ -2014,7 +2014,7 @@ async function drawPosters() {
       g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('換升溫速率,流出時間會變,KI 幾乎不變', 64, 612);
     } else if (P.kind === 'quad') {
       title('四極桿', '直流加上快速翻轉的交流,只讓一種 m/z 穿過');
-      const d = createSaddleDemo('quad', { font: '"Noto Sans TC", sans-serif' }); d.seek(13.3);   // 太輕的正要被甩出去、太重的往旁邊滑、要的那種留在中間
+      const d = createFieldDemo('quad', { font: '"Noto Sans TC", sans-serif' }); d.seek(13.3);   // 太輕的正要被甩出去、太重的往旁邊滑、要的那種留在中間
       g.save(); g.translate(150, 170); g.scale(1.22, 1.22); d.draw(g, { bare: true }); g.restore();
       g.textBaseline = 'alphabetic'; g.textAlign = 'left';
       g.fillStyle = '#cfe6ff'; g.font = '600 34px "Noto Sans TC", sans-serif'; g.fillText('電場像一個翻來翻去的馬鞍', 64, 560);
@@ -3177,7 +3177,7 @@ function resize3D() {
 }
 
 /* ---------- 動畫說明:牆上的四張說明圖、四極桿面板、說明視窗都能打開 ----------
-   每段動畫都是時間的函數(四極桿那段由 assets/saddle-field.js 從頭算到指定的時間),所以能暫停、跳段、重播。
+   每段動畫都是時間的函數(四極桿那段由 assets/analyzer-fields.js 從頭算到指定的時間),所以能暫停、跳段、重播。
    畫在 600 × 340 的虛擬座標裡;視窗開著時主畫面的 3D 暫停繪製 */
 const XF = '"Noto Sans TC","Outfit",system-ui,sans-serif', XM = '"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace';
 const XC = { ink: '#eef3fb', ink2: '#b9c4d8', muted: '#8290aa', accent: '#7fe3ff', warn: '#ffcf70', gold: '#d9a441', blue: '#5aa2ff', orange: '#ff9b4a', metal: '#8ea2ae', elec: '#ffe28a', carbon: '#a3aec0' };
@@ -3486,10 +3486,10 @@ XP.ei = (() => {
   };
 })();
 
-// ---------- 四極桿:翻轉的馬鞍(和「質譜儀-不同分析器比較」共用 assets/saddle-field.js) ----------
+// ---------- 四極桿:翻轉的馬鞍(和「質譜儀-不同分析器比較」共用 assets/analyzer-fields.js) ----------
 XP.quad = (() => {
   let demo = null;
-  const get = () => demo || (demo = createSaddleDemo('quad', {
+  const get = () => demo || (demo = createFieldDemo('quad', {
     font: XF,
     cues: [
       [0, '四極桿是四根平行的金屬桿,中間的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。不動的話,離子(球)一定會滾下去。'],

@@ -1,8 +1,29 @@
 {
+  "categories": [
+    {
+      "id": "ms",
+      "name": "質譜"
+    },
+    {
+      "id": "chrom",
+      "name": "層析"
+    },
+    {
+      "id": "spec",
+      "name": "光譜"
+    },
+    {
+      "id": "nmr",
+      "name": "NMR"
+    }
+  ],
   "instruments": [
     {
       "id": "lcq",
       "name": "離子阱質譜",
+      "categories": [
+        "ms"
+      ],
       "status": "ready",
       "theme": "mint",
       "image": "./assets/lcq.svg",
@@ -10,26 +31,11 @@
       "href": "./lcq/"
     },
     {
-      "id": "gc-ms",
-      "name": "GC-MS",
-      "status": "ready",
-      "theme": "blue",
-      "image": "./assets/gc-ms.svg",
-      "imageAlt": "氣相層析儀連接質譜儀的結構示意",
-      "href": "./gc-ms/"
-    },
-    {
-      "id": "uv-vis",
-      "name": "UV-Vis 分光光度計",
-      "status": "ready",
-      "theme": "lavender",
-      "image": "./assets/uv-vis.svg",
-      "imageAlt": "光源、光柵與樣品槽的光路概念示意",
-      "href": "./uv-vis/"
-    },
-    {
       "id": "lcq-3d",
       "name": "LCQ 離子之旅",
+      "categories": [
+        "ms"
+      ],
       "status": "ready",
       "theme": "mint",
       "image": "./assets/lcq-3d.svg",
@@ -37,22 +43,77 @@
       "href": "./lcq-3d/"
     },
     {
-      "id": "nmr",
-      "name": "NMR 核磁共振",
-      "status": "ready",
-      "theme": "blue",
-      "image": "./assets/nmr.svg",
-      "imageAlt": "剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意",
-      "href": "./nmr/"
-    },
-    {
       "id": "mass-analyzers",
       "name": "質譜儀-不同分析器比較",
+      "categories": [
+        "ms"
+      ],
       "status": "ready",
       "theme": "lavender",
       "image": "./assets/mass-analyzers.svg",
       "imageAlt": "質譜儀的四種分析器:四極柱、離子阱、飛行時間與 Orbitrap 的概念示意",
       "href": "./mass-analyzers/"
+    },
+    {
+      "id": "chromatography",
+      "name": "層析-GC 與 HPLC",
+      "categories": [
+        "chrom"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/chromatography.svg",
+      "imageAlt": "玻璃管柱裡分開的色素帶,與一支一支出來的層析圖峰",
+      "href": "./chromatography/"
+    },
+    {
+      "id": "gc-ms",
+      "name": "GC-MS",
+      "categories": [
+        "ms",
+        "chrom"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/gc-ms.svg",
+      "imageAlt": "氣相層析儀連接質譜儀的結構示意",
+      "href": "./gc-ms/"
+    },
+    {
+      "id": "spectroscopy",
+      "name": "光譜-光與分子",
+      "categories": [
+        "spec"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/spectroscopy.svg",
+      "imageAlt": "分子、能量階梯與從無線電波到 X 光的電磁波色帶",
+      "href": "./spectroscopy/"
+    },
+    {
+      "id": "uv-vis",
+      "name": "UV-Vis 分光光度計",
+      "categories": [
+        "spec"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/uv-vis.svg",
+      "imageAlt": "光源、光柵與樣品槽的光路概念示意",
+      "href": "./uv-vis/"
+    },
+    {
+      "id": "nmr",
+      "name": "NMR 核磁共振",
+      "categories": [
+        "nmr"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/nmr.svg",
+      "imageAlt": "剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意",
+      "href": "./nmr/"
     }
   ]
 }

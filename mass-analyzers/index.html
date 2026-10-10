@@ -53,6 +53,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .sk-fld:hover{color:var(--ink);background:rgba(255,255,255,.1)}
 .sk-fld[aria-pressed="true"]{background:var(--cyan);color:#04141b;border-color:transparent}
 html.film .sk-fld,html.touring .sk-fld{display:none}
+/* 影片與導覽停下來看電場時,把 3D 調暗(簡圖、字幕、主控台在上層) */
+.fdim{position:fixed;inset:0;z-index:3;pointer-events:none;background:rgba(6,10,14,.62);opacity:0}
 .c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)} .g{color:var(--mint)}
 
 /* 網站分頁(各教材共用) */
@@ -238,7 +240,7 @@ html.film .cmp th,html.film .cmp td{padding:14px 30px}
 <div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
 
 <header class="hud">
-  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a><a href="./" aria-current="page">質譜儀-不同分析器比較</a></nav>
+  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../lcq-3d/">離子之旅</a><a href="../nmr/">NMR</a><a href="./" aria-current="page">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="../chromatography/">層析</a></nav>
   <span class="k">質譜儀</span>
   <span class="big">不同分析器比較</span>
   <p class="lede">質譜儀先讓分子帶電變成離子,再依 m/z(離子的質量除以電荷)把它們分開。這裡的離子都只帶一個正電荷,m/z 就是離子的質量。分開的方法有四種:像篩子、先關起來再放出、比賽跑、量擺動快慢。同一組離子換一種分析器量一次,比比看差在哪裡。</p>
@@ -303,12 +305,13 @@ html.film .cmp th,html.film .cmp td{padding:14px 30px}
 <div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
 <div class="cmp panel" id="cmp"></div>
 <button class="btn" id="tourExit">結束導覽</button>
+<div class="fdim" id="fdim"></div>
 
 <script type="module">
 // ==== 00_core.js ====
 import { createQualityControls } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
-import { createSaddleDemo } from '../assets/saddle-field.js';
+import { createFieldDemo } from '../assets/analyzer-fields.js';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -1385,11 +1388,57 @@ const W = {
   spec: null, ghost: null, zoom: 0, conMode: 'spec', cmp: 0,
   labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1,
   skAna: null, skOp: 0, shift: 0, // 簡圖畫哪一台、簡圖的不透明度、3D 畫面往右下移的比例
+  field: null, dim: 0, // 影片停下來看電場時:{ ana, t(電場示意的時間) }、3D 調暗的程度
 };
 
 // ================= 影片腳本(導覽與錄影共用) =================
 // 腳本以 118 秒寫成;播放與錄影時整體放慢 1.2 倍,留時間看簡圖與字幕
-const SCRIPT_DUR = 118, FILM_SLOW = 1.2, FILM_DUR = SCRIPT_DUR * FILM_SLOW;
+const SCRIPT_DUR = 118, FILM_SLOW = 1.2;
+// 講完每一台,停下來看那一台的電場:簡圖換成電場示意(assets/analyzer-fields.js),3D 停在那一格並調暗。
+// at 是腳本時間;seg 是電場示意要播的片段 [起, 迄](好幾段就接起來播);caps 是停頓期間的字幕 [停頓後第幾秒, 字]
+const FHOLD = [
+  { at: 33.8, ana: 'q', chap: '02 · 四極柱', seg: [[5, 19]], caps: [
+    [0, '電場的樣子:四根桿子之間像一個翻來翻去的馬鞍;翻得夠快,離子還沒滾遠就被推回中間。'],
+    [6, '再加上直流電壓,只有一種 m/z 留得住:太輕的被甩出去,太重的被慢慢拉走。'] ] },
+  { at: 53.6, ana: 'it', chap: '03 · 離子阱', seg: [[12, 16.5], [26, 37.5]], caps: [
+    [0, '離子阱的電場也是翻轉的馬鞍;翻得夠快,離子就被關在中間。'],
+    [4.5, '收譜時把電壓調大,最輕的先撐不住,沿著軸向被甩出去打到偵測器,接著是下一種。'] ] },
+  { at: 75.6, ana: 'tof', chap: '04 · 飛行時間', seg: [[3.5, 17.5]], caps: [
+    [0, '飛行時間的電場畫成地形:推斥區是陡坡,每個離子滑下來得到一樣多的能量,越輕的跑得越快;飛行管是平地,速度不變。'],
+    [6, '反射鏡是上坡:跑得快的衝得比較高、多繞一點路,和慢的幾乎同時回到偵測器。'] ] },
+  { at: 97.6, ana: 'orb', chap: '05 · Orbitrap', seg: [[1, 5], [15, 26]], caps: [
+    [0, 'Orbitrap 的電場:中間的紡錘把離子往內吸,離子繞著它轉。'],
+    [4, '沿著紡錘的方向像一個碗,離子左右擺盪;越輕擺得越快,快慢只看 m/z。'],
+    [10, '外殼記下擺動的訊號,再拆成各種頻率:一種頻率就是一種 m/z。'] ] },
+];
+for (const h of FHOLD) h.dur = h.seg.reduce((s, [a, b]) => s + b - a, 0);
+const FILM_DUR = (SCRIPT_DUR + FHOLD.reduce((s, h) => s + h.dur, 0)) * FILM_SLOW;
+// 影片時間(腳本秒,含停頓)→ 腳本時間;停頓期間傳回停在哪一段、停了幾秒
+function filmWarp(s) {
+  let off = 0;
+  for (const h of FHOLD) {
+    if (s < h.at + off) return { t: s - off, hold: null, u: 0 };
+    if (s < h.at + off + h.dur) return { t: h.at, hold: h, u: s - off - h.at };
+    off += h.dur;
+  }
+  return { t: s - off, hold: null, u: 0 };
+}
+function holdDemoTime(h, u) { for (const [a, b] of h.seg) { if (u < b - a) return a + u; u -= b - a; } return h.seg[h.seg.length - 1][1]; }
+// 依影片時間算出這一格:先照原本的腳本,停頓時再換掉簡圖、字幕並調暗 3D;傳回腳本時間給 frameCommon
+function filmAt(s) {
+  const w = filmWarp(s);
+  film(w.t);
+  W.field = null; W.dim = 0;
+  if (w.hold) {
+    const h = w.hold, u = w.u, e = Math.min(sstep(0, 0.8, u), 1 - sstep(h.dur - 0.8, h.dur, u));
+    W.field = { ana: h.ana, t: holdDemoTime(h, u) };
+    W.skAna = h.ana; W.skOp = 1; W.dim = e;
+    let k = 0; h.caps.forEach(([at], i) => { if (u >= at) k = i; });
+    const a = h.caps[k][0], b = k + 1 < h.caps.length ? h.caps[k + 1][0] : h.dur;
+    W.cap = { chap: h.chap, txt: h.caps[k][1], op: win(u, a, b, 0.35) };
+  }
+  return w.t;
+}
 // 各台的取景:[相機位置, 看的點]
 const VIEW = {
   all: [[120, 320, 480], [0, 120, -20]],
@@ -1882,14 +1931,36 @@ function skOrb(c, t) {
   if (st) skStatus(c, st);
 }
 
-// ---------- 電場形狀:四極柱與離子阱共同的原理,翻轉的馬鞍(assets/saddle-field.js,GC-MS 也用同一支) ----------
-// 只在互動模式、選到四極柱或離子阱、按下「電場形狀」時畫;影片與導覽照舊畫簡圖。球照 Mathieu 方程式算,播完停 2.5 秒再從頭
-const SKF = { q: null, it: null, last: 0, hold: 0 };
-const skFieldOn = (ana) => !(FILM || tour.on) && S.skField && (ana === 'q' || ana === 'it');
+// ---------- 電場形狀:四台的電場都畫成地形(assets/analyzer-fields.js,GC-MS 的四極桿動畫也用同一支) ----------
+// 互動模式按「電場形狀」時畫,播完停 2.5 秒再從頭;影片與導覽在講完每一台時停下來播(W.field,見 50_film.js 的 FHOLD)
+const SKF = { q: null, it: null, tof: null, orb: null, last: 0, hold: 0 }, SKFF = {};
+const SKF_KIND = { q: 'quad', it: 'trap', tof: 'tof', orb: 'orb' };
+const SKF_SUB = { q: '電場形狀:翻轉的馬鞍', it: '電場形狀:翻轉的馬鞍', tof: '電場形狀:陡坡、平地、上坡', orb: '電場形狀:繞著轉、來回擺' };
+const skFieldOn = (ana) => !(FILM || tour.on) && S.skField && !!SKF_KIND[ana];
+// 影片用另一組示意,和互動模式的互不干擾
+const skFieldFilm = (ana) => SKFF[ana] || (SKFF[ana] = createFieldDemo(SKF_KIND[ana], { font: SANS, ions: ana === 'q' ? [{ mz: 160, label: 'm/z 160' }, { mz: 195, label: 'm/z 195' }, { mz: 285, label: 'm/z 285' }] : undefined }));
 function skFieldDemo(ana) {
   if (SKF[ana]) return SKF[ana];
+  if (ana === 'tof') return (SKF.tof = createFieldDemo('tof', {
+    font: SANS,
+    cues: [
+      [0, '飛行時間裡的電場畫成地形:推斥區是一道陡坡,飛行管是平地(沒有電場),反射鏡是一道上坡。'],
+      [4, '推斥極一推,離子從陡坡滑下來,每一個都得到一樣多的能量;越輕的跑得越快,在平地上一直維持同樣的速度。'],
+      [9, '反射鏡是上坡:跑得快的衝得比較高、多繞一點路,所以同一種離子不管快慢,幾乎同時回到偵測器。'],
+      [16, '把反射鏡關掉(控制面板的「反射鏡」也能切),離子直直飛到最後面:同一種離子有快有慢,到達的時間就散開,峰變寬,咖啡因和阿魏酸就分不開了。'],
+    ],
+  }));
+  if (ana === 'orb') return (SKF.orb = createFieldDemo('orb', {
+    font: SANS,
+    cues: [
+      [0, 'Orbitrap 中間是一根紡錘形的電極,外面包著兩半的外殼。紡錘把帶正電的離子往內吸,離子繞著它轉,像衛星繞地球,不會撞上去。'],
+      [6, '沿著紡錘的方向,電場像一個碗:離中間越遠,被推回來越用力,所以離子會左右來回擺盪。'],
+      [13, '擺盪的快慢只看 m/z:越輕擺得越快,和離子帶多少能量、一開始在哪裡都沒有關係。真的 Orbitrap 裡,m/z 195 每秒來回約 59 萬次。'],
+      [21, '外殼的兩半記下離子擺來擺去造成的訊號;混在一起的擺動再拆成各種頻率,一種頻率就是一種 m/z。記得越久,頻率分得越細。'],
+    ],
+  }));
   SKF[ana] = ana === 'q'
-    ? createSaddleDemo('quad', {
+    ? createFieldDemo('quad', {
       font: SANS,
       ions: [{ mz: 160, label: 'm/z 160' }, { mz: 195, label: 'm/z 195' }, { mz: 285, label: 'm/z 285' }],
       cues: [
@@ -1899,7 +1970,7 @@ function skFieldDemo(ana) {
         [22, '把兩種電壓按固定比例一起調高,留得住的 m/z 就往上換。一路掃過去,每種 m/z 輪流穿過、打到偵測器,就量出一張質譜;「篩得更細」就是讓這個窗口更窄。'],
       ],
     })
-    : createSaddleDemo('trap', {
+    : createFieldDemo('trap', {
       font: SANS,
       cues: [
         [0, '離子阱裡的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。把球放在不動的馬鞍上,它一定會滾下去。'],
@@ -1912,7 +1983,7 @@ function skFieldDemo(ana) {
     });
   return SKF[ana];
 }
-function skFieldRestart(ana) { if (ana === 'q' || ana === 'it') { skFieldDemo(ana).reset(); SKF.hold = 0; SKF.last = performance.now(); } }
+function skFieldRestart(ana) { if (SKF_KIND[ana]) { skFieldDemo(ana).reset(); SKF.hold = 0; SKF.last = performance.now(); } }
 
 const SK_DRAW = { q: skQuad, it: skTrap, tof: skTof, orb: skOrb };
 let skLastHead = '';
@@ -1921,11 +1992,12 @@ function drawSketch(t, ana) {
   const now = performance.now();
   if (!REC && now - skDrawnAt < 1000 / 30) return;
   skDrawnAt = now;
-  const field = skFieldOn(ana), sub = field ? '電場形狀:翻轉的馬鞍' : SK_HEAD[ana][1];
+  const filmF = (FILM || tour.on) && W.field ? W.field : null, field = !!filmF || skFieldOn(ana);
+  const sub = field ? SKF_SUB[ana] : SK_HEAD[ana][1];
   const head = SK_HEAD[ana][0] + '|' + sub;
   if (head !== skLastHead) {
     skLastHead = head; el('skTitle').textContent = SK_HEAD[ana][0]; el('skSub').textContent = sub;
-    skCv.setAttribute('aria-label', field ? '電場形狀:電場像一個翻來翻去的馬鞍,球照真的運動方程式移動,留得住或被甩出去' : '目前分析器的簡圖:離子從哪裡進來、怎麼走、在哪裡被量到');
+    skCv.setAttribute('aria-label', field ? '電場形狀:把電場畫成地形,球照真的運動方程式移動' : '目前分析器的簡圖:離子從哪裡進來、怎麼走、在哪裡被量到');
   }
   const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = skCv.clientWidth, h = skCv.clientHeight;
   if (!w || !h) return;
@@ -1933,6 +2005,7 @@ function drawSketch(t, ana) {
   const c = skCv.getContext('2d'), k = (w * dpr) / SKV.w;
   c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, skCv.width, skCv.height);
   c.setTransform(k, 0, 0, k, 0, 0);
+  if (filmF) { const d = skFieldFilm(ana); d.seek(filmF.t); d.draw(c); return; }
   if (field) {
     const d = skFieldDemo(ana), dt = Math.min(0.1, Math.max(0, (now - (SKF.last || now)) / 1000));
     SKF.last = now;
@@ -1981,8 +2054,11 @@ function updateDOM(t) {
   if (Math.abs(skOp - lastSkOp) > 0.002) { lastSkOp = skOp; note.style.opacity = skOp; note.style.visibility = skOp < 0.01 ? 'hidden' : 'visible'; }
   if (skOp > 0.01) drawSketch(t, film ? W.skAna : S.ana);
   if (!film) { const n = sketchText(); if (n !== lastNote) { lastNote = n; el('skTxt').textContent = n; } }
-  // 「電場形狀」只有四極柱與離子阱有
-  const fh = film || !(S.ana === 'q' || S.ana === 'it');
+  // 「電場形狀」四台都有;影片與導覽另外在講完每一台時停下來播
+  const fh = film;
+  // 停下來看電場時:3D 調暗,簡圖放大到 1.55 倍(以左上角為準),電場示意才看得清楚
+  const dim = film ? W.dim || 0 : 0;
+  if (Math.abs(dim - (el('fdim')._o ?? -1)) > 0.002) { el('fdim')._o = dim; el('fdim').style.opacity = dim; note.style.transformOrigin = 'top left'; note.style.transform = dim > 0.001 ? `scale(${(1 + 0.55 * ease(dim)).toFixed(4)})` : ''; }
   if (el('skField').hidden !== fh) el('skField').hidden = fh;
   const fo = skFieldOn(S.ana); if (root.classList.contains('sk-field') !== fo) root.classList.toggle('sk-field', fo);
   el('vR').textContent = `≈ ${fmtGap(gapOf(a, ri))}`; el('mR').style.width = `${clamp((Math.log10(R) - 2) / 3.3, 0.03, 1) * 100}%`;
@@ -2262,7 +2338,7 @@ IDLE.itT0 = IDLE.orbT0 = performance.now() / 1000 - 3;
 if (REC) {
   window.__dur = FILM_DUR;
   // 等一個畫格讓 DOM 標籤也更新;背景分頁的 rAF 可能停住,所以最多只等 300 ms
-  window.__seek = async (t) => { const ft = t / FILM_SLOW; film(ft); frameCommon(ft); render(); await Promise.race([new Promise((r) => requestAnimationFrame(() => r())), new Promise((r) => setTimeout(r, 300))]); return true; };
+  window.__seek = async (t) => { const ft = filmAt(t / FILM_SLOW); frameCommon(ft); render(); await Promise.race([new Promise((r) => requestAnimationFrame(() => r())), new Promise((r) => setTimeout(r, 300))]); return true; };
   await window.__seek(+Q.get('t') || 0);
   el('load').classList.add('done');
   window.__ready = true;
@@ -2288,7 +2364,7 @@ if (REC) {
     let t = now, ft = null;
     if (FILM) ft = ((now - filmStart) % FILM_DUR) / FILM_SLOW;
     else if (tour.on) { const tt = now - tour.t0; if (tt >= FILM_DUR) endTour(); else ft = tt / FILM_SLOW; }
-    if (ft !== null) { film(ft); t = ft; }
+    if (ft !== null) { ft = filmAt(ft); t = ft; }
     if (!FILM && !tour.on) { interactive(dt, now); nav.step(dt); controls.update(); }
     frameCommon(t);
     render();

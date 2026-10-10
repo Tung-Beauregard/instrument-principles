@@ -14,7 +14,7 @@ assert.equal(wheelKind(ev({ deltaY: -6, ctrlKey: true })), 'pinch', '觸控板�
 assert.equal(wheelKind(ev({ deltaY: 120 }), { kind: 'pan', at: 1000 }, 1100), 'pan', '同一串事件沿用第一下的判斷');
 assert.equal(wheelKind(ev({ deltaY: 120 }), { kind: 'pan', at: 1000 }, 1300), 'zoom', '停頓超過 220 ms 後重新判斷');
 
-const LESSONS = ['lcq', 'gc-ms', 'uv-vis', 'lcq-3d', 'nmr', 'mass-analyzers'];
+const LESSONS = ['lcq', 'gc-ms', 'uv-vis', 'lcq-3d', 'nmr', 'mass-analyzers', 'spectroscopy', 'chromatography'];
 for (const lesson of LESSONS) {
   const html = readFileSync(new URL(`../${lesson}/index.html`, import.meta.url), 'utf8');
   assert.ok(html.includes("from '../assets/camera-nav.js'"), `${lesson}: 沒有載入 assets/camera-nav.js`);

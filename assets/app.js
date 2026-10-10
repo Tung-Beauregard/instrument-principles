@@ -7,14 +7,17 @@
     return node;
   };
   const localPath = value => typeof value === 'string' && /^\.\/[a-zA-Z0-9_\-/.]+$/.test(value) && !value.split('/').includes('..');
-  const valid = item => item && /^[a-z0-9-]+$/.test(item.id) &&
+  const validCategory = cat => cat && /^[a-z0-9-]+$/.test(cat.id) && typeof cat.name === 'string' && cat.name.trim();
+  const valid = (item, catIds) => item && /^[a-z0-9-]+$/.test(item.id) &&
     ['ready', 'upcoming'].includes(item.status) && ['mint', 'blue', 'lavender'].includes(item.theme) &&
     ['name', 'imageAlt'].every(key => typeof item[key] === 'string' && item[key].trim()) &&
+    Array.isArray(item.categories) && item.categories.length > 0 && item.categories.every(id => catIds.has(id)) &&
     localPath(item.image) && (item.status === 'ready' ? localPath(item.href) : item.href === null);
 
-  function card(item) {
+  // 同一份教材可以出現在兩個分類(例如 GC-MS 在質譜與層析),所以標題 id 加上分類
+  function card(item, catId) {
     const ready = item.status === 'ready';
-    const titleId = item.id + '-title';
+    const titleId = catId + '-' + item.id + '-title';
     const article = element('article', 'instrument-card ' + item.theme);
     article.setAttribute('aria-labelledby', titleId);
     const link = element(ready ? 'a' : 'div', ready ? '' : 'pending');
@@ -22,7 +25,7 @@
     const img = element('img');
     Object.assign(img, { src: item.image, alt: item.imageAlt, width: 440, height: 260 });
     const label = element('div', 'card-label');
-    const title = element('h2', '', item.name);
+    const title = element('h3', '', item.name);
     title.id = titleId;
     const indicator = element('span', '', ready ? '↗' : '即將加入');
     if (ready) indicator.setAttribute('aria-hidden', 'true');
@@ -32,15 +35,30 @@
     return article;
   }
 
+  function section(cat, items) {
+    const node = element('section', 'category');
+    const heading = element('h2', 'category-title', cat.name);
+    heading.id = 'cat-' + cat.id + '-title';
+    node.setAttribute('aria-labelledby', heading.id);
+    const grid = element('div', 'instrument-grid');
+    grid.append(...items.map(item => card(item, cat.id)));
+    node.append(heading, grid);
+    return node;
+  }
+
   async function loadInstruments() {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
     try {
       const response = await fetch('./content/instruments.json', { signal: controller.signal, cache: 'no-cache' });
       if (!response.ok) return;
-      const { instruments } = await response.json();
-      if (!Array.isArray(instruments) || !instruments.length || !instruments.every(valid) || new Set(instruments.map(item => item.id)).size !== instruments.length) return;
-      document.getElementById('instrument-grid').replaceChildren(...instruments.map(card));
+      const { categories, instruments } = await response.json();
+      if (!Array.isArray(categories) || !categories.length || !categories.every(validCategory)) return;
+      const catIds = new Set(categories.map(cat => cat.id));
+      if (catIds.size !== categories.length) return;
+      if (!Array.isArray(instruments) || !instruments.length || !instruments.every(item => valid(item, catIds)) || new Set(instruments.map(item => item.id)).size !== instruments.length) return;
+      const sections = categories.map(cat => [cat, instruments.filter(item => item.categories.includes(cat.id))]).filter(([, items]) => items.length);
+      document.getElementById('catalogue').replaceChildren(...sections.map(([cat, items]) => section(cat, items)));
     } catch { /* Keep the complete static links when content cannot load. */ }
     finally { clearTimeout(timeout); }
   }

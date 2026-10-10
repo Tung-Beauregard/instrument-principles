@@ -238,11 +238,14 @@ Orbitrap:
 - 四台的外形、尺寸、電壓、離子速度與時間尺度都經過調整;離子數量與軌跡大小放大。
 - 譜由理論質量、同位素比例、高斯峰形與各分析器的峰寬算出,加上上述的系統誤差;雜訊經過放大;不是實測數據,不可用於實樣鑑定。
 
-電場形狀(四極柱與離子阱的簡圖切換;GC-MS 的四極桿動畫共用 `assets/saddle-field.js`):
+電場形狀(四台都有,互動模式在簡圖切換,影片與導覽講完每一台時停下來播;共用 `assets/analyzer-fields.js`,GC-MS 的四極桿動畫也用它):
 
 - 小球照 Mathieu 方程式逐步積分(步長 1/600 秒),不是事先畫好的路徑;曲面是同一個電位的示意,高低經過縮放。翻轉放慢到每秒 1.6 次、太慢的一段每秒 0.42 次,和 lcq/ 第 07 段相同。電壓固定時翻得越慢 q 越大,所以「太慢」那段的 q 約 6.5,一定不穩定。
 - 離子阱(環電極加交流、端蓋接地):a = 0;軸向 q_z、徑向 q_r = −q_z/2。主角 q_z 0.45(穩定),較重的約 0.25,太輕的 1.15(超過 0.908,留不住)。翻得夠快之後加一點阻尼代表氦氣冷卻(示意值 0.22 s⁻¹)。收譜那段把 q 每秒調高 14%,三顆球在 q_z 0.908 依序沿軸向射出;本頁 3D 的共振射出點畫在 0.83,這裡畫的是沒有共振射出時的穩定邊界,兩者都是示意。「每秒正負翻轉 76 萬次」取上方 Finnigan LCQ Series Hardware Manual 的 0.76 MHz。
 - 四極柱:x 那一對桿子加 +(U − V cos Ωt)、y 那一對加相反的電壓;直流與交流的比例固定在 a = 0.3 q(U/V = 0.15)。用 Mathieu 特徵曲線 a₀(q) 與 b₁(q) 的級數算出這條線上的穩定範圍約 q 0.625 到 0.725,要的那種離子放在中間(0.675),較輕與較重的 m/z 比是 0.82 與 1.46:較輕的超過右邊界、沿 x(交流)方向越擺越大,較重的低於下邊界、沿 y(直流)方向慢慢被拉走。掃描時 U、V 一起從 0.74 倍調到 1.62 倍,三種依序落進窗口。「篩得更細」就是讓窗口更窄(提高 U/V,往穩定區頂點靠),這裡沒有另外畫。
+- 飛行時間:電場畫成地形,推斥區是陡坡、飛行管是平地(沒有電場)、反射鏡是線性上坡;球照牛頓運動定律逐步積分(步長 1/600 秒)。三顆球:兩顆 m/z 195(其中一顆在推斥區起點遠一點,得到的能量少約兩成)、一顆 m/z 524。地形的長度(`TOF`:推斥區 0.1、反射鏡從 0.66 開始、坡度 1.3 倍)選成讓兩顆 m/z 195 經反射鏡後幾乎同時回到偵測器(差約 0.05 秒),關掉反射鏡直線飛時差約 0.3 秒;m/z 524 與 195 的飛行時間比接近 √(524/195) ≈ 1.64。這組數字是示意的比例,不是 6546 的尺寸;真實的時間見上面的計算推估。
+- Orbitrap:中心電極畫成紡錘、外殼分成左右兩半;沿軸向的電位畫成一個碗。軸向擺盪用公式直接算,頻率 = 0.9 × √(195 ÷ m/z) 次/秒(畫面放慢);三顆球 m/z 195、300、524 的快慢比是 1 : 0.81 : 0.61,和擺幅、起點無關。下方畫外殼兩半的差動訊號與「拆成頻率」的長條。真實儀器 m/z 195 每秒來回約 59 萬次(見上面 `ORB_F200` 的推估)。
+- 影片與導覽:講完每一台時停下來,把簡圖換成這一台的電場動畫(四極柱 14 秒、離子阱 16 秒、飛行時間 14 秒、Orbitrap 15 秒,只取動畫裡的關鍵段落),3D 調暗、說明文字放大,另有對應的字幕;所以影片總長從約 142 秒變成約 212 秒。
 
 ### 技術
 
@@ -275,3 +278,104 @@ Orbitrap:
 - PubChem:https://pubchem.ncbi.nlm.nih.gov/compound/2519、https://pubchem.ncbi.nlm.nih.gov/compound/445858、https://pubchem.ncbi.nlm.nih.gov/compound/9914740
 
 部分規格表是第三方網站保存的副本(NJIT、dsp-c.co.rs、pragolab.cz、conquerscientific.com、assets.thermofisher.cn);Stafford 1984 與 Dawson & Guilhaus 1989 只核對了書目,沒有讀到全文。原廠沒有公開 5977 的射頻頻率與 r₀、6546 的推斥頻率與飛行長度,以及 Q Exactive 的軸向頻率;上面用到的這幾類數值都標為推估或示意。
+
+## 光譜-光與分子(光與分子的交互作用)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/spectroscopy/
+
+不是某一台儀器,而是把常見的光譜放在一起比:每一種光一份帶的能量不同,只有剛好對上分子某一種動作的「台階」才會被吸收。無線電波讓原子核翻面(放在強磁鐵裡,核磁共振 NMR)、微波讓整個分子轉動(用一氧化碳氣體)、紅外線讓化學鍵伸縮彎曲(紅外光譜 FTIR)、可見光與紫外光讓電子跳到高一層(UV-Vis,用 β-胡蘿蔔素當有顏色的對照)、X 光把最內層的電子打出去;另外兩種用法:螢光(通寧水裡的奎寧)與拉曼(532 nm 雷射)。核磁共振、紅外、紫外與拉曼都用同一個分子香草醛。版型和 UV-Vis、NMR 頁相同。
+
+- 選一種光,鏡頭移過去;拖滑桿調頻率、波數、波長或能量,分子照能量對不對得上回應(自旋翻面、轉快一階、某一根鍵振動、電子雲變形、內層電子飛出)
+- 「掃描」從一端掃到另一端,下方螢幕畫出那一種光譜;左欄的能量階梯畫出這一份光的能量和分子的台階
+- 「光的其他用法」切換吸收、螢光、拉曼
+- 「導覽」自動播放約 187 秒,23 段字幕,內容與影片相同
+- 文字以台灣高中畢業看得懂為準
+
+### 數值與示意
+
+能量換算(計算):E = hc/λ,hc = 1239.84198 eV·nm;1 cm⁻¹ = 1.2398×10⁻⁴ eV。500 MHz 的無線電波約 2.07×10⁻⁶ eV;一氧化碳第一條轉動譜線 115.27 GHz 約 4.8×10⁻⁴ eV;中紅外 4000 到 400 cm⁻¹ 是 0.50 到 0.050 eV;可見光 400 到 700 nm 是 3.10 到 1.77 eV;紫外 200 到 400 nm 是 6.20 到 3.10 eV。片尾比較表的能量範圍取這幾個數量級。
+
+- 各區與分子動作的對應:微波(約 10⁻⁵ 到 10⁻³ eV)對應分子轉動、紅外對應振動、可見光把電子提到高一層、X 光把電子打出去(HyperPhysics);無線電波讓原子核的自旋翻面(Reusch)。
+- 核磁共振:香草醛在 CDCl₃ 的化學位移和 `nmr/` 相同(醛基 9.83、H-6 7.43、H-2 7.42、H-5 7.04、羥基約 6.2、甲氧基 3.96;來源見 NMR 一節)。BMRB bmse010006(250 MHz)為 9.81、7.44、7.41、7.04、3.92;羥基的位置和濃度有關,其他資料在 6.2 到 6.4 之間。磁場 11.74 T、500.13 MHz 同 NMR 一節。
+- 微波:一氧化碳 J = 1←0 為 115,271.2018 MHz(CDMS);其他譜線用剛性轉子 ν = 2B(J+1)、B = 57.636 GHz 算出 230.5、345.8、461.1 GHz(計算,沒有考慮離心畸變)。微波爐的 2.45 GHz 加熱主要是介電加熱、不是共振吸收(HyperPhysics),所以頁面沒有拿微波爐當例子。
+- 紅外:香草醛的吸收帶取自 NIST WebBook 的 Coblentz 光譜(礦物油糊 2529、KBr 錠 2530),由作者讀圖:O–H 寬帶,最深處 3140 到 3370;醛基 C–H 弱帶約 2814;C=O 1665 到 1671;苯環 1587 到 1592 與 1511 到 1515;C–O 1261 到 1266 與 1292 到 1296;1150 到 1164、1123、1029 到 1030。這是從紙本數位化的舊色散式光譜,約 ±5 cm⁻¹。頁面取 3180、2820、1666、1590、1510、1265、1155、1030;苯環 C–H 3020、甲基 C–H 2940 與 860 的彎曲依一般官能基範圍(Reusch、CU Boulder)。強度與寬度是示意。
+- 紫外:香草醛 231、279、308 nm(Cayman Chemical,溶劑未註明;NIST WebBook 的 Robinson & Kiang 1955 為 230、281 與 312 到 315 nm 的寬峰)。β-胡蘿蔔素在己烷 425、450、478 nm(LipidBank)。
+- 螢光:奎寧在 0.1 mol/L 過氯酸裡的吸收峰 250 與 347.5 nm,用 347.5 nm 激發時放光最強在 451.5 nm(Velapoldi & Mielenz 1980;SRM 936 證書)。頁面寫「吸收 350 nm、放出 450 nm 左右的藍光」。通寧水裡的奎寧在紫外燈下發藍光(UCAR)。
+- 拉曼:散射光中只有約一千萬分之一是拉曼散射(Renishaw;Bruker 與 HORIBA 寫的比例更小,所以頁面寫「大約一千萬份裡才有一份」);紅外看振動時偶極矩有沒有變、拉曼看極化率有沒有變(Reusch、Renishaw)。香草醛的拉曼位移依紅外的同一組振動放置,沒有找到可引用的實測拉曼譜,強度是示意,螢幕上只標苯環與 C=O 兩支。雷射 532 nm 是常見的選擇(Bruker)。
+- X 光:碳 1s 284.2 eV(X-Ray Data Booklet 表 1-1);氧 1s 543.1 eV 是同一張表的通用值,這次沒能從 PDF 抽出那一列核對。吸收邊之後的下降用冪次示意。
+
+教學示意:分子、光波、能量階梯與時間尺度都經過縮放;能量階梯的尺每格差 100 倍,各種動作的區塊是大略範圍;各種譜的形狀是高斯或勞倫茲峰的組合,不是實測數據,不可用於實樣鑑定。
+
+### 技術
+
+單一 HTML 檔(spectroscopy/index.html),用 three.js 0.183.2 繪圖,不需要建置,不使用到站人數計數。程式分區與修改方式見 spectroscopy/MAINTENANCE.md。
+
+### 來源連結
+
+- CODATA, hc in eV nm:https://physics.nist.gov/cgi-bin/cuu/Value?minvev
+- NASA Imagine the Universe, The Electromagnetic Spectrum:https://imagine.gsfc.nasa.gov/science/toolbox/emspectrum1.html
+- HyperPhysics, Molecular spectra:http://hyperphysics.gsu.edu/hbase/mod3.html ;Microwave oven:https://hyperphysics.gsu.edu/hbase/waves/mwoven.html
+- Reusch, Virtual Textbook of Organic Chemistry:https://organicchemistrydata.org/reusch/virtualtext/spectroscopy/spectroscopy-intro/ 、https://organicchemistrydata.org/reusch/virtualtext/spectroscopy/infrared-spectroscopy/
+- CU Boulder IR tutorial(醛):https://orgchemboulder.com/Spectroscopy/irtutor/aldehydesir.shtml
+- BMRB bmse010006(香草醛):https://bmrb.io/metabolomics/mol_summary/show_data.php?id=bmse010006
+- CDMS, CO:https://cdms.astro.uni-koeln.de/classic/entries/c028503.cat
+- NIST WebBook 香草醛,紅外與紫外:https://webbook.nist.gov/cgi/cbook.cgi?ID=C121335&Type=IR-SPEC&Index=1 、https://webbook.nist.gov/cgi/cbook.cgi?ID=C121335&Mask=400
+- Cayman Chemical, Vanillin:https://www.caymanchem.com/product/36422/vanillin
+- LipidBank, β-carotene:https://lipidbank.jp/VCA.html
+- Velapoldi & Mielenz 1980, NBS Special Publication 260-64:https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication260-64.pdf ;SRM 936 證書:https://tsapps.nist.gov/srmext/certificates/689.pdf
+- UCAR, Ultraviolet light and tonic water:https://scied.ucar.edu/activity/learn/ultraviolet-light-tonic-water
+- Renishaw, What Raman spectroscopy is:https://www.renishaw.com/en/what-raman-spectroscopy-is--25805
+- Bruker, What is Raman spectroscopy:https://www.bruker.com/en/products-and-solutions/raman-spectroscopy/raman-basics/what-is-raman-spectroscopy.html
+- X-Ray Data Booklet 表 1-1:https://xdb.lbl.gov/Section1/Table_1-1.pdf
+
+## 層析-GC 與 HPLC
+
+網頁:https://tung-beauregard.github.io/instrument-principles/chromatography/
+
+從茨維特的色素管柱開始,講層析為什麼能把混在一起的成分分開:管子裡有會流動的東西(流動相,推著分子走)與不動的東西(固定相,把分子拉住一下),每種分子被拉住的時間不一樣,走得快慢就不一樣。接著是氣相層析 GC(氦氣推、烘箱升溫)與液相層析 HPLC(液體推、甲醇比例慢慢增加),峰為什麼會變寬、填充顆粒大小與壓力,以及分離度 Rs。版型和光譜-光與分子相同。
+
+- 三台:茨維特的玻璃管柱、GC(氦氣鋼瓶、進樣口與針筒、烘箱裡盤起來的管柱、偵測器)、HPLC(溶劑瓶、幫浦、自動進樣器、放大剖開的管柱、偵測器)
+- 「進樣」打一針,色帶在管柱裡分開,下方層析圖一支一支長出來;換條件會自動再打一針,上一次畫成灰色虛線對照
+- GC 比較恆溫 100 °C、恆溫 140 °C 與升溫;HPLC 比較固定 50% 甲醇與甲醇慢慢增加,填充顆粒 5 µm 與 1.7 µm
+- 左欄的簡圖三種:管子裡面(兩種分子在兩相之間進出,下方是走與被拉住的時間比例)、峰為什麼會變寬、分得開嗎(兩支峰的距離與寬度)
+- 「導覽」自動播放約 202 秒,24 段字幕,內容與影片相同
+- 文字以台灣高中畢業看得懂為準
+
+### 數值與示意
+
+茨維特(1906):
+
+- 方法:把沉澱碳酸鈣裝進細玻璃管,色素溶在石油醚(加約一成酒精)裡倒進去,再用溶劑往下沖;用二硫化碳時色帶更清楚。CS₂ 的色帶由上到下:無色、黃色葉黃素 β、暗橄欖綠的葉綠素 b、暗藍綠的葉綠素 a、黃色葉黃素 α′ 與 α″、無色、橘黃色葉黃素 α;胡蘿蔔素不被拉住,最先流出。他把這樣的管子叫 chromatogram、方法叫 chromatographic method(Tswett 1906,Le Moyne College 的英譯節錄)。
+- 頁面簡化成四條:胡蘿蔔素(最快)、葉黃素、葉綠素 a、葉綠素 b(最上面),k = 0.15、1.0、2.0、3.0 是示意值,先後依上面的順序;讀值卡寫「石油醚」。chroma(顏色)加 graphein(寫)的字源是一般說法,沒有找到茨維特本人的解釋。
+
+GC:
+
+- 和 `gc-ms/` 同一個滯留模型(HP-5MS 30 m × 0.25 mm × 0.25 µm、He 1.0 mL/min、死時間 1.37 分、約 7 萬理論板數;ln k 由 KI 與溫度算,見 GC-MS 一節)。成分取其中六種:α-蒎烯 939、檸檬烯 1029、1,8-桉葉油醇 1031、沉香醇 1096、樟腦 1146、石竹烯 1417(KI)。
+- 三種條件的計算結果:恆溫 100 °C,α-蒎烯 2.60 分、樟腦 6.41 分、石竹烯 33.41 分(峰寬 σ 0.128 分,峰高只有 α-蒎烯的 4%);恆溫 140 °C,全部在 5.7 分內出完,前面幾支擠在死時間後面;升溫(60 °C 起每分鐘 10 °C,到 220 °C),3.98 到 10.37 分,峰寬都約 0.011 分。
+- 檸檬烯與 1,8-桉葉油醇:在 5% 苯基管柱(DB-5MS、HP-5MS)上,同一篇研究量到的保留指數只差 0 到 3(Angioni 等 2006:1028 與 1031;Maia 等 2005:1032 與 1032;Jalali-Heravi 等 2006:1035 與 1038;Hazzit 等 2006:1044 與 1046,NIST WebBook),常常重疊。本頁的模型算出 Rs:恆溫 100 °C 0.56、恆溫 140 °C 0.20、升溫 0.65。
+
+HPLC:
+
+- 管柱 150 × 4.6 mm、C18、1 mL/min,死時間 1.5 分(推估:空隙約 1.6 mL)。滯留用反相層析常見的 log k = log kw − S × 甲醇比例;五個成分的 kw、S 是依它們在 C18 上常見的先後設定的示意值(沒食子酸 1.0、3.5;兒茶素 2.0、4.0;表兒茶素 2.3、4.1;阿魏酸 2.6、4.2;槲皮素 3.6、4.8),不是某一個實際方法的數據。梯度從入口往出口推進,位置 z 的分子碰到的是 z × 死時間 之前進入管柱的溶劑。
+- 計算結果:固定 50% 甲醇,沒食子酸 1.77 分(幾乎沒被拉住)、槲皮素 25.27 分;甲醇 10% 起 15 分鐘加到 90%(0.8 分的延遲),5.24、9.22、10.41、11.55、14.28 分。
+- 板數:常用的估法 N ≈ 300 × 管長(mm) ÷ 粒徑(µm),150 mm、5 µm 約 9,000,文獻常以約 10,000 為新管柱的參考(MicroSolv;LCGC);頁面取 5 µm 10,000、1.7 µm 29,000(同一估法的比例)。峰寬和 √N 成反比,所以 1.7 µm 的峰寬約為 5 µm 的 0.58 倍(頁面寫「大約六成」)。
+- 壓力:同樣的管長與流速,壓力和粒徑平方成反比,(5 ÷ 1.7)² ≈ 8.7 倍。150 × 4.6 mm、5 µm、1 mL/min 用水約 60 bar(推估:常見的估算例子是 250 mm、5 µm、1 mL/min 用水約 100 bar,依管長換算);50% 甲醇的黏度約為水的 1.8 倍,頁面取約 100 bar,1.7 µm 約 900 bar(計算推估)。1.7 µm 的管柱通常做得短、細,UHPLC 管柱的耐壓約 1,000 到 1,240 bar(ACE、Waters 規格)。
+
+分離度:Rs = 兩峰的滯留時間差 ÷ 兩峰底寬的平均(底寬 = 4σ),Rs 1.5 時兩支峰之間回到基線。
+
+教學示意:三台的外觀、管柱長短與粗細、時間尺度都經過縮放;GC 與 HPLC 管柱裡的色帶放大 4 倍才看得見;層析圖的峰寬與高度照模型,不是實測數據,不可用於實樣鑑定。
+
+### 技術
+
+單一 HTML 檔(chromatography/index.html),用 three.js 0.183.2 繪圖,不需要建置,不使用到站人數計數。程式分區與修改方式見 chromatography/MAINTENANCE.md。
+
+### 來源連結
+
+- Tswett 1906, Ber. Dtsch. Bot. Ges. 第 24 卷的兩篇論文(英譯節錄,Le Moyne College):https://web.lemoyne.edu/Giunta/tswett.html
+- NIST WebBook 保留指數,檸檬烯:https://webbook.nist.gov/cgi/cbook.cgi?ID=C138863&Mask=2000&Type=KOVATS-RI-NON-POLAR-RAMP ;1,8-桉葉油醇:https://webbook.nist.gov/cgi/cbook.cgi?ID=C470826&Mask=2000&Type=KOVATS-RI-NON-POLAR-RAMP
+- MicroSolv, Theoretical plate estimates(N ≈ 300 L/dp):https://www.mtc-usa.com/kb-article/aa-01449
+- LCGC, Column plate number and system suitability:https://www.chromatographyonline.com/view/column-plate-number-and-system-suitability-1
+- Waters ACQUITY BEH C18 1.7 µm 最高壓力:https://support.waters.com/KB_Chem/Columns/WKB198141_What_is_the_column_maximum_backpressure_for_the_ACQUITY_BEH_C18_21x100mm_part_186002352
+- ACE 1.7 µm 管柱(耐壓 1,000 bar):https://www.hplc.eu/Downloads/ACE_1_7_Flyer.pdf
+
+HPLC 成分的 kw 與 S、茨維特色帶的速度、GC 與 HPLC 的外觀都是示意;壓力的數字是由文獻的例子換算的推估,不是某一支管柱的實測。

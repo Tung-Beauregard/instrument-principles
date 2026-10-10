@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1111">
-  <meta name="description" content="儀器原理：離子阱質譜、GC-MS、UV-Vis、LCQ 離子之旅、NMR 核磁共振與質譜儀-不同分析器比較互動教材入口。">
+  <meta name="description" content="儀器原理：依質譜、層析、光譜、NMR 分類的互動教材入口，包含離子阱質譜、LCQ 離子之旅、質譜儀-不同分析器比較、層析-GC 與 HPLC、GC-MS、光譜-光與分子、UV-Vis 與 NMR 核磁共振。">
   <meta property="og:title" content="儀器原理">
-  <meta property="og:description" content="離子阱質譜、GC-MS、UV-Vis、LCQ 離子之旅、NMR 核磁共振與質譜儀-不同分析器比較互動教材入口。">
+  <meta property="og:description" content="依質譜、層析、光譜、NMR 分類的儀器原理互動教材入口。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/">
   <link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/">
@@ -19,43 +19,81 @@
   <a class="skip-link" href="#main">跳到主要內容</a>
   <header class="site-header wrap"><h1>儀器原理</h1></header>
   <main class="wrap" id="main">
-    <div class="instrument-grid" id="instrument-grid">
-      <article class="instrument-card mint" aria-labelledby="lcq-title">
-        <a href="./lcq/" aria-labelledby="lcq-title">
-          <img src="./assets/lcq.svg" alt="離子阱質譜儀結構示意" width="440" height="260">
-          <div class="card-label"><h2 id="lcq-title">離子阱質譜</h2><span aria-hidden="true">↗</span></div>
-        </a>
-      </article>
-      <article class="instrument-card blue" aria-labelledby="gc-ms-title">
-        <a href="./gc-ms/" aria-labelledby="gc-ms-title">
-          <img src="./assets/gc-ms.svg" alt="氣相層析儀連接質譜儀的結構示意" width="440" height="260">
-          <div class="card-label"><h2 id="gc-ms-title">GC-MS</h2><span aria-hidden="true">↗</span></div>
-        </a>
-      </article>
-      <article class="instrument-card lavender" aria-labelledby="uv-vis-title">
-        <a href="./uv-vis/" aria-labelledby="uv-vis-title">
-          <img src="./assets/uv-vis.svg" alt="光源、光柵與樣品槽的光路概念示意" width="440" height="260">
-          <div class="card-label"><h2 id="uv-vis-title">UV-Vis 分光光度計</h2><span aria-hidden="true">↗</span></div>
-        </a>
-      </article>
-      <article class="instrument-card mint" aria-labelledby="lcq-3d-title">
-        <a href="./lcq-3d/" aria-labelledby="lcq-3d-title">
-          <img src="./assets/lcq-3d.svg" alt="離子沿著導軌穿過毛細管、多極柱與離子阱的概念示意" width="440" height="260">
-          <div class="card-label"><h2 id="lcq-3d-title">LCQ 離子之旅</h2><span aria-hidden="true">↗</span></div>
-        </a>
-      </article>
-      <article class="instrument-card blue" aria-labelledby="nmr-title">
-        <a href="./nmr/" aria-labelledby="nmr-title">
-          <img src="./assets/nmr.svg" alt="剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意" width="440" height="260">
-          <div class="card-label"><h2 id="nmr-title">NMR 核磁共振</h2><span aria-hidden="true">↗</span></div>
-        </a>
-      </article>
-      <article class="instrument-card lavender" aria-labelledby="mass-analyzers-title">
-        <a href="./mass-analyzers/" aria-labelledby="mass-analyzers-title">
-          <img src="./assets/mass-analyzers.svg" alt="質譜儀的四種分析器:四極柱、離子阱、飛行時間與 Orbitrap 的概念示意" width="440" height="260">
-          <div class="card-label"><h2 id="mass-analyzers-title">質譜儀-不同分析器比較</h2><span aria-hidden="true">↗</span></div>
-        </a>
-      </article>
+    <div class="catalogue" id="catalogue">
+      <section class="category" aria-labelledby="cat-ms-title">
+        <h2 class="category-title" id="cat-ms-title">質譜</h2>
+        <div class="instrument-grid">
+          <article class="instrument-card mint" aria-labelledby="ms-lcq-title">
+            <a href="./lcq/" aria-labelledby="ms-lcq-title">
+              <img src="./assets/lcq.svg" alt="離子阱質譜儀結構示意" width="440" height="260">
+              <div class="card-label"><h3 id="ms-lcq-title">離子阱質譜</h3><span aria-hidden="true">↗</span></div>
+            </a>
+          </article>
+          <article class="instrument-card mint" aria-labelledby="ms-lcq-3d-title">
+            <a href="./lcq-3d/" aria-labelledby="ms-lcq-3d-title">
+              <img src="./assets/lcq-3d.svg" alt="離子沿著導軌穿過毛細管、多極柱與離子阱的概念示意" width="440" height="260">
+              <div class="card-label"><h3 id="ms-lcq-3d-title">LCQ 離子之旅</h3><span aria-hidden="true">↗</span></div>
+            </a>
+          </article>
+          <article class="instrument-card lavender" aria-labelledby="ms-mass-analyzers-title">
+            <a href="./mass-analyzers/" aria-labelledby="ms-mass-analyzers-title">
+              <img src="./assets/mass-analyzers.svg" alt="質譜儀的四種分析器:四極柱、離子阱、飛行時間與 Orbitrap 的概念示意" width="440" height="260">
+              <div class="card-label"><h3 id="ms-mass-analyzers-title">質譜儀-不同分析器比較</h3><span aria-hidden="true">↗</span></div>
+            </a>
+          </article>
+          <article class="instrument-card blue" aria-labelledby="ms-gc-ms-title">
+            <a href="./gc-ms/" aria-labelledby="ms-gc-ms-title">
+              <img src="./assets/gc-ms.svg" alt="氣相層析儀連接質譜儀的結構示意" width="440" height="260">
+              <div class="card-label"><h3 id="ms-gc-ms-title">GC-MS</h3><span aria-hidden="true">↗</span></div>
+            </a>
+          </article>
+        </div>
+      </section>
+      <section class="category" aria-labelledby="cat-chrom-title">
+        <h2 class="category-title" id="cat-chrom-title">層析</h2>
+        <div class="instrument-grid">
+          <article class="instrument-card mint" aria-labelledby="chrom-chromatography-title">
+            <a href="./chromatography/" aria-labelledby="chrom-chromatography-title">
+              <img src="./assets/chromatography.svg" alt="玻璃管柱裡分開的色素帶,與一支一支出來的層析圖峰" width="440" height="260">
+              <div class="card-label"><h3 id="chrom-chromatography-title">層析-GC 與 HPLC</h3><span aria-hidden="true">↗</span></div>
+            </a>
+          </article>
+          <article class="instrument-card blue" aria-labelledby="chrom-gc-ms-title">
+            <a href="./gc-ms/" aria-labelledby="chrom-gc-ms-title">
+              <img src="./assets/gc-ms.svg" alt="氣相層析儀連接質譜儀的結構示意" width="440" height="260">
+              <div class="card-label"><h3 id="chrom-gc-ms-title">GC-MS</h3><span aria-hidden="true">↗</span></div>
+            </a>
+          </article>
+        </div>
+      </section>
+      <section class="category" aria-labelledby="cat-spec-title">
+        <h2 class="category-title" id="cat-spec-title">光譜</h2>
+        <div class="instrument-grid">
+          <article class="instrument-card lavender" aria-labelledby="spec-spectroscopy-title">
+            <a href="./spectroscopy/" aria-labelledby="spec-spectroscopy-title">
+              <img src="./assets/spectroscopy.svg" alt="分子、能量階梯與從無線電波到 X 光的電磁波色帶" width="440" height="260">
+              <div class="card-label"><h3 id="spec-spectroscopy-title">光譜-光與分子</h3><span aria-hidden="true">↗</span></div>
+            </a>
+          </article>
+          <article class="instrument-card lavender" aria-labelledby="spec-uv-vis-title">
+            <a href="./uv-vis/" aria-labelledby="spec-uv-vis-title">
+              <img src="./assets/uv-vis.svg" alt="光源、光柵與樣品槽的光路概念示意" width="440" height="260">
+              <div class="card-label"><h3 id="spec-uv-vis-title">UV-Vis 分光光度計</h3><span aria-hidden="true">↗</span></div>
+            </a>
+          </article>
+        </div>
+      </section>
+      <section class="category" aria-labelledby="cat-nmr-title">
+        <h2 class="category-title" id="cat-nmr-title">NMR</h2>
+        <div class="instrument-grid">
+          <article class="instrument-card blue" aria-labelledby="nmr-nmr-title">
+            <a href="./nmr/" aria-labelledby="nmr-nmr-title">
+              <img src="./assets/nmr.svg" alt="剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意" width="440" height="260">
+              <div class="card-label"><h3 id="nmr-nmr-title">NMR 核磁共振</h3><span aria-hidden="true">↗</span></div>
+            </a>
+          </article>
+        </div>
+      </section>
     </div>
   </main>
   <footer class="site-footer wrap">

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { RenderBudget, FramePacer } from '../assets/render-quality.js';
 
-const LESSONS = ['lcq', 'gc-ms', 'uv-vis', 'lcq-3d', 'nmr', 'mass-analyzers'];
+const LESSONS = ['lcq', 'gc-ms', 'uv-vis', 'lcq-3d', 'nmr', 'mass-analyzers', 'spectroscopy', 'chromatography'];
 for (const lesson of LESSONS) {
   const html = readFileSync(new URL(`../${lesson}/index.html`, import.meta.url), 'utf8');
   for (const [, code] of html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)) {

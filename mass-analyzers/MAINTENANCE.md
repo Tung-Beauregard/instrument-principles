@@ -1,6 +1,6 @@
 # 質譜儀-不同分析器比較:維護說明
 
-`mass-analyzers/index.html` 是單一 HTML 檔,用 three.js 0.183.2(jsDelivr ES module,經 importmap 載入)繪圖,不需要建置。版型和 `uv-vis/`、`nmr/` 相同:左上是標題、讀值卡與簡圖,右上是控制面板,下方是譜的主控台,場景裡是 CSS2D 零件標籤;「導覽」與錄影共用同一條時間軸(腳本 118 秒,播放時放慢成約 142 秒)。檔案由作者電腦上的原始碼片段串接而成,串接時保留了分區標記,在檔案裡搜尋 `// ==== ` 就能跳到各區。
+`mass-analyzers/index.html` 是單一 HTML 檔,用 three.js 0.183.2(jsDelivr ES module,經 importmap 載入)繪圖,不需要建置。版型和 `uv-vis/`、`nmr/` 相同:左上是標題、讀值卡與簡圖,右上是控制面板,下方是譜的主控台,場景裡是 CSS2D 零件標籤;「導覽」與錄影共用同一條時間軸(腳本 118 秒,加上講完每一台時停下來播的電場動畫共 59 秒,播放時放慢成約 212 秒)。檔案由作者電腦上的原始碼片段串接而成,串接時保留了分區標記,在檔案裡搜尋 `// ==== ` 就能跳到各區。
 
 **讀者設定:** 文字以台灣高中畢業看得懂為準。專有名詞換成白話或當場解釋(例如「解析度」改說「能分開的差距」,m/z 解釋成「質量除以電荷」),原理用左欄的簡圖說明。改文案時維持這個程度;規格、來源與型號留在說明視窗的小字與 `INSTRUMENTS.md`。
 
@@ -20,9 +20,9 @@
 | `28_orbi.js` | Orbitrap 尺寸 `OD` 與等位面 `orbZ()`;工作站 `OS`(中心電極 `spMat`、分成兩半的外電極 `outMats`、端板、C-trap `ctMat`、偏折透鏡路徑 `OS.zl`);顯示用頻率 `orbF()`、離子位置 `orbPos()`(C-trap 收集、經偏折透鏡注入、繞中心電極轉並沿軸振盪)、外電極的感應訊號 `orbSignal()`、`orbIons()` | Orbitrap 外形、注入 |
 | `30_source.js` | 中央的電灑游離源 `SRC`/`SRCG`(底座、分配中樞、離子漏斗、玻璃噴霧室、噴針)、四條離子導引 `guideCurve()`(飛行時間那一條沿後面低處走,從推斥區底下往上進)、發光管 `glowTubeMat()`、`GUIDES`、噴霧與導引裡的離子 `sourceIons()` | 離子源、導引路線 |
 | `40_labels.js` | `label(key, comp, anchor, title, sub)`(世界座標)、`labelOp()`;四台的名牌與各零件標籤(白話,例如「金屬桿 電壓正負交替」);互動模式每台顯示的標籤 `LBL_ANA` | 標籤文字與位置 |
-| `50_film.js` | 互動設定 `S`、這一格的狀態 `W`;腳本長度 `SCRIPT_DUR`、放慢倍數 `FILM_SLOW`、實際長度 `FILM_DUR`;各台取景 `VIEW`(互動模式)與影片用的 `VIEWF`/`ENDF`(`pull()` 拉遠、`slide()` 平移,配合畫面右移)、鏡頭 `CAMK`、字幕 `CAPS`、標籤時段 `LBL_WIN`、`track()`、`camAt()`;四極柱掃描的時間扭曲 `QWARP`/`qScanMz()`、各段時刻 `FQ`、`FIT`、`FTOF`、`FORB`;`film(t)`(也設定簡圖 `W.skAna`、`W.skOp` 與畫面右移 `W.shift`) | 字幕、運鏡、時間軸 |
+| `50_film.js` | 互動設定 `S`、這一格的狀態 `W`;腳本長度 `SCRIPT_DUR`、放慢倍數 `FILM_SLOW`、實際長度 `FILM_DUR`;各台取景 `VIEW`(互動模式)與影片用的 `VIEWF`/`ENDF`(`pull()` 拉遠、`slide()` 平移,配合畫面右移)、鏡頭 `CAMK`、字幕 `CAPS`、標籤時段 `LBL_WIN`、`track()`、`camAt()`;四極柱掃描的時間扭曲 `QWARP`/`qScanMz()`、各段時刻 `FQ`、`FIT`、`FTOF`、`FORB`;`film(t)`(也設定簡圖 `W.skAna`、`W.skOp` 與畫面右移 `W.shift`);電場動畫的停頓 `FHOLD`(在腳本的哪一秒停、停多久、動畫取哪幾段、這段的字幕)、影片時間換成腳本時間的 `filmWarp()`、`holdDemoTime()`、每一格的進入點 `filmAt()`(停頓時設 `W.field`、`W.dim` 與字幕) | 字幕、運鏡、時間軸 |
 | `60_state.js` | 收譜的長度 `RUN_DUR`、`orbRunT()`、`runDur()`、`startRun()`、`stopRun()`;待機動作 `IDLE` 與 `interactive(dt, now)`;把 `W` 套到場景的 `frameCommon(t)`(外殼、發光、離子、標籤) | 互動流程 |
-| `65_sketch.js` | 簡圖:600 × 340 虛擬座標的平面示意,畫在左欄的 `#sketch` 畫布;畫筆小工具 `skText()`、`skLead()`、`skDot()`、`skPath()`、`skArrow()`、`skFlash()`、`skSpark()`;四台各一個 `skQuad()`、`skTrap()`、`skTof()`、`skOrb()`;標題與比喻 `SK_HEAD`;進入點 `drawSketch(t, ana)` | 簡圖的畫法與標註 |
+| `65_sketch.js` | 簡圖:600 × 340 虛擬座標的平面示意,畫在左欄的 `#sketch` 畫布;畫筆小工具 `skText()`、`skLead()`、`skDot()`、`skPath()`、`skArrow()`、`skFlash()`、`skSpark()`;四台各一個 `skQuad()`、`skTrap()`、`skTof()`、`skOrb()`;標題與比喻 `SK_HEAD`;電場形狀 `SKF`、`SKF_KIND`、`SKF_SUB`、`skFieldOn()`、互動用的 `skFieldDemo()` 與影片用的 `skFieldFilm()`(兩組互不干擾)、`skFieldRestart()`;進入點 `drawSketch(t, ana)` | 簡圖的畫法與標註 |
 | `70_ui.js` | 讀值:能分開的差距 `gapOf()`/`fmtGap()`、量到的偏差 `errText()`、量一張譜 `timeText()`;簡圖下方的說明 `sketchText()`;`updateDOM()`(讀值、簡圖面板、主控台、字幕);比較表 `#cmp`;主控台 `drawPlot()`、放大段 `ZOOMS`/`specRange()`、譜 `drawSpec()`、比一比 `drawCompare()`;飛行時間的 `TOF_US195`、Orbitrap 的 `ORB_F200`(簡圖用來寫出真實的微秒與每秒來回次數);控制項 `buildResSeg()`、窄螢幕的「簡圖」按鈕;導覽 `tour`、`startTour()`、`endTour()` | 圖表、讀值、控制項 |
 | `75_nav.js` | 以共用的 `../assets/camera-nav.js` 建立視角操作 `nav` | |
 | `80_loop.js` | 畫面右移 `SHIFT`/`applyShift()`、`render()`、`resize()`、錄影用的 `window.__seek`、主迴圈(影片與導覽的時間除以 `FILM_SLOW` 才交給 `film()`)、除錯用的 `window.MSA` | |
@@ -50,8 +50,9 @@
 - 每台一張平面示意圖,和旁邊的 3D 同方向:四極柱與飛行時間的離子由右往左(偵測器、反射鏡在左邊),離子阱與 Orbitrap 由左往右。標題寫名字與一句比喻(`SK_HEAD`:像篩子、先關起來再依序放出、比賽跑、量擺動的快慢),最上面一行是現在的狀態。
 - 四極柱:兩根桿子代表四根,正負號一直翻轉;依 `W.qSetAt(t)` 放行的 m/z 決定每種離子是穩穩穿過、越晃越大撞上桿子,還是慢慢偏掉撞上桿子。離子阱:依 `W.itCyc` 進離子、撞氦氣變慢、繞小圈,掃描時依 `trapEject()` 的順序從右邊小孔出去。飛行時間:依 `W.tofPushes` 推出,路徑長與鑽入深度照一階能量聚焦的比例(去回總長 = 4 倍平均鑽入深度),到達時間和 3D 一樣用 `tofArrive()`;下方刻度用 `TOF_US195` 換成真實的微秒。Orbitrap:依 `W.orbBatch` 收集、送進去,兩種離子圈以 `orbF()` 的比例左右擺動,下方是外殼記下的訊號,狀態列用 `ORB_F200` 寫出每秒來回約幾萬次。
 - 互動模式:簡圖在左欄,畫目前選的分析器,下面是 `sketchText()` 的說明。影片與寬螢幕導覽:簡圖只在講各台時出現(`W.skOp`,換台時短暫淡出),說明那一行藏起來。窄螢幕(980 px 以下)預設不顯示,按控制面板的「簡圖」開關;打開時把讀值卡、大標題與說明藏起來,簡圖才放得進控制面板上方。
-- 電場形狀(2026-10-07):互動模式選四極柱或離子阱時,簡圖右上角的「電場形狀」(`skField`)把簡圖換成翻轉的馬鞍,用共用的 `../assets/saddle-field.js`(GC-MS 的四極桿動畫也用它)。`skFieldOn(ana)` 判斷要不要畫(互動模式、`S.skField`、四極柱或離子阱),`skFieldDemo(ana)` 建立並保存兩段示意(四極柱的三顆球標 m/z 160、195、285,離子阱用模組預設的 m/z),`drawSketch()` 依實際經過的時間 `advance()`,播完停 2.5 秒從頭;換分析器或剛按下時 `skFieldRestart()` 從頭播。簡圖底下的字改成這段的說明(`sketchText()` 回傳 `cueAt()`)。影片與導覽一律畫原本的簡圖,按鈕也藏起來。窄螢幕打開簡圖時,電場形狀的說明照樣顯示(`html.sk-open.sk-field`),很矮的手機上簡圖面板放到控制區上層,蓋住控制區最上面一列,「簡圖」鈕仍按得到。
-- 馬鞍的物理:球照 Mathieu 方程式逐步積分(步長 1/600 秒),翻轉放慢到每秒 1.6 次;離子阱 a = 0,主角 q_z 0.45,太輕的 1.15,掃描時 q 每秒升 14%,在穩定邊界 0.908 被甩出去;四極柱沿 a = 0.3 q 的掃描線,穩定窗口 q 0.625 到 0.725。曲面的高低只是示意。數值與取捨見 `INSTRUMENTS.md`,改了腳本或參數要跑 `node scripts/check-saddle.mjs`。
+- 電場形狀(2026-10-07 加入四極柱與離子阱,2026-10-08 擴充到四台):互動模式時簡圖右上角的「電場形狀」(`skField`)把簡圖換成這一台的電場動畫,用共用的 `../assets/analyzer-fields.js`(GC-MS 的四極桿動畫也用它):四極柱與離子阱是翻轉的馬鞍,飛行時間是陡坡、平地、上坡的地形(反射鏡開與關各推一次,下方是兩次的到達時間),Orbitrap 是紡錘與碗(三種 m/z 的擺盪,下方是外殼記下的訊號與拆出的頻率)。`skFieldOn(ana)` 判斷要不要畫(互動模式、`S.skField`),`skFieldDemo(ana)` 建立並保存四段示意(四極柱的三顆球標 m/z 160、195、285,飛行時間與 Orbitrap 的說明另外寫成本頁的版本,提到控制面板的「反射鏡」與真實的每秒 59 萬次),`drawSketch()` 依實際經過的時間 `advance()`,播完停 2.5 秒從頭;換分析器或剛按下時 `skFieldRestart()` 從頭播。簡圖底下的字改成這段的說明(`sketchText()` 回傳 `cueAt()`)。窄螢幕打開簡圖時,電場形狀的說明照樣顯示(`html.sk-open.sk-field`),很矮的手機上簡圖面板放到控制區上層,蓋住控制區最上面一列,「簡圖」鈕仍按得到。
+- 影片與導覽裡的電場(2026-10-08):講完每一台時時間軸停下來(`FHOLD`),簡圖換成那一台的電場動畫(`skFieldFilm()`,用 `seek()` 跳到 `W.field.t`,所以任一格都能重現),3D 用全畫面的半透明暗幕 `#fdim` 調暗(`W.dim`),簡圖面板以左上角為原點放大到 1.55 倍,字幕換成停頓專用的幾句。停頓只取動畫的關鍵段落(`seg`,例如離子阱取第 12 到 16.5 秒與第 26 到 37.5 秒),四台合計 59 秒。互動模式的「電場形狀」按鈕在影片與導覽時藏起來。
+- 馬鞍的物理:球照 Mathieu 方程式逐步積分(步長 1/600 秒),翻轉放慢到每秒 1.6 次;離子阱 a = 0,主角 q_z 0.45,太輕的 1.15,掃描時 q 每秒升 14%,在穩定邊界 0.908 被甩出去;四極柱沿 a = 0.3 q 的掃描線,穩定窗口 q 0.625 到 0.725。曲面的高低只是示意。飛行時間與 Orbitrap 的參數(`TOF`、`ORB_F0`)與取捨也在 `INSTRUMENTS.md`;改了腳本或參數要跑 `node scripts/check-fields.mjs`。
 - 畫面右移:影片與寬螢幕導覽講各台時,`applyShift()` 用 `camera.setViewOffset()` 把投影中心往右下移(鏡頭位置不變),3D 才不會躲在簡圖後面;`VIEWF` 是配合這個右移重新取景的鏡頭。`setViewOffset()` 會把 `camera.aspect` 設成傳進去的 fullWidth ÷ fullHeight,一定要傳真正的畫面寬高,傳 1、1 會讓 3D 橫向拉長(踩過的坑)。
 
 ## 收譜(互動模式)
@@ -70,13 +71,13 @@
 
 ## 視角操作
 
-六份 3D 教材共用 `../assets/camera-nav.js`,本頁在 `75_nav.js` 建立,只在互動模式作用;`startTour()` 會 `nav.cancel()`。操作方式與按鍵見 `nmr/MAINTENANCE.md` 的同名一節。選分析器時鏡頭用 `nav.flyTo()` 飛到 `VIEW` 的取景。
+各 3D 教材共用 `../assets/camera-nav.js`,本頁在 `75_nav.js` 建立,只在互動模式作用;`startTour()` 會 `nav.cancel()`。操作方式與按鍵見 `nmr/MAINTENANCE.md` 的同名一節。選分析器時鏡頭用 `nav.flyTo()` 飛到 `VIEW` 的取景。
 
 直式窄螢幕(寬高比小於 1.2)時,下半部被控制面板與主控台蓋住,`fitPortrait()` 把鏡頭往後拉、畫面往上移;開頁的鏡頭、選分析器的取景與導覽的鏡頭都經過它。錄影是 16:9,不受影響。視窗還沒有大小時(在隱藏的分頁或面板裡開啟)寬高比是 NaN 或 0,這時直接不調整;少了這個判斷,開頁的相機位置會變成 NaN,整個場景不見(踩過的坑)。
 
 ## 導覽與影片的時間軸
 
-- 腳本以 `SCRIPT_DUR` = 118 秒寫成,下面的秒數都是腳本時間;播放、導覽與錄影時整體放慢 `FILM_SLOW` = 1.2 倍,實際長度 `FILM_DUR` 約 141.6 秒(主迴圈與 `__seek` 把實際時間除以 1.2 再交給 `film()` 與 `frameCommon()`)。`CAMK` 是 [秒, 相機位置, 看的點],相鄰關鍵格用五次緩動內插。
+- 腳本以 `SCRIPT_DUR` = 118 秒寫成,下面的秒數都是腳本時間;另外在 33.8(四極柱,14 秒)、53.6(離子阱,16 秒)、75.6(飛行時間,14 秒)、97.6(Orbitrap,15 秒)各停下來播電場動畫(`FHOLD`)。播放、導覽與錄影時整體放慢 `FILM_SLOW` = 1.2 倍,實際長度 `FILM_DUR` = (118 + 59) × 1.2 = 212.4 秒(主迴圈與 `__seek` 把實際時間除以 1.2,經 `filmAt()` 扣掉停頓,再交給 `film()` 與 `frameCommon()`)。`CAMK` 是 [秒, 相機位置, 看的點],相鄰關鍵格用五次緩動內插。
 - 時間軸(腳本秒數):0.2 到 5.6 開場標題;6 到 9 剖開;6.2 總覽(四台與離子源);12.8 到 15 畫面右移、簡圖出現;15.6 四極柱(19 到 31 掃描,31 到 32.4 放大 m/z 195);35.8 離子阱(35 進離子,40.5 開始掃描,48.6 放大);55.8 飛行時間(56.3、62.2、68.8 各推一次,69.6 放大);77.8 Orbitrap(77.2 收集,80.6 注入,81 開始記錄,93 拆成頻率,94.6 放大);97.4 到 99.6 簡圖收起、畫面移回;100.4 回到總覽比一比(105.8 起比較表,主控台淡出);112.6 片尾標題;113.6 到 116.6 外殼關上。
 - 影片版面(`html.film`):讀值卡與簡圖在左上、主控台在右上、字幕在下方中央。
 - 「導覽」按鈕用同一條時間軸即時播放;按 Esc、「結束導覽」或播完,回到原本的分析器、外殼、譜與鏡頭。
@@ -84,7 +85,7 @@
 ## 網址參數
 
 - `?film`:影片版面,自動循環播放;`?t=秒數`(實際秒數)從某一秒開始。
-- `?film&rec`:錄影用。`window.__seek(t)` 畫出實際第 t 秒(完整畫質、DPR 1、不節流),`window.__dur` 是全長。要看腳本第 s 秒,用 `t = s × 1.2`。
+- `?film&rec`:錄影用。`window.__seek(t)` 畫出實際第 t 秒(完整畫質、DPR 1、不節流),`window.__dur` 是全長。實際秒數 ÷ 1.2 是含停頓的影片時間,扣掉前面的停頓才是腳本時間(例如腳本第 40 秒在實際的 (40 + 14) × 1.2 = 64.8 秒)。
 - `?perf=1`:顯示每秒幀數與繪圖裝置(共用的畫質模組)。
 - 除錯:主控台的 `window.MSA`。
 
@@ -94,7 +95,7 @@
 
 ## 修改後的檢查
 
-- 在網站根目錄執行 `node scripts/check-site.mjs`、`node scripts/check-render-quality.mjs`(含本頁的 module 語法檢查)、`node scripts/check-camera-nav.mjs` 與 `node scripts/check-saddle.mjs`。
+- 在網站根目錄執行 `node scripts/check-site.mjs`、`node scripts/check-render-quality.mjs`(含本頁的 module 語法檢查)、`node scripts/check-camera-nav.mjs` 與 `node scripts/check-fields.mjs`。
 - 用 HTTP 預覽打開 `mass-analyzers/`,四台各收一次譜、點譜放大兩段、跑一次導覽,確認 console 沒有錯誤;在 390px、768px、1280×720 與 1600×900 各看一次(窄螢幕按「簡圖」開關)。
 - 改了影片腳本或簡圖時,用 `?film&rec&t=秒數` 抽幾格,確認字幕、鏡頭、簡圖、標籤與主控台對得上,3D 沒有躲在簡圖、主控台或字幕後面;鏡頭在兩個關鍵格之間是直線移動,也要看途中有沒有穿過物體。
 - 改了數值時,對照 `INSTRUMENTS.md` 的來源與 `docs/VALIDATION.md` 的數值案例。
