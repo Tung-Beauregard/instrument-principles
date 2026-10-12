@@ -17,6 +17,7 @@
 - 本站是 W AI Studio 的儀器原理教學入口，使用繁體中文。
 - `index.html` 專責入口；每一台儀器有獨立、穩定的子目錄，使用小寫英文字與連字號。
 - 現有 `lcq/`、`gc-ms/`、`uv-vis/`、`lcq-3d/`、`nmr/`、`mass-analyzers/`、`spectroscopy/`、`chromatography/` 路徑不可隨意更名。必須更名時，更新所有引用並保留舊網址轉向。
+- `lcq/` 與 `lcq-3d/` 是同一份教材「離子阱質譜」的兩個畫面：「動畫講解」與「拆開探索」（使用者 2026-10-13 決定合併）。入口與 `content/instruments.json` 只列 `lcq`；`lcq-3d/` 不在清單裡，由這兩頁分頁列的「離子阱質譜」一組互相連結，其他教材的分頁列只連到 `../lcq/`。`scripts/check-site.mjs` 的 `extraPages` 照樣檢查 `lcq-3d/`。
 - 入口頂部品牌名稱只用「儀器原理」。底部「返回主頁」連到 `https://tung-beauregard.github.io/w-studio/`。
 - 每份教材至少有「儀器入口」返回連結。兄弟教材連結必須指向正確子目錄，不能把入口當作 LCQ 教材。
 - 首頁不可自動跳入教材，不可在入口預載或自動播放完整 3D 教材。

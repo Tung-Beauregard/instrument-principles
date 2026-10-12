@@ -31,18 +31,6 @@
       "href": "./lcq/"
     },
     {
-      "id": "lcq-3d",
-      "name": "LCQ 離子之旅",
-      "categories": [
-        "ms"
-      ],
-      "status": "ready",
-      "theme": "mint",
-      "image": "./assets/lcq-3d.svg",
-      "imageAlt": "離子沿著導軌穿過毛細管、多極柱與離子阱的概念示意",
-      "href": "./lcq-3d/"
-    },
-    {
       "id": "mass-analyzers",
       "name": "質譜儀-不同分析器比較",
       "categories": [

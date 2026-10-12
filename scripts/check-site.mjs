@@ -44,7 +44,9 @@ for (const item of instruments) for (const catId of item.categories) {
   }
 }
 const ready = instruments.filter(item => item.status === 'ready').length;
-const files = ['index.html', ...instruments.filter(item => item.status === 'ready').map(item => item.href.replace('./', '') + 'index.html')];
+// 不在入口清單、只從教材分頁列進去的頁面:離子阱質譜的「拆開探索」(2026-10-13 起)
+const extraPages = ['lcq-3d/index.html'];
+const files = ['index.html', ...instruments.filter(item => item.status === 'ready').map(item => item.href.replace('./', '') + 'index.html'), ...extraPages];
 for (const file of files) {
   const source = read(file);
   for (const match of source.matchAll(/(?:href|src)="([^"#]+)(?:#[^"]*)?"/g)) {
@@ -60,4 +62,8 @@ for (const file of files) {
   const ctl = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.exec(source);
   assert.equal(ctl, null, `Control character U+${ctl ? ctl[0].charCodeAt(0).toString(16).padStart(4, '0') : ''} in ${file}`);
 }
-console.log(`PASS: ${instruments.length} catalogue entries, ${ready} ready lessons, static fallback, local resources and navigation.`);
+for (const page of extraPages) {
+  const href = `href="../${page.replace('index.html', '')}"`;
+  assert.ok(files.some(file => file !== page && read(file).includes(href)), `No lesson links to ${page}`);
+}
+console.log(`PASS: ${instruments.length} catalogue entries, ${ready} ready lessons, ${extraPages.length} extra page, static fallback, local resources and navigation.`);

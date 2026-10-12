@@ -3,17 +3,18 @@
 互動儀器教材入口。頁面只保留「儀器原理」、儀器圖與名稱連結、返回主頁及到站人數，色彩延續 W AI Studio。
 
 - [儀器入口](https://tung-beauregard.github.io/instrument-principles/)
-- [離子阱質譜](https://tung-beauregard.github.io/instrument-principles/lcq/)
+- [離子阱質譜](https://tung-beauregard.github.io/instrument-principles/lcq/)（動畫講解；另一個畫面是[拆開探索](https://tung-beauregard.github.io/instrument-principles/lcq-3d/)）
 - [UV-Vis 分光光度計](https://tung-beauregard.github.io/instrument-principles/uv-vis/)
 - [GC-MS](https://tung-beauregard.github.io/instrument-principles/gc-ms/)
-- [LCQ 離子之旅](https://tung-beauregard.github.io/instrument-principles/lcq-3d/)
 - [NMR 核磁共振](https://tung-beauregard.github.io/instrument-principles/nmr/)
 - [質譜儀-不同分析器比較](https://tung-beauregard.github.io/instrument-principles/mass-analyzers/)
 - [層析-GC 與 HPLC](https://tung-beauregard.github.io/instrument-principles/chromatography/)
 - [光譜-光與分子](https://tung-beauregard.github.io/instrument-principles/spectroscopy/)
 - [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-目前共有八份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、LCQ 離子之旅、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。
+目前共有七份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。
+
+離子阱質譜有兩個畫面：「動畫講解」（`lcq/`）與「拆開探索」（`lcq-3d/`）。拆開探索原本是另一份教材「LCQ 離子之旅」，2026-10-13 併入；入口只列一張卡片，兩個畫面由分頁列的「離子阱質譜」一組互相切換，網址都沒有變。
 
 ## 專案結構
 
@@ -29,11 +30,12 @@ assets/
   *.svg                    品牌與儀器概念示意
 content/
   instruments.json         儀器名稱、順序、圖片、狀態與連結
-lcq/index.html             原本根目錄的離子阱教材
+lcq/index.html             離子阱質譜的「動畫講解」（原本根目錄的離子阱教材）
+lcq/MAINTENANCE.md         動畫講解的程式結構、物理數值、章節時間軸與修改方式
 gc-ms/index.html           GC-MS 教材
 uv-vis/index.html          UV-Vis 分光光度計教材
-lcq-3d/index.html          LCQ 離子之旅；LCQ Deca XP 拆解式 3D 導覽
-lcq-3d/MAINTENANCE.md      LCQ 離子之旅的程式結構與修改方式
+lcq-3d/index.html          離子阱質譜的「拆開探索」；不在入口清單，由分頁列進入
+lcq-3d/MAINTENANCE.md      拆開探索的程式結構與修改方式
 nmr/index.html             NMR 核磁共振；以 Bruker AVANCE III 500 為例，跟著訊號走一圈
 nmr/MAINTENANCE.md         NMR 教材的程式結構與修改方式
 mass-analyzers/index.html  質譜儀-不同分析器比較；四極柱、離子阱、飛行時間與 Orbitrap 的原理比較
@@ -105,9 +107,9 @@ node scripts/check-fields.mjs
 
 教材網址加上 `?perf=1` 可查看 FPS、繪圖比例與瀏覽器回報的繪圖裝置；資料僅顯示在本頁，不上傳。例如 `lcq-3d/?perf=1`。若顯示軟體繪圖，先檢查瀏覽器圖形加速與顯示驅動；畫質模式不保證特定裝置的幀率。
 
-八份 3D 教材共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
+八個 3D 頁面（七份教材，離子阱質譜有兩個畫面）共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
 
-維護索引：[離子阱](./lcq/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[離子之旅](./lcq-3d/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)。
+維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)。
 
 ## 品牌與資料來源
 

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LCQ Deca XP 離子之旅</title>
-<meta name="description" content="把 LCQ Deca XP 離子阱質譜儀拆開來看:從噴出帶電液滴的噴針、加熱的毛細管、送離子前進的金屬柱,到關住離子的離子阱與偵測器,一路追著離子變成質譜。">
+<title>離子阱質譜原理:拆開探索</title>
+<meta name="description" content="離子阱質譜原理的拆開探索,以 LCQ Deca XP 為例:把儀器拆開來看,從噴出帶電液滴的噴針、加熱的毛細管、送離子前進的金屬柱,到關住離子的離子阱與偵測器,一路追著離子變成質譜。">
 <meta name="theme-color" content="#070a12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -344,6 +344,12 @@ button { font: inherit; color: inherit; }
 #sitenav a:hover { background: rgba(255, 255, 255, 0.07); color: var(--fg); }
 #sitenav a[aria-current="page"] { background: var(--on-bg); color: var(--on-fg); }
 #sitenav a:focus-visible { outline: 2px solid var(--ion); outline-offset: 2px; }
+/* 離子阱質譜一組:「動畫講解」(../lcq/)與「拆開探索」(本頁) */
+#sitenav .sn-lesson {
+  display: flex; align-items: center; gap: 2px; flex: none; padding-left: 10px;
+  border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line);
+}
+#sitenav .sn-name { margin-right: 4px; font: 700 13px/1.5 var(--f-zh); color: var(--fg); white-space: nowrap; }
 #app.cine #sitenav { opacity: 0; pointer-events: none; }
 .side { top: 66px; }
 
@@ -359,6 +365,8 @@ button { font: inherit; color: inherit; }
 }
 @media (max-width: 420px) {
   #sitenav a { padding-left: 7px; padding-right: 7px; font-size: 11.5px; }
+  #sitenav .sn-lesson { padding-left: 7px; }
+  #sitenav .sn-name { font-size: 11.5px; }
 }
 
 </style>
@@ -366,15 +374,15 @@ button { font: inherit; color: inherit; }
 </head>
 <body>
 <main id="app">
-  <nav id="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="./" aria-current="page">離子之旅</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="../chromatography/">層析</a></nav>
-  <canvas id="gl" aria-label="LCQ Deca XP 的 3D 模型,可拖曳旋轉、滾輪縮放"></canvas>
+  <nav id="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><span class="sn-lesson" role="group" aria-label="離子阱質譜"><span class="sn-name" aria-hidden="true">離子阱質譜</span><a href="../lcq/">動畫講解</a><a href="./" aria-current="page">拆開探索</a></span><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="../chromatography/">層析</a></nav>
+  <canvas id="gl" aria-label="離子阱質譜儀(以 LCQ Deca XP 為例)的 3D 模型,可拖曳旋轉、滾輪縮放"></canvas>
   <canvas id="ov" aria-hidden="true"></canvas>
   <div class="vignette"></div>
 
   <aside class="side">
     <div class="brand">
-      <h1><span>LCQ DECA XP</span><b>離子之旅</b></h1>
-      <p>一滴樣品溶液從噴針出來,最後變成質譜上的一根峰;質譜就是把離子依 m/z(質量除以電荷)排開的圖。把離子阱質譜儀拆開,沿著離子走的路線,看它經過的每個零件,以及壓力從一大氣壓一路降到 10⁻⁵ Torr(約一億分之一大氣壓)。</p>
+      <h1><span>離子阱質譜</span><b>拆開探索</b></h1>
+      <p>一滴樣品溶液從噴針出來,最後變成質譜上的一根峰;質譜就是把離子依 m/z(質量除以電荷)排開的圖。把離子阱質譜儀拆開,沿著離子走的路線,看它經過的每個零件,以及壓力從一大氣壓一路降到 10⁻⁵ Torr(約一億分之一大氣壓)。範例儀器是 LCQ Deca XP。</p>
     </div>
     <div class="stats">
       <div class="stat glass"><i><em>階段</em>STEP</i><b id="stPhase"><span class="dot"></span>注入</b></div>
@@ -2688,10 +2696,10 @@ function drawBug(g, W, H, s, a) {
   if (a <= 0.01) return;
   const k = s / 1.75;
   g.globalAlpha = a;
-  g.fillStyle = '#dfe6f5'; g.font = `600 ${20 * k}px ${FONT.ui}`;
-  g.fillText('LCQ DECA XP', 44 * k, 62 * k);
+  g.fillStyle = '#dfe6f5'; g.font = `500 ${20 * k}px ${FONT.zh}`;
+  g.fillText('離子阱質譜', 44 * k, 62 * k);
   g.fillStyle = '#7fe3ff'; g.font = `900 ${38 * k}px ${FONT.zh}`;
-  g.fillText('離子之旅', 44 * k, 108 * k);
+  g.fillText('拆開探索', 44 * k, 108 * k);
   g.globalAlpha = 1;
 }
 // 導覽與影片裡的兩個示波窗:疊在畫面右側一欄
@@ -2753,7 +2761,7 @@ const SHOTS = [
 // 分段:每段的機身狀態、標籤、示波窗與字幕
 const SCENES = [
   { t: 0, view: 'ext', labels: ['cabSrc', 'cabLed', 'syringe'], hud: [0, 0], bug: 1,
-    caps: [{ t: 0.8, chap: 'LCQ DECA XP', main: '一台離子阱質譜儀,我們把它拆開來看', sub: '樣品溶液從前面的離子源進去,出來的是依質量排開的質譜。跟著離子走完全程。' }] },
+    caps: [{ t: 0.8, chap: '離子阱質譜', main: '一台離子阱質譜儀,我們把它拆開來看', sub: '樣品溶液從前面的離子源進去,出來的是依質量排開的質譜。跟著離子走完全程。' }] },
   { t: 7, view: 'asm', labels: ['R0', 'R1', 'R2', 'R3', 'turbo', 'fore'], hud: [0, 0], bug: 1,
     caps: [{ t: 7.6, chap: '01 ・ 四個壓力區', main: '從一大氣壓到 10⁻⁵ Torr,壓力差了將近一億倍', sub: '兩台機械幫浦和一台渦輪幫浦分段抽氣;1 Torr 約等於 1 mmHg。' }] },
   { t: 14.5, view: 'asm', labels: ['probe'], hud: [0, 0], bug: 0,
@@ -2789,7 +2797,7 @@ const SCENES = [
       { t: 124.5, chap: '11 ・ MS/MS 掃描', main: '碎片比原本的離子輕,先被射出', sub: 'm/z 不到原本約 27% 的碎片留不住,也就是離子阱的「三分之一規則」。' },
     ] },
   { t: 133, view: 'asm', labels: [], hud: [0, 0], bug: 1,
-    caps: [{ t: 133.5, chap: 'LCQ DECA XP', main: '帶電、傳輸、關住、放出、偵測', sub: '實機一輪不到一秒,一張接一張記錄下來。' }] },
+    caps: [{ t: 133.5, chap: '離子阱質譜', main: '帶電、傳輸、關住、放出、偵測', sub: '實機一輪不到一秒,一張接一張記錄下來。' }] },
 ];
 // 每段要不要顯示幫浦、真空腔玻璃的濃淡(拉近時淡掉,畫面乾淨)
 const SCENE_FX = [[1, 1], [1, 1], [0, 0.25], [0, 0.25], [0, 0.2], [0, 1], [0, 1], [0, 1], [0, 1], [1, 1], [0, 1], [1, 1]];
@@ -2923,7 +2931,7 @@ function stopTour() {
 // ================================================================ 「原理」視窗的內容
 const HELP_HTML = `
 <h2 id="helpTitle">離子阱質譜儀怎麼把分子變成一張譜</h2>
-<p>LCQ Deca XP 是一種離子阱質譜儀(正式名稱是三維四極離子阱質譜儀)。樣品溶液在大氣壓下被噴成帶電的小液滴,再變成離子,經過四個壓力越來越低的區域,在離子阱裡先存起來,再依 m/z(離子的質量除以電荷,又叫質荷比)一種一種射到偵測器上。</p>
+<p>這裡以 LCQ Deca XP 為例,它是一種離子阱質譜儀(正式名稱是三維四極離子阱質譜儀)。樣品溶液在大氣壓下被噴成帶電的小液滴,再變成離子,經過四個壓力越來越低的區域,在離子阱裡先存起來,再依 m/z(離子的質量除以電荷,又叫質荷比)一種一種射到偵測器上。</p>
 
 <h3>一條路,四個壓力區</h3>
 <p>離子源在一大氣壓 (760 Torr;Torr 是壓力單位,1 Torr 約等於 1 mmHg)。毛細管出口到截取錐之間約 <b>1 Torr</b>,由迴轉式機械幫浦抽(實機有兩台)。四極柱所在的區域約 <b>10⁻³ Torr</b>,接渦輪分子幫浦(高速旋轉的葉片把氣體分子打走)中段的抽氣口;離子阱與偵測器所在的分析區約 <b>2×10⁻⁵ Torr</b>,接同一台渦輪幫浦的主抽氣口,一台抽兩區。阱內另外通入約 1 mL/min 的氦氣,阱內的壓力約 1 mTorr(千分之一 Torr)。</p>
@@ -3414,7 +3422,7 @@ function clearTourDom() {
 // ================================================================ 錄成影片:逐格算圖 → WebCodecs H.264 → MP4
 const EXPORT = { active: false, cancel: false, w: 1920, h: 1080, fps: 30, url: null };
 const MUXER_URL = 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.mjs';
-const VIDEO_NAME = 'LCQ_Deca_XP_離子之旅.mp4';
+const VIDEO_NAME = '離子阱質譜_拆開探索.mp4';
 
 // 背景分頁的 setTimeout 會被節流,用 MessageChannel 讓出執行緒
 const _mc = new MessageChannel();
@@ -3425,7 +3433,7 @@ const yieldNow = () => new Promise((r) => { _mcRes = r; _mc.port2.postMessage(0)
 // 錄影前把所有會用到的字都載入,避免前幾格用到備用字型
 async function loadFonts() {
   if (!document.fonts) return;
-  const texts = [HELP_HTML.replace(/<[^>]+>/g, ''), ...SCENES.flatMap((s) => s.caps.flatMap((c) => [c.chap, c.main, c.sub])), ...LABELS.flatMap((l) => [l.name, l.val]), '穩定圖質譜調諧參數儀器設定全掃描的碎片藍色區內留得住正離子示例值示意動畫零件尺寸與時間尺度經過調整離子之旅開關'].join('');
+  const texts = [HELP_HTML.replace(/<[^>]+>/g, ''), ...SCENES.flatMap((s) => s.caps.flatMap((c) => [c.chap, c.main, c.sub])), ...LABELS.flatMap((l) => [l.name, l.val]), '穩定圖質譜調諧參數儀器設定全掃描的碎片藍色區內留得住正離子示例值示意動畫零件尺寸與時間尺度經過調整離子阱質譜拆開探索動畫講解開關'].join('');
   const uniq = [...new Set(texts)].join('');
   const jobs = [];
   for (const w of [400, 500, 700, 900]) jobs.push(document.fonts.load(`${w} 24px "Noto Sans TC"`, uniq));

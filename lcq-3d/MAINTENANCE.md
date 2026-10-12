@@ -1,6 +1,14 @@
-# LCQ 離子之旅:維護說明
+# 離子阱質譜原理(拆開探索):維護說明
 
-## 2026-10-05：即時繪圖效能
+## 2026-10-13:併入「離子阱質譜」,改名「拆開探索」
+
+- 這一頁原名「LCQ 離子之旅」,入口有自己的卡片。2026-10-13 起和 `../lcq/` 合併成同一份教材「離子阱質譜」的兩個畫面:`lcq/` 是「動畫講解」,本頁是「拆開探索」。網址 `lcq-3d/` 不變。
+- 入口:`content/instruments.json` 與入口靜態備援拿掉了這一張卡片,`assets/lcq-3d.svg` 一併刪除。本頁不在清單裡,`scripts/check-site.mjs` 用 `extraPages` 照樣檢查它的連結、返回入口連結與控制字元,並確認至少有一份教材連到它。
+- 分頁列:`lcq/` 與本頁把「離子阱質譜」做成一組(`<span class="sn-lesson" role="group">`,樣式 `.sn-lesson`、`.sn-name`),裡面是「動畫講解」與「拆開探索」兩個連結,目前的畫面反白;其他教材的分頁列拿掉「離子之旅」,只連到 `../lcq/`。
+- 本頁改了的文字:`<title>`、meta description、畫布的 `aria-label`、標題 `<h1>`(「離子阱質譜」「拆開探索」)、介紹最後一句「範例儀器是 LCQ Deca XP」、影片左上角的字卡 `drawBug()`(兩行都改用 `FONT.zh`)、導覽頭尾兩段字幕的章節名(`'LCQ DECA XP'` 改成 `'離子阱質譜'`)、原理視窗第一段、影片檔名 `VIDEO_NAME`(`離子阱質譜_拆開探索.mp4`),以及 `loadFonts()` 預載的字。機身上的「LCQ DECA」銘牌是模型的一部分,沒有改。
+- 本頁的模型、模擬、導覽時間軸與資訊框都沒有改。
+
+## 2026-10-05:即時繪圖效能
 
 - 共用 `../assets/render-quality.js` 加入自動/流暢/完整畫質；`fitToWindow()` 同步後製與解析度，`frame()` 上限 60 FPS 並略過背景分頁。`tick()` 的科學計算、固定子步、粒子數與導覽時間軸不改。
 - `drawStab()` 把固定穩定區、格線與座標快取到 `stabBackground`，只在畫布尺寸或字型就緒時重畫。離子點、MS/MS 活化標記仍畫在即時圖層，不快取動態資料。
@@ -31,7 +39,7 @@
 | `91_float.js` | 可拖動、可縮放的資訊框:`makeFloating()`、`initFloating()`、`pinFloat()`、`clampFloat()`、`resetAllFloats()`;導覽字幕與示波窗的 DOM 更新 `updateTourDom()`、`clearTourDom()` | 資訊框預設位置、縮放範圍 |
 | `95_export.js`、`96_recui.js` | 錄影 `exportVideo()` 與錄影視窗 | 錄影解析度、位元率 |
 
-網站版專用的分頁列樣式在 `<style>` 最後一段,`#sitenav` 開頭。
+網站版專用的分頁列樣式在 `<style>` 最後一段,`#sitenav` 開頭;「離子阱質譜」一組的 `.sn-lesson`、`.sn-name` 也在那裡,420 px 以下另有縮小字級的規則。
 
 ## 座標、尺度與模型階層
 

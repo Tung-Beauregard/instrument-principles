@@ -4,7 +4,12 @@
 
 ## 離子阱質譜原理(以 LCQ Deca XP 為例)
 
-網頁:https://tung-beauregard.github.io/instrument-principles/lcq/
+一份教材兩個畫面,從分頁列的「離子阱質譜」一組切換(2026-10-13 起;拆開探索原本是另一份教材「LCQ 離子之旅」,網址沒有變):
+
+- 動畫講解:https://tung-beauregard.github.io/instrument-principles/lcq/
+- 拆開探索:https://tung-beauregard.github.io/instrument-principles/lcq-3d/
+
+### 動畫講解(lcq/)
 
 沿著離子走的路徑看一遍離子阱質譜儀的硬體:電灑游離、加熱毛細管、截取錐、四極桿與八極桿、離子阱、偵測器。後半段說明離子阱怎麼依質荷比把離子分開,最後示範 MS/MS。範例儀器是 Thermo Finnigan LCQ Deca XP。
 
@@ -13,15 +18,55 @@
 - 「自己操作」可以自己調射頻振幅、做掃描
 - 說明視窗裡可以把整段動畫錄成 1080p 的 MP4
 
-### 數值與示意
+#### 數值與示意
 
 主要數值取自 Finnigan LCQ Series Hardware Manual、LCQ Deca Hardware Manual、LCQ Deca XP Plus 規格表、March (1997) 與 Wong & Cooks (1997)。約 280 kHz 的端帽交流頻率與每 m/z 約 4.25 V 是依這些數值計算的,手冊沒有直接寫。
 
 毛細管長度、桿子尺寸與偵測器幾何是示意;液滴、離子雲與振盪幅度已放大,時間也放慢了很多倍。
 
-### 技術
+公式與推算(程式裡的位置見 lcq/MAINTENANCE.md「物理與數值」):
 
-單一 HTML 檔(lcq/index.html),用 three.js 繪圖,不需要建置。底部的到站人數由免費的 Abacus 計數服務記錄,同一台裝置只算一次。
+- q_z = 8eV / (m (r₀² + 2z₀²) Ω²)。用 r₀ = 7.07 mm、z₀ = 7.85 mm、Ω = 2π × 760 kHz 得 q = 0.1954 × V / (m/z),V 是環形電極電壓的零到峰值。
+- 共振射出時的電壓 V = 0.83 / 0.1954 × m/z ≈ 4.25 V × m/z:m/z 195、524、1222 分別約 830、2230、5190 V;8500 V 對應 m/z 約 2000,若等到 q = 0.908 才排出只到約 1830。
+- 端帽交流頻率:a = 0 時 β(0.83) ≈ 0.736,軸向振盪頻率 β × 760 kHz / 2 ≈ 280 kHz。MS/MS 活化的 q = 0.25 對應 β ≈ 0.179,約 68 kHz。
+- 低質量截止:留得住的最小 m/z = 0.1954 × V / 0.908;MS/MS 把 m/z 611 放到 q = 0.25(約 782 V)時約 168。
+- 平均下來的位能井深度 D ≈ q × V / 8(擬位能近似)。
+- m/z 150 掃到 2000:1850 ÷ 5500 ≈ 0.34 秒。
+
+示範樣品都是 [M+H]⁺:LCQ 正離子校正液的咖啡因 195、MRFA 524 與 Ultramark 的一根 1222;天然物檜木醇 165、兒茶素 291、槲皮素 303、扁柏脂素 355、蘆丁 611。蘆丁 MS/MS 的碎片 465(少鼠李糖)與 303(少芸香糖)是黃酮苷常見的裂解方式,不是這台儀器的實測;峰高都是示意。各項數值的來源頁碼尚未逐項記錄。
+
+#### 技術
+
+單一 HTML 檔(lcq/index.html),用 three.js 0.183.2 繪圖,不需要建置。底部的到站人數由免費的 Abacus 計數服務記錄,同一台裝置只算一次。程式分區、物理數值與章節時間軸見 lcq/MAINTENANCE.md。
+
+### 拆開探索(lcq-3d/)
+
+仿照 [The Plane of Focus](https://sael.net/plane-of-focus/) 的拆解式 3D 呈現,把 LCQ Deca XP 的離子路徑排在一條導軌上,可以在外觀、組裝、展開之間切換,跟著離子從電灑噴針走到偵測器。和「動畫講解」是同一台儀器的另一種呈現,著重零件剖面、壓力分區與穩定圖。
+
+- 「播放導覽」(或按 C)自動運鏡,附中文字幕,共 12 段,約 2 分 21 秒
+- 機身切換外觀、組裝、展開;點零件會在左側顯示說明,鏡頭也會靠過去
+- 掃描模式切換 Full MS 與 MS/MS;下方兩個示波窗即時顯示 Mathieu 穩定圖與質譜
+- 拖曳「RF 振幅」滑桿手動掃描,拉回最左邊會重新注入離子
+- 標題說明、控制面板、穩定圖、質譜與導覽字幕都可以拖動、從右下角縮放,位置記在瀏覽器裡;「重設版面」還原
+- 「錄成影片」把整段導覽逐格算圖存成 1080p MP4(需要支援 WebCodecs 的 Chrome 或 Edge)
+
+#### 數值與示意
+
+規格取自 LCQ Deca Hardware Manual (1999)、LCQ Series Hardware Manual、LCQ Deca XP Plus 規格表與 Wong & Cooks, Current Separations 16:3:
+
+- 離子光學順序:加熱毛細管、管透鏡、截取錐、方柱四極柱、多極柱間透鏡、八極柱、入口透鏡、離子阱;多極柱 RF 2.45 MHz、400 Vp-p
+- 壓力:毛細管到截取錐約 1 Torr,四極柱區約 10⁻³ Torr,分析區約 2×10⁻⁵ Torr;阱內氦氣約 1 mL/min,約 1 mTorr
+- 離子阱:r₀ = 0.707 cm、z₀ = 0.785 cm(March 1997 寫 0.783 cm),RF 0.76 MHz、最高約 8500 V (0-p),共振射出點 q_z = 0.83,掃描約每秒 5500 u
+- MS/MS:隔離用 5 至 380 kHz 的寬頻波形;Activation Q 0.25、30 ms(預設值出自 LCQ Fleet 手冊,XP Plus 文獻採用相同設定)
+- 偵測:轉換打拿極 ±15 kV,連續式電子倍增管 −0.8 至 −2.5 kV、增益約 3×10⁵
+
+計算推估:穩定圖由 Mathieu 方程數值積分(RK4,以單值矩陣的跡 |tr| < 2 判斷穩定)畫出;MS/MS 活化時的低質量截止是 0.25 / 0.908 ≈ 前驅離子 m/z 的 27%。
+
+教學示意:離子源畫成正交噴灑(XP Plus 的設計;原始 Deca XP 與 XP MAX 的噴灑角度不同,這裡未區分機型);示範樣品是 LCQ 正離子校正液(咖啡因 m/z 195、MRFA m/z 524、Ultramark 1621),質譜峰高為示意;零件尺寸、離子振盪頻率與時間尺度都經過調整;主控台上的調諧參數是文獻中的正離子示例值;阱內 8 字形軌跡用低 q 近似 ω_z = 2ω_r 繪製。模擬結果不可用於實樣鑑定。
+
+#### 技術
+
+單一 HTML 檔(lcq-3d/index.html),用 three.js 0.183.2 繪圖,不需要建置,不使用到站人數計數。程式分區與修改方式見 lcq-3d/MAINTENANCE.md。
 
 ## GC-MS 氣相層析質譜
 
@@ -65,37 +110,6 @@
 ### 技術
 
 單一 HTML 檔(uv-vis/index.html),用 three.js 繪圖,不需要建置。
-
-## LCQ 離子之旅(LCQ Deca XP 拆解式導覽)
-
-網頁:https://tung-beauregard.github.io/instrument-principles/lcq-3d/
-
-仿照 [The Plane of Focus](https://sael.net/plane-of-focus/) 的拆解式 3D 呈現,把 LCQ Deca XP 的離子路徑排在一條導軌上,可以在外觀、組裝、展開之間切換,跟著離子從電灑噴針走到偵測器。和「離子阱質譜」教材是同一台儀器的另一種呈現,著重零件剖面、壓力分區與穩定圖。
-
-- 「播放導覽」(或按 C)自動運鏡,附中文字幕,共 12 段,約 2 分 21 秒
-- 機身切換外觀、組裝、展開;點零件會在左側顯示說明,鏡頭也會靠過去
-- 掃描模式切換 Full MS 與 MS/MS;下方兩個示波窗即時顯示 Mathieu 穩定圖與質譜
-- 拖曳「RF 振幅」滑桿手動掃描,拉回最左邊會重新注入離子
-- 標題說明、控制面板、穩定圖、質譜與導覽字幕都可以拖動、從右下角縮放,位置記在瀏覽器裡;「重設版面」還原
-- 「錄成影片」把整段導覽逐格算圖存成 1080p MP4(需要支援 WebCodecs 的 Chrome 或 Edge)
-
-### 數值與示意
-
-規格取自 LCQ Deca Hardware Manual (1999)、LCQ Series Hardware Manual、LCQ Deca XP Plus 規格表與 Wong & Cooks, Current Separations 16:3:
-
-- 離子光學順序:加熱毛細管、管透鏡、截取錐、方柱四極柱、多極柱間透鏡、八極柱、入口透鏡、離子阱;多極柱 RF 2.45 MHz、400 Vp-p
-- 壓力:毛細管到截取錐約 1 Torr,四極柱區約 10⁻³ Torr,分析區約 2×10⁻⁵ Torr;阱內氦氣約 1 mL/min,約 1 mTorr
-- 離子阱:r₀ = 0.707 cm、z₀ = 0.785 cm(March 1997 寫 0.783 cm),RF 0.76 MHz、最高約 8500 V (0-p),共振射出點 q_z = 0.83,掃描約每秒 5500 u
-- MS/MS:隔離用 5 至 380 kHz 的寬頻波形;Activation Q 0.25、30 ms(預設值出自 LCQ Fleet 手冊,XP Plus 文獻採用相同設定)
-- 偵測:轉換打拿極 ±15 kV,連續式電子倍增管 −0.8 至 −2.5 kV、增益約 3×10⁵
-
-計算推估:穩定圖由 Mathieu 方程數值積分(RK4,以單值矩陣的跡 |tr| < 2 判斷穩定)畫出;MS/MS 活化時的低質量截止是 0.25 / 0.908 ≈ 前驅離子 m/z 的 27%。
-
-教學示意:離子源畫成正交噴灑(XP Plus 的設計;原始 Deca XP 與 XP MAX 的噴灑角度不同,這裡未區分機型);示範樣品是 LCQ 正離子校正液(咖啡因 m/z 195、MRFA m/z 524、Ultramark 1621),質譜峰高為示意;零件尺寸、離子振盪頻率與時間尺度都經過調整;主控台上的調諧參數是文獻中的正離子示例值;阱內 8 字形軌跡用低 q 近似 ω_z = 2ω_r 繪製。模擬結果不可用於實樣鑑定。
-
-### 技術
-
-單一 HTML 檔(lcq-3d/index.html),用 three.js 0.183.2 繪圖,不需要建置,不使用到站人數計數。程式分區與修改方式見 lcq-3d/MAINTENANCE.md。
 
 ## NMR 核磁共振(以 Bruker AVANCE III 500 為例)
 
