@@ -37,6 +37,13 @@
 
 ## 更新紀錄
 
+### 2026-10-13：推送與部署確認
+
+- 提交 `238b469`（離子阱質譜合併成一份教材、補齊動畫講解的維護文件），以 fast-forward 推送到 `main`（基準 `e264081`，推送前 `git fetch` 確認遠端沒有新提交）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上的入口、八個教材頁面、`content/instruments.json`、`scripts/check-site.mjs` 與 `lcq/MAINTENANCE.md` 都和提交的版本完全相同；`assets/lcq-3d.svg` 回 404（已刪除）。
+- 通過：以 Chromium 走一遍正式網址：入口質譜區三張卡片、四區共八張；從「離子阱質譜」卡片進到動畫講解，自動播放，分頁列「動畫講解」反白，到站人數有顯示；點「拆開探索」切到 `lcq-3d/`，標題是「離子阱質譜」「拆開探索」、分頁列「拆開探索」反白；兩頁 console 都沒有錯誤。
+- 未執行：Safari、Firefox 與真實觸控裝置。
+
 ### 2026-10-13：離子阱質譜合併成一份教材（動畫講解、拆開探索），補齊動畫講解的維護文件
 
 - 執行者：Claude，在作者電腦的 `main`（基準 `e264081`，開工前 `git fetch` 確認遠端沒有新提交）。
