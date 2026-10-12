@@ -283,26 +283,29 @@ Orbitrap:
 
 網頁:https://tung-beauregard.github.io/instrument-principles/spectroscopy/
 
-不是某一台儀器,而是把常見的光譜放在一起比:每一種光一份帶的能量不同,只有剛好對上分子某一種動作的「台階」才會被吸收。無線電波讓原子核翻面(放在強磁鐵裡,核磁共振 NMR)、微波讓整個分子轉動(用一氧化碳氣體)、紅外線讓化學鍵伸縮彎曲(紅外光譜 FTIR)、可見光與紫外光讓電子跳到高一層(UV-Vis,用 β-胡蘿蔔素當有顏色的對照)、X 光把最內層的電子打出去;另外兩種用法:螢光(通寧水裡的奎寧)與拉曼(532 nm 雷射)。核磁共振、紅外、紫外與拉曼都用同一個分子香草醛。版型和 UV-Vis、NMR 頁相同。
+不是某一台儀器,而是把常見的光譜放在一起比:每一種光一份帶的能量不同,只有剛好對上分子某一種動作的「台階」才會被吸收。無線電波讓原子核翻面(放在強磁鐵裡,核磁共振 NMR)、微波讓整個分子轉動、紅外線讓化學鍵伸縮彎曲(紅外光譜 FTIR)、可見光與紫外光讓電子跳到高一層(UV-Vis)、X 光把最內層的電子打出去;另外兩種用法:螢光與拉曼(532 nm 雷射)。每一段都用同一個分子香草醛,每一種光看的地方在分子上發亮,最後一段「比一比」逐一比較每一種光看分子的哪裡、拿來做什麼;β-胡蘿蔔素只在紫外與可見光的螢幕上當有顏色的對照。版型和 UV-Vis、NMR 頁相同。
 
 - 選一種光,鏡頭移過去;拖滑桿調頻率、波數、波長或能量,分子照能量對不對得上回應(自旋翻面、轉快一階、某一根鍵振動、電子雲變形、內層電子飛出)
 - 「掃描」從一端掃到另一端,下方螢幕畫出那一種光譜;左欄的能量階梯畫出這一份光的能量和分子的台階
 - 「光的其他用法」切換吸收、螢光、拉曼
-- 「導覽」自動播放約 187 秒,23 段字幕,內容與影片相同
+- 這一種光看的地方(原子、鍵或電子雲)一直微微發亮;「比較表」打開每一種光看分子的哪裡、拿來做什麼的表
+- 「導覽」自動播放約 221 秒,31 段字幕,內容與影片相同;導覽與影片會把分子移到面板之間空出來的地方,放不下就縮小,不會被字幕或螢幕擋住
 - 文字以台灣高中畢業看得懂為準
 
 ### 數值與示意
 
-能量換算(計算):E = hc/λ,hc = 1239.84198 eV·nm;1 cm⁻¹ = 1.2398×10⁻⁴ eV。500 MHz 的無線電波約 2.07×10⁻⁶ eV;一氧化碳第一條轉動譜線 115.27 GHz 約 4.8×10⁻⁴ eV;中紅外 4000 到 400 cm⁻¹ 是 0.50 到 0.050 eV;可見光 400 到 700 nm 是 3.10 到 1.77 eV;紫外 200 到 400 nm 是 6.20 到 3.10 eV。片尾比較表的能量範圍取這幾個數量級。
+能量換算(計算):E = hc/λ,hc = 1239.84198 eV·nm;1 cm⁻¹ = 1.2398×10⁻⁴ eV。500 MHz 的無線電波約 2.07×10⁻⁶ eV;香草醛的轉動譜線在 2 到 20 GHz,是 8.3×10⁻⁶ 到 8.3×10⁻⁵ eV(h = 4.1357×10⁻¹⁵ eV·s);中紅外 4000 到 400 cm⁻¹ 是 0.50 到 0.050 eV;可見光 400 到 700 nm 是 3.10 到 1.77 eV;紫外 200 到 400 nm 是 6.20 到 3.10 eV。片尾比較表的能量範圍取這幾個數量級。
 
 - 各區與分子動作的對應:微波(約 10⁻⁵ 到 10⁻³ eV)對應分子轉動、紅外對應振動、可見光把電子提到高一層、X 光把電子打出去(HyperPhysics);無線電波讓原子核的自旋翻面(Reusch)。
 - 核磁共振:香草醛在 CDCl₃ 的化學位移和 `nmr/` 相同(醛基 9.83、H-6 7.43、H-2 7.42、H-5 7.04、羥基約 6.2、甲氧基 3.96;來源見 NMR 一節)。BMRB bmse010006(250 MHz)為 9.81、7.44、7.41、7.04、3.92;羥基的位置和濃度有關,其他資料在 6.2 到 6.4 之間。磁場 11.74 T、500.13 MHz 同 NMR 一節。
-- 微波:一氧化碳 J = 1←0 為 115,271.2018 MHz(CDMS);其他譜線用剛性轉子 ν = 2B(J+1)、B = 57.636 GHz 算出 230.5、345.8、461.1 GHz(計算,沒有考慮離心畸變)。微波爐的 2.45 GHz 加熱主要是介電加熱、不是共振吸收(HyperPhysics),所以頁面沒有拿微波爐當例子。
+- 微波:香草醛的轉動光譜有人在超音速噴流裡量過,看到醛基朝向不同的兩種構形,羥基都和甲氧基形成分子內氫鍵(Cocinero 等 2010)。那篇的轉動常數這次讀不到全文,頁面改用計算值:以 NIST WebBook 的香草醛 3D 結構(B3LYP/6-31G*)算慣性矩,得 A 2330.2、B 694.1、C 550.0 MHz;把羥基的氫轉向甲氧基(實驗看到的氫鍵構形)後為 A 2390.6、B 690.5、C 551.1 MHz,頁面用後者。譜線以剛體非對稱陀螺對角化算出(a 型、J+1 ← J),強度取 2 K 的分布、只留最強那條的 2% 以上,共 189 條在 2 到 20 GHz,大約每 B + C ≈ 1.24 GHz 一群。全部是計算推估,沒有考慮離心畸變與甲基的內轉動,也不知道實際的偶極矩分量(只畫 a 型)。微波爐的 2.45 GHz 加熱主要是介電加熱、不是共振吸收(HyperPhysics),所以頁面沒有拿微波爐當例子。
 - 紅外:香草醛的吸收帶取自 NIST WebBook 的 Coblentz 光譜(礦物油糊 2529、KBr 錠 2530),由作者讀圖:O–H 寬帶,最深處 3140 到 3370;醛基 C–H 弱帶約 2814;C=O 1665 到 1671;苯環 1587 到 1592 與 1511 到 1515;C–O 1261 到 1266 與 1292 到 1296;1150 到 1164、1123、1029 到 1030。這是從紙本數位化的舊色散式光譜,約 ±5 cm⁻¹。頁面取 3180、2820、1666、1590、1510、1265、1155、1030;苯環 C–H 3020、甲基 C–H 2940 與 860 的彎曲依一般官能基範圍(Reusch、CU Boulder)。強度與寬度是示意。
 - 紫外:香草醛 231、279、308 nm(Cayman Chemical,溶劑未註明;NIST WebBook 的 Robinson & Kiang 1955 為 230、281 與 312 到 315 nm 的寬峰)。β-胡蘿蔔素在己烷 425、450、478 nm(LipidBank)。
-- 螢光:奎寧在 0.1 mol/L 過氯酸裡的吸收峰 250 與 347.5 nm,用 347.5 nm 激發時放光最強在 451.5 nm(Velapoldi & Mielenz 1980;SRM 936 證書)。頁面寫「吸收 350 nm、放出 450 nm 左右的藍光」。通寧水裡的奎寧在紫外燈下發藍光(UCAR)。
+- 螢光:香草醛的水溶液(10⁻⁴ mol/L,加硫酸、鹽酸或氫氧化鈉調酸鹼),中性的香草醛放光在 330 nm,失去羥基上氫離子的陰離子放光在 405 nm 附近;基態 pKa 7.2,激發態約 −0.5,所以激發以後更容易失去氫離子(Vasilyeva 等 2002)。頁面的激發光譜用香草醛的吸收,放光畫 330 與 405 nm 兩個帶,兩者的相對強度是示意;文獻沒有給螢光量子產率,頁面不寫亮或暗。
 - 拉曼:散射光中只有約一千萬分之一是拉曼散射(Renishaw;Bruker 與 HORIBA 寫的比例更小,所以頁面寫「大約一千萬份裡才有一份」);紅外看振動時偶極矩有沒有變、拉曼看極化率有沒有變(Reusch、Renishaw)。香草醛的拉曼位移依紅外的同一組振動放置,沒有找到可引用的實測拉曼譜,強度是示意,螢幕上只標苯環與 C=O 兩支。雷射 532 nm 是常見的選擇(Bruker)。
 - X 光:碳 1s 284.2 eV(X-Ray Data Booklet 表 1-1);氧 1s 543.1 eV 是同一張表的通用值,這次沒能從 PDF 抽出那一列核對。吸收邊之後的下降用冪次示意。
+
+比一比(每一種光看香草醛的哪裡):NMR 看每一個氫和它的鄰居;轉動光譜看整個分子的形狀;紅外最容易看到振動時偶極矩改變大的極性鍵(O–H、C=O、C–O);拉曼最容易看到極化率改變大的鍵(苯環骨架);紫外與可見光看苯環接醛基、連成一片的 π 電子;螢光看吸收以後會發光的部分;X 光看碳、氧最內層的電子(氫只有一個電子,沒有內層電子)。這是教學上的簡化:每一種光其實都會碰到整個分子,這裡畫的是那種光最容易看出來的部分;拉曼「水的干擾小」是因為水的拉曼散射很弱,紅外則會被水強烈吸收(Wenzel,LibreTexts)。
 
 教學示意:分子、光波、能量階梯與時間尺度都經過縮放;能量階梯的尺每格差 100 倍,各種動作的區塊是大略範圍;各種譜的形狀是高斯或勞倫茲峰的組合,不是實測數據,不可用於實樣鑑定。
 
@@ -318,13 +321,14 @@ Orbitrap:
 - Reusch, Virtual Textbook of Organic Chemistry:https://organicchemistrydata.org/reusch/virtualtext/spectroscopy/spectroscopy-intro/ 、https://organicchemistrydata.org/reusch/virtualtext/spectroscopy/infrared-spectroscopy/
 - CU Boulder IR tutorial(醛):https://orgchemboulder.com/Spectroscopy/irtutor/aldehydesir.shtml
 - BMRB bmse010006(香草醛):https://bmrb.io/metabolomics/mol_summary/show_data.php?id=bmse010006
-- CDMS, CO:https://cdms.astro.uni-koeln.de/classic/entries/c028503.cat
 - NIST WebBook 香草醛,紅外與紫外:https://webbook.nist.gov/cgi/cbook.cgi?ID=C121335&Type=IR-SPEC&Index=1 、https://webbook.nist.gov/cgi/cbook.cgi?ID=C121335&Mask=400
 - Cayman Chemical, Vanillin:https://www.caymanchem.com/product/36422/vanillin
+- NIST WebBook 香草醛的 3D 結構(B3LYP/6-31G*,算轉動常數用):https://webbook.nist.gov/cgi/cbook.cgi?Str3File=C121335
+- Cocinero 等 2010, Conformational equilibria in vanillin and ethylvanillin, Phys. Chem. Chem. Phys. 12:12486(doi:10.1039/C0CP00585A):https://pubs.rsc.org/en/content/articlelanding/2010/cp/c0cp00585a
+- Vasilyeva 等 2002, Experimental and quantum-chemical study of excited electronic states of vanillin protolytic species, Atmospheric and Oceanic Optics 15(3):239–241:https://ao.iao.ru/en/content/vol.15-2002/iss.03/10
 - LipidBank, β-carotene:https://lipidbank.jp/VCA.html
-- Velapoldi & Mielenz 1980, NBS Special Publication 260-64:https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication260-64.pdf ;SRM 936 證書:https://tsapps.nist.gov/srmext/certificates/689.pdf
-- UCAR, Ultraviolet light and tonic water:https://scied.ucar.edu/activity/learn/ultraviolet-light-tonic-water
 - Renishaw, What Raman spectroscopy is:https://www.renishaw.com/en/what-raman-spectroscopy-is--25805
+- Wenzel, Molecular and Atomic Spectroscopy, 5: Raman Spectroscopy(LibreTexts,水的拉曼散射很弱):https://chem.libretexts.org/Bookshelves/Analytical_Chemistry/Molecular_and_Atomic_Spectroscopy_(Wenzel)/5:_Raman_Spectroscopy
 - Bruker, What is Raman spectroscopy:https://www.bruker.com/en/products-and-solutions/raman-spectroscopy/raman-basics/what-is-raman-spectroscopy.html
 - X-Ray Data Booklet 表 1-1:https://xdb.lbl.gov/Section1/Table_1-1.pdf
 

@@ -234,6 +234,8 @@ html.film .chip b{font-size:23px}
 html:not(.film):not(.touring) #skTitle,html:not(.film):not(.touring) #skSub{display:none}
 html.film .sk-tabs,html.touring .sk-tabs{display:none}
 .sk-head span#skSub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 窄螢幕的比較表:用左右邊界定寬度(left:50% 時可用寬度只剩半個螢幕,字會擠成一直行) */
+@media (max-width:760px){.cmp{left:12px;right:12px;top:50%;transform:translateY(-50%);max-height:calc(100vh - 24px);overflow:auto}.cmp table{width:100%;font-size:12px}.cmp th,.cmp td{white-space:normal;padding:6px 8px}}
 </style>
 <script type="importmap">
 {"imports":{
@@ -948,21 +950,22 @@ const S = {
 };
 const W = {
   inst: 'gc', run: null, rt: -1, ghost: null, rate: 1, part: 5, syr: 0, ovenT: 60, bandOp: 1, tags: 0,
-  labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1, sk: 'micro', skT: 0, rsPair: null, shift: 0,
+  labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1, sk: 'micro', skT: 0, rsPair: null, focusR: 100, capZone: 0,
 };
 
 // ================= 影片腳本(導覽與錄影共用) =================
 // 腳本以 168 秒寫成;播放與錄影時整體放慢 1.2 倍,留時間看字幕
 const SCRIPT_DUR = 168, FILM_SLOW = 1.2, FILM_DUR = SCRIPT_DUR * FILM_SLOW;
 // 各段的取景:[相機位置, 看的點]
+// [相機位置, 看的點, 主角的半徑];導覽與影片會把主角縮放、移到面板之間空出來的地方(見 80_loop.js)
 const VIEW = {
-  all: [[60, 280, 960], [40, 96, 0]],
-  tsw: [[-190, 170, 560], [-300, 118, 0]],
-  tswB: [[-150, 150, 600], [-232, 112, 0]],
-  gc: [[50, 186, 548], [0, 104, -10]],
-  coil: [[22, 108, 216], [0, 82, -14]],
-  lc: [[350, 168, 470], [300, 92, 0]],
-  lcCol: [[262, 98, 176], [244, 76, 20]],
+  all: [[60, 280, 960], [40, 96, 0], 100],
+  tsw: [[-190, 170, 560], [-300, 118, 0], 112],
+  tswB: [[-218, 150, 600], [-300, 112, 0], 112],
+  gc: [[50, 186, 548], [0, 104, -10], 130],
+  coil: [[22, 108, 216], [0, 82, -14], 72],
+  lc: [[350, 168, 470], [300, 92, 0], 130],
+  lcCol: [[262, 98, 176], [244, 76, 20], 64],
 };
 // 影片裡的每一次進樣:這段時間 [a, b] 對應到分析的第 r0 到 r1 分鐘;ghost 是畫成灰色對照的上一次
 // 新的一針在打針前 2 秒(frunAt)就換過去,所以上一針要在那之前跑完
@@ -979,10 +982,10 @@ const FRUNS = [
   { inst: 'gc', cond: 'ramp', a: 130.0, b: 130.01, r0: 13, r1: 13 },
 ];
 const CAMK = [
-  [0, [60, 330, 1180], [40, 96, 0]], [5.6, ...VIEW.all], [8.6, ...VIEW.tsw], [21.6, ...VIEW.tsw], [24.0, ...VIEW.tswB], [43.2, ...VIEW.tswB],
+  [0, [60, 330, 1180], [40, 96, 0], 100], [5.6, ...VIEW.all], [8.6, ...VIEW.tsw], [21.6, ...VIEW.tsw], [24.0, ...VIEW.tswB], [43.2, ...VIEW.tswB],
   [46.6, ...VIEW.gc], [53.0, ...VIEW.gc], [56.2, ...VIEW.coil], [61.8, ...VIEW.coil], [64.6, ...VIEW.gc], [75.4, ...VIEW.gc],
   [78.8, ...VIEW.lc], [111.2, ...VIEW.lc], [113.8, ...VIEW.lcCol], [129.2, ...VIEW.lcCol], [132.4, ...VIEW.gc], [147.4, ...VIEW.gc],
-  [150.6, ...VIEW.all], [162, ...VIEW.all], [168, [60, 330, 1180], [40, 96, 0]],
+  [150.6, ...VIEW.all], [162, ...VIEW.all], [168, [60, 330, 1180], [40, 96, 0], 100],
 ];
 const CAPS = [
   [6.0, 13.0, '01 · 茨維特的管子', '1906 年,植物學家茨維特把葉子的色素溶液倒進一支塞滿碳酸鈣粉的玻璃管,再從上面一直加溶劑往下沖。'],
@@ -1021,12 +1024,12 @@ const CHAP = [
 ];
 function camAt(t) {
   const K = CAMK;
-  if (t <= K[0][0]) return [v3(...K[0][1]), v3(...K[0][2])];
+  if (t <= K[0][0]) return [v3(...K[0][1]), v3(...K[0][2]), K[0][3]];
   for (let i = 0; i < K.length - 1; i++) {
-    const [ta, pa, qa] = K[i], [tb, pb, qb] = K[i + 1];
-    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [v3(...pa).lerp(v3(...pb), u), v3(...qa).lerp(v3(...qb), u)]; }
+    const [ta, pa, qa, ra] = K[i], [tb, pb, qb, rb] = K[i + 1];
+    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [v3(...pa).lerp(v3(...pb), u), v3(...qa).lerp(v3(...qb), u), lerp(ra, rb, u)]; }
   }
-  const L = K[K.length - 1]; return [v3(...L[1]), v3(...L[2])];
+  const L = K[K.length - 1]; return [v3(...L[1]), v3(...L[2]), L[3]];
 }
 // 這個時間點正在顯示哪一次進樣(新的一針在打針前 2 秒就換過去,先畫空的層析圖;接著上一段繼續跑的不提早)
 function frunAt(t) { let f = null; for (const x of FRUNS) if (t >= (x.r0 > 0 ? x.a : (x.syr ?? x.a) - 2)) f = x; return f; }
@@ -1047,17 +1050,18 @@ function film(t) {
   W.bandOp = 1;
   W.tags = win(t, 12.4, 43.4, 0.8);
   // 鏡頭
-  const [cp, ct] = fitPortrait(...camAt(t), ch.inst === 'tsw' ? 1.5 : 2.4);
-  camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct);
+  const [cp0, ct0, fr] = camAt(t), [cp, ct] = fitPortrait(cp0, ct0, ch.inst === 'tsw' ? 1.5 : 2.4);
+  camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct); W.focusR = fr;
   W.labels = {}; for (const [a, b, keys] of LBL_WIN) for (const k of keys) W.labels[k] = Math.max(W.labels[k] || 0, win(t, a, b, 0.5));
   W.cap = null; for (const c of CAPS) if (t >= c[0] && t < c[1]) W.cap = { chap: c[2], txt: c[3], op: win(t, c[0], c[1], 0.35) };
+  // 有字幕的時段連成一片(字幕之間的空檔不算),3D 讓開字幕的位置才不會一句一句上下跳
+  W.capZone = 0; for (const c of CAPS) W.capZone = Math.max(W.capZone, win(t, c[0] - 0.6, c[1] + 0.6, 0.8));
   W.title = win(t, 0.2, 5.6, 0.9); W.outro = sstep(162.2, 163.4, t); W.chips = win(t, 5.6, 161.8, 0.8);
   W.cmp = win(t, 148.6, 161.6, 0.6);
   W.skOp = win(t, 13.4, 147.8, 0.8);
   // 層析圖:茨維特那一段開始放偵測器以後才出現;最後的比較表時收起來
   W.conOp = Math.max(win(t, 35.4, 43.6, 0.6), win(t, 50.2, 75.8, 0.6), win(t, 88.8, 129.6, 0.6), win(t, 130.4, 147.6, 0.6));
   W.rsPair = null;
-  W.shift = win(t, 13.4, 147.8, 1.6); // 左邊有簡圖、右上有層析圖的時候,3D 往右下讓開
 }
 
 // ==== 60_state.js ====
@@ -1551,16 +1555,41 @@ addEventListener('keydown', (e) => { if (e.key === 'Escape') endTour(); });
 
 // ==== 80_loop.js ====
 // ================= 迴圈 =================
-// 影片與寬螢幕導覽時,左邊有簡圖、右上有層析圖,把 3D 的投影中心往右下移(鏡頭位置不動)
-// 互動模式在寬螢幕上也移一點:往右避開左欄,往上避開下方的層析圖
-const SHIFT = { x: -0.15, y: -0.08 }, SHIFT_I = { x: -0.08, y: 0.09 };
+// 影片與寬螢幕導覽:左欄有標題與簡圖、右上有層析圖、下方有字幕。把主角(W.focusR 是它的半徑)
+// 移到這些面板之間空出來的地方,放不下就縮小一點;鏡頭位置不動,只改投影(setViewOffset 與 zoom)。
+// 各面板依自己的透明度加權,淡入淡出時畫面跟著平順地移動;字幕用「兩行字」的高度保留位置,換句子時不會跳
+// 互動模式在寬螢幕上也移一點:往右避開左欄,往上避開下方的層析圖(SHIFT_I)
+const SHIFT_I = { x: -0.08, y: 0.09 }, FIT_M = 14;
+let capKey = '', capH = 0;
+function capReserve() {
+  const k = `${innerWidth}x${innerHeight}|${root.className}`;
+  if (k !== capKey) {
+    capKey = k;
+    const cs = getComputedStyle(el('cap')), tx = getComputedStyle(el('capTxt')), ch = getComputedStyle(el('chap'));
+    const lh = (s) => parseFloat(s.lineHeight) || parseFloat(s.fontSize) * 1.5;
+    capH = parseFloat(cs.bottom) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + lh(ch) + parseFloat(ch.marginBottom) + 2 * lh(tx);
+  }
+  return capH;
+}
+function freeRect(w, h) {
+  const m = FIT_M, note = el('note').getBoundingClientRect(), con = el('console').getBoundingClientRect();
+  const x0 = lerp(m, (note.width ? note.right : 0) + m, clamp(W.skOp, 0, 1)), x1 = w - m, y0 = m;
+  const y1 = lerp(h - m, h - capReserve() - m, clamp(W.capZone, 0, 1));
+  // 右上的層析圖:主角放在它下面或左邊,看哪一邊空出來的正方形比較大(兩種之間平順地換)
+  const wc = clamp(W.conOp, 0, 1), A = [x0, x1, lerp(y0, con.bottom + m, wc), y1], B = [x0, lerp(x1, con.left - m, wc), y0, y1];
+  const sz = (r) => Math.min(r[1] - r[0], r[3] - r[2]), k = sstep(-30, 30, sz(A) - sz(B)), r = A.map((v, i) => lerp(B[i], v, k));
+  return { cx: (r[0] + r[1]) / 2, cy: (r[2] + r[3]) / 2, w: Math.max(40, r[1] - r[0]), h: Math.max(40, r[3] - r[2]) };
+}
 function applyShift() {
-  const wide = FILM || (innerWidth >= 1100 && innerWidth / innerHeight >= 4 / 3);
-  const k = !wide ? 0 : FILM || tour.on ? W.shift || 0 : 1, sh = FILM || tour.on ? SHIFT : SHIFT_I;
+  const wide = FILM || (innerWidth >= 1100 && innerWidth / innerHeight >= 4 / 3), w = innerWidth, h = innerHeight;
+  const unzoom = () => { if (camera.zoom !== 1) { camera.zoom = 1; camera.updateProjectionMatrix(); } };
+  if (!wide) { if (camera.view && camera.view.enabled) camera.clearViewOffset(); unzoom(); return; }
   // setViewOffset 會把 aspect 設成 fullWidth / fullHeight,所以要傳真正的畫面大小
-  const w = innerWidth, h = innerHeight;
-  if (k > 0.001) camera.setViewOffset(w, h, sh.x * k * w, sh.y * k * h, w, h);
-  else if (camera.view && camera.view.enabled) camera.clearViewOffset();
+  if (!(FILM || tour.on)) { unzoom(); camera.setViewOffset(w, h, SHIFT_I.x * w, SHIFT_I.y * h, w, h); return; }
+  const F = freeRect(w, h), d = camera.position.distanceTo(controls.target);
+  const rpx = ((W.focusR || 100) / (d * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))) * (h / 2);
+  camera.zoom = clamp((0.47 * Math.min(F.w, F.h)) / rpx, 0.45, 1);
+  camera.setViewOffset(w, h, w / 2 - F.cx, h / 2 - F.cy, w, h);
 }
 function render() {
   applyShift();

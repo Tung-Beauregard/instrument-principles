@@ -178,7 +178,7 @@ html.film .lbl span{font-size:14px}
 html.film .lbl i{width:8px;height:8px}
 html.rec *{transition:none!important;animation:none!important}
 /* 影片最後的比較表 */
-.cmp{position:fixed;left:50%;top:50%;transform:translate(-50%,-56%);z-index:8;display:none;padding:22px 26px 18px;opacity:0}
+.cmp{position:fixed;left:50%;top:var(--cmp-y,50%);transform:translate(-50%,-50%);z-index:8;display:none;padding:22px 26px 18px;opacity:0}
 html.film .cmp,html.touring .cmp{display:block}
 .cmp table{border-collapse:collapse;font-size:15px}
 .cmp th,.cmp td{padding:9px 18px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--line)}
@@ -186,10 +186,16 @@ html.film .cmp,html.touring .cmp{display:block}
 .cmp td:first-child,.cmp th:first-child{text-align:left;color:var(--ink-2);font-weight:500}
 .cmp tr:last-child td{border-bottom:0}
 .cmp td b{font-family:var(--mono);font-weight:600;color:var(--cyan)}
+.cmp td small{display:block;margin-top:2px;font-family:var(--mono);font-size:.78em;color:var(--muted)}
+.cmp .x{position:absolute;right:10px;top:10px;display:none}
+/* 互動模式按「比較表」打開;導覽與影片照時間軸出現 */
+html.cmp-open:not(.film):not(.touring) .cmp{display:block;opacity:1!important;visibility:visible!important;z-index:9;max-width:calc(100vw - 24px);max-height:calc(100vh - 24px);overflow:auto;padding-top:46px}
+html.cmp-open:not(.film):not(.touring) .cmp .x{display:block}
+@media (max-width:760px){.cmp table{font-size:12px}.cmp th,.cmp td{white-space:normal;padding:6px 8px}}
 html.film .cmp{padding:30px 38px 24px}
 html.film .cmp table{font-size:24px}
 html.film .cmp th{font-size:25px}
-html.film .cmp th,html.film .cmp td{padding:14px 30px}
+html.film .cmp th,html.film .cmp td{padding:11px 30px}
 
 @media (max-width:980px){
   .lede,.foot{display:none}
@@ -225,6 +231,8 @@ html.film #plot{height:260px}
 /* 窄螢幕:控制面板疊在光譜螢幕上面,不能蓋到螢幕的標題 */
 @media (max-width:980px){.ctl{bottom:252px}}
 @media (max-width:560px){#plot{height:150px}.ctl{bottom:222px;gap:6px 10px}.seg button{padding:5px 8px}}
+/* 窄螢幕的比較表:用左右邊界定寬度(left:50% 時可用寬度只剩半個螢幕,字會擠成一直行) */
+@media (max-width:760px){.cmp{left:12px;right:12px;top:var(--cmp-y,50%);transform:translateY(-50%);max-height:calc(100vh - 24px);overflow:auto}.cmp table{width:100%}}
 </style>
 <script type="importmap">
 {"imports":{
@@ -269,6 +277,7 @@ html.film #plot{height:260px}
     <div class="row">
       <button class="btn" id="btnScan">掃描</button>
       <button class="btn" id="btnTour">導覽</button>
+      <button class="btn" id="btnCmp">比較表</button>
       <button class="btn" id="btnSketch">簡圖</button>
       <button class="btn sq" id="btnHelp" aria-label="說明">?</button>
     </div>
@@ -280,12 +289,13 @@ html.film #plot{height:260px}
   <ul>
     <li>選一種光,鏡頭會靠近分子;拖曳「調頻率」的滑桿,能量剛好對上某一階時,分子就會動起來,下面的光譜也會出現一個吸收。按「掃描」自動掃過一遍</li>
     <li>「螢光」:吸收紫外光的分子,放出顏色比較偏紅(能量比較小)的光;「拉曼」:雷射打到分子後彈開的光,極少數顏色變了一點</li>
+    <li>每一種光都照同一個香草醛,這種光看的地方(原子、鍵或電子雲)會微微發亮;「比較表」列出每一種光看分子的哪裡、拿來做什麼</li>
     <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
     <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
     <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
     <li>「導覽」自動播一遍,內容和影片相同,按 Esc 結束</li>
   </ul>
-  <p class="fine" id="helpFine">示意圖:分子、光波與能量階梯的大小都經過縮放,不是照比例。例子是香草醛(核磁共振、紅外光、紫外光、拉曼),螢光用通寧水裡的奎寧,轉動用一氧化碳氣體;譜線位置取自文獻與資料庫,形狀是示意。來源見 INSTRUMENTS.md。</p>
+  <p class="fine" id="helpFine">示意圖:分子、光波與能量階梯的大小都經過縮放,不是照比例。每一段都用同一個香草醛;譜線位置取自文獻與資料庫,轉動譜線依計算的轉動常數畫出,形狀是示意;β-胡蘿蔔素只當有顏色的對照。來源見 INSTRUMENTS.md。</p>
 </div>
 
 <section class="console panel" id="console">
@@ -369,8 +379,8 @@ function nmColor(nm) {
 const BANDS = {
   radio: { id: 'radio', name: '無線電波', what: '原子核翻面', unit: 'ppm', lo: 12, hi: -0.5,
     energy: (x) => eHz(500.13e6 * (1 + x * 1e-6)), fmt: (x) => `δ ${x.toFixed(2)}`, color: '#7fb0ff', waveLen: 150, tuneName: '調頻率(在 500 MHz 附近)' },
-  micro: { id: 'micro', name: '微波', what: '整個分子轉動', unit: 'GHz', lo: 40, hi: 500,
-    energy: (x) => eHz(x * 1e9), fmt: (x) => `${x.toFixed(1)} GHz`, color: '#6fe0c8', waveLen: 86, tuneName: '調頻率' },
+  micro: { id: 'micro', name: '微波', what: '整個分子轉動', unit: 'GHz', lo: 2, hi: 20,
+    energy: (x) => eHz(x * 1e9), fmt: (x) => `${x.toFixed(2)} GHz`, color: '#6fe0c8', waveLen: 86, tuneName: '調頻率' },
   ir: { id: 'ir', name: '紅外線', what: '化學鍵伸縮、彎曲', unit: 'cm⁻¹', lo: 4000, hi: 500,
     energy: (x) => eCm(x), fmt: (x) => `${Math.round(x)} cm⁻¹`, color: '#ff6f5c', waveLen: 40, tuneName: '調波數(每公分幾個波)' },
   vis: { id: 'vis', name: '可見光', what: '電子跳上去', unit: 'nm', lo: 400, hi: 700,
@@ -382,7 +392,7 @@ const BANDS = {
 };
 const BAND_IDS = ['radio', 'micro', 'ir', 'vis', 'uv', 'xray'];
 const MODES = {
-  fluo: { id: 'fluo', name: '螢光', unit: 'nm', lo: 250, hi: 420, fmt: (x) => `激發 ${Math.round(x)} nm`, tuneName: '調激發光的波長', color: '#a98cff' },
+  fluo: { id: 'fluo', name: '螢光', unit: 'nm', lo: 250, hi: 380, fmt: (x) => `激發 ${Math.round(x)} nm`, tuneName: '調激發光的波長', color: '#a98cff' },
   raman: { id: 'raman', name: '拉曼', unit: 'cm⁻¹', lo: 200, hi: 3400, fmt: (x) => `位移 ${Math.round(x)} cm⁻¹`, tuneName: '看哪一個位移', color: '#5dff8a' },
 };
 
@@ -420,13 +430,18 @@ const IR_BANDS = [
 const UV_BANDS = [{ nm: 231, I: 1.0, w: 13 }, { nm: 279, I: 0.62, w: 12 }, { nm: 308, I: 0.6, w: 16 }];
 // 可見光的對照:β-胡蘿蔔素(三個肩峰)
 const CAROTENE = [{ nm: 425, I: 0.75, w: 14 }, { nm: 450, I: 1.0, w: 14 }, { nm: 478, I: 0.85, w: 13 }];
-// 微波:一氧化碳的轉動譜線 ν = 2B(J+1),B = 57.636 GHz
-const CO_B = 57.6359683;
-const CO_LINES = [0, 1, 2, 3].map((J) => ({ J, ghz: 2 * CO_B * (J + 1) }));
+// 微波:香草醛氣體的轉動譜線(a 型,J+1 ← J),每三個數字一組:頻率 GHz、相對強度、下面那一階的 J。
+// 轉動常數 A 2390.6、B 690.5、C 551.1 MHz,由 NIST WebBook 的計算結構(B3LYP/6-31G*,羥基的氫轉向甲氧基)算出;
+// 能階用剛體非對稱陀螺對角化,強度取噴流裡 2 K 的分布,只留最強那一條的 2% 以上
+const VAN_ROT = { A: 2390.6, B: 690.5, C: 551.1 };
+const VAN_LINES = (() => { const a = [2.3438,0.023,1,2.475,0.036,1,2.6226,0.029,1,3.5107,0.086,2,3.6921,0.111,2,3.7248,0.053,2,3.7575,0.054,2,3.9286,0.107,2,4.672,0.195,3,4.8858,0.233,3,4.96,0.153,3,4.982,0.073,3,4.9838,0.073,3,5.0406,0.157,3,5.2278,0.238,3,5.8266,0.342,4,6.0515,0.392,4,6.1897,0.291,4,6.2263,0.076,4,6.2263,0.076,4,6.2332,0.182,4,6.2396,0.182,4,6.3462,0.305,4,6.5172,0.41,4,6.9736,0.511,5,7.1887,0.565,5,7.4127,0.451,5,7.4702,0.064,5,7.4702,0.064,5,7.4775,0.172,5,7.4778,0.172,5,7.4868,0.313,5,7.5035,0.314,5,7.6732,0.479,5,7.7933,0.6,5,8.113,0.678,6,8.3021,0.729,6,8.6276,0.607,6,8.7143,0.046,6,8.7143,0.046,6,8.7204,0.135,6,8.7205,0.135,6,8.7317,0.273,6,8.7328,0.273,6,8.7418,0.446,6,8.779,0.45,6,9.0156,0.653,6,9.0517,0.777,6,9.2451,0.821,7,9.3996,0.863,7,9.8334,0.737,7,9.9584,0.028,7,9.9584,0.028,7,9.9639,0.09,7,9.9639,0.09,7,9.9731,0.201,7,9.9731,0.201,7,9.9893,0.364,7,9.9924,0.364,7,9.997,0.561,7,10.0696,0.568,7,10.2876,0.913,7,10.3636,0.799,7,10.3704,0.921,8,10.4893,0.953,8,11.0292,0.823,8,11.2076,0.052,8,11.2076,0.052,8,11.2154,0.127,8,11.2154,0.127,8,11.2285,0.253,8,11.2286,0.253,8,11.2504,0.431,8,11.2507,0.641,8,11.2576,0.431,8,11.3791,0.653,8,11.4901,0.969,9,11.4964,0.989,8,11.5772,0.991,9,11.7071,0.893,8,12.2142,0.857,9,12.4515,0.026,9,12.4515,0.026,9,12.4583,0.069,9,12.4583,0.069,9,12.469,0.151,9,12.469,0.151,9,12.4869,0.284,9,12.4874,0.284,9,12.5008,0.678,9,12.5148,0.466,9,12.5301,0.467,9,12.605,0.963,10,12.6665,0.977,10,12.6742,1.0,9,12.7101,0.695,9,13.0377,0.924,9,13.3882,0.839,10,13.7017,0.033,10,13.7017,0.033,10,13.7108,0.079,10,13.7108,0.079,10,13.7162,0.909,11,13.725,0.162,10,13.725,0.162,10,13.7455,0.669,10,13.7486,0.292,10,13.7499,0.292,10,13.7584,0.917,11,13.7819,0.469,10,13.812,0.471,10,13.8201,0.952,10,14.0625,0.691,10,14.3492,0.893,10,14.5513,0.778,11,14.8246,0.818,12,14.853,0.823,12,14.9366,0.859,11,14.9534,0.036,11,14.9534,0.036,11,14.9652,0.081,11,14.9652,0.081,11,14.9827,0.623,11,14.9836,0.159,11,14.9837,0.159,11,15.0139,0.281,11,15.0168,0.281,11,15.0509,0.443,11,15.106,0.445,11,15.4322,0.646,11,15.6369,0.812,11,15.7037,0.686,12,15.931,0.704,13,15.9497,0.707,13,16.0305,0.739,12,16.2066,0.035,12,16.2066,0.035,12,16.2108,0.549,12,16.2216,0.076,12,16.2216,0.076,12,16.2451,0.147,12,16.2453,0.147,12,16.2829,0.254,12,16.2889,0.254,12,16.3205,0.395,12,16.4151,0.398,12,16.8112,0.571,12,16.8463,0.577,13,16.8968,0.698,12,17.036,0.582,14,17.0481,0.583,14,17.1103,0.61,13,17.4284,0.46,13,17.4615,0.032,13,17.4615,0.032,13,17.4803,0.067,13,17.4803,0.067,13,17.5097,0.127,13,17.5102,0.127,13,17.5555,0.217,13,17.5673,0.217,13,17.5892,0.334,13,17.7427,0.337,13,17.9802,0.465,14,18.1251,0.569,13,18.1399,0.462,15,18.1477,0.463,15,18.1845,0.484,14,18.1889,0.478,13,18.6343,0.368,14,18.7183,0.027,14,18.7183,0.027,14,18.7415,0.056,14,18.7415,0.056,14,18.7777,0.104,14,18.7787,0.104,14,18.8314,0.176,14,18.8533,0.176,14,18.8551,0.269,14,19.0914,0.272,14,19.1065,0.36,15,19.2432,0.353,16,19.2482,0.354,16,19.2589,0.37,15,19.3187,0.443,14,19.5549,0.379,14,19.8279,0.282,15,19.9771,0.022,15,19.9771,0.022,15], out = []; for (let i = 0; i < a.length; i += 3) out.push({ ghz: a[i], I: a[i + 1], J: a[i + 2] }); return out; })();
+// 每一群譜線的間隔(GHz):B + C
+const VAN_GAP = (VAN_ROT.B + VAN_ROT.C) / 1000;
 // X 光:K 殼層(1s)的束縛能(eV)
 const XEDGE = [{ el: 'C', eV: 284.2, atoms: [0, 1, 2, 3, 4, 5, 6, 11] }, { el: 'O', eV: 543.1, atoms: [7, 10, 15] }];
-// 螢光:奎寧(通寧水)的激發與放光
-const QUININE = { ex: [{ nm: 250, I: 1.0, w: 14 }, { nm: 350, I: 0.62, w: 22 }], em: { nm: 450, w: 34 } };
+// 螢光:香草醛的水溶液(Vasilyeva 等 2002):中性的香草醛放出 330 nm 左右的光,失去一個氫離子的陰離子放出 405 nm 左右;
+// 激發光譜就是它的吸收(UV_BANDS),兩種放光的相對強度是示意
+const VAN_FLUO = { em: [{ nm: 330, I: 1.0, w: 16 }, { nm: 405, I: 0.6, w: 24 }] };
 // 拉曼:香草醛的主要拉曼位移(cm⁻¹)與相對強度
 const RAMAN = [
   { cm: 3070, I: 0.35, w: 18, bonds: [9, 17, 18] }, { cm: 2940, I: 0.25, w: 20, bonds: [12, 13, 14] }, { cm: 1666, I: 0.55, w: 14, bonds: [7] },
@@ -434,6 +449,17 @@ const RAMAN = [
   { cm: 1030, I: 0.3, w: 12, bonds: [11] }, { cm: 800, I: 0.4, w: 12, bonds: [0, 1, 2, 3, 4, 5] },
 ];
 const RAMAN_LASER = 532; // nm
+// 每一種光「看」香草醛的哪裡:atoms、bonds 是 ATOMS、BONDS 的索引,cloud 是苯環與醛基的電子雲;what 與 use 是說明文字
+const LOOK = {
+  radio: { atoms: [8, 9, 12, 13, 14, 16, 17, 18], col: [0.45, 0.7, 1.6], what: '每一個氫,和它旁邊接了什麼', use: '拼出分子的結構' },
+  micro: { all: true, col: [0.35, 1.3, 1.05], what: '整個分子', use: '量出分子的形狀(要先變成氣體)' },
+  ir: { bonds: [7, 10, 11, 15, 16], col: [1.6, 0.55, 0.3], what: '極性的鍵(O–H、C=O、C–O)', use: '找出有哪些官能基' },
+  raman: { bonds: [0, 1, 2, 3, 4, 5], col: [0.35, 1.6, 0.45], what: '容易變形的鍵(苯環骨架)', use: '看骨架,和紅外互補' },
+  uv: { cloud: true, col: [0.75, 0.55, 1.6], what: '連成一片的電子(苯環接醛基)', use: '量濃度、看顏色' },
+  fluo: { cloud: true, col: [0.55, 0.45, 1.6], what: '吸收以後會發光的部分', use: '量極少量的分子、看酸鹼' },
+  xray: { atoms: [0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 15], col: [1.3, 1.45, 1.7], what: '碳、氧最內層的電子', use: '看有哪些元素' },
+};
+LOOK.vis = LOOK.uv;
 
 // ==== 10_scene.js ====
 // ================= 場景 =================
@@ -566,13 +592,6 @@ function placeBonds() {
 const UPV = v3(0, 1, 0);
 placeBonds();
 
-// ---------- 一氧化碳(微波那一段) ----------
-const CO = new THREE.Group(); CO.position.set(0, MOL_Y, 0); scene.add(CO); CO.visible = false;
-const coC = new THREE.Mesh(sphereG, MAT.C.clone()), coO = new THREE.Mesh(sphereG, MAT.O.clone());
-coC.scale.setScalar(9); coO.scale.setScalar(8.6); coC.position.set(-13, 0, 0); coO.position.set(11, 0, 0);
-const coB1 = new THREE.Mesh(cylG, MAT.bond), coB2 = new THREE.Mesh(cylG, MAT.bond), coB3 = new THREE.Mesh(cylG, MAT.bond);
-for (const [m, dy] of [[coB1, 0], [coB2, 2.6], [coB3, -2.6]]) { m.rotation.z = -Math.PI / 2; m.position.set(-13, dy, 0); m.scale.set(1.1, 24, 1.1); }
-CO.add(coC, coO, coB1, coB2, coB3);
 
 // ---------- 電子雲(紫外光、可見光) ----------
 // 平常的 π 電子雲(青色,環的上下兩片),吸收之後跳到 π*(紫色,中間多一道節面,分成好幾瓣)
@@ -655,13 +674,6 @@ const PHOTONS = [];
   for (let i = 0; i < 64; i++) { const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })); m.visible = false; scene.add(m); PHOTONS.push(m); }
 }
 
-// ---------- 比色管與紫外燈(螢光那一段):通寧水裡的奎寧 ----------
-const CUV = new THREE.Group(); CUV.position.set(0, MOL_Y - 6, 0); scene.add(CUV); CUV.visible = false;
-const cuvGlass = new THREE.Mesh(new THREE.BoxGeometry(34, 84, 34), MAT.glass); CUV.add(cuvGlass);
-const cuvLiqMat = new THREE.MeshStandardMaterial({ color: 0x2a3a48, roughness: 0.2, transparent: true, opacity: 0.6, emissive: new THREE.Color(0.12, 0.32, 1.9), emissiveIntensity: 0 });
-const cuvLiq = new THREE.Mesh(new THREE.BoxGeometry(30, 62, 30), cuvLiqMat); cuvLiq.position.y = -9; CUV.add(cuvLiq);
-const cuvCap = new THREE.Mesh(new THREE.BoxGeometry(36, 8, 36), MAT.dark); cuvCap.position.y = 46; CUV.add(cuvCap);
-const cuvStand = new THREE.Mesh(new THREE.CylinderGeometry(22, 26, MOL_Y - 50, 24), MAT.metal); cuvStand.position.y = -(MOL_Y - 50) / 2 - 42; CUV.add(cuvStand);
 
 // ---------- 牆上的電磁波色帶:左邊能量小,右邊能量大 ----------
 const RIB = { x0: -290, x1: 290, y: 176, z: -296 };
@@ -693,19 +705,20 @@ function ribbonX(band, f) { const i = BAND_IDS.indexOf(band); return RIB.x0 + (R
 const IRW = (x) => IR_BANDS.reduce((s, b) => s + b.I * gauss(x, b.cm, b.w), 0);
 const UVA = (nm) => UV_BANDS.reduce((s, b) => s + b.I * gauss(nm, b.nm, b.w), 0);
 const CARA = (nm) => CAROTENE.reduce((s, b) => s + b.I * gauss(nm, b.nm, b.w), 0);
-const QEX = (nm) => QUININE.ex.reduce((s, b) => s + b.I * gauss(nm, b.nm, b.w), 0);
-// 放光的譜往長波長那邊拖一點尾巴
-const QEM = (nm) => 0.85 * gauss(nm, QUININE.em.nm - 5, QUININE.em.w * 0.88) + 0.38 * gauss(nm, QUININE.em.nm + 40, QUININE.em.w * 1.2);
+// 螢光:激發光譜就是香草醛的吸收;放光是中性(330 nm)與陰離子(405 nm)兩個帶
+const FEX = (nm) => UVA(nm);
+const FEM = (nm) => VAN_FLUO.em.reduce((s, b) => s + b.I * gauss(nm, b.nm, b.w), 0);
 const RAMW = (cm) => RAMAN.reduce((s, b) => s + b.I * gauss(cm, b.cm, b.w), 0);
 const NMRW = (ppm) => NMR_H.reduce((s, h) => s + h.n * lorentz(ppm, h.ppm, h.w || 0.03), 0);
-const COW = (ghz) => CO_LINES.reduce((s, l) => s + (1 - 0.18 * l.J) * gauss(ghz, l.ghz, 4), 0);
+// 轉動譜線:每一條畫成很窄的峰(畫面上的寬度;真的線寬只有幾 kHz)
+const VANW = (ghz) => VAN_LINES.reduce((s, l) => s + l.I * gauss(ghz, l.ghz, 0.012), 0);
 // X 光:吸收在 K 殼層的束縛能突然變大(吸收邊),之後隨能量慢慢下降
 const XABS = (ev) => 0.08 + XEDGE.reduce((s, e, i) => s + (ev >= e.eV ? [0.55, 0.45][i] * (e.eV / ev) ** 2.2 : 0), 0);
 
 // 這一刻分子在做什麼:{ abs(這份光被吸收多少,0 到 1), what(文字), ...各種動作的強度 }
 function respond(band, mode, x) {
   const R = { abs: 0, what: '沒有吸收,光直接穿過去', spin: null, rot: 0, vib: null, exc: 0, ion: [0, 0], fluo: 0, raman: 0, ramanBonds: null };
-  if (mode === 'fluo') { const a = clamp(QEX(x), 0, 1); R.fluo = a; R.abs = a; R.what = a > 0.2 ? '吸收紫外光,放出藍光' : '這個波長吸收很少'; return R; }
+  if (mode === 'fluo') { const a = clamp(FEX(x), 0, 1); R.fluo = a; R.abs = a; R.exc = a; R.what = a > 0.2 ? '吸收紫外光,再放出光' : '這個波長吸收很少'; return R; }
   if (mode === 'raman') {
     const s = RAMW(x); R.raman = clamp(s, 0, 1);
     let best = null, bw = 0; for (const b of RAMAN) { const w = b.I * gauss(x, b.cm, b.w); if (w > bw) { bw = w; best = b; } }
@@ -718,9 +731,10 @@ function respond(band, mode, x) {
     const k = R.spin.indexOf(Math.max(...R.spin)); R.abs = clamp(Math.max(...R.spin), 0, 1);
     R.what = R.abs > 0.3 ? `${NMR_H[k].name}翻面` : '頻率沒對上任何氫';
   } else if (band === 'micro') {
-    let J = 0; for (const l of CO_LINES) if (x >= l.ghz - 2) J = l.J + 1;
-    R.rot = J; R.abs = clamp(COW(x), 0, 1);
-    R.what = R.abs > 0.3 ? `吸收,轉得更快(第 ${J} 階)` : `轉動(第 ${J} 階)`;
+    // 滑桿附近那一群譜線是從第 J 階跳到第 J + 1 階(每一群間隔約 B + C)
+    const J = Math.max(0, Math.round(x / VAN_GAP) - 1);
+    R.rot = J; R.abs = clamp(VANW(x) * 1.15, 0, 1);
+    R.what = R.abs > 0.3 ? `吸收,轉到第 ${J + 1} 階` : `轉動(第 ${J} 階)`;
   } else if (band === 'ir') {
     R.vib = BONDS.map(() => 0);
     let best = null, bw = 0;
@@ -738,17 +752,18 @@ function respond(band, mode, x) {
 
 // ================= 把狀態畫到 3D 上 =================
 const _sp = { e: new THREE.Euler(), q: new THREE.Quaternion() };
-let coAngle = 0;
 function updateScene(t, dt) {
   const band = W.band, mode = W.mode, R = W.resp;
-  // 分子、一氧化碳、比色管誰出現
-  const molOp = W.molOp, coOp = W.coOp, cuvOp = W.cuvOp;
-  MOL.visible = molOp > 0.01; CO.visible = coOp > 0.01; CUV.visible = cuvOp > 0.01;
+  // 每一段都是同一個香草醛
+  const molOp = W.molOp;
+  MOL.visible = molOp > 0.01;
   for (const m of atomMats) { m.transparent = molOp < 0.99; m.opacity = molOp; }
   for (const g of bondMesh) for (const m of g.children) { m.material.transparent = molOp < 0.99; m.material.opacity = molOp; }
-  for (const m of [coC.material, coO.material]) { m.transparent = coOp < 0.99; m.opacity = coOp; }
-  MAT.bond.transparent = coOp < 0.99; MAT.bond.opacity = coOp; // 一氧化碳的鍵用這個材質(香草醛的鍵各自複製了一份)
-  cuvGlass.material.opacity = 0.28 * cuvOp; cuvLiqMat.opacity = 0.55 * cuvOp; cuvLiqMat.transparent = true;
+  // 微波:整個分子繞直立的軸轉
+  MOLI.rotation.set(0, W.rotAngle || 0, 0);
+  // 這一種光看的地方(原子、鍵或電子雲)微微發亮
+  const LK = W.look ? LOOK[W.look] : null, la = LK ? clamp(W.lookA, 0, 1) * (0.78 + 0.22 * Math.sin(t * 4)) : 0;
+  atomMats.forEach((m, i) => { const on = LK && (LK.all || (LK.atoms && LK.atoms.includes(i))) ? la * (LK.all ? 0.5 : 1) : 0; m.emissive.setRGB(LK ? LK.col[0] * on : 0, LK ? LK.col[1] * on : 0, LK ? LK.col[2] * on : 0); });
   // 振動:每根鍵依強度沿鍵的方向伸縮(氫幾乎全部是氫在動),彎曲則往側邊擺
   for (let i = 0; i < POS.length; i++) POS[i].copy(BASE[i]);
   if (R.vib || (R.ramanBonds && W.ramanVib > 0.01)) {
@@ -766,10 +781,14 @@ function updateScene(t, dt) {
   }
   placeBonds();
   // 有在振動的鍵亮一點
-  BONDS.forEach((bd, k) => { const A = R.vib ? R.vib[k] : 0, on = Math.max(A, R.ramanBonds && R.ramanBonds.bonds.includes(k) ? W.ramanVib : 0); for (const m of bondMesh[k].children) m.material.emissive.setRGB(0.9 * on, 0.55 * on, 0.15 * on); });
+  BONDS.forEach((bd, k) => {
+    const A = R.vib ? R.vib[k] : 0, on = Math.max(A, R.ramanBonds && R.ramanBonds.bonds.includes(k) ? W.ramanVib : 0), hl = LK && LK.bonds && LK.bonds.includes(k) ? la : 0;
+    for (const m of bondMesh[k].children) m.material.emissive.setRGB(0.9 * on + (LK ? LK.col[0] * hl : 0), 0.55 * on + (LK ? LK.col[1] * hl : 0), 0.15 * on + (LK ? LK.col[2] * hl : 0));
+  });
   // 電子雲
   const exc = W.exc;
-  c0m.opacity = 0.11 * (1 - exc) * W.cloudOp * molOp; c1m.opacity = 0.22 * exc * W.cloudOp * molOp;
+  const lc = LK && LK.cloud ? la : 0;
+  c0m.opacity = (0.11 * (1 - exc) * W.cloudOp + 0.12 * lc * (1 - exc)) * molOp; c1m.opacity = 0.22 * exc * Math.max(W.cloudOp, lc) * molOp;
   CLOUD0.visible = c0m.opacity > 0.002; CLOUD1.visible = c1m.opacity > 0.002;
   // 原子核自旋:放進磁鐵後朝上繞著轉;頻率對上就翻成朝下
   const sOp = W.spinOp * molOp;
@@ -784,15 +803,13 @@ function updateScene(t, dt) {
   });
   // 磁鐵
   for (const m of magMats) m.opacity = W.magnet; MAG.visible = W.magnet > 0.01; fieldMat.opacity = 0.35 * W.magnet;
-  // 微波:一氧化碳轉動,階越高轉越快
-  CO.rotation.set(0.35, W.coAngle, 0.15 * Math.sin(t * 0.7));
   // 光源與光波
   const col = W.beamCol;
   srcLensMat.color.setRGB(col[0] * (0.4 + W.light), col[1] * (0.4 + W.light), col[2] * (0.4 + W.light));
   const laserOn = mode === 'raman' ? W.light : 0;
   laserMat.opacity = laserOn * 0.9; laser.visible = laserOn > 0.01;
   const waveOn = mode === 'raman' ? 0 : W.light;
-  const lam = W.waveLen, amp = 11, inX1 = mode === 'fluo' ? -26 : -46;
+  const lam = W.waveLen, amp = 11, inX1 = -46;
   WAVE_IN.mesh.visible = WAVE_OUT.mesh.visible = waveOn > 0.01;
   setRibbon(WAVE_IN, SRC_X + 24, inX1, lam, amp, t, 70);
   const outAmp = amp * (1 - 0.85 * clamp(R.abs, 0, 1));
@@ -800,8 +817,6 @@ function updateScene(t, dt) {
   WAVE_IN.mat.color.setRGB(col[0], col[1], col[2]); WAVE_OUT.mat.color.setRGB(col[0], col[1], col[2]);
   WAVE_IN.mat.opacity = 0.85 * waveOn; WAVE_OUT.mat.opacity = 0.85 * waveOn * (mode === 'fluo' ? 0.4 : 1);
   detFaceMat.color.setRGB(0.08 + 0.4 * col[0] * waveOn * (1 - 0.8 * R.abs), 0.2 + 0.4 * col[1] * waveOn * (1 - 0.8 * R.abs), 0.3 + 0.4 * col[2] * waveOn * (1 - 0.8 * R.abs));
-  // 螢光:比色管發藍光
-  cuvLiqMat.emissiveIntensity = 1.6 * W.fluoGlow * cuvOp;
   // 色帶上的記號
   const f = W.band ? clamp((W.x - BANDS[W.band].lo) / (BANDS[W.band].hi - BANDS[W.band].lo), 0, 1) : 0.5;
   marker.visible = !!W.band && W.ribOp > 0.01; ribbon.material.opacity = 0.95 * W.ribOp;
@@ -814,14 +829,14 @@ function photons(t) {
   let k = 0;
   const put = (x, y, z, r, c, a) => { if (k >= PHOTONS.length) return; const m = PHOTONS[k++]; m.visible = a > 0.01; m.position.set(x, y, z); m.scale.setScalar(r); m.material.color.setRGB(c[0], c[1], c[2]); m.material.opacity = a; };
   const dir = (n) => { const u = hash1(n * 3.1) * 2 - 1, a = hash1(n * 7.7) * TAU, s = Math.sqrt(1 - u * u); return [Math.cos(a) * s, u * 0.8, Math.sin(a) * s]; };
-  // 螢光:每 0.12 秒放出一份藍光,往四面八方
+  // 螢光:每 0.12 秒從香草醛放出一份光,往四面八方;六成是 330 nm(看不到的紫外光,畫成淡紫色),四成是陰離子的 405 nm 紫光
   if (W.mode === 'fluo' && W.fluoGlow > 0.02) {
     const rate = 0.12, n0 = Math.floor((t - 1.6) / rate);
     for (let n = n0; n <= Math.floor(t / rate); n++) {
       if (hash1(n * 1.37) > W.fluoGlow) continue;
       const age = t - n * rate; if (age < 0 || age > 1.6) continue;
-      const d = dir(n), c = nmColor(440 + 30 * hash1(n));
-      put(CUV.position.x + d[0] * (14 + 110 * age), CUV.position.y - 8 + d[1] * (14 + 110 * age), CUV.position.z + d[2] * (14 + 110 * age), 2.4, [c[0] * 1.6, c[1] * 1.6, c[2] * 2.2], 1 - age / 1.6);
+      const d = dir(n), uvLight = hash1(n * 2.3) < 0.6, c = uvLight ? [0.62, 0.55, 1.0] : nmColor(405);
+      put(MOL.position.x + d[0] * (30 + 110 * age), MOL.position.y + d[1] * (30 + 110 * age), MOL.position.z + d[2] * (30 + 110 * age), uvLight ? 2.0 : 2.6, [c[0] * 1.7, c[1] * 1.7, c[2] * 2.2], 1 - age / 1.6);
     }
   }
   // 拉曼:每 0.07 秒彈開一份;極少數(畫面上放大到約一成)顏色偏紅一點,鍵跟著振動
@@ -876,8 +891,6 @@ label('src', v3(SRC_X, MOL_Y + 22, 0), v3(SRC_X + 10, MOL_Y + 62, 10), '光源',
 label('det', v3(DET_X + 8, MOL_Y + 32, 0), v3(DET_X - 4, MOL_Y + 66, 10), '偵測器', '量穿過來的光');
 label('mol', v3(-30, MOL_Y + 40, 0), v3(-70, MOL_Y + 76, 16), '香草醛', 'C₈H₈O₃,每一顆球是一個原子');
 label('mag', v3(56, MOL_Y + 104, 0), v3(110, MOL_Y + 132, 0), '強磁鐵', '原子核像小磁針一樣排好');
-label('co', v3(0, MOL_Y + 14, 0), v3(-36, MOL_Y + 52, 14), '一氧化碳', '只有兩個原子的小分子');
-label('cuv', v3(-14, MOL_Y + 26, 14), v3(-60, MOL_Y + 64, 20), '通寧水', '裡面的奎寧會發螢光');
 label('laser', v3(-160, MOL_Y + 2, 0), v3(-160, MOL_Y + 40, 10), '雷射', '532 nm 綠光');
 label('rib', v3(RIB.x0 + 70, RIB.y + 32, RIB.z + 2), v3(RIB.x0 + 60, RIB.y + 66, RIB.z + 10), '電磁波', '左邊能量小,右邊能量大');
 const LBL_KEYS = Object.keys(LBL);
@@ -887,14 +900,14 @@ const LBL_KEYS = Object.keys(LBL);
 // S:互動模式的設定;W:這一格要畫的樣子(導覽與錄影由 film(t) 從時間算出,互動模式由 interactive() 平滑趨近)
 const S = {
   band: 'ir', mode: 'abs',
-  x: { radio: 11.2, micro: 70, ir: 2000, vis: 560, uv: 365, xray: 200, fluo: 300, raman: 1000 }, // 每一種光各自記住滑桿位置
+  x: { radio: 11.2, micro: 9.4, ir: 2000, vis: 560, uv: 365, xray: 200, fluo: 308, raman: 1000 }, // 每一種光各自記住滑桿位置
   scan: null, // { key, t0, dur, from, to }
   shown: {}, // 每一種光的光譜已經掃過的範圍 { key: [lo, hi] }
 };
 const W = {
   band: 'ir', mode: 'abs', x: 2000, resp: null,
-  molOp: 1, coOp: 0, cuvOp: 0, spinOp: 0, magnet: 0, cloudOp: 0, exc: 0, fluoGlow: 0, ramanVib: 0, ribOp: 1, light: 1,
-  beamCol: [1, 1, 1], waveLen: 40, coAngle: 0, shift: 0,
+  molOp: 1, spinOp: 0, magnet: 0, cloudOp: 0, exc: 0, fluoGlow: 0, ramanVib: 0, ribOp: 1, light: 1,
+  beamCol: [1, 1, 1], waveLen: 40, rotAngle: 0, look: null, lookA: 0, focusR: 80, capZone: 0,
   labels: null, conOp: 1, conKey: 'ir', reveal: null, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1,
 };
 const keyOf = (band, mode) => (mode === 'abs' ? band : mode);
@@ -903,78 +916,102 @@ const UVVIS = { lo: 200, hi: 700 };
 const rangeOf = (key) => (key === 'uvvis' ? UVVIS : BANDS[key] || MODES[key]);
 
 // ================= 影片腳本(導覽與錄影共用) =================
-// 腳本以 156 秒寫成;播放與錄影時整體放慢 1.2 倍,留時間看字幕與能量階梯
-const SCRIPT_DUR = 156, FILM_SLOW = 1.2, FILM_DUR = SCRIPT_DUR * FILM_SLOW;
-// 各段的取景:[相機位置, 看的點]
+// 腳本以 184 秒寫成;播放與錄影時整體放慢 1.2 倍,留時間看字幕與能量階梯
+const SCRIPT_DUR = 184, FILM_SLOW = 1.2, FILM_DUR = SCRIPT_DUR * FILM_SLOW;
+// 各段的取景:[相機位置, 看的點, 主角的半徑];導覽與影片會把主角縮放、移到面板之間空出來的地方(見 80_loop.js)
 const VIEW = {
-  all: [[40, 210, 600], [0, 88, 20]],
-  mol: [[50, 156, 270], [0, 110, 0]],
-  radio: [[100, 190, 520], [0, 108, 0]],
-  micro: [[34, 136, 170], [0, 112, 0]],
-  ir: [[40, 150, 270], [0, 114, 0]],
-  uv: [[-50, 158, 290], [0, 114, 0]],
-  fluo: [[60, 150, 260], [-30, 108, 0]],
-  raman: [[30, 170, 360], [-40, 100, 0]],
-  xray: [[50, 150, 250], [0, 114, 0]],
+  all: [[40, 210, 600], [0, 88, 20], 100],
+  mol: [[50, 156, 270], [0, 110, 0], 46],
+  radio: [[100, 190, 520], [0, 108, 0], 70],
+  micro: [[50, 150, 270], [0, 112, 0], 46],
+  ir: [[40, 150, 270], [0, 114, 0], 46],
+  uv: [[-50, 158, 290], [0, 114, 0], 50],
+  fluo: [[60, 150, 270], [0, 110, 0], 50],
+  raman: [[40, 165, 340], [-14, 106, 0], 56],
+  xray: [[50, 150, 250], [0, 114, 0], 46],
 };
 // 每一段:光的種類與用法、這一段的時間、掃描的時間(滑桿從一端掃到另一端)
 const SEGS = [
   { k: 'intro', a: 5.6, b: 19.5 },
   { k: 'radio', band: 'radio', mode: 'abs', a: 19.5, b: 39.5, scan: [23.0, 36.0] },
-  { k: 'micro', band: 'micro', mode: 'abs', a: 39.5, b: 49.2, scan: [41.0, 48.0] },
-  { k: 'ir', band: 'ir', mode: 'abs', a: 49.2, b: 70.0, scan: [51.5, 66.5] },
-  { k: 'uv', band: 'vis', mode: 'abs', a: 70.0, b: 88.2, scan: [72.0, 84.0], from: 700, to: 200 },
-  { k: 'fluo', band: 'uv', mode: 'fluo', a: 88.2, b: 104.2, scan: [90.0, 98.0] },
-  { k: 'raman', band: 'vis', mode: 'raman', a: 104.2, b: 121.2, scan: [107.0, 118.0] },
-  { k: 'xray', band: 'xray', mode: 'abs', a: 121.2, b: 131.2, scan: [122.0, 129.4] },
-  { k: 'other', a: 131.2, b: 138.2 },
-  { k: 'cmp', a: 138.2, b: 150.4 },
+  { k: 'micro', band: 'micro', mode: 'abs', a: 39.5, b: 53.5, scan: [41.4, 51.8] },
+  { k: 'ir', band: 'ir', mode: 'abs', a: 53.5, b: 74.3, scan: [55.8, 70.8] },
+  { k: 'uv', band: 'vis', mode: 'abs', a: 74.3, b: 92.5, scan: [76.3, 88.3], from: 700, to: 200 },
+  { k: 'fluo', band: 'uv', mode: 'fluo', a: 92.5, b: 108.5, scan: [94.3, 102.3] },
+  { k: 'raman', band: 'vis', mode: 'raman', a: 108.5, b: 125.5, scan: [111.3, 122.3] },
+  { k: 'xray', band: 'xray', mode: 'abs', a: 125.5, b: 135.5, scan: [126.3, 133.7] },
+  { k: 'other', a: 135.5, b: 142.5 },
+  { k: 'cmp', a: 142.5, b: 178.2 },
 ];
 const CAMK = [
-  [0, [80, 260, 760], [0, 90, 20]], [5.6, ...VIEW.all],
+  [0, [80, 260, 760], [0, 90, 20], 100], [5.6, ...VIEW.all],
   [12.0, ...VIEW.mol], [19.6, ...VIEW.mol], [21.6, ...VIEW.radio], [38.6, ...VIEW.radio],
-  [40.6, ...VIEW.micro], [48.4, ...VIEW.micro], [50.4, ...VIEW.ir], [69.0, ...VIEW.ir],
-  [71.0, ...VIEW.uv], [87.4, ...VIEW.uv], [89.4, ...VIEW.fluo], [103.4, ...VIEW.fluo],
-  [105.6, ...VIEW.raman], [120.4, ...VIEW.raman], [122.0, ...VIEW.xray], [130.4, ...VIEW.xray],
-  [133.0, ...VIEW.all], [150.4, ...VIEW.all], [156, [80, 260, 760], [0, 90, 20]],
+  [40.6, ...VIEW.micro], [52.6, ...VIEW.micro], [54.6, ...VIEW.ir], [73.4, ...VIEW.ir],
+  [75.4, ...VIEW.uv], [91.6, ...VIEW.uv], [93.6, ...VIEW.fluo], [107.6, ...VIEW.fluo],
+  [109.8, ...VIEW.raman], [124.6, ...VIEW.raman], [126.2, ...VIEW.xray], [134.6, ...VIEW.xray],
+  [137.2, ...VIEW.all], [141.6, ...VIEW.all], [144.0, ...VIEW.mol], [169.8, ...VIEW.mol],
+  [172.4, ...VIEW.all], [178.2, ...VIEW.all], [184, [80, 260, 760], [0, 90, 20], 100],
 ];
 const CAPS = [
   [6.0, 12.6, '01 · 光與分子', '光有很多種:無線電波、微波、紅外線、可見光、紫外線、X 光。它們都是電磁波,差別在一份光帶多少能量:波長越短,能量越大。'],
-  [12.8, 19.4, '01 · 光與分子', '分子會動的方式也有好幾種,每一種都像一段階梯。一份光的能量剛好等於某一階,才會被吸收,分子就做那一種動作。'],
+  [12.8, 19.4, '01 · 光與分子', '分子會動的方式也有好幾種,每一種都像一段階梯;一份光的能量剛好等於某一階,才會被吸收。接下來每一種光都照同一個分子:香草醛。'],
   [20.0, 26.6, '02 · 無線電波', '無線電波的能量非常小,只夠讓原子核翻個面。原子核要先放進很強的磁鐵裡,像小磁針一樣排好方向。'],
   [26.8, 33.2, '02 · 無線電波', '頻率剛好對上,氫原子核就翻過去。每個氫周圍的電子不一樣,需要的頻率差一點點,所以同一個分子裡的氫出現在不同的位置。'],
-  [33.4, 39.4, '02 · 無線電波', '這就是核磁共振(NMR)的氫譜:香草醛醛基的氫在 9.8,甲氧基的三個氫在 3.9。'],
-  [40.0, 44.4, '03 · 微波', '微波能讓整個分子轉起來。小分子(這裡用一氧化碳氣體)每吸收一份,就轉得更快一階。'],
-  [44.6, 49.0, '03 · 微波', '所以轉動的譜線一條一條、間隔一樣:115、231、346 GHz;大分子在液體裡擠成一片,實驗室很少用。'],
-  [49.6, 55.8, '04 · 紅外線', '紅外線的能量剛好讓化學鍵像彈簧一樣伸縮、彎曲。不同的鍵有自己的頻率,像粗細不一樣的彈簧。'],
-  [56.0, 62.6, '04 · 紅外線', 'O–H 在 3200 附近,C=O 在 1666,苯環在 1590 和 1510;單位 cm⁻¹ 是每公分有幾個波。'],
-  [62.8, 69.6, '04 · 紅外線', '把每個頻率被吸收多少畫出來,就是紅外光譜(FTIR);看哪裡有吸收,就知道分子裡有哪些官能基。'],
-  [70.4, 76.6, '05 · 可見光與紫外光', '能量再大一點,就能讓電子跳到高一層的軌域。香草醛不吸收可見光,所以看起來是白色的。'],
-  [76.8, 82.6, '05 · 可見光與紫外光', '到了紫外光(308、279、231 nm),電子吸收了能量跳上去;紫外光譜(UV-Vis)就是量這些吸收。'],
-  [82.8, 88.0, '05 · 可見光與紫外光', '吸收可見光的分子就有顏色:β-胡蘿蔔素吸收藍光(450 nm),我們看到的是剩下的橘色。'],
-  [88.6, 94.6, '06 · 螢光', '有些分子吸收紫外光之後,先把一點能量變成振動(熱),再放出一份能量小一點的光,這就是螢光。'],
-  [94.8, 100.8, '06 · 螢光', '通寧水裡的奎寧吸收 350 nm 的紫外光,放出 450 nm 左右的藍光:放出來的光能量比較小,所以波長比較長。'],
-  [101.0, 104.0, '06 · 螢光', '螢光光譜儀量的,就是放出來的光有哪些顏色、有多亮。'],
-  [104.6, 110.6, '07 · 拉曼', '拉曼用一道雷射照分子。絕大部分的光彈開之後顏色不變;大約一千萬份裡才有一份,把一點能量留給化學鍵的振動,顏色變了一點。'],
-  [110.8, 116.6, '07 · 拉曼', '變了多少,剛好等於那根鍵的振動頻率。所以拉曼光譜和紅外光譜一樣看得到振動,只是用的是彈開的光。'],
-  [116.8, 121.0, '07 · 拉曼', '有些振動紅外光看得清楚,有些拉曼看得清楚,兩種常常一起用。'],
-  [121.6, 126.4, '08 · X 光', 'X 光的能量大到可以把原子最裡面那一層的電子打出去。每種元素需要的能量不一樣:碳 284 eV、氧 543 eV。'],
-  [126.6, 131.0, '08 · X 光', '所以 X 光看得出樣品裡有哪些元素;晶體繞射則是用 X 光找出原子的排列。'],
-  [131.6, 137.8, '09 · 不是靠光的', '質譜不靠光:它把分子變成離子,再秤離子的重量。層析也不靠光:它先把混在一起的成分分開,再交給偵測器。'],
-  [138.6, 146.6, '10 · 比一比', '光的能量從小到大:原子核翻面、分子轉動、化學鍵振動、電子跳上去、打掉內層電子,各自對應一種光譜儀。'],
+  [33.4, 39.4, '02 · 無線電波', '這就是核磁共振(NMR)的氫譜:醛基的氫在 9.8,甲氧基的三個氫在 3.9。看每個氫的位置和鄰居,就拼得出分子的結構。'],
+  [40.0, 46.2, '03 · 微波', '微波能讓整個分子轉起來。香草醛要先變成氣體,在真空裡噴出來冷到只剩幾 K,再一份一份吸收微波,一階一階轉得更快。'],
+  [46.4, 53.2, '03 · 微波', '它比較重、轉得慢,譜線擠在 2 到 20 GHz,大約每 1.2 GHz 一群。從譜線的位置算得出分子的形狀,連醛基朝哪一邊都分得出來。'],
+  [54.0, 60.2, '04 · 紅外線', '紅外線的能量剛好讓化學鍵像彈簧一樣伸縮、彎曲。不同的鍵有自己的頻率,像粗細不一樣的彈簧。'],
+  [60.4, 67.0, '04 · 紅外線', 'O–H 在 3200 附近,C=O 在 1666,苯環在 1590 和 1510;單位 cm⁻¹ 是每公分有幾個波。'],
+  [67.2, 74.0, '04 · 紅外線', '把每個頻率被吸收多少畫出來,就是紅外光譜(FTIR)。它最容易看到 O–H、C=O 這種極性的鍵,用來找分子裡有哪些官能基。'],
+  [74.8, 81.0, '05 · 可見光與紫外光', '能量再大一點,就能讓電子跳到高一層的軌域。香草醛不吸收可見光,所以看起來是白色的。'],
+  [81.2, 87.0, '05 · 可見光與紫外光', '到了紫外光(308、279、231 nm),苯環和醛基連成一片的電子吸收能量跳上去;紫外光譜(UV-Vis)量這些吸收,常用來量濃度。'],
+  [87.2, 92.4, '05 · 可見光與紫外光', '會吸收可見光的分子才有顏色:例如胡蘿蔔裡的 β-胡蘿蔔素吸收藍光(450 nm),我們看到剩下的橘色。'],
+  [93.0, 99.0, '06 · 螢光', '有些分子吸收紫外光之後,先把一點能量變成振動(熱),再放出一份能量小一點的光,這就是螢光。'],
+  [99.2, 105.2, '06 · 螢光', '香草醛吸收 308 nm 的紫外光,放出 330 nm 左右的光,還是看不到的紫外光;在鹼性的水裡失去一個氫離子以後,改放出 405 nm 的紫光。'],
+  [105.4, 108.4, '06 · 螢光', '螢光很靈敏,極少量的分子也量得到,還會跟著周圍的酸鹼改變。'],
+  [108.9, 114.9, '07 · 拉曼', '拉曼用一道雷射照分子。絕大部分的光彈開之後顏色不變;大約一千萬份裡才有一份,把一點能量留給化學鍵的振動,顏色變了一點。'],
+  [115.1, 120.9, '07 · 拉曼', '變了多少,剛好等於那根鍵的振動頻率。所以拉曼光譜和紅外光譜一樣看得到振動,只是用的是彈開的光。'],
+  [121.1, 125.3, '07 · 拉曼', '拉曼最容易看到苯環骨架這種容易變形的鍵,紅外最容易看到極性的鍵,兩種常常一起用。'],
+  [125.9, 130.7, '08 · X 光', 'X 光的能量大到可以把原子最裡面那一層的電子打出去。每種元素需要的能量不一樣:碳 284 eV、氧 543 eV。'],
+  [130.9, 135.3, '08 · X 光', '所以 X 光看得出樣品裡有哪些元素;晶體繞射則是用 X 光找出原子的排列。'],
+  [135.9, 142.1, '09 · 不是靠光的', '質譜不靠光:它把分子變成離子,再秤離子的重量。層析也不靠光:它先把混在一起的成分分開,再交給偵測器。'],
+  [142.8, 146.0, '10 · 比一比', '同一個香草醛,每一種光看的地方不一樣。'],
+  [146.2, 149.4, '10 · 比一比', 'NMR 看每一個氫,和它旁邊接了什麼:拼出分子的結構。'],
+  [149.6, 152.8, '10 · 比一比', '轉動光譜看整個分子的形狀:量原子之間的距離(要先變成氣體)。'],
+  [153.0, 156.2, '10 · 比一比', '紅外看極性的鍵(O–H、C=O、C–O):找出有哪些官能基。'],
+  [156.4, 159.6, '10 · 比一比', '拉曼看容易變形的鍵(苯環骨架):和紅外互補,水的干擾也小。'],
+  [159.8, 163.0, '10 · 比一比', '紫外光看連成一片的電子(苯環接醛基):量濃度、看顏色。'],
+  [163.2, 166.4, '10 · 比一比', '螢光看吸收以後會發光的部分:極少量也量得到,還能看酸鹼。'],
+  [166.6, 169.8, '10 · 比一比', 'X 光看最內層的電子:有哪些元素(碳、氧;氫沒有內層電子,看不到)。'],
+  [170.4, 177.8, '10 · 比一比', '從能量最小的無線電波到能量最大的 X 光,各看分子的一部分;實驗室常把幾種一起用,才確定是什麼分子。'],
 ];
 const LBL_WIN = [
-  [6.4, 18.8, ['src', 'det', 'rib']], [12.4, 19.0, ['mol']], [21.0, 38.6, ['mag']], [41.0, 48.4, ['co']],
-  [89.6, 103.4, ['cuv']], [105.4, 112.0, ['laser']],
+  [6.4, 18.8, ['src', 'det', 'rib']], [12.4, 19.0, ['mol']], [21.0, 38.6, ['mag']], [109.6, 116.0, ['laser']],
 ];
+// 比一比:同一個香草醛,一種光一種光換;x 是那種光對得上的位置
+const CMP_SEQ = [
+  { key: 'radio', band: 'radio', mode: 'abs', x: 9.83, con: 'radio' },
+  { key: 'micro', band: 'micro', mode: 'abs', x: 9.40, con: 'micro' },
+  { key: 'ir', band: 'ir', mode: 'abs', x: 1666, con: 'ir' },
+  { key: 'raman', band: 'vis', mode: 'raman', x: 1590, con: 'raman' },
+  { key: 'uv', band: 'uv', mode: 'abs', x: 308, con: 'uvvis' },
+  { key: 'fluo', band: 'uv', mode: 'fluo', x: 308, con: 'fluo' },
+  { key: 'xray', band: 'xray', mode: 'abs', x: 600, con: 'xray' },
+];
+const CMP_T0 = 146.2, CMP_STEP = 3.4;
+function cmpAt(t) {
+  const i = Math.floor((t - CMP_T0) / CMP_STEP); if (i < 0 || i >= CMP_SEQ.length) return null;
+  const a0 = CMP_T0 + i * CMP_STEP;
+  return Object.assign({}, CMP_SEQ[i], { u: (t - a0) / CMP_STEP, a: win(t, a0, a0 + CMP_STEP, 0.35) });
+}
 function camAt(t) {
   const K = CAMK;
-  if (t <= K[0][0]) return [v3(...K[0][1]), v3(...K[0][2])];
+  if (t <= K[0][0]) return [v3(...K[0][1]), v3(...K[0][2]), K[0][3]];
   for (let i = 0; i < K.length - 1; i++) {
-    const [ta, pa, qa] = K[i], [tb, pb, qb] = K[i + 1];
-    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [v3(...pa).lerp(v3(...pb), u), v3(...qa).lerp(v3(...qb), u)]; }
+    const [ta, pa, qa, ra] = K[i], [tb, pb, qb, rb] = K[i + 1];
+    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [v3(...pa).lerp(v3(...pb), u), v3(...qa).lerp(v3(...qb), u), lerp(ra, rb, u)]; }
   }
-  const L = K[K.length - 1]; return [v3(...L[1]), v3(...L[2])];
+  const L = K[K.length - 1]; return [v3(...L[1]), v3(...L[2]), L[3]];
 }
 const segAt = (t) => SEGS.find((s) => t >= s.a && t < s.b) || null;
 // 這一段的滑桿位置:掃描時從一端掃到另一端,掃完停在最後
@@ -984,19 +1021,33 @@ function segX(s, t) {
 }
 // 開場:光從無線電波一路換到 X 光(只換光,分子不做事)
 function introBand(t) { const u = clamp((t - 6.4) / 12, 0, 0.999); return BAND_IDS[Math.floor(u * 6)]; }
-// 微波那一段的轉角:一路積分(掃到第幾條線就轉多快),同一個 t 永遠同一個角度
-function coAngleAt(s, t) {
-  let a = 0; const step = 1 / 60;
-  for (let u = s.a; u < t; u += step) { const R = respond('micro', 'abs', segX(s, u)); a += TAU * 0.22 * (1 + R.rot) * Math.min(step, t - u); }
+// 微波那一段的轉角:一路積分(掃到第幾群譜線就轉多快),頭尾慢慢加速、減速,
+// 整段轉完剛好是整數圈,下一段的分子才會是原來的方向;同一個 t 永遠同一個角度
+const ROT_STEP = 1 / 60;
+function rotRaw(s, t) {
+  let a = 0;
+  for (let u = s.a; u < t; u += ROT_STEP) {
+    const J = Math.max(0, Math.round(segX(s, u) / VAN_GAP) - 1), env = sstep(s.a, s.a + 1.2, u) * (1 - sstep(s.b - 1.6, s.b, u));
+    a += TAU * 0.22 * (1 + 0.12 * J) * env * Math.min(ROT_STEP, t - u);
+  }
   return a;
+}
+let rotFull = null;
+function rotAngleAt(s, t) {
+  if (rotFull === null) { const e = rotRaw(s, s.b); rotFull = Math.max(1, Math.round(e / TAU)) * TAU / e; }
+  return rotRaw(s, t) * rotFull;
 }
 
 function film(t) {
-  const s = segAt(t);
+  const s = segAt(t), cm = s && s.k === 'cmp' ? cmpAt(t) : null;
   // 先放預設值,各段再改
-  Object.assign(W, { molOp: 1, coOp: 0, cuvOp: 0, spinOp: 0, magnet: 0, cloudOp: 0, fluoGlow: 0, ramanVib: 0, ribOp: 1, light: 0, conOp: 0, cmp: 0, skOp: 1 });
+  Object.assign(W, { molOp: 1, spinOp: 0, magnet: 0, cloudOp: 0, fluoGlow: 0, ramanVib: 0, ribOp: 1, light: 0, conOp: 0, cmp: 0, skOp: 1, look: null, lookA: 0, rotAngle: 0 });
   W.mode = 'abs';
-  if (s && s.band) {
+  if (cm) {
+    // 比一比:同一個香草醛,這一種光看的地方發亮;光譜螢幕放這一種光的整張譜
+    W.band = cm.band; W.mode = cm.mode; W.x = cm.x; W.light = 0.75 * cm.a; W.look = cm.key; W.lookA = cm.a;
+    W.conOp = cm.a; W.conKey = cm.con; W.reveal = null;
+  } else if (s && s.band) {
     W.band = s.band; W.mode = s.mode; W.x = segX(s, t);
     if (s.k === 'uv') W.band = W.x >= 400 ? 'vis' : 'uv'; // 從紅光一路掃到紫外光
     W.light = win(t, s.a + 0.6, s.b - 0.2, 0.8);
@@ -1010,26 +1061,29 @@ function film(t) {
   if (s && s.k === 'intro') W.resp = respond('ir', 'abs', 1900); // 開場只看光的樣子
   // 各段的道具
   W.magnet = win(t, 19.8, 39.2, 1.2); W.spinOp = win(t, 21.0, 39.0, 1.0);
-  W.coOp = win(t, 39.8, 49.0, 0.8); W.molOp = 1 - W.coOp;
-  W.cloudOp = win(t, 70.2, 88.0, 0.8);
+  W.cloudOp = Math.max(win(t, 74.5, 108.3, 0.8), cm && (cm.key === 'uv' || cm.key === 'fluo') ? cm.a : 0);
   W.exc = W.cloudOp > 0 ? W.resp.exc : 0;
-  W.cuvOp = win(t, 88.4, 104.0, 0.8); W.molOp *= 1 - W.cuvOp;
-  W.fluoGlow = s && s.k === 'fluo' ? W.resp.fluo * W.light : 0;
-  W.ramanVib = s && s.k === 'raman' && W.resp.ramanBonds ? W.resp.ramanBonds.a * W.light : 0;
-  if (s && s.k === 'micro') W.coAngle = coAngleAt(s, t);
+  const act = cm ? cm.a : W.light;
+  W.fluoGlow = W.mode === 'fluo' ? W.resp.fluo * act : 0;
+  W.ramanVib = W.mode === 'raman' && W.resp.ramanBonds ? W.resp.ramanBonds.a * act : 0;
+  if (s && s.k === 'micro') W.rotAngle = rotAngleAt(s, t);
+  if (cm && cm.key === 'micro') W.rotAngle = TAU * ease(cm.u);
   // 光束的顏色與波長(畫面上的)
   setBeam(W.band, W.mode, W.x);
   // 鏡頭
-  const [cp, ct] = fitPortrait(...camAt(t));
-  camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct);
+  const [cp0, ct0, fr] = camAt(t), [cp, ct] = fitPortrait(cp0, ct0);
+  camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct); W.focusR = fr;
   W.labels = {}; for (const [a, b, keys] of LBL_WIN) for (const k of keys) W.labels[k] = Math.max(W.labels[k] || 0, win(t, a, b, 0.5));
   W.cap = null; for (const c of CAPS) if (t >= c[0] && t < c[1]) W.cap = { chap: c[2], txt: c[3], op: win(t, c[0], c[1], 0.35) };
-  W.title = win(t, 0.2, 5.6, 0.9); W.outro = sstep(150.6, 151.8, t); W.chips = win(t, 5.6, 150.4, 0.8);
-  W.cmp = win(t, 138.4, 150.2, 0.6);
-  W.skOp = win(t, 12.4, 131.0, 0.8);
-  W.shift = win(t, 12.4, 131.6, 1.6); // 有能量階梯的時候,3D 往右下讓開
+  // 有字幕的時段連成一片(字幕之間的空檔不算),3D 讓開字幕的位置才不會一句一句上下跳
+  W.capZone = 0; for (const c of CAPS) W.capZone = Math.max(W.capZone, win(t, c[0] - 0.6, c[1] + 0.6, 0.8));
+  W.title = win(t, 0.2, 5.6, 0.9); W.outro = sstep(178.4, 179.6, t);
+  // 最後的比較表很高,出現前左上的標題與讀值卡先淡出,表格才不會壓到它們
+  W.chips = win(t, 5.6, 171.0, 0.8);
+  W.cmp = win(t, 170.6, 177.8, 0.6);
+  W.skOp = win(t, 12.4, 170.2, 0.8);
   // 牆上的電磁波色帶:開場與最後看整體時清楚,鏡頭靠近分子時淡一點,才不會搶走畫面上方
-  W.ribOp = Math.max(win(t, 0, 20.4, 0.8), win(t, 131.4, 160, 1.0) * (1 - 0.7 * W.cmp), 0.3);
+  W.ribOp = Math.max(win(t, 0, 20.4, 0.8), win(t, 135.4, 145.0, 1.0), win(t, 170.4, 190, 1.0) * (1 - 0.7 * W.cmp), 0.3);
 }
 function setBeam(band, mode, x) {
   if (mode === 'fluo') { W.beamCol = [0.62, 0.42, 1.6]; W.waveLen = 11; return; }
@@ -1043,13 +1097,14 @@ function setBeam(band, mode, x) {
 // ==== 60_state.js ====
 // ================= 互動模式 =================
 // 選一種光,鏡頭靠近;拖滑桿調頻率,分子照能量對不對得上回應;「掃描」自動掃一遍,光譜螢幕跟著畫出來
+// 每一種光都照同一個香草醛,這種光看的地方(原子、鍵或電子雲)一直微微發亮
 const VIEW_OF = { radio: 'radio', micro: 'micro', ir: 'ir', vis: 'uv', uv: 'uv', xray: 'xray', fluo: 'fluo', raman: 'raman' };
-let coA = 0;
+let rotA = 0;
 function curKey() { return keyOf(S.band, S.mode); }
 function startScan(now) {
   const key = curKey(), R = rangeOf(key);
   S.shown[key] = null;
-  S.scan = { key, t0: now, dur: key === 'radio' ? 9 : 7, from: R.lo, to: R.hi };
+  S.scan = { key, t0: now, dur: key === 'radio' || key === 'micro' ? 9 : 7, from: R.lo, to: R.hi };
   el('btnScan').classList.add('on'); el('btnScan').textContent = '停止';
 }
 function stopScan() { if (!S.scan) return; S.scan = null; el('btnScan').classList.remove('on'); el('btnScan').textContent = '掃描'; }
@@ -1061,17 +1116,18 @@ function interactive(dt, now) {
   W.band = S.band; W.mode = S.mode; W.x = x;
   W.resp = respond(S.band, S.mode, x);
   const r = (cur, tgt, k = 4) => approach(cur, tgt, k, dt), abs = S.mode === 'abs';
-  W.light = 1;
+  W.light = 1; W.molOp = 1;
   W.magnet = r(W.magnet, abs && S.band === 'radio' ? 1 : 0);
   W.spinOp = r(W.spinOp, abs && S.band === 'radio' ? 1 : 0);
-  W.coOp = r(W.coOp, abs && S.band === 'micro' ? 1 : 0);
-  W.cuvOp = r(W.cuvOp, S.mode === 'fluo' ? 1 : 0);
-  W.molOp = (1 - W.coOp) * (1 - W.cuvOp);
-  W.cloudOp = r(W.cloudOp, abs && (S.band === 'vis' || S.band === 'uv') ? 1 : 0);
+  W.cloudOp = r(W.cloudOp, (abs && (S.band === 'vis' || S.band === 'uv')) || S.mode === 'fluo' ? 1 : 0);
   W.exc = r(W.exc, W.resp.exc, 6);
   W.fluoGlow = r(W.fluoGlow, S.mode === 'fluo' ? W.resp.fluo : 0, 5);
   W.ramanVib = r(W.ramanVib, W.resp.ramanBonds ? W.resp.ramanBonds.a : 0, 5);
-  coA += TAU * 0.22 * (1 + (W.resp.rot || 0)) * dt; W.coAngle = coA;
+  // 微波:整個分子轉,越高階轉越快;換成別的光時轉回原來的方向
+  if (abs && S.band === 'micro') rotA += TAU * 0.22 * (1 + 0.12 * (W.resp.rot || 0)) * dt;
+  else rotA = approach(rotA, Math.round(rotA / TAU) * TAU, 2.5, dt);
+  W.rotAngle = rotA;
+  W.look = key; W.lookA = r(W.lookA, 0.32, 3);
   setBeam(S.band, S.mode, x);
   Object.assign(W, { ribOp: 0.55, labels: null, conOp: 1, conKey: key, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1 });
   // 光譜螢幕:已經掃過或拖過的範圍才畫出來
@@ -1152,11 +1208,11 @@ function drawLadderRight(c, key, R, x) {
       c.globalAlpha = clamp(A * 1.5, 0, 1);
       arrowV(c, 360, 128 - 22, 128, 'rgba(168,188,198,.9)', 2, true);
       lt(c, '變成熱', 360, 92, { size: 12.5, color: COL.ink2, align: 'center' });
-      arrowV(c, 418, 128, 270, '#5aa2ff', 2.8, false);
-      lt(c, '放出 450 nm', 418, 312, { size: 12.5, color: '#5aa2ff', align: 'center' });
+      arrowV(c, 418, 128, 262, '#9d8cff', 2.8, false);
+      lt(c, '放出 330 nm', 418, 312, { size: 12.5, color: '#9d8cff', align: 'center' });
       c.globalAlpha = 1;
     }
-    head(A > 0.1 ? '吸收紫外光,放出藍光' : '這個波長幾乎不吸收', A > 0.1 ? '#5aa2ff' : COL.muted);
+    head(A > 0.1 ? '吸收紫外光,再放出光' : '這個波長幾乎不吸收', A > 0.1 ? '#9d8cff' : COL.muted);
     return;
   }
   if (key === 'raman') {
@@ -1174,12 +1230,17 @@ function drawLadderRight(c, key, R, x) {
   }
   const band = key, A = R.abs;
   if (band === 'micro') {
-    // 轉動的台階:能量和 J(J+1) 成正比,越上面間隔越大
-    const yJ = (J) => 296 - 9.5 * J * (J + 1);
-    for (let J = 0; J <= 4; J++) level(c, X0, X1, yJ(J), `第 ${J} 階`, J === R.rot ? '#6fe0c8' : 'rgba(168,188,198,.7)');
-    for (const l of CO_LINES) { const on = Math.abs(x - l.ghz) < 6; c.globalAlpha = on ? 1 : 0.28; arrowV(c, 290 + l.J * 40, yJ(l.J), yJ(l.J + 1), '#6fe0c8', on ? 3 : 1.8); lt(c, `${Math.round(l.ghz)}`, 290 + l.J * 40, yJ(l.J) + 14, { size: 11.5, color: '#6fe0c8', align: 'center', mono: true }); }
+    // 轉動的台階:能量和 J(J+1) 成正比,越上面間隔越大;畫目前附近的五階,箭頭下寫往上跳一階要的頻率(GHz,約 (B + C)(J + 1))
+    const J0 = R.rot || 0, base = Math.max(0, J0 - 1), e0 = base * (base + 1), e1 = (base + 4) * (base + 5);
+    const yJ = (J) => 296 - ((J * (J + 1) - e0) / (e1 - e0)) * 236;
+    for (let J = base; J <= base + 4; J++) level(c, X0, X1, yJ(J), `第 ${J} 階`, J === J0 + (res(A) ? 1 : 0) ? '#6fe0c8' : 'rgba(168,188,198,.7)');
+    for (let J = base; J < base + 4; J++) {
+      const on = J === J0 && res(A); c.globalAlpha = on ? 1 : 0.28;
+      arrowV(c, 290 + (J - base) * 40, yJ(J), yJ(J + 1), '#6fe0c8', on ? 3 : 1.8);
+      lt(c, (VAN_GAP * (J + 1)).toFixed(1), 290 + (J - base) * 40, yJ(J) + 14, { size: 11.5, color: '#6fe0c8', align: 'center', mono: true });
+    }
     c.globalAlpha = 1;
-    head(res(A) ? `對上了:吸收,轉到第 ${R.rot} 階` : '對不上:光直接穿過去', res(A) ? '#6fe0c8' : COL.muted);
+    head(res(A) ? `對上了:吸收,轉到第 ${J0 + 1} 階` : '對不上:光直接穿過去', res(A) ? '#6fe0c8' : COL.muted);
     return;
   }
   // 其他:兩個台階(要的能量)和打進來的光
@@ -1227,13 +1288,14 @@ function drawLadder(t) {
 // ================= 介面 =================
 // 能量階梯下方的說明(互動模式)
 function ladderText() {
-  const key = curKey(), E = photonE(S.band, S.mode, S.x[key]), R = W.resp;
-  if (S.mode === 'fluo') return `激發光 ${Math.round(S.x.fluo)} nm(一份 ${fmtE(E)})。${R.fluo > 0.1 ? '奎寧吸收之後先變成一點熱,再放出 450 nm 左右的藍光,能量比吸收的小。' : '這個波長奎寧幾乎不吸收,所以不太發光。'}`;
-  if (S.mode === 'raman') return `雷射 532 nm(一份 ${fmtE(E)})。${R.raman > 0.15 ? `彈開的光有極少數少了 ${Math.round(S.x.raman)} cm⁻¹ 的能量,剛好是一根鍵振動一階。` : '在這個位移,沒有哪一種振動對得上。'}`;
-  const hint = { radio: '每個氫翻面需要的頻率差一點點,拖滑桿找找看。', micro: '每吸收一份就轉快一階;往右拖,看它一階一階轉快。', ir: '拖過 3200、1666、1590,看是哪一根鍵在動。', vis: '香草醛不吸收可見光;換到紫外線看看。', uv: '拖到 308、279、231 nm,電子雲會跳到高一層。', xray: '拖過 284 與 543 eV,內層電子被打出來。' }[S.band];
-  return `這一份光 ${fmtE(E)}:${R.what}。${hint}`;
+  const key = curKey(), E = photonE(S.band, S.mode, S.x[key]), R = W.resp, L = LOOK[key];
+  const tail = L ? `這種光看的是${L.what},用來${L.use}。` : '';
+  if (S.mode === 'fluo') return `激發光 ${Math.round(S.x.fluo)} nm(一份 ${fmtE(E)})。${R.fluo > 0.1 ? '香草醛吸收之後先變成一點熱,再放出 330 nm 左右的光;在鹼性的水裡失去一個氫離子以後,放出 405 nm 的紫光。' : '這個波長香草醛幾乎不吸收,所以不太發光。'}${tail}`;
+  if (S.mode === 'raman') return `雷射 532 nm(一份 ${fmtE(E)})。${R.raman > 0.15 ? `彈開的光有極少數少了 ${Math.round(S.x.raman)} cm⁻¹ 的能量,剛好是一根鍵振動一階。` : '在這個位移,沒有哪一種振動對得上。'}${tail}`;
+  const hint = { radio: '每個氫翻面需要的頻率差一點點,拖滑桿找找看。', micro: '每吸收一份就轉快一階;譜線一群一群,間隔約 1.2 GHz。', ir: '拖過 3200、1666、1590,看是哪一根鍵在動。', vis: '香草醛不吸收可見光;換到紫外線看看。', uv: '拖到 308、279、231 nm,電子雲會跳到高一層。', xray: '拖過 284 與 543 eV,內層電子被打出來。' }[S.band];
+  return `這一份光 ${fmtE(E)}:${R.what}。${hint}${tail}`;
 }
-let lastNote = '', lastCap = '', lastTitle = '', lastCmp = -1, lastChip = '', lastSub = '', lastCon = '';
+let lastNote = '', lastCap = '', lastTitle = '', lastCmp = -1, lastCmpY = null, lastChip = '', lastSub = '', lastCon = '';
 function updateDOM(t) {
   const film = FILM || tour.on;
   const key = W.mode === 'abs' ? W.band : W.mode;
@@ -1249,7 +1311,7 @@ function updateDOM(t) {
   drawLadder(t);
   if (!film) { const n = ladderText(); if (n !== lastNote) { lastNote = n; el('skTxt').textContent = n; } }
   // 標籤
-  const L = W.labels || { rib: 0.9, mol: W.molOp, mag: W.magnet, co: W.coOp, cuv: W.cuvOp, laser: W.mode === 'raman' ? 1 : 0 };
+  const L = W.labels || { rib: 0.9, mol: W.molOp, mag: W.magnet, laser: W.mode === 'raman' ? 1 : 0 };
   for (const k of LBL_KEYS) labelOp(k, L[k] || 0);
   labelSub('src', W.mode === 'fluo' ? '紫外燈' : W.mode === 'raman' ? '雷射' : W.band ? `發出${BANDS[W.band].name}` : '');
   // 光譜螢幕
@@ -1271,23 +1333,32 @@ function updateDOM(t) {
       lastTitle = tk;
       const tx = tk === 't'
         ? ['光譜', '光與分子怎麼互動', '無線電波、微波、紅外線、可見光、紫外線、X 光,各自讓分子做什麼', '']
-        : ['光譜-光與分子的交互作用', '翻面 · 轉動 · 振動 · 跳上去 · 打出來', 'NMR · 轉動光譜 · 紅外與拉曼 · UV-Vis 與螢光 · X 光', '光與分子交互作用的示意動畫;分子、光波與能量都經過縮放。譜線位置取自文獻與資料庫,例子是香草醛、一氧化碳、奎寧與 β-胡蘿蔔素。'];
+        : ['光譜-光與分子的交互作用', '翻面 · 轉動 · 振動 · 跳上去 · 打出來', 'NMR · 轉動光譜 · 紅外與拉曼 · UV-Vis 與螢光 · X 光', '光與分子交互作用的示意動畫;分子、光波與能量都經過縮放。每一段都用同一個香草醛,譜線位置取自文獻、資料庫與計算;β-胡蘿蔔素只當有顏色的對照。'];
       ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => { el(id).textContent = tx[i]; });
       el('titlecard').classList.toggle('outro', tk === 'o');
     }
     document.querySelector('.hud').style.opacity = W.chips;
     if (Math.abs(W.cmp - lastCmp) > 0.002) { lastCmp = W.cmp; const cm = el('cmp'); cm.style.opacity = W.cmp; cm.style.visibility = W.cmp < 0.01 ? 'hidden' : 'visible'; }
+    // 比較表放在字幕上方空間的正中間(字幕保留的高度和 3D 讓位用的是同一個,見 80_loop.js 的 capReserve)
+    const cy = Math.round((innerHeight - capReserve()) / 2);
+    if (cy !== lastCmpY) { lastCmpY = cy; root.style.setProperty('--cmp-y', `${cy}px`); }
   }
 }
 // 比較表(影片最後一段)
-el('cmp').innerHTML = `<table>
-<tr><th>光</th><th>分子怎麼動</th><th>一份光的能量</th><th>對應的光譜儀</th></tr>
-<tr><td>無線電波(在磁鐵裡)</td><td>原子核翻面</td><td><b>約 10⁻⁶ eV</b></td><td>核磁共振 NMR</td></tr>
-<tr><td>微波</td><td>整個分子轉動</td><td><b>約 10⁻⁴ eV</b></td><td>轉動光譜</td></tr>
-<tr><td>紅外線</td><td>化學鍵伸縮、彎曲</td><td><b>0.05 至 0.5 eV</b></td><td>紅外光譜 FTIR、拉曼</td></tr>
-<tr><td>可見光、紫外線</td><td>電子跳到高一層</td><td><b>1.6 至 6 eV</b></td><td>UV-Vis、螢光</td></tr>
-<tr><td>X 光</td><td>打掉最內層的電子</td><td><b>數百 eV 以上</b></td><td>X 光螢光、繞射</td></tr>
+el('cmp').innerHTML = `<button class="btn sq x" id="cmpX" aria-label="關閉比較表">×</button><table>
+<tr><th>光(一份的能量)</th><th>分子怎麼動</th><th>看香草醛的哪裡</th><th>拿來做什麼</th></tr>
+<tr><td>無線電波,在磁鐵裡<small>約 10⁻⁶ eV</small></td><td>原子核翻面</td><td>每一個氫,和它的鄰居</td><td>拼出分子的結構(NMR)</td></tr>
+<tr><td>微波<small>約 10⁻⁵ eV</small></td><td>整個分子轉動</td><td>整個分子</td><td>量分子的形狀(要變成氣體)</td></tr>
+<tr><td>紅外線<small>0.05 至 0.5 eV</small></td><td>化學鍵伸縮、彎曲</td><td>極性的鍵:O–H、C=O</td><td>找官能基(FTIR)</td></tr>
+<tr><td>雷射,看彈開的光<small>拉曼</small></td><td>化學鍵振動</td><td>容易變形的鍵:苯環骨架</td><td>看骨架,和紅外互補</td></tr>
+<tr><td>紫外線、可見光<small>1.6 至 6 eV</small></td><td>電子跳到高一層</td><td>連成一片的電子</td><td>量濃度、看顏色(UV-Vis)</td></tr>
+<tr><td>紫外線,看放回來的光<small>螢光</small></td><td>電子跳上去再落下</td><td>吸收以後會發光的部分</td><td>量極少量、看酸鹼</td></tr>
+<tr><td>X 光<small>數百 eV 以上</small></td><td>打掉最內層的電子</td><td>碳、氧最內層的電子</td><td>看有哪些元素</td></tr>
 </table>`;
+// 互動模式也能打開比較表;Esc 或 × 關閉
+function setCmpOpen(on) { root.classList.toggle('cmp-open', on); el('btnCmp').classList.toggle('on', on); }
+el('btnCmp').addEventListener('click', () => setCmpOpen(!root.classList.contains('cmp-open')));
+el('cmpX').addEventListener('click', () => setCmpOpen(false));
 
 // ---------- 光譜螢幕 ----------
 const plot = el('plot'), tip = el('tip');
@@ -1295,11 +1366,11 @@ let plotDrawnAt = -Infinity;
 // 每一種光的圖:橫軸範圍(照該光譜的習慣方向)、軸名、標題、曲線
 const PLOTS = {
   radio: { x0: 12, x1: -0.5, axis: 'δ(ppm)', title: '核磁共振氫譜', sample: '香草醛,500 MHz 磁鐵', y: (x) => NMRW(x) / 3.05, peaks: [[9.83, '醛基'], [7.42, '苯環上的氫'], [6.2, 'OH'], [3.96, 'OCH₃']] },
-  micro: { x0: 40, x1: 500, axis: '頻率(GHz)', title: '轉動光譜', sample: '一氧化碳氣體', y: (x) => COW(x), peaks: CO_LINES.map((l) => [l.ghz, `${Math.round(l.ghz)}`]) },
+  micro: { x0: 2, x1: 20, axis: '頻率(GHz)', title: '轉動光譜', sample: '香草醛氣體,冷到幾 K(依計算的轉動常數)', y: (x) => clamp(VANW(x) * 1.15, 0, 1), sticks: VAN_LINES, note: '一群一群,間隔約 1.2 GHz', peaks: [] },
   ir: { x0: 4000, x1: 500, axis: '波數(cm⁻¹)', title: '紅外光譜', sample: '香草醛', y: (x) => IRW(x), trans: true, peaks: [[3180, 'O–H'], [1666, 'C=O'], [1590, '苯環'], [1265, 'C–O']] },
   vis: { x0: 200, x1: 700, axis: '波長(nm)', title: '紫外光與可見光光譜', sample: '香草醛(紫)與 β-胡蘿蔔素(橘,對照)', y: (x) => UVA(x), y2: (x) => CARA(x), rainbow: true, peaks: [[308, '308'], [279, '279'], [231, '231']] },
   xray: { x0: 150, x1: 700, axis: '光子能量(eV)', title: 'X 光吸收', sample: '香草醛裡的碳與氧', y: (x) => XABS(x), peaks: [[284.2, '碳 284'], [543.1, '氧 543']] },
-  fluo: { x0: 250, x1: 600, axis: '波長(nm)', title: '螢光', sample: '通寧水裡的奎寧', y: (x) => QEX(x), y2: (x) => QEM(x), peaks: [[350, '吸收'], [450, '放光']] },
+  fluo: { x0: 250, x1: 480, axis: '波長(nm)', title: '螢光', sample: '香草醛的水溶液', y: (x) => FEX(x), y2: (x) => FEM(x), peaks: [[308, '吸收'], [330, '放光'], [405, '鹼性時']] },
   raman: { x0: 200, x1: 3400, axis: '拉曼位移(cm⁻¹)', title: '拉曼光譜', sample: '香草醛,雷射 532 nm', y: (x) => RAMW(x), peaks: [[1590, '苯環'], [1666, 'C=O']] },
 };
 PLOTS.uv = PLOTS.vis; PLOTS.uvvis = PLOTS.vis;
@@ -1313,7 +1384,7 @@ function drawPlot() {
   const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
   const P = PLOTS[W.conKey]; if (!P) return;
   const ck = W.conKey;
-  if (ck !== lastCon) { lastCon = ck; el('conTitle').textContent = P.title; el('conSample').textContent = P.sample; el('legend').innerHTML = P.y2 ? (ck === 'fluo' ? '<span><i style="border-top:2px solid #b48cff"></i>吸收</span><span><i style="border-top:2px solid #5aa2ff"></i>放光</span>' : '<span><i style="border-top:2px solid #b48cff"></i>香草醛</span><span><i style="border-top:2px dashed #ffb04a"></i>β-胡蘿蔔素</span>') : ''; }
+  if (ck !== lastCon) { lastCon = ck; el('conTitle').textContent = P.title; el('conSample').textContent = P.sample; el('legend').innerHTML = P.y2 ? (ck === 'fluo' ? '<span><i style="border-top:2px solid #b48cff"></i>吸收</span><span><i style="border-top:2px solid #9d8cff"></i>放光</span>' : '<span><i style="border-top:2px solid #b48cff"></i>香草醛</span><span><i style="border-top:2px dashed #ffb04a"></i>β-胡蘿蔔素</span>') : ''; }
   const fs = FILM ? 14 : 11, Lp = FILM ? 16 : 12, Rp = FILM ? 14 : 10, Tp = FILM ? 22 : 18, Bp = FILM ? 34 : 26;
   const pw = w - Lp - Rp, ph = h - Tp - Bp, yb = Tp + ph;
   const X = (x) => Lp + ((x - P.x0) / (P.x1 - P.x0)) * pw;
@@ -1343,17 +1414,32 @@ function drawPlot() {
     if (fill && started) { c.lineTo(last, P.trans ? Tp : yb); c.lineTo(first, P.trans ? Tp : yb); c.closePath(); c.fillStyle = fill; c.fill(); }
   };
   if (P.trans) { c.fillStyle = COL.muted; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText('100% 穿透', Lp + 4, Tp - fs - 3); }
-  if (ck === 'fluo') {
+  if (P.note) { c.fillStyle = COL.muted; c.textAlign = 'left'; c.textBaseline = 'top'; c.font = `${fs}px ${SANS}`; c.fillText(P.note, Lp + 4, Tp - fs - 3); }
+  const em = ck === 'fluo' ? clamp(FEX(W.x) * 1.6, 0, 1) : 0;
+  if (P.sticks) {
+    // 轉動譜線又細又密:每一條畫成一根直線(掃過的才畫)
+    c.strokeStyle = '#6fe0c8'; c.lineWidth = FILM ? 1.6 : 1.2;
+    c.beginPath();
+    for (const l of P.sticks) { if (l.ghz < r0 || l.ghz > r1) continue; const px = Math.round(X(l.ghz)) + 0.5; c.moveTo(px, yb); c.lineTo(px, yb - ph * 0.92 * clamp(l.I, 0, 1)); }
+    c.stroke();
+  } else if (ck === 'fluo') {
     curve(P.y, '#b48cff', null, 'rgba(180,140,255,.12)');
-    const em = clamp(QEX(W.x) * 1.6, 0, 1);
-    curve((x) => P.y2(x) * em, '#5aa2ff', null, 'rgba(90,162,255,.16)', 1, true);
+    curve((x) => P.y2(x) * em, '#9d8cff', null, 'rgba(157,140,255,.16)', 1, true);
   } else if (P.y2) {
     curve(P.y, '#b48cff', null, 'rgba(180,140,255,.12)');
     curve(P.y2, '#ffb04a', [6, 5], null);
   } else curve(P.y, ck === 'ir' ? '#ff8a6b' : ck === 'raman' ? '#5dff8a' : ck === 'xray' ? '#d8f0ff' : ck === 'micro' ? '#6fe0c8' : '#74e4ff', null, ck === 'ir' ? null : 'rgba(116,228,255,.10)');
   // 峰的標示(已經掃過的)
   c.font = `600 ${fs}px ${SANS}`; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.fillStyle = COL.ink2;
-  for (const [x, s] of P.peaks) { if (x < r0 || x > r1) continue; const v = P.trans ? Tp + ph * 0.92 * clamp(P.y(x), 0, 1) + fs + 6 : yb - ph * 0.92 * clamp(P.y(x) * (ck === 'fluo' && s === '放光' ? 0 : 1), 0, 1.05) - 4; c.fillText(s, X(x), P.trans ? v + 4 : Math.max(Tp + fs, v)); }
+  for (const [x, s] of P.peaks) {
+    // 螢光的放光峰一直畫著(不跟著掃描),標在放光曲線上;其他的峰掃過才標
+    const emit = ck === 'fluo' && x > 320;
+    if (!emit && (x < r0 || x > r1)) continue;
+    if (emit && em < 0.05) continue;
+    const yv = emit ? P.y2(x) * em : P.y(x);
+    const v = P.trans ? Tp + ph * 0.92 * clamp(yv, 0, 1) + fs + 6 : yb - ph * 0.92 * clamp(yv, 0, 1.05) - 4;
+    c.fillText(s, X(x), P.trans ? v + 4 : Math.max(Tp + fs, v));
+  }
   // 現在的位置
   const xm = X(W.x);
   c.strokeStyle = '#fff6c4'; c.lineWidth = 1.4; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(xm, Tp - 6); c.lineTo(xm, yb); c.stroke(); c.setLineDash([]);
@@ -1393,7 +1479,7 @@ syncTune();
 // ---------- 導覽 ----------
 const tour = { on: false, t0: 0, saved: null };
 function startTour() {
-  stopScan(); el('help').classList.remove('show');
+  stopScan(); el('help').classList.remove('show'); setCmpOpen(false);
   tour.saved = { band: S.band, mode: S.mode, cp: camera.position.clone(), ct: controls.target.clone() };
   tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false; nav.cancel();
 }
@@ -1404,22 +1490,50 @@ function endTour() {
   camera.position.copy(s.cp); controls.target.copy(s.ct); controls.update();
   Object.assign(W, { labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1 });
   el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; el('cmp').style.opacity = 0; el('cmp').style.visibility = 'hidden'; document.querySelector('.hud').style.opacity = 1; lastNote = ''; lastCon = '';
+  root.style.removeProperty('--cmp-y'); lastCmpY = null;
 }
 el('btnTour').addEventListener('click', startTour);
 el('tourExit').addEventListener('click', endTour);
-addEventListener('keydown', (e) => { if (e.key === 'Escape') endTour(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape') { endTour(); setCmpOpen(false); } });
 
 // ==== 80_loop.js ====
 // ================= 迴圈 =================
-// 影片與寬螢幕導覽時左邊有能量階梯,把 3D 的投影中心往右下移(鏡頭位置不動)
-const SHIFT = { x: -0.15, y: -0.12 };
+// 影片與寬螢幕導覽:左欄有標題與能量階梯、右上有光譜螢幕、下方有字幕。把主角(W.focusR 是它的半徑)
+// 移到這些面板之間空出來的地方,放不下就縮小一點;鏡頭位置不動,只改投影(setViewOffset 與 zoom)。
+// 各面板依自己的透明度加權,淡入淡出時畫面跟著平順地移動;字幕用「兩行字」的高度保留位置,換句子時不會跳
+const FIT_M = 14;
+let capKey = '', capH = 0;
+function capReserve() {
+  const k = `${innerWidth}x${innerHeight}|${root.className}`;
+  if (k !== capKey) {
+    capKey = k;
+    const cs = getComputedStyle(el('cap')), tx = getComputedStyle(el('capTxt')), ch = getComputedStyle(el('chap'));
+    const lh = (s) => parseFloat(s.lineHeight) || parseFloat(s.fontSize) * 1.5;
+    capH = parseFloat(cs.bottom) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + lh(ch) + parseFloat(ch.marginBottom) + 2 * lh(tx);
+  }
+  return capH;
+}
+function freeRect(w, h) {
+  const m = FIT_M, note = el('note').getBoundingClientRect(), con = el('console').getBoundingClientRect();
+  const x0 = lerp(m, (note.width ? note.right : 0) + m, clamp(W.skOp, 0, 1)), x1 = w - m, y0 = m;
+  const y1 = lerp(h - m, h - capReserve() - m, clamp(W.capZone, 0, 1));
+  // 右上的光譜螢幕:主角放在它下面或左邊,看哪一邊空出來的正方形比較大(兩種之間平順地換)
+  const wc = clamp(W.conOp, 0, 1), A = [x0, x1, lerp(y0, con.bottom + m, wc), y1], B = [x0, lerp(x1, con.left - m, wc), y0, y1];
+  const sz = (r) => Math.min(r[1] - r[0], r[3] - r[2]), k = sstep(-30, 30, sz(A) - sz(B)), r = A.map((v, i) => lerp(B[i], v, k));
+  return { cx: (r[0] + r[1]) / 2, cy: (r[2] + r[3]) / 2, w: Math.max(40, r[1] - r[0]), h: Math.max(40, r[3] - r[2]) };
+}
 function applyShift() {
-  const wide = FILM || (innerWidth >= 1100 && innerWidth / innerHeight >= 4 / 3);
-  const k = (FILM || tour.on) && wide ? W.shift || 0 : 0;
+  const wide = FILM || (innerWidth >= 1100 && innerWidth / innerHeight >= 4 / 3), w = innerWidth, h = innerHeight;
+  if (!(FILM || tour.on) || !wide) {
+    if (camera.view && camera.view.enabled) camera.clearViewOffset();
+    if (camera.zoom !== 1) { camera.zoom = 1; camera.updateProjectionMatrix(); }
+    return;
+  }
+  const F = freeRect(w, h), d = camera.position.distanceTo(controls.target);
+  const rpx = ((W.focusR || 80) / (d * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))) * (h / 2);
+  camera.zoom = clamp((0.47 * Math.min(F.w, F.h)) / rpx, 0.45, 1);
   // setViewOffset 會把 aspect 設成 fullWidth / fullHeight,所以要傳真正的畫面大小
-  const w = innerWidth, h = innerHeight;
-  if (k > 0.001) camera.setViewOffset(w, h, SHIFT.x * k * w, SHIFT.y * k * h, w, h);
-  else if (camera.view && camera.view.enabled) camera.clearViewOffset();
+  camera.setViewOffset(w, h, w / 2 - F.cx, h / 2 - F.cy, w, h);
 }
 function render() {
   applyShift();
@@ -1470,7 +1584,7 @@ if (REC) {
     if (FILM) ft = ((now - filmStart) % FILM_DUR) / FILM_SLOW;
     else if (tour.on) { const tt = now - tour.t0; if (tt >= FILM_DUR) endTour(); else ft = tt / FILM_SLOW; }
     if (ft !== null) { film(ft); t = ft; }
-    if (!FILM && !tour.on) { interactive(dt, now); W.shift = 0; nav.step(dt); controls.update(); }
+    if (!FILM && !tour.on) { interactive(dt, now); nav.step(dt); controls.update(); }
     frame(t, dt);
     render();
   };
