@@ -8,7 +8,7 @@
 
 ## 分區與主要名稱
 
-`<head>` 最前面有一小段 script 先讀 `localStorage` 的 `lcq-theme`,設定 `<html data-theme>`,避免淺色模式先閃深色。CSS 的顏色都是 `:root` 的變數,深淺兩組;分頁列是 `#sitenav`(其他教材是 `.sitenav`),「離子阱質譜」一組的樣式是 `.sn-lesson` 與 `.sn-name`。module 開頭先載入共用的 `../assets/render-quality.js` 與 `../assets/camera-nav.js`,`quality` 的選單掛在 `#sitenav` 底下。
+`<head>` 最前面有一小段 script 先讀 `localStorage` 的 `lcq-theme`,設定 `<html data-theme>`,避免淺色模式先閃深色。CSS 的顏色都是 `:root` 的變數,深淺兩組;分頁列是 `#sitenav`(其他教材是 `.sitenav`),「離子阱質譜」一組的樣式是 `.sn-lesson` 與 `.sn-name`。分頁列和畫質選單的容器 `#qhost` 一起包在固定於左上角的 `#topnav` 裡(縱向排列、靠右對齊,選單在分頁列右端下方);`#topnav` 本身 `pointer-events:none`,只有子元素接收滑鼠,分頁列下方的空白處仍然可以拖曳畫面。module 開頭先載入共用的 `../assets/render-quality.js` 與 `../assets/camera-nav.js`,`quality` 的選單掛在 `#qhost`。
 
 | 分區 | 內容 | 常改的地方 |
 |---|---|---|
@@ -17,7 +17,7 @@
 | `sim.js` | 顏色 `COL`;目前的樣品 `sampleState`、`setSample()`、`pickSpecies()`;電灑 `EsiSim`;傳輸 `TRANSPORT_SPEED` 與 `TransportSim`;背景氣體 `GasSim`;離子阱 `TRAP`、`OMEGA_V`、`TrapSim`;馬鞍面 `SaddleSim`;質譜累加 `Spectrum` | 粒子數量、速度、阱內運動參數 |
 | `overlay.js` | 疊圖畫布 `OV`、`OV_COL`、`ovResize()`、`ovTheme()`;字型 `FONT_SANS`、`FONT_MONO`;字幕標記 `parseRich()`、斷行 `layoutRich()`(`NO_START` 避頭字元)、`drawRichLines()`;3D 標籤 `projectPx()`、`drawLabel()`;儀表面板 `panelBox()`、`drawRF()`、`drawQ()`、`drawScope()`、`drawSpectrum()`、`drawWell()`、`drawSteps()`;整格疊圖 `OVS`、`drawOverlay()`、片頭片尾 `drawEndCard()`、重點整理 `drawRecap()`、`fitText()`、`drawWrapped()` | 面板文字與版面、片頭片尾 |
 | `story.js` | 放大模型的擺放 `DIO`、機殼內的擺放 `CABPOSE`、座標換算 `D()`;鏡頭關鍵格 `K()`、`KP()`、`HUDX`;每格狀態 `F` 與 `resetF()`;`labels()`、`caption()`;掃描游標 `warpScan()`、`scanKeys()`;章節 `CHAPTERS`、`TOTAL`、`chapterAt()`、`storyCamera()` | 字幕、標籤、運鏡、章節長度 |
-| `app.js` | 建立場景物件與 `ST`;`OrbitControls`;播放狀態 `APP`;`simStep()`、`storyUpdate()`、`storyStep()`、`seek()`;把狀態套到場景的 `applyFrame()`;`adjFov()`、`updateCamera()`、`renderFrame()`、主迴圈 `loop()`;播放列(`updateBar()`、`railTime()`、`jumpChapter()`、`setPlaying()`、`showHint()`);視角操作 `camFree()`、`nav`;鍵盤、主題、說明視窗;操作台 `LAB`、`labFill()`、`enterLab()`、`exitLab()`、`labStep()`;`resize()`;錄影 `record()`;到站人數 `loadVisits()`;`boot()`;除錯用的 `shot()`、`run()`、`window.lcq` | 互動流程、錄影、計數 |
+| `app.js` | 建立場景物件與 `ST`;`OrbitControls`;播放狀態 `APP`;`simStep()`、`storyUpdate()`、`storyStep()`、`seek()`;把狀態套到場景的 `applyFrame()`;`adjFov()`、`updateCamera()`、`renderFrame()`、主迴圈 `loop()`;播放列(`updateBar()`、`railTime()`、`jumpChapter()`、`setPlaying()`、`showHint()`);視角操作 `camFree()`、`nav`;鍵盤、主題、說明視窗;操作台 `LAB`、`labFill()`、`enterLab()`、`exitLab()`、`labStep()`;`resize()`;錄影 `record()` 與支援檢查 `canRecord()`;到站人數 `loadVisits()`;`boot()`;除錯用的 `shot()`、`run()`、`window.lcq` | 互動流程、錄影、計數 |
 
 ## 座標、尺度與模型
 
@@ -33,7 +33,7 @@
 
 ## 物理與數值
 
-- `PHYS`:r₀ 7.07 mm、z₀ 7.85 mm(March 1997),射頻 760 kHz、振幅 0 到 8500 V 零到峰值(LCQ Series Hardware Manual),共振射出點 q = 0.83(Wong & Cooks 1997),a = 0 的穩定邊界 q = 0.908,掃描速率每秒 5500 m/z 單位。
+- `PHYS`:r₀ 7.07 mm、z₀ 7.85 mm(March 1999,Encyclopedia of Spectroscopy and Spectrometry 的〈Ion Trap Mass Spectrometers〉,原文寫 LCQ 與 GCQ 的離子阱 r0 = 0.707 cm、z0 = 0.785 cm),射頻 760 kHz、振幅 0 到 8500 V 零到峰值(LCQ Series Hardware Manual),共振射出點 q = 0.83(Wong & Cooks 1997),a = 0 的穩定邊界 q = 0.908,掃描速率每秒 5500 m/z 單位。
 - q_z = 8eV / (m (r₀² + 2z₀²) Ω²),整理成 `qOf(V, mz) = V / (kV · mz)`,`kV` = 5.1175 V。**`kV` 是寫死的常數**,不會隨 r₀、z₀、射頻頻率自動重算;改這三個值時要自己重算 kV(用上面的數值與 1 Th = 1.66054×10⁻²⁷ kg / e,得 q = 0.19541 × V / (m/z))。
 - `vEjectOf(mz) = 0.83 × kV × mz`,每 m/z 約 4.2475 V:m/z 195.09 約 829 V、524.27 約 2227 V、1222 約 5190 V(字幕寫 830、2230、5190);8500 V 能射出的最大 m/z 約 2001,若等到 0.908 才排出只到約 1829。
 - β:`betaExact(q)` 以 a = 0 的連分數迭代(展開到 k = 10),`betaOf()` 用 0 到 0.908 之間 2048 格的查表內插,q ≥ 0.908 回傳 1。β(0.83) ≈ 0.736,對應的軸向振盪頻率 β × 760 / 2 ≈ 280 kHz,也就是端帽交流電壓的頻率(計算值,手冊沒有直接寫,字幕與標籤都註明)。MS/MS 活化時 β(0.25) ≈ 0.179,約 68 kHz。
@@ -104,7 +104,7 @@
 - `storyStep(dt)` 推進時間,跨章時呼叫 `enter(ST, true)`,再 `storyUpdate()`(`resetF()`、`ch.update()`、字幕)與 `simStep(dt)`。`simStep()` 讓所有模擬前進一步,`F.acquire` 為 true 時才把阱的事件加進質譜,最後重算 `ST.counts`(每種 m/z 還剩幾顆)。播到結尾自動暫停。
 - `seek(t)`:各模擬用固定種子重設(章號加 11、12、13、14),呼叫 `enter(ST, false)` 與 `prewarm`,再從章節開頭以 1/30 秒一步重算到 t。同一個時間點拖過去的畫面一定相同;連續播放到同一點可能略有不同(見上面 `enter` 的 `cont`)。章節越長、跳得越後面重算越久,最長的 `scan` 一章約 1260 步。
 - 播放列:拖曳或點擊時間軸跳到該點(操作台會先關掉),滑過顯示章名與時間;時間軸取得焦點時 ← → 切換章節。`jumpChapter(-1)` 在章節開頭 2 秒內回上一章,否則回到本章開頭。
-- 鍵盤(焦點在輸入元件或說明視窗時不處理):空白鍵播放或暫停(操作台中按會先離開操作台),播放中 ← → 切換章節,F 全螢幕。暫停時顯示提示「暫停中:拖曳或用方向鍵改變視角,按空白鍵繼續」。
+- 鍵盤(焦點在輸入元件或說明視窗時不處理):空白鍵播放或暫停(操作台中按會先離開操作台),播放中 ← → 切換章節,F 全螢幕。暫停時 `showHint()` 顯示提示「暫停中:拖曳或用方向鍵改變視角,按空白鍵繼續」3.2 秒。提示 `#hint` 在畫質選單下方(桌機 top 112 px、680 px 以下 102 px);它的 z-index 是 9,比 `#topnav` 的 11 低,放在 16 px 時會被分頁列整個蓋住(2026-10-13 以前就是這樣)。
 - 暫停後拖曳鏡頭會把 `APP.userCam` 設為 true,`updateCamera()` 改走使用者鏡頭分支;再播放時 `setPlaying(true)` 記下目前鏡頭,1.2 秒內接回動畫鏡頭。
 - 窄螢幕:`adjFov()` 在寬高比小於 1.6 時加大視角(上限 78°),保留 16:9 畫面的左右範圍;寬高比小於 1.15 時(`mobile()`)不做左右偏移,改成上下偏移,面板也改成滿寬。
 - 開頁:`boot()` 套主題、`resize()`,把程式裡所有中文字元收集起來預載 Noto Sans TC(400、500、700)與 IBM Plex Mono(400、500、600),最多等 7 秒,再 `seek(0)` 開始播放。網址有 `?paused` 或系統設定減少動態效果(`prefers-reduced-motion: reduce`)時停在第一格不自動播放。
@@ -129,11 +129,16 @@
 - `seek(from)` 後以固定的 1/fps 一步一步 `storyStep()`,每格把 3D 畫面和疊圖畫布畫到同一張畫布再編碼。編碼佇列超過 8 格就等 `dequeue` 事件;每 30 格用 `MessageChannel` 讓出一次執行緒(背景分頁的計時器會被節流,這樣切到別的分頁也會繼續錄)。
 - 完成後下載 `ion-trap-ms.mp4`;`finally` 還原顆粒、`resize()` 恢復使用者畫質,回到原本的時間點並暫停,結果留在 `window.__lastRec`。
 - 從主控台可以指定範圍與規格:`lcq.record({ from, to, fps, width, height, bitrate, upload })`;`upload` 是作者本機伺服器接收影片的網址,正式網站用不到。
-- 限制:按鈕沒有先檢查瀏覽器有沒有 `VideoEncoder`,在不支援 WebCodecs 的瀏覽器按下去會顯示「錄製失敗」。全長 299 秒的錄影在作者電腦上約需一到幾分鐘。
+- 按鈕預設隱藏。開頁時 `canRecord()` 先確認有 `VideoEncoder` 與 `VideoFrame`,再用 `VideoEncoder.isConfigSupported()` 問 `avc1.640028`、1920×1080、7 Mbps、30 fps 能不能編碼;可以才顯示「錄成影片」,不行就顯示說明視窗裡的 `#recNo`(「這個瀏覽器不能錄影,請改用電腦版的 Chrome 或 Edge」)。改 `record()` 的預設編碼設定時,`canRecord()` 要一起改。
+- 全長 299 秒的錄影在作者電腦上約需一到幾分鐘。
 
 ## 到站人數
 
-`loadVisits()` 用 Abacus 的 `tung-beauregard-github-io/instrument-principles` 計數,和入口共用 `lcq-visited` 這個瀏覽器記錄:網域是 `*.github.io` 而且這個瀏覽器沒記過時用 `hit`(加一並記下),其他情況只 `get`;6 秒逾時。成功才顯示 `#visits`。**和入口不同:** 服務失敗時這一頁把計數藏起來,入口(`assets/app.js`)與 `AGENTS.md` 第 6 節的規定是顯示「—」。這個差異尚未修改,記在 `docs/HANDOFF.md` 的缺口裡。
+`loadVisits()` 用 Abacus 的 `tung-beauregard-github-io/instrument-principles` 計數,和入口(`../assets/app.js`)用同一套規則(2026-10-13 對齊):
+
+- 只有網址是 `tung-beauregard.github.io` 而且路徑在 `/instrument-principles/` 底下、這個瀏覽器可以寫入 `localStorage`、又沒有 `lcq-visited` 記錄時才用 `hit`(加一,成功後記下 `lcq-visited`);本機預覽、別的網域、儲存空間不能用時都只 `get`。
+- 回應不是 200、數值不是非負整數、連不上或 6 秒逾時,都顯示「—」,`title` 改成「到站人數暫時無法載入」。不論成功或失敗,結束時才把 `#visits` 顯示出來,載入中不會先閃一個 0。
+- 改這段時,入口的 `loadVisits()` 要一起看,兩邊共用同一個計數與瀏覽器記錄。
 
 ## 網址參數與除錯
 
@@ -164,24 +169,27 @@
 - 加熱匣的材質設了 `polygonOffset`,避免和加熱塊的切面重疊閃爍。
 - 錄影等 `dequeue` 事件、用 `MessageChannel` 讓出執行緒,不用 `setTimeout`,因為背景分頁的計時器會被節流。
 
-## 已知問題(尚未修改)
+## 2026-10-13:修正的問題
 
-- 畫質選單看不到:`../assets/render-quality.css` 的 `#sitenav > .quality-control` 把選單絕對定位在分頁列下方,但 2026-10-07 起 `#sitenav` 設了 `overflow-x:auto`(手機上要能橫向捲動),選單落在分頁列的捲動範圍外被裁掉。2026-10-13 在 880 px 寬實測:分頁列高 37.5 px,選單在 top 60.5 px,`#sitenav` 的 `scrollHeight` 86 大於 `clientHeight` 36,畫面上看不到。修法要另外決定選單放哪裡(例如分頁列外另設一個固定位置的容器)。
-- 到站人數在服務失敗時隱藏,不是顯示「—」(見上面「到站人數」)。
-- 錄影按鈕沒有先檢查 WebCodecs(見上面「錄影」)。
+- 畫質選單看不到:選單原本掛在 `#sitenav` 裡,靠 `../assets/render-quality.css` 的 `#sitenav > .quality-control` 絕對定位到分頁列下方;2026-10-07 分頁列加了 `overflow-x:auto`(手機上要能橫向捲動)之後,選單落在捲動範圍外被裁掉(880 px 寬實測 `scrollHeight` 86、`clientHeight` 36)。改成上面說的 `#topnav` 與 `#qhost`,選單不在分頁列裡面,不會再被裁掉;共用的 `render-quality.css` 沒有改。
+- 「暫停中」提示被分頁列蓋住:分頁列變寬之後,置中、top 16 px 的提示落在分頁列底下(1280 px 寬實測完全重疊)。移到畫質選單下方。
+- 到站人數:服務失敗時改成顯示「—」,加一的條件改成和入口相同(見上面「到站人數」)。
+- 錄影按鈕:先確認瀏覽器能編碼才顯示(見上面「錄影」)。
+- 離子阱尺寸的出處:說明視窗、片尾字卡與程式註解原本寫 March (1997),改成讀得到原文的 March (1999)。數值 r₀ 7.07 mm、z₀ 7.85 mm 沒有變。
 
 ## 修改後要檢查
 
 - 共用命令:`node scripts/check-site.mjs`、`node scripts/check-render-quality.mjs`(含這一頁 module 的語法)、`node scripts/check-camera-nav.mjs`。
 - HTTP 預覽打開 `lcq/`:自動播放、console 沒有錯誤;拖時間軸跳到每一章,畫面與字幕對得上;暫停後拖曳、方向鍵、R 都正常,再播放鏡頭會接回去。
 - 「自己操作」:換樣品、重新裝填、自動掃描(質譜依序出峰)、開始掃描後取消勾選端帽交流電壓(峰偏大約 9%、變寬),離開後回到原本的時間點。
-- 深淺色切換、390 px 寬的播放列與分頁列(可以橫向捲動)、畫質選單。
+- 深淺色切換、390 px 寬的播放列與分頁列(可以橫向捲動);畫質選單在分頁列右端下方看得到、切換有效;暫停時提示出現在選單下方,沒有被擋住。
+- 到站人數:正常時是數字;在主控台把 `fetch` 換成會失敗的函式再呼叫一次 `loadVisits` 的同一段程式,應顯示「—」。錄影按鈕在支援的瀏覽器出現,沒有 `VideoEncoder` 時不出現、改顯示說明。
 - 動到錄影或時間軸時,用主控台 `lcq.record({ from: 0, to: 10 })` 錄一小段確認檔案能播放。
 - 詳細步驟與預期結果見 `../docs/VALIDATION.md` 的「lcq:離子阱質譜(動畫講解)」。
 
 ## 2026-10-05:即時繪圖效能
 
 - `loop()` 只在前景且非錄影時執行,先通過共用 `quality.shouldRender()` 的 60 FPS 上限,再用實際時間差推進原本動畫。
-- `resize()` 套用 `../assets/render-quality.js` 的畫質、解析度預算(每格最多約 340 萬像素)與 AO。`renderFrame()` 保留相機、粒子尺寸、composer 與文字疊圖;畫質控制在 `#sitenav` 下方,不擠壓手機播放列。
+- `resize()` 套用 `../assets/render-quality.js` 的畫質、解析度預算(每格最多約 340 萬像素)與 AO。`renderFrame()` 保留相機、粒子尺寸、composer 與文字疊圖;畫質控制在分頁列下方,不擠壓手機播放列(2026-10-13 起掛在 `#qhost`,見上方「修正的問題」)。
 - 自動模式取代舊的 90 格單向降畫質邏輯,避免視窗 resize 把已降低的畫質重設。
 - `record()` 強制完整後製,使用原有固定時間步與尺寸;`finally` 的 `resize()` 恢復使用者畫質。錄影不經即時節流器。
