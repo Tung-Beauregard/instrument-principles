@@ -30,6 +30,13 @@
 
 ## 更新紀錄
 
+### 2026-10-13：推送與部署確認（動畫講解的修正）
+
+- 提交 `303095a`，以 fast-forward 推送到 `main`（基準 `71b29a4`，推送前 `git fetch` 確認遠端沒有新提交）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上的 `lcq/index.html`、`lcq/MAINTENANCE.md`、`INSTRUMENTS.md` 和提交的版本完全相同。
+- 通過：以 Chromium 開正式網址的 `lcq/`：畫質選單在分頁列右端下方，暫停提示在選單下方，到站人數顯示數字，「錄成影片」按鈕出現，說明視窗的出處是 March (1999)，console 沒有錯誤。
+- 未執行：Safari、Firefox 與真實觸控裝置。
+
 ### 2026-10-13：動畫講解修正畫質選單、暫停提示、到站人數、錄影按鈕與離子阱尺寸的出處
 
 - 執行者：Claude，在作者電腦的 `main`（基準 `71b29a4`）。使用者要求把上一段交接列出的問題都修掉。
