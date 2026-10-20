@@ -32,6 +32,13 @@
 
 ## 更新紀錄
 
+### 2026-10-20：推送與部署確認（動畫講解改版與分享預覽）
+
+- 提交 `4b5ece4`，以 fast-forward 推送到 `main`（基準 `289acae`，推送前 `git fetch` 確認遠端沒有新提交）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上的入口、八個教材頁、`lcq/MAINTENANCE.md`、`INSTRUMENTS.md`、`docs/VALIDATION.md`、`scripts/check-site.mjs` 與九張預覽圖都和提交的版本完全相同（比對 SHA-256）。
+- 通過：以 Chromium 開正式網址 `lcq/?paused#adducts`：停在「加成離子與團簇離子」的 04:08 / 06:34，16 章、文字稿 16 項，「錄成影片」按鈕出現，到站人數顯示數字；`og:image` 回 200、`image/jpeg`；console 沒有錯誤。
+- 未執行：社群網站上的實際預覽、Safari、Firefox 與真實觸控裝置。
+
 ### 2026-10-20：動畫講解加三章、章節連結、字幕文字稿與操作台的新功能；各頁加分享預覽圖
 
 - 執行者：Claude，在作者電腦的 `main`（基準 `289acae`，開工前 `git fetch` 確認遠端沒有新提交）。使用者要求做上一段提出的 1 到 8 項（章節連結、字幕文字稿、分享預覽圖、重錄兩支影片、負離子與加成離子、操作台的 MS/MS 與 MS³、同位素峰與電荷數、空間電荷與自動增益控制），另加團簇離子。
