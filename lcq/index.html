@@ -4,7 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>離子阱質譜原理</title>
-<meta name="description" content="離子阱質譜原理的互動 3D 解說,以 LCQ Deca XP 為例:從電灑游離、進入真空、離子導引到離子阱掃描,說明儀器怎麼分辨不同質荷比的離子。">
+<meta name="description" content="離子阱質譜原理的互動 3D 解說,以 LCQ Deca XP 為例:從電灑游離、進入真空、離子導引到離子阱掃描,說明儀器怎麼分辨不同質荷比的離子,再看加成離子、同位素峰、負離子模式與串聯質譜。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="離子阱質譜原理">
+<meta property="og:description" content="離子阱質譜原理的互動 3D 解說,以 LCQ Deca XP 為例:從電灑游離、進入真空、離子導引到離子阱掃描,說明儀器怎麼分辨不同質荷比的離子,再看加成離子、同位素峰、負離子模式與串聯質譜。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/lcq/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/lcq.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="離子阱質譜原理動畫的片頭:LCQ Deca XP 機身與標題">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
@@ -105,6 +115,15 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!importa
 #lab .btns .main{background:var(--accent);color:var(--accent-ink);border-color:transparent}
 #lab .hint{margin:12px 0 0;color:var(--ink2);font-size:12.5px;line-height:1.6}
 #lab .read{margin-top:10px;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink2)}
+#lab .pair{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+#lab .pair button{height:32px;border-radius:8px;border:1px solid var(--line);background:var(--panel-solid);cursor:pointer;font-size:13.5px}
+#lab .pair button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+#lab .pair button:disabled,#lab .go:disabled{opacity:.45;cursor:not-allowed}
+#lab details{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+#lab summary{cursor:pointer;font-weight:600}
+#lab details .hint{margin-top:8px}
+#lab .go{width:100%;height:34px;margin-top:10px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 #about{max-width:min(640px,calc(100% - 32px));max-height:calc(100% - 40px);padding:0;border:1px solid var(--line);border-radius:16px;
   background:var(--panel-solid);color:var(--ink);box-shadow:var(--shadow)}
@@ -115,6 +134,14 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!importa
 #about p{margin:0 0 10px}
 #about ul{margin:0 0 10px;padding-left:20px}
 #about code{font-family:var(--mono);font-size:13px}
+#about details summary{cursor:pointer;color:var(--accent);font-weight:600}
+#about .tnote{margin:8px 0 0;color:var(--ink2);font-size:13px}
+#transcriptList{margin:8px 0 0;padding:0;list-style:none}
+#transcriptList li{margin:0 0 12px}
+#transcriptList a{font-weight:600;color:var(--accent);text-decoration:none}
+#transcriptList a:hover,#transcriptList a:focus-visible{text-decoration:underline}
+#transcriptList .tt{margin-left:8px;font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
+#transcriptList p{margin:4px 0 0;font-size:13.5px;line-height:1.7}
 #about .foot{display:flex;gap:8px;justify-content:flex-end;padding:12px 24px 18px;flex-wrap:wrap}
 #about .foot button{height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--line);background:transparent;cursor:pointer}
 #about .foot .main{background:var(--accent);color:var(--accent-ink);border-color:transparent}
@@ -178,16 +205,19 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!importa
 </div>
 <div id="tip"></div>
 <div id="hint"></div>
+<div id="capLive" class="sr-only" aria-live="polite"></div>
 
 <aside id="lab" hidden aria-label="離子阱操作台">
   <h2>離子阱操作台</h2>
   <p class="sub">調高環形電極電壓的振幅,看哪一種離子先對上端帽的節拍、先被排出。</p>
   <label>樣品
     <select id="labSample">
-      <option value="cal">校正液:咖啡因 195、MRFA 524、Ultramark 1222</option>
-      <option value="np">天然物:檜木醇 165、兒茶素 291、槲皮素 303、扁柏脂素 355、蘆丁 611</option>
+      <option value="cal">校正液:咖啡因、MRFA、Ultramark</option>
+      <option value="np">天然物:檜木醇、兒茶素、槲皮素、扁柏脂素、蘆丁</option>
+      <option value="rutin">蘆丁標準品:看加成離子與團簇離子</option>
     </select>
   </label>
+  <div class="pair" role="group" aria-label="離子模式"><button id="labPos" aria-pressed="true">正離子</button><button id="labNeg" aria-pressed="false">負離子</button></div>
   <div class="row"><span>環形電極電壓振幅</span><output id="labVOut">500 V</output></div>
   <input type="range" id="labV" min="0" max="8500" step="1" value="500" aria-label="環形電極電壓振幅">
   <div class="scale"><span>0 V</span><span>8500 V</span></div>
@@ -196,28 +226,61 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!importa
     <button id="labInject">重新裝填</button>
     <button id="labScan" class="main">自動掃描</button>
   </div>
+  <details>
+    <summary>串聯質譜(MS/MS、MS³)</summary>
+    <label>挑一種離子撞碎
+      <select id="labPrec"></select>
+    </label>
+    <div class="pair" role="group" aria-label="撞碎幾次"><button id="labMs2" aria-pressed="true">MS²:撞一次</button><button id="labMs3" aria-pressed="false">MS³:再撞碎片</button></div>
+    <button id="labMsmsGo" class="go">開始</button>
+    <p class="hint">先把其他離子趕出去,只留下挑的那一種;再照它的振盪頻率輕推,撞氦氣碎裂;最後掃描排出碎片。MS³ 是從碎片裡再挑一種撞碎。</p>
+  </details>
+  <details>
+    <summary>放大掃描(看同位素峰)</summary>
+    <label>離子
+      <select id="labZoomIon"></select>
+    </label>
+    <button id="labZoomGo" class="go">開始</button>
+    <p class="hint">把掃描放慢、只掃一小段,峰變窄,看得出相鄰的同位素峰。間距 1 是帶一個電荷,0.5 是兩個。</p>
+  </details>
+  <details>
+    <summary>裝填量與空間電荷</summary>
+    <div class="row"><span>樣品濃度</span><output id="labConcOut">1×</output></div>
+    <input type="range" id="labConc" min="-2" max="3" step="1" value="0" aria-label="樣品濃度">
+    <div class="scale"><span>0.25×</span><span>8×</span></div>
+    <label class="chk"><input type="checkbox" id="labAGC" checked>自動增益控制</label>
+    <p class="hint">自動增益控制先快速試掃一次,再決定要收集多久,讓阱裡的離子數維持在目標值。關掉時濃度越高、裝進去的離子越多;離子太擠會互相推擠,峰的位置偏移、峰也變寬(示意)。</p>
+  </details>
   <div class="read" id="labRead"></div>
-  <p class="hint">關掉端帽交流電壓,離子要等到 q = 0.908 留不住時才被甩出;儀器仍照 0.83 換算,算出的質荷比會偏大約 9%,峰也比較寬。</p>
+  <p class="hint">關掉端帽交流電壓,離子要等到 q = 0.908 留不住時才被甩出;儀器仍照 0.83 換算,算出的質荷比會偏大約 9%,峰也比較寬。按「自動掃描」會先把交流電壓打勾,要看關掉的效果,開始掃描後再取消。</p>
   <p class="hint">拖曳旋轉視角,右鍵平移,滾輪縮放;方向鍵或 WASD 移動,R 回到預設視角。</p>
 </aside>
 
 <dialog id="about">
   <div class="in">
     <h2>關於這段動畫</h2>
-    <p>這是離子阱質譜原理的解說動畫,以 Thermo Finnigan LCQ Deca XP 為例。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比(質量除以電荷,m/z)把離子分開。</p>
+    <p>這是離子阱質譜原理的解說動畫,以 Thermo Finnigan LCQ Deca XP 為例。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比(質量除以電荷,m/z)把離子分開,再看真實質譜上常見的加成離子、團簇離子、同位素峰與負離子模式,最後是串聯質譜。</p>
     <p>分頁列的「拆開探索」是同一台儀器的另一種看法:把機身展開成一排零件,點零件看說明,旁邊同時畫出穩定圖和質譜。</p>
     <h3>操作</h3>
     <ul>
       <li>空白鍵播放或暫停;播放中左右方向鍵切換章節,時間軸取得焦點時也可以用方向鍵切換。</li>
       <li>暫停或「自己操作」時可以改變視角:滑鼠拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;觸控板雙指滑動平移、兩指捏合縮放;觸控螢幕單指旋轉、雙指平移與縮放。</li>
       <li>鍵盤:方向鍵或 W A S D 移動(左右平移、上下前後),Q E 轉向,+ − 縮放,按住 Shift 加快;R 回到動畫的鏡頭(操作台則回到預設視角)。</li>
-      <li>「自己操作」會開啟離子阱操作台,可以自己調環形電極的電壓振幅、做掃描。</li>
+      <li>「自己操作」會開啟離子阱操作台,可以自己調環形電極的電壓振幅、做掃描,也可以切換正負離子、做串聯質譜、放大掃描看同位素峰,或改變裝填量看空間電荷的影響。</li>
+      <li>網址會跟著目前的章節改變(例如 <code>#scan</code>),複製網址分享,對方打開就從那一章開始;也可以在網址後面加 <code>?t=3:00</code> 指定時間,<code>#lab</code> 直接開操作台。</li>
     </ul>
+    <h3>字幕文字稿</h3>
+    <details id="transcript">
+      <summary>展開每一章的字幕</summary>
+      <p class="tnote">點章名可以從那一章開始播放。</p>
+      <ol id="transcriptList"></ol>
+    </details>
     <h3>數值與示意</h3>
     <p>射頻頻率 760 kHz、振幅 0 至 8500 V(零到峰值)、掃描速率每秒約 5,500 個 m/z 單位、氦氣約 10⁻³ Torr、轉換二次發射電極 ±15 kV、倍增器增益約 3×10⁵、各區氣壓等數值取自 Finnigan LCQ Series Hardware Manual(LCQ Deca XP MAX)與 LCQ Deca Hardware Manual。離子阱尺寸 r₀ = 7.07 mm、z₀ = 7.85 mm 取自 March(1999,Encyclopedia of Spectroscopy and Spectrometry)對 LCQ 離子阱的描述;排出點 q = 0.83 取自 Wong 與 Cooks(1997)。約 280 kHz 的端帽交流頻率與每 m/z 約 4.25 V 是依上述數值計算的,手冊沒有直接寫;實機的對應關係由質量校正決定。</p>
     <p>機身尺寸與 MSⁿ 取自 LCQ Deca XP Plus 規格表;噴針約 4.5 kV、毛細管最高 350 °C 取自 Thermo 應用報告 315;活化 q = 0.25、30 ms 取自已發表的 Deca XP Plus 方法。蘆丁的碎片是黃酮苷常見的裂解方式,不是這台儀器的實測。截取錐錯開約 1.5 mm 是從零件標示推定的。</p>
     <p>為什麼在 q = 0.83 就用共振推出,而不等到留不住的邊界 0.908:這樣推出的峰比較窄;而且在 0.908 才排出的話,8500 V 只掃得到約 m/z 1830,用 0.83 才到得了 2000。</p>
     <p>毛細管長度、桿子粗細、孔徑、偵測器尺寸等手冊沒有寫的部分是示意。離子源畫成探針由上方噴入;XP Plus 的正交離子源是從側面水平噴入,XP MAX 的 Ion Max 離子源約 60 度,原理相同。液滴、離子雲和振盪幅度都放大過,時間也放慢了很多倍,才看得到。</p>
+    <p>加成離子與團簇離子的 m/z 依 Fiehn 實驗室整理的 ESI 加成離子表(根據 Huang 等,1999)計算,蘆丁的分子量 610.1534 與緩激肽的分子量取自 ChEBI;峰的高低是示意。同位素峰的高度依 IUPAC 的同位素豐度計算。蘆丁負離子 609 的碎片 301 與 300 都見於已發表的 LC-MS/MS 資料,哪一個高要看儀器與碰撞能量,這裡各畫一半;扁柏脂素沒有酸性的 OH,負離子模式畫得很弱。放大掃描的用途、自動增益控制與各種掃描的峰寬(一般約 0.45、放大掃描約 0.3)取自 LCQ Fleet 規格表,那是同系列較新的機型;空間電荷只畫出偏移與變寬的方向,數值是示意。偵測負離子時轉換電極改加正電壓、撞出正離子,依偵測器廠商的技術說明。</p>
     <h3>錄成影片</h3>
     <p>可以把整段動畫錄成 1920×1080 的 MP4,沿用目前的深色或淺色模式。錄製時畫面會逐格算圖,通常一到幾分鐘。</p>
     <p id="recNo" hidden>這個瀏覽器不能錄影,請改用電腦版的 Chrome 或 Edge。</p>
@@ -312,20 +375,89 @@ function betaOf(q) {
 const BETA_EJECT = betaOf(PHYS.qEject);
 
 // ---------- samples and colour by m/z ----------
+// label = ion notation shown on spectrum peaks, f = elemental formula of the ion (for isotope patterns).
+// m/z values are monoisotopic; relative abundances (ab) are illustrative.
 const SAMPLES = {
   cal: [
-    { name: '咖啡因', mz: 195.09, ab: 1.0 },
-    { name: 'MRFA', mz: 524.27, ab: 0.8 },
-    { name: 'Ultramark', mz: 1222.0, ab: 0.7 },
+    { name: '咖啡因', label: '[M+H]⁺', mz: 195.09, ab: 1.0, f: 'C8H11N4O2' },
+    { name: 'MRFA', label: '[M+H]⁺', mz: 524.26, ab: 0.8, f: 'C23H38N7O5S' },
+    { name: 'Ultramark', label: '', mz: 1222.0, ab: 0.7 },
   ],
   np: [
-    { name: '檜木醇', mz: 165.09, ab: 0.55 },
-    { name: '兒茶素', mz: 291.09, ab: 0.7 },
-    { name: '槲皮素', mz: 303.05, ab: 1.0 },
-    { name: '扁柏脂素', mz: 355.12, ab: 0.45 },
-    { name: '蘆丁', mz: 611.16, ab: 0.85 },
+    { name: '檜木醇', label: '[M+H]⁺', mz: 165.09, ab: 0.55, f: 'C10H13O2' },
+    { name: '兒茶素', label: '[M+H]⁺', mz: 291.09, ab: 0.7, f: 'C15H15O6' },
+    { name: '槲皮素', label: '[M+H]⁺', mz: 303.05, ab: 1.0, f: 'C15H11O7' },
+    { name: '扁柏脂素', label: '[M+H]⁺', mz: 355.12, ab: 0.45, f: 'C20H19O6' },
+    { name: '蘆丁', label: '[M+H]⁺', mz: 611.16, ab: 0.85, f: 'C27H31O16' },
+  ],
+  // rutin standard (M = 610.1534): adduct ions and non-covalent clusters (dimers)
+  rutin: [
+    { name: '蘆丁', label: '[M+H]⁺', mz: 611.16, ab: 1.0, f: 'C27H31O16' },
+    { name: '蘆丁', label: '[M+Na]⁺', mz: 633.14, ab: 0.55, f: 'C27H30O16Na' },
+    { name: '蘆丁', label: '[M+K]⁺', mz: 649.12, ab: 0.25, f: 'C27H30O16K' },
+    { name: '蘆丁', label: '[2M+H]⁺', mz: 1221.31, ab: 0.3, f: 'C54H61O32' },
+    { name: '蘆丁', label: '[2M+Na]⁺', mz: 1243.30, ab: 0.4, f: 'C54H60O32Na' },
   ],
 };
+// negative-ion mode: [M-H]- and its adducts; the calibration solution is only shown in positive mode
+const SAMPLES_NEG = {
+  np: [
+    { name: '檜木醇', label: '[M−H]⁻', mz: 163.08, ab: 0.6, f: 'C10H11O2' },
+    { name: '兒茶素', label: '[M−H]⁻', mz: 289.07, ab: 0.75, f: 'C15H13O6' },
+    { name: '槲皮素', label: '[M−H]⁻', mz: 301.04, ab: 1.0, f: 'C15H9O7' },
+    { name: '扁柏脂素', label: '[M−H]⁻', mz: 353.10, ab: 0.04, f: 'C20H17O6' }, // no acidic H: hardly any [M-H]-
+    { name: '蘆丁', label: '[M−H]⁻', mz: 609.15, ab: 0.9, f: 'C27H29O16' },
+  ],
+  rutin: [
+    { name: '蘆丁', label: '[M−H]⁻', mz: 609.15, ab: 1.0, f: 'C27H29O16' },
+    { name: '蘆丁', label: '[M+HCOO]⁻', mz: 655.15, ab: 0.35, f: 'C28H31O18' },
+    { name: '蘆丁', label: '[2M−H]⁻', mz: 1219.30, ab: 0.3, f: 'C54H59O32' },
+  ],
+};
+// MS/MS products by precursor m/z (p = share of precursors giving that product, illustrative; label = neutral loss)
+const PRODUCTS = {
+  '195.09': [{ mz: 138.07, p: 1, label: '−57' }],                                    // caffeine: loss of CH3NCO
+  '611.16': [{ mz: 465.10, p: 0.55, label: '−146' }, { mz: 303.05, p: 0.45, label: '−308' }], // rutin: rhamnose, rutinose
+  '465.10': [{ mz: 303.05, p: 1, label: '−162' }],                                   // MS3: glucose
+  // rutin [M-H]-: aglycone 301 and its radical form 300; which is taller depends on the instrument and collision energy
+  '609.15': [{ mz: 300.03, p: 0.5, label: '−309' }, { mz: 301.04, p: 0.5, label: '−308' }],
+};
+const productsOf = (mz) => PRODUCTS[mz.toFixed(2)] || null;
+function pickProduct(mz, r) {
+  const list = productsOf(mz);
+  let u = r();
+  for (const p of list) { u -= p.p; if (u <= 0) return p; }
+  return list[list.length - 1];
+}
+// a doubly charged example for the isotope spacing (bradykinin [M+2H]2+, M = 1059.5614)
+const BRADYKININ = { name: '緩激肽', label: '[M+2H]²⁺', mz: 530.79, f: 'C50H75N15O11', z: 2 };
+// isotope pattern from IUPAC abundances; returns [{d, ab}] (d = mass offset in u from the monoisotopic peak, tallest = 1)
+const ISO = {
+  C: [[0, 0.9893], [1.003355, 0.0107]], H: [[0, 0.999885], [1.006277, 0.000115]],
+  N: [[0, 0.99636], [0.997035, 0.00364]], O: [[0, 0.99757], [1.004217, 0.00038], [2.004245, 0.00205]],
+  S: [[0, 0.9499], [0.999388, 0.0075], [1.995796, 0.0425], [3.99501, 0.0001]], Na: [[0, 1]],
+  K: [[0, 0.932581], [0.999, 0.000117], [1.998117, 0.067302]],
+};
+function isotopePattern(f, nBins = 6) {
+  let bins = [{ ab: 1, ms: 0 }];
+  for (const [, el, cnt] of f.matchAll(/([A-Z][a-z]?)(\d*)/g)) {
+    const iso = ISO[el];
+    for (let k = 0; k < (+cnt || 1); k++) {
+      const next = Array.from({ length: Math.min(nBins, bins.length + 3) }, () => ({ ab: 0, ms: 0 }));
+      bins.forEach((b, i) => {
+        for (const [d, a] of iso) {
+          const j = i + Math.round(d);
+          if (j < next.length) { next[j].ab += a * b.ab; next[j].ms += a * (b.ms + b.ab * d); }
+        }
+      });
+      bins = next;
+    }
+  }
+  const top = Math.max(...bins.map((b) => b.ab));
+  return bins.filter((b) => b.ab / top > 0.004).map((b) => ({ d: b.ms / b.ab, ab: b.ab / top }));
+}
+// one species per isotope peak of an ion (for the zoom scan)
+const isotopeSpecies = (ion, z = 1) => isotopePattern(ion.f).map((p, k) => ({ name: ion.name, label: k ? '' : ion.label, mz: ion.mz + p.d / z, ab: p.ab }));
 const MZ_STOPS = [[0, '#ff5470'], [0.24, '#ff8b3d'], [0.44, '#ffd447'], [0.62, '#7fdc7a'], [0.8, '#3fc3ff'], [1, '#a98bff']]
   .map(([t, h]) => [t, new THREE.Color(h)]);
 const mzT = (mz) => clamp((Math.log10(mz) - 2) / (Math.log10(2000) - 2), 0, 1);
@@ -1065,13 +1197,17 @@ const COL = {
   ion: new THREE.Color('#7fe0ff'), neutral: new THREE.Color('#8b96a3'), gas: new THREE.Color('#9aa6b4'),
   he: new THREE.Color('#a9d4ff'), electron: new THREE.Color('#cfe8ff'), sheath: new THREE.Color('#b8dcff'),
   drop: new THREE.Color('#d5ebff'), dropHot: new THREE.Color('#79c8ff'),
+  posIon: new THREE.Color('#ffc27a'), // secondary positive ions from the conversion dynode in negative mode
 };
 
 // ---------- current sample ----------
-const sampleState = { key: 'cal', list: SAMPLES.cal, cols: [] };
-function setSample(key) {
-  sampleState.key = key;
-  sampleState.list = SAMPLES[key];
+// key: a SAMPLES name, or an array of species (zoom scan); pol: '+' or '-'
+const sampleState = { key: 'cal', pol: '+', list: SAMPLES.cal, cols: [] };
+function setSample(key, pol = '+') {
+  const custom = Array.isArray(key);
+  sampleState.key = custom ? 'custom' : key;
+  sampleState.pol = pol;
+  sampleState.list = custom ? key : (pol === '-' ? SAMPLES_NEG[key] : SAMPLES[key]);
   sampleState.cols = sampleState.list.map((s) => colorForMz(s.mz));
 }
 setSample('cal');
@@ -1330,6 +1466,10 @@ class TrapSim {
     this.t = 0; this.V = 500; this.ac = 0; this.events = []; this.pulses = [];
     this.excite = null; // {sp, q} resonance excitation for CID
     this.tracer = [];   // per species: recent axial positions for the oscilloscope
+    this.res = 0.19;          // spread of the recorded m/z: FWHM about 0.45, like the LCQ Fleet spec at 5,000 Da/s; the zoom scan narrows it
+    this.wRes = TRAP.wRes;    // resonance width; the zoom scan narrows it so close isotopes leave one by one
+    this.sc = 0;              // overfill beyond the target (0 = at the target): space-charge shift and broadening
+    this.secCol = null;       // colour of the secondary particles (positive ions in negative mode)
   }
   // put a cooled cloud in the trap at once
   fill(perSpecies = 26, weights = null) {
@@ -1339,15 +1479,18 @@ class TrapSim {
       for (let k = 0; k < n; k++) this.addIon(i, false);
     });
   }
-  addIon(sp, injected = true, mzOverride = null) {
+  addIon(sp, injected = true, mzOverride = null, label = null) {
     const r = this.r;
     const ion = {
-      sp, mz: mzOverride ?? sampleState.list[sp].mz, ph: r() * 6.283,
-      A: injected ? 7.2 : 1.3 + r() * 0.6, Ath: 1.2 + r() * 0.7, th: injected ? Math.PI : r() * 6.283,
+      sp, mz: mzOverride ?? sampleState.list[sp].mz, label: label ?? (mzOverride == null ? sampleState.list[sp].label || '' : ''), ph: r() * 6.283,
+      A: injected ? 7.2 : 1.3 + r() * 0.6, Ath: (1.2 + r() * 0.7) * (1 + 0.15 * this.sc), th: injected ? Math.PI : r() * 6.283,
       Ar1: injected ? 0.6 : 0.35 + r() * 0.35, Ar2: 0.35 + r() * 0.35, thr1: r() * 6.283, thr2: r() * 6.283,
       x: 0, y: 0, z: 0, state: 'trap', trail: [], col: null, born: this.t,
     };
     ion.col = colorForMz(ion.mz).clone();
+    // which end cap this ion leaves through, half and half (taken from a random value already drawn, so the sequence is unchanged).
+    // Using the sign of z instead lets ions of one m/z lock to the RF beat and all leave on the same side.
+    ion.side = Math.round(ion.Ath * 1e4) & 1 ? 1 : -1;
     if (injected) ion.ph = 0;
     this.ions.push(ion);
     return ion;
@@ -1375,7 +1518,7 @@ class TrapSim {
         o.Ar1 += -TRAP.gammaHe * 0.8 * (o.Ar1 - 0.45) * dt;
         if (acOn) {
           const d = (b - BETA_EJECT) / BETA_EJECT;
-          o.A += TRAP.gain * this.ac * dt / (1 + (d / TRAP.wRes) ** 2);
+          o.A += TRAP.gain * this.ac * dt / (1 + (d / this.wRes) ** 2);
         }
         if (this.excite && Math.abs(o.mz - this.excite.mz) < 1.5) {
           const bt = betaOf(this.excite.q), d = (b - bt) / bt;
@@ -1386,18 +1529,25 @@ class TrapSim {
       const z = o.A * Math.cos(o.th + o.ph) * (1 - 0.5 * Math.min(q, 0.95) * Math.cos(Phi));
       const yr = o.Ar1 * Math.cos(o.thr1) * (1 + 0.25 * Math.min(q, 0.95) * Math.cos(Phi));
       const zr = o.Ar2 * Math.sin(o.thr2) * (1 + 0.25 * Math.min(q, 0.95) * Math.cos(Phi));
-      o.x = IP.trapX + z; o.y = yr; o.z = zr;
+      // on the far side the ion turns back at the end cap; it leaves on its own side half a cycle later.
+      // Ions thrown out by the isolation waveform (kick) leave through whichever end cap they reach first:
+      // heavy ions swing slowly and would otherwise outlast the isolation step.
+      const side = o.kick ? Math.sign(z) || 1 : o.side;
+      o.x = IP.trapX + (Math.sign(z) === side ? z : clamp(z, -TRAP.zEject, TRAP.zEject)); o.y = yr; o.z = zr;
       o.trail.push(o.x, o.y, o.z);
       if (o.trail.length > 3 * 22) o.trail.splice(0, 3);
-      if (Math.abs(z) > TRAP.zEject) {
+      if (Math.abs(z) > TRAP.zEject && Math.sign(z) === side) {
         this.ions.splice(i, 1);
-        const dir = Math.sign(z), qe = qOf(this.V, o.mz), edge = this.labMap && qe > 0.89;
-        this.flights.push({ ion: o, dir, t0: t, x0: o.x, y0: o.y, z0: o.z, V: this.V, mzMeas: edge ? this.V / (PHYS.kV * PHYS.qEject) : o.mz, wide: edge });
+        const dir = side, qe = qOf(this.V, o.mz), edge = this.labMap && qe > 0.89;
+        // too many ions: their charge weakens the trapping field, they leave late (higher apparent m/z) and spread (illustrative)
+        const shift = 0.0004 * o.mz * this.sc;
+        this.flights.push({ ion: o, dir, t0: t, x0: o.x, y0: o.y, z0: o.z, V: this.V, mzMeas: (edge ? this.V / (PHYS.kV * PHYS.qEject) : o.mz) + shift,
+          wide: edge, spread: this.res * (1 + 0.5 * this.sc) });
       }
       if (o.cid && o.heat > o.cid.need) {
         // dissociation: precursor replaced by its product ions
         this.ions.splice(i, 1);
-        for (const pr of o.cid.products) if (r() < pr.p) { const n = this.addIon(o.sp, false, pr.mz); n.A = 2.5; n.x = o.x; }
+        for (const pr of o.cid.products) if (r() < pr.p) { const n = this.addIon(o.sp, false, pr.mz, pr.label ?? ''); n.A = 2.5; n.x = o.x; }
       }
     }
     // flights to the detector (exit side) or back toward the octapole (entrance side)
@@ -1408,7 +1558,7 @@ class TrapSim {
           this.flights.splice(i, 1);
           for (let k = 0; k < 3; k++) this.sec.push({ t0: t, x: IP.dynode.x + gauss(r) * 1.2, z: gauss(r) * 1.2, col: f.ion.col });
           this.pulses.push(t);
-          this.events.push({ t, mz: f.mzMeas + gauss(r) * (f.wide ? 0.004 * f.mzMeas : 0.16), V: f.V, sp: f.ion.sp, col: f.ion.col });
+          this.events.push({ t, mz: f.mzMeas + gauss(r) * (f.wide ? 0.004 * f.mzMeas : f.spread), V: f.V, sp: f.ion.sp, col: f.ion.col, label: f.ion.label, key: f.ion.mz });
           if (ctl && ctl.onDetect) ctl.onDetect(f.ion);
         }
       } else if (age > 0.7) this.flights.splice(i, 1);
@@ -1455,7 +1605,7 @@ class TrapSim {
       for (const f of this.flights) { const [x, y, z, a] = this.flightPos(f, t); P.add(x, y, z + 0.2, f.ion.col, 0.75, vis * a); }
       for (const s of this.sec) {
         const u = clamp((t - s.t0) / 0.24, 0, 1);
-        D.add(lerp(s.x, IP.multMouth.x, u), lerp(IP.dynode.y + 1.5, IP.multMouth.y + 1, u), s.z * (1 - u) + 0.3, COL.electron, 0.55, vis);
+        D.add(lerp(s.x, IP.multMouth.x, u), lerp(IP.dynode.y + 1.5, IP.multMouth.y + 1, u), s.z * (1 - u) + 0.3, this.secCol || COL.electron, 0.55, vis);
       }
       for (const c of this.cas) {
         const u = clamp((t - c.t0) / 0.5, 0, 1);
@@ -1554,12 +1704,14 @@ class SaddleSim {
 // ---------- spectrum accumulator ----------
 class Spectrum {
   constructor() { this.reset(); }
-  reset() { this.peaks = []; this.max = 1; }
-  add(mz, w, col) {
-    // events closer than the peak width join one peak; s2 keeps the spread (Welford)
-    const near = Math.max(0.6, 0.008 * mz);
-    let p = this.peaks.find((pp) => Math.abs(pp.mz - mz) < near);
-    if (!p) { p = { mz, w: 0, col: col || colorForMz(mz).clone(), n: 0, s2: 0 }; this.peaks.push(p); }
+  reset() { this.peaks = []; this.max = 1; this.near = null; }
+  add(mz, w, col, label = '', key = null) {
+    // events of the same ion species (key = its true m/z) form one peak; without a key, events closer than the peak width join.
+    // The peak is drawn at the mean of the recorded m/z with their spread, so close peaks (isotopes 0.5 apart) may overlap.
+    // s2 keeps the spread (Welford).
+    const near = this.near ?? Math.max(0.6, 0.008 * mz);
+    let p = key != null ? this.peaks.find((pp) => pp.key === key) : this.peaks.find((pp) => pp.key == null && Math.abs(pp.mz - mz) < near);
+    if (!p) { p = { mz, w: 0, col: col || colorForMz(mz).clone(), n: 0, s2: 0, label, key }; this.peaks.push(p); }
     p.n++;
     const d = mz - p.mz;
     p.mz += d / p.n;
@@ -1577,7 +1729,7 @@ class Spectrum {
 // =====================================================================
 // Overlay drawn on a 2D canvas: captions, labels, instrument panels. Everything here also ends up in the recorded video.
 // =====================================================================
-const OV = { cv: $('#ov'), ctx: null, W: 1, H: 1, U: 1, pr: 1, bottom: 0, C: null };
+const OV = { cv: $('#ov'), ctx: null, W: 1, H: 1, U: 1, pr: 1, bottom: 0, navRight: 0, navBottom: 0, C: null };
 OV.ctx = OV.cv.getContext('2d');
 const OV_COL = {
   dark: { text: '#eaf0f5', sub: '#9eb0c1', faint: 'rgba(234,240,245,0.42)', panel: 'rgba(9,13,18,0.76)', line: 'rgba(255,255,255,0.12)',
@@ -1586,13 +1738,16 @@ const OV_COL = {
     grid: 'rgba(21,32,43,0.07)', accent: '#0b8580', warn: '#c27400', band0: 'rgba(240,244,247,0)', band1: 'rgba(240,244,247,0.82)', shadow: 'rgba(255,255,255,0.7)' },
 };
 OV.C = OV_COL.dark;
-function ovResize(w, h, pr, bottomCss) {
+function ovResize(w, h, pr, bottomCss, nav = null) {
   OV.pr = pr;
   OV.cv.width = Math.round(w * pr);
   OV.cv.height = Math.round(h * pr);
   OV.W = OV.cv.width; OV.H = OV.cv.height;
   OV.U = Math.max(Math.min(OV.W / 1920, OV.H / 1080), 0.74 * pr);
   OV.bottom = (bottomCss || 0) * pr;
+  // area taken by the site navigation and quality menu (#topnav), so the panels can start below it
+  OV.navRight = nav ? nav.right * pr : 0;
+  OV.navBottom = nav ? (nav.bottom + 10) * pr : 0;
 }
 function ovTheme(dark) { OV.C = dark ? OV_COL.dark : OV_COL.light; }
 const FONT_SANS = '"Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif';
@@ -1822,9 +1977,10 @@ function drawSpectrum(g, x, y, w, a, spec, view) {
   g.textAlign = 'left';
   g.fillText('m/z', px1 - 26 * U, base + 40 * U);
   if (view.vAxis) { g.fillStyle = C.faint; g.fillText('排出時的電壓振幅(V)', px0, top - 40 * U); }
-  // peaks
+  // peaks; view.ionLabels adds the ion notation ([M+Na]⁺, −146 …) above the m/z, labels are lifted when they would overlap
   const max = view.norm || spec.max || 1;
-  for (const p of spec.peaks) {
+  const tags = [], lh = 15 * U, ceil = y + 48 * U;
+  for (const p of [...spec.peaks].sort((pa, pb) => pa.mz - pb.mz)) {
     const hh = (base - top - 18 * U) * clamp(p.w / max, 0, 1);
     if (hh < 0.5) continue;
     const xx = mx(p.mz);
@@ -1834,7 +1990,21 @@ function drawSpectrum(g, x, y, w, a, spec, view) {
     const sig = p.n > 1 ? Math.sqrt(p.s2 / p.n) : 0;
     const hw = Math.max(2.2 * U, (sig / (hi - lo)) * (px1 - px0) * 1.2);
     g.beginPath(); g.moveTo(xx - hw * 2.2, base); g.quadraticCurveTo(xx - hw * 0.6, base - hh * 0.15, xx, base - hh); g.quadraticCurveTo(xx + hw * 0.6, base - hh * 0.15, xx + hw * 2.2, base); g.closePath(); g.fill();
-    if (p.w / max > 0.08 && !p.noLabel) { g.font = fnt(600, 13 * U, true); g.textAlign = 'center'; g.fillText(p.mz.toFixed(1), xx, base - hh - 8 * U); g.textAlign = 'left'; }
+    if (p.w / max <= 0.08 || p.noLabel) continue;
+    const lines = [[p.mz.toFixed(view.dp ?? 1), fnt(600, 13 * U, true), col]];
+    if (view.ionLabels && p.label) lines.unshift([p.label, fnt(500, 12 * U), C.sub]);
+    const tw = Math.max(...lines.map(([s, f]) => { g.font = f; return g.measureText(s).width; })) + 6 * U, th = lines.length * lh;
+    let bottom = base - hh - 8 * U;
+    for (let k = 0; k < 8; k++) {
+      const hit = tags.find((tg) => Math.abs(tg.x - xx) < (tg.w + tw) / 2 && bottom - th < tg.bottom && bottom > tg.top);
+      if (!hit) break;
+      bottom = hit.top - 2 * U;
+    }
+    bottom = Math.max(bottom, ceil + th);
+    tags.push({ x: xx, w: tw, top: bottom - th, bottom });
+    g.textAlign = 'center';
+    lines.forEach(([s, f, c], i) => { g.font = f; g.fillStyle = c; g.fillText(s, xx, bottom - (lines.length - 1 - i) * lh); });
+    g.textAlign = 'left';
   }
   // scan cursor
   if (view.cursor != null && view.cursor > lo && view.cursor < hi) {
@@ -1916,8 +2086,9 @@ function drawOverlay(story) {
   // instrument panels
   if (hudOn) {
     const a = OVS.hudA, hd = OVS.hud;
-    let y = 34 * U;
     const x = landscape ? hudX : 16 * U, w = landscape ? hudW : W - 32 * U;
+    // start below the navigation when the panel column would run under it (portrait, or a narrow landscape window)
+    let y = x < OV.navRight ? Math.max(34 * U, OV.navBottom) : 34 * U;
     const U0 = OV.U;
     if (!landscape) OV.U = U0 * 0.8;
     const gap = 14 * U;
@@ -2102,10 +2273,40 @@ function scanKeys(t0, list, m0, mEnd, tail = 2, fast = 3.4, slow = 4.6) {
   return keys;
 }
 
+// scan cursor through narrow windows [lo, hi, seconds], moving fast in between; used where species are close in m/z
+function windowKeys(t0, m0, windows, fast = 1.2, mEnd = null, tail = 1) {
+  const keys = [[t0, m0, 0]];
+  let t = t0;
+  for (const [lo, hi, dur] of windows) { t += fast; keys.push([t, lo, 1]); t += dur; keys.push([t, hi, 0]); }
+  if (mEnd != null) keys.push([t + tail, mEnd, 1]);
+  return keys;
+}
+const M_START = 500 / (PHYS.kV * PHYS.qEject); // ejection point while ions are stored at 500 V
+const RECAP_LINES = [
+  '同樣的電壓下,每種質荷比的 **q** 不同,振盪頻率也不同。',
+  '端帽上固定頻率的交流電壓,只推得動頻率對上的那一種離子。',
+  '電壓振幅等速上升,離子依質荷比由小到大,輪流對上節拍被排出。',
+  '排出的時刻對應電壓振幅,電壓振幅對應 **m/z**,這就是質譜的橫軸。',
+];
+// shared by the three "reading a real spectrum" chapters: the scan panel set-up
+function readSpecUpdate(ST, t, scanFrom, view) {
+  F.pose = 1; F.cab = 0; F.cabSlide = 1; F.trapVis = 1; F.he = 0.5; F.trails = 0.5;
+  F.scanLed = t > scanFrom ? 1 : 0; F.acquire = t > scanFrom;
+  const ac = sstep(1, 2.5, t);
+  ST.trap.ac = ac; F.acGlow = ac;
+  const m = warpScan(t, ST.scan);
+  ST.trap.V = m * PHYS.kV * PHYS.qEject;
+  F.ring = 0.35 + 0.65 * ST.trap.V / 6000;
+  OVS.hudA = 1;
+  OVS.hud = { rf: 1, spec: 1, V: ST.trap.V, spectrum: ST.spectrum, rfNote: t > scanFrom ? '動畫在兩組峰之間快轉' : '',
+    specView: { ...view, cursor: t > scanFrom && m > view.lo && m < view.hi ? m : null } };
+  return m;
+}
 const CAL = () => SAMPLES.cal;
 const CHAPTERS = [
   {
     key: 'intro', title: '開場', dur: 7,
+    transcript: ['離子阱質譜原理(Ion Trap MS),以 Thermo Finnigan LCQ Deca XP 為例。'],
     start: KP(0, V3(2.3, 1.4, 3.3), V3(0, 0.32, 0), { sy: -0.13 }),
     cam: [KP(7, V3(1.55, 0.98, 2.35), V3(0, 0.3, 0), { sy: -0.1 })],
     cues: [],
@@ -2325,6 +2526,75 @@ const CHAPTERS = [
     },
   },
   {
+    key: 'adducts', title: '加成離子與團簇離子', dur: 34,
+    cam: [K(3.5, D(270, -2, 0), [0.03, 0.035, 0.21], { sx: HUDX }), K(34, D(268, -2, 0), [0.035, 0.04, 0.23], { sx: HUDX })],
+    cues: [
+      [0.3, '同一個分子在質譜上常常不只一根峰。以蘆丁標準品為例,分子量 610.15,接上 H⁺ 的 **[M+H]⁺** 落在 {611|m/z 611}。'],
+      [8.5, '溶液和玻璃器皿裡有微量的鈉、鉀,分子也會接上 Na⁺、K⁺,落在 {633|633} 和 {649|649},這些叫**加成離子**;611 和 633 正好差 22,常用來確認分子量。'],
+      [17, '濃度高時,兩個分子會靠較弱的非共價作用黏在一起再帶電,落在 {1221|[2M+H]⁺ 1221} 和 {1243|[2M+Na]⁺ 1243},這叫**團簇離子**。'],
+      [26, '團簇不是樣品裡另一個大分子,多寡和濃度、離子源的條件有關;毛細管溫度高一點,常能把它拆開。'],
+    ],
+    enter(ST) {
+      ST.trap.reset(46); ST.trap.V = 500; setSample('rutin'); ST.trap.fill(28); ST.spectrum.reset();
+      ST.scan = windowKeys(5, M_START, [[592, 664, 9], [1192, 1262, 7]], 1.2, 1300, 1);
+    },
+    update(ST, t) {
+      readSpecUpdate(ST, t, 5, { lo: 550, hi: 1300, step: 100, ionLabels: true, title: '質譜:蘆丁標準品(正離子)' });
+    },
+  },
+  {
+    key: 'isotopes', title: '同位素峰與電荷數', dur: 31,
+    cam: [K(3.5, D(268, -2, 0), [0.03, 0.035, 0.2], { sx: HUDX }), K(31, D(266, -1, 0), [0.03, 0.03, 0.19], { sx: HUDX })],
+    cues: [
+      [0.3, '把掃描放慢、只掃一小段(**放大掃描**),峰就變窄。蘆丁 {611|611} 的旁邊還有 612、613:分子裡約有 1.1% 的碳是較重的 ¹³C。'],
+      [8.8, '蘆丁有 27 個碳,含一個 ¹³C 的分子約是一個都不含的三成,所以 612 約有 611 的三成高。峰和峰相差 1,表示離子帶一個電荷。'],
+      [16.5, '這是**緩激肽**(一種胜肽)接上兩個 H⁺ 的 [M+2H]²⁺:同位素峰只差 0.5,因為質量差 1、再除以電荷 2。'],
+      [24, '所以看同位素峰的間距就知道電荷數:間距 1 是一價,0.5 是二價,約 0.33 是三價。'],
+    ],
+    enter(ST) {
+      ST._zoomB = false;
+      const ion = SAMPLES.rutin[0];
+      ST.trap.reset(39); ST.trap.V = 500; setSample(isotopeSpecies(ion)); ST.trap.fill(30);
+      ST.trap.res = 0.13; ST.trap.wRes = 0.004; ST.spectrum.reset();
+      ST.scan = windowKeys(4, M_START, [[609.3, 615.3, 8]], 1.2);
+      ST.zoomView = { lo: 608.6, hi: 615.6, step: 1, dp: 2, title: '放大掃描:蘆丁 [M+H]⁺' };
+    },
+    update(ST, t) {
+      if (t >= 15 && !ST._zoomB) {
+        // second half: a doubly charged peptide, isotope peaks 0.5 apart
+        ST._zoomB = true;
+        ST.trap.reset(40); ST.trap.V = 500; setSample(isotopeSpecies(BRADYKININ, 2)); ST.trap.fill(30);
+        ST.trap.res = 0.13; ST.trap.wRes = 0.004; ST.spectrum.reset();
+        ST.scan = windowKeys(16.5, M_START, [[529.6, 533.4, 7.5]], 1.2);
+        ST.zoomView = { lo: 529.2, hi: 533.8, step: 0.5, dp: 2, title: '放大掃描:緩激肽 [M+2H]²⁺' };
+      }
+      readSpecUpdate(ST, t, t < 15 ? 4 : 16.5, ST.zoomView);
+      OVS.hud.rfNote = '';
+    },
+  },
+  {
+    key: 'negative', title: '負離子模式', dur: 30,
+    cam: [K(3.5, D(288, -6, 0), [0.04, 0.03, 0.24], { sx: HUDX }), K(30, D(284, -4, 0), [0.045, 0.04, 0.25], { sx: HUDX })],
+    cues: [
+      [0.3, '把噴針改接負高壓,就是**負離子模式**:分子失去一個 H⁺,變成 **[M−H]⁻**。蘆丁出現在 {609|609},比正離子模式的 611 少 2。'],
+      [9.5, '酚類、黃酮類帶有容易解離的酸性 H,常用負離子模式量;流動相加了甲酸時,還會看到接上甲酸根的 {655|[M+HCOO]⁻ 655}。'],
+      [17, '濃度高時一樣有團簇 {1219|[2M−H]⁻ 1219}。離子阱照樣依 m/z 由小到大排出,q 只看質量除以電荷的大小。'],
+      [23.5, '偵測器的轉換二次發射電極改成 **+15 kV** 去吸負離子;撞出的正離子再進電子倍增器,放大成訊號。'],
+    ],
+    enter(ST) {
+      ST.trap.reset(46); ST.trap.V = 500; setSample('rutin', '-'); ST.trap.fill(28); ST.spectrum.reset();
+      ST.trap.secCol = COL.posIon;
+      ST.scan = windowKeys(6, M_START, [[590, 672, 9], [1190, 1250, 5]], 1.2, 1300, 1);
+    },
+    update(ST, t) {
+      readSpecUpdate(ST, t, 6, { lo: 550, hi: 1300, step: 100, ionLabels: true, title: '質譜:蘆丁標準品(負離子)' });
+      OVS.labels = labels(ST, t, [
+        ['asm:dynode', '轉換二次發射電極', '+15 kV,吸引負離子', 21, 30, 70, 10],
+        ['asm:mult', '電子倍增器', '收下撞出的正離子', 22, 30, 70, -40],
+      ]);
+    },
+  },
+  {
     key: 'msms', title: '串聯質譜 MS/MS', dur: 34,
     cam: [K(3, D(266, 0, 0), [0.015, 0.02, 0.15], { sx: HUDX }), K(34, D(272, -2, 0), [0.03, 0.03, 0.17], { sx: HUDX })],
     cues: [
@@ -2334,7 +2604,7 @@ const CHAPTERS = [
       [27.6, 'MS/MS 不需要第二個分析器,每一步都在同一個阱裡按時間先後完成;碎片還能再挑出來拆,最多做到 MS¹⁰。'],
     ],
     enter(ST) {
-      ST.trap.reset(36); ST.trap.V = 500; setSample('np'); ST.trap.fill(18); ST.spectrum.reset();
+      ST.trap.reset(60); ST.trap.V = 500; setSample('np'); ST.trap.fill(18); ST.spectrum.reset();
       ST.iso = 0; ST.act = 0;
       ST.scan = scanKeys(17.4, [303.05, 465.10, 611.16], 782 / (PHYS.kV * PHYS.qEject), 700, 1, 1.6, 3.6);
     },
@@ -2353,8 +2623,8 @@ const CHAPTERS = [
       if (t > 10 && t < 16.2) {
         tr.excite = { mz: rut, q: 0.25, amp: 2.6 };
         for (const o of tr.ions) if (Math.abs(o.mz - rut) < 1 && !o.cid) {
-          const pick = tr.r() < 0.55 ? 465.10 : 303.05;
-          o.cid = { need: 1.6 + tr.r() * 3.4, products: [{ mz: pick, p: 1 }] };
+          const pr = pickProduct(rut, tr.r);
+          o.cid = { need: 1.6 + tr.r() * 3.4, products: [{ ...pr, p: 1 }] };
         }
         F.acGlow = 0.4 + 0.3 * Math.sin(t * 9);
       } else tr.excite = null;
@@ -2370,11 +2640,12 @@ const CHAPTERS = [
       OVS.hudA = 1;
       OVS.hud = { q: 1, steps: 1, stepList: ['裝入離子', '只留下 m/z 611', '照節拍輕推,撞氦氣碎裂', '掃描排出碎片離子'], step, stepProg: (t - stepT[0]) / (stepT[1] - stepT[0]),
         spec: sstep(17, 18, t), V: tr.V, species: ST.speciesNow(), spectrum: ST.spectrum,
-        specView: { lo: 150, hi: 700, step: 100, cursor: m, title: '碎片的質譜:m/z 611 撞碎後', right: 'MS²' }, hide: (s) => !ST.counts[s.mz] };
+        specView: { lo: 150, hi: 700, step: 100, cursor: m, ionLabels: true, title: '碎片的質譜:m/z 611 撞碎後', right: 'MS²' }, hide: (s) => !ST.counts[s.mz] };
     },
   },
   {
     key: 'recap', title: '重點整理', dur: 17,
+    transcript: ['為什麼分得出不同的質荷比:', ...RECAP_LINES],
     cam: [KP(8, V3(0.12, 1.0, 2.25), V3(-0.04, 0.6, 0)), KP(17, V3(0.26, 1.04, 2.34), V3(-0.04, 0.6, 0))],
     cues: [],
     enter(ST) { ST.trap.reset(37); setSample('cal'); ST.trap.fill(10); ST.trap.V = 500; },
@@ -2382,12 +2653,7 @@ const CHAPTERS = [
       F.pose = 1; F.cab = 0; F.cabSlide = 1; F.trapVis = 1; F.gas = 0.6;
       OVS.recap = win(t, 0.6, 13.4, 0.8);
       OVS.recapReveal = (t - 1.0) / 1.6;
-      OVS.recapLines = [
-        '同樣的電壓下,每種質荷比的 **q** 不同,振盪頻率也不同。',
-        '端帽上固定頻率的交流電壓,只推得動頻率對上的那一種離子。',
-        '電壓振幅等速上升,離子依質荷比由小到大,輪流對上節拍被排出。',
-        '排出的時刻對應電壓振幅,電壓振幅對應 **m/z**,這就是質譜的橫軸。',
-      ];
+      OVS.recapLines = RECAP_LINES;
       OVS.endCard = win(t, 13.4, 17.2, 0.8);
     },
   },
@@ -2456,7 +2722,7 @@ function simStep(dt) {
   trans.step(dt, { feed: F.feed, feedFrom: F.feedFrom, gateOpen: F.gateOpen, neutrals: F.neutrals }, (sp) => { if (F.trapAccept) trap.addIon(sp, true); });
   trap.step(dt, {});
   if (trap.events.length) {
-    if (F.acquire) for (const e of trap.events) spectrum.add(e.mz, 1, e.col);
+    if (F.acquire) for (const e of trap.events) spectrum.add(e.mz, 1, e.col, e.label, e.key);
     trap.events.length = 0;
   }
   saddle.step(dt, { omega: F.saddleOmega, mix: F.saddleMix });
@@ -2609,6 +2875,7 @@ function loop(now) {
   updateCamera(dt);
   renderFrame();
   updateBar(false);
+  updateLiveCaption();
 }
 
 // ---------- player bar ----------
@@ -2636,6 +2903,7 @@ function updateBar(force) {
   timeEl.textContent = `${fmtT(t)} / ${fmtT(TOTAL)}`;
   rail.setAttribute('aria-valuenow', String(Math.round((t / TOTAL) * 100)));
   rail.setAttribute('aria-valuetext', `${CHAPTERS[APP.chapter].title},${fmtT(t)}`);
+  syncHash();
 }
 function railTime(clientX) {
   for (const s of segs) {
@@ -2723,15 +2991,183 @@ const about = $('#about');
 $('#infoBtn').addEventListener('click', () => { if (APP.playing) setPlaying(false); about.showModal(); });
 $('#aboutClose').addEventListener('click', () => about.close());
 
+// ---------- chapter links (#key, ?t=m:ss, #lab), transcript, captions for screen readers ----------
+const plainCue = (s) => s.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\{[\d.]+\|(.+?)\}/g, '$1');
+function linkTarget() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h === 'lab') return 'lab';
+  const i = CHAPTERS.findIndex((c) => c.key === h);
+  if (i >= 0) return CHAPTERS[i].t0 + 0.01;
+  const v = new URLSearchParams(location.search).get('t');
+  const m = v && /^(?:(\d+):)?(\d+(?:\.\d+)?)$/.exec(v.trim());
+  return m ? clamp(+(m[1] || 0) * 60 + +m[2], 0, TOTAL - 0.01) : null;
+}
+// the address follows the current chapter, so copying it shares that chapter (chapter 0 has no hash)
+let hashKey = decodeURIComponent(location.hash.slice(1));
+function syncHash() {
+  if (APP.rec) return;
+  const key = APP.mode === 'lab' ? 'lab' : APP.chapter > 0 ? CHAPTERS[APP.chapter].key : '';
+  if (key === hashKey) return;
+  hashKey = key;
+  try { history.replaceState(null, '', location.pathname + location.search + (key ? `#${key}` : '')); } catch (err) { /* not allowed here */ }
+}
+function goChapter(i) {
+  if (about.open) about.close();
+  if (APP.mode === 'lab') exitLab();
+  seek(CHAPTERS[i].t0 + 0.01);
+  setPlaying(true);
+}
+addEventListener('hashchange', () => {
+  const target = linkTarget();
+  hashKey = decodeURIComponent(location.hash.slice(1));
+  if (target === 'lab') { if (APP.mode !== 'lab') enterLab(); return; }
+  if (typeof target !== 'number' || !location.hash) return;
+  goChapter(chapterAt(target));
+});
+function buildTranscript() {
+  const ol = $('#transcriptList');
+  CHAPTERS.forEach((ch, i) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${ch.key}`;
+    a.textContent = `${String(i).padStart(2, '0')}  ${ch.title}`;
+    const tt = document.createElement('span');
+    tt.className = 'tt'; tt.textContent = fmtT(ch.t0);
+    li.append(a, tt);
+    for (const s of ch.transcript || ch.cues.map((c) => c[1])) {
+      const p = document.createElement('p');
+      p.textContent = plainCue(s);
+      li.append(p);
+    }
+    ol.append(li);
+  });
+  ol.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    e.preventDefault();
+    const i = CHAPTERS.findIndex((c) => `#${c.key}` === a.getAttribute('href'));
+    if (i >= 0) goChapter(i);
+  });
+}
+let liveText = '';
+function updateLiveCaption() {
+  const s = APP.mode === 'story' && OVS.caption && OVS.caption.a > 0.5 ? plainCue(OVS.caption.text) : '';
+  if (s && s !== liveText) { liveText = s; $('#capLive').textContent = s; }
+}
+
 // ---------- sandbox: drive the trap yourself ----------
 const labEl = $('#lab'), labBtn = $('#labBtn'), labV = $('#labV'), labVOut = $('#labVOut'), labAC = $('#labAC'), labSample = $('#labSample'), labRead = $('#labRead');
-const LAB = { auto: false, m: 0 };
+const labPos = $('#labPos'), labNeg = $('#labNeg'), labPrec = $('#labPrec'), labMs2 = $('#labMs2'), labMs3 = $('#labMs3'), labMsmsGo = $('#labMsmsGo');
+const labZoomIon = $('#labZoomIon'), labZoomGo = $('#labZoomGo'), labConc = $('#labConc'), labConcOut = $('#labConcOut'), labAGC = $('#labAGC');
+// mode: 'full' (scan everything), 'msms' (isolate, activate, scan the products) or 'zoom' (slow scan over one ion's isotope peaks)
+const LAB = { auto: false, m: 0, pol: '+', mode: 'full', level: 2, seq: null, zoom: null, fill: 1, zoomList: [] };
+const labConcX = () => 2 ** +labConc.value;
+const labBase = () => (LAB.pol === '-' ? SAMPLES_NEG : SAMPLES)[labSample.value];
 function labFill() {
-  setSample(labSample.value);
   // ions are loaded at a low storage voltage, as on the instrument
-  labV.value = '500'; LAB.auto = false;
-  trap.reset(99); trap.V = 500; trap.fill(22); spectrum.reset();
-  trap.labMap = true;
+  LAB.auto = false; LAB.seq = null; LAB.zoom = null; LAB.mode = 'full';
+  if (!SAMPLES_NEG[labSample.value]) LAB.pol = '+';
+  setSample(labSample.value, LAB.pol);
+  labV.value = '500';
+  trap.reset(99); trap.V = 500; trap.labMap = true;
+  // automatic gain control keeps the charge in the trap at the target; without it the fill follows the concentration
+  LAB.fill = labAGC.checked ? 1 : labConcX();
+  trap.sc = Math.max(0, LAB.fill - 1);
+  trap.secCol = LAB.pol === '-' ? COL.posIon : null;
+  trap.fill(22 * LAB.fill);
+  spectrum.reset();
+  labMsmsGo.textContent = '開始';
+  labControls();
+}
+function labControls() {
+  const negOK = !!SAMPLES_NEG[labSample.value];
+  labNeg.disabled = !negOK;
+  labNeg.title = negOK ? '' : '校正液在這裡只示範正離子';
+  labPos.setAttribute('aria-pressed', String(LAB.pol === '+'));
+  labNeg.setAttribute('aria-pressed', String(LAB.pol === '-'));
+  // precursors with known products
+  const base = labBase(), precs = base.filter((s) => productsOf(s.mz)), keep = labPrec.value;
+  labPrec.replaceChildren(...precs.map((s) => new Option(`${s.name} ${s.label} m/z ${s.mz.toFixed(2)}`, s.mz.toFixed(2))));
+  if (precs.some((s) => s.mz.toFixed(2) === keep)) labPrec.value = keep;
+  labPrec.disabled = labMsmsGo.disabled = !precs.length;
+  labMsUpdate();
+  // zoom scan: ions of this sample with a known formula, plus a doubly charged peptide in positive mode
+  LAB.zoomList = [...base.filter((s) => s.f).map((s) => ({ ...s, z: 1 })), ...(LAB.pol === '+' ? [BRADYKININ] : [])];
+  const zkeep = +labZoomIon.value || 0;
+  labZoomIon.replaceChildren(...LAB.zoomList.map((s, i) => new Option(`${s.name} ${s.label} m/z ${s.mz.toFixed(2)}${s.z > 1 ? ',帶 2 個電荷' : ''}`, String(i))));
+  labZoomIon.value = String(zkeep < LAB.zoomList.length ? zkeep : 0);
+}
+function labMsUpdate() {
+  const prec = +labPrec.value;
+  const ms3 = !!prec && (productsOf(prec) || []).some((p) => productsOf(p.mz));
+  labMs3.disabled = !ms3;
+  labMs3.title = ms3 ? '' : '這種離子的碎片沒有再往下拆的資料';
+  if (!ms3) LAB.level = 2;
+  labMs2.setAttribute('aria-pressed', String(LAB.level === 2));
+  labMs3.setAttribute('aria-pressed', String(LAB.level === 3));
+}
+function labStartMsms() {
+  const prec = +labPrec.value;
+  if (!prec) return;
+  const level = LAB.level;
+  labFill();
+  const second = level === 3 ? productsOf(prec).find((p) => productsOf(p.mz)) : null;
+  const steps = [`只留下 m/z ${prec.toFixed(0)}`, '照節拍輕推,撞氦氣碎裂'];
+  if (second) steps.push(`只留下碎片 m/z ${second.mz.toFixed(0)}`, '再推一次,碎片再裂開');
+  steps.push('掃描排出碎片離子');
+  LAB.mode = 'msms';
+  LAB.seq = { prec, second, target: prec, phase: 'iso', t: 0, step: 0, steps, ms: second ? 'MS³' : 'MS²', v0: trap.V, m0: 0 };
+  labMsmsGo.textContent = '進行中';
+}
+// one tick of the MS/MS sequence: isolate (broadband kick), activate at q = 0.25, optionally again for MS3, then scan out
+function labSeqStep(dt) {
+  const S = LAB.seq, tr = trap;
+  S.t += dt;
+  if (S.phase === 'iso') {
+    for (const o of tr.ions) if (Math.abs(o.mz - S.target) > 0.5 && !o.kick) { o.kick = 1; o.kickAt = S.t + tr.r() * 1.4; }
+    for (const o of tr.ions) if (o.kick && S.t > o.kickAt) o.A += dt * 26;
+    F.acGlow = 0.6;
+    if (S.t > 2.4) { S.phase = 'act'; S.t = 0; S.step++; S.v0 = tr.V; }
+  } else if (S.phase === 'act') {
+    tr.V = lerp(S.v0, 0.25 * PHYS.kV * S.target, sstep(0, 1, S.t));
+    if (S.t > 1) {
+      tr.excite = { mz: S.target, q: 0.25, amp: 2.6 };
+      for (const o of tr.ions) if (Math.abs(o.mz - S.target) < 0.5 && !o.cid) o.cid = { need: 1.0 + tr.r() * 2.0, products: [{ ...pickProduct(S.target, tr.r), p: 1 }] };
+      F.acGlow = 0.4 + 0.3 * Math.sin(APP.simT * 9);
+    }
+    if (S.t > 4.4) {
+      tr.excite = null;
+      S.step++; S.t = 0;
+      if (S.second && S.target === S.prec) {
+        S.target = S.second.mz; S.phase = 'iso';
+        for (const o of tr.ions) { o.kick = 0; o.cid = null; o.heat = 0; }
+      } else {
+        S.phase = 'scan'; spectrum.reset();
+        LAB.auto = true; LAB.m = S.m0 = tr.V / (PHYS.kV * PHYS.qEject); labAC.checked = true;
+      }
+    }
+  } else if (S.phase === 'scan' && !LAB.auto) { S.phase = 'done'; labMsmsGo.textContent = '再做一次'; }
+  if (S.phase === 'iso' || S.phase === 'act') labV.value = String(Math.round(tr.V));
+}
+function labStartZoom() {
+  const ion = LAB.zoomList[+labZoomIon.value];
+  if (!ion) return;
+  labFill();
+  LAB.mode = 'zoom';
+  setSample(isotopeSpecies(ion, ion.z), ion.z > 1 ? '+' : LAB.pol);
+  trap.reset(98); trap.V = 500; trap.labMap = true; trap.res = 0.13; trap.wRes = 0.004; // FWHM about 0.3 (ZoomScan)
+  trap.secCol = LAB.pol === '-' && ion.z === 1 ? COL.posIon : null;
+  trap.fill(30);
+  spectrum.reset();
+  LAB.zoom = { lo: ion.mz - 1.2 / ion.z, hi: ion.mz + 4.6 / ion.z, z: ion.z, title: `放大掃描:${ion.name} ${ion.label}` };
+  LAB.auto = true; LAB.m = M_START; labAC.checked = true;
+}
+// spacing of the first two isotope peaks after a zoom scan -> charge state
+function labZoomResult() {
+  const pk = spectrum.peaks.filter((p) => p.n >= 2).sort((a, b) => a.mz - b.mz);
+  if (pk.length < 2) return '';
+  const d = pk[1].mz - pk[0].mz, z = Math.max(1, Math.round(1 / d));
+  return `相鄰同位素峰相差 ${d.toFixed(2)}${z > 1 ? `(約 1/${z})` : ''} → 帶 ${z} 個電荷`;
 }
 function enterLab() {
   APP.mode = 'lab'; APP.playing = false;
@@ -2739,7 +3175,9 @@ function enterLab() {
   $('#playIcon').setAttribute('d', 'M8 5v14l11-7z');
   esi.reset(91); trans.reset(92); saddle.reset(93);
   labV.value = '500'; LAB.auto = false;
+  labConcOut.textContent = `${labConcX()}×`;
   labFill();
+  syncHash();
   controls.enabled = true;
   controls.target.copy(D(272, -2, 0));
   camera.position.copy(D(272, -2, 0)).add(V3(0.04, 0.035, 0.2));
@@ -2750,7 +3188,7 @@ function exitLab() {
   if (APP.mode !== 'lab') return;
   APP.mode = 'story';
   labEl.hidden = true; labBtn.classList.remove('on'); labBtn.setAttribute('aria-pressed', 'false');
-  LAB.auto = false;
+  LAB.auto = false; LAB.seq = null; LAB.zoom = null; LAB.mode = 'full';
   trap.labMap = false;
   seek(APP.t, false);
 }
@@ -2759,39 +3197,81 @@ labSample.addEventListener('change', labFill);
 $('#labInject').addEventListener('click', () => { LAB.auto = false; labFill(); });
 $('#labScan').addEventListener('click', () => {
   if (LAB.auto) { LAB.auto = false; return; }
-  if (!trap.ions.length) labFill();
+  if (LAB.mode !== 'full' || !trap.ions.length) labFill();
   spectrum.reset();
   LAB.auto = true; LAB.m = trap.V / (PHYS.kV * PHYS.qEject);
   labAC.checked = true;
 });
-labV.addEventListener('input', () => { LAB.auto = false; });
+labV.addEventListener('input', () => { LAB.auto = false; if (LAB.seq) { LAB.seq = null; LAB.mode = 'full'; trap.excite = null; labMsmsGo.textContent = '開始'; } });
+labPos.addEventListener('click', () => { if (LAB.pol !== '+') { LAB.pol = '+'; labFill(); } });
+labNeg.addEventListener('click', () => { if (LAB.pol !== '-') { LAB.pol = '-'; labFill(); } });
+labPrec.addEventListener('change', labMsUpdate);
+labMs2.addEventListener('click', () => { LAB.level = 2; labMsUpdate(); });
+labMs3.addEventListener('click', () => { LAB.level = 3; labMsUpdate(); });
+labMsmsGo.addEventListener('click', labStartMsms);
+labZoomGo.addEventListener('click', labStartZoom);
+labConc.addEventListener('input', () => { labConcOut.textContent = `${labConcX()}×`; labFill(); });
+labAGC.addEventListener('change', labFill);
 function labStep(dt) {
   resetF();
-  Object.assign(F, { pose: 1, cab: 0, cabSlide: 1, trapVis: 1, he: 0.5, trails: 1, acquire: true });
+  const S = LAB.seq, busy = !!S && (S.phase === 'iso' || S.phase === 'act');
+  Object.assign(F, { pose: 1, cab: 0, cabSlide: 1, trapVis: 1, he: 0.5, trails: LAB.fill > 2 ? 0.4 : 1, acquire: !busy });
+  if (S) labSeqStep(dt);
   if (LAB.auto) {
-    const hiW = labAC.checked ? 1.03 : 1.12;
-    const near = sampleState.list.some((s) => trap.ions.some((o) => o.mz === s.mz) && LAB.m / s.mz > 0.91 && LAB.m / s.mz < hiW);
-    LAB.m += dt * LAB.m * (near ? 0.022 : 0.2);
+    if (LAB.zoom) {
+      // zoom scan: move fast up to the window (without jumping over it), then slowly across it
+      const Z = LAB.zoom;
+      LAB.m = LAB.m < Z.lo ? Math.min(Z.lo, LAB.m + dt * Math.max(30, LAB.m * 0.6)) : LAB.m + dt * (Z.hi - Z.lo) / 9;
+      if (LAB.m >= Z.hi) LAB.auto = false;
+    } else {
+      // slow down while an ion in the trap is close to the ejection point
+      const hiW = labAC.checked ? 1.03 : 1.12;
+      const near = trap.ions.some((o) => LAB.m / o.mz > 0.91 && LAB.m / o.mz < hiW);
+      LAB.m += dt * LAB.m * (near ? 0.022 : 0.2);
+    }
     const v = LAB.m * PHYS.kV * PHYS.qEject;
     if (v >= PHYS.Vmax) { LAB.auto = false; labV.value = String(PHYS.Vmax); } else labV.value = String(Math.round(v));
   }
   const target = +labV.value;
   trap.V += (target - trap.V) * Math.min(1, dt * 6);
-  trap.ac = labAC.checked ? 1 : 0;
-  F.acGlow = trap.ac; F.ring = 0.35 + 0.65 * trap.V / 8500;
+  trap.ac = busy ? 0 : labAC.checked ? 1 : 0;
+  if (!busy) F.acGlow = trap.ac;
+  F.ring = 0.35 + 0.65 * trap.V / 8500;
   simStep(dt);
   labVOut.textContent = `${fmtV(trap.V)} V`;
-  $('#labScan').textContent = LAB.auto ? '停止掃描' : '自動掃描';
+  $('#labScan').textContent = LAB.auto && !S ? '停止掃描' : '自動掃描';
+  // read-out: one line per ion species in the trap (or about to be loaded), then the trap state
   const L = sampleState.list;
-  labRead.innerHTML = L.map((s) => {
+  const rows = LAB.mode === 'msms'
+    ? [...new Map(trap.ions.map((o) => [o.mz, { name: '', label: o.label, mz: o.mz }])).values()].sort((a, b) => a.mz - b.mz)
+    : L;
+  const lines = rows.map((s) => {
     const q = qOf(trap.V, s.mz), n = ST.counts[s.mz] || 0;
     const state = n ? (q >= PHYS.qMax ? '留不住' : `q ${q.toFixed(3)}`) : '已排出';
-    return `<span style="color:${cssForMz(s.mz)}">●</span> m/z ${s.mz.toFixed(1)}  ${state}`;
-  }).join('<br>') + `<br>留得住的最小 m/z ${(trap.V / (PHYS.kV * PHYS.qMax)).toFixed(0)}`;
-  const lo = L[0].mz < 200 ? 100 : 150, hi = sampleState.key === 'np' ? 700 : 1400;
+    return `<span style="color:${cssForMz(s.mz)}">●</span> ${s.name ? `${s.name} ` : ''}${s.label ? `${s.label} ` : ''}m/z ${s.mz.toFixed(LAB.zoom ? 2 : 1)}  ${state}`;
+  });
+  if (S) lines.unshift(`${S.ms}:${S.steps[Math.min(S.step, S.steps.length - 1)]}${S.phase === 'done' ? '(完成)' : ''}`);
+  if (LAB.zoom && !LAB.auto) { const res = labZoomResult(); if (res) lines.push(res); }
+  lines.push(`留得住的最小 m/z ${(trap.V / (PHYS.kV * PHYS.qMax)).toFixed(0)}`);
+  const conc = labConcX();
+  if (labAGC.checked) lines.push(`自動增益控制:裝填維持在目標值${conc > 1 ? `(注入時間縮成 1/${conc})` : conc < 1 ? `(注入時間拉長 ${1 / conc} 倍)` : ''}`);
+  else lines.push(`裝填:目標值的 ${LAB.fill} 倍${LAB.fill > 1 ? ',離子太擠,峰會偏移、變寬' : LAB.fill < 1 ? ',離子少,訊號弱' : ''}`);
+  labRead.innerHTML = lines.join('<br>');
+  // panels: spectrum range follows the mode
+  const cursor = trap.V / (PHYS.kV * PHYS.qEject);
+  let specView;
+  if (LAB.zoom) specView = { lo: LAB.zoom.lo - 0.6 / LAB.zoom.z, hi: LAB.zoom.hi, step: LAB.zoom.z > 1 ? 0.5 : 1, dp: 2, title: LAB.zoom.title, cursor };
+  else if (S) specView = { lo: 100, hi: Math.ceil((S.prec * 1.08) / 100) * 100, step: 100, ionLabels: true, cursor: S.phase === 'scan' ? cursor : null, right: S.ms,
+    title: `碎片的質譜:m/z ${S.prec.toFixed(0)}${S.second ? ` → ${S.second.mz.toFixed(0)}` : ''} 撞碎後` };
+  else {
+    const top = Math.max(...L.map((s) => s.mz)), hi = top < 650 ? 700 : 1400;
+    specView = { lo: L[0].mz < 200 ? 100 : 150, hi, step: hi > 1000 ? 200 : 100, vAxis: true, ionLabels: true, cursor,
+      title: sampleState.pol === '-' ? '質譜:偵測器訊號(負離子)' : '質譜:偵測器訊號' };
+  }
+  const stepProg = !S ? 0 : S.phase === 'iso' ? S.t / 2.4 : S.phase === 'act' ? S.t / 4.4 : S.phase === 'done' ? 1 : clamp((LAB.m - S.m0) / (S.prec * 1.05 - S.m0), 0, 1);
   OVS.hudA = 1;
-  OVS.hud = { rf: 1, q: 1, scope: 1, spec: 1, V: trap.V, species: L, trap, ac: trap.ac, spectrum, hide: (s) => !ST.counts[s.mz],
-    specView: { lo, hi, step: hi > 1000 ? 200 : 100, vAxis: true, cursor: trap.V / (PHYS.kV * PHYS.qEject) } };
+  OVS.hud = { rf: 1, q: 1, scope: LAB.mode === 'full' ? 1 : 0, steps: S ? 1 : 0, stepList: S ? S.steps : [], step: S ? Math.min(S.step, S.steps.length - 1) : 0, stepProg,
+    spec: 1, V: trap.V, species: LAB.mode === 'msms' ? ST.speciesNow() : L, trap, ac: trap.ac, spectrum, hide: (s) => !ST.counts[s.mz], specView };
   OVS.caption = null;
 }
 
@@ -2804,7 +3284,7 @@ function resize(prOverride) {
   if (w * h * pr * pr > 3.4e6) pr = Math.sqrt(3.4e6 / (w * h));
   setRenderSize(w, h, pr);
   const barH = $('#bar').getBoundingClientRect().height + 22;
-  ovResize(w, h, pr, barH);
+  ovResize(w, h, pr, barH, $('#topnav').getBoundingClientRect());
 }
 addEventListener('resize', () => { if (!APP.rec) resize(); });
 
@@ -2931,16 +3411,21 @@ async function boot() {
   applyTheme();
   resize();
   const src = [...document.scripts].map((s) => s.textContent).join('');
-  const cjk = [...new Set(src.match(/[\u{2000}-\u{206f}\u{3000}-\u{9fff}\u{ff00}-\u{ffef}·°µ±×⁰-⁹₀-₉]/gu) || [])].join('');
+  // every non-Latin character the canvas draws (CJK, superscripts like ⁺⁻²⁺, the minus sign), so the right font subsets load
+  const cjk = [...new Set(src.match(/[\u{2000}-\u{20cf}\u{2190}-\u{22ff}\u{3000}-\u{9fff}\u{ff00}-\u{ffef}·°µ±×¹²³]/gu) || [])].join('');
   const fontLoads = [400, 500, 700].map((wt) => document.fonts.load(`${wt} 30px "Noto Sans TC"`, cjk + 'LCQ'))
     .concat([400, 500, 600].map((wt) => document.fonts.load(`${wt} 30px "IBM Plex Mono"`, '0123456789.,:/V kHzm/zLCQ Deca XP')));
   await Promise.race([Promise.all(fontLoads), new Promise((r) => setTimeout(r, 7000))]);
-  seek(0);
-  applyFrame(0);
+  buildTranscript();
+  // a link may open a chapter (#scan), a time (?t=3:00) or the sandbox (#lab); read it before the first seek rewrites the hash
+  const target = linkTarget();
+  seek(typeof target === 'number' ? target : 0);
+  applyFrame(APP.simT);
   updateCamera(0);
   $('#loading').classList.add('done');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  setPlaying(!reduce && !new URLSearchParams(location.search).has('paused'));
+  if (target === 'lab') enterLab();
+  else setPlaying(!reduce && !new URLSearchParams(location.search).has('paused'));
   renderer.setAnimationLoop(loop);
   loadVisits();
 }
@@ -2966,7 +3451,8 @@ function run(t1, fps = 30) {
   while (APP.t < t1 - 1e-6) storyStep(Math.min(1 / fps, t1 - APP.t));
   return Math.round(performance.now() - t0);
 }
-window.lcq = { record, seek, setPlaying, shot, run, APP, TOTAL, CHAPTERS, trap, spectrum, view, ST, lab: { enterLab, exitLab, labStep } };
+window.lcq = { record, seek, setPlaying, shot, run, APP, TOTAL, CHAPTERS, trap, spectrum, view, ST,
+  lab: { enterLab, exitLab, labStep, labFill, labStartMsms, labStartZoom, LAB }, isotopePattern };
 boot();
 
 

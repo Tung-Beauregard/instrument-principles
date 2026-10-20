@@ -66,4 +66,17 @@ for (const page of extraPages) {
   const href = `href="../${page.replace('index.html', '')}"`;
   assert.ok(files.some(file => file !== page && read(file).includes(href)), `No lesson links to ${page}`);
 }
-console.log(`PASS: ${instruments.length} catalogue entries, ${ready} ready lessons, ${extraPages.length} extra page, static fallback, local resources and navigation.`);
+// share previews (2026-10-20): every page names its own address and a 1200x630 image that exists in assets/og/
+const SITE = 'https://tung-beauregard.github.io/instrument-principles/';
+for (const file of files) {
+  const source = read(file);
+  const meta = (prop) => (source.match(new RegExp(`<meta property="${prop}" content="([^"]*)">`)) || [])[1];
+  assert.equal(meta('og:url'), SITE + file.replace('index.html', ''), `og:url out of sync in ${file}`);
+  const image = meta('og:image');
+  assert.ok(image && image.startsWith(SITE + 'assets/og/'), `Missing og:image in ${file}`);
+  assert.ok(fs.existsSync(path.join(root, image.slice(SITE.length))), `Missing share image ${image} for ${file}`);
+  assert.equal(meta('og:image:width'), '1200', `og:image:width in ${file}`);
+  assert.equal(meta('og:image:height'), '630', `og:image:height in ${file}`);
+  assert.ok(meta('og:title') && meta('og:description'), `og:title / og:description missing in ${file}`);
+}
+console.log(`PASS: ${instruments.length} catalogue entries, ${ready} ready lessons, ${extraPages.length} extra page, static fallback, local resources, navigation and share previews.`);

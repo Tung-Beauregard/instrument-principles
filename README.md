@@ -27,6 +27,7 @@ assets/
   render-quality.css       畫質選單
   camera-nav.js            教材共用的視角操作：滾輪、觸控板、方向鍵與 WASD
   analyzer-fields.js       四種質量分析器的電場示意：四極柱與離子阱是翻轉的馬鞍、飛行時間是坡道地形、Orbitrap 是紡錘與碗（GC-MS 與質譜儀-不同分析器比較）
+  og/*.jpg                 各頁的分享預覽圖（1200 × 630），由 scripts/make-og-images.mjs 產生
   *.svg                    品牌與儀器概念示意
 content/
   instruments.json         儀器名稱、順序、圖片、狀態與連結
@@ -48,6 +49,7 @@ scripts/check-site.mjs     資料、相對連結與靜態備援檢查
 scripts/check-render-quality.mjs  各教材的 module 語法與畫質、幀率邏輯檢查
 scripts/check-camera-nav.mjs  共用視角操作的滾輪判斷與各教材接線檢查
 scripts/check-fields.mjs   四種電場示意的物理（穩定條件、射出順序、飛行時間的聚焦、Orbitrap 的頻率）與兩份教材的接線檢查
+scripts/make-og-images.mjs 重產 assets/og/ 的分享預覽圖（用本機的 Chrome 或 Edge 無頭截圖）
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
 INSTRUMENTS.md             各儀器功能、數據與示意說明
@@ -98,6 +100,18 @@ node scripts/check-fields.mjs
 ```
 
 另需實際檢查：桌面與手機入口排版、每份教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
+
+## 分享預覽圖
+
+入口與每個教材頁的 `<head>` 都有 Open Graph 標籤（2026-10-20 起），網址貼到 LINE、Facebook、Slack 這類地方時會顯示標題、說明與一張 1200 × 630 的圖。`og:url` 與 `og:image` 必須是完整的正式網址（`https://tung-beauregard.github.io/instrument-principles/…`），社群網站不接受相對路徑；這是 AGENTS.md 第 6 節相對連結規則的例外。教材頁的 `og:title`、`og:description` 照抄該頁的 `<title>` 與 meta description（入口的 `og:description` 是另寫的短版），改了其中一邊要一起看。`scripts/check-site.mjs` 會檢查每頁的 `og:url` 是自己的網址、圖檔存在、寬高 1200 × 630。
+
+圖是從頁面本身截的：先用任一靜態伺服器服務這個目錄，再執行
+
+```sh
+node scripts/make-og-images.mjs http://127.0.0.1:8000/
+```
+
+網址省略時用 `http://127.0.0.1:4378/`；後面加名稱（`portal`、`lcq`、`lcq-3d`、`gc-ms`…）只重產那幾張。預設用 `C:/Program Files/Google/Chrome/Application/chrome.exe`，其他位置用環境變數 `OG_BROWSER` 指定（Edge 也可以）。截圖用深色模式與 GPU、關掉擴充功能，截圖前會移除擴充功能塞進頁面的元素（例如翻譯工具的浮動按鈕）。各頁等待的秒數與網址在腳本的 `SHOTS`：動畫講解截 `lcq/?paused&t=3.6` 的片頭並隱藏介面，拆開探索截 `lcq-3d/?view=asm` 的組裝視圖，其他頁截打開後的第一個畫面。教材的開頭畫面改了就重產那一張。
 
 ## 3D 畫質與效能
 

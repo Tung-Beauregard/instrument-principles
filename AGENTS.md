@@ -17,6 +17,7 @@
 - 本站是 W AI Studio 的儀器原理教學入口，使用繁體中文。
 - `index.html` 專責入口；每一台儀器有獨立、穩定的子目錄，使用小寫英文字與連字號。
 - 現有 `lcq/`、`gc-ms/`、`uv-vis/`、`lcq-3d/`、`nmr/`、`mass-analyzers/`、`spectroscopy/`、`chromatography/` 路徑不可隨意更名。必須更名時，更新所有引用並保留舊網址轉向。
+- `lcq/` 的章節 `key`（例如 `#scan`、`#adducts`）也是對外網址（2026-10-20 起網址會跟著章節改變，使用者會複製分享），一樣不可隨意更名；必須改時讓舊的 key 仍然對到同一章。
 - `lcq/` 與 `lcq-3d/` 是同一份教材「離子阱質譜」的兩個畫面：「動畫講解」與「拆開探索」（使用者 2026-10-13 決定合併）。入口與 `content/instruments.json` 只列 `lcq`；`lcq-3d/` 不在清單裡，由這兩頁分頁列的「離子阱質譜」一組互相連結，其他教材的分頁列只連到 `../lcq/`。`scripts/check-site.mjs` 的 `extraPages` 照樣檢查 `lcq-3d/`。
 - 入口頂部品牌名稱只用「儀器原理」。底部「返回主頁」連到 `https://tung-beauregard.github.io/w-studio/`。
 - 每份教材至少有「儀器入口」返回連結。兄弟教材連結必須指向正確子目錄，不能把入口當作 LCQ 教材。
@@ -27,7 +28,7 @@
 - `assets/`：入口頁 CSS、JavaScript、標誌、插圖；`content/instruments.json`：教材資料。
 - 每份教材自己的資源放在該教材目錄，避免把所有檔案堆到根目錄。
 - `scripts/` 放維護檢查工具；`README.md` 放使用、結構與預覽說明；`INSTRUMENTS.md` 放教材功能和來源資訊。
-- 不將暫存檔、截圖、錄製影片、下載副本、測試伺服器輸出或本機專屬路徑提交進正式網站。
+- 不將暫存檔、截圖、錄製影片、下載副本、測試伺服器輸出或本機專屬路徑提交進正式網站。例外是 `assets/og/` 的分享預覽圖：它們是網站資源，一律用 `scripts/make-og-images.mjs` 重產，不手動另存（見 README「分享預覽圖」）。
 - 延續純 HTML／CSS／JavaScript、不需建置的架構。新增框架或外部依賴需有具體需要。
 
 ## 3. 新增與更新儀器
@@ -61,7 +62,7 @@
 
 ## 6. 連結、相依與驗證
 
-- 網站內使用 `./`、`../` 相對連結，支援 GitHub Pages 的 `/instrument-principles/` 子路徑。
+- 網站內使用 `./`、`../` 相對連結，支援 GitHub Pages 的 `/instrument-principles/` 子路徑。唯一的例外是分享預覽的 `og:url`、`og:image`：社群網站只認完整網址，所以寫正式網址，由 `scripts/check-site.mjs` 檢查。
 - 不用 `/assets/...` 指向網域根目錄；不嵌入本機路徑、憑證或存取權杖。
 - JSON 文案用 `textContent` 等安全 API 呈現，不直接注入任意 HTML。
 - 到站人數沿用 Abacus 的 `tung-beauregard-github-io/instrument-principles` 計數與 `lcq-visited` 瀏覽器記錄，不另開計數或重設歷史數字。

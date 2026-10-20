@@ -77,6 +77,8 @@
 - `?tour`:開啟後直接播放導覽。
 - 作者本機版另有自動錄影上傳參數,網站版不含。
 
+分享預覽(2026-10-20):`<head>` 的 meta description 之後有 Open Graph 標籤,`og:title`、`og:description` 照抄本頁的 `<title>` 與 meta description,圖是 `../assets/og/lcq-3d.jpg`,由 `scripts/make-og-images.mjs` 開 `?view=asm` 等 12 秒後截下組裝視圖。改了標題、說明或開啟時的畫面,要一起改標籤或重產圖(見 README「分享預覽圖」)。
+
 ## 連動關係
 
 - 每格 `tick()` 依序更新導覽或視圖狀態、`applyLayout()` 移動零件、`cycleStep()` 決定閘門與 RF、`simStep()` 推進粒子,接著 `renderScene()` 畫出粒子與兩張示波圖。
