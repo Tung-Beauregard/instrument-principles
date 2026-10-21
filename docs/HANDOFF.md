@@ -35,6 +35,12 @@
 
 ## 更新紀錄
 
+### 2026-10-22：推送與部署確認（數據畫圖）
+
+- 提交 `8539c91`，以 fast-forward 推送到 `main`（基準 `473027f`，推送前 `git fetch` 確認遠端沒有新提交）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功（head `8539c91`）；推送後約 40 秒正式網址上就有 `plot/`。正式網址上的 `plot/index.html`、`plot/app.js`、`plot/figure.js`、`plot/parsers.js`、`index.html`、`content/instruments.json`、`assets/plot.svg`、`assets/og/plot.jpg`、`uv-vis/index.html`、`lcq/index.html`、`README.md`、`docs/HANDOFF.md` 都和提交的版本完全相同（比對 SHA-256；工作目錄因為 autocrlf 是 CRLF，要和 `git show HEAD:檔案` 比）。入口有「工具」區，`plot/` 的標題是「數據畫圖：放檔案就畫圖」，`og:image` 回 200、`image/jpeg`、63 KB。
+- 未執行：在正式網址實際拖放檔案（本機預覽已做）；社群網站上的分享預覽。
+
 ### 2026-10-22：新增工具頁「數據畫圖」（plot/）
 
 - 執行者：Claude，在作者電腦上工作；提交者 tung-beauregard。
