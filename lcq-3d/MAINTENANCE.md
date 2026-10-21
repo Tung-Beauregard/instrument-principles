@@ -88,7 +88,7 @@
 
 ## 錄影
 
-「錄成影片」逐格算圖,用 WebCodecs 的 H.264 編碼,再用 jsDelivr 上的 mp4-muxer 5.2.2 封裝成 MP4。只有支援 `VideoEncoder` 的瀏覽器會顯示這個按鈕(Chrome、Edge)。1080p、30 fps 全長 141 秒,一般筆電約 2 到 5 分鐘算完,檔案約 110 MB。錄好的影片不要提交進網站。
+「錄成影片」逐格算圖,用 WebCodecs 的 H.264 編碼,再用 jsDelivr 上的 mp4-muxer 5.2.2 封裝成 MP4。只有支援 `VideoEncoder` 的瀏覽器會顯示這個按鈕(Chrome、Edge;Firefox 也支援)。`pickConfig()` 依序試 Baseline 5.1、4.2、4.0(`avc1.42E033`、`avc1.42E02A`、`avc1.42E028`),都不支援才試 High 與 Main。Baseline 排在前面是因為 Firefox 的 High profile 編碼器會產生 B 畫格、畫格不照順序送出,mp4-muxer 會丟掉亂序的畫格,影片缺格(2026-10-22 用 Firefox 157 實測,改了之後 2 秒 60 格完整)。1080p、30 fps 全長 141 秒,一般筆電約 2 到 5 分鐘算完,檔案約 110 MB。錄好的影片不要提交進網站。
 
 ## 修改後的檢查
 

@@ -4,17 +4,20 @@
 
 ## 目前缺口（截至 2026-10-22 最新一次更新）
 
-- `plot/`（數據畫圖，2026-10-22 新增的工具頁）：`plot/MAINTENANCE.md`、`docs/VALIDATION.md` 的段落與 `scripts/check-plot.mjs` 都已建立。未覆蓋：Safari、Firefox 與觸控裝置；真實儀器檔案不在儲存庫裡（只在作者電腦上試過 .spc、.asp、DSC csv、LCQ .RAW，TGA 的 xlsx 與 csv 用合成檔）；SVG 貼進 PowerPoint 後「轉換成圖案」只用 COM 確認插入成功（型別為 Graphic），轉換本身沒有自動化方法，待人工點一次；.spc 舊格式（0x4D）、多子檔與其他 Thermo 機型的 .RAW 沒有檔案可驗證。
+- `plot/`（數據畫圖，2026-10-22 新增的工具頁）：`plot/MAINTENANCE.md`、`docs/VALIDATION.md` 的段落與 `scripts/check-plot.mjs` 都已建立。未覆蓋：macOS 與 iPhone 的 Safari 與觸控裝置（2026-10-22 補測過 Firefox 157 與 WebKit 27.2 讀兩欄文字檔、畫圖與下載 PNG）；真實儀器檔案不在儲存庫裡（只在作者電腦上試過 .spc、.asp、DSC csv、LCQ .RAW，TGA 的 xlsx 與 csv 用合成檔）；SVG 貼進 PowerPoint 後「轉換成圖案」只用 COM 確認插入成功（型別為 Graphic），轉換本身沒有自動化方法，待人工點一次；.spc 舊格式（0x4D）、多子檔與其他 Thermo 機型的 .RAW 沒有檔案可驗證。
 
 - `lcq/MAINTENANCE.md`：2026-10-13 依目前程式重寫，涵蓋分區、座標與擺放、物理數值與推算、阱內運動模型、其他模擬、章節時間軸、播放與跳轉、操作台、錄影、到站人數、網址參數、修改切入點；同日修正的問題另列一節。2026-10-20 補上三個新章節、樣品與碎片表、同位素、離子從哪一側出去、空間電荷、章節連結與文字稿、操作台的串聯質譜與放大掃描。
-- `gc-ms/MAINTENANCE.md`、`uv-vis/MAINTENANCE.md`：已補上效能相關結構（`gc-ms/` 另補上 2026-10-07 的鏡頭、放大鏡與點選放大），完整模型座標、科學公式與時間軸仍待補。
+- `gc-ms/MAINTENANCE.md`、`uv-vis/MAINTENANCE.md`：2026-10-22 依目前程式重寫，涵蓋分區、啟動順序、狀態、座標與模型、科學模型與數值、圖表與互動、導覽與影片時間軸、網址參數、修改切入點、設計取捨與已知的不一致；保留 2026-10-05、2026-10-07 的內容。
 - `lcq-3d/MAINTENANCE.md`：已有，2026-10-02 增量補上座標與模型階層、資訊框、導覽流程、網址參數與設計取捨；2026-10-13 補上併入離子阱質譜的變更。
 - `nmr/MAINTENANCE.md`：2026-10-07 隨改版重寫，涵蓋分區、座標、S 與 W 狀態、收訊流程、自旋模擬、訊號路徑、譜圖螢幕、影片時間軸與錄影。
 - `mass-analyzers/MAINTENANCE.md`：2026-10-07 建立，涵蓋分區、座標、S 與 W 狀態、收譜流程、主控台、直式螢幕的取景、影片時間軸與錄影；2026-10-08 補上四種電場與影片的停頓。
 - `spectroscopy/MAINTENANCE.md`、`chromatography/MAINTENANCE.md`：2026-10-08 建立，涵蓋分區、座標、狀態、模型、互動流程、影片時間軸與錄影；2026-10-12 補上每一段都用香草醛、比一比與導覽的取景。
-- `docs/VALIDATION.md`：已補四份教材的效能回歸步驟與實際結果，2026-10-13 新增 `lcq/` 的操作步驟與數值案例，2026-10-20 改版後重新量過並補上新章節、連結與操作台的步驟；`gc-ms/`、`uv-vis/` 的完整科學數值案例與全長錄影驗收仍待補。
-- `INSTRUMENTS.md`：已有各教材功能與來源概述；完整的公式、參數、單位與來源頁碼仍需逐項核對。離子阱質譜一節列出了手冊與文獻名稱，2026-10-13 補上動畫講解的公式與推算，離子阱尺寸附上 March (1999) 的原文句子；2026-10-20 補上加成離子、同位素、負離子、峰寬的來源與核對狀態，另列來源連結；其餘數值的頁碼都未記錄。
+- `docs/VALIDATION.md`：已補四份教材的效能回歸步驟與實際結果，2026-10-13 新增 `lcq/` 的操作步驟與數值案例，2026-10-20 改版後重新量過並補上新章節、連結與操作台的步驟；2026-10-22 新增跨瀏覽器（Firefox、WebKit）的檢查，`gc-ms/` 補上完整一節、`uv-vis/` 新增一節，兩節的新步驟多數還沒在瀏覽器走過（表中有標）；`uv-vis/` 的全長影片驗收仍待補。
+- `INSTRUMENTS.md`：已有各教材功能與來源概述；完整的公式、參數、單位與來源頁碼仍需逐項核對。離子阱質譜一節列出了手冊與文獻名稱，2026-10-13 補上動畫講解的公式與推算，離子阱尺寸附上 March (1999) 的原文句子；2026-10-20 補上加成離子、同位素、負離子、峰寬的來源與核對狀態，另列來源連結；2026-10-22 補上 GC-MS 與 UV-Vis 的公式與推算、規格與數值的狀態表、KI 對照與來源連結；其餘數值的頁碼都未記錄。
 - `lcq` 的待確認資料：March (1997) 那篇入門文章的全文需要登入，沒有讀到；原本引用它的地方已改成讀得到原文的 March (1999)。蘆丁負離子碎片 300 與 301 的高低（動畫各畫一半）、He 等 2013 用的 609 → 300、團簇在毛細管溫度高時變少，這三件只有搜尋摘要或摘要，沒有讀到全文；ScienceDirect 的頁面擋機器人。峰寬借用的是後繼機型 LCQ Fleet 的規格，Deca XP 自己的峰寬沒有找到。
+- `gc-ms` 的待確認資料：`lnk()` 四個係數的校正依據、死時間 1.37 min、理論板數 7 萬（Restek 寫這種管柱約 12 萬）、質譜強度的出處、離子源 230 °C（只見搜尋摘要）、電子倍增器「十萬倍以上」與游離能「8 到 10 eV」都沒有找到出處；Agilent 的原廠頁面與 5973N 手冊擋自動讀取。
+- `uv-vis` 的待確認資料：說明視窗引用的「原廠技術資料（2020 年 4 月版）」沒有找到，規格是對 SPECORD PLUS 系列 Version 1.2（06/2026）核對，推定是 SPECORD 250 PLUS（頁面不寫型號）；DPPH 的 328、237 nm 兩帶、福林酚 880 nm 那一帶、葉綠素的其他 6 帶沒有找到出處；DPPH 517 nm、福林酚 765 nm、葉綠素 430 nm 只見於搜尋摘要。
+- 瀏覽器：2026-10-22 起 Chrome、Firefox 157、WebKit 27.2（Windows 版，Playwright）都測過載入與基本操作；macOS 與 iPhone 的 Safari、手機實機、真實觸控板都還沒測。
 - `lcq-3d` 的待確認資料：原始 LCQ Deca XP（非 Plus、非 MAX）的噴灑角度；主控台調諧參數是文獻示例值，不是某台儀器的實際設定。
 - `nmr` 的推估資料：不是依某一台實際儀器建模，示例配置（AVANCE III 500、Ascend 500 磁鐵、5 mm BBO 探頭）是合理的組合；Ascend 500 的磁場中心離地高度手冊未填（目前用 UltraShield Plus 500 的站位規劃值 1.10 m）；香草醛 H-2 與 H-6 在 CDCl₃ 的個別位移是依文獻多重峰範圍推估，沒有和實測譜比對。
 - `mass-analyzers` 的推估與示意：離子阱的 r₀、z₀ 與射出點 q_z 0.83 沒有原廠文件（r₀、z₀ 的文獻出處是 March 1999，見 `INSTRUMENTS.md` 離子阱質譜一節）；Orbitrap 的軸向頻率由 Q Exactive UHMR 的近似式推估；飛行時間的 2 m、6.5 kV 取自 Agilent 的一般技術文件，不是 6546 的規格；Orbitrap 中間兩檔的速度依兩端推估；四極柱的「提高解析」與飛行時間的直線模式是示意的對照。部分規格表是第三方網站的副本。
@@ -24,16 +27,46 @@
 
 以上是文件與驗證缺口，不代表已確認儀器程式存在錯誤。
 
+## 已確認、尚未修改的程式問題（2026-10-22 重寫維護文件時發現）
+
+詳細的位置與證據見各教材 `MAINTENANCE.md` 的「已知的不一致」或「目前已知、尚未修改的地方」。這次的範圍是測試與文件，程式都還沒改。
+
+- `gc-ms/`：說明視窗寫 Limonene 與 1,8-Cineole 在 10 °C/min 時分離度「只剩 0.7」（模型 0.65）、換升溫速率 KI「只差一兩個單位」（α-Pinene、Camphene 差 3）；α-Terpineol 的質譜少了 m/z 154，放大鏡示範 M⁺• 154 時譜圖上圈的是空位；導覽第 5 站只有 16 秒，三種斷法要 19.2 秒，第三種剛斷開就換站；螢幕與文字寫掃描到 m/z 400，模擬只到 230；`kickoff()` 在 3D 載入慢時可能蓋掉使用者剛做的操作；焦點在下拉選單時空白鍵也會播放或暫停；程式註解把 KI 表寫成「非極性管柱」（數值是 5% 苯基的）。
+- `uv-vis/`：`noiseSigma()` 的註解寫 2 nm、500 nm 時約 0.0001 A，實際算出 0.00027 A；福林酚的曲線最高點在約 780 nm，不在標示的 765 nm；偵測器標籤的小字「致冷晶片降溫」每格都被讀值蓋掉；只加 `?rec`、不加 `?film` 時載入提示不消失；牆上說明螢幕在等字型之前就畫好（推測，可能用到備用字型）；氧化鈥第 10 帶在頻寬小於約 1 nm 時應分成兩個最低點，程式畫成一個；頻寬的效果是對吸光度捲積（實際儀器平均的是透射光，4 nm 時 0.720 對 0.686）；葉綠素 a 溶液的吸收帶有 470 nm（萃取液算類胡蘿蔔素用的）卻沒有葉綠素 b 645 nm 附近那一帶；畫面寫「拖曳主光柵」，前置光柵也拖得動；字幕寫雜散光「不到 0.005 %」，原廠是「≤」。
+- `spectroscopy/`：390 px 寬時，3D 場景的文字會從半透明的標題卡後面透出來（Chrome、Firefox 相同），只影響美觀。
+
 ## 下一步
 
 - 用真實的觸控板與觸控螢幕試視角操作，特別是觸控板與滑鼠滾輪的判斷。
-- 使用 [維護資料更新提示詞](./AI-MAINTENANCE-PROMPT.md)，補齊 `gc-ms/`、`uv-vis/` 維護文件中已列明的缺口。
+- 照 `docs/VALIDATION.md` 的 gc-ms、uv-vis 兩節在瀏覽器走一遍，把「未在瀏覽器執行」「未實測」換成實際結果。
+- 決定上一節「已確認、尚未修改的程式問題」要不要修（多數是改說明文字或資料，影響小）。
+- 手機實機（作者的 S23，用 adb 與 Chrome 遠端偵錯；腳本已備好）、macOS 或 iPhone 的 Safari、真實觸控板。
 - 若取得 LCQ Deca XP 原廠資料，核對噴灑角度、一般掃描與放大掃描的峰寬，以及 `INSTRUMENTS.md` 的來源頁碼。
 - 分享預覽上線後，貼到 LINE、Facebook 或 Slack 看一次實際顯示（社群網站會快取預覽，改圖後可能要用各自的偵錯工具重新抓）。
 - 用 NVDA 或 VoiceOver 實際聽一次動畫講解的字幕（`#capLive`）。
-- 數據畫圖：在 PowerPoint 實際插入下載的 SVG 並「轉換成圖案」看一次；拿更多儀器檔案（實際的 TGA.xlsx、其他批次的 LCQ .RAW、Safari 與 Firefox）試。
+- 數據畫圖：在 PowerPoint 實際插入下載的 SVG 並「轉換成圖案」看一次；拿更多儀器檔案（實際的 TGA.xlsx、其他批次的 LCQ .RAW、macOS 或 iPhone 的 Safari）試。
 
 ## 更新紀錄
+
+### 2026-10-22：跨瀏覽器測試、Firefox 錄影修正，GC-MS 與 UV-Vis 的維護文件
+
+- 執行者：Claude，在作者電腦的 `main`（基準 `473027f`，開工時遠端沒有新提交；提交前 `git fetch` 發現另一個工作階段推了數據畫圖的 `8539c91`、`bf51d5a`，把這次的提交 rebase 到它們之後，交接紀錄與驗證文件的衝突手動合併，兩邊內容都保留）。使用者要求做上次提出的第 9 項（Safari、Firefox、手機與觸控板的實機測試）與第 10 項（比照離子阱補齊 GC-MS、UV-Vis 的維護文件）。
+- 第 9 項：
+  - 用 Playwright 1.64 測 Chrome 156、Firefox 157 與 WebKit 27.2（測試版瀏覽器經使用者同意後下載，不在儲存庫裡），桌機與手機兩種尺寸、九個頁面（測試時數據畫圖還沒合併進來，另外補測，見下一點）；結果記在 `docs/VALIDATION.md`「跨瀏覽器與手機」。這台電腦上 Playwright 的 Firefox 放在 C 槽使用者資料夾時啟動不了（Windows 回報 mozglue 的 side-by-side 錯誤），複製到其他磁碟就能執行。
+  - 發現並修正：Firefox 錄影失敗。它的 H.264 編碼器用 High profile 時會產生 B 畫格、畫格不照順序送出，mp4-muxer 拒收（動畫講解整個失敗，拆開探索會缺格）。`lcq/index.html` 的錄影改用 `REC_CODEC` = `avc1.42E028`（Constrained Baseline，沒有 B 畫格）並加上 `firstTimestampBehavior: 'offset'`，`canRecord()` 一起改；`lcq-3d/index.html` 的 `pickConfig()` 改成先試 Baseline。改完兩頁在 Firefox 與 Chrome 各錄 2 秒，都是完整的 60 格。
+  - 其他發現都不是頁面的問題：WebKit 在 DPR 2 時截圖的 3D 是黑的（把畫布讀回來是完整的）；Firefox 的字型檢查時間點太早；Chrome 對本機伺服器沒有 favicon 的 404。
+  - 數據畫圖補測：rebase 之後在三個瀏覽器、兩種尺寸用檔案選擇器放進合成的兩欄文字光譜，都畫出光譜疊圖、能下載 PNG、沒有錯誤；結果加在 VALIDATION.md 的同一張表。
+  - 未執行：手機實機（S23 這次沒有接上電腦，測試腳本已備好）；真實觸控板（作者電腦沒有）；macOS 與 iPhone 的 Safari（沒有設備）。
+- 第 10 項：
+  - `gc-ms/MAINTENANCE.md`、`uv-vis/MAINTENANCE.md` 依目前程式重寫（由兩個子代理分頭讀程式、用 Node 跑原始碼算數值，Claude 抽查程式名稱與數值後合併）；更正舊文件兩處（走走停停是每種 120 顆；電子撞擊游離的斷法寫在 `XP.ei`，沒有讀 `FRAG.apin`）。
+  - `INSTRUMENTS.md` 的 GC-MS、UV-Vis 兩節補上公式與推算、規格與數值的狀態表、來源連結；GC-MS 的 KI 改寫成「5% 苯基管柱（HP-5 類）」並附 Babushok 等 2011 的對照表；UV-Vis 寫明規格對應 SPECORD 250 PLUS 的技術資料（推定，頁面不寫型號），葉綠素的名稱改成和程式相同。
+  - `docs/VALIDATION.md`：`gc-ms` 整節更新、新增 `uv-vis` 一節；GC-MS 的流出時間、烷類、KI，UV-Vis 的讀值卡與影片畫格在三個瀏覽器實測相同，其餘新步驟標「未在瀏覽器執行」或「未實測」。
+  - 來源：Claude 自己再讀過 Agilent 6850 Series II 規格表（5989-0958EN）、Analytik Jena SPECORD PLUS 技術資料 Version 1.2、NIST SRM 2034 證書，和子代理的引用相符；Babushok 等 2011 的數值由子代理從 NIST 保存的 PDF 讀出，Claude 抽查了 Linalool、Camphor、1,8-Cineole、Caryophyllene oxide 四列。
+  - 找到但沒有修的程式問題列在上方「已確認、尚未修改的程式問題」。
+- 其他文件：`lcq/MAINTENANCE.md`、`lcq-3d/MAINTENANCE.md` 的錄影一節（為什麼用 Baseline）。
+- 驗證：
+  - 通過：`node scripts/check-site.mjs`、`node --check assets/app.js`、`check-render-quality.mjs`、`check-camera-nav.mjs`、`check-fields.mjs`、`git diff --check`。
+  - 通過：三個瀏覽器的載入、WebGL2、版面、拖曳與滾輪、動畫講解的連結與操作台、錄影（見 VALIDATION.md）。
 
 ### 2026-10-22：推送與部署確認（數據畫圖）
 

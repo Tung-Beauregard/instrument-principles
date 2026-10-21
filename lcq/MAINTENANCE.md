@@ -157,12 +157,12 @@
 
 說明視窗的「錄成影片」呼叫 `record()`:
 
-- 從 jsDelivr 動態載入 mp4-muxer 5.2.1(`+esm`),用 WebCodecs 的 `VideoEncoder`(`avc1.640028`、7 Mbps、1920×1080、30 fps,每 2 秒一個關鍵格)。
+- 從 jsDelivr 動態載入 mp4-muxer 5.2.1(`+esm`,`firstTimestampBehavior: 'offset'`),用 WebCodecs 的 `VideoEncoder`(`REC_CODEC` = `avc1.42E028`,H.264 Constrained Baseline、level 4.0;7 Mbps、1920×1080、30 fps,每 2 秒一個關鍵格)。**不要改回 High profile(`avc1.640028`):** Firefox 的編碼器用 High 時會產生 B 畫格,畫格不照順序送出(1 3 2 5 4…),mp4-muxer 收到第一格就丟出錯誤,Firefox 錄影整個失敗;Baseline 依規格沒有 B 畫格(2026-10-22 用 Firefox 157 與 Chrome 156 實測)。
 - `body.rec` 藏起介面;`quality.configure(…, { recording: true })` 強制完整畫質,AO 開啟,顆粒關掉(結束後還原)。沿用目前的深淺色模式。
 - `seek(from)` 後以固定的 1/fps 一步一步 `storyStep()`,每格把 3D 畫面和疊圖畫布畫到同一張畫布再編碼。編碼佇列超過 8 格就等 `dequeue` 事件;每 30 格用 `MessageChannel` 讓出一次執行緒(背景分頁的計時器會被節流,這樣切到別的分頁也會繼續錄)。
 - 完成後下載 `ion-trap-ms.mp4`;`finally` 還原顆粒、`resize()` 恢復使用者畫質,回到原本的時間點並暫停,結果留在 `window.__lastRec`。
 - 從主控台可以指定範圍與規格:`lcq.record({ from, to, fps, width, height, bitrate, upload })`;`upload` 是作者本機伺服器接收影片的網址,正式網站用不到。
-- 按鈕預設隱藏。開頁時 `canRecord()` 先確認有 `VideoEncoder` 與 `VideoFrame`,再用 `VideoEncoder.isConfigSupported()` 問 `avc1.640028`、1920×1080、7 Mbps、30 fps 能不能編碼;可以才顯示「錄成影片」,不行就顯示說明視窗裡的 `#recNo`(「這個瀏覽器不能錄影,請改用電腦版的 Chrome 或 Edge」)。改 `record()` 的預設編碼設定時,`canRecord()` 要一起改。
+- 按鈕預設隱藏。開頁時 `canRecord()` 先確認有 `VideoEncoder` 與 `VideoFrame`,再用 `VideoEncoder.isConfigSupported()` 問 `REC_CODEC`、1920×1080、7 Mbps、30 fps 能不能編碼;可以才顯示「錄成影片」,不行就顯示說明視窗裡的 `#recNo`(「這個瀏覽器不能錄影,請改用電腦版的 Chrome 或 Edge」)。改 `record()` 的預設編碼設定時,`canRecord()` 要一起改。2026-10-22 實測:Chrome 156 與 Firefox 157 顯示按鈕、錄得出完整的檔案;Playwright 的 WebKit 27.2(Windows)不支援,顯示 `#recNo`。
 - 錄影時 `ovResize()` 不帶 `#topnav` 的範圍,面板照原本的位置畫。全長 394 秒的錄影在作者電腦上約需幾分鐘。
 
 ## 到站人數

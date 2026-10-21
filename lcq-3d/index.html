@@ -3455,7 +3455,9 @@ async function loadFonts() {
 
 async function pickConfig(w, h, fps) {
   const bitrate = Math.round(w * h * fps * 0.11);
-  for (const codec of ['avc1.640033', 'avc1.640028', 'avc1.4d0028', 'avc1.42E028']) {
+  // Baseline(42E0..)排在前面:它沒有 B 畫格。Firefox 用 High profile 時會產生 B 畫格、畫格不照順序送出,
+  // mp4-muxer 會丟掉亂序的畫格,影片因此缺格(2026-10-22)。Baseline 5.1、4.2、4.0 依序試,都不支援才用 High 與 Main
+  for (const codec of ['avc1.42E033', 'avc1.42E02A', 'avc1.42E028', 'avc1.640033', 'avc1.640028', 'avc1.4d0028']) {
     const c = { codec, width: w, height: h, bitrate, framerate: fps, avc: { format: 'avc' } };
     try { const s = await VideoEncoder.isConfigSupported(c); if (s.supported) return c; } catch (e) { /* 試下一個 */ }
   }
