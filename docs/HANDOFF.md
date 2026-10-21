@@ -48,6 +48,13 @@
 
 ## 更新紀錄
 
+### 2026-10-22：推送與部署確認（跨瀏覽器測試、Firefox 錄影修正、GC-MS 與 UV-Vis 的維護文件）
+
+- 提交 `bbb7e37`，rebase 到數據畫圖的 `bf51d5a` 之後以 fast-forward 推送到 `main`（推送前再 `git fetch` 確認遠端沒有更新的提交）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上的 `lcq/index.html`、`lcq-3d/index.html`、`gc-ms/MAINTENANCE.md`、`uv-vis/MAINTENANCE.md`、`lcq/MAINTENANCE.md`、`INSTRUMENTS.md`、`docs/VALIDATION.md`、`docs/HANDOFF.md`、`plot/index.html` 都和提交的版本完全相同（比對 SHA-256）。
+- 通過：用 Firefox 157 開正式網址的 `lcq/`（先標記已計數，不增加到站人數）：「錄成影片」出現，錄 1 秒得到 `ion-trap-ms.mp4`，沒有頁面錯誤。
+- 未執行：手機實機（S23 沒有接上）、macOS 與 iPhone 的 Safari、真實觸控板。
+
 ### 2026-10-22：跨瀏覽器測試、Firefox 錄影修正，GC-MS 與 UV-Vis 的維護文件
 
 - 執行者：Claude，在作者電腦的 `main`（基準 `473027f`，開工時遠端沒有新提交；提交前 `git fetch` 發現另一個工作階段推了數據畫圖的 `8539c91`、`bf51d5a`，把這次的提交 rebase 到它們之後，交接紀錄與驗證文件的衝突手動合併，兩邊內容都保留）。使用者要求做上次提出的第 9 項（Safari、Firefox、手機與觸控板的實機測試）與第 10 項（比照離子阱補齊 GC-MS、UV-Vis 的維護文件）。
