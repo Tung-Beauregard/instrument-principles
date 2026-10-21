@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>數據畫圖:放檔案就畫圖</title>
+<meta name="description" content="把儀器匯出的檔案放進來就畫成報告用的圖:FTIR 的 .spc 與 .asp、PerkinElmer 的 DSC 與 TGA csv、整理好的 TGA xlsx、LCQ 質譜的 .RAW。黑白、完整框線,可下載 SVG(貼進 PowerPoint 能轉成圖案編輯)或 300 dpi 的 PNG。檔案只在你的瀏覽器裡處理,不會上傳。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="數據畫圖:放檔案就畫圖">
+<meta property="og:description" content="把儀器匯出的檔案放進來就畫成報告用的圖:FTIR 的 .spc 與 .asp、PerkinElmer 的 DSC 與 TGA csv、整理好的 TGA xlsx、LCQ 質譜的 .RAW。黑白、完整框線,可下載 SVG(貼進 PowerPoint 能轉成圖案編輯)或 300 dpi 的 PNG。檔案只在你的瀏覽器裡處理,不會上傳。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/plot/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/plot.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="數據畫圖:放檔案的區域與一張黑白光譜圖">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/plot/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<style>
+:root{color-scheme:dark;font-family:"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f0f3ee;background:#0b1111;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid #a5f3cd;outline-offset:3px}
+.skip-link{position:fixed;top:12px;left:12px;z-index:9;padding:12px 18px;background:#a5f3cd;color:#0b1111;transform:translateY(-160%)}
+.skip-link:focus{transform:none}
+.wrap{width:min(1180px,calc(100% - 48px));margin-inline:auto}
+/* 分頁列(和其他教材共用的樣式) */
+.sitenav{display:flex;gap:2px;padding:3px;margin:16px auto 0;border-radius:10px;background:#101818;border:1px solid #253430;overflow-x:auto;white-space:nowrap;max-width:max-content;scrollbar-width:thin}
+.sitenav a{padding:5px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:#9caca5;flex:none}
+.sitenav a:hover{color:#f0f3ee;background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:#f0f3ee;color:#0b1111}
+.nav-wrap{width:min(1180px,calc(100% - 48px));margin-inline:auto}
+header.top{padding:26px 0 18px;border-bottom:1px solid #253430}
+h1{margin:0 0 8px;font-size:24px;font-weight:600;letter-spacing:.08em}
+.lede{margin:0;font-size:14px;line-height:1.75;color:#9caca5;max-width:70em}
+main{flex:1;display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:28px;padding:22px 0 40px;align-items:start}
+.side{display:grid;gap:14px}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:120px;padding:18px;border:1.5px dashed #2b3b33;border-radius:12px;background:#101818;cursor:pointer;text-align:center}
+.drop:hover,.drop.over{border-color:#a5f3cd}
+.drop b{font-size:15px;font-weight:600}
+.drop span{font-size:12.5px;color:#9caca5;line-height:1.6}
+.hint{margin:0;font-size:12px;line-height:1.7;color:#9caca5}
+.hint code{font-family:ui-monospace,Consolas,monospace;color:#c9d6cf}
+.files-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.files-head h2{margin:0;font-size:14px;font-weight:600;letter-spacing:.12em;color:#a5f3cd}
+.file{padding:12px 14px;border:1px solid #253430;border-radius:12px;background:#101818;display:grid;gap:8px}
+.file.bad{border-color:#6a3030}
+.file-head{display:flex;align-items:center;gap:8px}
+.file-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px}
+.tag{font-size:11px;padding:2px 8px;border-radius:999px;background:#14251e;color:#a5f3cd;flex:none}
+.bad .tag{background:#2a1515;color:#f0a8a8}
+.meta{margin:0;font-size:11.5px;line-height:1.6;color:#9caca5;word-break:break-all}
+.err{margin:0;font-size:12.5px;color:#f0a8a8}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px}
+.row .k{color:#9caca5;flex:none}
+.pair{display:inline-flex;align-items:center;gap:6px}
+input[type=text],input[type=number],select{font:inherit;font-size:13px;color:#f0f3ee;background:#0b1111;border:1px solid #2b3b33;border-radius:8px;padding:6px 9px;min-width:0}
+input[type=text]{flex:1 1 120px}
+input[type=number]{width:88px}
+input[type=checkbox]{width:18px;height:18px;accent-color:#a5f3cd;margin:0}
+.btn,button.icon{font:inherit;cursor:pointer;color:#f0f3ee;background:#14251e;border:1px solid #2b3b33;border-radius:9px;padding:8px 14px;min-height:40px}
+.btn:hover{border-color:#a5f3cd}
+.btn.quiet{background:transparent}
+button.icon{min-height:32px;min-width:32px;padding:0 8px;border-radius:8px;font-size:18px;line-height:1;background:transparent}
+button.icon:hover{color:#f0a8a8;border-color:#6a3030}
+.tic{height:44px;border:1px solid #2b3b33;border-radius:6px;overflow:hidden;cursor:col-resize;touch-action:none;background:#fff}
+.tic svg{display:block;width:100%;height:100%}
+.series .row{padding:2px 0}
+.content{display:grid;gap:26px;min-width:0}
+#empty{margin:0;padding:40px 20px;border:1px solid #253430;border-radius:12px;color:#9caca5;font-size:14px;line-height:1.8;text-align:center}
+.figure{display:grid;gap:12px;min-width:0}
+.fig-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fig-head h2{margin:0;font-size:16px;font-weight:600}
+.tools{display:flex;gap:8px}
+.paper{background:#fff;border-radius:12px;padding:12px;overflow:auto;color:#111}
+.paper svg{display:block;width:100%;height:auto;max-width:900px;margin:0 auto}
+.paper.bad{color:#b00020;font-size:14px}
+.optbox{border:1px solid #253430;border-radius:12px;background:#101818;padding:0 14px}
+.optbox summary{cursor:pointer;padding:12px 0;font-size:13.5px;font-weight:600;color:#a5f3cd;list-style-position:inside}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px 22px;padding:0 0 14px}
+.opts .row{justify-content:space-between}
+footer.site-footer{border-top:1px solid #253430;padding:20px 0;font-size:12.5px;line-height:1.8;color:#9caca5}
+footer.site-footer a:hover{color:#a5f3cd}
+.muted{color:#9caca5;font-size:13px;margin:0}
+@media (max-width:900px){
+  main{grid-template-columns:1fr}
+  .wrap,.nav-wrap{width:calc(100% - 32px)}
+}
+@media (max-width:620px){
+  h1{font-size:21px}
+  .tools{width:100%}
+  .tools .btn{flex:1}
+  .paper{padding:6px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要內容</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="../chromatography/">層析</a><a href="./" aria-current="page">數據畫圖</a></nav></div>
+<header class="top wrap">
+  <h1>數據畫圖</h1>
+  <p class="lede">把儀器匯出的檔案放進來,就畫成報告用的圖:黑白、完整框線、座標黑字。可以下載 SVG(插進 PowerPoint 後按右鍵「轉換成圖案」就能逐條編輯)或 300 dpi 的 PNG。檔案只在你的瀏覽器裡處理,不會上傳。</p>
+</header>
+<main class="wrap" id="main">
+  <aside class="side">
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="選擇或拖放檔案">
+      <b>把檔案拖到這裡,或點一下選檔</b>
+      <span>可以一次放好幾個;同一種數據會疊在同一張圖</span>
+    </div>
+    <input id="file-input" type="file" multiple hidden accept=".spc,.asp,.csv,.txt,.dat,.asc,.xlsx,.raw,.RAW">
+    <p class="hint">認得的檔案:FTIR 的 <code>.spc</code>、<code>.asp</code>;PerkinElmer 匯出的 DSC 或 TGA <code>.csv</code>(要有 Program Temperature 欄);溫度欄配重量欄的 TGA <code>.xlsx</code>;Thermo LCQ Deca XP 的 <code>.RAW</code>;兩欄數字的 <code>.txt</code> 或 <code>.csv</code>。</p>
+    <div class="files-head"><h2>檔案</h2><button class="btn quiet" id="clear" type="button">全部清掉</button></div>
+    <div id="files"></div>
+  </aside>
+  <section class="content" aria-label="圖">
+    <p id="empty">放進檔案後,圖會出現在這裡。</p>
+    <div id="figures"></div>
+  </section>
+</main>
+<footer class="site-footer wrap">
+  <p>光譜以原檔的吸光度畫,曲線只加固定位移;質譜把選定掃描的峰疊在一起,每 0.1 取 ±0.65 的視窗加總再除以掃描張數,局部最大值畫成一根棒;DSC 依程式溫度分升溫與降溫段;TGA 以第一點為 100%,DTG 用 1 °C 格點做移動平均。做法細節見 <a href="https://github.com/Tung-Beauregard/instrument-principles/blob/main/plot/MAINTENANCE.md">plot/MAINTENANCE.md</a>。</p>
+</footer>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

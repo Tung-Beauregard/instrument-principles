@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" role="img" aria-label="一個檔案落進畫框,框裡畫出一條黑白的光譜曲線">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6f8f5"/>
+      <stop offset="1" stop-color="#e3e9e4"/>
+    </linearGradient>
+  </defs>
+  <!-- 落下的檔案 -->
+  <g transform="translate(312 26) rotate(12)">
+    <path d="M0 0h44l18 18v58H0z" fill="#14251e" stroke="#a5f3cd" stroke-width="2"/>
+    <path d="M44 0v18h18" fill="none" stroke="#a5f3cd" stroke-width="2"/>
+    <path d="M10 32h40M10 44h40M10 56h28" stroke="#5f8f78" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <path d="M332 112c-6 14-14 22-28 30" fill="none" stroke="#a5f3cd" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7"/>
+  <path d="M300 136l6 10 12-4" fill="none" stroke="#a5f3cd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 畫框與光譜 -->
+  <rect x="48" y="78" width="248" height="148" rx="6" fill="url(#paper)" stroke="#2b3b33" stroke-width="2"/>
+  <rect x="78" y="92" width="206" height="112" fill="none" stroke="#0b1111" stroke-width="2.2"/>
+  <path d="M78 204v5M119 204v5M160 204v5M201 204v5M242 204v5M284 204v5M78 92h-5M78 148h-5M78 204h-5" stroke="#0b1111" stroke-width="2.2"/>
+  <path d="M80 176c12-1 20-2 28-4 6-2 8-24 14-24s7 20 12 22c9 3 22 0 34-2 6-1 9-50 14-50s6 40 10 46c4 6 12 4 20 2 8-2 14-30 20-30s8 24 12 28c6 6 20 10 38 12" fill="none" stroke="#0b1111" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M80 196c40 0 80 0 120 0s62 0 102 0" fill="none" stroke="#9caca5" stroke-width="1.6" stroke-dasharray="4 5"/>
+</svg>

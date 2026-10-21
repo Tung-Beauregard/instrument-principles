@@ -421,3 +421,25 @@ HPLC:
 - ACE 1.7 µm 管柱(耐壓 1,000 bar):https://www.hplc.eu/Downloads/ACE_1_7_Flyer.pdf
 
 HPLC 成分的 kw 與 S、茨維特色帶的速度、GC 與 HPLC 的外觀都是示意;壓力的數字是由文獻的例子換算的推估,不是某一支管柱的實測。
+
+## 數據畫圖(plot/)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/plot/
+
+不是教材,是工具:把儀器匯出的檔案放進瀏覽器,畫成報告用的黑白圖,可下載 SVG(貼進 PowerPoint 後可轉換成圖案編輯)或 300 dpi 的 PNG。檔案只在瀏覽器裡處理,不上傳。
+
+- 光譜(.spc、.asp、兩欄文字):疊圖,原檔的吸光度只加固定位移,可標峰位、可改成正規化
+- DSC(PerkinElmer csv):上排只畫升溫段,下排升溫紅、降溫藍,可選要不要在溫度反轉處接在一起;左側 endo ↑ / exo ↓ 的圖例
+- TGA(PerkinElmer csv 或溫度欄配重量欄的 xlsx):重量 % 與 DTG,csv 的降溫段可用藍色接在後面
+- 質譜(Thermo LCQ Deca XP .RAW):選掃描種類與範圍後平均成棒狀圖,標主要峰與 NL
+
+### 格式與算法的依據
+
+- Galactic SPC 檔頭與 Y 陣列的編碼依 Galactic 的 SPC 檔案格式說明;只支援新格式(fversn 0x4B)與第一個子檔,以 Agilent MicroLab 匯出的檔驗證。
+- Agilent .asp 與 PerkinElmer Pyris 的 csv 欄位,依實際匯出的檔案。
+- LCQ Deca XP .RAW(版本 62)的版面(run header、掃描索引、峰值編碼)是從檔案逆向推得的,沒有原廠文件;讀檔後逐張用檔內索引的基峰與 TIC 核對,全部一致才算讀對。
+- 質譜平均:把選定掃描的峰疊在一起,中心每 0.1 取 ±0.65 的視窗加總,除以掃描張數,局部極大為一根棒,m/z 取視窗內強度加權平均。這個做法在作者的國科會報告裡與 Xcalibur 的平均圖譜在 50 個峰標示中 49 個一致(差的一個是四捨五入),NL 全部一致。
+- DTG:−dW/dT,內插到 1 °C 格點,中央差分後做前後各 8 點的移動平均;重量以第一點為 100%。
+- DSC 分段:依程式溫度的升降;樣品溫度在程式溫度剛反轉時還在往原方向走,所以升溫段從樣品溫度最低點起算、降溫段從最高點起算(可關掉)。
+
+圖上的數值都是原檔讀出來的量測值,沒有校正或平滑(DTG 的移動平均除外);工具不做鑑定或判讀。程式分區與檔案格式細節見 plot/MAINTENANCE.md。

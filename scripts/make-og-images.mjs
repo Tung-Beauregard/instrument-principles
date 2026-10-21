@@ -29,6 +29,7 @@ const SHOTS = [
   { name: 'mass-analyzers', url: 'mass-analyzers/', wait: 18 },
   { name: 'spectroscopy', url: 'spectroscopy/', wait: 18 },
   { name: 'chromatography', url: 'chromatography/', wait: 18 },
+  { name: 'plot', url: 'plot/', wait: 3 },
 ].filter((s) => !only.length || only.includes(s.name));
 
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'og-profile-'));

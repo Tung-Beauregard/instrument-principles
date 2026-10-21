@@ -2,7 +2,9 @@
 
 由新到舊排列。每次交付在「更新紀錄」最上方新增一段，並同步更新「目前缺口」與「下一步」。
 
-## 目前缺口（截至 2026-10-20 最新一次更新）
+## 目前缺口（截至 2026-10-22 最新一次更新）
+
+- `plot/`（數據畫圖，2026-10-22 新增的工具頁）：`plot/MAINTENANCE.md`、`docs/VALIDATION.md` 的段落與 `scripts/check-plot.mjs` 都已建立。未覆蓋：Safari、Firefox 與觸控裝置；真實儀器檔案不在儲存庫裡（只在作者電腦上試過 .spc、.asp、DSC csv、LCQ .RAW，TGA 的 xlsx 與 csv 用合成檔）；SVG 貼進 PowerPoint 後「轉換成圖案」只用 COM 確認插入成功（型別為 Graphic），轉換本身沒有自動化方法，待人工點一次；.spc 舊格式（0x4D）、多子檔與其他 Thermo 機型的 .RAW 沒有檔案可驗證。
 
 - `lcq/MAINTENANCE.md`：2026-10-13 依目前程式重寫，涵蓋分區、座標與擺放、物理數值與推算、阱內運動模型、其他模擬、章節時間軸、播放與跳轉、操作台、錄影、到站人數、網址參數、修改切入點；同日修正的問題另列一節。2026-10-20 補上三個新章節、樣品與碎片表、同位素、離子從哪一側出去、空間電荷、章節連結與文字稿、操作台的串聯質譜與放大掃描。
 - `gc-ms/MAINTENANCE.md`、`uv-vis/MAINTENANCE.md`：已補上效能相關結構（`gc-ms/` 另補上 2026-10-07 的鏡頭、放大鏡與點選放大），完整模型座標、科學公式與時間軸仍待補。
@@ -29,8 +31,27 @@
 - 若取得 LCQ Deca XP 原廠資料，核對噴灑角度、一般掃描與放大掃描的峰寬，以及 `INSTRUMENTS.md` 的來源頁碼。
 - 分享預覽上線後，貼到 LINE、Facebook 或 Slack 看一次實際顯示（社群網站會快取預覽，改圖後可能要用各自的偵錯工具重新抓）。
 - 用 NVDA 或 VoiceOver 實際聽一次動畫講解的字幕（`#capLive`）。
+- 數據畫圖：在 PowerPoint 實際插入下載的 SVG 並「轉換成圖案」看一次；拿更多儀器檔案（實際的 TGA.xlsx、其他批次的 LCQ .RAW、Safari 與 Firefox）試。
 
 ## 更新紀錄
+
+### 2026-10-22：新增工具頁「數據畫圖」（plot/）
+
+- 執行者：Claude，在作者電腦上工作；提交者 tung-beauregard。
+- 基準提交：`473027f`（開工前 `git fetch`，遠端比本機多 16 個提交，先 fast-forward 再修改）。
+- 起因：使用者要把「放檔案就畫圖」的功能併進實驗室網站。做法沿用作者在國科會進度報告裡畫圖的 Python 程式，改寫成瀏覽器端的 JavaScript。
+- 完成：
+  - `plot/index.html`、`plot/app.js`、`plot/parsers.js`、`plot/figure.js`：拖放或選檔後在瀏覽器裡讀檔（Galactic .spc、Agilent .asp、PerkinElmer 的 DSC 與 TGA csv、溫度欄配重量欄的 TGA xlsx、Thermo LCQ Deca XP 的 .RAW、兩欄文字），畫成黑白、完整框線的 SVG（光譜疊圖、DSC 升溫與升降溫、TGA 與 DTG、質譜棒狀圖），可下載 SVG 或 300 dpi 的 PNG。檔案不上傳、不連網路。質譜檔可選掃描種類與範圍（總離子流圖上拖一段）。
+  - 入口：`content/instruments.json` 新增分類「工具」（`tools`）與項目 `plot`；`index.html` 靜態備援新增這一區；`assets/plot.svg` 概念圖；八個教材頁的分頁列最後加上「數據畫圖」（每頁只改那一行）。
+  - 分享預覽：`plot/` 的 og 標籤與 `assets/og/plot.jpg`（`scripts/make-og-images.mjs` 加了 `plot`，用本機 Chrome 重產）。
+  - 檢查：新增 `scripts/check-plot.mjs`（合成各格式的小檔案核對讀檔與畫圖）。
+  - 文件：`plot/MAINTENANCE.md`（新建）、`INSTRUMENTS.md`（數據畫圖一節：格式依據與算法）、`docs/VALIDATION.md`（檢查命令、入口工具區、`plot/` 段落）、`README.md`（結構、檢查命令、維護索引、工具分類）、`AGENTS.md`（路徑清單、分類、維護文件表加上 `plot/`）、本檔。
+- 驗證：
+  - 通過：`node scripts/check-site.mjs`（8 entries, 8 ready lessons, 1 extra page, share previews）、`node scripts/check-plot.mjs`、`node --check` 三個 module、`check-render-quality.mjs`、`check-camera-nav.mjs`、`check-fields.mjs`、`git diff --check`。
+  - 通過（本機 HTTP 預覽，Chromium）：1024 px 與 375 px 寬都沒有橫向捲動（375 px 時分頁列可橫向捲動）；console 沒有錯誤。用作者電腦上的真實檔案餵進頁面：4 個 .spc/.asp（1718 與 1798 點，.asp 的 Y、X 兩欄版本與同名 .spc 的峰位、吸光度一致）、2 個 DSC csv（各 4 段，升降溫交替）、3 個 LCQ .RAW（24、46 與 4382 張掃描，算出的基峰與 TIC 全部與檔內索引一致；4382 張的 LC 全程紀錄讀檔 38 ms、平均 2219 張約 0.5 s），加上合成的 TGA xlsx 與含降溫段的 TGA csv，四種圖都畫出來；SVG 經 `<img>` 畫到 canvas（300 dpi，2490 × 1620 等）正常。
+  - 通過（PowerPoint COM）：下載的 FTIR SVG 用 `Shapes.AddPicture` 插入新簡報，型別為 Graphic（28），尺寸 500 × 388.5 pt。「轉換成圖案」沒有對應的 COM 方法（`Ungroup` 回報只有群組才能用），未執行。
+  - 未執行：Safari、Firefox、真實觸控裝置；真實的 TGA.xlsx（作者的檔在隨身碟上，當時沒接）。
+  - 以上為本機預覽結果；GitHub Pages 部署後的狀態以交付回報為準。
 
 ### 2026-10-20：推送與部署確認（動畫講解改版與分享預覽）
 

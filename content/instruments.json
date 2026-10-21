@@ -15,6 +15,10 @@
     {
       "id": "nmr",
       "name": "NMR"
+    },
+    {
+      "id": "tools",
+      "name": "工具"
     }
   ],
   "instruments": [
@@ -102,6 +106,18 @@
       "image": "./assets/nmr.svg",
       "imageAlt": "剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意",
       "href": "./nmr/"
+    },
+    {
+      "id": "plot",
+      "name": "數據畫圖",
+      "categories": [
+        "tools"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/plot.svg",
+      "imageAlt": "一個檔案落進畫框,框裡畫出一條黑白的光譜曲線",
+      "href": "./plot/"
     }
   ]
 }

@@ -10,9 +10,10 @@
 - [質譜儀-不同分析器比較](https://tung-beauregard.github.io/instrument-principles/mass-analyzers/)
 - [層析-GC 與 HPLC](https://tung-beauregard.github.io/instrument-principles/chromatography/)
 - [光譜-光與分子](https://tung-beauregard.github.io/instrument-principles/spectroscopy/)
+- [數據畫圖](https://tung-beauregard.github.io/instrument-principles/plot/)（工具：把儀器匯出的檔案畫成報告用的圖）
 - [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-目前共有七份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。
+目前共有七份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。另有「工具」區（2026-10-22 起）放數據畫圖：把 FTIR、DSC、TGA、LCQ 質譜的檔案放進瀏覽器就畫成黑白的報告用圖，可下載 SVG 或 PNG；它不是教材，檔案只在瀏覽器裡處理。
 
 離子阱質譜有兩個畫面：「動畫講解」（`lcq/`）與「拆開探索」（`lcq-3d/`）。拆開探索原本是另一份教材「LCQ 離子之旅」，2026-10-13 併入；入口只列一張卡片，兩個畫面由分頁列的「離子阱質譜」一組互相切換，網址都沒有變。
 
@@ -45,11 +46,17 @@ spectroscopy/index.html    光譜-光與分子；無線電波到 X 光、螢光�
 spectroscopy/MAINTENANCE.md  光譜-光與分子教材的程式結構與修改方式
 chromatography/index.html  層析-GC 與 HPLC；從茨維特的色素管柱到氣相與液相層析
 chromatography/MAINTENANCE.md  層析-GC 與 HPLC 教材的程式結構與修改方式
+plot/index.html            數據畫圖（工具）；放進儀器檔案就畫成報告用的黑白圖，可下載 SVG 或 PNG
+plot/parsers.js            數據畫圖的讀檔：.spc、.asp、PerkinElmer 的 DSC 與 TGA csv、xlsx、LCQ .RAW、兩欄文字
+plot/figure.js             數據畫圖的 SVG 繪圖：座標軸、光譜疊圖、DSC、TGA 與 DTG、質譜棒狀圖
+plot/app.js                數據畫圖的頁面邏輯：拖放、檔案清單、各圖的設定、匯出
+plot/MAINTENANCE.md        數據畫圖的程式結構、檔案格式、算法與修改方式
 scripts/check-site.mjs     資料、相對連結與靜態備援檢查
 scripts/check-render-quality.mjs  各教材的 module 語法與畫質、幀率邏輯檢查
 scripts/check-camera-nav.mjs  共用視角操作的滾輪判斷與各教材接線檢查
 scripts/check-fields.mjs   四種電場示意的物理（穩定條件、射出順序、飛行時間的聚焦、Orbitrap 的頻率）與兩份教材的接線檢查
 scripts/make-og-images.mjs 重產 assets/og/ 的分享預覽圖（用本機的 Chrome 或 Edge 無頭截圖）
+scripts/check-plot.mjs     數據畫圖的讀檔與畫圖檢查（在程式裡合成各種格式的小檔案，不需要真實數據）
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
 INSTRUMENTS.md             各儀器功能、數據與示意說明
@@ -70,7 +77,7 @@ HTTP 網站會載入 `content/instruments.json`；此檔是儀器卡片的主要
 - `status: "ready"`：教材已完成，必須填入有效相對網址 `href`。
 - `status: "upcoming"`：僅顯示準備中狀態，不產生可點擊的教材連結。
 - `theme`：`mint`、`blue` 或 `lavender`。
-- `categories`：所屬分類的 `id`，可以填好幾個（GC-MS 同時屬於質譜與層析）。分類本身列在檔案最上方的 `categories`，依那裡的順序分區；同一分類裡依教材陣列的順序。分類裡沒有教材時不顯示那一區。
+- `categories`：所屬分類的 `id`，可以填好幾個（GC-MS 同時屬於質譜與層析）。分類本身列在檔案最上方的 `categories`，依那裡的順序分區；同一分類裡依教材陣列的順序。分類裡沒有教材時不顯示那一區。「工具」分類（`tools`，2026-10-22 起）放數據畫圖這類不是教材的頁面。
 - `name`：儀器名稱，也是入口連結文字。
 - `image`：本站 SVG 或其他靜態圖片相對路徑。
 - 修改資料後，同步更新 `index.html` 的靜態備援卡片。執行檢查避免兩份內容不一致。
@@ -97,6 +104,7 @@ node --check assets/app.js
 node scripts/check-render-quality.mjs
 node scripts/check-camera-nav.mjs
 node scripts/check-fields.mjs
+node scripts/check-plot.mjs
 ```
 
 另需實際檢查：桌面與手機入口排版、每份教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
@@ -123,7 +131,7 @@ node scripts/make-og-images.mjs http://127.0.0.1:8000/
 
 八個 3D 頁面（七份教材，離子阱質譜有兩個畫面）共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
 
-維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)。
+維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)。
 
 ## 品牌與資料來源
 
