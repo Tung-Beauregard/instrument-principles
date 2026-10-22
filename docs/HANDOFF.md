@@ -48,6 +48,13 @@
 
 ## 更新紀錄
 
+### 2026-10-22：推送與部署確認（手機版的面板收合）
+
+- 提交 `7ea0823`，以 fast-forward 推送到 `main`（推送前 `git fetch` 確認遠端沒有新提交）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上的 `assets/mobile-panels.js`、`assets/mobile-panels.css`、六份教材的 `index.html`、`README.md`、`docs/HANDOFF.md`、`docs/VALIDATION.md`、`scripts/check-mobile-panels.mjs` 都和提交的版本完全相同（比對 SHA-256）。
+- 通過：用 Chrome 開正式網址的 `uv-vis/`、`gc-ms/`（先標記已計數，不增加到站人數），直拿 390×844、橫拿 844×390（觸控）與桌機 1280×800 照 VALIDATION.md「手機版面板收合」的步驟測過，結果和本機相同，沒有錯誤。
+- 未執行：手機實機（S23 沒有接上）、macOS 與 iPhone 的 Safari。
+
 ### 2026-10-22：手機版的面板收合（六份教材）
 
 - 執行者：Claude，在作者電腦的 `main`（基準 `bc40e04`，提交前 `git fetch` 確認遠端沒有新提交）。使用者說離子阱質譜在手機上還行，其他教材用手機打開時介面擋住整個視窗，要求「如果用手機開介面可以預設縮小但縮小時要知道哪邊有哪個可以看/調整」，中途補充「可以建議使用橫式螢幕」。
