@@ -349,8 +349,18 @@ DPPH 與福林酚的吸收帶比 4 nm 寬很多，換波長寬度幾乎看不出
 - 即時最高 60 FPS。隱藏分頁暫停場景工作；恢復時平移 `filmStart`、`tour.t0`、`S.scanT0`，不跳過掃描或導覽。
 - `?film` 為影片展示；`?rec` 提供既有 `window.__seek` 固定時間畫格。REC 強制完整畫質、DPR 1，繞過圖表節流與即時幀率上限（`?rec` 時不跑主迴圈）。可用 `?film&rec&t=64` 人工檢查一格。
 
+## 手機版的面板收合（2026-10-22）
+
+- 共用的 `../assets/mobile-panels.js` 與 `../assets/mobile-panels.css`（用法寫在 js 檔開頭的註解）；module 一開始（`if (REC) root.classList.add('rec');` 之後）建立 `mp`。
+- 寬度 760 px 以下或高度 500 px 以下（`MOBILE_QUERY`）時 `<html>` 加上 `mp`，控制面板 `#ctl` 與光譜螢幕 `#console` 搬進底部的停靠區 `.mp-dock`（橫拿時在右側），預設各收成一條細條：「調整 · 樣品、波長、波長寬度、外殼、掃描、導覽、說明、畫質」與「吸收光譜 · ＜`#conSample`＞」（例如「DPPH 甲醇溶液」，每 0.4 秒更新）。點細條展開或收起；按「掃描」時 `mp.open('#console')` 打開光譜，兩塊都展開放不下時把光譜捲進畫面。
+- 收起控制面板時一併關掉說明框（`onToggle`）。手機上的說明框放在標題下方（CSS 變數 `--mp-free-top`），太長就在框內捲動；橫拿時蓋在標題上，不擋右側的停靠區。
+- 導覽或 `?film` 時（`suspended()`）細條藏起來、面板照導覽原本的方式出現，結束後回到原本的收合狀態；導覽字幕放在停靠區上方（`--mp-dock-h`），橫拿時放在左下。
+- 直拿的觸控手機開頁 1.5 秒後提示一次「建議轉成橫式觀看」（`sessionStorage` 的 `mp-rotate-hint`，8 秒後或按 × 收起）。
+- 手機版的樣式是 CSS 最後 `html.mp` 開頭的那一段：標題縮小、讀值卡排成一列、導言、說明文字與頁尾不顯示、控制面板一欄、光譜螢幕改成一欄（讀值排在圖下方一列）、圖例保留。桌機與平板不符合 `MOBILE_QUERY`，不加任何 class，版面和以前相同；`scripts/check-mobile-panels.mjs` 檢查共用樣式表的每條規則都限定在 `html.mp` 底下，也檢查本頁的接線。
+
 ## 修改後要檢查
 
+- 手機尺寸（390×844 與 844×390，觸控）：兩條細條有名稱與內容說明、預設收起、點了展開；按「掃描」光譜自動展開；說明框在標題下方；導覽中細條藏起來，結束後回到原本的狀態；詳見 `docs/VALIDATION.md` 的「手機版面板收合」。
 - 共用命令：`node scripts/check-site.mjs`（含 og 標籤與圖檔）、`node scripts/check-render-quality.mjs`（含這一頁 module 的語法）、`node scripts/check-camera-nav.mjs`（確認有建立 `nav` 並每格呼叫 `nav.step(dt)`）。
 - HTTP 預覽開 `uv-vis/`：console 沒有錯誤；開頭是 DPPH、517 nm、1 nm、吸光度 0.920、樣品光 12%。
 - 樣品、波長寬度、波長（319 與 320 nm 換燈）、拖曳主光柵、掃描（約 6 秒）與上一次的比較、外殼、說明、導覽開始與 Esc 結束、視角操作與 R；數值與預期見 VALIDATION.md 的「uv-vis」一節。

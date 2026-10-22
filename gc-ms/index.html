@@ -294,12 +294,56 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
   .tag,.hud,.tags{transition:none}
 }
 @media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}}
+/* 手機版(html.mp,由 ../assets/mobile-panels.js 加上):說明與底部的層析圖、質譜收成有標籤的細條,「調整」細條打開原本的設定面板 */
+html.mp .brief{gap:8px}
+html.mp .ttl{flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap}
+html.mp .ttl-a{font-size:27px}
+html.mp .ttl-b{font-size:23px;margin:0}
+html.mp .lede{display:none}
+html.mp .story{min-height:0}
+html.mp .chip{flex:1 1 0;min-width:0;padding:5px 8px 6px}
+html.mp .chip-k{letter-spacing:.08em}
+html.mp .chip-v{font-size:13.5px}
+html.mp .chip-k .kname{display:none}
+/* 說明的細條自己帶底色;展開時和底下的說明框接成一塊 */
+html.mp .brief > .mp-tab{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+html.mp .brief > .mp-tab.mp-is-open{border-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0;margin-bottom:-8px}
+html.mp .brief > .mp-tab.mp-is-open + .story{border-top:0;border-top-left-radius:0;border-top-right-radius:0;padding-top:2px}
+/* 主控台:細條在最上面,展開時底下才是圖(圖的高度和原本一樣) */
+html.mp .console{height:auto;grid-template-rows:auto auto 252px}
+html.mp .console.mp-closed{grid-template-rows:none}
+/* 圖固定排在細條下面那一列:導覽中細條藏起來時,主控台的高度才會和原本一樣 */
+html.mp .console > .cs{grid-row:3}
+html.mp .console > .mp-tab + .mp-tab{border-top:1px solid var(--line)}
+@media (min-width:761px){
+  /* 橫拿手機:主控台全寬,兩條細條並排;頁尾的出處省掉(連同那一列),讓出高度給 3D */
+  html.mp .hud{grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"brief ctl ctl" "brief hole hole" "con con con"}
+  html.mp .console{grid-template-rows:auto 212px}
+  html.mp .console > .cs{grid-row:2}
+  html.mp .console > .mp-tab{grid-column:auto}
+  html.mp .console > .mp-tab + .mp-tab{border-top:0;border-left:1px solid var(--line)}
+  html.mp .credit{display:none}
+  /* 打開層析圖時:主控台改放右側整欄,層析圖與質譜用分頁切換(和直拿一樣),左邊留標題、說明和縮小的 3D */
+  html.mp:not(.mp-suspended) .hud:has(> .console.mp-open){grid-template-columns:minmax(250px,330px) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"brief con" "hole con"}
+  html.mp:not(.mp-suspended) .hud:has(> .console.mp-open) > .hole{grid-area:hole}
+  html.mp:not(.mp-suspended) .console.mp-open{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr)}
+  html.mp:not(.mp-suspended) .console.mp-open > .mp-tab{grid-column:1 / -1}
+  html.mp:not(.mp-suspended) .console.mp-open > .mp-tab + .mp-tab{border-left:0;border-top:1px solid var(--line)}
+  html.mp:not(.mp-suspended) .console.mp-open > .cs{grid-row:3}
+  html.mp:not(.mp-suspended) .console.mp-open .cs-ms{display:none;border-left:0!important}
+  html.mp:not(.mp-suspended) .console.mp-open[data-tab="ms"] .cs-ms{display:flex}
+  html.mp:not(.mp-suspended) .console.mp-open[data-tab="ms"] .cs-chrom{display:none}
+  html.mp:not(.mp-suspended) .console.mp-open .tabs{display:flex}
+  html.mp:not(.mp-suspended) .console.mp-open .no-m{display:none!important}
+  html.mp:not(.mp-suspended) .console.mp-open .legend{font-size:10.5px;gap:3px 9px}
+}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"}}
 </script>
 
 <link rel="stylesheet" href="../assets/render-quality.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
 <div class="app" id="app">
@@ -498,6 +542,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 <script type="module">
 import { createQualityControls } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
+import { createMobilePanels } from '../assets/mobile-panels.js';
 import { createFieldDemo } from '../assets/analyzer-fields.js';
 const quality = createQualityControls({ host: '.ctl', onChange: () => resize3D() });
 /* =========================================================
@@ -3589,6 +3634,19 @@ initUI();
 S.run = getRun(S.rate);
 E.tSlider.max = S.run.tEnd.toFixed(2);
 buildTable();
+// 手機版:說明與層析圖、質譜預設收成有標籤的細條,「調整」細條打開原本的設定面板;直拿時建議轉成橫式(../assets/mobile-panels.js)
+// 橫拿的平板(高度超過 500 px)和桌機一樣不收合
+let storyOpen = false;
+createMobilePanels({
+  query: '(max-width: 760px), (max-height: 500px) and (max-width: 1180px)',
+  top: '.brief', rotateHint: true,
+  suspended: () => tourOn(),
+  panels: [
+    { el: '#story', place: 'before', dir: 'down', icon: 'text', label: '說明', items: () => (storyOpen ? '' : E.story.textContent), onToggle: (open) => { storyOpen = open; } },
+    { el: '#console', icon: 'adjust', label: '調整', items: '追蹤成分、時間、升溫速率、組裝或拆開、重新進樣、導覽、動畫、原理說明、畫質', action: () => E.btnSheet.click() },
+    { el: '#console', icon: 'chart', label: '層析圖・質譜', items: () => `示範精油 · HP-5MS · 升溫 ${S.rate} °C/min`, keep: ['#btnPlay'] },
+  ],
+});
 let kicked = false;
 function kickoff() {
   if (kicked) return; kicked = true;

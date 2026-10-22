@@ -93,8 +93,19 @@
 
 頁面本身沒有錄影按鈕。影片用作者電腦上的錄影程式(和 NMR 同一支 `record.mjs`,加上 `--page /mass-analyzers/index.html`):啟動本機伺服器提供網站根目錄,用無頭 Chrome 或 Edge 開 `?film=1&rec=1`,逐格呼叫 `__seek` 並截圖,交給 ffmpeg 編成 1920×1080、30 fps 的 H.264 MP4。錄好的影片不要提交進網站。
 
+## 手機版的面板收合(2026-10-22)
+
+- 共用的 `../assets/mobile-panels.js` 與 `../assets/mobile-panels.css`(用法寫在 js 檔開頭的註解)。`00_core.js` 一開始(`if (REC) root.classList.add('rec');` 之後)建立 `mp`。
+- 寬度 760 px 以下或高度 500 px 以下(`MOBILE_QUERY`)時 `<html>` 加上 `mp`,控制面板 `#ctl` 與主控台 `#console` 搬進底部的停靠區 `.mp-dock`(橫拿時在右側),預設各收成一條細條:「調整 · 分析器、<`#resName`>、外殼、收譜、導覽、簡圖、說明、畫質」與「<`#conTitle`> · <`#conSample`>」(例如「質譜 · 咖啡因、阿魏酸、MRFA(各多帶一個 H⁺)」,每 0.4 秒更新)。點細條展開或收起;按「收譜」時 `mp.open('#console')` 打開主控台,兩塊都展開放不下時把主控台捲進畫面。
+- 收起控制面板時一併關掉說明框(`onToggle`)。手機上的說明框放在標題下方(CSS 變數 `--mp-free-top`),太長就在框內捲動;橫拿時蓋在標題上,不擋右側的停靠區。
+- 導覽或 `?film` 時(`suspended()`)細條藏起來、面板照導覽原本的方式出現,結束後回到原本的收合狀態;導覽字幕放在停靠區上方(`--mp-dock-h`),橫拿時放在左下。
+- 直拿的觸控手機開頁 1.5 秒後提示一次「建議轉成橫式觀看」(`sessionStorage` 的 `mp-rotate-hint`,8 秒後或按 × 收起)。
+- 手機版的樣式是 CSS 最後 `html.mp` 開頭的那一段:標題縮小、讀值卡排成一列、導言與頁尾不顯示、控制面板一欄、主控台改成一欄(三個讀值排在圖下方一列)、圖例保留。簡圖和 980 px 以下一樣由「簡圖」開關(`html.mp.sk-open`,連同電場形狀的說明),寬度超過 980 px 的矮螢幕也照這樣。桌機與平板不符合 `MOBILE_QUERY`,不加任何 class,版面和以前相同;`scripts/check-mobile-panels.mjs` 檢查共用樣式表的每條規則都限定在 `html.mp` 底下,也檢查本頁的接線。
+- 直拿時的取景 `fitPortrait()`:原本固定把畫面往上移 0.36(下半部被控制面板與主控台蓋住);手機版互動時改成 `portraitLift()` 依標題下緣與停靠區上緣算,主角放在兩者之間的正中間(開頁、選分析器時量),導覽中仍是 0.36。
+
 ## 修改後的檢查
 
+- 手機尺寸(390×844 與 844×390,觸控):兩條細條有名稱與內容說明、預設收起、點了展開;按「收譜」主控台自動展開;「簡圖」與「電場形狀」在標題的位置出現;導覽中細條藏起來,結束後回到原本的狀態;詳見 `docs/VALIDATION.md` 的「手機版面板收合」。
 - 在網站根目錄執行 `node scripts/check-site.mjs`、`node scripts/check-render-quality.mjs`(含本頁的 module 語法檢查)、`node scripts/check-camera-nav.mjs` 與 `node scripts/check-fields.mjs`。
 - 用 HTTP 預覽打開 `mass-analyzers/`,四台各收一次譜、點譜放大兩段、跑一次導覽,確認 console 沒有錯誤;在 390px、768px、1280×720 與 1600×900 各看一次(窄螢幕按「簡圖」開關)。
 - 改了影片腳本或簡圖時,用 `?film&rec&t=秒數` 抽幾格,確認字幕、鏡頭、簡圖、標籤與主控台對得上,3D 沒有躲在簡圖、主控台或字幕後面;鏡頭在兩個關鍵格之間是直線移動,也要看途中有沒有穿過物體。

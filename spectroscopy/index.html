@@ -243,6 +243,34 @@ html.film #plot{height:260px}
 @media (max-width:560px){#plot{height:150px}.ctl{bottom:222px;gap:6px 10px}.seg button{padding:5px 8px}}
 /* 窄螢幕的比較表:用左右邊界定寬度(left:50% 時可用寬度只剩半個螢幕,字會擠成一直行) */
 @media (max-width:760px){.cmp{left:12px;right:12px;top:var(--cmp-y,50%);transform:translateY(-50%);max-height:calc(100vh - 24px);overflow:auto}.cmp table{width:100%}}
+/* 手機版(html.mp,由 ../assets/mobile-panels.js 加上):標題與讀值縮小,控制面板與譜收在底部的停靠區 */
+html.mp .hud{left:12px;top:10px;width:min(380px,calc(100vw - 24px))}
+html.mp .hud .k{font-size:16px}
+html.mp .hud .big{font-size:26px;text-shadow:0 0 16px rgba(116,228,255,.3)}
+html.mp .sitenav{margin-bottom:8px;max-width:100%}
+html.mp .chips{gap:6px;margin:6px 0 0}
+html.mp .chip{flex:1 1 0;min-width:0;padding:5px 9px 6px}
+html.mp .chip small{font-size:10px;letter-spacing:.06em}
+html.mp .chip b{display:block;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+html.mp .lede,html.mp .note,html.mp .foot{display:none}
+html.mp input[type=range]{width:100%}
+html.mp .con-head > b,html.mp .con-head > .s{display:none}
+html.mp .legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px}
+html.mp #plot{height:150px}
+/* 說明框:放在標題下方,太長就捲動;橫拿時蓋在標題上,不擋右側的停靠區 */
+html.mp .help{left:12px;right:auto;top:var(--mp-free-top,120px);width:min(380px,calc(100vw - 24px));max-height:calc(100vh - var(--mp-free-top,120px) - 12px);max-height:calc(100dvh - var(--mp-free-top,120px) - 12px);overflow:auto;overscroll-behavior:contain}
+/* 導覽中:字幕放在停靠區上方 */
+html.mp.touring .cap.withcon{bottom:calc(var(--mp-dock-h,230px) + 20px)}
+@media (orientation:landscape){
+  html.mp .help{top:10px;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .cap,html.mp.touring .cap.withcon{left:12px;right:auto;bottom:12px;transform:none;max-width:calc(100vw - min(380px,46vw) - 36px)}
+}
+html.mp .ctl{grid-template-columns:minmax(0,1fr);gap:8px}
+html.mp .seg button{padding:5px 8px}
+/* 簡圖:和窄螢幕一樣由控制面板的按鈕叫出來,出現時取代標題與讀值 */
+html.mp #btnSketch{display:inline-block}
+html.mp.sk-open .note{display:block}
+html.mp.sk-open .chips,html.mp.sk-open .sk-txt,html.mp.sk-open .hud .k,html.mp.sk-open .hud .big,html.mp.touring .note{display:none}
 </style>
 <script type="importmap">
 {"imports":{
@@ -251,6 +279,7 @@ html.film #plot{height:260px}
 }}
 </script>
 <link rel="stylesheet" href="../assets/render-quality.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
 <div id="stage"></div>
@@ -324,6 +353,7 @@ html.film #plot{height:260px}
 // ==== 00_core.js ====
 import { createQualityControls } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
+import { createMobilePanels } from '../assets/mobile-panels.js';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -341,6 +371,16 @@ const FILM = Q.has('film'), REC = Q.has('rec');
 const root = document.documentElement;
 if (FILM) root.classList.add('film');
 if (REC) root.classList.add('rec');
+// 手機版:控制面板與譜預設收成有標籤的細條,放在底部;直拿時建議轉成橫式(../assets/mobile-panels.js)
+const mp = createMobilePanels({
+  dock: true, top: '.hud', rotateHint: true,
+  suspended: () => FILM || root.classList.contains('touring'),
+  panels: [
+    { el: '#ctl', icon: 'adjust', label: '調整', items: () => `光的種類、其他用法、${el('tuneName').textContent.replace(/[(\uFF08].*$/u, '')}、掃描、導覽、比較表、簡圖、說明、畫質`, onToggle: (open) => { if (!open) el('help').classList.remove('show'); } },
+    { el: '#console', icon: 'chart', label: () => el('conTitle').textContent, items: () => el('conSample').textContent },
+  ],
+});
+el('btnScan').addEventListener('click', () => mp.open('#console'));
 window.__err = null;
 addEventListener('error', (e) => { window.__err = String(e.message || e); });
 
@@ -504,12 +544,20 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 92, 0);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
 controls.minDistance = 30; controls.maxDistance = 1100; controls.maxPolarAngle = 1.5;
+// 往上移多少(以半個畫面高為 1)。手機版(html.mp)的面板平常收成底部的細條,不用再讓出下半部:
+// 互動時改成把主角放在標題與停靠區之間的正中間(選儀器、開頁時量);導覽照原本的 0.36
+function portraitLift() {
+  if (!mp.active() || root.classList.contains('touring')) return 0.36;
+  const top = $('.hud').getBoundingClientRect().bottom, dock = document.querySelector('.mp-dock');
+  const bottom = dock ? dock.getBoundingClientRect().top : innerHeight;
+  return clamp((innerHeight - top - bottom) / innerHeight, -0.36, 0.36);
+}
 // 直式的窄螢幕:下半部被控制面板和光譜螢幕蓋住,鏡頭往後拉、畫面往上移;視窗還沒有大小時不調整
 function fitPortrait(p, q) {
   const asp = innerWidth / innerHeight;
   if (!(asp > 0) || asp >= 1.2) return [p, q];
   const k = clamp(1.3 / asp, 1, 2.4), np = q.clone().add(p.clone().sub(q).multiplyScalar(k));
-  const lift = 0.36 * np.distanceTo(q) * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const lift = portraitLift() * np.distanceTo(q) * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
   return [np.setY(np.y - lift), q.clone().setY(q.y - lift)];
 }
 { const [p, q] = fitPortrait(camera.position.clone(), controls.target.clone()); camera.position.copy(p); controls.target.copy(q); }
@@ -1388,13 +1436,14 @@ function drawPlot() {
   const now = performance.now();
   if (!REC && now - plotDrawnAt < 1000 / 30) return;
   plotDrawnAt = now;
+  const P = PLOTS[W.conKey], ck = W.conKey;
+  // 標題與圖例在量畫布之前更新:手機版把譜收起來時畫布寬度是 0,收合列上的標題也要跟著換
+  if (P && ck !== lastCon) { lastCon = ck; el('conTitle').textContent = P.title; el('conSample').textContent = P.sample; el('legend').innerHTML = P.y2 ? (ck === 'fluo' ? '<span><i style="border-top:2px solid #b48cff"></i>吸收</span><span><i style="border-top:2px solid #9d8cff"></i>放光</span>' : '<span><i style="border-top:2px solid #b48cff"></i>香草醛</span><span><i style="border-top:2px dashed #ffb04a"></i>β-胡蘿蔔素</span>') : ''; }
   const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = plot.clientWidth, h = plot.clientHeight;
   if (!w) return;
   if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
   const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
-  const P = PLOTS[W.conKey]; if (!P) return;
-  const ck = W.conKey;
-  if (ck !== lastCon) { lastCon = ck; el('conTitle').textContent = P.title; el('conSample').textContent = P.sample; el('legend').innerHTML = P.y2 ? (ck === 'fluo' ? '<span><i style="border-top:2px solid #b48cff"></i>吸收</span><span><i style="border-top:2px solid #9d8cff"></i>放光</span>' : '<span><i style="border-top:2px solid #b48cff"></i>香草醛</span><span><i style="border-top:2px dashed #ffb04a"></i>β-胡蘿蔔素</span>') : ''; }
+  if (!P) return;
   const fs = FILM ? 14 : 11, Lp = FILM ? 16 : 12, Rp = FILM ? 14 : 10, Tp = FILM ? 22 : 18, Bp = FILM ? 34 : 26;
   const pw = w - Lp - Rp, ph = h - Tp - Bp, yb = Tp + ph;
   const X = (x) => Lp + ((x - P.x0) / (P.x1 - P.x0)) * pw;

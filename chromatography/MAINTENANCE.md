@@ -59,8 +59,20 @@
 
 頁面本身沒有錄影按鈕。影片用作者電腦上的錄影程式(和 NMR 同一支 `record.mjs`,加上 `--page /chromatography/index.html`),逐格呼叫 `__seek` 並截圖,編成 1920×1080、30 fps 的 H.264 MP4。錄好的影片不要提交進網站。
 
+## 手機版的面板收合(2026-10-22)
+
+- 共用的 `../assets/mobile-panels.js` 與 `../assets/mobile-panels.css`(用法寫在 js 檔開頭的註解)。`00_core.js` 一開始(`if (REC) root.classList.add('rec');` 之後)建立 `mp`。
+- 寬度 760 px 以下或高度 500 px 以下(`MOBILE_QUERY`)時 `<html>` 加上 `mp`,控制面板 `#ctl` 與層析圖 `#console` 搬進底部的停靠區 `.mp-dock`(橫拿時在右側),預設各收成一條細條:「調整 · 儀器、<`#condName`>、填充顆粒(只有 HPLC)、進樣、導覽、放大圖、說明、畫質」與「<`#conTitle`> · <`#conSample`>」(例如「氣相層析圖 · 精油 · 升溫」,每 0.4 秒更新)。點細條展開或收起;按「進樣」時 `mp.open('#console')` 打開層析圖,兩塊都展開放不下時把層析圖捲進畫面。
+- 收起控制面板時一併關掉說明框(`onToggle`)。手機上的說明框放在標題下方(CSS 變數 `--mp-free-top`),太長就在框內捲動;橫拿時蓋在標題上,不擋右側的停靠區。
+- 導覽或 `?film` 時(`suspended()`)細條藏起來、面板照導覽原本的方式出現,結束後回到原本的收合狀態;導覽字幕放在停靠區上方(`--mp-dock-h`),橫拿時放在左下。
+- 直拿的觸控手機開頁 1.5 秒後提示一次「建議轉成橫式觀看」(`sessionStorage` 的 `mp-rotate-hint`,8 秒後或按 × 收起)。
+- 手機版的樣式是 CSS 最後 `html.mp` 開頭的那一段:標題縮小、讀值卡排成一列、導言與頁尾不顯示、控制面板一欄、按鈕內距縮小、圖例保留。簡圖和 980 px 以下一樣由「放大圖」開關(`html.mp.sk-open`)。桌機與平板不符合 `MOBILE_QUERY`,不加任何 class,版面和以前相同;`scripts/check-mobile-panels.mjs` 檢查共用樣式表的每條規則都限定在 `html.mp` 底下,也檢查本頁的接線。
+- `drawPlot()` 改成先更新層析圖的標題、樣品與圖例,再量畫布大小:收起時畫布寬度是 0,以前在 `if (!w) return;` 就離開,細條上的標題不會跟著換儀器。
+- 直拿時的取景 `fitPortrait()`:原本固定把畫面往上移 0.36;手機版互動時改成 `portraitLift()` 依標題下緣與停靠區上緣算,主角放在兩者之間的正中間(開頁、選儀器時量),導覽中仍是 0.36。
+
 ## 修改後的檢查
 
+- 手機尺寸(390×844 與 844×390,觸控):兩條細條有名稱與內容說明、預設收起、點了展開;換儀器時收起的細條標題跟著換;按「進樣」層析圖自動展開;導覽中細條藏起來,結束後回到原本的狀態;詳見 `docs/VALIDATION.md` 的「手機版面板收合」。
 - 在網站根目錄執行 `node scripts/check-site.mjs`、`node scripts/check-render-quality.mjs` 與 `node scripts/check-camera-nav.mjs`。
 - 用 HTTP 預覽打開 `chromatography/`,三台各跑一次,GC 換三種溫度、HPLC 換兩種流動相與兩種顆粒,看層析圖、灰色對照、讀值與簡圖;在 390px、768px、1280×720 與桌面寬度各看一次。
 - 改了影片腳本時,用 `?film&rec&t=秒數` 抽幾格,確認字幕、鏡頭、簡圖、標籤與層析圖對得上。

@@ -27,6 +27,8 @@ assets/
   render-quality.js        教材共用畫質、幀率上限與可選效能顯示
   render-quality.css       畫質選單
   camera-nav.js            教材共用的視角操作：滾輪、觸控板、方向鍵與 WASD
+  mobile-panels.js         手機版的面板收合：控制面板、譜與說明收成有標籤的細條，直拿時建議轉成橫式
+  mobile-panels.css        收合細條、底部停靠區與轉向提示的樣式（只在手機尺寸作用）
   analyzer-fields.js       四種質量分析器的電場示意：四極柱與離子阱是翻轉的馬鞍、飛行時間是坡道地形、Orbitrap 是紡錘與碗（GC-MS 與質譜儀-不同分析器比較）
   og/*.jpg                 各頁的分享預覽圖（1200 × 630），由 scripts/make-og-images.mjs 產生
   *.svg                    品牌與儀器概念示意
@@ -54,6 +56,7 @@ plot/MAINTENANCE.md        數據畫圖的程式結構、檔案格式、算法�
 scripts/check-site.mjs     資料、相對連結與靜態備援檢查
 scripts/check-render-quality.mjs  各教材的 module 語法與畫質、幀率邏輯檢查
 scripts/check-camera-nav.mjs  共用視角操作的滾輪判斷與各教材接線檢查
+scripts/check-mobile-panels.mjs  手機版面板收合的樣式範圍（只在手機尺寸作用）與六份教材的接線檢查
 scripts/check-fields.mjs   四種電場示意的物理（穩定條件、射出順序、飛行時間的聚焦、Orbitrap 的頻率）與兩份教材的接線檢查
 scripts/make-og-images.mjs 重產 assets/og/ 的分享預覽圖（用本機的 Chrome 或 Edge 無頭截圖）
 scripts/check-plot.mjs     數據畫圖的讀檔與畫圖檢查（在程式裡合成各種格式的小檔案，不需要真實數據）
@@ -103,6 +106,7 @@ node scripts/check-site.mjs
 node --check assets/app.js
 node scripts/check-render-quality.mjs
 node scripts/check-camera-nav.mjs
+node scripts/check-mobile-panels.mjs
 node scripts/check-fields.mjs
 node scripts/check-plot.mjs
 ```
@@ -130,6 +134,8 @@ node scripts/make-og-images.mjs http://127.0.0.1:8000/
 教材網址加上 `?perf=1` 可查看 FPS、繪圖比例與瀏覽器回報的繪圖裝置；資料僅顯示在本頁，不上傳。例如 `lcq-3d/?perf=1`。若顯示軟體繪圖，先檢查瀏覽器圖形加速與顯示驅動；畫質模式不保證特定裝置的幀率。
 
 八個 3D 頁面（七份教材，離子阱質譜有兩個畫面）共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
+
+手機上（寬度 760 px 以下，或高度 500 px 以下的橫拿畫面），UV-Vis、NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC、GC-MS 六份教材用 `assets/mobile-panels.js` 把控制面板、譜與說明收成有標籤的細條（2026-10-22）。細條寫著這一塊叫什麼、裡面有什麼可以看或調整，例如「調整 · 樣品、波長、波長寬度…」「吸收光譜 · DPPH 甲醇溶液」，點一下展開、再點收起；按「掃描」「收訊」這類按鈕時譜會自動展開。橫拿時面板放在右側，讓出 3D 畫面；直拿的觸控手機會提示一次建議轉成橫式。導覽中細條藏起來，結束後回到原本的收合狀態。桌機與平板的版面不變。離子阱質譜的兩個畫面沒有用這個模組。
 
 維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)。
 

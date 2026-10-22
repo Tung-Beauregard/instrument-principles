@@ -1,0 +1,39 @@
+/* 手機版的面板收合(assets/mobile-panels.js,2026-10-22)。
+   只在 html.mp(手機尺寸)時作用;桌機版面不受影響。顏色沿用各頁面板自己的底色與字色。 */
+.mp-tab{display:none}
+html.mp .mp-tab{display:flex;align-items:center;gap:4px;margin:0;min-height:42px;min-width:0;grid-column:1/-1;flex:none}
+html.mp .mp-toggle{flex:1;min-width:0;display:flex;align-items:center;gap:8px;min-height:42px;margin:0;padding:8px 10px 8px 12px;border:0;border-radius:inherit;background:transparent;color:inherit;font:inherit;font-size:13px;line-height:1.3;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html.mp .mp-toggle:focus-visible{outline:2px solid currentColor;outline-offset:-3px}
+html.mp .mp-ico{width:16px;height:16px;flex:none;opacity:.8}
+html.mp .mp-label{font-weight:700;white-space:nowrap;flex:none}
+/* 裡面有什麼:最多兩行,窄的手機也看得到大部分項目 */
+html.mp .mp-items{flex:1;min-width:0;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;white-space:normal;font-size:12px;line-height:1.35;opacity:.62}
+html.mp .mp-chev{flex:none;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.08)}
+html.mp .mp-chev svg{width:14px;height:14px;transition:transform .2s}
+html.mp .mp-down .mp-chev svg{transform:rotate(180deg)}
+html.mp .mp-is-open:not(.mp-act) .mp-chev svg{transform:rotate(180deg)}
+html.mp .mp-is-open.mp-down .mp-chev svg{transform:none}
+html.mp .mp-keep{display:flex;align-items:center;gap:6px;padding-right:8px}
+html.mp .mp-keep:empty{display:none}
+/* 收起:面板只剩細條 */
+html.mp .mp-closed{padding:0!important;min-height:0!important;height:auto!important;overflow:hidden}
+html.mp .mp-closed > :not(.mp-tab){display:none!important}
+html.mp .mp-hidden{display:none!important}
+/* 展開:細條是面板的標題列 */
+html.mp .mp-open > .mp-tab:not(.mp-act){border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:4px}
+/* 底部停靠區:原本各自 position: fixed 的面板在這裡由上往下排 */
+html.mp .mp-dock{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom, 0px));z-index:6;display:flex;flex-direction:column;gap:8px;overflow-y:auto;overscroll-behavior:contain;pointer-events:none;scrollbar-width:none}
+html.mp .mp-dock::-webkit-scrollbar{display:none}
+html.mp .mp-dock > *{position:static!important;inset:auto!important;transform:none!important;width:auto!important;max-width:none!important;margin:0!important;pointer-events:auto;flex:none}
+/* 橫拿手機:停靠區放右側,中間的 3D 畫面不被擋住 */
+@media (orientation:landscape){
+  html.mp .mp-dock{left:auto;right:calc(12px + env(safe-area-inset-right, 0px));width:min(380px,46vw)}
+}
+/* 導覽、影片中:細條藏起來,面板照導覽原本的方式出現 */
+html.mp-suspended .mp-tab{display:none!important}
+/* 直拿手機時的「建議轉成橫式觀看」提示:放在標題下方,8 秒後自己收起 */
+.mp-rotate{position:fixed;left:50%;top:var(--mp-free-top,140px);transform:translateX(-50%);z-index:20;display:flex;align-items:center;gap:8px;width:max-content;max-width:calc(100vw - 32px);padding:5px 5px 5px 12px;border-radius:999px;background:rgba(10,15,19,.9);border:1px solid rgba(255,255,255,.16);color:#eaf3f6;font-size:12.5px;line-height:1.4;box-shadow:0 6px 24px rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.mp-rotate .mp-ico{width:18px;height:18px;flex:none;opacity:.85}
+.mp-rotate-x{flex:none;width:30px;height:30px;display:grid;place-items:center;margin:0;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.1);color:inherit;cursor:pointer}
+.mp-rotate-x svg{width:12px;height:12px}
+@media (prefers-reduced-motion:reduce){html.mp .mp-chev svg{transition:none}}
