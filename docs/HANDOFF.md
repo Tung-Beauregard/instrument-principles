@@ -48,6 +48,13 @@
 
 ## 更新紀錄
 
+### 2026-10-22：推送與部署確認（手機版第二輪）
+
+- 提交 `9cd9bd7`，以 fast-forward 推送到 `main`（推送前 `git fetch` 確認遠端沒有新提交）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上的 `assets/mobile-panels.js`、`assets/mobile-panels.css`、六份教材的 `index.html`、`README.md`、`docs/HANDOFF.md`、`docs/VALIDATION.md`、`scripts/check-mobile-panels.mjs` 都和提交的版本完全相同（比對 SHA-256）。
+- 通過：用 Chrome 開正式網址的 `spectroscopy/`、`gc-ms/`（先標記已計數，不增加到站人數），在 390×844、844×390、360×680、780×300（觸控）與桌機 1280×800 照 VALIDATION.md「手機版面板收合」的步驟測過，結果和本機相同，沒有錯誤。
+- 未執行：手機實機（S23 沒有接上）、macOS 與 iPhone 的 Safari。
+
 ### 2026-10-22：手機版第二輪（3D 讓位、橫拿版面）
 
 - 執行者：Claude，在作者電腦的 `main`（基準 `4ddd0ea`）。使用者用手機看過第一輪之後說：「光與分子互動 感覺手機也不太順」，接著說「GC那一頁 橫向後上面的介面還在擋住大部分介面了」。
