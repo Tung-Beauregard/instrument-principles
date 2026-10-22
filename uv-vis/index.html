@@ -199,6 +199,17 @@ html.mp .con-body{grid-template-columns:minmax(0,1fr);gap:8px}
 html.mp .meters{flex-direction:row;align-items:flex-end;gap:12px}
 html.mp .meters .m{flex:1;min-width:0}
 html.mp .m.big b.n{font-size:20px}
+/* 橫拿(高度常常只剩 300 px 左右):標題排成一行、讀值卡變矮,停靠區在右上角(見 mobile-panels.css) */
+@media (orientation:landscape){
+  html.mp .hud{top:8px}
+  html.mp .sitenav{margin-bottom:6px}
+  html.mp .hud .k,html.mp .hud .big{display:inline;white-space:nowrap}
+  html.mp .hud .k{font-size:14px;margin-right:8px}
+  html.mp .hud .big{font-size:19px}
+  html.mp .chips{margin-top:4px}
+  html.mp .chip{padding:3px 8px 4px}
+  html.mp .chip b{font-size:13px}
+}
 </style>
 <script type="importmap">
 {"imports":{
@@ -1285,7 +1296,8 @@ function interactive(dt, now) {
   W.sample = S.sample; W.scan = S.scan; W.ghost = S.ghost; W.flick = 1;
   W.labels = null; W.conOp = 1; W.cap = null; W.title = W.outro = 0;
 }
-function render() { composer.render(); labelR.render(scene, camera); }
+// 手機版:3D 的投影中心移到標題與停靠區之外的空地(mp.applyView,導覽與影片時不作用)
+function render() { mp.applyView(camera); composer.render(); labelR.render(scene, camera); }
 function resize() {
   const w = innerWidth, h = innerHeight;
   DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);

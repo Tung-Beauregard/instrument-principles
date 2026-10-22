@@ -269,6 +269,17 @@ html.mp.sk-open .note{display:block}
 html.mp.sk-open .chips,html.mp.sk-open .sk-txt,html.mp.sk-open .hud .k,html.mp.sk-open .hud .big,html.mp.touring .note{display:none}
 html.mp.sk-open.sk-field .sk-txt{display:block;font-size:11.5px;line-height:1.55;margin-top:4px}
 html.mp.sk-open.sk-field .hud{z-index:7}
+/* 橫拿(高度常常只剩 300 px 左右):標題排成一行、讀值卡變矮,停靠區在右上角(見 mobile-panels.css) */
+@media (orientation:landscape){
+  html.mp .hud{top:8px}
+  html.mp .sitenav{margin-bottom:6px}
+  html.mp .hud .k,html.mp .hud .big{display:inline;white-space:nowrap}
+  html.mp .hud .k{font-size:14px;margin-right:8px}
+  html.mp .hud .big{font-size:19px}
+  html.mp .chips{margin-top:4px}
+  html.mp .chip{padding:3px 8px 4px}
+  html.mp .chip b{font-size:13px}
+}
 </style>
 <script type="importmap">
 {"imports":{
@@ -540,13 +551,10 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 95, -10);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
 controls.minDistance = 4; controls.maxDistance = 900; controls.maxPolarAngle = 1.47;
-// 往上移多少(以半個畫面高為 1)。手機版(html.mp)的面板平常收成底部的細條,不用再讓出下半部:
-// 互動時改成把主角放在標題與停靠區之間的正中間(選儀器、開頁時量);導覽照原本的 0.36
+// 往上移多少(以半個畫面高為 1)。手機版(html.mp)互動時不移:render() 裡的 mp.applyView() 會把投影中心
+// 放到標題與停靠區之外的空地,面板展開或收起時也跟著移;導覽照原本的 0.36
 function portraitLift() {
-  if (!mp.active() || root.classList.contains('touring')) return 0.36;
-  const top = $('.hud').getBoundingClientRect().bottom, dock = document.querySelector('.mp-dock');
-  const bottom = dock ? dock.getBoundingClientRect().top : innerHeight;
-  return clamp((innerHeight - top - bottom) / innerHeight, -0.36, 0.36);
+  return mp.active() && !root.classList.contains('touring') ? 0 : 0.36;
 }
 // 直式的窄螢幕(手機、直拿的平板):下半部被控制面板和主控台蓋住,鏡頭往後拉、畫面往上移,整台才放得進上方露出來的那一段
 // 視窗還沒有大小時(例如在隱藏的分頁或面板裡開啟)寬高比是 NaN 或 0,這時不調整,否則相機位置會變成 NaN、整個畫面不見
@@ -2378,7 +2386,8 @@ function applyShift() {
   else if (camera.view && camera.view.enabled) camera.clearViewOffset();
 }
 function render() {
-  applyShift();
+  // 手機版:3D 的投影中心移到標題與停靠區之外的空地;導覽、影片與桌機照原本的 applyShift()
+  if (!mp.applyView(camera)) applyShift();
   fitClip(controls.target);
   composer.render(); labelR.render(scene, camera);
 }

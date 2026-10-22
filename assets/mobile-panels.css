@@ -25,9 +25,11 @@ html.mp .mp-open > .mp-tab:not(.mp-act){border-bottom:1px solid rgba(255,255,255
 html.mp .mp-dock{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom, 0px));z-index:6;display:flex;flex-direction:column;gap:8px;overflow-y:auto;overscroll-behavior:contain;pointer-events:none;scrollbar-width:none}
 html.mp .mp-dock::-webkit-scrollbar{display:none}
 html.mp .mp-dock > *{position:static!important;inset:auto!important;transform:none!important;width:auto!important;max-width:none!important;margin:0!important;pointer-events:auto;flex:none}
-/* 橫拿手機:停靠區放右側,中間的 3D 畫面不被擋住 */
+/* 橫拿手機(高度常常只剩 300 px 左右):停靠區掛在右上角,面板往下展開,下面整條留給 3D 畫面 */
 @media (orientation:landscape){
-  html.mp .mp-dock{left:auto;right:calc(12px + env(safe-area-inset-right, 0px));width:min(380px,46vw)}
+  html.mp .mp-dock{left:auto;right:calc(12px + env(safe-area-inset-right, 0px));top:calc(8px + env(safe-area-inset-top, 0px));bottom:auto;width:min(380px,46vw)}
+  html.mp .mp-dock .mp-chev svg{transform:rotate(180deg)}
+  html.mp .mp-dock .mp-is-open .mp-chev svg{transform:none}
 }
 /* 導覽、影片中:細條藏起來,面板照導覽原本的方式出現 */
 html.mp-suspended .mp-tab{display:none!important}

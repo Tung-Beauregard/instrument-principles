@@ -135,7 +135,7 @@ node scripts/make-og-images.mjs http://127.0.0.1:8000/
 
 八個 3D 頁面（七份教材，離子阱質譜有兩個畫面）共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
 
-手機上（寬度 760 px 以下，或高度 500 px 以下的橫拿畫面），UV-Vis、NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC、GC-MS 六份教材用 `assets/mobile-panels.js` 把控制面板、譜與說明收成有標籤的細條（2026-10-22）。細條寫著這一塊叫什麼、裡面有什麼可以看或調整，例如「調整 · 樣品、波長、波長寬度…」「吸收光譜 · DPPH 甲醇溶液」，點一下展開、再點收起；按「掃描」「收訊」這類按鈕時譜會自動展開。橫拿時面板放在右側，讓出 3D 畫面；直拿的觸控手機會提示一次建議轉成橫式。導覽中細條藏起來，結束後回到原本的收合狀態。桌機與平板的版面不變。離子阱質譜的兩個畫面沒有用這個模組。
+手機上（寬度 760 px 以下，或高度 500 px 以下的橫拿畫面），UV-Vis、NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC、GC-MS 六份教材用 `assets/mobile-panels.js` 把控制面板、譜與說明收成有標籤的細條（2026-10-22）。細條寫著這一塊叫什麼、裡面有什麼可以看或調整，例如「調整 · 樣品、波長、波長寬度…」「吸收光譜 · DPPH 甲醇溶液」，點一下展開、再點收起；按「掃描」「收訊」這類按鈕時譜會自動展開。面板展開時，3D 的主角會移到沒被擋住的地方；橫拿時標題縮成一行、細條掛在右上角（GC-MS 是上下各一條），下面整片留給 3D；直拿的觸控手機會提示一次建議轉成橫式。導覽中細條藏起來，結束後回到原本的收合狀態。桌機與平板的版面不變。離子阱質譜的兩個畫面沒有用這個模組。
 
 維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)。
 

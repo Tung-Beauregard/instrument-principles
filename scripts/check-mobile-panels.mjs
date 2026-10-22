@@ -43,7 +43,13 @@ for (const [lesson, cfg] of Object.entries(LESSONS)) {
     assert.ok(/el: '#ctl'/.test(call) && /el: '#console'/.test(call), `${lesson}: 控制面板與譜都要能收合`);
     assert.ok(new RegExp(`${cfg.run.replace('#', '#?')}'\\)\\)?\\.addEventListener\\('click', \\(\\) => mp\\.open\\('#console'\\)\\)`).test(html), `${lesson}: 按 ${cfg.run} 時沒有打開譜`);
     assert.ok(/onToggle: \(open\) => \{ if \(!open\) .*\('help'\)\.classList\.remove\('show'\); \}/.test(call), `${lesson}: 收起控制面板時沒有一起關掉說明框`);
+    // 3D 讓位:render() 每一格呼叫 mp.applyView(camera);有直拿取景的頁面,手機版互動時不再自己往上移
+    const r0 = html.indexOf('function render() {');
+    assert.ok(r0 > 0 && /mp\.applyView\(camera\)/.test(html.slice(r0, r0 + 400)), `${lesson}: render() 沒有呼叫 mp.applyView(camera)`);
+    if (html.includes('function fitPortrait(')) {
+      assert.ok(/function portraitLift\(\) \{\n  return mp\.active\(\) && !root\.classList\.contains\('touring'\) \? 0 : 0\.36;/.test(html), `${lesson}: 手機版互動時 portraitLift() 要是 0(由 mp.applyView 取景)`);
+    }
   }
   assert.ok(/html\.mp \.hud|html\.mp \.brief/.test(html), `${lesson}: 沒有手機版的標題樣式`);
 }
-console.log(`PASS: mobile-panels.css only applies at phone sizes; ${Object.keys(LESSONS).length} lessons wired (dock, labels, run opens the chart, tour suspends, rotate hint).`);
+console.log(`PASS: mobile-panels.css only applies at phone sizes; ${Object.keys(LESSONS).length} lessons wired (dock, labels, run opens the chart, tour suspends, rotate hint, 3D kept in the free area).`);

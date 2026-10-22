@@ -21,8 +21,14 @@
 // suspended() 傳回 true 時(導覽、影片)暫時全部展開、藏起細條,結束後恢復原本的收合狀態
 // rotateHint  true 時,觸控手機直拿的話在 3D 畫面下方提示「建議轉成橫式觀看」,8 秒後或按 × 收起;
 //             同一次瀏覽(sessionStorage)只出現一次,導覽中不出現
-// 橫拿手機時(landscape)停靠區改放在右側,不再整條橫在底部,讓出中間的 3D 畫面。
-// 傳回 { open(el), close(el), toggle(el), active() };open(el) 在停靠區裡會把那塊面板捲進畫面(例如按「掃描」後的光譜)。
+// 橫拿手機時(landscape)停靠區改放在右上角、面板往下展開,下面整條讓給 3D 畫面。
+// 傳回 { open(el), close(el), toggle(el), active(), applyView(camera), freeRect() };
+//   open(el) 在停靠區裡會把那塊面板捲進畫面(例如按「掃描」後的光譜)。
+//   applyView(camera) 給有停靠區的頁面在 render() 裡呼叫:手機上(不是導覽或影片)把 three.js 相機的投影中心
+//     (鏡頭看的那一點)平順地移到標題與停靠區之外最大的那一塊空地中間,空地小時稍微縮小(camera.zoom 最小 0.62),
+//     面板展開或收起時跟著移;傳回 true 表示這一格的投影由這裡處理,false 時(桌機、導覽、影片)
+//     會先清掉自己設的偏移與縮放,頁面照原本的方式處理。空地每 0.4 秒與面板開關、視窗大小改變時重量,不在每一格量。
+//   freeRect() 傳回目前量到的空地 {x, y, w, h, cx, cy}(px)。傳回的這個物件也放在 globalThis.__mobilePanels,方便除錯與測試。
 export const MOBILE_QUERY = '(max-width: 760px), (max-height: 500px)';
 const PORTRAIT_PHONE = '(orientation: portrait) and (max-width: 760px) and (pointer: coarse)';
 const HINT_KEY = 'mp-rotate-hint';
@@ -40,6 +46,7 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
   const root = document.documentElement;
   const mq = matchMedia(query);
   const portrait = matchMedia(PORTRAIT_PHONE);
+  const landscape = matchMedia('(orientation: landscape)');
   const $ = (s) => (typeof s === 'string' ? document.querySelector(s) : s);
   const list = panels.map((cfg, i) => ({ ...cfg, i, el: $(cfg.el), open: !!cfg.open })).filter((p) => p.el);
   let on = false, susp = false, dockEl = null, uid = 0;
@@ -122,12 +129,57 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
     const y = tr ? tr.bottom + 8 : 120;
     root.style.setProperty('--mp-free-top', `${Math.round(y)}px`);
     if (!dockEl) return;
-    // the dock may go up to the top of the screen when it sits beside the title (landscape), else only to below it
+    // landscape: the dock hangs from the top right, beside the title, and may reach the bottom of the screen;
+    // portrait: it sits on the bottom and may grow only up to below the title
     const d = dockEl.getBoundingClientRect();
+    const fromTop = landscape.matches; // mobile-panels.css hangs the dock from the top in landscape
     const beside = tr && (d.left >= tr.right || d.right <= tr.left);
-    dockEl.style.maxHeight = `${Math.max(120, innerHeight - (beside ? 12 : y) - 12)}px`;
+    const room = fromTop ? innerHeight - d.top - 12 : innerHeight - (beside ? 12 : y) - 12;
+    dockEl.style.maxHeight = `${Math.max(120, room)}px`;
     // pages place things above the dock with this (e.g. the tour captions)
     root.style.setProperty('--mp-dock-h', `${Math.round(dockEl.offsetHeight)}px`);
+    free = measureFree(tr, dockEl.getBoundingClientRect());
+  }
+  // the biggest empty rectangle left by the title and the dock (candidates are built from their edges);
+  // a squarer and bigger area wins, and the previous choice is kept unless another one is clearly bigger
+  let free = null;
+  function measureFree(T, D) {
+    const w = innerWidth, h = innerHeight, none = { left: 0, right: 0, top: 0, bottom: 0 };
+    T = T || none; D = D && D.height > 0 ? D : none;
+    const hit = (r, o) => o.right > o.left && r[0] < o.right - 1 && r[2] > o.left + 1 && r[1] < o.bottom - 1 && r[3] > o.top + 1;
+    const xs0 = [0, T.right, D.right], xs1 = [w, T.left, D.left], ys0 = [0, T.bottom, D.bottom], ys1 = [h, T.top, D.top];
+    const prev = free;
+    let best = null, bs = -Infinity;
+    for (const x0 of xs0) for (const x1 of xs1) for (const y0 of ys0) for (const y1 of ys1) {
+      const r = [x0, y0, x1, y1];
+      if (x1 - x0 < 60 || y1 - y0 < 60 || hit(r, T) || hit(r, D)) continue;
+      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+      let sc = Math.min(x1 - x0, y1 - y0) + 0.02 * Math.max(x1 - x0, y1 - y0);
+      if (prev && Math.abs(prev.cx - cx) < 40 && Math.abs(prev.cy - cy) < 40) sc += 24;
+      if (sc > bs) { bs = sc; best = { x: x0, y: y0, w: x1 - x0, h: y1 - y0, cx, cy }; }
+    }
+    // nothing left (both panels open up to the title): keep the last place rather than jumping to the middle
+    return best || prev || { x: 0, y: 0, w, h, cx: w / 2, cy: h / 2 };
+  }
+  // keep the 3D subject in the free area (see the header comment)
+  const view = { x: 0, y: 0, z: 1, set: false, last: 0 };
+  function applyView(camera) {
+    const now = performance.now(), dt = view.last ? Math.min(0.1, (now - view.last) / 1000) : 0;
+    view.last = now;
+    if (!on || !dockEl || suspended()) {
+      if (view.set) { camera.clearViewOffset(); camera.zoom = 1; camera.updateProjectionMatrix(); view.set = false; }
+      view.x = 0; view.y = 0; view.z = 1;
+      return false;
+    }
+    const w = innerWidth, h = innerHeight, F = free || measureFree(null, null);
+    const tx = w / 2 - F.cx, ty = h / 2 - F.cy, tz = Math.min(1, Math.max(0.62, Math.sqrt((F.w * F.h) / (w * h)) / 0.62));
+    const k = view.set ? 1 - Math.exp(-7 * dt) : 1; // about a third of a second to settle; the first frame jumps
+    view.x += (tx - view.x) * k; view.y += (ty - view.y) * k; view.z += (tz - view.z) * k;
+    camera.zoom = view.z;
+    // setViewOffset sets the aspect from the full size and updates the projection matrix
+    camera.setViewOffset(w, h, view.x, view.y, w, h);
+    view.set = true;
+    return true;
   }
   // "turn the phone sideways" hint
   let hint = null, hintTimer = 0, hintShown = false;
@@ -199,7 +251,7 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
   susp = !!suspended();
   root.classList.toggle('mp-suspended', susp);
   if (mq.matches) enter(); else apply();
-  return {
+  const api = {
     open: (el) => {
       const p = find(el);
       if (!p) return;
@@ -210,5 +262,10 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
     close: (el) => { const p = find(el); if (p && p.open) toggle(p, false); },
     toggle: (el) => { const p = find(el); if (p) toggle(p); },
     active: () => on,
+    applyView,
+    freeRect: () => free,
   };
+  // 除錯與測試用(和 camera-nav.js 的 globalThis.__cameraNav 一樣)
+  globalThis.__mobilePanels = api;
+  return api;
 }

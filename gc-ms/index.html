@@ -316,26 +316,50 @@ html.mp .console.mp-closed{grid-template-rows:none}
 html.mp .console > .cs{grid-row:3}
 html.mp .console > .mp-tab + .mp-tab{border-top:1px solid var(--line)}
 @media (min-width:761px){
-  /* 橫拿手機:主控台全寬,兩條細條並排;頁尾的出處省掉(連同那一列),讓出高度給 3D */
-  html.mp .hud{grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"brief ctl ctl" "brief hole hole" "con con con"}
+  /* 橫拿手機(網址列占掉一段時高度只剩 300 px 左右):上面一條是分頁列、讀值與說明細條,下面一條是主控台的兩條細條,
+     中間整片是 3D。標題省掉(分頁列上已經標出 GC-MS),頁尾的出處也省掉 */
+  html.mp{--gut:12px}
+  html.mp .hud{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"brief brief" "hole hole" "con con";padding:calc(8px + env(safe-area-inset-top, 0px)) var(--gut) calc(8px + env(safe-area-inset-bottom, 0px));gap:8px 12px}
+  html.mp .hud>.hole{grid-area:hole}
+  html.mp .credit{display:none}
+  html.mp .brief{position:relative;z-index:2;flex-direction:row;align-items:center;gap:8px}
+  html.mp .sitenav{flex:1 1 0;min-width:120px}
+  html.mp .ttl{display:none}
+  html.mp .chips{flex:none;flex-wrap:nowrap;gap:6px}
+  html.mp .chip{flex:none;width:86px;padding:3px 8px 4px}
+  html.mp .chip-v{font-size:13px}
+  html.mp .brief > .mp-tab{flex:0 1 230px;min-width:150px}
+  html.mp .tourbar{flex:0 1 auto;min-width:0}
+  /* 說明框:從上面那一條往下展開,蓋在 3D 的左上角(和細條分成兩塊) */
+  html.mp .story{position:absolute;left:0;top:calc(100% + 6px);width:min(440px,calc(50vw - 30px));max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px);overflow:auto}
+  html.mp .brief > .mp-tab.mp-is-open{border-bottom:1px solid var(--line);border-radius:var(--r);margin-bottom:0}
+  html.mp .brief > .mp-tab.mp-is-open + .story{border-top:1px solid var(--line);border-radius:var(--r);padding-top:9px}
+  /* 主控台收起時:兩條細條並排 */
   html.mp .console{grid-template-rows:auto 212px}
   html.mp .console > .cs{grid-row:2}
   html.mp .console > .mp-tab{grid-column:auto}
   html.mp .console > .mp-tab + .mp-tab{border-top:0;border-left:1px solid var(--line)}
-  html.mp .credit{display:none}
-  /* 打開層析圖時:主控台改放右側整欄,層析圖與質譜用分頁切換(和直拿一樣),左邊留標題、說明和縮小的 3D */
-  html.mp:not(.mp-suspended) .hud:has(> .console.mp-open){grid-template-columns:minmax(250px,330px) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"brief con" "hole con"}
-  html.mp:not(.mp-suspended) .hud:has(> .console.mp-open) > .hole{grid-area:hole}
-  html.mp:not(.mp-suspended) .console.mp-open{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr)}
-  html.mp:not(.mp-suspended) .console.mp-open > .mp-tab{grid-column:1 / -1}
-  html.mp:not(.mp-suspended) .console.mp-open > .mp-tab + .mp-tab{border-left:0;border-top:1px solid var(--line)}
-  html.mp:not(.mp-suspended) .console.mp-open > .cs{grid-row:3}
-  html.mp:not(.mp-suspended) .console.mp-open .cs-ms{display:none;border-left:0!important}
-  html.mp:not(.mp-suspended) .console.mp-open[data-tab="ms"] .cs-ms{display:flex}
-  html.mp:not(.mp-suspended) .console.mp-open[data-tab="ms"] .cs-chrom{display:none}
-  html.mp:not(.mp-suspended) .console.mp-open .tabs{display:flex}
-  html.mp:not(.mp-suspended) .console.mp-open .no-m{display:none!important}
-  html.mp:not(.mp-suspended) .console.mp-open .legend{font-size:10.5px;gap:3px 9px}
+  /* 打開層析圖時:主控台改放右半邊(層析圖與質譜用分頁切換,和直拿一樣),左半邊是 3D */
+  html.mp:not(.mp-suspended) .hud:has(> .console.mp-open){grid-template-rows:auto minmax(0,1fr);grid-template-areas:"brief brief" "hole con"}
+  html.mp .console.mp-open{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+  html.mp .console.mp-open > .cs{grid-row:2;grid-column:1 / -1}
+  html.mp .console.mp-open .cs-ms{display:none;border-left:0!important}
+  html.mp .console.mp-open[data-tab="ms"] .cs-ms{display:flex}
+  html.mp .console.mp-open[data-tab="ms"] .cs-chrom{display:none}
+  html.mp .console.mp-open .tabs{display:flex}
+  html.mp .console.mp-open .no-m{display:none!important}
+  html.mp .console.mp-open .legend{font-size:10.5px;gap:3px 9px}
+  /* 導覽中:分頁列先藏起來,上面一條是讀值與導覽列,講稿排在它下面一整行;3D 在左半邊,主控台在右半邊(圖例與總覽條省掉) */
+  html.mp.mp-suspended .hud{grid-template-rows:auto minmax(0,1fr);grid-template-areas:"brief brief" "hole con"}
+  html.mp.mp-suspended .sitenav{display:none}
+  html.mp.mp-suspended .brief{flex-wrap:wrap;row-gap:6px}
+  html.mp.mp-suspended .story{position:static;order:2;flex:1 0 100%;width:auto;max-height:5.2em;overflow:auto;padding:6px 12px}
+  html.mp.mp-suspended .tourbar{order:1;flex:1 1 auto}
+  html.mp.mp-suspended .console .legend,html.mp.mp-suspended .console .cv-over{display:none}
+}
+@media (min-width:761px) and (max-height:420px){
+  /* 很矮的橫拿畫面(網址列占掉一段時):打開的圖省掉圖例與總覽條,層析圖才有高度(總覽條的跳時間可以改用拖曳層析圖) */
+  html.mp .console.mp-open .legend,html.mp .console.mp-open .cv-over{display:none}
 }
 </style>
 <script type="importmap">
