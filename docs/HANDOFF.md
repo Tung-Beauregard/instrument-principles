@@ -48,6 +48,13 @@
 
 ## 更新紀錄
 
+### 2026-10-22：推送與部署確認（離子阱質譜兩頁的手機版）
+
+- 提交 `80aac87`，以 fast-forward 推送到 `main`（推送前 `git fetch` 確認遠端沒有新提交）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上的 `assets/mobile-panels.js`、`lcq/index.html`、`lcq-3d/index.html`、`uv-vis/index.html`、`gc-ms/index.html`、`README.md`、`docs/HANDOFF.md`、`docs/VALIDATION.md`、`scripts/check-mobile-panels.mjs` 都和提交的版本完全相同（比對 SHA-256）。
+- 通過：用 Chrome 開正式網址的 `lcq/`、`lcq-3d/`（先標記已計數，不增加到站人數），在 390×844、844×390、360×680、780×300（觸控）與桌機 1280×800 照 VALIDATION.md「手機版面板收合」的步驟測過，結果和本機相同，沒有錯誤。
+- 未執行：手機實機（S23 沒有接上）、macOS 與 iPhone 的 Safari。
+
 ### 2026-10-22：離子阱質譜兩頁加轉向提示、全站手機檢查
 
 - 執行者：Claude，在作者電腦的 `main`（基準 `1431b15`）。使用者要求：「LCQ的兩頁也加轉向提示  目前每頁都檢查一下」。
