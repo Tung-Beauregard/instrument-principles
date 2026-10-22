@@ -379,8 +379,24 @@ button { font: inherit; color: inherit; }
   #sitenav .sn-name { font-size: 11.5px; }
 }
 
+/* 手機橫拿(高度 500 px 以下的橫向畫面;html.mp 由 ../assets/mobile-panels.js 加上):控制面板收成右上角的「調整」細條,
+   往下展開;標題排成一行、說明文字省掉,分頁列讓出右上角。直拿照原本的排法 */
+html.mp #sitenav{top:8px;left:12px;max-width:calc(100% - min(380px,46vw) - 40px)}
+html.mp .side{top:50px;left:12px;width:min(360px,calc(100% - min(380px,46vw) - 40px));gap:6px}
+html.mp .brand h1{flex-direction:row;align-items:baseline;gap:8px}
+html.mp .brand h1 span{font-size:13px}
+html.mp .brand h1 b{font-size:19px}
+html.mp .brand p,html.mp .why{display:none}
+html.mp .stat{padding:4px 8px 3px}
+html.mp .stat b{font-size:13px}
+/* 停靠區裡的控制面板不能拖動或縮放,手指在上面可以捲動停靠區 */
+html.mp .mp-dock .ctl{cursor:auto;touch-action:auto}
+html.mp .mp-dock .ctl .fp-grip,html.mp .mp-dock .ctl .fp-size{display:none}
+/* 導覽與錄影(#app.cine)時只留工具列;控制面板搬進停靠區後不在 #app 裡,所以另外寫一次 */
+html.mp:has(#app.cine) .mp-dock .ctl .row:not(.tools){display:none}
 </style>
 <link rel="stylesheet" href="../assets/render-quality.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
 <main id="app">
@@ -469,6 +485,7 @@ button { font: inherit; color: inherit; }
 <script type="module">
 import { createQualityControls } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
+import { createRotateHint, createMobilePanels } from '../assets/mobile-panels.js';
 const quality = createQualityControls({ host: '.ctl', onChange: () => onResize() });
 const BUILD = {"target":"site","canExport":true};
 // ==== 00_core.js ====
@@ -3243,6 +3260,7 @@ function frame(now) {
   tick(dt);
   if (!TOUR.on) camera.fov = fitFov(30);
   if (!TOUR.on && !FLY.on) { nav?.step(dt); controls.update(); }
+  mp.applyView(camera); // 手機橫拿:3D 的投影中心移到標題與停靠區之外的空地(導覽與錄影時不作用)
   renderScene();
   drawUIOverlay();
   updateStats(simTime);
@@ -3353,7 +3371,7 @@ function makeFloating(el, id, name, surfaces = [el], fixWidth = true) {
     window.addEventListener('pointercancel', up);
   };
   const startDrag = (e) => {
-    if (e.button !== 0 || (e.currentTarget !== grip && isControl(e.target))) return;
+    if (e.button !== 0 || el.closest('.mp-dock') || (e.currentTarget !== grip && isControl(e.target))) return;
     e.preventDefault(); e.stopPropagation();
     if (!floatState[id]) pinFloat(id);
     const st = floatState[id], x0 = e.clientX, y0 = e.clientY, sx = st.x, sy = st.y;
@@ -3582,7 +3600,16 @@ function bindRec() {
 // ==== 99_boot.js ====
 // ================================================================ 開始
 if (typeof bindRec === 'function') bindRec();
+// 手機橫拿(高度 500 px 以下):控制面板收成右上角的「調整」細條(../assets/mobile-panels.js);直拿照原本的排法
+const mp = createMobilePanels({
+  query: '(max-height: 500px) and (orientation: landscape)',
+  dock: true, top: '.side',
+  suspended: () => TOUR.on || EXPORT.active,
+  panels: [{ el: '.ctl', icon: 'adjust', label: '調整', items: '掃描模式、機身、交流電壓、自動循環、導覽、錄影、原理、重設版面、畫質' }],
+});
 boot();
+// 手機直拿時建議轉成橫式(../assets/mobile-panels.js 的 createRotateHint);導覽與錄影時不出現
+createRotateHint({ top: '.stats', suspended: () => TOUR.on || EXPORT.active });
 // 除錯用:在主控台可以用 window.LCQ 查看狀態
 window.LCQ = { THREE, scene, camera, controls, CY, SIM, VS, TOUR, COMPS, setView, setMode, startTour, stopTour, tourStep, tick, renderScene, exportVideo, K, LABELS, SHOTS, SCENES, resetForTour, tourState, drawLabels, drawScopes, drawBug, drawCaption, drawNote, applyLayout };
 

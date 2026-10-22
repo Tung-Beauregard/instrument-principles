@@ -90,8 +90,16 @@
 
 「錄成影片」逐格算圖,用 WebCodecs 的 H.264 編碼,再用 jsDelivr 上的 mp4-muxer 5.2.2 封裝成 MP4。只有支援 `VideoEncoder` 的瀏覽器會顯示這個按鈕(Chrome、Edge;Firefox 也支援)。`pickConfig()` 依序試 Baseline 5.1、4.2、4.0(`avc1.42E033`、`avc1.42E02A`、`avc1.42E028`),都不支援才試 High 與 Main。Baseline 排在前面是因為 Firefox 的 High profile 編碼器會產生 B 畫格、畫格不照順序送出,mp4-muxer 會丟掉亂序的畫格,影片缺格(2026-10-22 用 Firefox 157 實測,改了之後 2 秒 60 格完整)。1080p、30 fps 全長 141 秒,一般筆電約 2 到 5 分鐘算完,檔案約 110 MB。錄好的影片不要提交進網站。
 
+## 手機:轉向提示與橫拿時的控制面板(2026-10-22)
+
+- 直拿的觸控手機開頁後提示一次「建議轉成橫式觀看」(共用的 `../assets/mobile-panels.js` 的 `createRotateHint()`,位置在 `.stats` 下方;導覽與錄影時不出現)。直拿的版面照原本的排法。
+- 高度 500 px 以下的橫向畫面(`createMobilePanels` 的 `query`):控制面板 `.ctl` 搬進右上角的停靠區,收成「調整 · 掃描模式、機身、交流電壓、自動循環、導覽、錄影、原理、重設版面、畫質」細條,往下展開;標題排成一行、說明文字(`.brand p`、`.why`)省掉,分頁列讓出右上角。`frame()` 在 `renderScene()` 之前呼叫 `mp.applyView(camera)`,3D 移到標題與停靠區之外的空地。
+- 停靠區裡的控制面板不能拖動或縮放(`makeFloating()` 的 `startDrag` 看到 `.mp-dock` 就不動作,把手藏起來),手指在上面可以捲動停靠區。控制面板搬出 `#app` 之後,原本的 `#app.cine .ctl .row:not(.tools)` 對不到,所以另寫 `html.mp:has(#app.cine) .mp-dock .ctl .row:not(.tools)`:導覽與錄影時只留工具列。
+- `mp` 在 `boot()` 之前建立,第一格的 `frame()` 就會用到;`scripts/check-mobile-panels.mjs` 檢查這些接線。
+
 ## 修改後的檢查
 
+- 手機:390×844、360×680 直拿出現一次轉向提示、版面不變;780×300、844×390 橫拿時控制面板是右上角的「調整」細條,展開後 3D 移到左邊,導覽時只留工具列;詳見 [docs/VALIDATION.md](../docs/VALIDATION.md) 的「手機版面板收合」。
 - 在網站根目錄執行 `node scripts/check-site.mjs`。
 - 用 HTTP 預覽打開 `lcq-3d/`,確認畫面有動、console 沒有錯誤、分頁列能回到入口與其他教材,並在 390px、768px 與桌面寬度各看一次。
 - 改了導覽時,按「播放導覽」從頭看到尾,確認字幕與鏡頭對得上。

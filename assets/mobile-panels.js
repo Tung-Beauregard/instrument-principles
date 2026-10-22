@@ -19,8 +19,8 @@
 // top     停靠區最高只到這個元素的下緣(加 8 px),兩塊都展開也不會蓋住標題
 //         這個高度另外寫在 CSS 變數 --mp-free-top,停靠區自己的高度寫在 --mp-dock-h,頁面可以拿來排說明框與導覽字幕
 // suspended() 傳回 true 時(導覽、影片)暫時全部展開、藏起細條,結束後恢復原本的收合狀態
-// rotateHint  true 時,觸控手機直拿的話在 3D 畫面下方提示「建議轉成橫式觀看」,8 秒後或按 × 收起;
-//             同一次瀏覽(sessionStorage)只出現一次,導覽中不出現
+// rotateHint  true 時,觸控手機直拿的話在 top 元素下方提示「建議轉成橫式觀看」(見下面的 createRotateHint),
+//             8 秒後或按 × 收起;同一次瀏覽(sessionStorage)只出現一次,導覽中不出現
 // 橫拿手機時(landscape)停靠區改放在右上角、面板往下展開,下面整條讓給 3D 畫面。
 // 傳回 { open(el), close(el), toggle(el), active(), applyView(camera), freeRect() };
 //   open(el) 在停靠區裡會把那塊面板捲進畫面(例如按「掃描」後的光譜)。
@@ -42,10 +42,54 @@ const svg = (d, cls = '') => `<svg class="${cls}" viewBox="0 0 16 16" fill="none
 const CHEV = '<path d="M4 10l4-4 4 4"/>';
 const val = (v) => (typeof v === 'function' ? v() : v) || '';
 
+// 「建議轉成橫式觀看」提示:手機尺寸(query)的觸控手機直拿時,開頁 1.5 秒後出現在 top 元素下方(沒有就離頂端 120 px),
+// 8 秒後或按 × 收起;同一次瀏覽(sessionStorage 的 mp-rotate-hint)只出現一次。suspended() 為 true 時
+// (導覽、錄影、還在載入)先不出現,出現後變成 true 或轉成橫的就收起。樣式是 mobile-panels.css 的 .mp-rotate。
+// createMobilePanels({ rotateHint: true }) 會呼叫它;沒有收合面板的頁面(離子阱質譜的兩頁)直接呼叫。
+export function createRotateHint({ top = null, suspended = () => false, query = MOBILE_QUERY } = {}) {
+  const mq = matchMedia(query), portrait = matchMedia(PORTRAIT_PHONE);
+  const pick = (x) => (typeof x === 'string' ? document.querySelector(x) : x);
+  const born = performance.now();
+  let hint = null, timer = 0, shown = false;
+  try { shown = sessionStorage.getItem(HINT_KEY) === '1'; } catch (e) { /* storage blocked: show once per page */ }
+  const ready = () => mq.matches && portrait.matches && !suspended();
+  function place() {
+    const t = top && pick(top), r = t ? t.getBoundingClientRect() : null;
+    hint.style.top = `${Math.round(r && r.height ? r.bottom + 8 : 120)}px`;
+  }
+  function show() {
+    shown = true;
+    try { sessionStorage.setItem(HINT_KEY, '1'); } catch (e) { /* ignore */ }
+    hint = document.createElement('div');
+    hint.className = 'mp-rotate';
+    hint.setAttribute('role', 'status');
+    hint.innerHTML = `${svg('<rect x="4.5" y="1.5" width="7" height="13" rx="1.5"/><path d="M14.5 9.5a6 6 0 0 1-4 4.8M13 15l-2.5-.7.8-2.4"/>', 'mp-ico')}<span>建議轉成橫式觀看,3D 畫面比較大</span>`;
+    const x = document.createElement('button');
+    x.type = 'button';
+    x.className = 'mp-rotate-x';
+    x.setAttribute('aria-label', '關閉提示');
+    x.innerHTML = svg('<path d="M4 4l8 8M12 4l-8 8"/>');
+    x.addEventListener('click', hide);
+    hint.append(x);
+    document.body.append(hint);
+    place();
+    timer = setTimeout(hide, 8000);
+  }
+  function hide() {
+    clearTimeout(timer);
+    if (hint) { hint.remove(); hint = null; }
+  }
+  const iv = setInterval(() => {
+    if (hint) { if (ready()) place(); else hide(); return; }
+    if (shown) { clearInterval(iv); return; }
+    if (performance.now() - born >= 1500 && ready()) show();
+  }, 400);
+  return { hide };
+}
+
 export function createMobilePanels({ panels = [], dock = false, top = null, suspended = () => false, rotateHint = false, query = MOBILE_QUERY } = {}) {
   const root = document.documentElement;
   const mq = matchMedia(query);
-  const portrait = matchMedia(PORTRAIT_PHONE);
   const landscape = matchMedia('(orientation: landscape)');
   const $ = (s) => (typeof s === 'string' ? document.querySelector(s) : s);
   const list = panels.map((cfg, i) => ({ ...cfg, i, el: $(cfg.el), open: !!cfg.open })).filter((p) => p.el);
@@ -181,32 +225,6 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
     view.set = true;
     return true;
   }
-  // "turn the phone sideways" hint
-  let hint = null, hintTimer = 0, hintShown = false;
-  const born = performance.now();
-  try { hintShown = sessionStorage.getItem(HINT_KEY) === '1'; } catch (e) { /* storage blocked: show once per page */ }
-  function showHint() {
-    if (!rotateHint || hintShown || !on || susp || !portrait.matches || performance.now() - born < 1500) return;
-    hintShown = true;
-    try { sessionStorage.setItem(HINT_KEY, '1'); } catch (e) { /* ignore */ }
-    hint = document.createElement('div');
-    hint.className = 'mp-rotate';
-    hint.setAttribute('role', 'status');
-    hint.innerHTML = `${svg('<rect x="4.5" y="1.5" width="7" height="13" rx="1.5"/><path d="M14.5 9.5a6 6 0 0 1-4 4.8M13 15l-2.5-.7.8-2.4"/>', 'mp-ico')}<span>建議轉成橫式觀看,3D 畫面比較大</span>`;
-    const x = document.createElement('button');
-    x.type = 'button';
-    x.className = 'mp-rotate-x';
-    x.setAttribute('aria-label', '關閉提示');
-    x.innerHTML = svg('<path d="M4 4l8 8M12 4l-8 8"/>');
-    x.addEventListener('click', hideHint);
-    hint.append(x);
-    document.body.append(hint);
-    hintTimer = setTimeout(hideHint, 8000);
-  }
-  function hideHint() {
-    clearTimeout(hintTimer);
-    if (hint) { hint.remove(); hint = null; }
-  }
   function enter() {
     on = true;
     root.classList.add('mp');
@@ -242,8 +260,6 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
     const s = !!suspended();
     if (s !== susp) { susp = s; root.classList.toggle('mp-suspended', s); apply(); }
     if (on) { for (const p of list) refreshText(p); fitDock(); }
-    if (hint && (susp || !on || !portrait.matches)) hideHint();
-    else showHint();
   };
   mq.addEventListener('change', () => (mq.matches ? enter() : leave()));
   addEventListener('resize', () => { if (on) fitDock(); });
@@ -251,6 +267,7 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
   susp = !!suspended();
   root.classList.toggle('mp-suspended', susp);
   if (mq.matches) enter(); else apply();
+  if (rotateHint) createRotateHint({ top, suspended, query });
   const api = {
     open: (el) => {
       const p = find(el);

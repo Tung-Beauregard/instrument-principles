@@ -173,6 +173,10 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!importa
   #loading .bar i{animation:none;width:100%}
 }
 @media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}#sitenav .sn-lesson{padding-left:7px}#sitenav .sn-name{font-size:11.5px}}
+/* 手機橫拿(高度不到 480 px,網址列還在時):播放中 3.5 秒沒操作就把上方分頁列與下方播放列淡出(html.immersive),
+   字幕往下、儀器面板往上,用整個畫面;點一下、移動滑鼠或按任一鍵就回來。暫停、操作台與錄影時不收 */
+#topnav,#bar{transition:opacity .35s}
+html.immersive #topnav,html.immersive #bar,html.immersive #topnav>*{opacity:0;pointer-events:none}
 </style>
 <script type="importmap">
 {
@@ -183,6 +187,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!importa
 }
 </script>
 <link rel="stylesheet" href="../assets/render-quality.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
 <div id="stage" aria-label="離子阱質譜原理的立體解說動畫,以 LCQ Deca XP 為例">
@@ -297,6 +302,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!importa
 <script type="module">
 import { createQualityControls } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
+import { createRotateHint } from '../assets/mobile-panels.js';
 const quality = createQualityControls({ host: '#qhost', onChange: () => resize() });
 // ---- core.js ----
 import * as THREE from 'three';
@@ -1743,11 +1749,15 @@ function ovResize(w, h, pr, bottomCss, nav = null) {
   OV.cv.width = Math.round(w * pr);
   OV.cv.height = Math.round(h * pr);
   OV.W = OV.cv.width; OV.H = OV.cv.height;
-  OV.U = Math.max(Math.min(OV.W / 1920, OV.H / 1080), 0.74 * pr);
+  // 0.74 keeps small phones readable; a short landscape phone (address bar shown, under 480 px tall) lets it shrink
+  // with the height down to 0.53, so captions and panels leave more of the 3D visible (recordings are 1080 px tall: unchanged)
+  const short = w > h * 1.15 && h < 480;
+  OV.U = Math.max(Math.min(OV.W / 1920, OV.H / 1080), (short ? 0.74 * Math.max(0.72, h / 480) : 0.74) * pr);
   OV.bottom = (bottomCss || 0) * pr;
   // area taken by the site navigation and quality menu (#topnav), so the panels can start below it
   OV.navRight = nav ? nav.right * pr : 0;
   OV.navBottom = nav ? (nav.bottom + 10) * pr : 0;
+  OV.botNow = OV.navNow = null; // the next frame starts from the exact positions (still shots right after a resize)
 }
 function ovTheme(dark) { OV.C = dark ? OV_COL.dark : OV_COL.light; }
 const FONT_SANS = '"Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif';
@@ -2066,6 +2076,12 @@ const OVS = {
 };
 function drawOverlay(story) {
   const g = OV.ctx, { W, H, U, C } = OV;
+  // the top tabs and the player bar fade out on short landscape phones (html.immersive): captions move down and
+  // the panel column moves up with them, smoothly; recordings use the exact values so every frame is the same
+  const imm = !APP.rec && document.documentElement.classList.contains('immersive');
+  const tb = imm ? 14 * OV.pr : OV.bottom, tn = imm ? 0 : OV.navBottom;
+  if (APP.rec || OV.botNow == null) { OV.botNow = tb; OV.navNow = tn; }
+  else { OV.botNow += (tb - OV.botNow) * 0.12; OV.navNow += (tn - OV.navNow) * 0.12; }
   g.setTransform(1, 0, 0, 1, 0, 0);
   g.clearRect(0, 0, W, H);
   g.textBaseline = 'alphabetic';
@@ -2088,7 +2104,7 @@ function drawOverlay(story) {
     const a = OVS.hudA, hd = OVS.hud;
     const x = landscape ? hudX : 16 * U, w = landscape ? hudW : W - 32 * U;
     // start below the navigation when the panel column would run under it (portrait, or a narrow landscape window)
-    let y = x < OV.navRight ? Math.max(34 * U, OV.navBottom) : 34 * U;
+    let y = x < OV.navRight ? Math.max(34 * U, OV.navNow) : 34 * U;
     const U0 = OV.U;
     if (!landscape) OV.U = U0 * 0.8;
     const gap = 14 * U;
@@ -2109,11 +2125,11 @@ function drawOverlay(story) {
     const lines = layoutRich(g, parseRich(cap.text), font, maxW);
     const lh = 47 * U;
     const blockH = lines.length * lh + 40 * U;
-    const baseY = H - OV.bottom - 58 * U - (lines.length - 1) * lh;
-    const grad = g.createLinearGradient(0, H - OV.bottom - blockH - 120 * U, 0, H);
+    const baseY = H - OV.botNow - 58 * U - (lines.length - 1) * lh;
+    const grad = g.createLinearGradient(0, H - OV.botNow - blockH - 120 * U, 0, H);
     grad.addColorStop(0, C.band0); grad.addColorStop(0.55, C.band1); grad.addColorStop(1, C.band1);
     g.globalAlpha = Math.min(1, cap.a * 1.4) * (cap.band ?? 1);
-    g.fillStyle = grad; g.fillRect(0, H - OV.bottom - blockH - 120 * U, W, blockH + 120 * U + OV.bottom);
+    g.fillStyle = grad; g.fillRect(0, H - OV.botNow - blockH - 120 * U, W, blockH + 120 * U + OV.botNow);
     g.globalAlpha = 1;
     const cx = areaW / 2;
     if (cap.tag) {
@@ -2941,6 +2957,18 @@ function jumpChapter(d) {
   const i = clamp(APP.chapter + (d < 0 && lt > 2 ? 0 : d), 0, CHAPTERS.length - 1);
   seek(CHAPTERS[i].t0 + 0.01);
 }
+// ---------- short landscape phones: let the animation use the whole screen ----------
+// 高度不到 480 px 的橫向畫面:播放中 3.5 秒沒操作就加上 html.immersive(上下兩條淡出,見 CSS);任何操作都會叫回來
+const SHORT_LAND = matchMedia('(orientation: landscape) and (max-height: 479px)');
+let idleTimer = 0;
+function wakeControls() {
+  document.documentElement.classList.remove('immersive');
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    if (SHORT_LAND.matches && APP.playing && APP.mode === 'story' && !APP.rec) document.documentElement.classList.add('immersive');
+  }, 3500);
+}
+for (const ev of ['pointerdown', 'pointermove', 'keydown', 'wheel']) addEventListener(ev, wakeControls, { passive: true });
 function setPlaying(p) {
   if (p && APP.t >= TOTAL - 0.02) seek(0);
   if (p && APP.userCam) { APP.blendFrom = { p: camera.position.clone(), l: controls.target.clone() }; APP.blend = 0; APP.userCam = false; }
@@ -2949,6 +2977,7 @@ function setPlaying(p) {
   $('#playIcon').setAttribute('d', p ? 'M7 5h4v14H7zm6 0h4v14h-4z' : 'M8 5v14l11-7z');
   playBtn.setAttribute('aria-label', p ? '暫停' : '播放');
   if (!p && APP.mode === 'story') showHint('暫停中:拖曳或用方向鍵改變視角,按空白鍵繼續');
+  wakeControls();
 }
 function showHint(text) {
   const h = $('#hint');
@@ -3456,6 +3485,8 @@ function run(t1, fps = 30) {
 }
 window.lcq = { record, seek, setPlaying, shot, run, APP, TOTAL, CHAPTERS, trap, spectrum, view, ST,
   lab: { enterLab, exitLab, labStep, labFill, labStartMsms, labStartZoom, LAB }, isotopePattern };
+// 手機直拿時建議轉成橫式(../assets/mobile-panels.js 的 createRotateHint);載入畫面還在、錄影中先不出現
+createRotateHint({ top: '#topnav', suspended: () => !!APP.rec || !$('#loading').classList.contains('done') });
 boot();
 
 

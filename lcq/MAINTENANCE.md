@@ -223,8 +223,17 @@
 - 錄影按鈕:先確認瀏覽器能編碼才顯示(見上面「錄影」)。
 - 離子阱尺寸的出處:說明視窗、片尾字卡與程式註解原本寫 March (1997),改成讀得到原文的 March (1999)。數值 r₀ 7.07 mm、z₀ 7.85 mm 沒有變。
 
+## 手機:轉向提示與橫拿時讓出畫面(2026-10-22)
+
+- 直拿的觸控手機開頁後提示一次「建議轉成橫式觀看」:共用的 `../assets/mobile-panels.js` 的 `createRotateHint()`(樣式在 `../assets/mobile-panels.css`),位置在 `#topnav` 下方;載入畫面還在(`#loading` 還沒有 `done`)或錄影中先不出現。同一次瀏覽只出現一次。
+- 高度不到 480 px 的橫向畫面(手機橫拿、網址列還在,例如 780×300):
+  - 疊在畫面上的字幕、儀器面板與標籤的比例 `OV.U` 原本最小 0.74,改成跟著高度縮,最小 0.53(`ovResize()`;480 px 以上與錄影不變)。
+  - 播放中 3.5 秒沒操作就在 `<html>` 加上 `immersive`,把 `#topnav` 與 `#bar` 淡出;字幕往下(`OV.botNow`)、儀器面板往上(`OV.navNow`)平順地跟著移,用整個畫面。點一下、移動滑鼠或按任一鍵(`wakeControls()`)就回來;暫停、「自己操作」與錄影時不收。錄影時 `OV.botNow`、`OV.navNow` 直接用 `OV.bottom`、`OV.navBottom`,每一格的字幕位置和以前相同。
+- 這頁沒有收合面板,直拿與桌機照原本的排法;`scripts/check-mobile-panels.mjs` 檢查上面的接線。
+
 ## 修改後要檢查
 
+- 手機:390×844、360×680 直拿時出現一次轉向提示;780×300、844×390 橫拿播放 4 秒後上下兩條淡出、字幕在底部、儀器面板完整,點一下就回來,暫停時不收;詳見 `../docs/VALIDATION.md` 的「手機版面板收合」。
 - 共用命令:`node scripts/check-site.mjs`(含分享預覽的 og 標籤與圖檔)、`node scripts/check-render-quality.mjs`(含這一頁 module 的語法)、`node scripts/check-camera-nav.mjs`。
 - HTTP 預覽打開 `lcq/`:自動播放、console 沒有錯誤;拖時間軸跳到每一章,畫面與字幕對得上;暫停後拖曳、方向鍵、R 都正常,再播放鏡頭會接回去。
 - 新章節:用 `lcq.seek(章節開始, false); lcq.run(章節結束)` 跑完一章,看 `lcq.spectrum.peaks` 是否每根峰都出現(見 VALIDATION.md 的數字)。

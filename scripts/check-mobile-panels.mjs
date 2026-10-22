@@ -52,4 +52,26 @@ for (const [lesson, cfg] of Object.entries(LESSONS)) {
   }
   assert.ok(/html\.mp \.hud|html\.mp \.brief/.test(html), `${lesson}: 沒有手機版的標題樣式`);
 }
-console.log(`PASS: mobile-panels.css only applies at phone sizes; ${Object.keys(LESSONS).length} lessons wired (dock, labels, run opens the chart, tour suspends, rotate hint, 3D kept in the free area).`);
+// 離子阱質譜的兩個畫面:直拿只有轉向提示;拆開探索在手機橫拿時把控制面板收成細條,動畫講解在矮的橫向畫面播放時讓出上下兩條
+{
+  const js = readFileSync(new URL('../assets/mobile-panels.js', import.meta.url), 'utf8');
+  assert.ok(/export function createRotateHint\(/.test(js), 'mobile-panels.js 要匯出 createRotateHint');
+  assert.ok(/if \(rotateHint\) createRotateHint\(/.test(js), 'createMobilePanels 的 rotateHint 要交給 createRotateHint');
+  for (const lesson of ['lcq', 'lcq-3d']) {
+    const html = readFileSync(new URL(`../${lesson}/index.html`, import.meta.url), 'utf8');
+    assert.ok(html.includes('<link rel="stylesheet" href="../assets/mobile-panels.css">'), `${lesson}: 沒有載入 mobile-panels.css(轉向提示的樣式)`);
+    assert.ok(/import \{ createRotateHint(, createMobilePanels)? \} from '\.\.\/assets\/mobile-panels\.js';/.test(html), `${lesson}: 沒有載入 createRotateHint`);
+    assert.equal((html.match(/createRotateHint\(\{/g) || []).length, 1, `${lesson}: createRotateHint 應該剛好呼叫一次`);
+    assert.ok(/createRotateHint\(\{ top: '[^']+', suspended: \(\) =>/.test(html), `${lesson}: 轉向提示要有位置與暫停條件`);
+  }
+  const l3 = readFileSync(new URL('../lcq-3d/index.html', import.meta.url), 'utf8');
+  assert.ok(l3.includes("query: '(max-height: 500px) and (orientation: landscape)'"), 'lcq-3d: 控制面板只在手機橫拿時收合(直拿照原本的排法)');
+  assert.ok(/mp\.applyView\(camera\);[^\n]*\n  renderScene\(\);/.test(l3), 'lcq-3d: 每一格在 renderScene() 之前呼叫 mp.applyView(camera)');
+  assert.ok(l3.indexOf('const mp = createMobilePanels({') < l3.indexOf('\nboot();'), 'lcq-3d: mp 要在 boot() 之前建立(第一格就會用到)');
+  assert.ok(/html\.mp:has\(#app\.cine\) \.mp-dock \.ctl \.row:not\(\.tools\)\{display:none\}/.test(l3), 'lcq-3d: 導覽時停靠區裡的控制面板只留工具列');
+  const l1 = readFileSync(new URL('../lcq/index.html', import.meta.url), 'utf8');
+  assert.ok(l1.includes("matchMedia('(orientation: landscape) and (max-height: 479px)')"), 'lcq: 只在矮的橫向畫面讓出上下兩條');
+  assert.ok(/html\.immersive #topnav,html\.immersive #bar/.test(l1), 'lcq: 缺少 html.immersive 的樣式');
+  assert.ok(/const imm = !APP\.rec && /.test(l1), 'lcq: 錄影時字幕位置不能跟著淡出改變');
+}
+console.log(`PASS: mobile-panels.css only applies at phone sizes; ${Object.keys(LESSONS).length} lessons wired (dock, labels, run opens the chart, tour suspends, rotate hint, 3D kept in the free area); ion trap pages: rotate hint, landscape panel, immersive playback.`);
