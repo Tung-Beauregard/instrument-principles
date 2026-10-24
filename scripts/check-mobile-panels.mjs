@@ -74,4 +74,20 @@ for (const [lesson, cfg] of Object.entries(LESSONS)) {
   assert.ok(/html\.immersive #topnav,html\.immersive #bar/.test(l1), 'lcq: 缺少 html.immersive 的樣式');
   assert.ok(/const imm = !APP\.rec && /.test(l1), 'lcq: 錄影時字幕位置不能跟著淡出改變');
 }
-console.log(`PASS: mobile-panels.css only applies at phone sizes; ${Object.keys(LESSONS).length} lessons wired (dock, labels, run opens the chart, tour suspends, rotate hint, 3D kept in the free area); ion trap pages: rotate hint, landscape panel, immersive playback.`);
+// 手機橫拿時寬度可能不到 760 px(2026-10-24 實機:Galaxy S23 Ultra 的 Chrome 橫拿是 742 × 298),橫拿的版面不能只看寬度
+{
+  const gc = readFileSync(new URL('../gc-ms/index.html', import.meta.url), 'utf8');
+  assert.ok(gc.includes('@media (max-width:760px) and (orientation:portrait), (max-width:760px) and (min-height:501px){'), 'gc-ms: 直排的手機版面只給直拿(或高於 500 px 的窄視窗)');
+  assert.ok(!/@media \(max-width:760px\)\{/.test(gc), 'gc-ms: 不能有只看寬度的直排手機版面,橫拿的手機也會套到');
+  assert.ok(gc.includes('@media (orientation:landscape) and (max-height:500px){') && gc.includes('@media (orientation:landscape) and (max-height:420px){'), 'gc-ms: 橫拿版面要用方向與高度判斷');
+  assert.ok(!/@media \(min-width:761px\)( and \(max-height:420px\))?\{/.test(gc), 'gc-ms: 橫拿版面不能要求寬度 761 px 以上');
+  assert.ok(/html\.mp \.ctl\{top:calc\(8px[^}]*max-height:calc\(100dvh - 16px\);overflow-y:auto/.test(gc), 'gc-ms: 橫拿時「調整」的設定面板要放得進矮畫面(放不下就在面板裡捲動)');
+  const l3 = readFileSync(new URL('../lcq-3d/index.html', import.meta.url), 'utf8');
+  assert.ok(/html\.mp #app\.cine #pStab\{[^}]*var\(--mp-dock-h/.test(l3) && /html\.mp #app\.cine #pSpec\{[^}]*var\(--mp-dock-h/.test(l3), 'lcq-3d: 手機橫拿導覽時兩個示波窗要排在停靠區下面');
+  assert.ok(/html\.mp #app\.cine \.cap\{left:calc\(\(100% - var\(--scol\)\) \/ 2\)[^}]*bottom:calc\(8px/.test(l3), 'lcq-3d: 手機橫拿導覽時字幕貼底、避開示波窗');
+  const js = readFileSync(new URL('../assets/mobile-panels.js', import.meta.url), 'utf8');
+  assert.ok(/export function revealCurrentNav\(/.test(js) && /if \(typeof document !== 'undefined'\) \{/.test(js), 'mobile-panels.js: 分頁列要自動捲到目前這一頁(只在瀏覽器裡執行)');
+  const plot = readFileSync(new URL('../plot/index.html', import.meta.url), 'utf8');
+  assert.ok(plot.includes('<script type="module" src="../assets/mobile-panels.js"></script>'), 'plot: 分頁列也要捲到目前這一頁');
+}
+console.log(`PASS: mobile-panels.css only applies at phone sizes; ${Object.keys(LESSONS).length} lessons wired (dock, labels, run opens the chart, tour suspends, rotate hint, 3D kept in the free area); ion trap pages: rotate hint, landscape panel, immersive playback; landscape layouts do not depend on width; the site nav shows the current page.`);

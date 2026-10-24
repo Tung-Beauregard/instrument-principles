@@ -42,6 +42,24 @@ const svg = (d, cls = '') => `<svg class="${cls}" viewBox="0 0 16 16" fill="none
 const CHEV = '<path d="M4 10l4-4 4 4"/>';
 const val = (v) => (typeof v === 'function' ? v() : v) || '';
 
+// 網站分頁列(.sitenav / #sitenav)比畫面窄、要左右捲時,把目前這一頁的分頁捲到分頁列中間。
+// 手機上分頁列常常排不下,不捲的話目前這一頁會被擠到看不到的地方(GC-MS 橫拿時省掉標題,就靠分頁列標出所在的頁面)。
+// 載入完成、字型載好與視窗大小改變(含轉向)時各捲一次;載入這個模組的頁面都會自動做,不用另外呼叫。
+export function revealCurrentNav() {
+  const a = document.querySelector('.sitenav a[aria-current="page"], #sitenav a[aria-current="page"]');
+  const nav = a && a.closest('.sitenav, #sitenav');
+  if (!nav || nav.scrollWidth <= nav.clientWidth + 1) return;
+  const r = a.getBoundingClientRect(), n = nav.getBoundingClientRect();
+  nav.scrollLeft += r.left + r.width / 2 - (n.left + n.width / 2);
+}
+if (typeof document !== 'undefined') {
+  let raf = 0;
+  const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(revealCurrentNav); };
+  if (document.readyState === 'complete') later(); else addEventListener('load', later, { once: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(later);
+  addEventListener('resize', later);
+}
+
 // 「建議轉成橫式觀看」提示:手機尺寸(query)的觸控手機直拿時,開頁 1.5 秒後出現在 top 元素下方(沒有就離頂端 120 px),
 // 8 秒後或按 × 收起;同一次瀏覽(sessionStorage 的 mp-rotate-hint)只出現一次。suspended() 為 true 時
 // (導覽、錄影、還在載入)先不出現,出現後變成 true 或轉成橫的就收起。樣式是 mobile-panels.css 的 .mp-rotate。

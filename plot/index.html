@@ -125,5 +125,7 @@ footer.site-footer a:hover{color:#a5f3cd}
   <p>光譜以原檔的吸光度畫,曲線只加固定位移;質譜把選定掃描的峰疊在一起,每 0.1 取 ±0.65 的視窗加總再除以掃描張數,局部最大值畫成一根棒;DSC 依程式溫度分升溫與降溫段;TGA 以第一點為 100%,DTG 用 1 °C 格點做移動平均。做法細節見 <a href="https://github.com/Tung-Beauregard/instrument-principles/blob/main/plot/MAINTENANCE.md">plot/MAINTENANCE.md</a>。</p>
 </footer>
 <script type="module" src="./app.js"></script>
+<!-- 手機上分頁列排不下時,把目前這一頁(排在最後)捲進來;和教材頁共用 ../assets/mobile-panels.js,載入就會自動做,不會建立收合面板 -->
+<script type="module" src="../assets/mobile-panels.js"></script>
 </body>
 </html>

@@ -394,6 +394,17 @@ html.mp .mp-dock .ctl{cursor:auto;touch-action:auto}
 html.mp .mp-dock .ctl .fp-grip,html.mp .mp-dock .ctl .fp-size{display:none}
 /* 導覽與錄影(#app.cine)時只留工具列;控制面板搬進停靠區後不在 #app 裡,所以另外寫一次 */
 html.mp:has(#app.cine) .mp-dock .ctl .row:not(.tools){display:none}
+/* 導覽時(手機橫拿):停靠區只留一列按鈕(停止導覽、錄成影片、原理;重設版面與畫質在導覽結束後還在),
+   兩個示波窗疊在停靠區正下方、和它靠右對齊(--mp-dock-h 是停靠區的高度,由 mobile-panels.js 隨時更新);
+   字幕貼底,在示波窗左邊的空間置中。窄螢幕原本為了讓出底部的控制面板把字幕往上抬,手機橫拿時會壓在畫面正中間 */
+html.mp:has(#app.cine) .mp-dock #layoutBtn,html.mp:has(#app.cine) .mp-dock .ctl .quality-control{display:none}
+html.mp #app.cine{--sfs:0.62;--scol:calc(292px * var(--sfs) + 24px)}
+html.mp #app.cine .scope{--fs:var(--sfs)}
+html.mp #app.cine #pStab{right:calc(12px + env(safe-area-inset-right, 0px));top:calc(16px + env(safe-area-inset-top, 0px) + var(--mp-dock-h, 46px))}
+html.mp #app.cine #pSpec{right:calc(12px + env(safe-area-inset-right, 0px));top:calc(24px + env(safe-area-inset-top, 0px) + var(--mp-dock-h, 46px) + var(--scope-h) * var(--sfs))}
+html.mp #app.cine .cap{left:calc((100% - var(--scol)) / 2);max-width:calc(100% - var(--scol) - 24px);bottom:calc(8px + env(safe-area-inset-bottom, 0px));padding:8px 16px 10px}
+@media (max-height:290px){html.mp #app.cine{--sfs:0.55}}
+@media (min-width:1101px){html.mp #app.cine{--scol:calc(352px * var(--sfs) + 24px)}}
 </style>
 <link rel="stylesheet" href="../assets/render-quality.css">
 <link rel="stylesheet" href="../assets/mobile-panels.css">

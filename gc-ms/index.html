@@ -257,8 +257,10 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
   .story{min-height:0}
 }
 
-/* ---------- 手機 ---------- */
-@media (max-width:760px){
+/* ---------- 手機 ----------
+   直拿,或高度超過 500 px 的窄視窗。橫拿的手機寬度可能不到 760 px(Galaxy S23 Ultra 的 Chrome 橫拿是 742 × 298),
+   不能只看寬度,否則橫拿也會套到這裡的直排版面;橫拿用下面 html.mp 的橫向版面 */
+@media (max-width:760px) and (orientation:portrait), (max-width:760px) and (min-height:501px){
   :root{--gut:16px}
   .hud{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(150px,1fr) auto auto;grid-template-areas:"brief" "hole" "con" "foot";padding:calc(12px + env(safe-area-inset-top, 0px)) var(--gut) calc(14px + env(safe-area-inset-bottom, 0px));gap:10px;overflow-y:auto}
   .hud>.hole{grid-area:hole}
@@ -315,9 +317,9 @@ html.mp .console.mp-closed{grid-template-rows:none}
 /* 圖固定排在細條下面那一列:導覽中細條藏起來時,主控台的高度才會和原本一樣 */
 html.mp .console > .cs{grid-row:3}
 html.mp .console > .mp-tab + .mp-tab{border-top:1px solid var(--line)}
-@media (min-width:761px){
-  /* 橫拿手機(網址列占掉一段時高度只剩 300 px 左右):上面一條是分頁列、讀值與說明細條,下面一條是主控台的兩條細條,
-     中間整片是 3D。標題省掉(分頁列上已經標出 GC-MS),頁尾的出處也省掉 */
+@media (orientation:landscape) and (max-height:500px){
+  /* 橫拿手機(網址列占掉一段時高度只剩 300 px 左右,寬度也可能不到 760 px):上面一條是分頁列、讀值與說明細條,
+     下面一條是主控台的兩條細條,中間整片是 3D。標題省掉(分頁列上已經標出 GC-MS),頁尾的出處也省掉 */
   html.mp{--gut:12px}
   html.mp .hud{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"brief brief" "hole hole" "con con";padding:calc(8px + env(safe-area-inset-top, 0px)) var(--gut) calc(8px + env(safe-area-inset-bottom, 0px));gap:8px 12px}
   html.mp .hud>.hole{grid-area:hole}
@@ -334,6 +336,8 @@ html.mp .console > .mp-tab + .mp-tab{border-top:1px solid var(--line)}
   html.mp .story{position:absolute;left:0;top:calc(100% + 6px);width:min(440px,calc(50vw - 30px));max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px);overflow:auto}
   html.mp .brief > .mp-tab.mp-is-open{border-bottom:1px solid var(--line);border-radius:var(--r);margin-bottom:0}
   html.mp .brief > .mp-tab.mp-is-open + .story{border-top:1px solid var(--line);border-radius:var(--r);padding-top:9px}
+  /* 「調整」打開的設定面板:從上緣 8 px 起排、間距收緊;畫面還是太矮(高度 300 px 上下)時在面板裡捲動,最下面的畫質不會被切掉 */
+  html.mp .ctl{top:calc(8px + env(safe-area-inset-top, 0px));padding:10px 12px;gap:8px;max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);overflow-y:auto;overscroll-behavior:contain}
   /* 主控台收起時:兩條細條並排 */
   html.mp .console{grid-template-rows:auto 212px}
   html.mp .console > .cs{grid-row:2}
@@ -357,7 +361,7 @@ html.mp .console > .mp-tab + .mp-tab{border-top:1px solid var(--line)}
   html.mp.mp-suspended .tourbar{order:1;flex:1 1 auto}
   html.mp.mp-suspended .console .legend,html.mp.mp-suspended .console .cv-over{display:none}
 }
-@media (min-width:761px) and (max-height:420px){
+@media (orientation:landscape) and (max-height:420px){
   /* 很矮的橫拿畫面(網址列占掉一段時):打開的圖省掉圖例與總覽條,層析圖才有高度(總覽條的跳時間可以改用拖曳層析圖) */
   html.mp .console.mp-open .legend,html.mp .console.mp-open .cv-over{display:none}
 }

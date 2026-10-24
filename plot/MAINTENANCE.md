@@ -6,7 +6,7 @@
 
 | 檔案 | 內容 | 常改的地方 |
 |---|---|---|
-| `index.html` | 版面、樣式、分頁列、說明文字;只有 `<script type="module" src="./app.js">` 一支程式 | 文字、支援格式的說明、CSS |
+| `index.html` | 版面、樣式、分頁列、說明文字;頁面程式只有 `<script type="module" src="./app.js">`,另外載入共用的 `../assets/mobile-panels.js`,只為了手機上分頁列排不下時把「數據畫圖」捲進來(2026-10-24,模組載入就會做,不建立收合面板) | 文字、支援格式的說明、CSS |
 | `parsers.js` | 讀檔:`parseSpc`、`parseAsp`、`parsePeCsv`(DSC 與 TGA csv)、`parseTgaXlsx`(含最小的 zip 與 xlsx 讀取 `unzipEntries`、`readXlsxSheet`)、`parseLcqRaw`、`parseXyText`;`detectType` 與 `parseFile` 是總入口;`trimTurnarounds`、`msSticks`、`fmtNL` 是數據整理 | 新格式、欄位名稱、平均算法 |
 | `figure.js` | 畫圖:`Fig`(SVG 畫布)、`Axes`(座標軸)、`spectrumFigure`、`dscFigure`、`tgaFigure`(含 `dtg`)、`msFigure`、`ticStrip`、`niceTicks`、`clipPolyline`、`simplify` | 版面尺寸、線寬字型、圖例 |
 | `app.js` | 頁面邏輯:`state`(檔案清單與各圖的選項)、`addFiles`、檔案卡片(`renderFiles`、`msControls`、`seriesControls`)、選項表單(`optionsForm`)、`buildSvg`、`renderFigures`、下載(`download`)、拖放綁定(`bind`);`window.plotApp` 給測試用 | 選項、預設值、介面文字 |
