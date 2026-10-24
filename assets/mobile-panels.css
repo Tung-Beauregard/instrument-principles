@@ -31,11 +31,45 @@ html.mp .mp-dock > *{position:static!important;inset:auto!important;transform:no
   html.mp .mp-dock .mp-chev svg{transform:rotate(180deg)}
   html.mp .mp-dock .mp-is-open .mp-chev svg{transform:none}
 }
-/* 導覽、影片中:細條藏起來,面板照導覽原本的方式出現 */
+/* 收在右緣的把手(rail,2026-10-24):收起的面板整個藏起來,畫面右緣只剩垂直置中的「‹」把手(直排兩個字);
+   點了面板才從右邊彈出來,停靠區排在把手左邊,把手變成「›」。把手的顏色不跟頁面,固定是深色玻璃 */
+html.mp.mp-railed:not(.mp-suspended){--mp-rail-w:calc(34px + env(safe-area-inset-right, 0px))}
+html.mp.mp-railed .mp-closed{display:none!important}
+html.mp .mp-rail{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-height:calc(100vh - 12px);max-height:calc(100dvh - 12px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding-right:env(safe-area-inset-right, 0px);pointer-events:none}
+html.mp .mp-rail::-webkit-scrollbar{display:none}
+html.mp .mp-rail > *{pointer-events:auto;flex:none}
+html.mp .mp-rail .mp-tab{flex-direction:column;align-items:center;gap:0;width:34px;min-height:0;border:1px solid rgba(255,255,255,.16);border-right:0;border-radius:12px 0 0 12px;background:rgba(10,15,22,.82);color:#eaf3f6;box-shadow:-3px 3px 14px rgba(0,0,0,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+html.mp .mp-rail .mp-toggle{flex:none;flex-direction:column;justify-content:center;gap:4px;width:100%;min-height:0;padding:7px 0;text-align:center}
+html.mp .mp-rail .mp-ico,html.mp .mp-rail .mp-label,html.mp .mp-rail .mp-items{display:none}
+html.mp .mp-short{display:none}
+html.mp .mp-rail .mp-short{display:block;writing-mode:vertical-rl;font-size:12px;font-weight:700;letter-spacing:.1em;line-height:1}
+html.mp .mp-rail .mp-chev{width:18px;height:18px;background:rgba(255,255,255,.1)}
+html.mp .mp-rail .mp-chev svg{width:12px;height:12px}
+html.mp .mp-rail .mp-tab .mp-chev svg{transform:rotate(-90deg)}
+html.mp .mp-rail .mp-tab.mp-is-open:not(.mp-act) .mp-chev svg{transform:rotate(90deg)}
+html.mp .mp-rail .mp-tab.mp-is-open:not(.mp-act){background:rgba(52,64,82,.94);border-color:rgba(255,255,255,.45)}
+/* 收起時仍要按得到的按鈕(例如 GC-MS 的播放)在把手下方變成小圓鈕,只留圖示 */
+html.mp .mp-rail .mp-keep{flex-direction:column;gap:4px;padding:0 0 6px}
+html.mp .mp-rail .mp-keep > *{min-width:0!important;width:26px;height:26px;padding:0!important;border-radius:50%!important;display:grid!important;place-items:center;gap:0!important;font-size:0!important}
+html.mp .mp-rail .mp-keep svg{width:11px;height:11px}
+/* 全螢幕鈕(瀏覽器支援時才有) */
+html.mp .mp-rail .mp-fs{width:34px;height:30px;display:grid;place-items:center;margin:0;padding:0;border:1px solid rgba(255,255,255,.16);border-right:0;border-radius:12px 0 0 12px;background:rgba(10,15,22,.82);color:#eaf3f6;box-shadow:-3px 3px 14px rgba(0,0,0,.35);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html.mp .mp-rail .mp-fs svg{width:15px;height:15px}
+html.mp .mp-rail .mp-fs:focus-visible{outline:2px solid currentColor;outline-offset:-3px}
+/* 停靠區排在把手左邊;橫拿時寬度扣掉把手,左緣和以前差不多,不會蓋到標題 */
+html.mp.mp-railed:not(.mp-suspended) .mp-dock{right:calc(var(--mp-rail-w) + 6px)}
+@media (orientation:landscape){
+  html.mp.mp-railed:not(.mp-suspended) .mp-dock{width:min(340px,calc(46vw - var(--mp-rail-w)))}
+}
+/* 面板從右邊彈出來 */
+@keyframes mp-pop{from{opacity:0;translate:14px 0}}
+html.mp.mp-railed:not(.mp-suspended) .mp-open{animation:mp-pop .18s ease-out}
+/* 導覽、影片中:細條與把手藏起來,面板照導覽原本的方式出現 */
 html.mp-suspended .mp-tab{display:none!important}
+html.mp-suspended .mp-rail{display:none!important}
 /* 直拿手機時的「建議轉成橫式觀看」提示:放在標題下方,8 秒後自己收起 */
 .mp-rotate{position:fixed;left:50%;top:var(--mp-free-top,140px);transform:translateX(-50%);z-index:20;display:flex;align-items:center;gap:8px;width:max-content;max-width:calc(100vw - 32px);padding:5px 5px 5px 12px;border-radius:999px;background:rgba(10,15,19,.9);border:1px solid rgba(255,255,255,.16);color:#eaf3f6;font-size:12.5px;line-height:1.4;box-shadow:0 6px 24px rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .mp-rotate .mp-ico{width:18px;height:18px;flex:none;opacity:.85}
 .mp-rotate-x{flex:none;width:30px;height:30px;display:grid;place-items:center;margin:0;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.1);color:inherit;cursor:pointer}
 .mp-rotate-x svg{width:12px;height:12px}
-@media (prefers-reduced-motion:reduce){html.mp .mp-chev svg{transition:none}}
+@media (prefers-reduced-motion:reduce){html.mp .mp-chev svg{transition:none}html.mp .mp-open{animation:none!important}}

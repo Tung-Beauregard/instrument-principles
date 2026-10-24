@@ -187,7 +187,7 @@ html.mp .con-head > b,html.mp .con-head > .s{display:none}
 html.mp .legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px}
 html.mp #plot{height:150px}
 /* 說明框:放在標題下方,太長就捲動;橫拿時蓋在標題上,不擋右側的停靠區 */
-html.mp .help{left:12px;right:auto;top:var(--mp-free-top,120px);width:min(380px,calc(100vw - 24px));max-height:calc(100vh - var(--mp-free-top,120px) - 12px);max-height:calc(100dvh - var(--mp-free-top,120px) - 12px);overflow:auto;overscroll-behavior:contain}
+html.mp .help{left:12px;right:auto;top:var(--mp-free-top,120px);width:min(380px,calc(100vw - 24px - var(--mp-rail-w, 0px)));max-height:calc(100vh - var(--mp-free-top,120px) - 12px);max-height:calc(100dvh - var(--mp-free-top,120px) - 12px);overflow:auto;overscroll-behavior:contain}
 /* 導覽中:字幕放在停靠區上方 */
 html.mp.touring .cap.withcon{bottom:calc(var(--mp-dock-h,230px) + 20px)}
 @media (orientation:landscape){

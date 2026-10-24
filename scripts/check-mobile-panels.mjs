@@ -13,7 +13,8 @@ const selectors = [];
 css.replace(/([^{}]+)\{[^{}]*\}/g, (m, sel) => { if (!sel.trim().startsWith('@')) selectors.push(...sel.split(',').map((x) => x.trim())); return m; });
 assert.ok(selectors.length > 20, 'mobile-panels.css 讀不到規則');
 for (const sel of selectors) {
-  const ok = /^html\.mp(-suspended)?[ .:]/.test(sel) || sel === '.mp-tab' || sel.startsWith('.mp-rotate');
+  // @keyframes 裡的 from、to、百分比不是選擇器
+  const ok = /^html\.mp(-suspended)?[ .:]/.test(sel) || sel === '.mp-tab' || sel.startsWith('.mp-rotate') || /^(from|to|\d+(\.\d+)?%)$/.test(sel);
   assert.ok(ok, `mobile-panels.css 的「${sel}」沒有限定在手機尺寸,桌機版面會被改到`);
 }
 assert.ok(/(^|\})\s*\.mp-tab\{display:none\}/.test(css), '桌機要藏起細條(.mp-tab{display:none})');
@@ -89,5 +90,20 @@ for (const [lesson, cfg] of Object.entries(LESSONS)) {
   assert.ok(/export function revealCurrentNav\(/.test(js) && /if \(typeof document !== 'undefined'\) \{/.test(js), 'mobile-panels.js: 分頁列要自動捲到目前這一頁(只在瀏覽器裡執行)');
   const plot = readFileSync(new URL('../plot/index.html', import.meta.url), 'utf8');
   assert.ok(plot.includes('<script type="module" src="../assets/mobile-panels.js"></script>'), 'plot: 分頁列也要捲到目前這一頁');
+}
+// 收在右緣的把手與全螢幕(2026-10-24):預設開啟,收起的面板整個藏起來,停靠區排在把手左邊,導覽中把手藏起來
+{
+  const js = readFileSync(new URL('../assets/mobile-panels.js', import.meta.url), 'utf8');
+  assert.ok(/rotateHint = false, rail = true,/.test(js), 'mobile-panels.js: 把手(rail)要預設開啟');
+  assert.ok(/root\.classList\.add\('mp-railed'\)/.test(js) && /p\.ph\.replaceWith\(p\.tab\)/.test(js), 'mobile-panels.js: 離開手機尺寸時細條要放回原處');
+  assert.ok(/const fsBtn = railEl && fsSupported\(\) \? makeFullscreenButton\(\) : null;/.test(js), 'mobile-panels.js: 全螢幕鈕只在瀏覽器支援時出現');
+  assert.ok(/requestFullscreen \|\| el\.webkitRequestFullscreen/.test(js), 'mobile-panels.js: 全螢幕要照顧舊版 Safari 的前綴');
+  assert.ok(/obs\.some\(\(o\) => hit\(r, o\)\)/.test(js) && /measureFree\(\[tr, dockEl\.getBoundingClientRect\(\), R\]\)/.test(js), 'mobile-panels.js: 3D 讓位時要避開把手');
+  assert.ok(/html\.mp\.mp-railed \.mp-closed\{display:none!important\}/.test(css), 'mobile-panels.css: 有把手時收起的面板要整個藏起來');
+  assert.ok(/html\.mp-suspended \.mp-rail\{display:none!important\}/.test(css), 'mobile-panels.css: 導覽中把手要藏起來');
+  assert.ok(/html\.mp\.mp-railed:not\(\.mp-suspended\) \.mp-dock\{right:calc\(var\(--mp-rail-w\) \+ 6px\)\}/.test(css), 'mobile-panels.css: 停靠區要排在把手左邊');
+  const gc = readFileSync(new URL('../gc-ms/index.html', import.meta.url), 'utf8');
+  assert.ok(gc.includes('html.mp.mp-railed:not(.mp-suspended) .hud{padding-right:calc(var(--gut) + var(--mp-rail-w))}'), 'gc-ms: 格線右邊要留出把手的寬度');
+  assert.ok(gc.includes('html.mp:has(#app.sheet) .mp-rail{display:none}'), 'gc-ms: 設定面板打開時把手要藏起來(兩者不在同一個圖層)');
 }
 console.log(`PASS: mobile-panels.css only applies at phone sizes; ${Object.keys(LESSONS).length} lessons wired (dock, labels, run opens the chart, tour suspends, rotate hint, 3D kept in the free area); ion trap pages: rotate hint, landscape panel, immersive playback; landscape layouts do not depend on width; the site nav shows the current page.`);

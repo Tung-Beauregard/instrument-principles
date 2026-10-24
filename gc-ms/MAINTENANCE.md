@@ -242,6 +242,7 @@ HTML：`#gl`（3D 畫布）、`#tags`（3D 標籤層）、`#lensBtn`（放大鏡
 
 - 共用的 `../assets/mobile-panels.js` 與 `../assets/mobile-panels.css`（用法寫在 js 檔開頭的註解）；在啟動段的 `buildTable()` 之後建立。本頁的面板排在 `.hud` 的格線裡，所以不用底部停靠區，細條直接插在面板裡。
 - 判斷用 `(max-width: 760px), (max-height: 500px) and (max-width: 1180px)`：比其他教材多一個 1180 px 的上限，因為 1180 px 以上的控制面板不是「設定」那種彈出面板，「調整」細條打不開它。符合時 `<html>` 加上 `mp`，預設收起：
+- 2026-10-24 起三條細條改成畫面右緣、垂直置中的「‹」把手(`mobile-panels.js` 的 `rail`):「說明」「調整」「圖譜」直排,收起的說明框與主控台整個藏起來,點把手才彈出;收起時播放鈕是「圖譜」把手下方只有圖示的小圓鈕,支援全螢幕的瀏覽器在最下面另有全螢幕鈕。`.hud` 的右邊留出 `--mp-rail-w`,打開的主控台不蓋到把手;設定面板 `.ctl` 在 `.hud` 的圖層裡,打開時把手會蓋在它上面,所以 `html.mp:has(#app.sheet) .mp-rail` 把把手藏起來;`refreshPanelRects()` 把 `.mp-rail` 也算進去,3D 標籤不畫在把手底下。下面寫的「細條」就是這些把手。
   - 說明 `#story`：細條「說明 · ＜說明的前兩行＞」插在說明框前面（`place: 'before'`，因為 `#story` 的內容整個會被換掉），往下展開；展開時細條不再重複那段字。
   - 主控台 `#console`：最上面兩條細條，「調整 · 追蹤成分、時間、升溫速率、組裝或拆開、重新進樣、導覽、動畫、原理說明、畫質」按了是打開原本的設定面板（`action`，等於按「設定」），「層析圖・質譜 · 示範精油 · HP-5MS · 升溫 ＜S.rate＞ °C/min」按了展開或收起圖；收起時「播放」鈕暫時搬到這條細條右邊（`keep`），不用展開也能播放或暫停。
 - 直排與橫拿的分法看方向與高度，不能只看寬度：手機橫拿時寬度常常不到 760 px（作者的 Galaxy S23 Ultra，Chrome 橫拿的可用畫面是 742×298；有瀏海的 iPhone 橫拿時 Safari 也會扣掉兩側）。2026-10-24 以前直排那段寫成 `@media (max-width:760px)`、橫拿那段寫成 `@media (min-width:761px)`，實機橫拿時套到直排版面，標題、讀值、說明與三條細條疊滿畫面，最下面一條還超出畫面。現在直排是 `@media (max-width:760px) and (orientation:portrait), (max-width:760px) and (min-height:501px)`（直拿，或高於 500 px 的窄視窗），橫拿是 `@media (orientation:landscape) and (max-height:500px)`（另有 `max-height:420px` 那一段）；`scripts/check-mobile-panels.mjs` 會擋下改回寬度的寫法。

@@ -311,6 +311,10 @@ html.mp .chip-k .kname{display:none}
 html.mp .brief > .mp-tab{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 html.mp .brief > .mp-tab.mp-is-open{border-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0;margin-bottom:-8px}
 html.mp .brief > .mp-tab.mp-is-open + .story{border-top:0;border-top-left-radius:0;border-top-right-radius:0;padding-top:2px}
+/* 收在右緣的把手(mobile-panels.js 的 rail):說明、調整、層析圖・質譜三個把手在畫面右緣,收起的說明框與主控台整個藏起來;
+   格線右邊留出把手的寬度,打開的主控台不會蓋到把手。設定面板(在 .hud 的圖層裡)打開時把手先藏起來,關掉面板再出現 */
+html.mp.mp-railed:not(.mp-suspended) .hud{padding-right:calc(var(--gut) + var(--mp-rail-w))}
+html.mp:has(#app.sheet) .mp-rail{display:none}
 /* 主控台:細條在最上面,展開時底下才是圖(圖的高度和原本一樣) */
 html.mp .console{height:auto;grid-template-rows:auto auto 252px}
 html.mp .console.mp-closed{grid-template-rows:none}
@@ -2641,7 +2645,7 @@ const _v = { p: null };
 // 介面面板的位置(標籤落在面板上就不畫)
 let panelRects = [], panelClock = 0;
 function refreshPanelRects() {
-  panelRects = ['.brief', '#ctl', '#console', '.note3d'].map(s => document.querySelector(s)).filter(Boolean)
+  panelRects = ['.brief', '#ctl', '#console', '.note3d', '.mp-rail'].map(s => document.querySelector(s)).filter(Boolean)
     .map(el => el.getBoundingClientRect()).filter(r => r.width > 0 && r.height > 0);
   G.holeRect = E.hole.getBoundingClientRect();
 }

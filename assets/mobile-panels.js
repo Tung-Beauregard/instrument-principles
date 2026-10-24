@@ -22,6 +22,10 @@
 // rotateHint  true 時,觸控手機直拿的話在 top 元素下方提示「建議轉成橫式觀看」(見下面的 createRotateHint),
 //             8 秒後或按 × 收起;同一次瀏覽(sessionStorage)只出現一次,導覽中不出現
 // 橫拿手機時(landscape)停靠區改放在右上角、面板往下展開,下面整條讓給 3D 畫面。
+// rail    true(預設,2026-10-24 起)時,細條全部改成畫面右緣、垂直置中的「‹」小把手(直排兩個字:調整、圖譜、說明,
+//         或 short 指定的字),收起的面板整個藏起來;點把手面板才彈出來(停靠區排在把手左邊),把手變成「›」,再點一次收回。
+//         keep 的按鈕在收起時變成把手下方的小圓鈕。瀏覽器支援全螢幕(Android 的 Chrome 等;iPhone 的 Safari 不支援網頁全螢幕)
+//         時,把手最下面另有全螢幕鈕。<html> 加上 mp-railed,CSS 變數 --mp-rail-w 是把手那一條的寬度(導覽中不算)。
 // 傳回 { open(el), close(el), toggle(el), active(), applyView(camera), freeRect() };
 //   open(el) 在停靠區裡會把那塊面板捲進畫面(例如按「掃描」後的光譜)。
 //   applyView(camera) 給有停靠區的頁面在 render() 裡呼叫:手機上(不是導覽或影片)把 three.js 相機的投影中心
@@ -41,6 +45,38 @@ const ICONS = {
 const svg = (d, cls = '') => `<svg class="${cls}" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const CHEV = '<path d="M4 10l4-4 4 4"/>';
 const val = (v) => (typeof v === 'function' ? v() : v) || '';
+// 收在右緣的把手上直排的兩個字
+const SHORT = { adjust: '調整', chart: '圖譜', text: '說明' };
+// 全螢幕:按鈕觸發才能進入(瀏覽器的規定);Safari 舊版用 webkit 前綴,iPhone 不支援網頁全螢幕
+const FS_IN = '<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>';
+const FS_OUT = '<path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/>';
+const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement || null;
+const fsSupported = () => typeof document !== 'undefined' && !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+function toggleFullscreen() {
+  if (fsElement()) {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (exit) { const r = exit.call(document); if (r && r.catch) r.catch(() => {}); }
+    return;
+  }
+  const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (req) { const r = req.call(el, { navigationUI: 'hide' }); if (r && r.catch) r.catch(() => {}); }
+}
+function makeFullscreenButton() {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'mp-fs';
+  const sync = () => {
+    const fs = !!fsElement();
+    b.innerHTML = svg(fs ? FS_OUT : FS_IN);
+    b.setAttribute('aria-label', fs ? '結束全螢幕' : '全螢幕');
+    b.setAttribute('aria-pressed', String(fs));
+  };
+  b.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', sync);
+  document.addEventListener('webkitfullscreenchange', sync);
+  sync();
+  return b;
+}
 
 // 網站分頁列(.sitenav / #sitenav)比畫面窄、要左右捲時,把目前這一頁的分頁捲到分頁列中間。
 // 手機上分頁列常常排不下,不捲的話目前這一頁會被擠到看不到的地方(GC-MS 橫拿時省掉標題,就靠分頁列標出所在的頁面)。
@@ -105,13 +141,17 @@ export function createRotateHint({ top = null, suspended = () => false, query = 
   return { hide };
 }
 
-export function createMobilePanels({ panels = [], dock = false, top = null, suspended = () => false, rotateHint = false, query = MOBILE_QUERY } = {}) {
+export function createMobilePanels({ panels = [], dock = false, top = null, suspended = () => false, rotateHint = false, rail = true, query = MOBILE_QUERY } = {}) {
   const root = document.documentElement;
   const mq = matchMedia(query);
   const landscape = matchMedia('(orientation: landscape)');
   const $ = (s) => (typeof s === 'string' ? document.querySelector(s) : s);
   const list = panels.map((cfg, i) => ({ ...cfg, i, el: $(cfg.el), open: !!cfg.open })).filter((p) => p.el);
   let on = false, susp = false, dockEl = null, uid = 0;
+  // the handles on the right edge (see the header comment); built once, attached while on
+  const railEl = rail ? document.createElement('div') : null;
+  if (railEl) railEl.className = 'mp-rail';
+  const fsBtn = railEl && fsSupported() ? makeFullscreenButton() : null;
 
   for (const p of list) {
     const tab = document.createElement('div');
@@ -119,7 +159,7 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'mp-toggle';
-    b.innerHTML = `${svg(ICONS[p.icon] || ICONS.adjust, 'mp-ico')}<b class="mp-label"></b><span class="mp-items"></span>`;
+    b.innerHTML = `${svg(ICONS[p.icon] || ICONS.adjust, 'mp-ico')}<b class="mp-label"></b><b class="mp-short" aria-hidden="true"></b><span class="mp-items"></span>`;
     const keep = document.createElement('span');
     keep.className = 'mp-keep';
     const chev = document.createElement('span');
@@ -145,10 +185,11 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
   const collapsible = list.filter((p) => !p.action);
 
   function refreshText(p) {
-    const label = val(p.label), items = val(p.items);
-    const lb = p.btn.querySelector('.mp-label'), it = p.btn.querySelector('.mp-items');
+    const label = val(p.label), items = val(p.items), short = val(p.short) || SHORT[p.icon] || label;
+    const lb = p.btn.querySelector('.mp-label'), it = p.btn.querySelector('.mp-items'), sh = p.btn.querySelector('.mp-short');
     if (lb.textContent !== label) lb.textContent = label;
     if (it.textContent !== items) it.textContent = items;
+    if (sh.textContent !== short) sh.textContent = short;
     const verb = p.action ? '打開' : p.open ? '收起' : '展開';
     const aria = `${verb}${label}${items ? `:${items}` : ''}`;
     if (p.btn.getAttribute('aria-label') !== aria) p.btn.setAttribute('aria-label', aria);
@@ -200,24 +241,27 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
     dockEl.style.maxHeight = `${Math.max(120, room)}px`;
     // pages place things above the dock with this (e.g. the tour captions)
     root.style.setProperty('--mp-dock-h', `${Math.round(dockEl.offsetHeight)}px`);
-    free = measureFree(tr, dockEl.getBoundingClientRect());
+    const R = railEl && railEl.isConnected && !susp ? railEl.getBoundingClientRect() : null;
+    free = measureFree([tr, dockEl.getBoundingClientRect(), R]);
   }
-  // the biggest empty rectangle left by the title and the dock (candidates are built from their edges);
-  // a squarer and bigger area wins, and the previous choice is kept unless another one is clearly bigger
+  // the biggest empty rectangle left by the title, the dock and the handles (candidates are built from their edges);
+  // the biggest area wins (the instruments are wide: below the title is better than the narrow column beside it),
+  // and the previous choice is kept unless another one is clearly bigger
   let free = null;
-  function measureFree(T, D) {
-    const w = innerWidth, h = innerHeight, none = { left: 0, right: 0, top: 0, bottom: 0 };
-    T = T || none; D = D && D.height > 0 ? D : none;
-    const hit = (r, o) => o.right > o.left && r[0] < o.right - 1 && r[2] > o.left + 1 && r[1] < o.bottom - 1 && r[3] > o.top + 1;
-    const xs0 = [0, T.right, D.right], xs1 = [w, T.left, D.left], ys0 = [0, T.bottom, D.bottom], ys1 = [h, T.top, D.top];
+  function measureFree(rects) {
+    const w = innerWidth, h = innerHeight;
+    const obs = rects.filter((o) => o && o.width > 0 && o.height > 0);
+    const hit = (r, o) => r[0] < o.right - 1 && r[2] > o.left + 1 && r[1] < o.bottom - 1 && r[3] > o.top + 1;
+    const xs0 = [0, ...obs.map((o) => o.right)], xs1 = [w, ...obs.map((o) => o.left)];
+    const ys0 = [0, ...obs.map((o) => o.bottom)], ys1 = [h, ...obs.map((o) => o.top)];
     const prev = free;
     let best = null, bs = -Infinity;
     for (const x0 of xs0) for (const x1 of xs1) for (const y0 of ys0) for (const y1 of ys1) {
       const r = [x0, y0, x1, y1];
-      if (x1 - x0 < 60 || y1 - y0 < 60 || hit(r, T) || hit(r, D)) continue;
+      if (x1 - x0 < 60 || y1 - y0 < 60 || obs.some((o) => hit(r, o))) continue;
       const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-      let sc = Math.min(x1 - x0, y1 - y0) + 0.02 * Math.max(x1 - x0, y1 - y0);
-      if (prev && Math.abs(prev.cx - cx) < 40 && Math.abs(prev.cy - cy) < 40) sc += 24;
+      let sc = (x1 - x0) * (y1 - y0);
+      if (prev && Math.abs(prev.cx - cx) < 40 && Math.abs(prev.cy - cy) < 40) sc *= 1.12;
       if (sc > bs) { bs = sc; best = { x: x0, y: y0, w: x1 - x0, h: y1 - y0, cx, cy }; }
     }
     // nothing left (both panels open up to the title): keep the last place rather than jumping to the middle
@@ -233,7 +277,7 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
       view.x = 0; view.y = 0; view.z = 1;
       return false;
     }
-    const w = innerWidth, h = innerHeight, F = free || measureFree(null, null);
+    const w = innerWidth, h = innerHeight, F = free || measureFree([]);
     const tx = w / 2 - F.cx, ty = h / 2 - F.cy, tz = Math.min(1, Math.max(0.62, Math.sqrt((F.w * F.h) / (w * h)) / 0.62));
     const k = view.set ? 1 - Math.exp(-7 * dt) : 1; // about a third of a second to settle; the first frame jumps
     view.x += (tx - view.x) * k; view.y += (ty - view.y) * k; view.z += (tz - view.z) * k;
@@ -246,6 +290,17 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
   function enter() {
     on = true;
     root.classList.add('mp');
+    if (railEl) {
+      // every bar becomes a handle on the right edge; a comment marks where it lived, to put it back on desktop sizes
+      root.classList.add('mp-railed');
+      document.body.append(railEl);
+      for (const p of list) {
+        if (!p.ph) p.ph = document.createComment('mp-tab');
+        p.tab.before(p.ph);
+        railEl.append(p.tab);
+      }
+      if (fsBtn) railEl.append(fsBtn);
+    }
     if (dock) {
       if (!dockEl) { dockEl = document.createElement('div'); dockEl.className = 'mp-dock'; }
       document.body.append(dockEl);
@@ -265,6 +320,11 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
         if (h) h.parent.insertBefore(p.el, h.next && h.next.parentNode === h.parent ? h.next : null);
       }
       dockEl.remove();
+    }
+    if (railEl) {
+      for (const p of list) if (p.ph && p.ph.parentNode) p.ph.replaceWith(p.tab);
+      railEl.remove();
+      root.classList.remove('mp-railed');
     }
     apply();
   }
