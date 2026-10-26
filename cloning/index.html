@@ -75,7 +75,6 @@
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, seg, ease, clamp, lerp, complement, rng } from '../assets/bio-draw.js';
-import { createRotateHint } from '../assets/mobile-panels.js';
 
 // 顏色:目標基因與目標蛋白一律薄荷綠;工具酵素(限制酶、接合酶、反轉錄酶、T7 RNA 聚合酶)淡紫;其他蛋白灰色
 const K = {
@@ -1107,7 +1106,6 @@ createLesson({
     { id: 'temp', label: '電泳樣品的誘導溫度', type: 'seg', options: [{ v: 16, label: '16 °C' }, { v: 37, label: '37 °C' }], chapters: ['confirm'], restart: false },
   ],
 });
-createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
 </script>
 </body>
 </html>

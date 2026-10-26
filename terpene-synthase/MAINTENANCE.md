@@ -8,7 +8,7 @@
 |---|---|
 | `terpene-synthase/index.html` | 頁面骨架(分頁列、標題、播放器、自己調整、章節、重點整理與資料來源)與 `<script type="module">`:分子骨架與畫法、七章的畫面、字幕與控制項 |
 | `../assets/terpene-synthase.svg` | 入口卡片的概念圖(440 × 260):臺灣杉小枝、鑽進酵素口袋的碳鏈、口袋裡的 α-pinene、層析圖上的一支峰 |
-| `../assets/bio-lesson.js`、`bio-draw.js`、`bio-lesson.css`、`mobile-panels.js` | 共用檔,這份教材沒有改動;用到 `createLesson`、`makeG` 的 `text / tag / rrect / circle / line / arrow / curve / panel / tube`、顏色 `C`、`FONT`、`seg / ease / clamp / lerp / rng / mix`、`createRotateHint` |
+| `../assets/bio-lesson.js`、`bio-draw.js`、`bio-lesson.css`、`mobile-panels.js` | 共用檔,這份教材沒有改動;用到 `createLesson`、`makeG` 的 `text / tag / rrect / circle / line / arrow / curve / panel / tube`、顏色 `C`、`FONT`、`seg / ease / clamp / lerp / rng / mix` |
 
 ## 分子的畫法(module 前段)
 

@@ -76,7 +76,6 @@
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, PAIR, seg, ease, clamp, lerp, complement } from '../assets/bio-draw.js';
-import { createRotateHint } from '../assets/mobile-panels.js';
 
 // ===================== 序列(全部是示意,不是實際的基因) =====================
 // 第 3 到 6 章共用的一段基因。上面這一股是編碼股(5′→3′),從 ATG 開始三個一組讀
@@ -861,7 +860,6 @@ const L = createLesson({
     { id: 'pam', label: '選哪一個 PAM', type: 'seg', options: [{ v: 0, label: 'PAM 1' }, { v: 1, label: 'PAM 2' }, { v: 2, label: 'PAM 3' }], chapters: ['design'], restart: false, onChange: () => jumpDesign() },
   ],
 });
-createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
 </script>
 </body>
 </html>

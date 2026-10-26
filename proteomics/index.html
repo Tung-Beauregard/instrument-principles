@@ -75,7 +75,6 @@
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, seg, ease, clamp, lerp, rng } from '../assets/bio-draw.js';
-import { createRotateHint } from '../assets/mobile-panels.js';
 
 // ================= 質量(Da,單同位素)=================
 // 殘基質量:Matrix Science「Amino acid reference data」。I 與 L 的組成相同(C6H11NO),質量完全一樣
@@ -783,7 +782,6 @@ createLesson({
     { id: 'tol', label: '母離子質量的容許誤差(Da)', type: 'seg', options: [{ v: 0.5, label: '±0.5' }, { v: 0.05, label: '±0.05' }, { v: 0.005, label: '±0.005' }], chapters: ['db'], restart: false },
   ],
 });
-createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
 // 資料庫在瀏覽器閒下來時先產生,到最後一章就不用等
 (window.requestIdleCallback || ((f) => setTimeout(f, 1200)))(() => db());
 </script>

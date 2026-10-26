@@ -76,7 +76,6 @@
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, seg, ease, clamp, lerp, rng } from '../assets/bio-draw.js';
-import { createRotateHint } from '../assets/mobile-panels.js';
 
 // ---------- 共用 ----------
 const LASER = '#7fb8ff', GREEN = '#7dff9e', ORANGE = '#ffb35c', PIRED = '#ff6f6f';
@@ -844,7 +843,6 @@ createLesson({
     { id: 'pick', label: '要收哪一種', type: 'seg', options: [{ v: 'pos', label: '有綠色螢光' }, { v: 'neg', label: '沒有螢光' }], chapters: ['sort'], restart: false },
   ],
 });
-createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
 </script>
 </body>
 </html>

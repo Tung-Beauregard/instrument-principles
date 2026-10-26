@@ -23,7 +23,7 @@
 2. **小圖示**:`conifer`、`broadleaf`(針葉樹、闊葉樹,y 是樹冠中間)、`stump`(樹頭,y 是地面)、`timber`(橫躺的木材)、`bottle`(油瓶,y 是瓶底)、`mark`(畫出來的勾與叉,不靠字型)、`chip`(等位基因長度的小方塊)、`trace`(電泳圖:高斯峰加總,只畫到 `x1`,用來做「掃描到哪裡、峰長到哪裡」)、`band`(膠上的發光帶)、`alignRow`(第 1 章含缺口 `-` 的比對列)、`intactSet`(第 7 章用固定種子的亂數決定哪幾份片段還完整)。
 3. **各章的資料常數**(都是示意值,見下方「數值」):`ALN`、`FL / FR / FLANK / bpOf`、`TPL / NEW`、`TREES`、`PI / CPI / NEED / canTell / FP / FP2 / SAME`、`MOTHER / CHILD / FROM_MOM / NEED_DAD / FATHERS`、`SP_A / SP_B / F1`、`SAMPLES`、`CP1 / CP2 / OILS`。
 4. **`chapters`**:8 章。
-5. **`createLesson({ chapters, state, controls })`** 與 `createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' })`。
+5. **`createLesson({ chapters, state, controls })`**(手機直拿時的轉向提示由播放器顯示,頁面不用自己呼叫)。
 
 顏色慣例:母本那一邊 `MOM = C.lav`(淡紫)、父本那一邊 `DAD = C.blue`(淺藍)、樣品與「完整、對得上」用 `C.mint`、引子與注意用 `C.amber`、排除與不符用 `C.red`、電泳的標準片段用 `C.hot`(橘)。木頭的棕色(`WOOD`、`WOOD_FACE`)與油的黃色(`OIL`)是這一頁自己的常數。重要資訊都另外寫字(長度數字、「來自母本」、「沒有 100」、「甲型」等),不只靠顏色。
 

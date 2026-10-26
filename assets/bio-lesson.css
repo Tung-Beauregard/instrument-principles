@@ -1,6 +1,6 @@
 /* 生化原理教材共用的版面(2026-10-26,配 bio-lesson.js)。顏色沿用入口:近黑底、薄荷綠重點、淺字。
    桌機:左邊動畫、字幕與播放列,右邊章節與「自己調整」。手機直拿:由上往下排。手機橫拿(高度 500 px 以下):
-   標題藏起來,動畫填滿左邊的高度、字幕疊在動畫底部,右邊一欄可以捲動。 */
+   標題藏起來,動畫填滿左邊的高度,字幕、自己調整與章節在右邊一欄(可以捲動)。全螢幕是劇場模式(檔案最後一段)。 */
 :root{color-scheme:dark;font-family:"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f0f3ee;background:#0b1111;-webkit-font-smoothing:antialiased;--line:#253430;--panel:#101818;--muted:#9caca5;--mint:#a5f3cd}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:flex;flex-direction:column}
@@ -121,5 +121,26 @@ footer.site a{color:#c9d4cf}
   .box{padding:10px 12px}
   #chapters button{padding:5px 8px;font-size:13px}
   .notes{padding-top:10px}
+}
+/* 全螢幕(劇場模式):按播放列的全螢幕鈕之後 html 有 .bio-fs(bio-lesson.js)。只留動畫、字幕、播放列與自己調整,動畫盡量大;
+   手機上播放器會順便把畫面鎖成橫向。直的螢幕(平板)由上往下排;橫的螢幕動畫在左邊占滿高度,右邊一欄由上往下是字幕、自己調整、播放列 */
+html.bio-fs,html.bio-fs body{overflow:hidden}
+html.bio-fs .nav-wrap,html.bio-fs header.top,html.bio-fs .notes,html.bio-fs footer.site,html.bio-fs .side>.box:not(#ops){display:none!important}
+html.bio-fs main.lesson{position:fixed;inset:0;z-index:5;width:auto;height:auto;margin:0;background:#0b1111;padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr);grid-template-areas:"stage" "cap" "bar" "ops";gap:8px;align-items:stretch}
+html.bio-fs .player,html.bio-fs .screen,html.bio-fs .side{display:contents}
+html.bio-fs .stage-box{grid-area:stage;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0f1716}
+html.bio-fs .cap{grid-area:cap;min-height:0;border:1px solid var(--line);border-radius:12px}
+html.bio-fs .bar{grid-area:bar}
+html.bio-fs #ops{grid-area:ops;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+@media (orientation:landscape){
+  html.bio-fs main.lesson{grid-template-columns:minmax(0,1fr) clamp(160px,22vw,320px);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"stage cap" "stage ops" "stage bar";gap:8px 10px}
+  html.bio-fs .stage-box{aspect-ratio:auto}
+  html.bio-fs .cap{padding:8px 10px;max-height:62vh;overflow-y:auto}
+  html.bio-fs .cap-tx{font-size:14px;line-height:1.55}
+  html.bio-fs #ops{padding:8px 10px}
+  html.bio-fs .bar{flex-wrap:wrap;gap:6px}
+  html.bio-fs .pb .lbl,html.bio-fs #chName{display:none}
+  html.bio-fs #btnPlay{min-width:0;flex:1 1 auto}
+  html.bio-fs #prog{order:9;flex:1 1 100%;min-width:0;height:14px}
 }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}

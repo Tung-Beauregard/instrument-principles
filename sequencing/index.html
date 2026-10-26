@@ -75,7 +75,6 @@
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, FONT, seg, ease, clamp, lerp, complement, rng } from '../assets/bio-draw.js';
-import { createRotateHint } from '../assets/mobile-panels.js';
 
 const BC = (b) => C[b] || C.N;
 const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
@@ -851,7 +850,6 @@ const L = createLesson({
     { id: 'focus', label: '看哪一種', type: 'seg', options: [{ v: 'all', label: '全部' }, { v: 'sanger', label: 'Sanger' }, { v: 'illumina', label: 'Illumina' }, { v: 'nano', label: '奈米孔' }], chapters: ['compare'], restart: false, onChange: (v, S) => { S.focusManual = true; } },
   ],
 });
-createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
 </script>
 </body>
 </html>

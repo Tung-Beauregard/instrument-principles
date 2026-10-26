@@ -14,7 +14,7 @@
 
 分享預覽圖 `assets/og/cloning.jpg` 由統整的人用 `scripts/make-og-images.mjs` 產生(建立本頁時還沒有這個檔)。分頁列目前只有「← 儀器入口」與本頁,統整時換成整區的分頁列。重點整理裡有連到 `../pcr/`、`../immunoassay/`、`../terpene-synthase/` 的相對連結;字幕裡提到本站「PCR 與電泳」與「抗體檢測」(字幕不能放連結)。
 
-頁面結尾呼叫 `createLesson({ chapters, state, controls })`,再呼叫 `createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' })`。`globalThis.__lesson`(播放器提供)是除錯與測試用的介面:`go(key)`、`pause()`、`time`、`state`、`redraw()`、`chapter`。
+頁面結尾呼叫 `createLesson({ chapters, state, controls })`(手機直拿時的轉向提示由播放器顯示,頁面不用自己呼叫)。`globalThis.__lesson`(播放器提供)是除錯與測試用的介面:`go(key)`、`pause()`、`time`、`state`、`redraw()`、`chapter`。
 
 ## 章節代號(對外網址)
 

@@ -26,6 +26,11 @@ const nodeCheck = (code, name) => {
 };
 nodeCheck(read('assets/bio-lesson.js'), 'bio-lesson.js');
 nodeCheck(read('assets/bio-draw.js'), 'bio-draw.js');
+// 轉向提示由播放器顯示一次(全螢幕可用時提示按全螢幕鈕),頁面不自己呼叫;全螢幕時切換劇場模式 .bio-fs,手機鎖成橫向
+const player = read('assets/bio-lesson.js'), css = read('assets/bio-lesson.css');
+assert.equal((player.match(/createRotateHint\(\{/g) || []).length, 1, 'bio-lesson.js 要呼叫一次 createRotateHint');
+assert.ok(player.includes("classList.toggle('bio-fs', on)") && player.includes("orient.lock('landscape')"), 'bio-lesson.js:全螢幕要切換 .bio-fs,手機要鎖成橫向');
+assert.ok(css.includes('html.bio-fs main.lesson{position:fixed;inset:0'), 'bio-lesson.css 缺少全螢幕的劇場模式版面');
 
 // 分頁列:← 儀器入口,然後是清單裡 bio 的每一頁(順序相同),本頁 aria-current
 const navOf = (html) => {
@@ -52,6 +57,7 @@ for (const item of bio) {
   assert.ok(html.includes('<link rel="stylesheet" href="../assets/bio-lesson.css">'), `${dir}: 沒有載入 bio-lesson.css`);
   assert.match(html, /import \{ createLesson \} from '\.\.\/assets\/bio-lesson\.js';/, `${dir}: 沒有載入 createLesson`);
   for (const n of NEED) assert.ok(html.includes(n), `${dir}: 播放器缺少 ${n}`);
+  assert.ok(!html.includes('createRotateHint'), `${dir}: 轉向提示由播放器顯示,頁面不要自己呼叫 createRotateHint`);
   assert.ok(!hasName(html), `${dir}: 頁面出現了提供研究主題的老師姓名`);
   assert.ok(!DASH.test(html), `${dir}: 頁面不應出現破折號`);
   const nav = navOf(html);

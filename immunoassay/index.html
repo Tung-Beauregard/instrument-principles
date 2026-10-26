@@ -75,7 +75,6 @@
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, seg, ease, clamp, lerp, rng } from '../assets/bio-draw.js';
-import { createRotateHint } from '../assets/mobile-panels.js';
 
 // 配色:一級抗體與捕捉抗體用藍,二級抗體與偵測抗體用薄荷綠,可變區(抓抗原的手臂末端)用琥珀,
 // 目標蛋白(抗原)用橘,其他蛋白用灰,阻斷用的蛋白用米色,酵素 HRP 用淡紫,雙硫鍵用淡黃
@@ -760,7 +759,6 @@ createLesson({
     { id: 'dil', label: '稀釋倍數', type: 'seg', options: [{ v: 1, label: '不稀釋' }, { v: 10, label: '10 倍' }, { v: 100, label: '100 倍' }], chapters: ['curve'], restart: false },
   ],
 });
-createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
 </script>
 </body>
 </html>

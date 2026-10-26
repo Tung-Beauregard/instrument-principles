@@ -17,7 +17,7 @@
 - 本站是 W AI Studio 的儀器原理教學入口，使用繁體中文。
 - `index.html` 專責入口；每一台儀器有獨立、穩定的子目錄，使用小寫英文字與連字號。
 - 現有 `lcq/`、`gc-ms/`、`uv-vis/`、`lcq-3d/`、`nmr/`、`mass-analyzers/`、`spectroscopy/`、`chromatography/`、`plot/` 路徑不可隨意更名，2026-10-26 起生化原理分區的 `central-dogma/`、`pcr/`、`sequencing/`、`dna-markers/`、`cloning/`、`terpene-synthase/`、`crispr/`、`immunoassay/`、`flow-cytometry/`、`proteomics/` 也一樣。必須更名時，更新所有引用並保留舊網址轉向。
-- 生化原理分區（使用者 2026-10-26 要求，分類 `bio`）是用 2D 動畫講分子生物學與生物化學的教材，共用 `assets/bio-lesson.js`（播放器）、`assets/bio-draw.js`（畫圖工具）與 `assets/bio-lesson.css`（版面）。這一區的分頁列只列「← 儀器入口」與這一區的教材，儀器教材的分頁列不列它們；新增或刪掉這一區的教材時，這一區每一頁的分頁列都要一起改（`scripts/check-bio.mjs` 會檢查順序和清單一致）。章節代號（網址的 `#`）是對外網址，比照 `lcq/` 不可隨意更名。頁面與文件不寫提供研究主題的老師姓名（使用者 2026-10-26 決定）；姓名也不寫進程式，`check-bio.mjs` 只放雜湊來比對。
+- 生化原理分區（使用者 2026-10-26 要求，分類 `bio`）是用 2D 動畫講分子生物學與生物化學的教材，共用 `assets/bio-lesson.js`（播放器）、`assets/bio-draw.js`（畫圖工具）與 `assets/bio-lesson.css`（版面）。這一區的分頁列只列「← 儀器入口」與這一區的教材，儀器教材的分頁列不列它們；新增或刪掉這一區的教材時，這一區每一頁的分頁列都要一起改（`scripts/check-bio.mjs` 會檢查順序和清單一致）。章節代號（網址的 `#`）是對外網址，比照 `lcq/` 不可隨意更名。頁面與文件不寫提供研究主題的老師姓名（使用者 2026-10-26 決定）；姓名也不寫進程式，`check-bio.mjs` 只放雜湊來比對。手機直拿時的轉向提示與全螢幕的劇場模式都由播放器處理，頁面不要自己呼叫 `createRotateHint`。
 - `lcq/` 的章節 `key`（例如 `#scan`、`#adducts`）也是對外網址（2026-10-20 起網址會跟著章節改變，使用者會複製分享），一樣不可隨意更名；必須改時讓舊的 key 仍然對到同一章。
 - `lcq/` 與 `lcq-3d/` 是同一份教材「離子阱質譜」的兩個畫面：「動畫講解」與「拆開探索」（使用者 2026-10-13 決定合併）。入口與 `content/instruments.json` 只列 `lcq`；`lcq-3d/` 不在清單裡，由這兩頁分頁列的「離子阱質譜」一組互相連結，其他教材的分頁列只連到 `../lcq/`。`scripts/check-site.mjs` 的 `extraPages` 照樣檢查 `lcq-3d/`。
 - 入口頂部品牌名稱只用「儀器原理」。底部「返回主頁」連到 `https://tung-beauregard.github.io/w-studio/`。

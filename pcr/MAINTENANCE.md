@@ -9,8 +9,8 @@
 | `pcr/index.html` | 頁面骨架(分頁列、標題、播放器、自己調整、章節、重點整理與資料來源)與 `<script type="module">` 裡的章節畫法、字幕與控制項 |
 | `../assets/bio-lesson.js` | 共用播放器 `createLesson()`:畫布縮放、播放與暫停、上一章與下一章、進度列、字幕、章節清單、控制項、網址 `#章節代號`、鍵盤、全螢幕鈕、點畫面的 `pointer`;開頭註解是用法 |
 | `../assets/bio-draw.js` | 共用畫圖工具 `makeG()`(文字、標籤、圓角方塊、箭頭、鹼基、單股、酵素、試管、溫度計、座標軸、曲線、框)與顏色 `C`、`seg / ease / clamp / lerp / complement / rng` |
-| `../assets/bio-lesson.css` | 共用版面:桌機左右兩欄;直拿由上往下;手機橫拿(高度 500 px 以下)時動畫在左、字幕在右上、自己調整與章節在右下 |
-| `../assets/mobile-panels.js` | 分頁列捲到目前這一頁(載入就做)、全螢幕的判斷(`fsSupported`、`toggleFullscreen`)、直拿時的轉向提示 `createRotateHint` |
+| `../assets/bio-lesson.css` | 共用版面:桌機左右兩欄;直拿由上往下;手機橫拿(高度 500 px 以下)時動畫在左、字幕在右上、自己調整與章節在右下;全螢幕(`html.bio-fs`)是劇場模式,只留動畫、字幕、播放列與自己調整,手機上會鎖成橫向 |
+| `../assets/mobile-panels.js` | 分頁列捲到目前這一頁(載入就做)、全螢幕的判斷(`fsSupported`、`toggleFullscreen`)、直拿時的轉向提示 `createRotateHint`(由 `bio-lesson.js` 呼叫,頁面不用自己呼叫) |
 | `../assets/pcr.svg` | 入口卡片的概念圖 |
 
 ## 播放器的約定(這一區共用)

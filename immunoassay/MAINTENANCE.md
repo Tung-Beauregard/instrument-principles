@@ -6,7 +6,7 @@
 
 | 檔案 | 內容 |
 |---|---|
-| `immunoassay/index.html` | 頁面(head 的 meta 與 og 標籤、分頁列、標題、播放器、自己調整、章節清單、重點整理與資料來源)與頁面程式(`<script type="module">`):畫圖小函式、資料常數、章節陣列 `chapters`、`createLesson(...)` 的狀態與控制項、`createRotateHint(...)` |
+| `immunoassay/index.html` | 頁面(head 的 meta 與 og 標籤、分頁列、標題、播放器、自己調整、章節清單、重點整理與資料來源)與頁面程式(`<script type="module">`):畫圖小函式、資料常數、章節陣列 `chapters`、`createLesson(...)` 的狀態與控制項 |
 | `assets/immunoassay.svg` | 入口卡片的概念圖(440 × 260):左邊有發光條帶的膜、中間兩支抗體夾住目標蛋白(上面那支帶酵素在發光)、右邊顏色深淺不同的孔盤與 450 nm 的光 |
 | `assets/bio-lesson.js`、`assets/bio-draw.js`、`assets/bio-lesson.css` | 共用的播放器、畫圖小工具與版面(不在這裡改;用法見各檔開頭註解) |
 | `assets/mobile-panels.js`、`assets/mobile-panels.css` | 共用的全螢幕判斷、分頁列捲動與手機轉向提示 |

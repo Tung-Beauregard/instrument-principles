@@ -75,7 +75,6 @@
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, FONT, seg, ease, clamp, lerp, rng, mix } from '../assets/bio-draw.js';
-import { createRotateHint } from '../assets/mobile-panels.js';
 
 // ================= 分子骨架 =================
 // 原子座標以鍵長為 1(y 朝下)。索引一律照 GPP 的碳編號:0 是 1 號碳(接二磷酸的那個)… 8 是 9 號碳,9 是 10 號碳(3 號碳上的甲基),10 是氧。
@@ -904,7 +903,6 @@ lesson = createLesson({
     { id: 'tps', label: '選基因', type: 'seg', options: [13, 14, 15, 16, 17].map((n) => ({ v: n, label: `TcTPS${n}` })), chapters: ['gcms'] },
   ],
 });
-createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
 </script>
 </body>
 </html>

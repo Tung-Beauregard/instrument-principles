@@ -10,7 +10,7 @@
 | `assets/central-dogma.svg` | 入口卡片的概念圖(440 × 260):左邊雙股螺旋,虛線箭頭轉錄成 mRNA,右邊核糖體接出胺基酸鏈,上方一行 `DNA → RNA → PROTEIN` | 只有改卡片圖時 |
 | `assets/bio-lesson.js`、`assets/bio-draw.js`、`assets/bio-lesson.css`、`assets/mobile-panels.*` | 共用的播放器、畫圖小工具、版面、手機旋轉提示與全螢幕(各教材共用,**不在這個目錄改**) | 共用檔由統整的人改 |
 
-頁面程式只依賴共用檔:`createLesson`(播放器)、`C`、`FONT`、`seg`、`ease`、`lerp`、`complement`、`rng`、`mix`(`bio-draw.js`)、`createRotateHint`(`mobile-panels.js`)。
+頁面程式只依賴共用檔:`createLesson`(播放器)、`C`、`FONT`、`seg`、`ease`、`lerp`、`complement`、`rng`、`mix`(`bio-draw.js`)。
 
 ## 程式結構
 
@@ -23,7 +23,7 @@
 - `strandPts`:一股核酸沿著每個鹼基自己的位置畫(骨架是折線),第 4 章的編碼股在泡泡裡撐開、mRNA 從兩個高度接起來都用它。
 - 遺傳密碼:`CODE_ORDER = 'UCAG'`、`CODE_AAS`(64 個字元,依第一、二、三個鹼基的 U、C、A、G 順序排,`*` 是終止)、`aaOf(codon)`;`AA` 是 20 種胺基酸的三字母縮寫與台灣常用中文名;`aaName`、`aaBead`(胺基酸的圓珠)。第 6、7 章的胺基酸全部用 `aaOf` 現算,不另外寫死。
 
-檔案最後是 `chapters` 陣列與 `createLesson({ chapters, state, controls })`,再呼叫 `createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' })`。
+檔案最後是 `chapters` 陣列與 `createLesson({ chapters, state, controls })`(手機直拿時的轉向提示由播放器顯示,頁面不用自己呼叫)。
 
 ## 每一章
 

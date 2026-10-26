@@ -12,7 +12,7 @@
 | `assets/crispr.svg` | 入口卡片的概念圖(440 × 260):淡紫半透明的 Cas9 套住 R 環、琥珀色的嚮導 RNA 和下面那一股配對、薄荷綠框住的 PAM、兩股在同一個位置斷開(上下各有薄荷綠的小火花)、右上角 `FIND · CUT · REPAIR` 小字。鹼基顏色和頁面一樣(A 綠、T 橘、G 粉紅、C 藍、U 黃),上下兩股互補 | 入口改版時 |
 | `assets/bio-lesson.js`、`assets/bio-draw.js`、`assets/bio-lesson.css`、`assets/mobile-panels.*` | 共用的播放器、畫圖小工具(`g.text`、`g.tag`、`g.strand`、`g.base`、`g.blob` 等)、版面、手機的轉向提示與全螢幕判斷 | 不在這份教材裡改;需要新畫法就在本頁寫小函式 |
 
-頁面結尾呼叫 `createLesson({ chapters, state, controls })`,回傳值存在 `L`(第 7 章跳時間用),再呼叫 `createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' })`。播放器的用法見 `assets/bio-lesson.js` 開頭的註解;`globalThis.__lesson` 是除錯與測試用的介面(`go`、`pause`、`time`、`state`、`redraw`、`chapter`)。
+頁面結尾呼叫 `createLesson({ chapters, state, controls })`,回傳值存在 `L`(第 7 章跳時間用)(手機直拿時的轉向提示由播放器顯示,頁面不用自己呼叫)。播放器的用法見 `assets/bio-lesson.js` 開頭的註解;`globalThis.__lesson` 是除錯與測試用的介面(`go`、`pause`、`time`、`state`、`redraw`、`chapter`)。
 
 ## 章節代號(對外網址)
 

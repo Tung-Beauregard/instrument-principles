@@ -22,13 +22,14 @@
 // 章節可以另外有 pointer(type, x, y, S):在畫面上按下(down)、移動(move,滑鼠或按住時)、放開(up)時呼叫,
 //   x、y 是邏輯座標;傳回 true 表示使用者動過(這一章播完停住)。要在畫面上拖動的章節加 drag: true,
 //   手指在畫布上才不會捲動頁面。畫面上的操作要改控制項的值時,用傳回的 api.set(id, v)(右邊的顯示會跟著更新)。
-// 頁面有 #btnFs 時,瀏覽器支援全螢幕就顯示全螢幕鈕(和其他教材共用 mobile-panels.js 的判斷)。
+// 頁面有 #btnFs 時,瀏覽器支援全螢幕就顯示全螢幕鈕(和其他教材共用 mobile-panels.js 的判斷)。全螢幕是劇場模式
+//   (html.bio-fs,版面在 bio-lesson.css),手機上順便鎖成橫向。觸控手機直拿時的轉向提示也由這裡顯示,頁面不用自己呼叫 createRotateHint。
 // 傳回的 api(也掛在 globalThis.__lesson,給測試與 scripts/make-og-images.mjs 用):go(第幾章或章節代號)、play()、pause()、
 //   chapter(目前章節代號)、duration(這一章幾秒)、time(可讀可設)、state、redraw()、set(id, v, { restart })。
 // 畫面縮得很小時(手機),畫圖的字會自動放大(g.boost,最多 1.3 倍),版面要留空間。
 import { makeG, C } from './bio-draw.js';
 // 分頁列排不下時捲到目前這一頁(模組載入就會做);全螢幕共用同一套判斷
-import { fsSupported, fsElement, toggleFullscreen } from './mobile-panels.js';
+import { fsSupported, fsElement, toggleFullscreen, createRotateHint } from './mobile-panels.js';
 
 export function createLesson({ chapters, state = {}, controls = [], W = 960, H = 540, autoplay = true }) {
   const need = (s) => { const e = document.querySelector(s); if (!e) throw new Error(`bio-lesson: 頁面缺少 ${s}`); return e; };
@@ -152,11 +153,22 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     setPlaying(!playing);
   });
   btnPrev.addEventListener('click', () => { go(t > 1.5 ? ci : ci - 1); });
-  // 全螢幕鈕(頁面有 #btnFs 而且瀏覽器支援時才出現;iPhone 的 Safari 不支援網頁全螢幕)
+  // 全螢幕鈕(頁面有 #btnFs 而且瀏覽器支援時才出現;iPhone 的 Safari 不支援網頁全螢幕)。
+  // 全螢幕時 html 加上 .bio-fs(劇場模式,版面在 bio-lesson.css):只留動畫、字幕、播放列與自己調整,動畫盡量大。
+  // 手機直拿時動畫只有螢幕寬,圖上的小字只剩 6 px 左右,所以手機進入全螢幕時順便鎖成橫向(Android 的 Chrome 只有全螢幕時能鎖),離開時解除。
   const btnFs = document.querySelector('#btnFs');
   if (btnFs) {
     btnFs.hidden = !fsSupported();
-    const syncFs = () => { const on = !!fsElement(); btnFs.setAttribute('aria-pressed', String(on)); btnFs.setAttribute('aria-label', on ? '結束全螢幕' : '全螢幕'); btnFs.classList.toggle('on', on); };
+    const phone = matchMedia('(pointer: coarse) and (max-width: 760px), (pointer: coarse) and (max-height: 500px)');
+    const orient = typeof screen !== 'undefined' ? screen.orientation : null;
+    let locked = false;
+    const syncFs = () => {
+      const on = !!fsElement();
+      btnFs.setAttribute('aria-pressed', String(on)); btnFs.setAttribute('aria-label', on ? '結束全螢幕' : '全螢幕'); btnFs.classList.toggle('on', on);
+      document.documentElement.classList.toggle('bio-fs', on);
+      if (on && phone.matches && orient && orient.lock) orient.lock('landscape').then(() => { locked = true; }, () => {});
+      if (!on && locked) { locked = false; try { orient.unlock(); } catch (e) { /* already unlocked */ } }
+    };
     btnFs.addEventListener('click', toggleFullscreen);
     document.addEventListener('fullscreenchange', syncFs);
     document.addEventListener('webkitfullscreenchange', syncFs);
@@ -245,5 +257,9 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
   const api = { go: (k) => go(typeof k === 'number' ? k : chapters.findIndex((c) => c.key === k)), play: () => setPlaying(true), pause: () => setPlaying(false),
     get chapter() { return chapters[ci].key; }, get duration() { return chapters[ci].dur; }, get time() { return t; }, set time(v) { t = v; lastCue = -2; }, state: S, redraw: draw, set: setValue };
   globalThis.__lesson = api; // 除錯與測試用
+  // 觸控手機直拿時提示一次(mobile-panels.js 的 createRotateHint),排在播放列下面,不擋播放鈕。
+  // 能全螢幕的瀏覽器建議按全螢幕鈕:直拿與一般橫拿時動畫都被約 200 px 的高度限住,只有全螢幕(會轉成橫的)才真的變大;
+  // 不能全螢幕的(iPhone 的 Safari)建議轉成橫式。
+  createRotateHint({ top: '.bar', suspended: () => false, text: btnFs && !btnFs.hidden ? '按全螢幕鈕,動畫會轉成橫的、放到最大' : '建議轉成橫式觀看,動畫比較大' });
   return api;
 }
