@@ -82,6 +82,9 @@ main.lesson{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;alig
 .notes h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#f0f3ee}
 .notes p,.notes li{font-size:14px;line-height:1.8;color:#c9d4cf}
 .notes ul{margin:0;padding-left:1.2em}
+/* 生化進階:重點整理最前面的「先看:」連到對應的基礎教材 */
+.notes .pre{margin:0 0 10px;padding:7px 12px;border-left:3px solid var(--mint);border-radius:0 8px 8px 0;background:rgba(165,243,205,.06)}
+.notes .pre a{color:var(--mint)}
 .notes .src li{font-size:12.5px;line-height:1.7;color:var(--muted)}
 .notes .src a{color:#c9d4cf}
 footer.site{border-top:1px solid var(--line);padding:16px 0 28px;font-size:12.5px;color:var(--muted)}

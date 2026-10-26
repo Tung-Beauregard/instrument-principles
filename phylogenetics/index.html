@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>演化樹:從序列推親緣關係</title>
+<meta name="description" content="用動畫看多序列比對、p 距離與 Jukes–Cantor 校正、UPGMA 與鄰接法怎麼建樹、簡約法與概似法、怎麼讀樹與 bootstrap 支持度,最後看萜類合成酶家族的樹。可以自己切換距離、建樹方法、定根方式與 bootstrap 的重抽次數。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="演化樹:從序列推親緣關係">
+<meta property="og:description" content="用動畫看序列比對、距離校正、UPGMA 與鄰接法建樹、簡約法與概似法、bootstrap 支持度,以及萜類合成酶家族的樹。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/phylogenetics/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/phylogenetics.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="演化樹:距離矩陣一步一步合併成樹的動畫">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/phylogenetics/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化進階"><a href="../">← 儀器入口</a><a href="../transcriptomics/">轉錄體分析</a><a href="../terpenoid-precursors/">萜類前驅物</a><a href="../enzyme-kinetics/">酵素動力學</a><a href="../population-genetics/">族群遺傳</a><a href="./" aria-current="page">演化樹</a><a href="../gene-function/">基因功能驗證</a></nav></div>
+<header class="top wrap">
+  <h1>演化樹 <span class="k">從序列推親緣關係</span></h1>
+  <p class="lede">把同源的序列排好,算出兩兩之間的距離,再用 UPGMA、鄰接法、簡約法或概似法推出樹;bootstrap 告訴你每個分支在重抽之下穩不穩。最後用萜類合成酶家族看:序列最像的基因,產物不一定一樣。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="演化樹動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <p class="pre">先看:<a href="../sequencing/">DNA 定序</a>、<a href="../terpene-synthase/">萜類合成酶</a></p>
+    <ul>
+      <li>多序列比對的前提是每一欄都來自同一個祖先位置;有空格或對不準的欄,建樹前通常整欄拿掉。</li>
+      <li>p 距離 = 不同的欄 ÷ 比較的欄。同一個位置換過不只一次時 p 會低估,Jukes–Cantor 校正 d = −(3/4)·ln(1 − 4p/3),d 的單位是每個位置的替換數;p 接近 0.75 時 d 趨近無限大(飽和)。</li>
+      <li>UPGMA 把最近的兩群合併、節點高度取距離的一半,等於假設各支演化一樣快;速率差很多時會把演化快的序列放錯。鄰接法用 Q(i,j) = (n − 2)·d(i,j) − r(i) − r(j) 找鄰居,距離剛好吻合某棵樹時一定還原那棵樹,不需要等速。</li>
+      <li>簡約法找改變次數最少的樹,概似法找在替換模型下最可能產生這組序列的樹;n 條序列的無根樹有 (2n − 5)!! 種(10 條就有 2,027,025 種),只能用搜尋法找。</li>
+      <li>讀樹:分支(clade)是一個節點和它所有的後代;繞節點轉動不改變關係,樹梢的上下順序沒有意義;根要靠外群,中點定根要假設等速。</li>
+      <li>Bootstrap 把欄位抽出放回重抽、重建樹,支持度是分支出現的比例。Felsenstein(1985)以 95% 為顯著;Hillis 與 Bull(1993)在等速、對稱的樹上模擬,70% 以上多半對應 95% 以上的正確機率。方法本身會錯時,錯的分支一樣拿到高支持。</li>
+      <li>植物萜類合成酶分成 TPS-a 到 TPS-h 共 7 群,裸子植物的 TPS-d 再分 d1、d2、d3。序列能看出屬於哪一群,產物要做出酵素、用 GC-MS 確認(做法見<a href="../terpene-synthase/">萜類合成酶</a>與<a href="../gene-function/">基因功能</a>)。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Saitou N, Nei M. The neighbor-joining method: a new method for reconstructing phylogenetic trees. Mol Biol Evol. 1987;4(4):406–425. <a href="https://doi.org/10.1093/oxfordjournals.molbev.a040454">doi:10.1093/oxfordjournals.molbev.a040454</a>(依摘要);Q 的寫法出自 Studier JA, Keppler KJ. Mol Biol Evol. 1988;5(6):729–731,和原本的判準等價、距離剛好吻合一棵樹時一定還原它,依 Gascuel O, Steel M. Neighbor-joining revealed. Mol Biol Evol. 2006;23(11):1997–2000 的整理。</li>
+      <li>Felsenstein J. Confidence limits on phylogenies: an approach using the bootstrap. Evolution. 1985;39(4):783–791. <a href="https://doi.org/10.1111/j.1558-5646.1985.tb00420.x">doi:10.1111/j.1558-5646.1985.tb00420.x</a>(欄位抽出放回、95% 為顯著、用的方法本身不一致時 bootstrap 無法補救);Hillis DM, Bull JJ. Syst Biol. 1993;42(2):182–192. <a href="https://doi.org/10.1093/sysbio/42.2.182">doi:10.1093/sysbio/42.2.182</a>(依摘要:70% 與 95%、速率很不相等時 50% 以上會高估)。</li>
+      <li>Baldauf SL. Phylogeny for the faint of heart: a tutorial. Trends Genet. 2003;19(6):345–351. <a href="https://doi.org/10.1016/S0168-9525(03)00112-4">doi:10.1016/S0168-9525(03)00112-4</a>(讀樹、節點可轉動、外群、多重替換使簡單計數低估、bootstrap 的做法與 70%、50% 以下通常不標);常見的誤讀見 Kummer TA, et al. J Microbiol Biol Educ. 2016;17(3):389–398(<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5134942/">PMC5134942</a>)。</li>
+      <li>Felsenstein J. Evolutionary trees from DNA sequences: a maximum likelihood approach. J Mol Evol. 1981;17(6):368–376. <a href="https://doi.org/10.1007/BF01734359">doi:10.1007/BF01734359</a>(依摘要);Jukes TH, Cantor CR. 1969, Evolution of protein molecules(收在 Mammalian Protein Metabolism 第 3 冊;原書未讀,公式由模型推導並用模擬驗算);EMBL-EBI <a href="https://www.ebi.ac.uk/training/online/courses/introduction-to-phylogenetics/">Introduction to phylogenetics</a>(枝長單位、外群、中點定根要假設等速)。</li>
+      <li>Chen F, et al. The family of terpene synthases in plants. Plant J. 2011;66(1):212–229. <a href="https://doi.org/10.1111/j.1365-313X.2011.04520.x">doi:10.1111/j.1365-313X.2011.04520.x</a>(依摘要:7 群、相近的酵素產物不同);各群的內容見 Karunanithi PS, Zerbe P. Front Plant Sci. 2019;10:1166(<a href="https://doi.org/10.3389/fpls.2019.01166">doi</a>);Bohlmann J, et al. PNAS. 1998;95(8):4126–4133(<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC22453/">PMC22453</a>,序列能歸群、不能判定功能);Martin DM, et al. Plant Physiol. 2004;135(4):1908–1927(<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC520763/">PMC520763</a>,TPS-d1、d2、d3)。</li>
+      <li>Ma LT, et al. Unveiling Monoterpene Biosynthesis in <i>Taiwania cryptomerioides</i> via Functional Characterization. Plants. 2021;10(11):2404. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/">PMC8625326</a>(MUSCLE 比對、鄰接法加 100 次 bootstrap;柏科單萜合成酶的分群;TcTPS13 到 17 的產物)。DDxxD 附近的胺基酸取自 NCBI 蛋白質資料庫:QHZ00920.1、QHZ00922.1、QHZ00923.1、ABW80964.1、O24475、Q40322。</li>
+      <li>示意:第 1 到 7 章的 6 條 DNA(50 欄)是在電腦裡照一棵已知的樹((A:0.06,B:0.08):0.10,(C:0.07,(D:0.05,E:0.35):0.08):0.06,O:0.30)用 Jukes–Cantor 模型模擬的(亂數種子 321),C 的 3 個空格也是設定的;距離、樹、Q、簡約與概似的分數、bootstrap(種子 7)都是頁面照公式現算。第 8 章的扇形與兩個群的畫法是示意,群內的分支順序沒有畫出。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化進階・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, FONT, seg, ease, clamp, lerp } from '../assets/bio-draw.js';
+
+// ==== 計算 ====
+// 這一段不碰畫面,scripts 以外的驗算(node)也直接抽這一段來跑
+// 可重現的亂數(和 bio-draw.js 的 rng 相同)
+function rngX(seed = 1) {
+  let s = seed >>> 0 || 1;
+  return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
+}
+// 沒有空格的欄(有空格的欄整欄拿掉)
+const fullCols = (seqs) => [...seqs[0]].map((_, i) => i).filter((i) => seqs.every((s) => s[i] !== '-'));
+// p 距離:不同的欄 ÷ 比較的欄數;cols 可以有重複(bootstrap 重抽時)
+function pDist(a, b, cols) { let k = 0; for (const i of cols) if (a[i] !== b[i]) k++; return k / cols.length; }
+// Jukes–Cantor 校正:d = −(3/4)·ln(1 − 4p/3);p ≥ 0.75 時沒有定義(飽和)
+const jc = (p) => (p < 0.75 ? -0.75 * Math.log(1 - (4 * p) / 3) : Infinity);
+function distMatrix(seqs, cols, corr = 'jc') {
+  const n = seqs.length, D = [...Array(n)].map(() => Array(n).fill(0));
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) { const p = pDist(seqs[i], seqs[j], cols); D[i][j] = D[j][i] = corr === 'jc' ? jc(p) : p; }
+  return D;
+}
+const roundM = (D, k = 2) => D.map((r) => r.map((v) => Math.round(v * 10 ** k) / 10 ** k));
+const keyOf = (a, b) => (a < b ? `${a},${b}` : `${b},${a}`);
+// UPGMA:每次合併距離最小的兩群,新節點高度 = 距離 ÷ 2,新的距離 = 兩群依大小加權平均。
+// 傳回 { nodes, root, steps };葉子是 0..n−1,內部節點從 n 起;steps 記每一步合併前的矩陣與選到的一對
+function upgma(D0) {
+  const n = D0.length, D = new Map();
+  const nodes = [...Array(n)].map((_, i) => ({ id: i, kids: null, h: 0, size: 1, leaves: [i] }));
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) D.set(keyOf(i, j), D0[i][j]);
+  let act = [...Array(n).keys()];
+  const steps = [];
+  while (act.length > 1) {
+    let best = null;
+    for (let x = 0; x < act.length; x++) for (let y = x + 1; y < act.length; y++) {
+      const v = D.get(keyOf(act[x], act[y]));
+      if (!best || v < best.v - 1e-12) best = { a: act[x], b: act[y], v };
+    }
+    const mat = act.map((i) => act.map((j) => (i === j ? 0 : D.get(keyOf(i, j)))));
+    const A = nodes[best.a], B = nodes[best.b];
+    const u = { id: nodes.length, kids: [best.a, best.b], h: best.v / 2, size: A.size + B.size, leaves: [...A.leaves, ...B.leaves].sort((p, q) => p - q) };
+    nodes.push(u);
+    const rest = act.filter((k) => k !== best.a && k !== best.b), nd = {};
+    for (const k of rest) { const v = (A.size * D.get(keyOf(best.a, k)) + B.size * D.get(keyOf(best.b, k))) / u.size; D.set(keyOf(u.id, k), v); nd[k] = v; }
+    steps.push({ act: [...act], mat, a: best.a, b: best.b, d: best.v, u: u.id, nd });
+    act = [...rest, u.id];
+  }
+  return { nodes, root: act[0], steps };
+}
+// 鄰接法(Saitou 與 Nei 1987;Q 的寫法照 Studier 與 Keppler 1988):
+// Q(i,j) = (r − 2)·d(i,j) − Σk d(i,k) − Σk d(j,k);選 Q 最小的一對 f、g 接到新節點 u:
+// δ(f,u) = d(f,g)/2 + (Σk d(f,k) − Σk d(g,k)) / (2(r − 2)),δ(g,u) = d(f,g) − δ(f,u);d(u,k) = (d(f,k) + d(g,k) − d(f,g)) / 2
+// 剩 3 個節點時直接接到中心。傳回 { edges: [{ a, b, len }], steps, n }
+function nj(D0) {
+  const n = D0.length, D = new Map();
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) D.set(keyOf(i, j), D0[i][j]);
+  const d = (a, b) => (a === b ? 0 : D.get(keyOf(a, b)));
+  let act = [...Array(n).keys()], next = n;
+  const edges = [], steps = [];
+  while (act.length > 3) {
+    const r = act.length, R = {}, Q = {};
+    for (const i of act) R[i] = act.reduce((s, k) => s + d(i, k), 0);
+    let best = null;
+    for (let x = 0; x < r; x++) for (let y = x + 1; y < r; y++) {
+      const i = act[x], j = act[y], q = (r - 2) * d(i, j) - R[i] - R[j];
+      Q[keyOf(i, j)] = q;
+      if (!best || q < best.q - 1e-12) best = { f: i, g: j, q };
+    }
+    const { f, g } = best, u = next++;
+    const lf = d(f, g) / 2 + (R[f] - R[g]) / (2 * (r - 2)), lg = d(f, g) - lf;
+    edges.push({ a: f, b: u, len: lf }, { a: g, b: u, len: lg });
+    const nd = {};
+    for (const k of act) if (k !== f && k !== g) { const v = (d(f, k) + d(g, k) - d(f, g)) / 2; D.set(keyOf(u, k), v); nd[k] = v; }
+    steps.push({ act: [...act], R, Q, f, g, q: best.q, u, lf, lg, nd, mat: act.map((i) => act.map((j) => d(i, j))) });
+    act = [...act.filter((k) => k !== f && k !== g), u];
+  }
+  const [i, j, k] = act, c = next++;
+  const li = (d(i, j) + d(i, k) - d(j, k)) / 2, lj = (d(i, j) + d(j, k) - d(i, k)) / 2, lk = (d(i, k) + d(j, k) - d(i, j)) / 2;
+  edges.push({ a: i, b: c, len: li }, { a: j, b: c, len: lj }, { a: k, b: c, len: lk });
+  steps.push({ act: [...act], last: true, c, li, lj, lk, mat: act.map((x) => act.map((y) => d(x, y))) });
+  return { edges, steps, n };
+}
+function upgmaEdges(U) {
+  const edges = [];
+  for (const nd of U.nodes) if (nd.kids) for (const k of nd.kids) edges.push({ a: k, b: nd.id, len: nd.h - U.nodes[k].h });
+  return edges;
+}
+function adjOf(edges) {
+  const m = new Map();
+  for (const { a, b, len } of edges) { if (!m.has(a)) m.set(a, []); if (!m.has(b)) m.set(b, []); m.get(a).push([b, len]); m.get(b).push([a, len]); }
+  return m;
+}
+// 以 root 為根,每個內部節點底下的葉子(位元遮罩)就是一個分支(clade);不含單一葉子與全部
+function cladesOf(edges, root, n) {
+  const adj = adjOf(edges), out = [], all = (1 << n) - 1;
+  const walk = (v, p) => {
+    if (v < n) return 1 << v;
+    let m = 0;
+    for (const [w] of adj.get(v)) if (w !== p) m |= walk(w, v);
+    if (m !== all && (m & (m - 1))) out.push(m);
+    return m;
+  };
+  walk(root, -1);
+  return out;
+}
+// 無根樹用外群(葉子 og)定根後的分支:從外群的鄰居往下走,不含整個內群
+function cladesRootedAt(edges, og, n) {
+  const adj = adjOf(edges), out = [], ing = ((1 << n) - 1) & ~(1 << og);
+  const walk = (v, p) => {
+    if (v < n) return 1 << v;
+    let m = 0;
+    for (const [w] of adj.get(v)) if (w !== p) m |= walk(w, v);
+    if (m !== ing && (m & (m - 1))) out.push(m);
+    return m;
+  };
+  walk(adj.get(og)[0][0], og);
+  return out;
+}
+// Bootstrap(Felsenstein 1985):欄位抽出放回重抽 m 次(m = 原本的欄數),算 JC 距離、重新建樹,記下每一次有哪些分支。
+// method:'nj'(外群 og 定根)或 'upgma'(UPGMA 自己的根)。傳回 { B, counts: Map(遮罩 → 次數), trees: 每一次的分支清單 }
+function bootstrap(seqs, cols, { method = 'nj', B = 1000, seed = 7, og = seqs.length - 1 } = {}) {
+  const R = rngX(seed), n = seqs.length, m = cols.length, counts = new Map(), trees = [];
+  for (let b = 0; b < B; b++) {
+    const pick = [];
+    for (let k = 0; k < m; k++) pick.push(cols[Math.floor(R() * m)]);
+    const D = distMatrix(seqs, pick, 'jc').map((row) => row.map((v) => (Number.isFinite(v) ? v : 5)));
+    let cl;
+    if (method === 'nj') cl = cladesRootedAt(nj(D).edges, og, n);
+    else { const U = upgma(D); cl = cladesOf(upgmaEdges(U), U.root, n); }
+    trees.push(cl);
+    for (const c of cl) counts.set(c, (counts.get(c) || 0) + 1);
+  }
+  return { B, counts, trees };
+}
+// 4 條序列的無根樹 (i,j)|(k,l) 上,一欄最少要改變幾次(Fitch 1971 的做法)
+function fitch4(x, [i, j, k, l]) {
+  let c = 0;
+  const join = (p, q) => { const s = p.filter((v) => q.includes(v)); if (s.length) return s; c++; return [...new Set([...p, ...q])]; };
+  join(join([x[i]], [x[j]]), join([x[k]], [x[l]]));
+  return c;
+}
+// Jukes–Cantor 下 4 條序列的無根樹 (q0,q1)–(q2,q3) 的 ln 概似;bl = [q0, q1, 中間, q2, q3] 的枝長。一樣的欄先合併
+function patterns4(seqs, cols, q) { const m = new Map(); for (const c of cols) { const k = q.map((i) => seqs[i][c]).join(''); m.set(k, (m.get(k) || 0) + 1); } return [...m]; }
+const PJC = (t) => { const e = Math.exp((-4 * t) / 3); return [0.25 + 0.75 * e, 0.25 - 0.25 * e]; };
+function lnL4(pats, bl) {
+  const P = bl.map(PJC);
+  let s = 0;
+  for (const [x, w] of pats) {
+    let L = 0;
+    for (const u of 'ACGT') {
+      const a = (x[0] === u ? P[0][0] : P[0][1]) * (x[1] === u ? P[1][0] : P[1][1]);
+      for (const v of 'ACGT') L += 0.25 * a * (u === v ? P[2][0] : P[2][1]) * (x[2] === v ? P[3][0] : P[3][1]) * (x[3] === v ? P[4][0] : P[4][1]);
+    }
+    s += w * Math.log(L);
+  }
+  return s;
+}
+// 最大概似:5 條枝長一條一條用黃金分割找最大值,重複到 ln L 不再變
+function mlFit(seqs, cols, q) {
+  const pats = patterns4(seqs, cols, q), bl = [0.1, 0.1, 0.1, 0.1, 0.1], gr = (Math.sqrt(5) - 1) / 2;
+  let best = lnL4(pats, bl);
+  for (let round = 0; round < 40; round++) {
+    const before = best;
+    for (let b = 0; b < 5; b++) {
+      const f = (lg) => { const t = [...bl]; t[b] = Math.exp(lg); return lnL4(pats, t); };
+      let lo = Math.log(1e-6), hi = Math.log(5), x1 = hi - gr * (hi - lo), x2 = lo + gr * (hi - lo), f1 = f(x1), f2 = f(x2);
+      for (let it = 0; it < 50; it++) {
+        if (f1 > f2) { hi = x2; x2 = x1; f2 = f1; x1 = hi - gr * (hi - lo); f1 = f(x1); } else { lo = x1; x1 = x2; f1 = f2; x2 = lo + gr * (hi - lo); f2 = f(x2); }
+      }
+      bl[b] = Math.exp((lo + hi) / 2);
+      best = lnL4(pats, bl);
+    }
+    if (Math.abs(best - before) < 1e-9) break;
+  }
+  return { bl, lnL: best };
+}
+// n 條序列的無根二分樹有 (2n − 5)!! = 3 × 5 × … × (2n − 5) 種
+const nTrees = (n) => { let v = 1; for (let k = 3; k <= 2 * n - 5; k += 2) v *= k; return v; };
+// ==== 計算結束 ====
+
+// ================= 示意資料 =================
+// 在一棵已知的樹 ((A:0.06,B:0.08):0.10,(C:0.07,(D:0.05,E:0.35):0.08):0.06,O:0.30) 上,用 Jukes–Cantor 模型模擬 50 欄(亂數種子 321);
+// E 這一支演化得特別快,O 是外群;C 在第 21 到 23 欄(索引 20 到 22)少了 3 個鹼基。ANC 是模擬時的祖先(樹根)序列
+const NM = ['A', 'B', 'C', 'D', 'E', 'O'];
+const ANC = 'AAGCCTCGCATTCGCCAGCTGGGTGGCATCATCACAATCCTTTTCATGAG';
+const SEQ = [
+  'AAGCCTCGCATTAGCCAGCTGGGTGGCATCATCAAAATCCTTTTCAGTAG',
+  'AAGGCTCGCATTCGCCAGCTGGGTGGCGTCATCAAAATCCTTTTCAGAAG',
+  'AACCCCGGCATTCGCCAGGT---TGGCACCATCACAAACTTTTTCATGAG',
+  'ACCCCCTGCATTCGCCAGGTGGGTGGCACCATAATAAAGCTTTTCATGAG',
+  'GCAGGGCGCACTCCCCACGTGGGTTGCACCATAATAAACCTTTTCAATTG',
+  'AATCCTGCGATTCTCTAGCTGGATGCCATCATCACAATCCTTTTTATGTT',
+];
+const COLS = fullCols(SEQ); // 沒有空格的 47 欄
+const PM = distMatrix(SEQ, COLS, 'p'), JM = distMatrix(SEQ, COLS, 'jc');
+const DM = roundM(JM, 2); // 建樹用的距離:取到小數第 2 位,畫面上的數字可以照著手算
+const UP = upgma(DM), NJT = nj(DM);
+const bitOf = (s) => [...s].reduce((m, ch) => m | (1 << NM.indexOf(ch)), 0);
+const nameOf = (m) => NM.filter((_, i) => m & (1 << i)).join('');
+// 支持 D+E 的欄:D 和 E 一樣,其他 4 條都和它們不同
+const SUP_DE = COLS.filter((c) => SEQ[3][c] === SEQ[4][c] && [0, 1, 2, 5].every((k) => SEQ[k][c] !== SEQ[3][c]));
+// 模擬時用的樹(正確答案),根放在外群的枝上
+const TRUE_TREE = { id: 'r', len: 0, kids: [
+  { id: 'in', len: 0.15, kids: [{ id: 'ab', len: 0.10, kids: [{ tip: 0, len: 0.06 }, { tip: 1, len: 0.08 }] }, { id: 'cde', len: 0.06, kids: [{ tip: 2, len: 0.07 }, { id: 'de', len: 0.08, kids: [{ tip: 3, len: 0.05 }, { tip: 4, len: 0.35 }] }] }] },
+  { tip: 5, len: 0.15 }] };
+
+// ================= 樹的整理與版面 =================
+// 無根樹在 (a, b) 這條邊上、離 a 為 la 的地方定根,變成巢狀的有根樹 { id, len, tip, kids }
+function rootAt(edges, n, a, b, la) {
+  const adj = adjOf(edges), L = adj.get(a).find(([w]) => w === b)[1];
+  const sub = (v, p, len) => (v < n ? { id: v, tip: v, len } : { id: v, len, kids: adj.get(v).filter(([w]) => w !== p).map(([w, l]) => sub(w, v, l)) });
+  return { id: 'root', len: 0, kids: [sub(a, b, la), sub(b, a, L - la)] };
+}
+// 外群定根:根放在外群那條枝的中間
+const rootOG = (edges, n, og) => { const e = edges.find((x) => x.a === og || x.b === og); return rootAt(edges, n, e.a === og ? e.b : e.a, og, e.len / 2); };
+// 中點定根:根放在相距最遠的兩個樹梢之間路徑的中點
+function rootMid(edges, n) {
+  const adj = adjOf(edges);
+  const far = (s) => { const d = new Map([[s, 0]]), prev = new Map(), st = [s]; while (st.length) { const v = st.pop(); for (const [w, l] of adj.get(v)) if (!d.has(w)) { d.set(w, d.get(v) + l); prev.set(w, v); st.push(w); } } return { d, prev }; };
+  let best = null;
+  for (let i = 0; i < n; i++) { const r = far(i); for (let j = i + 1; j < n; j++) if (!best || r.d.get(j) > best.len) best = { i, j, len: r.d.get(j), r }; }
+  const path = [];
+  for (let v = best.j; v !== best.i; v = best.r.prev.get(v)) path.push(v);
+  path.push(best.i); path.reverse();
+  const half = best.len / 2;
+  for (let k = 0; k + 1 < path.length; k++) { const a = path[k], b = path[k + 1]; if (best.r.d.get(b) >= half) return { tree: rootAt(edges, n, a, b, half - best.r.d.get(a)), far: [best.i, best.j], len: best.len }; }
+  return null;
+}
+function rootUP(U) {
+  const mk = (id, ph) => { const nd = U.nodes[id]; return nd.kids ? { id, h: nd.h, len: ph - nd.h, kids: nd.kids.map((k) => mk(k, nd.h)) } : { id, tip: id, h: 0, len: ph - 0 }; };
+  return mk(U.root, U.nodes[U.root].h);
+}
+// 算每個節點底下的葉子(mask)與最小的葉子編號,孩子依最小編號排(A 在最上面)
+function prep(T) {
+  const walk = (v) => {
+    if (v.tip != null) { v.mask = 1 << v.tip; v.minTip = v.tip; return; }
+    v.kids.forEach(walk);
+    v.kids.sort((p, q) => p.minTip - q.minTip);
+    v.mask = v.kids.reduce((m, k) => m | k.mask, 0);
+    v.minTip = Math.min(...v.kids.map((k) => k.minTip));
+  };
+  walk(T);
+  return T;
+}
+const nodesOf = (T) => { const out = []; const w = (v) => { out.push(v); if (v.kids) v.kids.forEach(w); }; w(T); return out; };
+// 長方形的樹:樹梢由上往下等距。mode:'phylo' 依枝長、'ultra' 依高度(樹梢對齊,UPGMA)、'clado' 只看層數。flip(v) 為真時那個節點的孩子倒過來排
+function layoutTree(T, { mode = 'phylo', x0 = 0, xTip = 0, scale = 1, y0, y1, flip = () => false }) {
+  const tips = [];
+  const walk = (v, depth) => {
+    v.depth = depth;
+    if (v.tip != null) { tips.push(v); return; }
+    (flip(v) ? [...v.kids].reverse() : v.kids).forEach((k) => walk(k, depth + k.len));
+  };
+  walk(T, 0);
+  tips.forEach((v, i) => { v.y = lerp(y0, y1, tips.length > 1 ? i / (tips.length - 1) : 0.5); });
+  const height = (v) => (v.tip != null ? 0 : 1 + Math.max(...v.kids.map(height)));
+  const setY = (v) => { if (v.tip != null) return v.y; const ys = v.kids.map(setY); v.y = (Math.min(...ys) + Math.max(...ys)) / 2; return v.y; };
+  setY(T);
+  for (const v of nodesOf(T)) v.x = mode === 'phylo' ? x0 + v.depth * scale : mode === 'ultra' ? xTip - (v.h || 0) * scale : xTip - height(v) * scale;
+  return tips;
+}
+// 畫枝:每個內部節點一條直線、往每個孩子一條橫線;show(v) 決定這個節點的枝要不要畫
+function drawTree(g, T, { show = () => true, color = C.backbone, lw = 2.4, alpha = 1, stub = 14, colorOf } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha;
+  const walk = (v) => {
+    if (v.tip != null) return;
+    v.kids.forEach(walk);
+    if (!show(v)) return;
+    const ys = v.kids.map((k) => k.y);
+    g.line(v.x, Math.min(...ys), v.x, Math.max(...ys), colorOf ? colorOf(v) : color, lw);
+    for (const k of v.kids) g.line(v.x, k.y, k.x, k.y, colorOf ? colorOf(k) : color, lw);
+  };
+  walk(T);
+  if (show(T) && stub) g.line(T.x - stub, T.y, T.x, T.y, colorOf ? colorOf(T) : color, lw);
+  ctx.restore();
+}
+// 無根樹的放射狀版面(等角度法):每個子樹分到的角度和它的樹梢數成正比
+function radialPos(edges, n, center, cx, cy, scale, a0 = 0) {
+  const adj = adjOf(edges), pos = new Map([[center, [cx, cy]]]);
+  const leaves = (v, p) => (v < n ? 1 : adj.get(v).filter(([w]) => w !== p).reduce((s, [w]) => s + leaves(w, v), 0));
+  const place = (v, p, lo, hi) => {
+    const kids = adj.get(v).filter(([w]) => w !== p), tot = kids.reduce((s, [w]) => s + leaves(w, v), 0);
+    let a = lo;
+    for (const [w, l] of kids) {
+      const span = ((hi - lo) * leaves(w, v)) / tot, mid = a + span / 2, [px, py] = pos.get(v);
+      pos.set(w, [px + Math.cos(mid) * l * scale, py + Math.sin(mid) * l * scale]);
+      place(w, v, a, a + span);
+      a += span;
+    }
+  };
+  place(center, -1, a0, a0 + Math.PI * 2);
+  return pos;
+}
+// 畫放射狀的鄰接法無根樹:樹梢的字沿著枝往外推一點;hiEdge(e) 為真的枝改用 hiColor
+function drawUnrooted(g, pos, { color = C.backbone, lw = 2.6, size = 16, hiEdge = null, hiColor = C.amber } = {}) {
+  for (const e of NJT.edges) {
+    const [x1, y1] = pos.get(e.a), [x2, y2] = pos.get(e.b), hi = hiEdge && hiEdge(e);
+    g.line(x1, y1, x2, y2, hi ? hiColor : color, hi ? lw + 0.8 : lw);
+  }
+  for (let i = 0; i < 6; i++) {
+    const [x, y] = pos.get(i), e = NJT.edges.find((ed) => ed.a === i || ed.b === i), o = e.a === i ? e.b : e.a, [ox, oy] = pos.get(o), L = Math.hypot(x - ox, y - oy) || 1;
+    g.text(x + ((x - ox) / L) * 15, y + ((y - oy) / L) * 15, NM[i], { size, weight: 700, color: i === 4 ? C.amber : C.ink, align: 'center' });
+  }
+}
+
+// ================= 畫圖小工具 =================
+const fm = (v, k = 2) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(k);
+const pct = (c, k) => (c === k ? 100 : Math.min(99, Math.round((100 * c) / k)));
+// 一格鹼基:底色是鹼基色、中間黑字;'-' 是空格。格子裡的字不跟著手機放大(放大會撐出格子)
+function baseCell(g, x, y, w, h, b, { alpha = 1, ring = 0 } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha;
+  if (b === '-') g.rrect(x, y, w, h, 3, '#0a1210', C.line, 1.2);
+  else g.rrect(x, y, w, h, 3, C[b] || C.N);
+  ctx.font = `700 ${Math.min(15, h * 0.62)}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = b === '-' ? C.muted : '#0b1111';
+  ctx.fillText(b === '-' ? '−' : b, x + w / 2, y + h / 2 + 0.5);
+  if (ring > 0) { ctx.globalAlpha *= ring; g.rrect(x - 2.5, y - 2.5, w + 5, h + 5, 5, null, C.amber, 2.4); }
+  ctx.restore();
+}
+// 一格胺基酸(第 1 章 DDxxD)
+function aaCell(g, x, y, w, h, a, { hot = false, alpha = 1 } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha;
+  g.rrect(x, y, w, h, 3, hot ? C.amber : 'rgba(184,164,244,.16)', hot ? null : 'rgba(184,164,244,.3)', 1);
+  ctx.font = `700 ${Math.min(14, h * 0.7)}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = hot ? '#0b1111' : C.ink; ctx.fillText(a, x + w / 2, y + h / 2 + 0.5);
+  ctx.restore();
+}
+// 距離矩陣:upper 只畫上三角(這時第一欄與最後一列是空的,不畫出來),否則整個畫;hl 是 { 'i,j': 框的顏色 },fill 是 { 'i,j': 底色 }
+function drawMatrix(g, x, y, labs, M, { cw = 60, ch = 32, upper = true, fmt = (v) => fm(v), hl = {}, fill = {}, alpha = 1, size = 14, labSize = 15, show = () => true } = {}) {
+  const ctx = g.ctx, n = labs.length, c0 = upper ? 1 : 0, rN = upper ? n - 1 : n;
+  ctx.save(); ctx.globalAlpha *= alpha;
+  labs.forEach((s, j) => { if (j >= c0) g.text(x + (j - c0 + 0.5) * cw, y - 14, s, { size: labSize, weight: 700, color: C.ink2, align: 'center', mono: true }); });
+  labs.forEach((s, i) => { if (i < rN) g.text(x - 10, y + (i + 0.5) * ch, s, { size: labSize, weight: 700, color: C.ink2, align: 'right', mono: true }); });
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    if (upper && j <= i) continue;
+    const k = `${i},${j}`;
+    if (!show(i, j)) continue;
+    const cx = x + (j - c0) * cw, cy = y + i * ch;
+    g.rrect(cx + 2, cy + 2, cw - 4, ch - 4, 5, fill[k] || (i === j ? null : 'rgba(255,255,255,.045)'), hl[k] || null, 2.2);
+    g.text(cx + cw / 2, cy + ch / 2 + 0.5, i === j ? '0' : fmt(M[i][j], i, j), { size, color: hl[k] || fill[k] ? C.ink : i === j ? C.muted : C.ink2, align: 'center', mono: true });
+  }
+  ctx.restore();
+}
+
+// ================= 第 1 章:同源與比對 =================
+const W1C0 = 10, W1N = 24, X1 = 128, CW1 = 25, CH1 = 24; // 畫面只列第 11 到 34 欄(索引 10 到 33)
+const xOf1 = (j) => X1 + (j - W1C0) * CW1;
+const X1END = X1 + W1N * CW1;
+const YANC = 50, yRow1 = (i) => 108 + i * 31;
+const CONS1 = []; for (let j = W1C0; j < W1C0 + W1N; j++) if (SEQ.every((s) => s[j] !== '-' && s[j] === SEQ[0][j])) CONS1.push(j);
+const GAP1 = [...SEQ[2]].map((b, i) => (b === '-' ? i : -1)).filter((i) => i >= 0); // C 的空格
+// 真的萜類合成酶在 DDxxD 附近的 13 個胺基酸(NCBI 蛋白質資料庫;第 5 到 9 個是 DDxxD)
+const MOTIF = [
+  ['臺灣杉 TcTPS13', 'VTYLDDIYDTYGT'],
+  ['臺灣杉 TcTPS15', 'ATVIDDIYDTYGT'],
+  ['臺灣杉 TcTPS16', 'VTYLDDIYDTYGT'],
+  ['紅檜 α-pinene 合成酶', 'VTYLDDMYDTYDF'],
+  ['大冷杉 pinene 合成酶', 'ITVLDDMYDTFGT'],
+  ['綠薄荷 limonene 合成酶', 'ITVIDDIYDVYGT'],
+];
+
+// ================= 第 3、4 章:建樹 =================
+const UPN = (id) => (id < 6 ? NM[id] : UP.nodes[id].leaves.map((i) => NM[i]).join(''));
+const NJL = {}; for (let i = 0; i < 6; i++) NJL[i] = [i];
+NJT.steps.forEach((s) => { if (!s.last) NJL[s.u] = [...NJL[s.f], ...NJL[s.g]].sort((p, q) => p - q); });
+const NJN = (id) => (id < 6 ? NM[id] : `(${NJL[id].map((i) => NM[i]).join('')})`);
+const T_UP = prep(rootUP(UP));
+const T_NJ = prep(rootOG(NJT.edges, 6, 5));
+const T_TRUE = prep(TRUE_TREE);
+const NJ_LAST = NJT.steps[NJT.steps.length - 1];
+// 每個內部節點是第幾步做出來的(UPGMA 的節點 id 從 6 起,一步一個;鄰接法的中心與根是最後一步)
+const madeAt = (isNJ, v) => (v.tip != null ? -1 : isNJ ? (v.id === 'root' || v.id === NJ_LAST.c ? NJT.steps.length - 1 : v.id - 6) : v.id - 6);
+// 把一組分支(遮罩)換成無根樹的分割來比較:含外群 O 的那一邊換成另一邊,只留兩邊都至少 2 個的
+const splitsOf = (masks) => [...new Set(masks.map((m) => (m & (1 << 5) ? 63 & ~m : m)).filter((m) => m & (m - 1) && (63 & ~m) & ((63 & ~m) - 1)))].sort((p, q) => p - q).join();
+const TRUE_SPLITS = splitsOf([bitOf('AB'), bitOf('DE'), bitOf('CDE')]);
+
+// ================= 第 5 章:簡約與概似 =================
+const Q4 = [[0, 1, 3, 4], [0, 3, 1, 4], [0, 4, 1, 3]]; // 樹 1:(A,B)(D,E);樹 2:(A,D)(B,E);樹 3:(A,E)(B,D)
+const CH4 = Q4.map((q) => COLS.map((c) => fitch4(SEQ.map((s) => s[c]), q))); // 每一欄在每棵樹上要改變幾次
+const INF4 = COLS.map((c, n) => [c, n]).filter(([, n]) => new Set(CH4.map((r) => r[n])).size > 1); // 讓三棵樹不同的欄
+const MP4 = CH4.map((r) => r.reduce((a, b) => a + b, 0));
+const BASE4 = MP4[0] - INF4.reduce((s, [, n]) => s + CH4[0][n], 0); // 其他欄在三棵樹上都一樣多
+let ML4 = null;
+const ml4 = () => ML4 || (ML4 = Q4.map((q) => mlFit(SEQ, COLS, q)));
+
+// ================= 第 7 章:bootstrap =================
+const BOOT = {};
+function bootOf(method, drop) {
+  const key = method + (drop ? '-drop' : '');
+  if (!BOOT[key]) {
+    const cols = drop ? COLS.filter((c) => !SUP_DE.includes(c)) : COLS;
+    const r = bootstrap(SEQ, cols, { method, B: 1000, seed: 7, og: 5 });
+    const D = roundM(distMatrix(SEQ, cols, 'jc'), 2);
+    let tree, clades;
+    if (method === 'nj') { const T = nj(D); tree = prep(rootOG(T.edges, 6, 5)); clades = cladesRootedAt(T.edges, 5, 6); }
+    else { const U = upgma(D); tree = prep(rootUP(U)); clades = cladesOf(upgmaEdges(U), U.root, 6); }
+    // 第 1 次重抽依序抽到哪幾欄(和 bootstrap() 用同一串亂數,畫面上一欄一欄抽給你看)
+    const R1 = rngX(7), first = [];
+    for (let k = 0; k < cols.length; k++) first.push(cols[Math.floor(R1() * cols.length)]);
+    BOOT[key] = { ...r, tree, clades, cols, first };
+  }
+  return BOOT[key];
+}
+const supportIn = (b, mask, k) => { let c = 0; for (let i = 0; i < k; i++) if (b.trees[i].includes(mask)) c++; return c; };
+
+let lesson = null;
+const replay = (t0) => { if (lesson) { lesson.time = t0; lesson.play(); } };
+
+const chapters = [
+  {
+    key: 'align', name: '同源與比對', dur: 16,
+    cues: [[0, '同源:這 6 條 DNA 來自同一個祖先序列;每一代複製時偶爾出錯(突變),累積下來就有同有異。'],
+      [4.5, '多序列比對把每一欄排成「同一個祖先位置的後代」;C 少了 3 個鹼基,就在那裡補上空格(gap,「−」)。'],
+      [9, '6 條都一樣的欄叫保守位置。萜類合成酶的 DDxxD(D 是天門冬胺酸,x 任一胺基酸)抓住金屬離子,幾乎不變。'],
+      [13, '比對錯了,後面的樹也會錯。有空格或對不準的欄,建樹前通常整欄拿掉:這裡 50 欄剩 47 欄。']],
+    draw(g, t) {
+      const a0 = ease(seg(t, 0, 0.9));
+      g.text(40, 22, '模擬的 DNA(示意):畫面只列出第 11 到 34 欄,全長 50 欄', { size: 13, color: C.muted, alpha: a0 });
+      // 祖先
+      const ancA = a0 * lerp(1, 0.3, ease(seg(t, 4.6, 5.6)));
+      g.text(X1 - 12, YANC + CH1 / 2, '祖先', { size: 15, weight: 700, color: C.ink2, align: 'right', alpha: ancA });
+      for (let j = W1C0; j < W1C0 + W1N; j++) baseCell(g, xOf1(j), YANC, CW1 - 3, CH1, ANC[j], { alpha: ancA });
+      if (t > 5) g.text(X1END + 12, YANC + CH1 / 2, '實際上看不到祖先', { size: 13, color: C.muted, alpha: ease(seg(t, 5, 5.8)) });
+      // 6 條後代從祖先往下複製;C 先是沒對齊的樣子(少的 3 個鹼基不在,後面的往左擠)
+      const kAl = ease(seg(t, 5.2, 7.4));
+      for (let i = 0; i < 6; i++) {
+        const k = ease(seg(t, 0.9 + 0.32 * i, 2.3 + 0.32 * i));
+        if (k <= 0) continue;
+        const y = lerp(YANC, yRow1(i), k);
+        g.text(X1 - 12, y + CH1 / 2, NM[i], { size: 16, weight: 700, color: C.ink, align: 'right', alpha: k });
+        const ring = Math.min(ease(seg(t, 2.3 + 0.32 * i, 2.9 + 0.32 * i)), 1 - seg(t, 8.4, 9.2));
+        for (let j = W1C0; j < W1C0 + W1N + (i === 2 ? 3 : 0); j++) {
+          const b = SEQ[i][j];
+          if (b === '-') { if (kAl > 0.4) baseCell(g, xOf1(j), y, CW1 - 3, CH1, '-', { alpha: k * seg(kAl, 0.4, 1) }); continue; }
+          const pos = i === 2 && j > GAP1[GAP1.length - 1] ? lerp(j - GAP1.length, j, kAl) : j;
+          const x = xOf1(pos), fade = clamp(1 - (x - (X1END - CW1)) / CW1);
+          if (fade <= 0) continue;
+          const mut = j < W1C0 + W1N && b !== ANC[j];
+          baseCell(g, x, y, CW1 - 3, CH1, b, { alpha: k * fade, ring: mut && k >= 1 ? ring : 0 });
+        }
+      }
+      // 右邊的說明
+      const nMut = ease(seg(t, 2.6, 3.2)) * (1 - seg(t, 8.4, 9.2));
+      if (nMut > 0) { g.text(X1END + 12, yRow1(0) + 6, '琥珀框:', { size: 14, weight: 700, color: C.amber, alpha: nMut }); g.text(X1END + 12, yRow1(0) + 28, '和祖先不一樣', { size: 14, color: C.ink2, alpha: nMut }); }
+      const nGap = ease(seg(t, 5.4, 6.2)) * (1 - seg(t, 8.6, 9.2));
+      if (nGap > 0) g.tag(X1END + 92, yRow1(2) + CH1 / 2, 'C 補上 3 個空格', { size: 14, color: C.ink, alpha: nGap });
+      // 保守欄
+      const cons = ease(seg(t, 9.1, 9.9));
+      if (cons > 0) {
+        for (const j of CONS1) g.rrect(xOf1(j) - 3, yRow1(0) - 5, CW1 + 3, yRow1(5) + CH1 - yRow1(0) + 10, 5, 'rgba(165,243,205,.07)', `rgba(165,243,205,${0.85 * cons})`, 2);
+        g.text(X1END + 12, yRow1(3) + 4, '綠框:6 條都一樣', { size: 14, weight: 700, color: C.mint, alpha: cons });
+        g.text(X1END + 12, yRow1(3) + 26, `(${CONS1.length} / ${W1N} 欄)`, { size: 14, color: C.ink2, alpha: cons });
+      }
+      // 有空格的欄整欄拿掉
+      const cut = ease(seg(t, 13.1, 13.9));
+      if (cut > 0) {
+        const xa = xOf1(GAP1[0]) - 3, xb = xOf1(GAP1[GAP1.length - 1]) + CW1, ya = yRow1(0) - 6, yb = yRow1(5) + CH1 + 6;
+        g.rrect(xa, ya, xb - xa, yb - ya, 5, `rgba(255,123,123,${0.12 * cut})`, `rgba(255,123,123,${cut})`, 2);
+        g.ctx.save(); g.ctx.globalAlpha *= cut; g.line(xa + 4, ya + 4, xb - 4, yb - 4, C.red, 2.4); g.line(xb - 4, ya + 4, xa + 4, yb - 4, C.red, 2.4); g.ctx.restore();
+        g.tag((xa + xb) / 2, yb + 18, '整欄拿掉:50 欄 → 47 欄', { size: 14, color: C.red, alpha: cut });
+      }
+      // 下方:真的萜類合成酶,DDxxD 附近
+      const ma = ease(seg(t, 9.3, 10.2));
+      if (ma > 0) {
+        const ctx = g.ctx;
+        ctx.save(); ctx.globalAlpha *= ma;
+        g.panel(24, 342, 912, 182, '');
+        g.text(40, 362, '真的萜類合成酶:DDxxD 附近的 13 個胺基酸(NCBI 蛋白質序列)', { size: 14, weight: 700, color: C.ink });
+        const ax = 316, aw = 22, ah = 18;
+        MOTIF.forEach(([lab, s], r) => {
+          const y = 384 + r * 22;
+          g.text(ax - 12, y + ah / 2, lab, { size: 13, color: C.ink2, align: 'right' });
+          [...s].forEach((a, c) => aaCell(g, ax + c * aw, y, aw - 2, ah, a, { hot: c === 4 || c === 5 || c === 8 }));
+        });
+        const tx = 640;
+        g.text(tx, 392, 'D = 天門冬胺酸(Asp)', { size: 14, color: C.ink });
+        g.text(tx, 418, 'x = 哪一個胺基酸都可以', { size: 14, color: C.ink });
+        g.text(tx, 444, 'DDxxD 抓住金屬離子', { size: 14, color: C.amber, weight: 700 });
+        g.text(tx, 470, '4 種植物、6 個酵素都一樣', { size: 14, color: C.ink2 });
+        g.text(tx, 500, '序列號見下方資料來源', { size: 13, color: C.muted });
+        ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'distance', name: '距離:p 與 Jukes–Cantor 校正', dur: 17,
+    cues: [[0, '最簡單的距離是 p 距離:比較的欄裡有幾欄不同,除以欄數。A 和 B 有 4 欄不同,p = 4 ÷ 47 = 0.085。'],
+      [5, '但同一個位置可能被換過不只一次:A 換成 G 再換回 A,看起來沒變。所以差得越多,p 低估得越多。'],
+      [9.5, 'Jukes–Cantor 模型假設四種鹼基互換的機率都一樣,校正成 d = −¾ ln(1 − 4p/3),單位是每個位置的替換數。'],
+      [13.5, 'E 和 O 有 24 欄不同,p = 0.51,校正後 d = 0.86。p 接近 0.75 時 d 趨近無限大:序列飽和,算不準了。']],
+    draw(g, t, S) {
+      const kJ = S.dist === 'jc' ? ease(seg(t, 10, 11.2)) : 0; // 0 是 p、1 是 JC
+      // 左上:兩對序列哪幾欄不同
+      g.panel(24, 20, 548, 172, '');
+      [[0, 1], [4, 5]].forEach(([i, j], r) => {
+        const y = 60 + r * 76, a = ease(seg(t, 0.2 + r * 0.6, 0.9 + r * 0.6)), sw = seg(t, 0.4 + r * 0.6, 2.6 + r * 0.6);
+        g.text(44, y, `${NM[i]} 對 ${NM[j]}`, { size: 16, weight: 700, color: C.ink, alpha: a });
+        let k = 0;
+        COLS.forEach((c, n) => {
+          if (n >= sw * COLS.length) return;
+          const x = 116 + n * 9.4;
+          if (SEQ[i][c] !== SEQ[j][c]) { k++; g.rrect(x, y - 15, 6.5, 30, 2, C.amber); } else g.rrect(x, y - 2, 6.5, 4, 2, 'rgba(185,199,192,.32)');
+        });
+        const ta = ease(seg(t, 2.6 + r * 0.6, 3.2 + r * 0.6));
+        if (ta > 0) g.text(116, y + 31, `${k} 欄不同 ÷ ${COLS.length} 欄 = p ${PM[i][j].toFixed(3)}${kJ >= 1 ? `  →  d ${JM[i][j].toFixed(3)}` : ''}`, { size: 15, color: C.amber, alpha: ta });
+      });
+      // 左下:距離矩陣
+      g.panel(24, 206, 548, 316, '');
+      const useJ = kJ >= 0.5, dip = 1 - 0.65 * (1 - Math.abs(kJ - 0.5) * 2) * (kJ > 0 && kJ < 1 ? 1 : 0);
+      g.text(44, 230, useJ ? '距離矩陣:Jukes–Cantor 校正後的 d' : '距離矩陣:p 距離', { size: 15, weight: 700, color: useJ ? C.mint : C.ink });
+      drawMatrix(g, 112, 274, NM, useJ ? JM : PM, { cw: 82, ch: 44, size: 15, hl: { '0,1': C.amber, '4,5': C.amber }, alpha: dip });
+      // 右上:p 與 d 的關係
+      g.panel(586, 20, 350, 316, '');
+      const A = g.axes(652, 46, 262, 220, { xmin: 0, xmax: 0.75, ymin: 0, ymax: 1.3, xticks: [0, 0.25, 0.5, 0.75], yticks: [0, 0.5, 1], xlab: 'p:看得到的不同比例', ylab: 'd:每個位置的替換數', fmtX: (v) => (v ? v.toFixed(2) : '0'), fmtY: (v) => v.toFixed(1) });
+      g.line(A.X(0), A.Y(0), A.X(0.75), A.Y(0.75), C.muted, 1.6, [5, 5]);
+      g.text(A.X(0.75) - 4, A.Y(0.75) + 16, 'd = p', { size: 13, color: C.muted, align: 'right', mono: true });
+      const kC = ease(seg(t, 9.6, 10.8));
+      if (kC > 0) {
+        const pts = [];
+        for (let p = 0; p <= 0.62 * kC + 1e-9; p += 0.005) pts.push([A.X(p), A.Y(Math.min(1.3, jc(p)))]);
+        g.curve(pts, C.mint, 2.6);
+        g.line(A.X(0.75), A.Y(0), A.X(0.75), A.Y(1.3), C.red, 1.6, [4, 4]);
+        g.text(A.X(0.75) - 6, A.Y(1.3) + 12, '飽和', { size: 13, color: C.red, align: 'right', alpha: kC });
+        g.text(A.X(0.47), A.Y(1.12), 'JC 校正', { size: 14, weight: 700, color: C.mint, align: 'right', alpha: kC });
+      }
+      const pa = ease(seg(t, 3.4, 4.4));
+      for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
+        const x = A.X(PM[i][j]), y = A.Y(lerp(PM[i][j], JM[i][j], kJ)), key = (i === 0 && j === 1) || (i === 4 && j === 5);
+        g.circle(x, y, key ? 6 : 4.5, key ? C.amber : 'rgba(213,221,217,.75)', null);
+      }
+      if (pa > 0) {
+        g.text(A.X(PM[0][1]) + 10, A.Y(lerp(PM[0][1], JM[0][1], kJ)) - 12, 'A 對 B', { size: 13, color: C.amber, alpha: pa });
+        g.text(A.X(PM[4][5]) - 10, A.Y(lerp(PM[4][5], JM[4][5], kJ)) - 2, 'E 對 O', { size: 13, color: C.amber, align: 'right', alpha: pa });
+      }
+      // 右下:同一個位置換兩次
+      g.panel(586, 350, 350, 172, '同一個位置換了兩次');
+      [['A', 'G', 'A', '看起來沒變'], ['C', 'T', 'G', '看起來只換 1 次']].forEach(([b0, b1, b2, s], r) => {
+        const y = 400 + r * 58, k0 = ease(seg(t, 5 + r * 1.6, 5.5 + r * 1.6)), k1 = ease(seg(t, 5.6 + r * 1.6, 6.2 + r * 1.6)), k2 = ease(seg(t, 6.3 + r * 1.6, 6.9 + r * 1.6));
+        if (k0 <= 0) return;
+        baseCell(g, 606, y - 15, 30, 30, b0, { alpha: k0 });
+        if (k1 > 0) { g.arrow(642, y, 672, y, { color: C.ink2, lw: 2, head: 8, alpha: k1 }); baseCell(g, 678, y - 15, 30, 30, b1, { alpha: k1 }); }
+        if (k2 > 0) { g.arrow(714, y, 744, y, { color: C.ink2, lw: 2, head: 8, alpha: k2 }); baseCell(g, 750, y - 15, 30, 30, b2, { alpha: k2 }); g.text(794, y, s, { size: 15, weight: 700, color: C.amber, alpha: k2 }); }
+      });
+      g.text(606, 506, '左:祖先  中:中間某一代  右:現在', { size: 13, color: C.muted, alpha: ease(seg(t, 5, 5.6)) });
+    },
+  },
+  {
+    key: 'build', name: 'UPGMA 與鄰接法', dur: 17,
+    cues: [[0, '有了距離就能建樹。UPGMA 每次把最近的兩群合併,新的距離取兩群的平均,節點高度是距離的一半。'],
+      [5, '這等於假設每一支演化一樣快。但 E 演化得快,和 D 的距離拉大到 0.38,比 C 和 D 的 0.14 遠得多。'],
+      [9.5, '結果 UPGMA 先合併 C 和 D,E 最後才接上;資料是照右下這棵樹模擬的,D 和 E 才是最近親。'],
+      [13.5, '鄰接法不假設等速,同一組距離得到正確的樹。右邊可以切換兩種方法;下一章看鄰接法怎麼算。']],
+    draw(g, t, S) {
+      const isNJ = S.build === 'nj', steps = isNJ ? NJT.steps : UP.steps;
+      const T0 = 1.6, DT = isNJ ? 2.2 : 1.9;
+      const done = clamp(Math.floor((t - T0) / DT) + 1, 0, steps.length); // 已經做完幾步
+      const cur = Math.min(done, steps.length - 1), st = steps[cur];
+      const nameF = isNJ ? NJN : UPN;
+      // 左上:這一步的距離矩陣
+      g.panel(24, 20, 432, 300, '');
+      g.text(40, 42, `${isNJ ? '鄰接法' : 'UPGMA'}・第 ${cur + 1} 步的距離`, { size: 15, weight: 700, color: C.ink });
+      const labs = st.act.map(nameF), n = labs.length, cw = n > 4 ? 64 : 78;
+      const pair = st.last ? [] : isNJ ? [st.f, st.g] : [st.a, st.b];
+      const pi = pair.map((id) => st.act.indexOf(id)).sort((p, q) => p - q);
+      const hot = t >= T0 + cur * DT - 0.4;
+      const hl = pi.length && hot ? { [`${pi[0]},${pi[1]}`]: C.mint } : {};
+      const fill = pi.length && hot ? { [`${pi[0]},${pi[1]}`]: 'rgba(165,243,205,.16)' } : {};
+      drawMatrix(g, 96, 92, labs, st.mat, { cw, ch: 32, hl, fill, labSize: n > 4 ? 14 : 15 });
+      if (st.last && hot) g.text(40, 300, '剩 3 個:一起接到中心', { size: 14, color: C.mint });
+      // E 的距離被拉大
+      const ea = Math.min(ease(seg(t, 5, 5.8)), 1 - seg(t, 9.2, 9.8));
+      if (ea > 0) g.tag(240, 302, isNJ ? 'D 和 E 的距離不是最小,卻先被接在一起' : `E 演化快:D–E ${fm(DM[3][4])},C–D 只有 ${fm(DM[2][3])}`, { size: 14, color: C.amber, alpha: ea });
+      // 右上:樹
+      g.panel(470, 20, 466, 300, '');
+      const T = isNJ ? T_NJ : T_UP;
+      layoutTree(T, isNJ ? { mode: 'phylo', x0: 500, scale: 520, y0: 62, y1: 262 } : { mode: 'ultra', xTip: 836, scale: 1150, y0: 62, y1: 262 });
+      drawTree(g, T, { show: (v) => madeAt(isNJ, v) < done, lw: 2.6 });
+      for (const v of nodesOf(T)) if (v.tip != null) {
+        g.circle(v.x, v.y, 3.5, C.ink);
+        g.text(v.x + 9, v.y, NM[v.tip], { size: 16, weight: 700, color: v.tip === 4 ? C.amber : C.ink });
+      }
+      if (isNJ) {
+        g.line(500, 296, 500 + 0.1 * 520, 296, C.ink2, 2);
+        g.text(500 + 0.1 * 520 + 10, 296, '0.1 個替換/位置', { size: 13, color: C.muted });
+        g.text(920, 40, '根放在外群 O 的枝上', { size: 13, color: C.muted, align: 'right' });
+      } else {
+        for (const h of [0, 0.1, 0.2]) { const x = 836 - h * 1150; g.line(x, 284, x, 290, C.ink2, 1.4); g.text(x, 302, h.toFixed(1), { size: 12, color: C.muted, align: 'center', mono: true }); }
+        g.line(836 - 0.28 * 1150, 284, 836, 284, C.ink2, 1.4);
+        g.text(560, 40, '高度 = 距離 ÷ 2;樹梢都對齊(等速)', { size: 13, color: C.muted });
+      }
+      // 左下:每一步
+      g.panel(24, 334, 548, 188, '');
+      steps.forEach((s, k) => {
+        if (k >= done) return;
+        const y = 358 + k * 26, last = k === done - 1;
+        const txt = isNJ ? (s.last ? `${k + 1}. 剩 ${s.act.map(NJN).join('、')},接到中心` : `${k + 1}. ${NJN(s.f)} + ${NJN(s.g)}(Q 最小 ${fm(s.q)})`) : `${k + 1}. ${UPN(s.a)} + ${UPN(s.b)}:距離 ${fm(s.d)}`;
+        g.text(44, y, txt, { size: 15, color: last ? C.mint : C.ink2, mono: false });
+      });
+      const va = ease(seg(t, 10, 10.8));
+      if (va > 0) {
+        // 和正確答案比:兩棵樹的無根分割一樣才算對
+        const ok = splitsOf(isNJ ? cladesRootedAt(NJT.edges, 5, 6) : cladesOf(upgmaEdges(UP), UP.root, 6)) === TRUE_SPLITS;
+        g.text(44, 500, ok ? '✓ 和正確答案一樣' : '✗ 錯了:C 和 D 被併成一群,E 被放到最外面', { size: 16, weight: 700, color: ok ? C.mint : C.red, alpha: va });
+      }
+      // 右下:正確答案
+      const ta = ease(seg(t, 9.6, 10.4));
+      if (ta > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ta;
+        g.panel(586, 334, 350, 188, '模擬時用的樹(正確答案)');
+        layoutTree(T_TRUE, { mode: 'phylo', x0: 612, scale: 380, y0: 372, y1: 502 });
+        drawTree(g, T_TRUE, { lw: 2.2, color: C.mint });
+        for (const v of nodesOf(T_TRUE)) if (v.tip != null) g.text(v.x + 8, v.y, NM[v.tip], { size: 14, weight: 700, color: v.tip === 4 ? C.amber : C.ink });
+        g.ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'nj', name: '鄰接法:用 Q 找鄰居', dur: 18,
+    cues: [[0, '鄰接法每一步替每一對算 Q = (n − 2) × d(i,j) − r(i) − r(j);n 是目前的節點數,r 是那一列距離的總和。'],
+      [5, 'E 離每一條都遠,r(E) = 2.81 最大,扣掉後 Q(D,E) = −3.08 最小,比 Q(C,D) = −2.83 還小:D、E 是鄰居。'],
+      [10, 'D、E 接到新節點 u:D 的枝長 0.38 ÷ 2 + (1.79 − 2.81) ÷ 8 = 0.06,E 的是 0.32;再算 u 到其他點的距離。'],
+      [14, '矩陣少一列,重複到剩 3 個節點。得到的無根樹和模擬用的樹一樣,E 的長枝也估了出來。']],
+    draw(g, t) {
+      const s1 = NJT.steps[0], n = s1.act.length;
+      g.text(40, 32, 'Q(i,j) = (n − 2) × d(i,j) − r(i) − r(j)', { size: 19, weight: 700, color: C.mint, mono: true });
+      g.text(40, 60, `n:目前的節點數(這一步是 ${n});r(i):第 i 列的距離加總`, { size: 14, color: C.ink2 });
+      // 左:距離矩陣與每一列的總和 r
+      const xD = 70, yD = 110, cw = 52, ch = 30;
+      const ra = seg(t, 1.2, 3.6);
+      drawMatrix(g, xD, yD, NM, s1.mat, { cw, ch, upper: false, size: 13.5, hl: t >= 5 ? { '3,4': C.mint, '4,3': C.mint } : {} });
+      g.text(xD + 6 * cw + 32, yD - 14, 'r', { size: 16, weight: 700, color: C.amber, align: 'center', mono: true });
+      s1.act.forEach((id, i) => {
+        if (i >= ra * 6.999) return;
+        g.text(xD + 6 * cw + 32, yD + (i + 0.5) * ch + 0.5, fm(s1.R[id]), { size: 14, weight: id === 4 ? 700 : 500, color: id === 4 ? C.amber : C.ink, align: 'center', mono: true });
+      });
+      if (t > 5.4) g.tag(xD + 6 * cw + 32, yD + 6 * ch + 13, 'E 離大家都遠', { size: 13, color: C.amber, alpha: ease(seg(t, 5.4, 6)) * (1 - seg(t, 13.4, 14)) });
+      // 右:Q 矩陣
+      const xQ = 562, cwQ = 70;
+      const qa = seg(t, 3, 5);
+      g.text(xQ - 30, yD - 38, 'Q(只看上三角)', { size: 14, weight: 700, color: C.ink2 });
+      const keys = []; for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) keys.push([i, j]);
+      const qShown = (i, j) => keys.findIndex(([a, b]) => a === i && b === j) < qa * keys.length;
+      const qHl = {}, qFill = {};
+      if (t >= 5) { qHl['3,4'] = C.mint; qFill['3,4'] = 'rgba(165,243,205,.18)'; qHl['2,3'] = C.amber; qHl['0,1'] = 'rgba(213,221,217,.6)'; }
+      drawMatrix(g, xQ, yD, NM, NM.map((_, i) => NM.map((__, j) => (i === j ? 0 : s1.Q[keyOf(i, j)]))), { cw: cwQ, ch, size: 13.5, show: qShown, hl: qHl, fill: qFill });
+      // 下左:算式
+      g.panel(24, 316, 532, 206, t >= 14 ? '後面幾步' : t >= 10 ? 'δ:接到新節點 u 的枝長' : '算式');
+      const lines = [];
+      const R = s1.R, d = (a, b) => DM[a][b];
+      const qOf = (a, b) => `Q(${NM[a]},${NM[b]}) = 4 × ${fm(d(a, b))} − ${fm(R[a])} − ${fm(R[b])} = ${fm(s1.Q[keyOf(a, b)])}`;
+      if (t < 14) {
+        if (t >= 5) lines.push([qOf(3, 4), C.mint, 5], [qOf(0, 1), C.ink2, 5.6], [qOf(2, 3), C.ink2, 6.2]);
+        if (t >= 10) {
+          lines.splice(1); // 只留 Q(D,E),下面換成枝長的算法
+          lines.push([`δ(D) = ${fm(d(3, 4))} ÷ 2 + (${fm(R[3])} − ${fm(R[4])}) ÷ 8 = ${s1.lf.toFixed(4)}`, C.ink, 10], [`δ(E) = ${fm(d(3, 4))} − ${s1.lf.toFixed(4)} = ${s1.lg.toFixed(4)}`, C.ink, 10.6],
+            [`d(u,k) = (d(D,k) + d(E,k) − ${fm(d(3, 4))}) ÷ 2`, C.ink2, 11.4], [`例:d(u,C) = (${fm(d(3, 2))} + ${fm(d(4, 2))} − ${fm(d(3, 4))}) ÷ 2 = ${s1.nd[2].toFixed(3)}`, C.ink2, 12]);
+        }
+      } else {
+        NJT.steps.slice(1).forEach((s, k) => {
+          const txt = s.last ? `最後剩 ${s.act.map(NJN).join('、')}:接到中心` : `第 ${k + 2} 步(n = ${s.act.length}):${NJN(s.f)} + ${NJN(s.g)},Q = ${fm(s.q)}`;
+          lines.push([txt, C.ink, 14 + k * 0.6]);
+        });
+        lines.push(['n = 4 時 Q 會兩兩相等,接哪一對結果都一樣', C.muted, 15.4]);
+      }
+      lines.forEach(([s, col, at], k) => g.text(40, 360 + k * 29, s, { size: 14, color: col, mono: /^(Q\(|δ|d\(u|例)/.test(s), alpha: ease(seg(t, at, at + 0.5)) }));
+      // 下右:樹
+      g.panel(570, 316, 366, 206, '');
+      if (t >= 10 && t < 14) {
+        // D、E 接到新節點 u,枝長照比例(1 個替換/位置 = 300 px);u 往下接到其他節點
+        const a = ease(seg(t, 10, 10.8)), cx = 690, cy = 468, sc = 300;
+        g.ctx.save(); g.ctx.globalAlpha *= a;
+        const pD = [cx - s1.lf * sc * 0.6, cy - s1.lf * sc * 0.8], pE = [cx + s1.lg * sc * 0.6, cy - s1.lg * sc * 0.8];
+        g.line(cx, cy, pD[0], pD[1], C.mint, 2.6); g.line(cx, cy, pE[0], pE[1], C.mint, 2.6); g.line(cx, cy, cx, cy + 26, C.ink2, 2, [4, 4]);
+        g.circle(cx, cy, 5, C.mint);
+        g.text(pD[0] - 8, pD[1], 'D', { size: 16, weight: 700, color: C.ink, align: 'right' });
+        g.text(pE[0] + 8, pE[1], 'E', { size: 16, weight: 700, color: C.amber });
+        g.text(cx - 14, cy + 6, 'u', { size: 16, weight: 700, color: C.mint, mono: true, align: 'right' });
+        g.text((cx + pE[0]) / 2 + 12, (cy + pE[1]) / 2 + 8, fm(s1.lg), { size: 13, color: C.ink2, mono: true });
+        g.text(cx + 14, cy + 22, '往下接其他節點', { size: 13, color: C.muted });
+        g.text(590, 340, `枝長照比例:E 的枝是 D 的 ${(s1.lg / s1.lf).toFixed(1)} 倍`, { size: 14, color: C.ink2 });
+        g.ctx.restore();
+      } else if (t >= 14) {
+        const a = ease(seg(t, 14, 15));
+        const pos = radialPos(NJT.edges, 6, NJ_LAST.c, 725, 440, 360, 2.618);
+        g.ctx.save(); g.ctx.globalAlpha *= a;
+        drawUnrooted(g, pos, { color: C.mint });
+        g.ctx.restore();
+        g.text(590, 340, '無根樹(枝長照比例)', { size: 14, color: C.ink2, alpha: a });
+        g.tag(846, 506, '✓ 和模擬用的樹一樣', { size: 14, color: C.mint, alpha: ease(seg(t, 15.6, 16.4)) });
+      } else g.text(753, 420, '接起來的樹會畫在這裡', { size: 14, color: C.muted, align: 'center' });
+    },
+  },
+  {
+    key: 'characters', name: '簡約法與概似法', dur: 16,
+    cues: [[0, '距離法把整條序列濃縮成一個數;以性狀為基礎的方法一欄一欄看。只看 A、B、D、E 四條,無根樹只有 3 種。'],
+      [4.5, '最大簡約法:數每一欄在這棵樹上最少要換幾次,總數最少的樹勝出。47 欄裡只有 7 欄會讓三棵樹不同。'],
+      [9, '最大概似法:在替換模型(這裡用 JC)下,算這棵樹產生這組序列的機率,取對數加總,最大的勝出。'],
+      [13, '兩種方法都選樹 1。序列一多,樹的數目暴增(10 條就有 200 多萬種無根樹),軟體只能用搜尋的方式找。']],
+    draw(g, t) {
+      const ML = ml4();
+      const cxs = [170, 480, 790], cy = 98;
+      // 目前看的是哪一欄(4.5 到 9 秒逐欄看讓三棵樹不同的 7 欄)
+      const ci = t < 4.5 ? -1 : Math.min(INF4.length - 1, Math.floor((t - 4.5) / 0.62));
+      const col = ci >= 0 ? INF4[ci][0] : null;
+      const shownUpTo = t < 4.5 ? -1 : t >= 9 ? INF4.length - 1 : ci;
+      Q4.forEach((q, ti) => {
+        const cx = cxs[ti], a = ease(seg(t, 0.3 + ti * 0.3, 1.1 + ti * 0.3));
+        g.ctx.save(); g.ctx.globalAlpha *= a;
+        const best = ti === 0 && t >= 13;
+        g.panel(cx - 145, 24, 290, 170, '');
+        g.text(cx - 130, 40, `樹 ${ti + 1}:(${NM[q[0]]},${NM[q[1]]})(${NM[q[2]]},${NM[q[3]]})`, { size: 15, weight: 700, color: best ? C.mint : C.ink });
+        const L = [cx - 40, cy + 6], Rr = [cx + 40, cy + 6];
+        const tipsP = [[L[0] - 52, L[1] - 35], [L[0] - 52, L[1] + 35], [Rr[0] + 52, Rr[1] - 35], [Rr[0] + 52, Rr[1] + 35]];
+        const col4 = col != null ? q.map((i) => SEQ[i][col]) : null;
+        const lc = best ? C.mint : C.backbone;
+        g.line(L[0], L[1], Rr[0], Rr[1], lc, 2.6);
+        tipsP.forEach((p, k) => g.line(k < 2 ? L[0] : Rr[0], k < 2 ? L[1] : Rr[1], p[0], p[1], lc, 2.6));
+        // 這一欄在這棵樹上的改變(一種最少次數的畫法):左右兩對各自不同就在第二支上打記號,兩邊沒有共同的鹼基就在中間打
+        if (col4) {
+          const mark = (x1, y1, x2, y2) => { const mx = (x1 + x2) / 2, my = (y1 + y2) / 2; g.line(mx - 6, my - 7, mx + 6, my + 7, C.amber, 3); };
+          const s1 = col4[0] === col4[1] ? [col4[0]] : [col4[0], col4[1]], s2 = col4[2] === col4[3] ? [col4[2]] : [col4[2], col4[3]];
+          if (col4[0] !== col4[1]) mark(L[0], L[1], tipsP[1][0], tipsP[1][1]);
+          if (col4[2] !== col4[3]) mark(Rr[0], Rr[1], tipsP[3][0], tipsP[3][1]);
+          if (!s1.some((v) => s2.includes(v))) mark(L[0], L[1], Rr[0], Rr[1]);
+        }
+        tipsP.forEach((p, k) => {
+          const id = q[k], left = k < 2;
+          if (col4) baseCell(g, p[0] - 11, p[1] - 11, 22, 22, col4[k]);
+          else g.circle(p[0], p[1], 4, C.ink);
+          g.text(p[0] + (left ? -18 : 18), p[1], NM[id], { size: 16, weight: 700, color: C.ink, align: left ? 'right' : 'left' });
+        });
+        // 簡約:累計的改變次數
+        if (t >= 1.6) {
+          const sum = BASE4 + INF4.slice(0, shownUpTo + 1).reduce((s, [, nIdx]) => s + CH4[ti][nIdx], 0);
+          g.text(cx - 130, 176, `簡約:改變 ${sum} 次`, { size: 15, weight: 700, color: t >= 9 && MP4[ti] === Math.min(...MP4) ? C.mint : C.ink });
+          if (col4) g.text(cx + 130, 176, `這一欄 +${CH4[ti][INF4[ci][1]]}`, { size: 14, color: C.amber, align: 'right' });
+        }
+        g.ctx.restore();
+      });
+      // 中間:簡約與概似的比較
+      const ba = ease(seg(t, 1.6, 2.4));
+      g.ctx.save(); g.ctx.globalAlpha *= ba;
+      g.panel(24, 206, 912, 120, '');
+      g.text(40, 228, `其他 ${COLS.length - INF4.length} 欄在三棵樹上都要換 ${BASE4} 次,不影響勝負;下面逐欄看剩下的 ${INF4.length} 欄`, { size: 14, color: C.ink2 });
+      // 7 欄的小方塊
+      [0, 1, 3, 4].forEach((sIdx, r) => g.text(52, 268 + r * 14, NM[sIdx], { size: 12, weight: 700, color: C.ink2, align: 'right', mono: true }));
+      g.text(52, 250, '欄', { size: 12, color: C.muted, align: 'right' });
+      INF4.forEach(([c], k) => {
+        const x = 62 + k * 52, on = k === ci && t < 9;
+        g.text(x + 11, 250, String(c + 1), { size: 13, weight: on ? 700 : 500, color: on ? C.amber : C.muted, align: 'center', mono: true });
+        [0, 1, 3, 4].forEach((sIdx, r) => baseCell(g, x, 262 + r * 14, 22, 13, SEQ[sIdx][c], { alpha: k <= shownUpTo ? 1 : 0.3 }));
+        if (on) g.rrect(x - 4, 258, 30, 62, 5, null, C.amber, 2);
+      });
+      const la = ease(seg(t, 9, 9.8));
+      if (la > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= la;
+        g.text(520, 250, '概似:ln L(越大越好)', { size: 15, weight: 700, color: C.ink });
+        const lo = Math.min(...ML.map((m) => m.lnL)) - 3, hi = Math.max(...ML.map((m) => m.lnL)) + 1;
+        ML.forEach((m, k) => {
+          const y = 274 + k * 20, w = ((m.lnL - lo) / (hi - lo)) * 220;
+          g.text(560, y, `樹 ${k + 1}`, { size: 13, color: C.ink2, align: 'right' });
+          g.rrect(568, y - 6, w * ease(seg(t, 9.4 + k * 0.2, 10.4 + k * 0.2)), 12, 4, k === 0 ? C.mint : 'rgba(213,221,217,.45)');
+          g.text(900, y, `${fm(m.lnL, 1)}`, { size: 14, weight: k === 0 ? 700 : 500, color: k === 0 ? C.mint : C.ink2, align: 'right', mono: true });
+        });
+        g.ctx.restore();
+      }
+      g.ctx.restore();
+      // 下方:機率差幾倍、樹的數目
+      const da = ease(seg(t, 10.4, 11.2));
+      if (da > 0) {
+        const dl = ML[0].lnL - Math.max(ML[1].lnL, ML[2].lnL);
+        g.ctx.save(); g.ctx.globalAlpha *= da;
+        g.panel(24, 340, 440, 182, '概似差多少');
+        g.text(40, 388, `ln L 差 ${dl.toFixed(1)}`, { size: 18, weight: 700, color: C.ink });
+        g.text(40, 420, `樹 1 產生這組序列的機率是次好的樹的`, { size: 14, color: C.ink2 });
+        g.text(40, 452, `e 的 ${dl.toFixed(1)} 次方 ≈ ${Math.round(Math.exp(dl)).toLocaleString('en-US')} 倍`, { size: 18, weight: 700, color: C.mint });
+        g.text(40, 490, '枝長也是一起找出來的(讓 ln L 最大)', { size: 13, color: C.muted });
+        g.ctx.restore();
+      }
+      const na = ease(seg(t, 13, 13.8));
+      if (na > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= na;
+        g.panel(478, 340, 458, 182, '幾條序列有幾種無根樹:(2n − 5)!!');
+        [[4, ''], [6, ''], [10, ''], [20, '']].forEach(([k], r) => {
+          const v = nTrees(k), s = v < 1e7 ? v.toLocaleString('en-US') : `${(v / 10 ** Math.floor(Math.log10(v))).toFixed(1)} × 10${String(Math.floor(Math.log10(v))).replace(/\d/g, (c) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c])}`;
+          g.text(500, 390 + r * 30, `${k} 條`, { size: 15, color: C.ink2 });
+          g.text(916, 390 + r * 30, `${s} 種`, { size: 16, weight: 700, color: r ? C.ink : C.mint, align: 'right', mono: true });
+        });
+        g.ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'read', name: '怎麼讀樹:根、分支、枝長', dur: 16,
+    cues: [[0, '鄰接法給的是無根樹:只說誰和誰相鄰,不說共同祖先在哪。要定根,常加一條確定在圈外的序列當外群,這裡是 O。'],
+      [5, '從外群那條枝把樹提起來,就是有根樹。一個節點和它所有的後代合稱一個分支(clade),例如 C、D、E。'],
+      [9.5, '枝長的單位是每個位置平均的替換數;比例尺 0.1 表示每個位置平均換 0.1 次。E 的枝最長:演化最快。'],
+      [13, '繞節點轉動不改變關係,樹梢的上下順序沒有意義。沒有外群時的中點定根要假設等速,這組資料就放錯了。']],
+    draw(g, t, S) {
+      // 左:無根樹
+      g.panel(24, 20, 392, 312, '無根樹(鄰接法)');
+      // 起始角度 2.618(150°):外群 O 朝左、E 的長枝朝右、A 和 B 朝下(scratchpad 的 radial-tune 算過,樹梢分得最開)
+      const pos = radialPos(NJT.edges, 6, NJ_LAST.c, 190, 186, 450, 2.618);
+      const oa = Math.min(ease(seg(t, 2, 2.8)), 1 - 0.6 * seg(t, 5, 6));
+      drawUnrooted(g, pos, { size: 17, hiEdge: oa > 0 ? (e) => e.a === 5 || e.b === 5 : null });
+      if (oa > 0) {
+        g.text(44, 142, '外群:根放在', { size: 14, weight: 700, color: C.amber, alpha: oa });
+        g.text(44, 164, '這條枝上', { size: 14, weight: 700, color: C.amber, alpha: oa });
+      }
+      g.text(40, 300, '枝長照比例;只有相鄰關係', { size: 13, color: C.muted });
+      // 右:有根樹
+      const mid = S.root === 'mid';
+      const R = mid ? rootMid(NJT.edges, 6) : null;
+      const T = prep(mid ? R.tree : rootOG(NJT.edges, 6, 5));
+      const cdeNode = nodesOf(T).find((v) => v.mask === bitOf('CDE'));
+      const flipNode = cdeNode || T;
+      const k = ease(seg(t, 13.2, 14.4));
+      // 轉動:13.2 秒前是一種順序、之後是另一種(按「轉動一個節點」換過來);中間的 y 用內插,看得到樹梢換位置
+      layoutTree(T, { mode: 'phylo', x0: 470, scale: 560, y0: 64, y1: 284, flip: (v) => v === flipNode && !S.rot });
+      const yA = new Map(nodesOf(T).map((v) => [v, v.y]));
+      layoutTree(T, { mode: 'phylo', x0: 470, scale: 560, y0: 64, y1: 284, flip: (v) => v === flipNode && S.rot });
+      for (const v of nodesOf(T)) v.y = lerp(yA.get(v), v.y, k);
+      const ra = ease(seg(t, 5, 6));
+      g.ctx.save(); g.ctx.globalAlpha *= ra;
+      g.panel(430, 20, 506, 312, mid ? '有根樹:中點定根' : '有根樹:外群定根');
+      // 分支(clade)
+      const ca = Math.min(ease(seg(t, 6.2, 7)), 1 - 0.7 * seg(t, 9.3, 10));
+      if (ca > 0 && cdeNode) {
+        const tips = nodesOf(cdeNode).filter((v) => v.tip != null), ys = tips.map((v) => v.y), xr = Math.max(...tips.map((v) => v.x)) + 34;
+        g.rrect(cdeNode.x - 12, Math.min(...ys) - 16, xr - cdeNode.x + 12, Math.max(...ys) - Math.min(...ys) + 32, 10, 'rgba(165,243,205,.08)', C.mint, 2);
+        g.tag(cdeNode.x + 4, Math.max(...ys) + 28, '分支(clade):C、D、E', { size: 14, color: C.mint, align: 'left', alpha: ca });
+      }
+      drawTree(g, T, { lw: 2.6, colorOf: (v) => (v.tip === 4 && t >= 10.4 ? C.amber : C.backbone) });
+      for (const v of nodesOf(T)) if (v.tip != null) g.text(v.x + 9, v.y, NM[v.tip], { size: 17, weight: 700, color: v.tip === 5 ? C.amber : C.ink });
+      g.circle(T.x, T.y, 5, C.amber);
+      g.text(T.x - 8, T.y - 14, '根', { size: 14, weight: 700, color: C.amber, align: 'center' });
+      // 比例尺
+      const sa = ease(seg(t, 9.6, 10.4));
+      if (sa > 0) {
+        g.line(470, 312, 470 + 0.1 * 560, 312, C.ink, 2.4);
+        g.text(470 + 0.1 * 560 + 10, 312, '0.1 個替換/位置', { size: 14, color: C.ink, alpha: sa });
+      }
+      // E 的枝最長:標籤放在那條橫線的上方中間
+      const eTip = nodesOf(T).find((v) => v.tip === 4), eUp = eTip && nodesOf(T).find((v) => v.kids && v.kids.includes(eTip));
+      if (t >= 10.4 && eTip && eUp) g.tag((eUp.x + eTip.x) / 2 + 20, eTip.y - 15, 'E 的枝最長:演化最快', { size: 13, color: C.amber, alpha: ease(seg(t, 10.4, 11)) * (k > 0 && k < 1 ? 0 : 1) });
+      if (mid) g.tag(800, 40, '外群 O 跑進群內:這個根不合理', { size: 13, color: C.red, alpha: ra });
+      if (k > 0 && k < 1) g.tag(flipNode.x + 40, flipNode.y, '轉動', { size: 13, color: C.mint });
+      g.ctx.restore();
+      // 下:常見的誤讀
+      const ma = ease(seg(t, 13.4, 14.2));
+      g.ctx.save(); g.ctx.globalAlpha *= ma;
+      g.panel(24, 346, 912, 176, '怎麼讀才對');
+      const rows = [
+        ['✗', '看樹梢的上下順序判斷誰和誰近:轉一下節點順序就變了', C.red],
+        ['✗', '數中間隔了幾個節點,或看外表多像', C.red],
+        ['✓', '看共同祖先:D 和 E 的共同祖先比 D 和 C 的近,所以 D 和 E 最親', C.mint],
+      ];
+      rows.forEach(([m, s, col], r) => { g.text(44, 388 + r * 40, m, { size: 18, weight: 700, color: col }); g.text(72, 388 + r * 40, s, { size: 15, color: C.ink }); });
+      g.ctx.restore();
+      if (ma <= 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ease(seg(t, 0.4, 1.2));
+        g.panel(24, 346, 912, 176, '');
+        g.text(44, 384, '無根樹:只有「誰和誰相鄰」;有根樹:多了時間的方向(由根往樹梢)', { size: 15, color: C.ink });
+        g.text(44, 420, '外群要選確定在研究對象之外、但不要遠得離譜的序列', { size: 15, color: C.ink2 });
+        g.text(44, 456, '分支(clade):一個節點和它所有的後代;單系群(monophyletic group)是同一件事', { size: 15, color: C.ink2 });
+        g.text(44, 492, '這棵樹的根放在外群那條枝的中間(長度各半)', { size: 13, color: C.muted });
+        g.ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'bootstrap', name: 'Bootstrap:分支有多穩', dur: 18,
+    cues: [[0, 'Bootstrap(拔靴法):把比對的欄「抽出放回」重抽一樣多次,有的欄抽到兩次,有的沒抽到,組成一份新的比對。'],
+      [4.5, '每一份都重新建樹,記下出現哪些分支。某個分支在 1000 棵樹裡出現 900 次,支持度就是 90%。'],
+      [10, 'Felsenstein(1985)以 95% 為顯著;Hillis 與 Bull(1993)模擬等速、對稱的樹,70% 以上多半對應 95% 以上的正確機率。'],
+      [14.5, '但它只量重抽後穩不穩:換成 UPGMA,錯的 C+D 也有 95%;拿掉支持 D+E 的 3 欄,這個分支就不見了。']],
+    draw(g, t, S) {
+      const b = bootOf(S.bmethod, S.drop), Bn = S.boots, isNJ = S.bmethod === 'nj';
+      // 上左:原本的比對與第 1 次重抽
+      g.panel(24, 20, 552, 214, '');
+      g.text(40, 40, `原本的比對(${b.cols.length} 欄)與第 1 次重抽:每欄被抽到幾次`, { size: 14, weight: 700, color: C.ink });
+      const xc = (n) => 44 + n * 10.8;
+      const draws = Math.floor(ease(seg(t, 0.8, 4.2)) * b.cols.length + 1e-9);
+      // 第 1 次重抽依序抽到的欄(bootOf 用同一串亂數先記好),抽到第 draws 個為止
+      const seq1 = b.first, cnt = new Map();
+      seq1.slice(0, draws).forEach((c) => cnt.set(c, (cnt.get(c) || 0) + 1));
+      COLS.forEach((c, n) => {
+        const used = b.cols.includes(c), x = xc(n);
+        SEQ.forEach((s, r) => g.rrect(x, 54 + r * 8, 8.6, 7, 1.5, C[s[c]], null));
+        if (!used) { g.ctx.save(); g.ctx.globalAlpha *= 0.9; g.rrect(x - 1, 52, 10.6, 52, 2, 'rgba(15,23,22,.72)', C.red, 1.2); g.line(x, 53, x + 8.6, 103, C.red, 1.6); g.ctx.restore(); return; }
+        const k2 = cnt.get(c) || 0;
+        if (draws >= b.cols.length && k2 === 0) g.text(x + 4.3, 118, '×', { size: 13, weight: 700, color: C.muted, align: 'center' });
+        for (let m = 0; m < k2; m++) g.circle(x + 4.3, 118 + m * 9, 3.4, m ? C.amber : C.mint);
+        if (draws < b.cols.length && seq1[draws] === c) g.rrect(x - 2, 50, 12.6, 56, 3, null, C.ink, 1.6);
+      });
+      const zeros = b.cols.filter((c) => (cnt.get(c) || 0) === 0).length, twice = b.cols.filter((c) => (cnt.get(c) || 0) >= 2).length;
+      const la = ease(seg(t, 4.2, 4.8)) * (1 - seg(t, 14.2, 14.5));
+      if (la > 0) g.text(40, 214, `這一次:${zeros} 欄沒抽到(×),${twice} 欄抽到兩次以上`, { size: 14, color: C.ink2, alpha: la });
+      g.text(40, 160, '一欄一個點:綠點是第 1 次抽到,琥珀點是又抽到', { size: 13, color: C.muted, alpha: ease(seg(t, 1, 1.6)) });
+      if (S.drop) g.text(40, 186, `紅框:拿掉的 ${SUP_DE.length} 欄(第 ${SUP_DE.map((c) => c + 1).join('、')} 欄,只有 D 和 E 一樣)`, { size: 13, color: C.red });
+      // 中左:做到第幾次
+      const kRep = Math.max(1, Math.min(Bn, Math.round(lerp(1, Bn, ease(seg(t, 4.6, 9.6))))));
+      g.panel(24, 246, 552, 86, '');
+      g.text(40, 274, '重抽 → 用 JC 距離重新建樹 → 記下有哪些分支', { size: 14, color: C.ink2 });
+      g.text(40, 308, `第 ${kRep.toLocaleString('en-US')} / ${Bn.toLocaleString('en-US')} 次`, { size: 20, weight: 700, color: C.mint, mono: true });
+      g.text(560, 308, isNJ ? '方法:鄰接法(外群 O 定根)' : '方法:UPGMA', { size: 14, color: C.ink2, align: 'right' });
+      // 右:樹與支持度
+      g.panel(590, 20, 346, 312, '');
+      g.text(606, 40, '支持度(%)', { size: 14, weight: 700, color: C.ink });
+      const T = b.tree;
+      // 和正確答案(A+B、D+E、C+D+E)不一樣的分支用紅色
+      const truth = [bitOf('AB'), bitOf('DE'), bitOf('CDE')];
+      const wrong = b.clades.filter((m) => !truth.includes(m) && m !== bitOf('ABCDE'));
+      layoutTree(T, { mode: 'clado', xTip: 868, scale: 54, y0: 72, y1: 292 });
+      drawTree(g, T, { lw: 2.4, colorOf: (v) => (wrong.includes(v.mask) ? C.red : C.backbone) });
+      for (const v of nodesOf(T)) {
+        if (v.tip != null) { g.text(v.x + 9, v.y, NM[v.tip], { size: 17, weight: 700, color: C.ink }); continue; }
+        if (!b.clades.includes(v.mask)) continue;
+        const p = pct(supportIn(b, v.mask, kRep), kRep);
+        g.text(v.x - 6, v.y - 13, `${p}`, { size: 16, weight: 700, color: wrong.includes(v.mask) ? C.red : p >= 95 ? C.mint : p >= 70 ? C.ink : C.amber, align: 'right', mono: true });
+      }
+      if (wrong.length) g.text(606, 314, '紅色:和正確答案不同的分支', { size: 13, color: C.muted });
+      // 下:門檻
+      const ta = ease(seg(t, 10, 10.8));
+      g.ctx.save(); g.ctx.globalAlpha *= ta;
+      g.panel(24, 346, 912, 176, '');
+      const X = (p) => 70 + (p / 100) * 820, yS = 424;
+      g.line(X(0), yS, X(100), yS, C.ink2, 2);
+      for (const p of [0, 50, 70, 95, 100]) { g.line(X(p), yS - 6, X(p), yS + 6, C.ink2, 1.6); g.text(X(p), yS + 20, `${p}%`, { size: 13, color: C.muted, align: 'center', mono: true }); }
+      g.text(X(50), yS + 44, '50% 以下通常不標', { size: 13, color: C.muted, align: 'center' });
+      g.text(X(70), yS + 64, '70%:Hillis 與 Bull(1993)', { size: 13, color: C.ink2, align: 'center' });
+      g.text(X(95) - 6, yS + 44, '95%:Felsenstein(1985)', { size: 13, color: C.ink2, align: 'right' });
+      const marks = b.clades.filter((m) => m !== bitOf('ABCDE')).map((m) => [m, pct(supportIn(b, m, kRep), kRep)]).sort((p, q) => p[1] - q[1]);
+      marks.forEach(([m, p], r) => {
+        const x = X(p), y = yS - 16 - (r % 3) * 22, bad = wrong.includes(m);
+        g.ctx.save(); g.ctx.beginPath(); g.ctx.moveTo(x, yS - 3); g.ctx.lineTo(x - 5, yS - 11); g.ctx.lineTo(x + 5, yS - 11); g.ctx.closePath(); g.ctx.fillStyle = bad ? C.red : C.mint; g.ctx.fill(); g.ctx.restore();
+        g.text(x, y - 8, `${nameOf(m).split('').join('+')} ${p}${bad ? '(錯)' : ''}`, { size: 13, weight: 700, color: bad ? C.red : C.ink, align: 'center' });
+      });
+      g.ctx.restore();
+      // 結論
+      const ka = ease(seg(t, 14.5, 15.3));
+      if (ka > 0) {
+        let msg;
+        const sDE = pct(supportIn(b, bitOf('DE'), Bn), Bn), sCD = pct(supportIn(b, bitOf('CD'), Bn), Bn);
+        if (!isNJ) msg = `C+D 是錯的,支持度卻有 ${sCD}%`;
+        else if (S.drop) msg = `拿掉 ${SUP_DE.length} 欄後改成 C+D(${sCD}%)`;
+        else msg = `這棵樹是對的;D+E 的支持度 ${sDE}%`;
+        g.tag(40, 214, msg, { size: 15, color: !isNJ || S.drop ? C.red : C.mint, align: 'left', alpha: ka });
+      }
+    },
+  },
+  {
+    key: 'tps', name: '萜類合成酶家族的樹', dur: 18,
+    cues: [[0, '植物的萜類合成酶是一個基因家族,一般分成 7 群:TPS-a、b、c、d、e/f、g、h(Chen et al. 2011)。'],
+      [4.5, '裸子植物的 TPS-d 再分成 d1、d2、d3,分別以單萜、倍半萜、雙萜合成酶為主;針葉樹的單萜合成酶在 d1。'],
+      [9.5, '放大柏科這一群:TcTPS13、15、16 和紅檜的 α-pinene 合成酶聚在一起,照最像的已知酵素猜,都會猜 α-pinene。'],
+      [14, '實驗結果卻是 geraniol、linalool 與 β-pinene。樹能告訴你屬於哪一群,產物還是要做出酵素、用 GC-MS 確認。']],
+    draw(g, t, S) {
+      // 左:7 群
+      g.panel(24, 20, 432, 502, '');
+      g.text(40, 42, '植物萜類合成酶的 7 群(Chen et al. 2011)', { size: 15, weight: 700, color: C.ink });
+      const FAM = [
+        ['TPS-a', '被子植物;多為倍半萜', C.lav], ['TPS-b', '被子植物;單萜', C.lav], ['TPS-c', '柯巴基二磷酸合成酶(CPS)', C.blue],
+        ['TPS-d', '裸子植物;單萜到雙萜', C.mint], ['TPS-e/f', '貝殼杉烯合成酶(KS)等', C.blue], ['TPS-g', '被子植物;單萜等', C.lav], ['TPS-h', '卷柏特有', C.amber],
+      ];
+      const yF = (i) => 84 + i * 52, xr = 60, xs = 104, xw = 150;
+      const dOn = ease(seg(t, 4.6, 5.4));
+      g.line(xr, yF(3), xs, yF(3), C.backbone, 2.4);
+      g.line(xs, yF(0), xs, yF(6), C.backbone, 2.4);
+      g.text(xr - 4, yF(3) + 22, '共同祖先', { size: 13, color: C.muted, align: 'center' });
+      FAM.forEach(([nm, ds, col], i) => {
+        const a = ease(seg(t, 0.4 + i * 0.4, 1.0 + i * 0.4));
+        if (!a) return;
+        const y = yF(i), hi = i === 3 && dOn > 0;
+        g.ctx.save(); g.ctx.globalAlpha *= a * (dOn > 0 && i !== 3 ? lerp(1, 0.55, dOn) : 1);
+        g.line(xs, y, xw, y, C.backbone, 2.4);
+        g.ctx.beginPath(); g.ctx.moveTo(xw, y); g.ctx.lineTo(xw + 46, y - 16); g.ctx.lineTo(xw + 46, y + 16); g.ctx.closePath();
+        g.ctx.fillStyle = col; g.ctx.globalAlpha *= hi ? 0.9 : 0.55; g.ctx.fill(); g.ctx.globalAlpha /= hi ? 0.9 : 0.55;
+        g.text(xw + 58, y - 10, nm, { size: 16, weight: 700, color: hi ? C.mint : C.ink, mono: true });
+        g.text(xw + 58, y + 12, ds, { size: 13, color: C.ink2 });
+        g.ctx.restore();
+      });
+      // TPS-d 再分 d1、d2、d3
+      if (dOn > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= dOn;
+        g.rrect(40, 424, 400, 86, 10, 'rgba(165,243,205,.07)', C.mint, 1.6);
+        g.text(54, 444, 'TPS-d 再分成三群(Martin et al. 2004)', { size: 14, weight: 700, color: C.mint });
+        [['d1', '多為單萜'], ['d2', '多為倍半萜'], ['d3', '多為雙萜']].forEach(([nm, ds], k) => {
+          const x = 56 + k * 128;
+          g.text(x, 474, nm, { size: 16, weight: 700, color: k === 0 ? C.mint : C.ink, mono: true });
+          g.text(x + 30, 474, ds, { size: 13, color: C.ink2 });
+        });
+        g.text(54, 498, '針葉樹的單萜合成酶都在 d1', { size: 13, color: C.ink2 });
+        g.ctx.restore();
+      }
+      // 右:柏科的單萜合成酶
+      const za = ease(seg(t, 9.4, 10.2));
+      if (za > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= za;
+        g.panel(470, 20, 466, 502, '');
+        g.text(486, 42, '放大:柏科的單萜合成酶(Ma et al. 2021)', { size: 15, weight: 700, color: C.ink });
+        const showExp = t >= 14 && S.tpsView === 'exp';
+        const GROUPS = [
+          { name: '第 1 群', y0: 84, rows: [['臺灣杉 TcTPS13', 'α-pinene?', 'geraniol'], ['臺灣杉 TcTPS15', 'α-pinene?', 'linalool'], ['臺灣杉 TcTPS16', 'α-pinene?', 'β-pinene'], ['紅檜(已知)', 'α-pinene', null]] },
+          { name: '第 2 群', y0: 272, rows: [['臺灣杉 TcTPS14', 'terpinolene?', 'geraniol'], ['臺灣杉 TcTPS17', 'terpinolene?', '測不到單萜'], ['日本扁柏(已知)', 'terpinolene', null], ['臺灣杉 Tc-αPIN/TEO', 'α-pinene、terpinolene', null], ['臺灣杉 Tc-TEO', 'terpinolene', null]] },
+        ];
+        GROUPS.forEach(({ name, y0, rows }) => {
+          const ys = rows.map((_, k) => y0 + 22 + k * 34), gx = 500, tx = 536;
+          g.text(486, y0 - 2, name, { size: 14, weight: 700, color: C.ink2 });
+          g.line(gx, ys[0], gx, ys[ys.length - 1], C.backbone, 2.2);
+          g.line(gx - 12, (ys[0] + ys[ys.length - 1]) / 2, gx, (ys[0] + ys[ys.length - 1]) / 2, C.backbone, 2.2);
+          rows.forEach(([lab, guess, real], k) => {
+            const y = ys[k], known = real == null;
+            g.line(gx, y, tx, y, C.backbone, 2.2);
+            g.text(tx + 8, y, lab, { size: 14, weight: known ? 500 : 700, color: known ? C.ink2 : C.ink });
+            const val = known ? guess : showExp ? real : t >= 11 ? guess : '';
+            if (!val) return;
+            const col = known ? C.ink2 : showExp ? (real === '測不到單萜' ? C.muted : C.mint) : C.amber;
+            g.tag(926, y, val, { size: 13, color: col, align: 'right', border: known ? C.line : col });
+          });
+        });
+        g.text(486, 460, '群內的分支順序沒有畫出(示意)', { size: 13, color: C.muted });
+        const va = ease(seg(t, 14.4, 15.2));
+        if (va > 0) {
+          // 新基因照「最像的已知酵素」猜的產物,和實驗結果對得上幾個
+          const fresh = GROUPS.flatMap((gr) => gr.rows).filter((r) => r[2] != null);
+          const right = fresh.filter((r) => r[1].replace('?', '') === r[2]).length;
+          g.tag(700, 494, showExp ? `照最像的已知酵素猜:${fresh.length} 個新基因猜對 ${right} 個` : '這是猜的;切到「實驗結果」看答案', { size: 14, color: showExp ? C.red : C.amber, alpha: va });
+        }
+        g.ctx.restore();
+      }
+    },
+  },
+];
+
+lesson = createLesson({
+  chapters,
+  state: { dist: 'jc', build: 'upgma', root: 'og', rot: false, boots: 1000, bmethod: 'nj', drop: false, tpsView: 'exp' },
+  controls: [
+    { id: 'dist', label: '距離', type: 'seg', options: [{ v: 'p', label: 'p 距離' }, { v: 'jc', label: 'Jukes–Cantor 校正' }], chapters: ['distance'] },
+    { id: 'build', label: '建樹方法', type: 'seg', options: [{ v: 'upgma', label: 'UPGMA' }, { v: 'nj', label: '鄰接法' }], chapters: ['build'], onChange: () => replay(1.2) },
+    { id: 'root', label: '定根方式', type: 'seg', options: [{ v: 'og', label: '外群 O' }, { v: 'mid', label: '中點定根' }], chapters: ['read'], onChange: () => replay(5) },
+    { id: 'spin', label: '轉動一個節點', type: 'button', onClick: (S) => { S.rot = !S.rot; replay(13); }, chapters: ['read'] },
+    { id: 'boots', label: '重抽次數', type: 'seg', options: [{ v: 10, label: '10 次' }, { v: 100, label: '100 次' }, { v: 1000, label: '1000 次' }], chapters: ['bootstrap'], onChange: () => replay(4.4) },
+    { id: 'bmethod', label: '建樹方法', type: 'seg', options: [{ v: 'upgma', label: 'UPGMA' }, { v: 'nj', label: '鄰接法' }], chapters: ['bootstrap'], onChange: () => replay(4.4) },
+    { id: 'drop', label: `拿掉支持 D+E 的 ${SUP_DE.length} 欄`, type: 'toggle', chapters: ['bootstrap'], onChange: () => replay(0.6) },
+    { id: 'tpsView', label: '新基因的產物', type: 'seg', options: [{ v: 'guess', label: '照最像的已知酵素猜' }, { v: 'exp', label: '實驗結果' }], chapters: ['tps'] },
+  ],
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="一段碳鏈卡在酵素的口袋裡,做出的環狀產物飄向右邊;右邊是初速度對受質濃度的飽和曲線,虛線標出最大速度與速度一半時的受質濃度">
+  <defs>
+    <linearGradient id="ek-enz" x1="44" y1="82" x2="182" y2="206" gradientUnits="userSpaceOnUse"><stop stop-color="#2b4d3c"/><stop offset="1" stop-color="#14281e"/></linearGradient>
+    <radialGradient id="ek-glow" cx="112" cy="104" r="44" gradientUnits="userSpaceOnUse"><stop stop-color="#a5f3cd" stop-opacity=".22"/><stop offset="1" stop-color="#a5f3cd" stop-opacity="0"/></radialGradient>
+  </defs>
+  <ellipse cx="220" cy="238" rx="190" ry="11" fill="#050e0c" opacity=".45"/>
+  <!-- 左:酵素、口袋裡的受質與金屬離子 -->
+  <path d="M44 146C40 110 70 84 104 82C122 81 136 84 150 92C178 106 188 136 180 162C172 190 140 206 104 204C70 202 48 178 44 146Z" fill="url(#ek-enz)" stroke="#6f9f86" stroke-width="1.6"/>
+  <g stroke="#4f8f74" stroke-width="7" stroke-linecap="round" opacity=".55"><path d="M66 172L92 188M138 186L162 168M58 126L74 108"/></g>
+  <circle cx="112" cy="104" r="23" fill="#0b1910" stroke="#3c684b" stroke-width="1.4"/>
+  <circle cx="112" cy="104" r="44" fill="url(#ek-glow)"/>
+  <path d="M96 107L101 100L106 107L111 100L116 107L121 100L126 107" stroke="#d5ddd9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#ffd166"><circle cx="130" cy="121" r="3.4"/><circle cx="138" cy="113" r="3.4"/><circle cx="139" cy="125" r="3.4"/></g>
+  <!-- 做出來的產物飄向右邊 -->
+  <path d="M126 88L166 64" stroke="#a5f3cd" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 5"/>
+  <path d="M183.8 57.5L183.8 66.5L176 71L168.2 66.5L168.2 57.5L176 53Z" stroke="#a5f3cd" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M212.1 36.5L212.1 43.5L206 47L199.9 43.5L199.9 36.5L206 33Z" stroke="#a5f3cd" stroke-width="2" stroke-linejoin="round" opacity=".55"/>
+  <!-- 右:初速度對受質濃度 -->
+  <path d="M240 40V206H424" stroke="#5f8f78" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M240 66H424" stroke="#9caca5" stroke-width="1.4" stroke-dasharray="4 5"/>
+  <path d="M240 136H273.2V206" stroke="#ffd166" stroke-width="1.4" stroke-dasharray="3 4"/>
+  <path d="M246.0 206.0L247.7 197.8L249.4 190.4L251.1 183.9L252.8 178.0L254.5 172.7L256.2 167.8L257.9 163.4L259.6 159.3L261.3 155.6L263.0 152.2L266.4 146.0L269.8 140.7L273.2 136.0L276.6 131.9L280.0 128.2L283.4 124.9L286.8 122.0L290.2 119.3L293.6 116.9L297.0 114.7L305.5 109.9L314.0 106.0L322.5 102.7L331.0 99.9L339.5 97.5L348.0 95.5L356.5 93.7L365.0 92.0L373.5 90.6L382.0 89.3L390.5 88.2L399.0 87.1L407.5 86.2L416.0 85.3" stroke="#a5f3cd" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#f0f3ee"><circle cx="249.4" cy="186.2" r="3.6"/><circle cx="254.5" cy="178.3" r="3.6"/><circle cx="261.3" cy="148.6" r="3.6"/><circle cx="293.6" cy="114.1" r="3.6"/><circle cx="322.5" cy="106.9" r="3.6"/><circle cx="365" cy="87.8" r="3.6"/><circle cx="407.5" cy="87.6" r="3.6"/></g>
+  <circle cx="273.2" cy="136" r="4.6" fill="#ffd166"/>
+  <text x="266" y="222" fill="#9caca5" font-size="11" font-family="Consolas,monospace">Km</text>
+  <text x="390" y="59" fill="#9caca5" font-size="11" font-family="Consolas,monospace">Vmax</text>
+</svg>

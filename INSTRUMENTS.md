@@ -538,7 +538,7 @@ HPLC 成分的 kw 與 S、茨維特色帶的速度、GC 與 HPLC 的外觀都是
 
 ## 生化原理
 
-入口的「生化原理」一區(2026-10-26 起)用 2D 動畫講分子生物學與生物化學的實驗原理,共十份,共用 `assets/bio-lesson.js`(播放器)、`assets/bio-draw.js`(畫圖)與 `assets/bio-lesson.css`(版面),不需要 WebGL。每份分成幾章,有字幕與「自己調整」的選項;章節代號就是網址的 `#`。動畫裡的序列、濃度、峰的位置多半是示意,各節分別列出哪些數值有來源、哪些是示意。程式結構見各資料夾的 MAINTENANCE.md。
+入口的「生化原理」一區(2026-10-26 起)用 2D 動畫講分子生物學與生物化學的實驗原理,共十份,共用 `assets/bio-lesson.js`(播放器)、`assets/bio-draw.js`(畫圖)與 `assets/bio-lesson.css`(版面),不需要 WebGL。每份分成幾章,有字幕與「自己調整」的選項;章節代號就是網址的 `#`。動畫裡的序列、濃度、峰的位置多半是示意,各節分別列出哪些數值有來源、哪些是示意。程式結構見各資料夾的 MAINTENANCE.md。2026-10-27 起,其中七份在最後加了「進階」章節(各節最後的「進階章節」)。
 
 ### 中心法則(`central-dogma/`)
 
@@ -622,6 +622,45 @@ Meselson 與 Stahl(1958,PNAS 44:671–682,依掃描全文):
 | qPCR 效率 | E = 10^(−1/斜率) − 1;斜率 −3.32 為 100%,起始量差 10 倍 Ct 差約 3.32 輪 | Agilent 斜率換算說明;MIQE(Bustin 2009,Clin Chem 55:611) |
 | 示意值 | 序列、引子 Tm 58 °C、產物 450 bp、雜帶長度、平原期上限 1×10¹²、膠的跑速、qPCR 曲線形狀與門檻 | 示意,不是實驗結果 |
 
+#### 進階章節(2026-10-27)
+
+第 8 到 10 章(`primer` 引子設計與 Tm、`ddct` qPCR 相對定量、`melt` 熔解曲線),給做過 GC-MS、LC-MS 這類儀器分析的大學部高年級與研究生。三章共 52 秒,控制項:引子(四條示意引子)、鹽的條件、處理的效果、目標基因的效率、樣品、模板量。動畫裡的 Tm、ΔΔCt、Pfaffl 比值與熔解曲線的峰都在頁面上照公式算,不是寫死的數字。
+
+| 項目 | 內容 | 狀態與來源 |
+|---|---|---|
+| 引子設計規則 | 長度 15 到 30 nt;GC 40% 到 60%;3′ 端要有 G 或 C;一對引子的 Tm 相差不超過 5 °C;兩條引子的 3′ 端不能互補,單一引子的 3′ 端也不能和自己其他部分互補(會形成引子二聚體或髮夾);避免 5 個以上相同鹼基與二核苷酸重複 | Lorenz 2012,J Vis Exp (63):3998,第 1 節(PMC4846334) |
+| Wallace 規則 | Tm ≈ 2(A+T) + 4(G+C),只看組成;常用於 14 到 20 nt 的粗估;最近鄰法較好,各種計算器都只是估計 | Lorenz 2012 第 5 節;Biopython Bio.SeqUtils.MeltingTemp 文件(引 Thein 與 Wallace 1986) |
+| 最近鄰參數 | 1 M NaCl 的統一參數(表 2 的 ΔH°、ΔS°,例如 CG/GC −10.6 kcal/mol、−27.2 cal/(K·mol);AA/TT −7.9、−22.2);起始項:末端 G·C 為 +0.1、−2.8,末端 A·T 為 +2.3、+4.1;自我互補的對稱校正 ΔS −1.4;表 1 的 ΔG°37(畫面上的長條) | SantaLucia J Jr. 1998,PNAS 95(4):1460–1465,表 1、表 2(PMC19045) |
+| 鹽校正與 Tm 公式 | ΔS°[Na⁺] = ΔS°(1 M) + 0.368 × N × ln[Na⁺],N = 磷酸數 ÷ 2 = 長度 − 1;Tm = 1000 × ΔH° ÷ (ΔS° + R ln(C/4)) − 273.15(兩股不自我互補而且等量時用總濃度 ÷ 4),R = 1.987 cal/(K·mol) | SantaLucia 1998 內文(式子在原文是圖片,係數 0.368 與 N − 1 另外對照 Biopython 文件的 salt_correction 方法 5) |
+| 計算條件 | 寡核苷酸 50 nM;鹽有三種:50 mM Na⁺、PCR 緩衝液(Primer3 的預設:一價 50 mM、Mg²⁺ 1.5 mM、dNTP 0.6 mM,依 von Ahsen 2001 換成 Na⁺ 等效 50 + 120 × √(1.5 − 0.6) ≈ 163.8 mM)、1 M Na⁺ | Primer3 說明文件(PRIMER_DNA_CONC、PRIMER_SALT_MONOVALENT、PRIMER_SALT_DIVALENT、PRIMER_DNTP_CONC 的預設與換算式);換算式也見 Biopython 文件 |
+| 驗算 | 28 nt 的 CGTTCCAAAGATGTGGGCATGAGCTTAC:Na⁺ 50 mM、50 nM 時 60.32 °C,55 mM 時 60.79 °C,50 + 5 + 120 × √1.5 mM 時 67.39 °C,和 Biopython 文件的範例值相同;同一條的 ΔH −222.9 kcal/mol、ΔS(50 mM)−632.27 cal/(K·mol),和 BioPHP 的線上 Tm 計算器相同(它的 Tm 顯示 61 °C,濃度項的寫法不同) | node 驗算(2026-10-27) |
+| 四條示意引子 | A CTGGATGACGAGATGGCTTG(GC 55%,Wallace 62 °C,最近鄰 52.7 / 58.4 / 67.5 °C,依序是 50 mM、PCR 緩衝液、1 M);B GGACCGCTCCTCCACAGCCG(GC 75%,70 °C;61.6 / 67.4 / 76.7 °C);C TTCACATAAAGTAAAGTTCG(GC 30%,52 °C;43.5 / 49.0 / 58.0 °C);D TCGGCAGGTCATTTGAATTC(GC 45%,58 °C;50.7 / 56.4 / 65.5 °C;3′ 端的 GAATTC 是回文,和自己 6 個鹼基互補) | 示意:隨機產生後依設計規則挑的,不對應真的基因;Tm 是照上面的公式算的 |
+| 3′ 端自我互補的判斷 | 把引子和自己反向對齊,從 3′ 端往 5′ 數連續配得上的鹼基數;4 個以上標成問題,畫出兩條引子 3′ 端對在一起、被聚合酶各自延長 | 判斷門檻 4 是示意;二聚體被 Taq 延長、和不加模板的對照比對見 Thermo Fisher Real-time PCR handbook 的 Formation of primer-dimers 段 |
+| Tm 預測的用法 | 演算法算出的 Tm 只供初步設計,實際的黏合溫度要用實驗(溫度梯度)決定;引子二聚體在 SYBR Green I 的測定裡可能造成偽陽性 | MIQE(Bustin 2009,Clin Chem 55:611)7.2 節 |
+| ΔΔCt 法 | ΔCt = Ct(目標)− Ct(參考);ΔΔCt = ΔCt(處理)− ΔCt(對照);倍數 = 2^(−ΔΔCt);要求兩個基因的效率相同(相對效率圖斜率 < 0.1 可接受);效率不同時,目標與參考的 Cq 差會隨模板量改變 | Livak 與 Schmittgen 2001(Methods 25:402,只讀到摘要);Thermo Fisher Real-time PCR handbook 4.3 節;MIQE 7.4.1 節 |
+| Pfaffl 法 | 比值 = E目標^ΔCP目標(對照 − 樣品) ÷ E參考^ΔCP參考(對照 − 樣品),E = 10^(−1/斜率)(E = 2 是每輪剛好加倍);兩個 E 都是 2 時化簡成 ΔΔ 法,ΔΔ 法只適合快速估計。頁面把 E 寫成 1 + E(E 是 MIQE 的效率,1.00 = 100%) | Pfaffl 2001,Nucleic Acids Res 29:e45(PMC55695) |
+| 效率範圍 | 效率最好接近 100%,超出 90% 到 110% 可能讓結果偏掉;目標與參考基因的效率要相近 | Thermo Fisher Real-time PCR handbook(Troubleshooting 一節) |
+| 相對定量的模型 | Ct = ln(門檻份數 ÷ 起始份數) ÷ ln(1 + E);效率 100% 時對照組目標 Ct 25、參考 Ct 18;處理組的上樣量 0.7 倍(兩個基因一起受影響,用來呈現參考基因的作用);參考基因效率固定 100%;Ct 取到小數第二位再算。2^(−ΔΔCt) ÷ 真值 = (真值 × 0.7)^(ln2 ÷ ln(1+E) − 1)。例:效率 90%、真值 8 倍時 2^(−ΔΔCt) 得 9.19(高估 15%),Pfaffl 得 8.01;效率 80%、16 倍時得 24.6(高估 54%) | 公式依 Livak、Pfaffl;Ct、上樣量與效率都是示意 |
+| 熔解曲線 | qPCR 後慢慢升溫,SYBR Green I 的螢光在接近產物 Tm 時陡降;曲線的形狀與位置由 GC/AT 比、長度與序列決定,Tm 差不到 2 °C 也分得出;專一的擴增是一個窄峰;引子二聚體是螢光較低、較寬、在 70 多 °C 熔解的峰(長短不一),沒有模板時更常見,模板越少越多;出現多個峰表示有別的產物 | Ririe KM, et al. 1997,Anal Biochem 245:154–160(摘要);Thermo Fisher Real-time PCR handbook(Formation of primer-dimers、High resolution melting 一節) |
+| 熔解曲線的模型 | 各產物還是雙股的比例 s = 1/(1 + e^((T − Tm)/w));F = 0.03 + (1 − 0.012(T − 60)) × Σ 量 × s;−dF/dT 用解析式;峰是局部最大值而且雙股分開的那一項大於 0.004。目標產物 84.5 °C(寬 0.55)、引子二聚體 76.5 °C(寬 1.6)、另一個產物 88 °C(寬 0.55);量依樣品與模板量(多、少、不加)而變 | 示意(Tm、寬度、量、染劑隨溫度變暗 1.2%/°C、背景 0.03、峰的門檻都不是實測) |
+
+教學示意:四條引子序列、3′ 端互補的門檻、相對定量的 Ct 與上樣量、擴增與熔解曲線的形狀、三種產物的 Tm 與量,都是為了說明原理設定的,不可用於判讀實際的實驗。
+
+來源連結:
+
+- SantaLucia J Jr. A unified view of polymer, dumbbell, and oligonucleotide DNA nearest-neighbor thermodynamics. Proc Natl Acad Sci USA. 1998;95(4):1460–1465:https://pmc.ncbi.nlm.nih.gov/articles/PMC19045/
+- Lorenz TC. Polymerase Chain Reaction: Basic Protocol Plus Troubleshooting and Optimization Strategies. J Vis Exp. 2012;(63):3998:https://pmc.ncbi.nlm.nih.gov/articles/PMC4846334/
+- Primer3 manual(PRIMER_DNA_CONC、PRIMER_SALT_MONOVALENT、PRIMER_SALT_DIVALENT、PRIMER_DNTP_CONC、PRIMER_TM_FORMULA、PRIMER_SALT_CORRECTIONS):https://primer3.org/manual.html
+- Biopython, Bio.SeqUtils.MeltingTemp(Tm_Wallace、Tm_NN 與 salt_correction 的說明與範例值):https://biopython.org/docs/latest/api/Bio.SeqUtils.MeltingTemp.html
+- BioPHP minitools, Melting Temperature (Tm) Calculation(比對 ΔH、ΔS 用):http://www.biophp.org/minitools/melting_temperature/demo.php
+- Livak KJ, Schmittgen TD. Analysis of relative gene expression data using real-time quantitative PCR and the 2^(−ΔΔCT) method. Methods. 2001;25(4):402–408:https://doi.org/10.1006/meth.2001.1262
+- Pfaffl MW. A new mathematical model for relative quantification in real-time RT-PCR. Nucleic Acids Res. 2001;29(9):e45:https://pmc.ncbi.nlm.nih.gov/articles/PMC55695/
+- Bustin SA, et al. The MIQE Guidelines. Clin Chem. 2009;55(4):611–622(7.2 節 Specificity、7.4.1 節 PCR efficiency):https://doi.org/10.1373/clinchem.2008.112797
+- Thermo Fisher Scientific. Real-time PCR handbook(2016):https://www.thermofisher.com/content/dam/LifeTech/Documents/PDFs/PG1503-PJ9169-CO019861-Update-qPCR-Handbook-branding-Americas-FLR.pdf
+- Ririe KM, et al. Product differentiation by analysis of DNA melting curves during the polymerase chain reaction. Anal Biochem. 1997;245(2):154–160:https://doi.org/10.1006/abio.1996.9916
+
+未確認:Livak 與 Schmittgen 2001、Ririe 1997 只讀到摘要;von Ahsen 2001 的換算式是從 Primer3 與 Biopython 的說明文件讀到的,沒有讀原文;SantaLucia 1998 的式子在網頁版是圖片,係數另外對照 Biopython 文件。
+
 ### DNA 定序(`sequencing/`)
 
 網頁:https://tung-beauregard.github.io/instrument-principles/sequencing/
@@ -648,6 +687,36 @@ Meselson 與 Stahl(1958,PNAS 44:671–682,依掃描全文):
 | 奈米孔準確度 | 2016 年單次約 92%;目前單次 99% 以上(最新模型 99.75%);多讀幾次的共識序列可以更準 | Jain 2016 Outlook;Oxford Nanopore「Accuracy」頁 |
 | 奈米孔通量與機身 | MinION 一片 2,048 個孔、512 個一組控制,重 90 公克;MinION 流動槽 512 個通道、PromethION 流動槽 2,675 個通道 | Jain 2016;Oxford Nanopore 線上商店的流動槽頁 |
 | 示意值 | 所有序列、反應管裡的材料畫法、八份新股停的位置、峰的形狀與雜訊、N 的判斷規則、毛細管跑速、叢的數目、橋的形狀、Illumina 的六叢序列、RNA-seq 的讀取次數、電流高低、單股前進速度、比較圖中奈米孔「常見幾萬」的範圍 | 示意,不是實驗結果 |
+
+#### 進階章節(2026-10-27)
+
+接在「三種方法比較」之後的三章,講 DNA 層次的分析(RNA-seq 的計數、標準化與差異表現在「轉錄體分析」`transcriptomics/`):
+
+| 章節 | 重點與公式 | 數值的來源與狀態 |
+|---|---|---|
+| `align` 進階:比對與覆蓋度 | 先用一小段完全相同的種子查索引找出候選位置,再往兩邊延伸、逐個比較(seed-and-extend);重複序列裡的 read 放在哪一份都一樣好,MAPQ = −10 log₁₀ Pr{放錯位置} 給 0;覆蓋度 c = N × L ÷ G;每個鹼基被蓋到的次數接近 Poisson,P(k) = c^k e^(−c) ÷ k!;沒蓋到的比例約 e^(−c);空洞段數約 N·e^(−c) | 種子與延伸:Li 2013(BWA-MEM)第 2.1.1 節;MAPQ 的定義:SAM 規格 1.4 節、Li 與 Durbin 2009 第 2.7.4 節;一樣好的位置隨機挑一個並給 0:Li 2008(MAQ)Overview、Li 與 Durbin 2009 第 3.2 節;c 與島數 N·e^(−cσ):Lander 與 Waterman 1988 第 232 到 234 頁;C = LN / G 與 Poisson:Illumina 技術說明 770-2011-022。參考序列、兩條 read、種子長度 4、索引的畫法、「MAPQ 60」都是示意(60 是 Li 與 Durbin 2009 模擬裡用的高值)。覆蓋度是真的模擬:環狀 G = 1,000,000、L = 150、起點均勻隨機(固定種子);1× 沒蓋到 37.1%(e^(−1) 36.8%)、空洞 2,415 段(N·e^(−c) 2,452.5);5× 0.65%(0.67%)、220 段(224.6);30× 與 100× 沒有空洞 |
+| `variant` 進階:變異判讀 | pileup;鹼基品質 Q = −10 log₁₀(錯誤率),Q20 = 1%、Q30 = 0.1%;二倍體三種基因型 0/0、0/1、1/1,讀到變異的比例約 0%、50%、100%;一條 read 讀到變異的機會 p = ε、0.5、1 − ε,看到 d 條裡 a 條變異的機率 ∝ p^a(1 − p)^(d − a)(Li 2011 式 2,m = 2);三種事先一樣時,機率最大的是判讀結果;真實基因型固定時 a 是二項分布,判對的機率是判成真實基因型的那些 a 的機率總和;低深度時異型合子可能只讀到一邊(深度 4 時 2 × 0.5⁴ = 12.5%) | Phred 20 = 1%、低於 5× 時常只讀到一條染色體、深度 > 20× 時 20% 到 80% 的規則才好用、事先機率偏向非異型合子以免把錯誤當變異:Nielsen 2011;式子:Li 2011 第 2.2 節式 (2)。ε = 1%(每個鹼基都當成 Q20)、只考慮兩種鹼基、三種基因型事先一樣、15 個鹼基的參考與抽出來的 read 都是示意。node 驗算:0/1 判對 87.5%(4 條)、97.85%(10 條)、99.994%(30 條);0/0 與 1/1 判對 96.06%、99.57%、99.9988%;讀到 1/10 條 T 時三種基因型的機率 90.3%、9.7%、0 |
+| `assembly` 進階:基因體組裝與 N50 | 把 read 切成 k-mer,節點是 k − 1 個鹼基、邊是 k-mer(de Bruijn 圖),沿著邊走拼回序列;重複序列讓路徑匯合後分岔,沒有 read 從頭跨到尾就只能斷開;長讀長跨過長的重複;N50 = contig 由長到短加總,過總長一半的那一條的長度;N50 只看長度,不管接得對不對,丟掉短的 contig 會讓它變大,不同組裝要用同一個總長(例如基因體大小)才能比較 | de Bruijn 圖:Compeau 2011 Fig. 2、Box 1、Box 2;路徑匯合、spanner、N50 定義與比較的限制:Miller 2010 第 1.2、1.3、2 節。火炬松:約 22 Gb、單一大配子體、contig N50 8,206 bp(Zimin 2014),82% 是重複序列(Neale 2014),加入約 12× 的 PacBio 長讀長後 contig N50 25,361 bp(Zimin 2017)。兩段 de Bruijn 序列(k = 4)與 1 Mb 的基因體是示意:223 段重複序列(30 到 80 bp、0.3 到 6 kb、7 到 13 kb、38、46、72 kb,固定種子,約佔 52.9%),讀長 ≥ 重複長 + 40 bp 才跨得過,跨不過的重複不放進 contig。node 驗算:150 bp 104 條、N50 7,102 bp;10 kb 18 條、80,802 bp;50 kb 2 條、557,930 bp;150 bp 丟掉 5 kb 以下剩 30 條、N50 12,057 bp、總長少 170 kb |
+
+控制項:平均定序深度 c(1×、5×、30×、100×);這個位置的 read 數(4、10、30)、真實基因型(0/0、0/1、1/1)、重新抽一組 read;讀長(150 bp、10 kb、50 kb)、丟掉 5 kb 以下的 contig。
+
+來源連結:
+
+- Lander ES, Waterman MS. Genomics 1988;2(3):231–239:https://doi.org/10.1016/0888-7543(88)90007-9
+- Illumina, Estimating Sequencing Coverage(Pub. No. 770-2011-022):https://www.illumina.com/documents/products/technotes/technote_coverage_calculation.pdf
+- Li H, Durbin R. Bioinformatics 2009;25(14):1754–1760:https://pmc.ncbi.nlm.nih.gov/articles/PMC2705234/
+- Li H, Ruan J, Durbin R. Genome Res 2008;18(11):1851–1858:https://pmc.ncbi.nlm.nih.gov/articles/PMC2577856/
+- Li H. Aligning sequence reads, clone sequences and assembly contigs with BWA-MEM. arXiv:1303.3997:https://arxiv.org/abs/1303.3997
+- SAM 格式規格:https://samtools.github.io/hts-specs/SAMv1.pdf
+- Nielsen R, et al. Nat Rev Genet 2011;12(6):443–451:https://pmc.ncbi.nlm.nih.gov/articles/PMC3593722/
+- Li H. Bioinformatics 2011;27(21):2987–2993:https://pmc.ncbi.nlm.nih.gov/articles/PMC3198575/
+- Compeau PEC, Pevzner PA, Tesler G. Nat Biotechnol 2011;29(11):987–991:https://pmc.ncbi.nlm.nih.gov/articles/PMC5531759/
+- Miller JR, Koren S, Sutton G. Genomics 2010;95(6):315–327:https://pmc.ncbi.nlm.nih.gov/articles/PMC2874646/
+- Zimin A, et al. Genetics 2014;196(3):875–890:https://pmc.ncbi.nlm.nih.gov/articles/PMC3948813/
+- Neale DB, et al. Genome Biol 2014;15:R59:https://pmc.ncbi.nlm.nih.gov/articles/PMC4053751/
+- Zimin AV, et al. GigaScience 2017;6(1):1–4:https://pmc.ncbi.nlm.nih.gov/articles/PMC5437942/
+
+未確認:Nystedt B, et al. Nature 2013(挪威雲杉約 200 億個鹼基)只讀到摘要,頁面沒有引用。
 
 ### DNA 鑑定與分子標記(`dna-markers/`)
 
@@ -797,6 +866,55 @@ His 標籤與 IMAC(Bornhorst 等 2000):組胺酸是和固定化金屬結合最�
 
 只在搜尋摘要看到、沒有讀到原文的:Tymoczko 等《Biochemistry: A Short Course》3e 第 41.3 節(細菌不能剪接內含子,所以表現真核基因要用 cDNA;出版社頁面 DNS 失敗);JoVE Science Education〈Pure Cultures and Streak Plating〉(菌落視為單一細胞的後代)。NEB 的 EcoRI、HindIII 產品頁回 403、REBASE 憑證錯誤,改用 Thermo Fisher 的產品頁;NCBI Bookshelf 的 Lodish《Molecular Cell Biology》要求人機驗證,沒有讀,SDS-PAGE 改以 OpenStax Microbiology 12.2 為準。pET 手冊第 11 版(哈佛的 PDF)字型無法抽出文字,改讀第 10 版。
 
+#### 進階章節(2026-10-27)
+
+原本的八章之後加了三章進階,代號 `#gibson`、`#golden-gate`、`#codon`,章名都以「進階:」開頭,共 53 秒(17 + 18 + 18)。整份教材變成 11 章、約 3 分 2 秒(182 秒),控制項 13 個。讀者假設已經看過前八章(限制酶選殖、轉形、誘導、純化)。
+
+- 第 9 章 進階:Gibson 組裝 (17 s) 不用限制酶,相鄰兩段共用一段重疊序列;5′ 外切酶把 5′ 端吃掉露出 3′ 單股、重疊處配對、聚合酶補空隙、接合酶封口,50 °C 一管同溫。控制項「要接的片段數」(2 / 3 / 5 段)與「重疊長度」(10 到 40 bp)
+- 第 10 章 進階:Golden Gate 組裝 (18 s) BsaI 認 GGTCTC 卻切在辨識序列外面,留下 4 個鹼基的突出端;辨識序列跟著丟掉的小段走,產物不再被切,接錯的還會被切開,所以切與接在同一管裡循環。控制項「突出端的組合」(都不一樣 / 有兩個一樣)與「切接反應的時間」(5 / 30 分鐘)
+- 第 11 章 進階:密碼子最佳化 (18 s) 大腸桿菌少用的密碼子、核糖體停頓、CAI 的定義與算法、兩個做法,以及「CAI 高不保證表現高」。控制項「序列」(原始 / 最佳化後)與「用補充稀有 tRNA 的菌株」
+
+##### 公式與算出來的數值
+
+- 重疊的專一性:n 個鹼基排得出 4ⁿ 種組合。畫面現算 4¹⁰ = 1.0 × 10⁶、4²⁰ = 1.1 × 10¹²、4⁴⁰ = 1.2 × 10²⁴,用來說明為什麼 20 bp 左右的重疊就足以讓兩端只配得上設計好的那一段。重疊還要在 50 °C 下黏得住,這一點只在字幕與判語裡定性說明。
+- 接點數與成功率:接進環狀載體時 f 段有 f 個接點,每個都要接對,整體 = p^f。畫面用 p = 0.97(示意)算出 0.97² = 94.1%、0.97³ = 91.3%、0.97⁵ = 85.9%。方向與 Potapov 等 2018 量到的「接點越多、正確率越低」一致(他們的 12 段預測 99%、實測 99.2 ± 0.6%;24 段預測 91%、實測 84 ± 5%)。
+- BsaI 的切點:GGTCTC(1/5) 指上股在辨識序列之後第 1 個鹼基後切、下股在第 5 個後切,留下 4 個鹼基的 5′ 突出。畫面的引子末端寫成 TT + GGTCTC + A + GGAG + 片段,切完留下的突出端就是 GGAG,辨識序列留在被丟掉的那一小段裡。
+- 突出端的組合:4 個鹼基有 4⁴ = 256 種,其中 16 種是回文(會自己和自己接),Engler 等 2008 因此說可用的是 240 種。
+- 接得出哪些環:把每一段的左右突出端當節點,從載體的右端走到載體的左端列出所有路徑。四個接點都不一樣(GGAG / AATG / AGGT / GCTT)時只有「載體-1-2-3」;把第 3 個接點也設成 AATG 之後,另外多出「載體-1-3」(跳過第 2 段)與「載體-1-2-2-3」(第 2 段接了兩份)。這三種就是畫面在「有兩個一樣」時列出來的結果。
+- CAI:w = 這個密碼子在同義家族裡的使用比例 ÷ 家族裡最高的那一個;CAI 是各 w 的幾何平均,寫成 (w₁ × w₂ × ⋯ × w_L)^(1/L),等價於 exp(ln w 的平均)。只有一個密碼子的家族(AUG、UGG)w 恆為 1,依 Sharp 與 Li 1987、Xia 2007 排除,所以示意序列的 L = 9。示意序列的 CAI:原始 0.2351(顯示 0.24)、最佳化後 1.0000(顯示 1.00);兩條序列每個位置的胺基酸相同(M A R L I R P G L K)。
+- 稀有密碼子的門檻:每一千個密碼子出現不到 10 次,也就是低於 1%。示意序列裡 AGG 0.21%、AGA 0.36%、CTA 0.42%、ATA 0.68%、CCC 0.54%、GGA 0.95% 共 6 個,最佳化後 0 個;對照的常用密碼子 CGT 是 2.00%。
+
+以上每一項都用 node 驗算過(4 的次方、0.97 的次方、由切點推出的突出端、路徑列舉、exp(平均 ln w))。
+
+##### 哪些是示意
+
+- 第 9 章:每段畫 56 bp、外切酶多吃 4 個鹼基、每個接點接對的機率 0.97、左下那個環的段數與顏色。反應條件(50 °C、一管、2 到 3 段 15 分鐘、4 段以上 1 小時、重疊 15 到 30 bp)有出處。
+- 第 10 章:引子末端的序列是為畫面設計的(GGTCTC 與切點位置是真的);四個接合位取自 MoClo 的 GGAG、AATG、AGGT、GCTT,「有兩個一樣」那一組是把第 3 個接點也改成 AATG。白藍菌落數不是示意,是 Engler 等 2008 Table 1 的實測(Promega 緩衝液,37 °C 切接之後再 50 °C 與 80 °C 各 5 分鐘;5 分鐘 364 白 6 藍 = 98.4%,30 分鐘 1820 白 1 藍 = 99.9%;白色表示接到片段,藍色表示載體自己接回去)。
+- 第 11 章:10 個密碼子的短序列是示意;w 與 CAI 依大腸桿菌全基因體的密碼子使用比例算出,真正的 CAI 以一組高表現基因當參考組,所以畫面上的值只用來看「換成常用密碼子之後怎麼變」,不是某個基因的實際 CAI。核糖體讀一個稀有密碼子慢 3.2 倍、「讀完要 2.3 倍時間」也是示意。
+
+##### 來源連結
+
+讀到內容的(2026-10-27):
+
+- Addgene, Gibson Assembly Cloning protocol:https://www.addgene.org/protocols/gibson-assembly/
+- SnapGene, Gibson Assembly:https://www.snapgene.com/guides/gibson-assembly
+- SnapGene, Golden Gate Assembly:https://www.snapgene.com/guides/golden-gate-assembly
+- Engler C, et al. A one pot, one step, precision cloning method with high throughput capability. PLoS ONE. 2008;3(11):e3647:https://pmc.ncbi.nlm.nih.gov/articles/PMC2574415/
+- Weber E, et al. A modular cloning system for standardized assembly of multigene constructs. PLoS ONE. 2011;6(2):e16765:https://pmc.ncbi.nlm.nih.gov/articles/PMC3041749/
+- Thermo Fisher Eco31I(BsaI)ER0291:https://www.thermofisher.com/order/catalog/product/ER0291
+- Potapov V, et al. Comprehensive profiling of four base overhang ligation fidelity by T4 DNA ligase and application to DNA assembly. ACS Synth Biol. 2018;7(11):2665–2674;讀的是預印本 bioRxiv 322297:https://www.biorxiv.org/content/10.1101/322297v1.full
+- Xia X. An improved implementation of codon adaptation index. Evol Bioinform Online. 2007;3:53–58:https://pmc.ncbi.nlm.nih.gov/articles/PMC2684136/
+- Rosano GL, et al. Front Microbiol. 2014;5:172:https://pmc.ncbi.nlm.nih.gov/articles/PMC4029002/(這次讀的是密碼子使用與稀有 tRNA 菌株那幾段)
+- Kudla G, et al. Coding-sequence determinants of gene expression in Escherichia coli. Science. 2009;324(5924):255–258:https://pmc.ncbi.nlm.nih.gov/articles/PMC3902468/
+- GenScript 的大腸桿菌密碼子使用表:https://www.genscript.com/tools/codon-frequency-table
+
+只讀到摘要或沒讀到原文的:
+
+- Gibson DG, et al. Enzymatic assembly of DNA molecules up to several hundred kilobases. Nat Methods. 2009;6(5):343–345. doi:10.1038/nmeth.1318(nature.com 要登入;只確認摘要寫的是 5′ 外切酶、聚合酶、接合酶的一管同溫反應,先把末端削成單股讓它們專一退火再共價接起來。反應條件改用 Addgene 與 SnapGene 的說明)
+- Sharp PM, Li WH. The codon adaptation index. Nucleic Acids Res. 1987;15(3):1281–1295(PMC340524 只給得到摘要與參考文獻,PDF 要通過 proof-of-work;公式改以 Xia 2007 為準)
+- Kane JF. Effects of rare codon clusters on high-level expression of heterologous proteins in Escherichia coli. Curr Opin Biotechnol. 1995;6(5):494–500(PubMed 與 Europe PMC 都擋自動讀取;內容只透過 Rosano 等 2014 的引用)
+- NEB 的 Gibson 與 Golden Gate 說明頁、FAQ:全部回 403,沒有引用。Kazusa 的 Codon Usage Database 查到的「Escherichia coli K12」只有 14 個 CDS,不適合當密碼子使用表,改用 GenScript 的表。
+
 ### 萜類合成酶(`terpene-synthase/`)
 
 網頁:https://tung-beauregard.github.io/instrument-principles/terpene-synthase/
@@ -902,6 +1020,43 @@ His 標籤與 IMAC(Bornhorst 等 2000):組胺酸是和固定化金屬結合最�
 
 Doudna JA、Charpentier E. 2014 Science 346:1258096 的綜論全文這次讀不到(出版社網站擋自動讀取),只確認了摘要,頁面沒有引用。
 
+#### 進階章節(2026-10-27)
+
+在原本八章後面加了三章,`name` 都以「進階:」開頭,代號是 `#base-edit`、`#prime-edit`、`#off-target`。這三章假設讀者看過前面,直接寫出窗口位置、公式與實際的效率數字;前八章不動。加完是 11 章、約 176 秒。
+
+- 第 9 章「進階:鹼基編輯」(18 秒):一邊切割能力壞掉的 Cas9(nickase)接上去胺酶,不切斷雙股。CBE 把編輯窗口裡的 C 去胺成 U、被讀成 T(另一股的 G 跟著變 A),ABE 把 A 去胺成次黃嘌呤、被聚合酶讀成 G。窗口從離 PAM 最遠的那一格算起:CBE 約第 4 到 8 格,ABE7.10 約第 4 到 7 格。窗口裡同一種鹼基會一起被改(旁觀編輯),所以畫面上的「編輯後」是由編輯器決定的,不是由使用者挑的那一格決定。控制項:編輯器種類(CBE / ABE)、想改的鹼基在第幾格(1 到 20)。
+- 第 10 章「進階:先導編輯」(18 秒):Cas9 H840A nickase 接反轉錄酶,嚮導換成 pegRNA,3′ 端多了引子結合區(PBS)與反轉錄模板。切開帶 PAM 的那一股,露出的 3′ 端黏回引子結合區當引子,反轉錄出帶著改變的新序列,舊的那一段被當成多餘的瓣切掉,接好之後是異雙股,由錯配修補決定結果。12 種鹼基替換與小的插入缺失都能做。控制項:想做的改變(替換 / 插入 3 個 / 缺失 3 個,pegRNA 的模板跟著重算)、引子結合區長度(6 到 17,畫面跟著算那一段基因體的 G 與 C 比例並依原文的 13 個給評語)。
+- 第 11 章「進階:脫靶評分」(17 秒):把第 7 章的定性判斷換成數字。CFD 分數把每個不配對的權重(看位置,也看是哪一種不配對)相乘;MIT 分數是位置權重相乘,再乘上不配對的平均間距那一項與 1 除以個數的平方。一條嚮導的整體特異性要把基因體裡所有候選位置的分數加起來。最後是 GUIDE-seq:34 bp 的雙股標籤被 NHEJ 接進 Cas9 切出的斷口,再定序找標籤落在哪裡,找到的脫靶位置大多是預測漏掉的。控制項:不配對的位置(1 到 20)、不配對的數目(1 到 3),分數即時重算。
+
+#### 進階章節的數值與示意
+
+- 鹼基編輯的窗口:CBE 約 5 個鹼基、典型是間隔序列第 4 到 8 格,原文明寫「counting the end distal to the PAM as position 1」(Komor 等 2016);ABE7.10 約 4 到 6 格寬、大約第 4 到 7 格,原文把 PAM 算成第 21 到 23 格(Gaudelli 等 2017),兩篇的第 1 格都在 PAM 遠端。兩篇都說邊界會隨標的序列而變。
+- 鹼基編輯的化學:C 去胺成 U,U 的配對性質和 T 一樣(Komor 等 2016);A 去胺成次黃嘌呤,在聚合酶的活性中心和 C 配對,所以被讀成 G,修補或複製後 A·T 變成 G·C(Gaudelli 等 2017)。
+- 鹼基編輯器的構造:rAPOBEC1 接在 dCas9 的 N 端(中間 16 個殘基的 XTEN 連接子),BE3 把 Cas9 第 840 位的 His 補回去,只切沒被編輯的那一股,並接上 UGI 擋住尿嘧啶 DNA 醣苷酶(Komor 等 2016);ABE7.10 是 wtTadA 與演化過的 TadA* 的異二聚體接 Cas9 nickase(Gaudelli 等 2017)。
+- 效率:BE3 在人類細胞最高 37%、摘要寫 15 到 75%,六個位置的插入缺失平均 1.1%(Komor 等 2016);ABE7.10 在 17 個位置平均 53%,產物純度通常 99.9% 以上、插入缺失通常 0.1% 以下(Gaudelli 等 2017)。
+- 旁觀編輯:去胺酶是連著作用的,窗口裡的 C 多半一起被改,體外實驗有超過 93% 的被編輯股不只改一個 C(Komor 等 2016);晚期的 ABE 對鄰近的腺嘌呤也是連著改(Gaudelli 等 2017)。
+- 先導編輯的機制與建議長度:切帶 PAM 的那一股;3′ 端和引子結合區配對、反轉錄出帶改變的 3′ 瓣、5′ 瓣被切掉與接合、異雙股由錯配修補決定結果;建議引子結合區從 13 個鹼基開始,引子區的 G 與 C 偏離 40 到 60% 時要試別的長度、G 與 C 低時通常要更長;反轉錄模板建議從 10 到 16 個開始(Anzalone 等 2019)。
+- 先導編輯的範圍與效率:12 種鹼基替換、最多 44 bp 的插入與 80 bp 的缺失;PE3 用第二條嚮導在沒被編輯的那一股切一刀,效率約 3 倍但插入缺失變多;PE3 在 HEK293T 常 20 到 50%、插入缺失 1 到 10%(Anzalone 等 2019)。
+- CFD:方法一節寫得很清楚,依補充資料 Supplementary Table 19 的活性比例查值,兩個以上的不配對把各自的值相乘,原文舉例第 7 格的 rG:dA 是 0.57、第 10 格的 rC:dT 是 0.87,乘起來 0.50(Doench 等 2016)。**原文的 CFD 定義裡沒有 PAM 這一項**;PAM 的數字是另外量的,NGG 的嚮導 91% 有活性,NAG 26%、NCG 11%、NGA 7%。原文也沒有寫位置是從哪一端數起。
+- MIT 分數:Hsu 等 2013 本文只說建立了一套打分演算法,沒有寫出公式與權重,公式放在該團隊的設計網站;本文的位置是從緊鄰 PAM 的那一格數起,方向和本頁相反。頁面上有註明公式的出處。
+- GUIDE-seq:34 bp、5′ 磷酸化、兩端有硫代磷酸鍵的雙股寡核苷酸被 NHEJ 接進平整的斷口;十三條嚮導在兩種人類細胞裡,每條找到 0 到 150 個以上的脫靶位置,大多是既有的計算方法與 dCas9 ChIP-seq 沒找到的;找到的位置最多差 6 個鹼基,也有差一格的凸起;可以偵測到突變頻率低到 0.1% 的位置(Tsai 等 2015)。
+- 植物的例子:水稻與小麥的腺嘌呤鹼基編輯,有效窗口是間隔序列第 4 到 8 格,原生質體 0.1 到 7.5%、再生水稻植株 15.8 到 59.1%,插入缺失低於 0.1%,表 1 有同一個窗口裡兩個腺嘌呤一起被改的基因型,OsACC 的 C2186R 讓水稻耐 haloxyfop-R-methyl(Li 等 2018);水稻的先導編輯把 OsALS 的 W548L 做出來,引子結合區 13 bp、反轉錄模板 15 bp,轉形癒合組織 0.26 到 2%,在含 bispyribac-sodium 的培養基上長出抗性苗,PE3 在植物裡沒有比 PE2 好(Butt 等 2020)。
+
+教學示意:第 9、10 章用另一段 45 個鹼基、15 個密碼子的示意基因,窗口裡刻意放了兩個 C 與兩個 A,旁觀編輯才看得出來;它不是實際基因。第 10 章把舊的與新的那一段都畫成 12 格,插入與缺失造成的長度變化只在下面的密碼子對照看得到,pegRNA 的嚮導與支架沒有畫。第 11 章的位置權重與不配對種類的係數都是示意值:**原文 CFD 的權重表在補充資料,本頁沒有用到**,畫面上只引用原文自己舉的例子來說明「相乘」這件事,並寫明權重是示意。「整體特異性 = 1 ÷ (1 + 分數總和)」是常見的彙總做法,原文沒有給這個式子;拿來加總的另外三個候選位置也是示意。CFD 不處理多一格少一格的凸起,本頁也沒有畫。畫面上的分數不能拿來實際挑嚮導。本頁一律用「第 1 格在 PAM 遠端」的編號,和第 4、7 章一致。
+
+#### 進階章節的來源連結
+
+- Komor AC, et al. Programmable editing of a target base in genomic DNA without double-stranded DNA cleavage. Nature. 2016;533(7603):420–424:https://pmc.ncbi.nlm.nih.gov/articles/PMC4873371/
+- Gaudelli NM, et al. Programmable base editing of A•T to G•C in genomic DNA without DNA cleavage. Nature. 2017;551(7681):464–471:https://pmc.ncbi.nlm.nih.gov/articles/PMC5726555/ (PMC 頁面標示有 2018 年的更正,未讀到更正內容)
+- Anzalone AV, et al. Search-and-replace genome editing without double-strand breaks or donor DNA. Nature. 2019;576(7785):149–157:https://pmc.ncbi.nlm.nih.gov/articles/PMC6907074/
+- Doench JG, et al. Optimized sgRNA design to maximize activity and minimize off-target effects of CRISPR-Cas9. Nat Biotechnol. 2016;34(2):184–191:https://pmc.ncbi.nlm.nih.gov/articles/PMC4744125/ (CFD 的定義在方法一節;權重表是補充資料 Supplementary Table 19,未讀到)
+- Hsu PD, et al. DNA targeting specificity of RNA-guided Cas9 nucleases. Nat Biotechnol. 2013;31(9):827–832:https://pmc.ncbi.nlm.nih.gov/articles/PMC3969858/ (本文沒有打分公式)
+- Tsai SQ, et al. GUIDE-seq enables genome-wide profiling of off-target cleavage by CRISPR-Cas nucleases. Nat Biotechnol. 2015;33(2):187–197:https://pmc.ncbi.nlm.nih.gov/articles/PMC4320685/
+- Li C, et al. Expanded base editing in rice and wheat using a Cas9-adenosine deaminase fusion. Genome Biol. 2018;19:59:https://pmc.ncbi.nlm.nih.gov/articles/PMC5972399/
+- Butt H, et al. Engineering herbicide resistance via prime editing in rice. Plant Biotechnol J. 2020;18(12):2370–2372:https://pmc.ncbi.nlm.nih.gov/articles/PMC7680537/
+
+這幾篇讀到的都是 PMC 的作者原稿版,引用數字時要和出版社的正式版再對一次。Zong 等 2017(水稻、小麥、玉米的胞嘧啶鹼基編輯,Nat Biotechnol 35:438)這次拿不到全文或正式摘要,頁面與本節都沒有引用。
+
 ### 抗體檢測:西方墨點法與 ELISA(`immunoassay/`)
 
 網頁:https://tung-beauregard.github.io/instrument-principles/immunoassay/
@@ -977,6 +1132,40 @@ ELISA:
 
 未確認:Lequin 2005、Findlay 與 Dillard 2007 只讀到摘要(全文需要訂閱或沒有讀到);Engvall 與 Perlmann 1971、Van Weemen 與 Schuurs 1971 只核對了書目,沒有讀到全文。頁面只用到這幾篇摘要與書目層級的內容(發展的團隊與年份、S 形曲線與四參數模型)。
 
+#### 進階章節(2026-10-27)
+
+第 8 章 `fit4pl`(四參數擬合)與第 9 章 `lod`(偵測極限與定量極限),給做過儀器分析的大學部高年級與研究生,兩章共 36 秒。兩章沿用第 6 章的示意曲線(a 0.06、b 1.15、c 4 ng/mL、d 3.0),濃度可以和第 6 章對照。控制項:擬合方式(直線、四參數)、擬合用的標準品(中段 4 點、6 點、全部 8 點)、空白的雜訊 SD(0.004 到 0.016)、重複次數(5、20、60 次)。擬合、反推、LoB、LoD、LoQ 都在頁面上照公式算。
+
+第 8 章:四參數擬合
+
+- S 形的原因:濃度高到捕捉抗體都被占滿時讀值不再增加(上平台),很低時只剩背景(下平台);配體結合分析的反應對濃度是 S 形,四參數羅吉斯模型(4PL)是公認的參考模型,在上下兩端比其他模型好;曲線不對稱時加第五個參數(5PL)可能更好;加權通常有幫助(Findlay 與 Dillard 2007 的摘要)。頁面的「捕捉抗體都占滿」是依三明治 ELISA 的原理寫的說明。
+- 公式:y = d + (a − d) ÷ (1 + (x/c)^b),a 是濃度 0 的讀值(下平台)、d 是很濃時的讀值(上平台)、c 是反曲點的濃度、b 是斜率;反推 x = c × ((a − d)/(y − d) − 1)^(1/b),讀值不在 a 與 d 之間時推不回來。五參數:y = d + (a − d) ÷ (1 + (x/c)^b)^s,s = 1 時就是 4PL;s ≠ 1 時 c 不再是反曲點(GraphPad Prism 說明的 Asymmetrical (five parameter) 一節,寫法換成本頁的符號;頁面只在字幕與重點整理提到 5PL,沒有做五參數擬合)。
+- 擬合:非線性最小平方(Levenberg-Marquardt),從粗估值(兩端取最小與最大讀值、斜率 0.5、反曲點取 log 濃度的平均)開始一步步調,畫面顯示每一步的曲線與殘差平方和。直線是吸光度對 log10 濃度的最小平方直線。
+- 判斷可不可信:ICH M10(2022)4.2.3 節,標準曲線至少 6 個濃度加空白,點靠近上下漸近線時最常用 4PL 或 5PL,範圍外可以加錨點,標準品反推值在標示值 ±20% 內(最低與最高的定量點 LLOQ、ULOQ ±25%);4.2.4.2 節,檢查樣品的準確度在 ±20% 內(LLOQ、ULOQ ±25%)。頁面一律用 ±20% 判斷,範圍外的樣品標「範圍外」。
+- 示意的數據:標準品 100 ng/mL 起三倍稀釋 8 點、各兩重複,讀值 = 示意曲線 + 雜訊(SD = 0.004 + 讀值的 3%,固定亂數);檢查樣品 0.1、1、10、50 ng/mL 的讀值直接取示意曲線(誤差只來自擬合)。這組數據算出:4PL 全部 8 點 a 0.0539、b 1.152、c 3.948 ng/mL、d 3.016(殘差平方和 0.0306),檢查樣品誤差 +11%、−1%、−3%、−10%;4PL 中段 4 點(0.41 到 11.1 ng/mL)a 0.105、d 2.65,0.1 與 50 ng/mL 推不回來;4PL 6 點時範圍外的 0.1 與 50 ng/mL 誤差 +41% 與 −25%;直線全部 8 點 +29%、−64%、+70%、+36%;直線中段 4 點時 1 與 10 ng/mL 是 −20% 與 +16%,範圍外的 0.1 ng/mL 是 +292%。LM 的結果用 Nelder-Mead 另外驗算,參數與殘差平方和相同。
+
+第 9 章:偵測極限與定量極限
+
+- LoB(空白極限)= 空白平均 + 1.645 SD:假設常態,空白的 95% 在它以下,其餘 5% 會被誤判成有待測物(偽陽性 α)。LoD(偵測極限)= LoB + 1.645 × 低濃度樣品的 SD:濃度在 LoD 的樣品只有 5% 低於 LoB(偽陰性 β)。LoQ(定量極限)≥ LoD,而且要達到偏差與不精密度的目標;功能靈敏度是 CV 20% 的濃度。廠商建立時建議 60 次、實驗室驗證時 20 次。傳統的「空白平均 + 2 SD」(或 3、4、10 SD)只證明能量到「沒有」(Armbruster 與 Pry 2008,依 CLSI EP17)。兩個 SD 相同時 LoD = 平均 + 3.29 SD,和常見的 3 SD 接近(由上面的式子推得)。
+- ICH Q2(R2)(2023)3.2.3.3 節:偵測極限 3.3σ/S、定量極限 10σ/S(σ 是讀值的 SD、S 是檢量線斜率);頁面的「平均 + 10 SD」對應這個定義。
+- SD 估計的可信度:n 次量測的 SD,95% 信賴區間用卡方分布(自由度 n − 1)算:n = 5 是估計值的 0.60 到 2.87 倍、20 是 0.76 到 1.46、60 是 0.85 到 1.22(node 算分位數,和卡方表相同)。
+- 模型:空白讀值 = 0.06(示意曲線的下平台)+ σB × 常態亂數;讀值的 SD = √(σB² + (3% × (讀值 − 0.06))²);低濃度樣品的平均放在真正的 LoD;LoB、LoD 在讀值上算,再用示意曲線換成濃度。精密度曲線用誤差傳遞:CV = 讀值的 SD ÷ (濃度 × 曲線斜率),CV 剛好 20% 的低濃度端是 LoQ、高濃度端是上限(二分法)。預設(σB 0.010、20 次)得 LoB 0.049、LoD 0.077(模擬的真值 0.081)、平均 + 3 SD 0.085、LoQ 0.11、平均 + 10 SD 0.26 ng/mL;σB 0.004 時 LoQ 0.047,0.016 時 0.16 ng/mL。驗算:低濃度樣品在真正 LoB 的 z 值是 −1.645;LoQ 處的 CV 是 20.0%。
+- 示意:空白的平均與 SD、讀值的 SD 模型(3%)、低濃度樣品、固定的亂數(種子 29),都不是實測。EP17 是用樣品的濃度結果算,頁面為了畫在同一條讀值軸上改在讀值上算(示意的簡化)。
+
+教學示意:第 8 章的標準品濃度、讀值雜訊與檢查樣品,第 9 章的空白讀值、雜訊與重複的亂數,都是為了說明原理設定的,不是實驗數據,不可用於判讀實際的實驗。
+
+來源連結:
+
+- Findlay JWA, Dillard RF. Appropriate calibration curve fitting in ligand binding assays. AAPS J. 2007;9(2):E260–E267:https://pmc.ncbi.nlm.nih.gov/articles/PMC2751416/
+- ICH M10 Bioanalytical Method Validation and Study Sample Analysis(2022,Step 4)4.2.3、4.2.4.2 節:https://database.ich.org/sites/default/files/M10_Guideline_Step4_2022_0524.pdf
+- GraphPad Prism Curve Fitting Guide, Asymmetrical (five parameter):https://www.graphpad.com/guides/prism/latest/curve-fitting/reg_asymmetric_dose_response_ec.htm
+- Gottschalk PG, Dunn JR. The five-parameter logistic: a characterization and comparison with the four-parameter logistic. Anal Biochem. 2005;343(1):54–65(經 GraphPad 說明引用,沒有讀原文)
+- Armbruster DA, Pry T. Limit of blank, limit of detection and limit of quantitation. Clin Biochem Rev. 2008;29(Suppl 1):S49–S52:https://pmc.ncbi.nlm.nih.gov/articles/PMC2556583/
+- CLSI EP17-A2, Evaluation of Detection Capability for Clinical Laboratory Measurement Procedures, 2nd ed.(2012):https://clsi.org/standards/products/method-evaluation/documents/ep17/
+- ICH Q2(R2) Validation of Analytical Procedures(2023)3.2.3.3 節:https://database.ich.org/sites/default/files/ICH_Q2%28R2%29_Guideline_2023_1130.pdf
+
+未確認:Findlay 與 Dillard 2007 只讀到摘要;CLSI EP17-A2 沒有讀到原文,LoB、LoD、60 與 20 次的內容依 Armbruster 與 Pry 2008;ICH Q2(R2) 的式子在 PDF 裡是符號字型,3.3 與 10 的係數另外對照了引用它的說明;NCBI Assay Guidance Manual 的免疫分析章節(Cox KL, et al.)因為網站要求驗證沒有讀到,頁面沒有用到它的內容。
+
 ### 流式細胞儀(`flow-cytometry/`)
 
 網頁:https://tung-beauregard.github.io/instrument-principles/flow-cytometry/
@@ -1007,6 +1196,43 @@ ELISA:
 | 細胞分選 | 噴嘴振動讓液流斷成規則的液滴;含要收的細胞的液滴帶電,正電的液滴偏向負極板,沒帶電的進廢液;一滴通常只包一個細胞 | Adan 2017 Electrostatic cell sorting 與 Figure 4;McKinnon 2018 Cell Sorters;Basu S, et al. 2010,J Vis Exp (41):1546(doi:10.3791/1546,PMC3144656) |
 | 液滴延遲 | 細胞從雷射流到液滴斷開點有一段時間差,儀器在那時給電,液滴斷開後帶著電 | US Patent 6,372,506 B1(Becton Dickinson,2002)Background |
 | 示意值 | 第 1 章點圖與計數速度;第 2 章樣品流寬度、細胞間隔與分布寬度;第 3 章 FSC、SSC 與大小、顆粒的對應(線性)與三群白血球的位置;第 4 章蛋白與抗體的數量、光路的排法;第 5 章各族群的位置、大小、陽性比例(70%、15%、5%)與螢光強度;第 6、7 章峰的 CV 3%、細胞核數、G2 比例、碎片、樣品 2C = 1.30 pg(番茄的峰位置由此換算為第 301.5 通道);第 8 章液滴大小、速度、延遲與偏轉路徑 | 示意,不是實驗結果 |
+
+#### 進階章節(2026-10-27)
+
+接在原本 8 章之後的兩章,章名以「進階:」開頭,章節代號 `compensation`、`endoreduplication`(網址 `#compensation`、`#endoreduplication`)。共 10 章。
+
+**第 9 章 進階:多色螢光的補償(18 秒)**
+
+- 內容:FITC 的放射光拖著長尾巴,一段落進 PE 偵測器的範圍(溢漏);用只染 FITC 的單染對照算溢漏係數;補償就是從 PE 扣掉 k × FITC,顏色多時把溢漏係數排成矩陣 S、乘上它的反矩陣;補償不足時 FITC 陽性的細胞斜斜往上,過度時被壓到零以下;補償剛好時,光子計數的誤差讓那一群在 PE 方向變寬,補償扣不掉。
+- 公式:溢漏係數 s = (陽性的 PE 中位數 − 陰性的 PE 中位數) ÷ (陽性的 FITC 中位數 − 陰性的 FITC 中位數);PE(補償後)= PE − k × FITC;多色時「真的 = 量到 × S⁻¹」。補償正確的判準:補償後,FITC 很亮的細胞和陰性細胞在 PE 偵測器的中位數相同(Roederer 2001 第 201 頁)。寬度用穩健標準差 rSD = (第 84.13 − 第 15.87 百分位) ÷ 2。
+- 控制項:補償 k(0 到 30%,預設 18%)、FITC 陽性細胞的亮度(暗 1,500、中 8,000、亮 40,000 單位)。
+- 示意的模型與數值:FITC 溢到 PE 偵測器 18%(PE 溢到 FITC 設成 0);每 1 單位訊號 0.1 個光電子(Poisson,用常態近似)加 15 單位電子雜訊;自發螢光 FITC 100、PE 60;染料量是對數常態(CV 30%);樣品陰性 1,400、FITC 陽性 1,100、PE 陽性 900 個,單染對照陰性與陽性(亮度 20,000)各 800 個,固定亂數種子;放射光譜的形狀(峰在 FITC 520、PE 578 nm,照 Adan 等 2017)與濾鏡範圍(515 到 545、564 到 606 nm)是示意;點圖用反雙曲正弦刻度 asinh(x ÷ 150)(Logicle 一類的畫法,參數是示意);「剛好」的容許範圍 max(陰性 rSD, 0.35 × 陽性 rSD) 是為了畫面判斷訂的。
+- node 驗算(用頁面本身的程式):單染對照 s = (3,647.4 − 61.2) ÷ (20,116.7 − 97.5) = 17.91%;補償 18% 時 FITC 陽性與陰性在 PE 的中位數 38.6 對 42.3(暗)、37.7 對 42.3(中)、37.3 對 42.3(亮);中亮度不補償 1,497.5、補償 30% 時 −931.2;補償剛好時 FITC 陽性的寬度 66、138、299(陰性約 29),亮 ÷ 中 = 2.17,接近 √(40,000 ÷ 8,000) = 2.24,符合「光子計數的誤差和訊號的平方根成正比」。
+- 來源:Roederer 2001(補償的定義、模型、光子計數的誤差和平方根成正比且過度補償也消不掉、對數刻度看不準中位數、FMO 對照);Maecker 與 Trotter 2006(單染對照要和樣品一樣亮或更亮、先設好電壓);Roca 等 2021(溢漏係數是陽性與陰性中位數連線的斜率、補償是乘上溢漏矩陣的反矩陣、變異數隨強度線性增加);Parks 等 2006(只讀摘要:補償後有負值,對數刻度畫不出來,Logicle 是廣義的雙曲正弦)。
+
+**第 10 章 進階:核內複製(17 秒)**
+
+- 內容:細胞不分裂而 DNA 繼續複製(核內複製),每一輪細胞核的 DNA 加倍;直方圖出現 2C、4C、8C、16C 一串峰,用對數橫軸看才等距;數每個峰的細胞核比例,算核內複製指數;4C 峰也混著還在 G2 期的細胞核,流式分不出來;量基因體大小要用幼嫩的葉。
+- 公式:核內複製指數(Barow 與 Meister 2003 的 cycle value)EI = Σ(i × pᵢ) ÷ Σ pᵢ,i 是複製輪數(2C 為 0、4C 為 1……),pᵢ 是各峰的細胞核比例。
+- 控制項:器官(葉、莖)、倍性(二倍體、人工四倍體)。
+- 實測數據(不是示意):阿拉伯芥 Ag-0 各 DNA 等級的細胞核比例(%),Pacey 等 2020 附錄表 A2(葉,抽薹第一天最大的蓮座葉)與表 A3(莖),依序 2C、4C、8C、16C、32C、64C、128C、256C、512C:葉 2x 12.02、18.66、23.61、37.61、7.15、0.81、0.11、0.02、0.02;葉 4x 21.80、24.85、38.35、13.99、0.92、0.04、0、0.06、0;莖 2x 13.61、52.55、26.06、7.19、0.40、0.18、0.01;莖 4x 26.48、56.77、15.22、1.38、0.13、0.02。
+- node 驗算:葉 2x 212.32 ÷ 100.01 = 2.12、葉 4x 147.82 ÷ 100.01 = 1.48、莖 2x 128.80 ÷ 100.00 = 1.29、莖 4x 91.97 ÷ 100.00 = 0.92(Pacey 等 2020 全部 55 個品系的平均:葉 2.1 與 1.8、莖 1.3 與 1.0)。
+- 示意:峰寬(log2 單位的標準差 0.05,約 CV 3.5%)、碎片、雜訊、細胞與細胞核的畫法;四倍體的峰在以二倍體為準的橫軸上右移一格,EI 仍從自己最左邊的峰算起。
+- 來源:Pacey 等 2020(EI 公式的轉述、Ag-0 的數據、PI 染色與對數刻度、每個樣品至少 5,000 個細胞核、基因體大或倍性高的物種常常很少或沒有核內複製);Lee 等 2009(核內複製是只有 S 期與 G 期、沒有細胞分裂的循環);Galbraith 等 1991(只讀摘要:阿拉伯芥除了花序,各組織都有核內複製,程度隨組織的年齡與位置而變);Doležel 等 2007(幼嫩的葉最好、分化與老化的組織核內多倍的細胞核多,第 2236 頁;8C 以上的峰用對數橫軸,第 2242 頁圖 1;老葉可能有很多 G2 期的細胞核;CV 在對數刻度上沒有意義,第 2239 頁)。Barow 與 Meister 2003 的原文出版社擋自動讀取,沒有讀到,公式依 Pacey 等 2020 的轉述。
+
+**沒有做的**:DNA 直方圖的細胞週期擬合(G1、S、G2 的比例)這次沒有做;三色以上的補償矩陣、光譜流式、雙細胞排除也沒有談。
+
+##### 來源連結
+
+- Roederer M. Spectral compensation for flow cytometry: visualization artifacts, limitations, and caveats. Cytometry. 2001;45(3):194–205:https://pubmed.ncbi.nlm.nih.gov/11746088/ (全文 PDF:https://biotech.ufl.edu/wp-content/uploads/2021/04/Roederer-2001-Cytometry-1.pdf )
+- Maecker HT, Trotter J. Flow cytometry controls, instrument setup, and the determination of positivity. Cytometry A. 2006;69:1037–1042:https://doi.org/10.1002/cyto.a.20333
+- Roca CP, et al. AutoSpill is a principled framework that simplifies the analysis of multichromatic flow cytometry data. Nat Commun. 2021;12:2890:https://pmc.ncbi.nlm.nih.gov/articles/PMC8129071/
+- Parks DR, Roederer M, Moore WA. A new "Logicle" display method avoids deceptive effects of logarithmic scaling for low signals and compensated data. Cytometry A. 2006;69(6):541–551(只讀摘要)
+- Pacey EK, Maherali H, Husband BC. The influence of experimentally induced polyploidy on the relationships between endopolyploidy and plant function in *Arabidopsis thaliana*. Ecol Evol. 2020;10(1):198–216:https://pmc.ncbi.nlm.nih.gov/articles/PMC6972801/
+- Barow M, Meister A. Endopolyploidy in seed plants is differently correlated to systematics, organ, life strategy and genome size. Plant Cell Environ. 2003;26:571–584:https://doi.org/10.1046/j.1365-3040.2003.00988.x (未讀到原文)
+- Lee HO, Davidson JM, Duronio RJ. Endoreplication: polyploidy with purpose. Genes Dev. 2009;23(21):2461–2477:https://pmc.ncbi.nlm.nih.gov/articles/PMC2779750/
+- Galbraith DW, Harkins KR, Knapp S. Systemic endopolyploidy in *Arabidopsis thaliana*. Plant Physiol. 1991;96(3):985–989:https://pmc.ncbi.nlm.nih.gov/articles/PMC1080875/ (只讀摘要)
+- Doležel J, et al. Estimation of nuclear DNA content in plants using flow cytometry. Nat Protoc. 2007;2(9):2233–2244:https://doi.org/10.1038/nprot.2007.310 (基礎章節已列)
 
 ### 蛋白質質譜定序(`proteomics/`)
 
@@ -1070,6 +1296,475 @@ ELISA:
 - 驗證用的工具:Protein Prospector MS-Product(https://prospector.ucsf.edu/prospector/cgi-bin/msform.cgi?form=msproduct)、Expasy PeptideMass(https://web.expasy.org/peptide_mass/)
 
 未確認:Steen H, Mann M. Nat Rev Mol Cell Biol. 2004;5:699–711 與 Aebersold R, Mann M. Nature. 2003;422:198–207 全文需訂閱,這次沒有讀到內文,沒有拿來當依據。三段蛋白質序列、流出時間、強度、資料庫都是示意。
+
+#### 進階章節(2026-10-27)
+
+接在原本 7 章之後的三章,章名以「進階:」開頭,章節代號 `quant`、`tmt`、`fdr`(網址 `#quant`、`#tmt`、`#fdr`)。共 10 章。定量拆成兩章(MS1 定量一章、MS2 的同重標記一章),因為兩種做法看的是不同的譜圖,放在同一章時字幕和畫面對不起來。進階定量沿用頁面原本的示意蛋白質與「跟著看的胜肽」控制項。
+
+**第 8 章 進階:定量(一)不標記與 SILAC(17 秒)**
+
+- 內容:不標記是兩個樣品分開跑,比同一個胜肽的層析峰面積(或數鑑定到的譜圖);分開跑會帶進每一針的差異,要用全部胜肽比例的中位數標準化(前提是大部分蛋白質沒變)。SILAC 讓樣品 B 的細胞吃重的離胺酸與精胺酸,收細胞後就和 A 混在一起;同一個胜肽在 MS1 成對出現,面積比就是 B : A,進樣多少不影響。
+- 公式:SILAC 質量差 Δ = 8.014199 × K 的個數 + 10.008269 × R 的個數(Unimod #259、#267;胜肽內部接 P 而沒切開的 K、R 也算),2+ 時兩峰相差 Δ ÷ 2;不標記的面積比 = 真的比例 × (1 + 進樣差),標準化後除以全部胜肽比例的中位數。
+- 控制項:兩樣品的真實比例 B : A(1、2、4、10)、第 2 針的進樣量(−40% 到 +40%),加上原本的蛋白質與跟著看的胜肽。
+- 驗算(node,用頁面本身的程式):VNLQDAFGIK(1 個 K)Δ = 8.014199,2+ 的 m/z 552.8060 → 556.8131;HDGTAKPVSFYR(1 個 K、1 個 R)Δ = 18.022468,689.3491 → 698.3604;ELPAFVLSR(1 個 R)Δ = 10.008269,516.2978 → 521.3020;12 個示意胜肽都列在 proteomics/MAINTENANCE.md。
+- 示意:兩個樣品的比例、進樣量、第 2 針的滯留時間偏移 0.22 分、標準化剛好除掉進樣差、同位素峰高度(和第 4 章同一個 Poisson 近似)。SILAC 畫成完全標記。
+
+**第 9 章 進階:定量(二)TMT 與比例壓縮(17 秒)**
+
+- 內容:TMT 標籤接在胜肽 N 端與 K 上,每個樣品一種,總質量相同,所以同一個胜肽在 MS1 疊成一根;碎裂時放出 m/z 126、127 的報導離子,強度比就是 B : A;挑母離子的視窗裡混進別的胜肽時,它們的報導離子一起加進來,比例被拉向 1 : 1(比例壓縮);MS3(再挑一根碎片碎裂)幾乎去掉干擾,代價是鑑定數少一些。
+- 公式:標記後 M = M + 229.162932 × (1 + K 的個數)(Unimod #737);報導離子 126.12773(樣品 A)、127.12476(樣品 B);共分離干擾 f = 視窗裡別的胜肽 ÷ 全部,假設別的胜肽在兩個通道一樣多,每個通道多 I = f × (A + B) ÷ (2 × (1 − f)),量到 = (B + I) ÷ (A + I)。
+- 控制項:真實比例(和上一章共用)、共分離的干擾(0% 到 60%)、改用 MS3(開關),加上原本的蛋白質與胜肽。
+- 驗算:VNLQDAFGIK 標記後 M = 1103.597510 + 2 × 229.162932 = 1561.923374,2+ 的 m/z 781.9690;4 : 1、f = 30% 時 I = 1.0714、量到 2.448;10 : 1、f = 35% 時 I = 2.9615、量到 3.272(壓縮 3.06 倍;Ting 等 2011 量到預期 10 : 1 的比例中位數被壓縮 3.2 倍,同一個量級);f = 0 時量到 = 真的。
+- 示意:干擾比例與「兩個通道一樣多」的假設、挑選視窗旁兩根別的胜肽的位置與高度、MS3 畫成完全去掉干擾(理想化;Ting 等 2011 有干擾時 10 : 1 量到 10.5,沒干擾時 11.7)、只畫兩個通道。挑選視窗寬 2 m/z 是 Ting 等 2011 用的寬度之一。
+
+**第 10 章 進階:誘餌資料庫與錯誤率(18 秒)**
+
+- 內容:每張譜圖都會配到分數最高的胜肽,所以一定有錯配;把序列反轉當誘餌和目標一起搜尋,配到誘餌一定是錯的,錯配落在兩邊的機會一樣,所以門檻以上錯的目標約等於誘餌數;FDR ≈ 誘餌數 ÷ 目標數;q 值是讓那一筆被接受的最低 FDR,常用 1% 當門檻。
+- 公式:FDR(s) = D(s) ÷ T(s)(門檻 s 以上的誘餌數與目標數);第 i 筆目標的 q 值 = 所有能接受它的門檻(分數 ≤ 它)中 FDR 的最小值。
+- 控制項:分數門檻(0.5 到 5.5,也可以在直方圖上拖)、顯示答案(只有模擬才知道哪些目標是錯的)、「設在 FDR 1%」按鈕。
+- 模擬(示意,固定亂數種子 7):20,000 張譜圖,30% 有正確的胜肽,正確配對的分數 ~ 常態(平均 3.0、標準差 0.7),目標與誘餌各一個最好的錯配 ~ 常態(平均 1.0、標準差 0.7),取最高的那一個(串接搜尋)。分數形狀借用 Käll 等 2008 圖 5 的模擬設定;20,000 張、30% 是為了畫面訂的。
+- 驗算:目標 12,884、誘餌 7,116、正確 5,782;門檻 2.5 時目標 4,848、誘餌 227、FDR 4.68%(模擬的實際錯誤 5.51%);門檻 3.0 時 3,091、34、1.10%(實際 1.23%);q ≤ 1% 的門檻 3.0346:目標 2,968、誘餌 29、FDR 0.98%(實際錯了 33,1.11%)。二分搜尋的累計數和直接數的一樣,q 值隨分數單調。誘餌數也有隨機誤差,門檻高時只剩幾十個,估計值和實際值差 0.1 到 0.9 個百分點。
+- 頁面上的誘餌示意:畫面上方是示意蛋白質的序列與反轉後的序列(K、R 標色,看得出組成一樣)。
+
+##### 來源連結
+
+- Zhang Y, et al. Protein analysis by shotgun/bottom-up proteomics. Chem Rev. 2013;113(4):2343–2394:https://pmc.ncbi.nlm.nih.gov/articles/PMC3751594/ (第 4.1 節定量、第 5.1 節誘餌;基礎章節已列)
+- Ong SE, et al. Stable isotope labeling by amino acids in cell culture, SILAC, as a simple and accurate approach to expression proteomics. Mol Cell Proteomics. 2002;1(5):376–386:https://doi.org/10.1074/mcp.M200025-MCP200 (讀摘要;原文用氘標記的白胺酸)
+- Unimod #259 Label:13C(6)15N(2):https://www.unimod.org/modifications_view.php?editid1=259 ;#267 Label:13C(6)15N(4):https://www.unimod.org/modifications_view.php?editid1=267 ;#737 TMT6plex:https://www.unimod.org/modifications_view.php?editid1=737
+- Thompson A, et al. Tandem mass tags: a novel quantification strategy for comparative analysis of complex protein mixtures by MS/MS. Anal Chem. 2003;75(8):1895–1904:https://doi.org/10.1021/ac0262560 (讀摘要)
+- Ting L, Rad R, Gygi SP, Haas W. MS3 eliminates ratio distortion in isobaric multiplexed quantitative proteomics. Nat Methods. 2011;8(11):937–940:https://pmc.ncbi.nlm.nih.gov/articles/PMC3205343/ (注意:不是 PMC3205864)
+- Elias JE, Gygi SP. Target-decoy search strategy for increased confidence in large-scale protein identifications by mass spectrometry. Nat Methods. 2007;4(3):207–214:https://doi.org/10.1038/nmeth1019 (讀摘要)
+- Elias JE, Gygi SP. Target-decoy search strategy for mass spectrometry-based proteomics. Methods Mol Biol. 2010;604:55–71:https://pmc.ncbi.nlm.nih.gov/articles/PMC2922680/
+- Käll L, Storey JD, MacCoss MJ, Noble WS. Assigning significance to peptides identified by tandem mass spectrometry using decoy databases. J Proteome Res. 2008;7(1):29–34:https://doi.org/10.1021/pr700600n
+- Deutsch EW, et al. Human Proteome Project mass spectrometry data interpretation guidelines 2.1. J Proteome Res. 2016;15(11):3961–3970:https://pmc.ncbi.nlm.nih.gov/articles/PMC5096969/
+
+## 生化進階
+
+入口的「生化進階」一區(2026-10-27 起)給做過基礎實驗的大學部高年級與研究生:假設讀者看過「生化原理」對應的那一份,直接用公式、統計與接近真實的數據樣子,並在畫面上讓讀者調參數看計算結果怎麼變。和生化原理共用同一個播放器與版面;動畫裡的計算照公式真的算,模擬資料(計數、頻率、序列、曲線)是示意,各節列出公式與數值的來源。
+
+### 轉錄體分析:從定序資料找出候選基因(`transcriptomics/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/transcriptomics/
+
+RNA-seq 資料怎麼分析到挑出萜類合成酶候選:FASTQ 與 Phred 品質分數、修剪接頭與低品質尾巴;有參考基因體時跨過內含子比對,沒有時(很多針葉樹)用 k-mer 與 de Bruijn 圖從頭組裝;計數、RPKM 與 TPM、DESeq2 的 size factor;生物重複與負二項變異;Benjamini–Hochberg 校正與火山圖;最後用 BLAST、Pfam 結構域、完整讀框、處理後上升與和萜類含量的相關挑出候選,再交給選殖、酵素反應與 qPCR 確認。生化進階分區的教材,8 章,138 秒,用共用播放器 `assets/bio-lesson.js`。先看的基礎教材是 `sequencing/`(DNA 定序)與 `terpene-synthase/`(萜類合成酶)。
+
+- 第 1 章 `#fastq`:一條 60 個鹼基的 read 的 FASTQ 四行;品質字元 → ASCII − 33 → Q → p(I、?、+ 三個例子);品質長條圖、讀進接頭的 12 個;先切接頭,再用 4 個鹼基的窗格照 Trimmomatic 的規則修剪,寫出保留幾個與 Σp
+- 第 2 章 `#align`:外顯子接成 mRNA,40 條 read 對回基因體,跨接點的 10 條拆成兩段跳過內含子;不會跨內含子時少算 25%;6 條落在和另一個很像的萜類合成酶相同的那段,兩邊都對得上
+- 第 3 章 `#assemble`:挪威雲杉與阿拉伯芥的基因體大小;兩種異構體(外顯子 2 有或沒有)切成 k-mer 的 de Bruijn 圖,分岔與會合;k = 3、5 時重複的小段被黏成同一個節點、出現多餘的岔路與環,k = 7 時只剩兩種剪接造成的分岔;Trinity 的輸出命名
+- 第 4 章 `#tpm`:5 個基因的轉錄體,原始計數、RPKM、TPM 三欄並排,對照與處理(定序量 2 倍)各一條;萜類合成酶增加 8 倍時 TPM 加總仍是一百萬、RPKM 加總改變、沒變的肌動蛋白 TPM 少了 29%
+- 第 5 章 `#size-factor`:2,000 個基因,處理組 80 個基因大量上升占掉讀數;B ÷ A 的直方圖、總讀數比與 size factor(median of ratios)的位置,沒變的基因用兩種方法校正後是幾倍
+- 第 6 章 `#replicates`:一個真的上升 2 倍的基因在 2、3、5 個重複時的點、95% 範圍與 p 值;4,000 個基因的平均與變異數(卜瓦松的線與負二項的曲線);CV² = 1/μ + α 拆成定序與個體兩項
+- 第 7 章 `#de-test`:p 值直方圖(有差異的與沒有差異的分開上色)、只看 p < 0.05 時選出的基因裡多少其實沒有差異;BH 的排序圖與 (i/m)·q 線;火山圖從未校正的 p 移到校正後的 p,依門檻分上下調
+- 第 8 章 `#candidates`:46 → 31 → 19 → 處理後上升 → 和單萜含量相關的篩選;參考的大冷杉 pinene 合成酶(UniProt O24475)與候選的結構域地圖;12 棵樹的表現量與含量散布圖、r 與五項檢查表;候選 A(五關都過)、B(讀框缺 5′ 端)、C(P450,不是萜類合成酶)
+- 控制項:修剪門檻 Q15、Q20、Q30;會不會跨內含子;k = 3、5、7;處理組萜類合成酶增加 8 倍(開關);大量上升的基因占掉的讀數(不變、約 20%、約 40%);每組 2、3、5 個生物重複;FDR 0.01、0.05、0.1;倍數門檻 1.5、2、4 倍;候選 A、B、C
+- 計算都在瀏覽器裡照公式算(固定亂數種子),不是寫死的數字
+
+#### 數值與示意
+
+有出處的定義與數值:
+
+- FASTQ 每筆四種行:@ 名稱、序列、+、品質;Sanger FASTQ 用 ASCII 33 到 126 表示 PHRED 0 到 93(舊的 Illumina 1.3+ 用 64)(Cock 等 2010)。名稱行範例 `@SIM:1:FCX:1:15:6329:1045 1:N:0:2` 取自 Illumina BaseSpace 的 FASTQ 說明。
+- Q = −10·log₁₀(e),Q10、Q20、Q30 判讀錯的機率 1/10、1/100、1/1,000(Illumina Quality Scores 頁);phred 為每個鹼基估計錯誤機率(Ewing 與 Green 1998,摘要)。
+- 品質越往 3′ 端越差,太低時要修掉(Conesa 等 2016);片段比讀長短時讀進接頭(Bolger 等 2014);Trimmomatic 的滑動窗格:`SLIDINGWINDOW:4:15` 表示 4 個鹼基平均低於 15 就切(README),切點與去尾巴的細節照 `SlidingWindowTrimmer.java`;TruSeq 第一讀接頭 AGATCGGAAGAGCACACGTCTGAACTCCAGTCA(cutadapt 文件,頁面用前 12 個)。
+- 比對要用能跨接點(spliced)的軟體(Conesa 等 2016;STAR 見 Dobin 等 2013,HISAT2 見 Kim 等 2019);多處比對主要來自重複序列與旁系同源基因的共同結構域,HTSeq-count、featureCounts 常丟掉,RSEM、eXpress、Sailfish、kallisto 依機率分配(Conesa 等 2016)。雲杉至少 69 個有轉錄的萜類合成酶(Keeling 等 2011)。
+- 挪威雲杉基因體約 20 Gb,第一個裸子植物基因體,阿拉伯芥小 100 倍以上,很多超過 10,000 bp 的內含子(Nystedt 等 2013,摘要);火炬松內含子平均超過 2.7 kbp、有的超過 100 kbp,重複序列約 82%(Neale 等 2014)。頁面寫「針葉樹的內含子常有幾千個鹼基,有的超過 10 萬」。
+- de Bruijn 圖:節點是 k 個鹼基、重疊 k − 1 個就連邊,預設 k = 25;報出異構體;在不同基因裡重複的序列造成模糊(Grabherr 等 2011)。命名 `TRINITY_DN1000_c115_g5_i1`:read 群、基因、異構體(Trinity wiki)。沒有基因體時,組裝的轉錄體對找松樹的萜類合成酶很重要(Hall 等 2013:受傷加茉莉酸甲酯處理的莖,Trinity 組裝,BLAST e 值小於 10⁻⁵)。
+- RPKM = 計數 × 10⁹ ÷(長度 × 總讀數);TPM = 10⁶ × (計數 ÷ 長度) ÷ Σ(計數 ÷ 長度)(Zhao 等 2020);RPKM 的平均依樣品而變,TPM 修正了這一點(Wagner 等 2012,摘要);RPKM 與 FPKM 在單端定序時相同,三者都是樣品內的量,遇到少數高表現又有差異的基因時表現不好(Conesa 等 2016)。
+- size factor:各樣品計數對幾何平均的比值取中位數(Anders 與 Huber 2010;Love 等 2014);一個條件裡有大量獨有或高表現的基因時,只用總讀數校正會偏(Robinson 與 Oshlack 2010)。
+- 負二項:平均 = size factor × q,變異數 μ + αμ²(Love 等 2014);卜瓦松的變異數等於平均(Anders 與 Huber 2010);同一管 RNA 重測照卜瓦松變,CV² = 1/μ + φ,技術的 CV 隨計數變大而變小,BCV 不會(edgeR User's Guide 2.9.2 節,2026-04-25 版)。
+- 重複:至少 3 個生物重複(Conesa 等 2016);建議至少 6 個,3 個重複時多數工具只找到 20% 到 40% 的顯著差異基因(Schurch 等 2016)。
+- BH:k 為最後一個 P₍ᵢ₎ ≤ (i/m)q* 的 i,拒絕前 k 個,獨立時控制 FDR 於 q*(Benjamini 與 Hochberg 1995 第 3.1 節);校正後 p = min(m·p₍ᵢ₎/i, 1) 再由大往小取最小值(PSU STAT 555 第 4.3 節,R 的 `p.adjust` 同法)。DESeq2 用 Wald 檢定與 BH 校正(Love 等 2014)。火山圖:−log₁₀ p 對 log₂ 倍數(Cui 與 Churchill 2003)。
+- E 值:分數至少 S 的比對碰巧出現的預期個數(NCBI BLAST 統計說明;Karlin 與 Altschul 1990)。
+- Pfam:PF01397 Terpene synthase, N-terminal domain(IPR001906);PF03936 Terpene synthase family, metal binding domain(IPR005630);PF00067 Cytochrome P450(InterPro)。
+- UniProt O24475(大冷杉 pinene 合成酶):628 個胺基酸,轉運胜肽 1–36,DDXXD 379–383,Mg²⁺ 結合位 379、383、531;InterPro 的 Pfam 位置 PF01397 74–265、PF03936 332–566(2026-10-27 查)。
+- 單萜合成酶 600 到 650 個胺基酸、N 端有送進質體的轉運胜肽、DDxxD 固定二價金屬離子、只靠序列比對不能判定功能(Bohlmann 等 1998);只看序列相似度無法準確預測功能(Keeling 等 2011)。臺灣杉的 5 個候選 593 到 628 個胺基酸、BLAST 的 E 值都是 0.0、用 RACE 取得全長(Ma 等 2021)。
+
+示意(頁面「資料來源」最後一條也有寫):
+
+- 第 1 章的插入片段與 60 個品質分數;第 2 章 900 個鹼基的 mRNA、40 條讀長 100 的 read 與相同的那一段(610 到 860);第 3 章三個外顯子序列(ATGGCGGGTTCG、AGCCATGT、TCGGATAACCAC,刻意設計成 k = 5 時有一個重複的小段);第 4 章 5 個基因的長度與分子數、總讀數 1,000 萬與 2,000 萬(整個轉錄體只有 5 個基因,所以 RPKM、TPM 的數值比實際大);第 5 章 2,000 個基因(其中 80 個上升)、總讀數 1,000 萬與 1,500 萬。
+- 第 6 到 8 章:4,000 個基因、每組最多 5 個重複,10% 有差異,離散度趨勢 α = 0.06 + 1/μ;例子基因(對照 260、處理後 2 倍);46 個像萜類合成酶的基因與 31、19 的篩選個數;12 棵樹的單萜含量;候選 A、B、C 的長度、結構域位置與 BLAST 結果。檢定是簡化的 Wald 檢定(離散度直接用趨勢值),不是完整的 DESeq2;換 30 個種子平均,FDR 0.05 時實際的偽發現比例約 4% 到 5%,頁面用的種子在 3.2% 到 4.9%。
+- 驗算過的數值(node,用頁面的計算區段):Q20 修剪保留 43 個,Σp 2.246 → 0.035;萜類合成酶增加 8 倍時 B 的 RPKM 加總 478,088(A 為 469,613)、TPM 加總都是 1,000,000、肌動蛋白 TPM 352,941 → 250,000;占掉 40% 時沒變的基因用總讀數校正 0.663 倍、用 size factor 0.988 倍;每組 3 重複時 p < 0.05 有 455 個(164 個其實沒差異),FDR 0.05 時 227 個(10 個沒差異);BH 原論文第 3.2 節的 15 個 p 值,本頁的 `bhK` 也是拒絕 4 個。
+
+教學示意:不可用於實際的差異表現分析或候選判斷。
+
+#### 技術
+
+單一 HTML 檔(transcriptomics/index.html),2D canvas 動畫,用生化原理分區共用的 assets/bio-lesson.js(播放器)、assets/bio-draw.js(畫圖工具,含固定種子的 `rng`)、assets/bio-lesson.css(版面),不需要建置、沒有外部依賴;示意資料與所有統計在載入時於瀏覽器裡算(約 40 毫秒),計算區段夾在 `// ===== 計算開始` 與 `// ===== 計算結束` 之間,可以單獨抽出來用 node 驗算。入口卡片圖 assets/transcriptomics.svg。程式分區、每章的時間點、預期的驗算值與修改方式見 transcriptomics/MAINTENANCE.md。
+
+#### 來源連結
+
+- Conesa A, et al. A survey of best practices for RNA-seq data analysis. Genome Biol. 2016;17:13:https://pmc.ncbi.nlm.nih.gov/articles/PMC4728800/
+- Cock PJ, et al. The Sanger FASTQ file format for sequences with quality scores, and the Solexa/Illumina FASTQ variants. Nucleic Acids Res. 2010;38(6):1767–1771:https://pmc.ncbi.nlm.nih.gov/articles/PMC2847217/
+- Ewing B, Green P. Base-calling of automated sequencer traces using phred. II. Error probabilities. Genome Res. 1998;8(3):186–194:https://doi.org/10.1101/gr.8.3.186 (只讀到摘要)
+- Illumina, Quality Scores for Next-Generation Sequencing:https://www.illumina.com/science/technology/next-generation-sequencing/plan-experiments/quality-scores.html ;BaseSpace FASTQ files:https://help.basespace.illumina.com/files-used-by-basespace/fastq-files
+- Bolger AM, et al. Trimmomatic: a flexible trimmer for Illumina sequence data. Bioinformatics. 2014;30(15):2114–2120:https://pmc.ncbi.nlm.nih.gov/articles/PMC4103590/ ;Trimmomatic 原始碼與 README:https://github.com/usadellab/Trimmomatic
+- cutadapt 使用說明(TruSeq 接頭):https://cutadapt.readthedocs.io/en/stable/guide.html
+- Dobin A, et al. STAR: ultrafast universal RNA-seq aligner. Bioinformatics. 2013;29(1):15–21:https://pmc.ncbi.nlm.nih.gov/articles/PMC3530905/ ;Kim D, et al. HISAT2. Nat Biotechnol. 2019;37:907–915:https://pmc.ncbi.nlm.nih.gov/articles/PMC7605509/
+- Nystedt B, et al. The Norway spruce genome sequence and conifer genome evolution. Nature. 2013;497:579–584:https://doi.org/10.1038/nature12211 (只讀到摘要)
+- Neale DB, et al. Decoding the massive genome of loblolly pine. Genome Biol. 2014;15:R59:https://pmc.ncbi.nlm.nih.gov/articles/PMC4053751/
+- Grabherr MG, et al. Trinity: reconstructing a full-length transcriptome without a genome from RNA-Seq data. Nat Biotechnol. 2011;29(7):644–652:https://pmc.ncbi.nlm.nih.gov/articles/PMC3571712/ ;Trinity 輸出說明:https://github.com/trinityrnaseq/trinityrnaseq/wiki/Output-of-Trinity-Assembly
+- Hall DE, et al. Transcriptome resources and functional characterization of monoterpene synthases for two host species of the mountain pine beetle. BMC Plant Biol. 2013;13:80:https://pmc.ncbi.nlm.nih.gov/articles/PMC3668260/
+- Keeling CI, et al. Transcriptome mining, functional characterization, and phylogeny of a large terpene synthase gene family in spruce. BMC Plant Biol. 2011;11:43:https://pmc.ncbi.nlm.nih.gov/articles/PMC3058080/
+- Mortazavi A, et al. Mapping and quantifying mammalian transcriptomes by RNA-Seq. Nat Methods. 2008;5:621–628:https://doi.org/10.1038/nmeth.1226
+- Wagner GP, et al. Measurement of mRNA abundance using RNA-seq data: RPKM measure is inconsistent among samples. Theory Biosci. 2012;131(4):281–285:https://doi.org/10.1007/s12064-012-0162-3 (只讀到摘要)
+- Zhao S, et al. Misuse of RPKM or TPM normalization when comparing across samples and sequencing protocols. RNA. 2020;26(8):903–909:https://doi.org/10.1261/rna.074922.120
+- Love MI, et al. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 2014;15:550:https://pmc.ncbi.nlm.nih.gov/articles/PMC4302049/
+- Anders S, Huber W. Differential expression analysis for sequence count data. Genome Biol. 2010;11:R106:https://pmc.ncbi.nlm.nih.gov/articles/PMC3218662/
+- Robinson MD, Oshlack A. A scaling normalization method for differential expression analysis of RNA-seq data. Genome Biol. 2010;11:R25:https://pmc.ncbi.nlm.nih.gov/articles/PMC2864565/
+- Schurch NJ, et al. How many biological replicates are needed in an RNA-seq experiment and which differential expression tool should you use? RNA. 2016;22(6):839–851:https://pmc.ncbi.nlm.nih.gov/articles/PMC4878611/
+- edgeR User's Guide(Bioconductor,2026-04-25 版):https://bioconductor.org/packages/release/bioc/html/edgeR.html
+- Benjamini Y, Hochberg Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. J R Stat Soc B. 1995;57(1):289–300:https://doi.org/10.1111/j.2517-6161.1995.tb02031.x ;Penn State STAT 555, 4.3:https://online.stat.psu.edu/stat555/node/59/
+- Cui X, Churchill GA. Statistical tests for differential expression in cDNA microarray experiments. Genome Biol. 2003;4:210:https://pmc.ncbi.nlm.nih.gov/articles/PMC154570/
+- NCBI, The Statistics of Sequence Similarity Scores:https://www.ncbi.nlm.nih.gov/BLAST/tutorial/Altschul-1.html ;Karlin S, Altschul SF. PNAS. 1990;87(6):2264–2268:https://pmc.ncbi.nlm.nih.gov/articles/PMC53667/
+- InterPro PF01397:https://www.ebi.ac.uk/interpro/entry/pfam/PF01397/ ;PF03936:https://www.ebi.ac.uk/interpro/entry/pfam/PF03936/ ;UniProt O24475:https://www.uniprot.org/uniprotkb/O24475/entry
+- Bohlmann J, et al. Plant terpenoid synthases: molecular biology and phylogenetic analysis. PNAS. 1998;95(8):4126–4133:https://pmc.ncbi.nlm.nih.gov/articles/PMC22453/
+- Ma LT, et al. Unveiling monoterpene biosynthesis in *Taiwania cryptomerioides* via functional characterization. Plants. 2021;10(11):2404:https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/
+- 只寫在 MAINTENANCE.md、頁面沒有列的:Foster AJ, et al. Plant Physiol. 2013;161(4):1993–2004(西部紅側柏腺體,依摘要);Martin D, et al. Plant Physiol. 2002;129(3):1003–1018(茉莉酸甲酯與創傷樹脂道,依摘要);Chen C, et al. BMC Genomics. 2018;19:550(樟樹化學型的 RNA-seq,https://pmc.ncbi.nlm.nih.gov/articles/PMC6057064/ );Everaert C, et al. Sci Rep. 2017;7:1559(RNA-seq 與 qPCR 的一致性,https://pmc.ncbi.nlm.nih.gov/articles/PMC5431503/ );TransDecoder wiki(https://github.com/TransDecoder/TransDecoder/wiki )
+
+未確認:Compeau PEC 等 2011(Nat Biotechnol 29:987–991,de Bruijn 圖的教學)這次讀不到內文,沒有拿來當依據;重複小段讓圖打結的說法依 Grabherr 等 2011。
+
+### 萜類前驅物:MEP 與 MVA 兩條路(`terpenoid-precursors/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/terpenoid-precursors/
+
+萜類的 5 碳積木 IPP 與 DMAPP 從哪裡來:質體的 MEP 路徑(丙酮酸 + G3P → DXP → MEP → … → HMBPP → IPP 與 DMAPP)與細胞質的 MVA 路徑(3 個乙醯輔酶 A → HMG-CoA → 甲羥戊酸 → IPP,IDI 換成 DMAPP)。算兩條路的碳與輔因子帳,看接長鏈時 DMAPP 與 IPP 要怎麼配、IDI 要轉多少,用金魚草花的抑制劑與氘標記實驗說明怎麼判斷萜類的碳從哪條路來,最後是內質網上的 CYP720B 把雙萜骨架氧化成針葉樹的樹脂酸。生化進階分區的動畫教材,接在「萜類合成酶」(`terpene-synthase/`)之後,版型和生化原理分區相同。
+
+- 8 章,共 131 秒:細胞裡的兩個工廠、MVA 路徑、MEP 路徑、接長鏈(IPP 與 DMAPP 要怎麼配)、抑制劑、同位素標記(質譜上的 +2、+4、+6)、P450 做出樹脂酸、從光合作用到精油與樹脂
+- 可以自己調:接成多長的鏈(GPP、FPP、GGPP;第 4、8 章)、抑制劑(不加、lovastatin、fosmidomycin)、標記前驅物(²H₂-DOX、²H₂-MVL)與每個 5 碳單位帶標記的機率 p、P450(CYP720B1、CYP720B4)、走哪一條路(MEP、MVA)
+- 第 2、3 章的分子畫成碳珠(依來源上色:三個乙醯基;丙酮酸與 G3P),可以看出哪個碳變成 CO₂、DXR 怎麼把直鏈重排成分岔;第 7 章是松香烷骨架的線條式
+
+#### 數值與示意
+
+有出處:
+
+- 分區與產物:MVA 在細胞質,主要做倍半萜、三萜、固醇(與油菜素固醇、泛醌側鏈);MEP 在質體,主要做異戊二烯、單萜、雙萜(含吉貝素)、類胡蘿蔔素、葉綠素與生育醇、質體醌的側鏈(Laule 2003、Bick & Lange 2003、Tholl & Lee 2011)。HMGR 在內質網膜上、是限速步驟之一(Leivar 2005);PMK、MVD 在過氧化體(Simkin 2011),IDI 也在過氧化體(Sapir-Mir 2008)。被子植物在一般條件下,葉綠素的側鏈、三萜、類胡蘿蔔素幾乎只來自各自的路,其他萜類常有兩種來源(Hemmerlin 2012 的摘要)。
+- 反應式(KEGG M00095、M00096 的各步反應):MVA 每個 IPP 用 3 乙醯輔酶 A + 2 NADPH + 3 ATP,放 1 個 CO₂;MEP 每個 IPP 或 DMAPP 用丙酮酸 + G3P + NADPH + CTP + ATP + 4 個還原態鐵氧化還原蛋白,放 1 個 CO₂。
+- HDR 的產物 IPP:DMAPP:菸草 BY-2 細胞 85:15(Tritsch 2010 的摘要),大腸桿菌的 IspH 5:1(Rohdich 2002;Zhao 2013),Tholl & Lee 2011 寫「5 到 6:1」。頁面用 85:15。
+- 抑制劑:lovastatin(mevinolin)是 HMGR 的競爭性抑制劑,Ki 0.6 nM(Alberts 1980);fosmidomycin 抑制 DXR(Mueller 2000;Jomaa 1999)。
+- 金魚草(Dudareva 2005,PMC545543):花枝插在含 2 mg/mL [5,5-²H₂]-DOX 或 3 mg/mL [2,2-²H₂]-MVL 的 5% 蔗糖水;GC-MS 以位移離子 ÷(位移 + 未位移)算標記比例,月桂烯用 m/z 93、95、97;DOX 讓單萜出現 +2、+4、橙花叔醇出現 +2、+4、+6,MVL 沒有標記單萜但標記橙花叔醇;fosmidomycin 100 μM 讓單萜 3 小時內少 60%,橙花叔醇較慢下降;mevinolin 100 μM 對橙花叔醇幾乎沒有影響;花瓣的 MVA 在甲羥戊酸之前停住;+6 表示質體送出的是 IPP 或 DMAPP(只送 GPP 時倍半萜最多 +4)。
+- 阿拉伯芥幼苗:lovastatin 讓固醇先降、再回升到高於對照,類胡蘿蔔素與葉綠素暫時增加(Laule 2003)。
+- [1-¹³C] 葡萄糖經糖解後,5 碳單位的 1 號碳只經 MEP 帶標記,2、4 號碳只經 MVA,5 號碳兩條都會,約為葡萄糖標記的 50%(Skorupinska-Tudek 2008)。頁面依反應追出的碳對應(MVA:IPP 的 1、2 號碳來自第一個乙醯基、3 號與 5 號碳來自第二個、4 號碳來自第三個,第三個的羰基碳變成 CO₂;MEP:IPP 的 1、2、4 號碳來自 G3P,3、5 號碳來自丙酮酸)與此一致。
+- 樹脂酸:火炬松 CYP720B1 在 18 號碳做醇 → 醛 → 酸,微粒體對 abietadiene 測不到活性、酵母中約 2%(Ro 2005);LAS 做出 levopimaradiene、abietadiene、palustradiene、neoabietadiene,LAS 在質體、CYP720B1 在內質網(Ro & Bohlmann 2006 的摘要);西加雲杉 CYP720B4 能氧化 24 種雙萜,在酵母裡把 abietadiene 一路做到松香酸;莖外層雙萜類 92% 樹脂酸、5% 醛、3% 醇、不到 1% 烯(Hamberger 2011)。GC-MS 前樹脂酸先甲基化(Ro 2005 的方法)。松節油來自單萜合成酶、松香是雙萜樹脂酸的部分(Phillips 2003 的摘要);木材抽出物與硫酸鹽法製漿的妥爾油含樹脂酸(Foster 1980 的摘要)。
+- 理論質量產率(由葡萄糖、含輔因子的成本):MEP 30%、MVA 25%(Zhao 2013)。
+
+照公式算(頁面裡真的計算,用 node 驗算過):
+
+- 碳帳(從三碳化合物算起):MEP 每個 5 碳單位進 6 個碳、放 1 個 CO₂,留 5/6 = 83.3%;MVA 進 9 個碳(3 個丙酮酸)、放 4 個 CO₂,留 5/9 = 55.6%。C₁₀、C₁₅、C₂₀ 依次是 MEP 12、18、24 個碳,MVA 18、27、36 個碳。
+- IDI:5n 個碳的鏈要 DMAPP 1/n,原料已有 d₀,IDI 要轉 1/n − d₀:GPP(質體,d₀ = 0.15)35%、FPP(細胞質,d₀ = 0)33.3%、GGPP(質體)10%;60 格原料池分別轉 21、20、6 格。
+- 二項分布:P(+2k) = C(n,k)·p^k·(1 − p)^(n−k),被標記的比例 1 − (1 − p)^n。p = 0.3:單萜 49%、42%、9%(51%),倍半萜 34.3%、44.1%、18.9%、2.7%(65.7%)。
+
+示意(頁面「資料來源」最後一條也有寫):
+
+- 細胞與胞器的形狀;分子畫成碳珠加部分官能基;MEcPP 的環畫成一條弧。
+- 第 4 章的 60 格原料池與 IDI 轉換量只算單一產物的帳;實際的 IDI 量由整體需求與調控決定。
+- 第 5 章的時間曲線:只有「fosmidomycin 讓單萜 3 小時內少 60%」取自論文;橙花叔醇下降的形狀(3 小時約 74、12 小時 48)、lovastatin 的平線(100 ± 1.5)、照課本分工的預期(虛線)都是依論文文字畫的示意;lovastatin 下的單萜論文沒有給數據,頁面不畫。
+- 第 6 章的二項分布模型、p 值與長條高度(論文沒有用這個模型,長條不是實測,沒有計入天然同位素與氘的同位素效應)。
+- 第 7 章的酵素形狀;第 8 章的流程圖版面,碳帳不含運輸、輔因子再生與光合作用本身的成本。
+
+教學示意:長條、曲線與碳帳是用來說明判斷的方法,不是實驗數據,不可用來推定實樣的生合成來源。
+
+#### 技術
+
+單一 HTML 檔(terpenoid-precursors/index.html),2D canvas 動畫,用共用的 assets/bio-lesson.js(播放器)、assets/bio-draw.js(畫圖工具)與 assets/bio-lesson.css(版面);分子由頁面裡的 `drawMol()` 畫(兩個狀態之間內插位置、鍵與官能基),不需要建置,不使用到站人數計數。入口卡片概念圖 assets/terpenoid-precursors.svg。分頁列暫時只有「← 儀器入口」與本頁(`aria-label="生化進階"`),等生化進階分區成立後換成整區的分頁列。程式分區、每章的時間點與修改方式見 terpenoid-precursors/MAINTENANCE.md。
+
+#### 來源連結
+
+- Hemmerlin A, et al. 2012, Prog Lipid Res 51(2):95–148(只讀到摘要):https://doi.org/10.1016/j.plipres.2011.12.001
+- Tholl D, Lee S. 2011, Arabidopsis Book 9:e0143:https://pmc.ncbi.nlm.nih.gov/articles/PMC3268506/
+- Laule O, et al. 2003, Proc Natl Acad Sci USA 100:6866–6871(只讀到摘要):https://doi.org/10.1073/pnas.1031755100
+- Bick JA, Lange BM. 2003, Arch Biochem Biophys 415:146–154(只讀到摘要):https://doi.org/10.1016/s0003-9861(03)00233-9
+- Leivar P, et al. 2005, Plant Physiol 137:57–69(只讀到摘要):https://doi.org/10.1104/pp.104.050245
+- Simkin AJ, et al. 2011, Planta 234:903–914(只讀到摘要):https://doi.org/10.1007/s00425-011-1444-6
+- Sapir-Mir M, et al. 2008, Plant Physiol 148:1219–1228(依標題):https://doi.org/10.1104/pp.108.127951
+- KEGG 模組 M00095:https://www.kegg.jp/module/M00095 ;M00096:https://www.kegg.jp/module/M00096 ;反應式以 KEGG REST 讀取(例如 https://rest.kegg.jp/get/R01121)
+- Tritsch D, et al. 2010, FEBS Lett 584(1):129–134(只讀到摘要):https://doi.org/10.1016/j.febslet.2009.11.010
+- Rohdich F, et al. 2002, Proc Natl Acad Sci USA 99:1158–1163:https://pmc.ncbi.nlm.nih.gov/articles/PMC122160/
+- Zhao L, et al. 2013, Annu Rev Biochem 82:497–530:https://pmc.ncbi.nlm.nih.gov/articles/PMC5031371/
+- Alberts AW, et al. 1980, Proc Natl Acad Sci USA 77:3957–3961:https://pmc.ncbi.nlm.nih.gov/articles/PMC349746/ ;PubChem lovastatin(同義名 mevinolin):https://pubchem.ncbi.nlm.nih.gov/compound/53232
+- Mueller C, et al. 2000, Biochem Soc Trans 28:792–793(只讀到摘要):https://doi.org/10.1042/bst0280792 ;Jomaa H, et al. 1999, Science 285:1573–1576(只讀到摘要):https://doi.org/10.1126/science.285.5433.1573
+- Dudareva N, et al. 2005, Proc Natl Acad Sci USA 102(3):933–938:https://pmc.ncbi.nlm.nih.gov/articles/PMC545543/
+- Hemmerlin A, et al. 2006, Plant Physiol 142:441–457(DOX 在細胞質被磷酸化,只讀到摘要):https://doi.org/10.1104/pp.106.086652
+- Skorupinska-Tudek K, et al. 2008, J Biol Chem 283(30):21024–21035:https://pmc.ncbi.nlm.nih.gov/articles/PMC3258935/
+- Lichtenthaler HK, et al. 1997, FEBS Lett 400(3):271–274(只讀到摘要):https://doi.org/10.1016/s0014-5793(96)01404-4 ;Rohmer M, et al. 1993, Biochem J 295:517–524(只讀到摘要):https://pmc.ncbi.nlm.nih.gov/articles/PMC1134910/
+- Ro DK, et al. 2005, Proc Natl Acad Sci USA 102(22):8060–8065:https://pmc.ncbi.nlm.nih.gov/articles/PMC1138258/
+- Ro DK, Bohlmann J. 2006, Phytochemistry 67(15):1572–1578(只讀到摘要):https://doi.org/10.1016/j.phytochem.2006.01.011
+- Hamberger B, et al. 2011, Plant Physiol 157(4):1677–1695:https://pmc.ncbi.nlm.nih.gov/articles/PMC3327196/
+- Phillips MA, et al. 2003, Arch Biochem Biophys 411:267–276(只讀到摘要):https://doi.org/10.1016/s0003-9861(02)00746-4
+- Foster DO, Zinkel DF, Conner AH. 1980, Tappi 63(12):103–105(只讀到摘要):https://research.fs.usda.gov/treesearch/30550
+- Kasahara H, et al. 2002, J Biol Chem 277:45188–45194(只讀到摘要,頁面沒有列):https://doi.org/10.1074/jbc.m208659200
+- Estévez JM, et al. 2001, J Biol Chem 276:22901–22909(只讀到摘要,頁面沒有列):https://doi.org/10.1074/jbc.m100854200
+- Fatland BL, et al. 2002, Plant Physiol 130:740–756(只讀到摘要,頁面沒有列):https://doi.org/10.1104/pp.008110
+- Zeidler J, Lichtenthaler HK. 2001, Planta 213:323–326(西黃松針葉的半萜由 MEP 來,只讀到摘要,頁面沒有列):https://doi.org/10.1007/s004250100562
+- OpenStax Biology 2e, 8.3 Using Light Energy to Make Organic Molecules:https://openstax.org/books/biology-2e/pages/8-3-using-light-energy-to-make-organic-molecules
+
+未確認:Vranová E, et al. 2013 Annu Rev Plant Biol 64:665–700 與 Tholl D. 2015 Adv Biochem Eng Biotechnol 148:63–106 只讀到摘要,沒有拿來當具體數字的依據。Schwender 1996 與 Lichtenthaler 1997 的全文(標記位置的原始表格)這次讀不到,標記位置改用 Skorupinska-Tudek 2008 的全文。
+
+### 酵素動力學:Km 與 kcat 怎麼量(`enzyme-kinetics/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/enzyme-kinetics/
+
+酵素有多快、對受質多敏感,要從初速度對受質濃度的曲線求出來。生化進階分區的教材,7 章(約 2 分鐘),用共用播放器 `assets/bio-lesson.js`;例子以西加雲杉(*Picea sitchensis*)的單萜合成酶為主,先看的基礎教材是「萜類合成酶」與「基因選殖與蛋白表現」。
+
+- 第 1 章:E + S ⇌ ES → E + P 與 k₁、k₋₁、kcat;同一個酵素一次一次做出產物;產物對時間的曲線為什麼變彎(受質變少、產物抑制、酵素失活),初速度 v₀ 是開頭直線段的斜率
+- 第 2 章:萜類合成酶的測法:緩衝液裡放酵素、GPP、Mg²⁺,上蓋含內標(異丁基苯)的戊烷,30 °C 反應後搖勻,戊烷層打進 GC-MS,用產物峰對內標峰的面積比換算產物量;時間曲線上改取樣時間,看受質用掉幾 % 與 P ÷ t 低估多少
+- 第 3 章:9 個濃度的初速度連成飽和曲線,v₀ = Vmax[S]/(Km + [S]),Km 是速度一半時的 [S];低濃度近乎直線(斜率 Vmax/Km)、高濃度趨近 Vmax;Km = (k₋₁ + kcat)/k₁,kcat 遠小於 k₋₁ 時才約等於解離常數
+- 第 4 章:kcat = Vmax/[E]ₜ 與從蛋白質濃度換算 [E]ₜ;兩個酵素分子用真實時間做產物(PsTPS-3car2 每秒 0.098 個、酵素的中位數每秒約 10 個);kcat 與 kcat/Km 的對數數線
+- 第 5 章:雙倒數圖(Lineweaver–Burk)把低濃度點的誤差放大(δ/v₀²);非線性迴歸直接擬合原始數據;同樣的實驗模擬 200 次,比較兩種方法 Km 的中間 95%
+- 第 6 章:競爭型、非競爭型、反競爭型抑制的曲線、雙倒數圖的型態、和誰結合、速率式與表觀參數
+- 第 7 章:PsTPS-3car2 的 596 號 Leu 換成 Phe(或 PsTPS-sab 反過來):產物比例、kcat 與 Km 的變化
+- 控制項:取樣時間(第 2 章)、受質濃度範圍(第 3、5 章)、量測誤差與「換一組誤差」(第 5 章)、抑制型態與 [I]/Ki(第 6 章)、突變方向(第 7 章)
+
+#### 數值與示意
+
+公式(第 3 到 6 章都即時照公式算,不是寫死的數字):
+
+- v₀ = Vmax[S]/(Km + [S]);Km = (k₋₁ + kcat)/k₁;kcat = Vmax/[E]ₜ;[E]ₜ = 蛋白質濃度 ÷ 分子量;[S] 遠小於 Km 時 v₀ ≈ (kcat/Km)[E]ₜ[S];kcat/Km 的單位換算 μM⁻¹min⁻¹ × 10⁶ ÷ 60 = M⁻¹s⁻¹。
+- 雙倒數 1/v₀ = (Km/Vmax)(1/[S]) + 1/Vmax;誤差傳遞 δ(1/v₀) ≈ δ/v₀²。
+- 抑制,α = 1 + [I]/Ki:競爭型 v₀ = Vmax[S]/(αKm + [S]);非競爭型 v₀ = (Vmax/α)[S]/(Km + [S])(和 E、ES 結合的解離常數相同);反競爭型 v₀ = Vmax[S]/(Km + α[S])。
+- 非線性擬合:K 固定時最佳 V = Σv·f ÷ Σf²(f = [S]/(K + [S])),在 log K(0.01 到 10⁴ μM)上用格點加黃金分割找殘差平方和最小;雙倒數擬合是 1/v 對 1/[S] 的一般線性迴歸,v ≤ 0 的點拿掉,截距或斜率 ≤ 0 算「算不出來」。
+- 時間曲線:d[S]/dt = −V·e^(−kd·t)·[S]/(K(1 + [P]/Kp) + [S]),四階 Runge–Kutta。
+
+用 node 驗算過:沒有誤差時兩種擬合都拿回真值;非線性擬合和 20 萬格的暴力格點一致;時間曲線和積分式 Km·ln([S]₀/[S]) + ([S]₀ − [S]) = Vt 一致(差 10⁻⁷ 以內);抑制式等於用表觀參數算的 Michaelis–Menten;論文表 3 的 kcat/Km 與 kcat ÷ Km 一致。範圍 1 到 60 μM、誤差 2% 時,200 次重做的 Km 中間 95% 是非線性 13.9 到 18.9 μM、雙倒數 5.9 μM 到算不出(35 次截距或斜率 ≤ 0);範圍只到 8 μM、誤差 4% 時非線性擬合也有 20 次定不出 Km。
+
+實測(取自論文):
+
+- Roach et al. 2014 表 3(kcat 每分鐘、Km μM、kcat/Km μM⁻¹min⁻¹):PsTPS-3car2 野生型 5.86、15.8、0.37;L596F 38.57、15.3、2.52;PsTPS-sab 野生型 32.68、35.7、0.92;F596L 4.95、31.6、0.16。L596F 的 kcat 是野生型的 6.6 倍,內文的 kcat/Km 寫 2.2,頁面用表的 2.52(等於 38.57 ÷ 15.3)。表 1 的產物比例(%,(+)-3-carene、(−)-sabinene、terpinolene、其他):3car2 野生型 67.5、6.9、15.4、10.2;L596F 12.3、37.4、35.4、14.9;sab 野生型 1.3、44.7、35.9、18.1;F596L 28.6、18.7、24.9、27.8。
+- Roach et al. 2014 的方法:500 μL 反應(25 mM HEPES、100 mM KCl、10 mM MgCl₂、5 mM DTT、10% 甘油)、GPP 1 到 60 μM 共 9 個濃度、酵素 pM 級、30 °C 10 分鐘(3car2 野生型 20 分鐘)、上蓋 500 μL 含 2.5 μM 異丁基苯的戊烷、渦旋 30 秒後離心分層、GC-MS 以內標的校正係數定量、非線性迴歸(ANEMONA);同源模型裡 Phe596 離 α-terpinyl 陽離子 4 號碳不到 4 Å、Leu596 在 5 Å 外。
+- 第 4 章的萜類合成酶:檸檬烯合成酶 Km 12.6 μM、kcat 0.037 s⁻¹(Srividya et al. 2015);青蒿 β-farnesene 合成酶放射性方法 kcat 0.020 s⁻¹、Km 1.9 μM、kcat/Km 10.3 mM⁻¹s⁻¹(Vardakou et al. 2014;同一支酵素 GC-MS 方法量到 0.198 s⁻¹、11.9 μM、16.6 mM⁻¹s⁻¹,Km 與 kcat 差約 7 倍,kcat/Km 接近)。
+- 酵素 kcat 中位數約 10 s⁻¹、kcat/Km 中位數約 10⁵ M⁻¹s⁻¹、次級代謝的 kcat 中位數 2.5 s⁻¹(Bar-Even et al. 2011,依摘要與 BioNumbers);擴散上限 10⁸ 到 10⁹ M⁻¹s⁻¹(LibreTexts)。
+- 1913 年 Michaelis 與 Menten 用蔗糖酶、只量反應早期,蔗糖的常數 16.7 mM(Johnson 與 Goody 2011)。
+- 動力學實驗把反應時間調到受質用掉不超過 20%(Srividya et al. 2015);先用時間曲線找出直線段再做穩定態實驗(Vardakou et al. 2014)。
+
+示意(頁面「資料來源」最後一條也有寫):第 1、2 章的時間曲線與常數(第 1 章 [S]₀ 10 μM、V 0.3 μM/min、失活 0.015 min⁻¹、產物抑制常數 8 μM;第 2 章 [S]₀ 5 μM、V 0.2 μM/min)、反應瓶與層析圖的樣子、峰面積比與校正係數(內標量 1.25 nmol 由 2.5 μM × 0.5 mL 算出);第 3、5、6 章以 Km 15.8 μM、Vmax = 1 的相對速度畫曲線,9 個濃度等比取;第 5 章的誤差是固定標準差的常態分布;第 4 章從蛋白質濃度換算的例子(0.65 mg/mL、65 kDa、稀釋 50 萬倍、20 pM、117.2 pM/min);第 6 章的抑制劑與 Ki;第 7 章 helix J、側鏈與陽離子的畫法。模擬的數據不是任何實驗的實測結果,不能拿來估計真實酵素的參數。
+
+#### 技術
+
+單一 HTML 檔(enzyme-kinetics/index.html),2D canvas 動畫,用生化原理與生化進階共用的 `assets/bio-lesson.js`(播放器)、`assets/bio-draw.js`(畫圖)、`assets/bio-lesson.css`(版面),不需要建置、沒有外部依賴。計算(擬合、模擬、時間曲線)在瀏覽器裡做,第 5 章 200 次重做的擬合在設定改變時才重算。數學集中在 module 裡 `// BEGIN-MATH` 到 `// END-MATH` 之間,可以抽出來用 node 驗算。入口卡片圖 `assets/enzyme-kinetics.svg`。程式分區、每章的時間點與修改方式見 enzyme-kinetics/MAINTENANCE.md。
+
+#### 來源連結
+
+- Johnson KA, Goody RS. The original Michaelis constant: translation of the 1913 Michaelis–Menten paper. Biochemistry. 2011;50(39):8264–8269:https://pmc.ncbi.nlm.nih.gov/articles/PMC3381512/
+- Jakubowski H, Flatt P. Fundamentals of Biochemistry(LibreTexts)6.3 Kinetics with Enzymes:https://bio.libretexts.org/Bookshelves/Biochemistry/Fundamentals_of_Biochemistry_(Jakubowski_and_Flatt)/01%3A_Unit_I-_Structure_and_Catalysis/06%3A_Enzyme_Activity/6.03%3A_Kinetics_with_Enzymes ;6.4 Enzyme Inhibition:https://bio.libretexts.org/Bookshelves/Biochemistry/Fundamentals_of_Biochemistry_(Jakubowski_and_Flatt)/01%3A_Unit_I-_Structure_and_Catalysis/06%3A_Enzyme_Activity/6.04%3A_Enzyme_Inhibition
+- GraphPad Prism Curve Fitting Guide, Avoid Scatchard, Lineweaver-Burk and similar transforms:https://www.graphpad.com/guides/prism/latest/curve-fitting/avoidscatchard_lineweaver_burkeandsimilartransforms.htm
+- Roach CR, et al. Plasticity and evolution of (+)-3-carene synthase and (−)-sabinene synthase functions of a Sitka spruce monoterpene synthase gene family associated with weevil resistance. J Biol Chem. 2014;289(34):23859–23869:https://pmc.ncbi.nlm.nih.gov/articles/PMC4156071/ (方法、表 1、表 3、同源模型與討論)
+- Vardakou M, et al. Comparative analysis and validation of the malachite green assay for the high throughput biochemical characterization of terpene synthases. MethodsX. 2014;1:187–196:https://pmc.ncbi.nlm.nih.gov/articles/PMC4472957/
+- O'Maille PE, et al. A single-vial analytical and quantitative gas chromatography-mass spectrometry assay for terpene synthases. Anal Biochem. 2004;335(2):210–217:https://doi.org/10.1016/j.ab.2004.09.011 (摘要)
+- Srividya N, et al. Functional analysis of (4S)-limonene synthase mutants reveals determinants of catalytic outcome in a model monoterpene synthase. Proc Natl Acad Sci USA. 2015;112(11):3332–3337:https://pmc.ncbi.nlm.nih.gov/articles/PMC4371936/
+- Bar-Even A, et al. The moderately efficient enzyme: evolutionary and physicochemical trends shaping enzyme parameters. Biochemistry. 2011;50(21):4402–4410:https://doi.org/10.1021/bi2002289 (摘要);BioNumbers 111411、111412、111415:https://bionumbers.hms.harvard.edu/bionumber.aspx?id=111415
+
+未確認:Berg、Tymoczko、Stryer《Biochemistry》第 5 版 8.4 節(NCBI Bookshelf)這次被網站的驗證頁擋住,沒有讀到內文,改用 LibreTexts 的教科書;Christianson 2017(PMC5599884)讀到的部分沒有萜類環化酶的 kcat 範圍,沒有引用;Bar-Even 2011 與 O'Maille 2004 只核對到摘要(Bar-Even 另有 BioNumbers 引用的內文數值)。
+
+### 族群遺傳與產地鑑定(`population-genetics/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/population-genetics/
+
+從一棵棵樹的 SSR 基因型算到族群層次:等位基因頻率與期望異質度、哈溫平衡與近親係數 F、Ho 比 He 少的三種原因(近親、混群、無效等位基因)、Fst 與基因流(島嶼模型)、STRUCTURE 分群與 Evanno 的 ΔK,最後用指派檢定(Rannala 與 Mountain 的貝氏基因型機率)與排除檢定(模擬個體)推回查獲木材的產區,並以紅檜 4 區與桃花心木的研究說明產地鑑定的限制。生化進階分區的動畫教材,基礎是「DNA 鑑定」(`dna-markers/`),用共用播放器 `assets/bio-lesson.js`。
+
+- 8 章,共 132 秒:從一棵棵樹到等位基因頻率、哈溫平衡與近親係數 F、Ho 比 He 少的三種原因、Fst、基因流、STRUCTURE、指派檢定與排除檢定、產地鑑定的實務與限制
+- 可以自己調:取樣棵數(5、10、30、100)、等位基因頻率 p 與近親係數 F、兩群的差異、每代移入數 Nm(0.1、1、4、10)、群數 K(2 到 5)、查獲的木材(三件)與使用的位點數(1 到 12)
+- 畫面上的計算都由公式即時算出:He 與 2N/(2N − 1) 修正、95% 誤差棒、p² + Fpq、Fst = (Ht − Hs)/Ht、島嶼模型的逐代模擬、混合模型的 EM、ΔK、多位點基因型的 log₁₀ 概似值與相對分數、排除檢定的 p 值
+
+#### 數值與示意
+
+有出處:
+
+- 紅檜(*Chamaecyparis formosensis*,Huang 2022):4 區 92 棵(西南 MM 20、西北 HV 25、西北 GW 23、東部 SY 24)、36 個 SSR;各區 Fis 0.132 到 0.242(Fis = 1 − Ho/He);36 個位點有 23 個偏離哈溫平衡;兩兩 Fst 0.035(HV–GW,論文視為沒有分化)到 0.074(MM–HV),Nm 3.141 到 6.832;STRUCTURE K = 1 到 5、每個 K 20 次,以 Structure Harvester 的 ΔK 選 K = 3(SY、MM 各一群,HV 與 GW 同一群);GeneClass 2.0 自我指派 81/92 = 88.0%(MM 95%、HV 88%、GW 69.6%、SY 100%),GW 有 4 棵被判到 HV、3 棵被判到 MM。論文摘要寫 88.44%,Table 6 與內文是 88.04%,頁面用 81/92。
+- 計算推估:紅檜論文的 Nm 和 (1/Fst − 1) ÷ 4 一致(例如 0.074 → 3.13,論文 3.141;0.035 → 6.89,論文 6.832),差別來自 Fst 只印到小數 3 位;論文沒有寫出換算式。
+- 臺灣扁柏乾燥木材 22 件 7 件驗出(Huang 2020)。
+- 桃花心木(Degen 2013):31 個林分、1,971 棵、6 個核 SSR,遺傳距離與地理距離 r = 0.82,兩批木材都指派回正確國家。
+- 每族群 25 到 30 個就能把頻率估準(Hale 2012);約 10 個位點、每區 30 到 50 個、Fst 約 0.1 時貝氏指派可接近全對(Cornuet 1999 的摘要);GeneClass2 預設 1,000 個模擬個體、α = 0.01;用 ΔK 的研究 54% 選出 K = 2(Janes 2017 的摘要)。
+- 公式:p² + Fpq、2pq(1 − F)、F = 1 − Ho/He、部分自交平衡 F = s/(2 − s)、Wahlund 效應、Fst = (Ht − Hs)/Ht、樣本 He 乘 n/(n − 1)(Holsinger 講義);島嶼模型 Fst ≈ 1/(4Nm + 1)(Holsinger 與 Weir 2009),它的假設很少成立(Whitlock 與 McCauley 1999);ΔK = |L(K+1) − 2L(K) + L(K−1)| ÷ sd(L(K))(Evanno 2005,算法照 Structure Harvester 的程式);基因型機率 (n_h + 1/k)(n_h + 1 + 1/k)/((n + 2)(n + 1)) 與 2(n_h + 1/k)(n_g + 1/k)/((n + 2)(n + 1))(Rannala 與 Mountain 1997 式 9)。
+
+示意(頁面「資料來源」最後一條也有寫):
+
+- 五個產區(A 到 E,E 沒有取樣)的頻率由 Balding–Nichols 模型與固定種子產生,參考樣本每區 25 棵,D 區另有一棵從 A 移入、一棵 A × D 混血;樣本算出的兩兩 Fst:B–C 0.035(刻意最像),其他 0.060 到 0.126。三件木材分別來自 A、C、E。
+- 第 3 章的自交比例 1/3、A 與 D 各半混合、無效等位基因頻率 0.15 與 0.25(期望值,沒有取樣誤差)。
+- 第 4 章兩群在一個位點的頻率;第 5 章 8 個族群、每個 25 棵、40 個位點、起始 Fst 0.3 的島嶼模擬(第 100 到 150 代平均 Fst 對 1/(4Nm + 1):0.707 對 0.714、0.183 對 0.200、0.060 對 0.059、0.027 對 0.024)。
+- 第 6 章每個 K 的 ln P(D)(10 次,示意);長條是用 EM 求混合模型最大概似算出的,不是 STRUCTURE 的 MCMC。示意資料的 ΔK:K = 2 為 52.4、K = 3 為 95.8、K = 4 為 0.6、K = 5 為 0.3。
+- 指派結果(12 個位點):木材 1 指向 A(100%,p = 0.434,其他三區 p < 0.001);木材 2 是 C 85.2%、B 14.8%,兩區都不能排除;木材 3 的分數 A 100% 卻 p = 0.003,四區都被排除(只用 8 個位點時 A 的 p = 0.128,排除不了)。
+
+教學示意:族群、頻率、基因型、木材與模擬都是示意,不是任何實驗的資料,不可用於實樣鑑定。
+
+#### 技術
+
+單一 HTML 檔(population-genetics/index.html),共用 `assets/bio-lesson.js`、`assets/bio-draw.js`、`assets/bio-lesson.css`,不需要建置、沒有外部依賴,不使用到站人數計數。示意資料在瀏覽器裡用固定種子產生;比較慢的計算(各 K 的 EM 約 0.1 秒、排除檢定的模擬、島嶼模擬)在頁面載入後閒置時分批先算,結果有快取。入口卡片圖 `assets/population-genetics.svg`。程式分區、每章的時間點、驗算值與修改方式見 population-genetics/MAINTENANCE.md。
+
+#### 來源連結
+
+- Huang CJ, et al. 2022, Sci Rep 12:4126(紅檜):https://pmc.ncbi.nlm.nih.gov/articles/PMC8904461/
+- Huang CJ, et al. 2020, Sci Rep 10:22095(臺灣扁柏):https://pmc.ncbi.nlm.nih.gov/articles/PMC7744516/
+- Holsinger KE, Weir BS 2009, Nat Rev Genet 10:639–650:https://pmc.ncbi.nlm.nih.gov/articles/PMC4687486/
+- Holsinger KE, EEB 5348 Population Genetics 講義(CC BY 4.0):https://darwin.eeb.uconn.edu/eeb348-notes/inbreeding.pdf 、https://darwin.eeb.uconn.edu/eeb348-notes/genetic-structure.pdf
+- Weir BS, Cockerham CC 1984, Evolution 38:1358–1370:https://doi.org/10.1111/j.1558-5646.1984.tb05657.x
+- Whitlock MC, McCauley DE 1999, Heredity 82:117–125(FST ≠ 1/(4Nm+1))
+- Rousset F 1997, Genetics 145:1219–1228(距離隔離):https://pmc.ncbi.nlm.nih.gov/articles/PMC1207888/
+- Pritchard JK, et al. 2000, Genetics 155:945–959:https://pmc.ncbi.nlm.nih.gov/articles/PMC1461096/
+- STRUCTURE 2.3 說明文件:https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/structure_doc.pdf
+- Evanno G, et al. 2005, Mol Ecol 14:2611–2620:https://doi.org/10.1111/j.1365-294X.2005.02553.x (全文沒有讀到)
+- Structure Harvester(Earl DA, vonHoldt BM 2012, Conserv Genet Resour 4:359–361)的程式:https://github.com/dentearl/structureHarvester
+- Janes JK, et al. 2017, Mol Ecol 26:3594–3602:https://doi.org/10.1111/mec.14187
+- Rannala B, Mountain JL 1997, PNAS 94:9197–9201:https://pmc.ncbi.nlm.nih.gov/articles/PMC23111/
+- Cornuet JM, et al. 1999, Genetics 153:1989–2000(摘要)
+- GeneClass2(Piry S, et al. 2004, J Hered 95:536–539)說明文件:https://www1.montpellier.inrae.fr/CBGP/software/GeneClass/GeneClass2/Help.pdf
+- Chapuis MP, Estoup A 2007, Mol Biol Evol 24:621–631:https://academic.oup.com/mbe/article/24/3/621/1246960
+- Van Oosterhout C, et al. 2006, Mol Ecol Notes 6:255–256:https://assets.uea.ac.uk/f/185167/x/3d0a8c7abd/van-oosterhout-et-al-2006-men.pdf
+- Hale ML, et al. 2012, PLoS ONE 7:e45170:https://pmc.ncbi.nlm.nih.gov/articles/PMC3440332/
+- Degen B, et al. 2013, Forensic Sci Int Genet 7:55–62:https://doi.org/10.1016/j.fsigen.2012.06.003 (摘要)
+- Dormontt EE, et al. 2015, Biol Conserv 191:790–798:https://doi.org/10.1016/j.biocon.2015.06.038 (摘要)
+
+未確認:Paetkau D, et al. 1995(Mol Ecol 4:347–354)與 Manel S, et al. 2005(Trends Ecol Evol 20:136–142)的全文沒有讀到,頁面沒有拿來當依據。
+
+### 演化樹:從序列推親緣關係(`phylogenetics/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/phylogenetics/
+
+怎麼從序列推出演化樹,以及怎麼判斷樹可不可信:多序列比對(同源、空格、保守位置,附真的萜類合成酶 DDxxD)、p 距離與 Jukes–Cantor 校正、UPGMA 與鄰接法(Q 矩陣一步一步算)、簡約法與概似法、怎麼讀樹(無根與有根、外群、分支、枝長單位、轉動節點、中點定根)、bootstrap(抽出放回、70% 與 95% 的解讀、方法錯時錯的分支也會高支持),最後用萜類合成酶家族收尾:TPS-a 到 TPS-h 七群、裸子植物的 TPS-d 再分 d1、d2、d3,柏科同一群的酵素產物各不相同,功能要靠實驗。生化進階分區的教材,8 章、約 2 分 16 秒,用共用播放器 `assets/bio-lesson.js`。先看 `sequencing/` 與 `terpene-synthase/`。
+
+- 第 1 章:模擬的祖先序列複製成 6 條後代,突變加框;C 少 3 個鹼基,比對時補空格;6 條都一樣的保守欄;下方是 6 個真的萜類合成酶在 DDxxD 附近的 13 個胺基酸;有空格的欄整欄拿掉(50 → 47 欄)
+- 第 2 章:A 對 B、E 對 O 哪幾欄不同與 p;距離矩陣;p 對 d 的圖(d = p 與 JC 曲線、0.75 飽和);同一位置換兩次看不出來
+- 第 3 章:UPGMA 一步一步合併(矩陣與長出來的樹),結果 C、D 被併在一起、E 被放到最外面,和模擬時用的樹比對;可切換鄰接法
+- 第 4 章:鄰接法第一步的 r、Q 矩陣與算式,D、E 的距離不是最小卻 Q 最小;枝長 δ 與新距離的算法;後面幾步與整棵無根樹
+- 第 5 章:A、B、D、E 的 3 種無根樹,逐欄的最少改變次數(簡約)與 JC 下的 ln L(概似);(2n − 5)!! 的表
+- 第 6 章:無根樹與外群定根的有根樹;分支(clade);比例尺;轉動節點;中點定根在速率不等時放錯;常見誤讀
+- 第 7 章:第 1 次重抽每欄被抽到幾次;重抽次數跑到 10、100 或 1000,支持度跟著變;50%、70%、95% 的刻度
+- 第 8 章:7 群的示意圖與 d1、d2、d3;柏科單萜合成酶的兩個群,照最像的已知酵素猜產物與實驗結果
+- 控制項:距離(p、JC)、建樹方法(第 3 章)、定根方式與轉動節點(第 6 章)、重抽次數、建樹方法與「拿掉支持 D+E 的 3 欄」(第 7 章)、新基因的產物(猜的或實驗結果)
+- 文字以看過基礎教材的大學部高年級與研究生為準;公式寫出來,符號第一次出現時說明
+
+#### 數值與示意
+
+公式:
+
+- p 距離 = 不同的欄 ÷ 比較的欄;Jukes–Cantor d = −(3/4)·ln(1 − 4p/3),由 p = (3/4)(1 − e^(−4d/3)) 反推,d 是每個位置的替換數,p → 0.75 時 d → ∞(Jukes 與 Cantor 1969 原書未讀;在模型下模擬 20 萬個位置,d = 0.1、0.5、1 校正回 0.1007、0.4990、0.9997)。
+- UPGMA:合併最近的兩群,高度 = 距離 ÷ 2,新距離依兩群大小加權平均(維基百科 UPGMA 條目;例子的高度 8.5、11、14、16.5 驗算相同)。
+- 鄰接法:Q(i,j) = (n − 2)·d(i,j) − r(i) − r(j);δ(f,u) = d(f,g)/2 + (r(f) − r(g)) / (2(n − 2));d(u,k) = (d(f,k) + d(g,k) − d(f,g)) / 2(Saitou 與 Nei 1987;Q 的寫法是 Studier 與 Keppler 1988,依 Gascuel 與 Steel 2006 的整理;維基百科的例子 Q = −50…、枝長 2 與 3 驗算相同)。
+- 簡約用 Fitch 的交集與聯集(和窮舉內部節點狀態的結果逐欄相同);概似用 JC、鹼基頻率各 1/4,對內部節點狀態加總,5 條枝長一起最大化(和逐欄窮舉相同,最佳值附近每條枝 ±2% 都不會更大)。
+- Bootstrap:欄位抽出放回重抽一樣多次、重新建樹,支持度 = 出現次數 ÷ 重抽次數(Felsenstein 1985)。無根二分樹的數目 (2n − 5)!!(逐步加入法列舉 4 到 8 條驗算)。
+
+示意(頁面「資料來源」最後一條也有寫):
+
+- 6 條 DNA(A、B、C、D、E 與外群 O,50 欄)是在樹 ((A:0.06,B:0.08):0.10,(C:0.07,(D:0.05,E:0.35):0.08):0.06,O:0.30) 上用 JC 模型模擬的(亂數種子 321,做法寫在 `phylogenetics/MAINTENANCE.md`),E 演化最快;C 在第 21 到 23 欄的空格也是設定的。距離取到小數第 2 位後建樹。
+- 由這組資料算出:A 對 B 4/47(p 0.085、d 0.090),E 對 O 24/47(p 0.511、d 0.857);UPGMA 依序合併 A+B(0.09)、C+D(0.14)、AB+CD(0.33)、O(0.43)、E(0.5625),錯;鄰接法第一步 r(E) = 2.81 最大,Q(D,E) = −3.08 < Q(A,B) = −3.02 < Q(C,D) = −2.83,δ(D) = 0.0625、δ(E) = 0.3175,得到正確的樹;簡約 27、32、33 次;ln L = −167.212、−174.214、−174.439(差 7.0,約 1,099 倍);bootstrap(種子 7、1000 次)鄰接法 A+B 85%、D+E 73%、C+D+E 72%,UPGMA 的錯分支 C+D 95%,拿掉只有 D、E 相同的 3 欄(第 2、33、35 欄)後鄰接法改成 C+D 86%、D+E 剩 4%;中點定根落在 (D,E) 與其他之間,外群 O 跑進群內。
+- 第 6 章根放在外群枝的中間、第 8 章 7 群從同一點分出與群內順序都是示意;「照最像的已知酵素猜」是頁面的示範(第 1 群猜紅檜的 α-pinene,TcTPS14 照最佳 BLAST 結果日本扁柏 terpinolene 合成酶猜 terpinolene,TcTPS17 的最佳結果是臺灣杉一支已知的萜類合成酶 GenBank AIO10963,第 2 群裡已知的臺灣杉酵素都做 terpinolene,所以也猜 terpinolene)。
+
+查來的:
+
+- DDxxD 附近的胺基酸(NCBI 蛋白質):臺灣杉 TcTPS13(QHZ00920.1,第一個 D 在第 380 個)、TcTPS15(QHZ00922.1,362)、TcTPS16(QHZ00923.1,369)、紅檜 α-pinene 合成酶(ABW80964.1,381)、大冷杉 pinene 合成酶(UniProt O24475,379)、綠薄荷 limonene 合成酶(Q40322,352);畫面取 D 前後各 4 個。TcTPS14(QHZ00921.1)在同一位置是 ADTYH,頁面沒有放。
+- Bootstrap 的解讀:Felsenstein 1985 以 95% 以上為顯著,並指出用的方法本身不一致(例如依整體相似度分群而各支速率差很多)時 bootstrap 不能補救;Hillis 與 Bull 1993 的模擬(等速、對稱的樹、節點之間改變不超過 20% 的欄)裡 70% 以上多半對應 95% 以上的機率是真的,速率很不相等時 50% 以上會高估;Baldauf 2003 寫 70% 以上多半可靠、慣例上只標 50% 以上;EMBL-EBI 的課程寫一般接受 80%(或 90%)以上,前提是用了合適的模型,而且解讀仍有爭議。
+- TPS 家族:Chen 等 2011 一般分 7 群(摘要);各群內容照 Karunanithi 與 Zerbe 2019、Jiang 等 2019(後者在鳳梨與地錢也找到 TPS-d);Martin 等 2004 TPS-d1 主要是單萜、d2 倍半萜、d3 雙萜,針葉樹的單萜合成酶都在 d1;Bohlmann 等 1998 序列能歸群、不能判定功能,唇形科與大冷杉的 limonene 合成酶只有 30 到 35% 相同。
+- 柏科的例子:Ma 等 2021 以 MUSCLE 比對、MEGA X 鄰接法與 100 次 bootstrap 建樹,TcTPS13、15、16 和紅檜 α-pinene 合成酶一群,TcTPS14、17 和日本扁柏 terpinolene 合成酶及臺灣杉的 terpinolene/α-pinene 合成酶一群;產物 TcTPS13、14 geraniol,15 linalool,16 β-pinene,17 測不到;作者寫單萜的功能不跟著親緣。
+
+教學示意:模擬資料只有 47 欄,用來示範演算法與 bootstrap 的意義;頁面全部用 JC 距離,沒有講速率變異(Γ)、搜尋法與貝氏法;不可用於實際資料的分析或判讀。
+
+#### 技術
+
+單一 HTML 檔(phylogenetics/index.html),共用 `assets/bio-lesson.js`(播放器)、`assets/bio-draw.js`(畫圖)、`assets/bio-lesson.css`,不需要建置、沒有外部依賴,不使用到站人數計數。距離、UPGMA、鄰接法、Fitch 在載入時算;最大概似在第一次畫第 5 章時算;bootstrap 每種組合第一次用到時算 1000 次後快取(桌機 Chrome 量到:第一次畫第 5 章約 60 毫秒,第 7 章每種組合 16 到 37 毫秒,之後每一格不到 1 毫秒)。計算都在 module 開頭 `// ==== 計算 ====` 那一段,可以抽出來用 node 驗算。入口卡片圖 `assets/phylogenetics.svg`。程式分區、每章的時間點與修改方式見 phylogenetics/MAINTENANCE.md。
+
+#### 來源連結
+
+- Saitou N, Nei M. 1987, Mol Biol Evol 4(4):406–425(摘要):https://doi.org/10.1093/oxfordjournals.molbev.a040454
+- Studier JA, Keppler KJ. 1988, Mol Biol Evol 5(6):729–731(原文未讀):https://doi.org/10.1093/oxfordjournals.molbev.a040527 ;Gascuel O, Steel M. 2006, Mol Biol Evol 23(11):1997–2000:https://academic.oup.com/mbe/article/23/11/1997/1333126
+- Felsenstein J. 1985, Evolution 39(4):783–791:https://doi.org/10.1111/j.1558-5646.1985.tb00420.x
+- Hillis DM, Bull JJ. 1993, Syst Biol 42(2):182–192(摘要):https://doi.org/10.1093/sysbio/42.2.182
+- Baldauf SL. 2003, Trends Genet 19(6):345–351:https://doi.org/10.1016/S0168-9525(03)00112-4
+- Felsenstein J. 1981, J Mol Evol 17(6):368–376(摘要):https://doi.org/10.1007/BF01734359
+- EMBL-EBI, Introduction to phylogenetics:https://www.ebi.ac.uk/training/online/courses/introduction-to-phylogenetics/
+- Kummer TA, et al. 2016, J Microbiol Biol Educ 17(3):389–398:https://pmc.ncbi.nlm.nih.gov/articles/PMC5134942/
+- Chen F, et al. 2011, Plant J 66(1):212–229(摘要):https://doi.org/10.1111/j.1365-313X.2011.04520.x
+- Karunanithi PS, Zerbe P. 2019, Front Plant Sci 10:1166:https://doi.org/10.3389/fpls.2019.01166 ;Jiang SY, et al. 2019, Genome Biol Evol 11(8):2078–2098:https://pmc.ncbi.nlm.nih.gov/articles/PMC6681836/
+- Bohlmann J, et al. 1998, PNAS 95(8):4126–4133:https://pmc.ncbi.nlm.nih.gov/articles/PMC22453/
+- Martin DM, et al. 2004, Plant Physiol 135(4):1908–1927:https://pmc.ncbi.nlm.nih.gov/articles/PMC520763/
+- Ma LT, et al. 2021, Plants 10(11):2404:https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/
+- NCBI 蛋白質序列:QHZ00920.1、QHZ00921.1、QHZ00922.1、QHZ00923.1(https://www.ncbi.nlm.nih.gov/protein/QHZ00923.1 ,其餘同一格式)、ABW80964.1、AIO10963.1、BAI53108.1;UniProt O24475(https://www.uniprot.org/uniprotkb/O24475 )、Q40322
+- 公式核對:維基百科 Neighbor joining(https://en.wikipedia.org/wiki/Neighbor_joining )與 UPGMA(https://en.wikipedia.org/wiki/UPGMA )條目的例子
+
+未確認:Studier 與 Keppler 1988、Sokal 與 Michener 1958、Jukes 與 Cantor 1969 的原文,以及 Chen 2011 的全文(出版社擋自動讀取)都沒有讀到;Ma 2021 的圖 2(樹的圖)本身沒有讀到,柏科兩群只依文字描述,群內順序沒有畫。
+
+### 在植物裡驗證基因功能(`gene-function/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/gene-function/
+
+生化進階分區的教材,接在 `cloning/`(在大腸桿菌裡做出酵素)、`terpene-synthase/` 與 `crispr/` 後面。主題是「大腸桿菌裡做得出產物,不代表植物裡真的這樣用」:純化的酵素加上受質,測到的是它能做什麼;植物細胞還有胞器位置、前驅物供應與其他酵素的搭配。7 章、115 秒,每章有字幕,第 1、3、4、5、6 章可以自己調。
+
+- 第 1 章:試管裡測到的產物對上植物細胞的兩個區(質體的 MEP 途徑供 GPP 與 GGPP、細胞質的 MVA 途徑供 FPP);酵素移進選到的那一區,遇到的受質與做出的產物跟著換
+- 第 2 章:農桿菌的 Ti 質體與雙元載體、25 個鹼基對的邊界、傷口汁液與乙醯丁香酮打開 vir、針筒把菌液推進葉背、T-DNA 進細胞核後不嵌進染色體也會表現幾天;下方是 T-DNA 的線性圖(左邊界、35S 啟動子、要表現的基因、終止子、右邊界)
+- 第 3 章:DCL4 與 DCL2 把轉殖基因的雙股 RNA 切成 21 到 22 個核苷酸的 siRNA、AGO 切掉 mRNA、p19 二聚體夾住 siRNA;右邊是表現量對天數的對數曲線,可以改天數與要不要打 p19,讀出兩條曲線的倍數
+- 第 4 章:3 到 5 天後用固相微萃取吸頂空或葉片浸己烷,GC-MS 的三條訊號(打酵素的葉片、只打空載體的葉片、標準品);可以切換要不要一起打上游的 DXS 與 GGPPS
+- 第 5 章:接上 GFP 的融合蛋白、共軛焦的綠色通道與葉綠素自發螢光的紅色通道與疊圖;切掉轉運胜肽後綠色訊號改落在葉綠體之間;下方是示意的轉運胜肽序列與算出來的組成
+- 第 6 章:TRV1 與 TRV2 的分工、目標片段滑進 TRV2、新長出來的葉子被沉默;三種目標(空載體、PDS、萜類合成酶)的葉色、兩條轉錄本與產物峰
+- 第 7 章:進入生殖期的年數長條圖(柳、楊樹、赤松、歐洲雲杉、橡),加上楊樹是模式樹、針葉樹難轉殖、替代做法三張卡
+- 控制項:前端的轉運胜肽(有、沒有)、一起打 p19(打、不打)、浸潤後第幾天(1 到 12)、上游酵素(不打、DXS + GGPPS)、VIGS 的目標(空載體、PDS、萜類合成酶)
+- 讀者是做森林化學與植物天然物的大學部高年級與研究生,假設已經看過上面三份基礎教材
+
+#### 數值與示意
+
+區室與前驅物:
+
+- 質體的 MEP 途徑一般供應半萜、單萜與雙萜的受質,細胞質的 MVA 途徑供應倍半萜,兩區之間有 IPP 交換(Pazouki 與 Niinemets 2016,摘要與引言)。單萜與雙萜合成酶在質體、倍半萜合成酶在細胞質;單萜與雙萜合成酶嚴格只用 GPP 或 GGPP,有幾支倍半萜合成酶在試管裡能用 GPP 做出 limonene,但在細胞質遇不到質體做的 GPP(Bohlmann 等 1998)。
+- 第 1 章與第 5 章的實例:金魚草的 AmNES/LIS-1 與 AmNES/LIS-2 胺基酸序列 95% 相同,前者在細胞質做 nerolidol、後者在質體做 linalool,次細胞定位加上受質可得性決定產物(Nagegowda 等 2008,摘要)。
+- 轉運胜肽:單萜合成酶約 600 到 650 個胺基酸,比倍半萜合成酶長 50 到 70 個,主要就是 N 端那一段;各條序列彼此不像,共同點是絲胺酸與蘇胺酸偏多、酸性殘基偏少;高度保守的連續兩個精胺酸大約界定成熟蛋白的 N 端(Bohlmann 等 1998)。冷杉三支單萜合成酶的 N 端 60 到 70 個胺基酸,絲胺酸占 11 到 22%、Asp 加 Glu 只有 2 到 4 個(Bohlmann 等 1997)。
+- 轉運胜肽同源性低、不易預測,有這一段不等於一定進質體,最後要靠免疫標記或螢光融合蛋白確認(Pazouki 與 Niinemets 2016)。AmNES/LIS-2 就是例子:五個預測程式有三個把它判在細胞質。
+
+農桿菌:
+
+- T-DNA 兩端是 25 個鹼基對的不完全重複邊界序列;vir 區至少七個主要基因座;雙元載體把 T-DNA 放在廣宿主範圍的複製子上、vir 基因留在卸掉致病性的 Ti 質體;傷口汁液 pH 5.0 到 5.8;最有效的 vir 誘導物是單環酚類(以乙醯丁香酮為例),經 VirA 與 VirG 雙組分系統調控;暫時表現不需要 T-DNA 嵌入,表現通常持續幾天(Hwang 等 2017)。
+- 操作條件(頁面只提到針筒與葉背,細節在 MAINTENANCE.md):菌液 OD600 1.0,MMA 為 10 mM MES pH 5.6、10 mM MgCl₂ 加乙醯丁香酮(測 0 到 600 μM、最佳 500 μM);6 到 8 週大植株最上面三片葉、從葉背用鈍頭針筒注入(Norkunas 等 2018)。
+
+基因沉默與 p19:
+
+- 農桿菌浸潤的表現必然被轉錄後基因沉默壓下來,伴隨轉殖基因來源的 siRNA 累積;沒有 P19 時螢光從第 4 天起下降、第 10 天幾乎看不到;P19 形成二聚體夾鉗,結合 DCL4 與 DCL2 產生的 21 到 22 個核苷酸 siRNA,擋住裝進 AGO1 與 AGO2;一起表現時第 4、7、10 天螢光約高一個數量級、mRNA 最多高約一千倍,整個第 4 到 10 天都維持(Jay 等 2023)。
+- p19 結合 21 到 25 個核苷酸、3′ 端突出 2 個核苷酸的雙股 RNA,幾乎不結合單股、長雙股或平整末端的雙股,以隔離這些雙股來抑制沉默(Silhavy 等 2002)。
+- **第 3 章的曲線是示意的模型**,公式是 `F(d) = (1 − exp(−d/1.4)) × 10^(−K·a(d))`、`a(d) = 1/(1 + exp(−(d − d½)/w))`,不打 p19 是 K 1.6、d½ 2.6、w 1.0,一起打是 K 0.9、d½ 7.0、w 2.0。這組參數只校準到上面兩個對照點,用 node 驗算出第 4、7、10 天的倍數分別是 13.2、13.5、7.3(約一個數量級),不打 p19 的最高點在第 1.1 天、有 p19 在第 2.9 天。不是任何一次實驗的實測曲線。
+
+暫時表現看產物:
+
+- 只打空 T-DNA 載體的葉片測不到產物;浸潤後 3 天開始累積、第 5 天最高;葉片浸己烷 2 分鐘後 GC-MS;一起打 DXS2 與 GGPPS2 使 cembratrien-ol 增加 3.5 倍(Brückner 與 Tissier 2013,用的是銀杏、蓖麻與菸草的三支合成酶)。
+- 歐洲雲杉的 isopimara-7,15-diene 合成酶與西加雲杉的 CYP720B4 在菸草表現,只打 p19 的對照葉片沒有背景;第 4 天採收;isopimaric acid 45 到 55 μg/g 乾重;一起打 DXS 與 GGPPs 各增加 3 倍(Gnanasekaran 等 2015)。
+- 在大腸桿菌或酵母裡表現植物酵素常卡在溶解度與功能;植物宿主同時有 MVA 與 MEP 兩條途徑,胞器導向訊號的加工在植物間高度保守(Brückner 與 Tissier 2013)。
+- 第 4 章的峰面積基準 100 是示意,乘上 3.5 用的是上面的實測倍數;峰形與滯留時間是示意。
+
+VIGS:
+
+- TRV 是雙分體正股 RNA 病毒;TRV2 經改造帶一段目標基因片段,和 TRV1 一起用農桿菌接種到 3 週大的葉片;沉默出現在新長出來、沒有被接種的葉子,約 2 到 3 週(Senthil-Kumar 與 Mysore 2014,摘要)。插入片段 200 到 1000 bp;光漂白最快在浸潤後 1.5 週出現(Velásquez 等 2009)。一般認為 VIGS 持續約 3 週(Senthil-Kumar 與 Mysore 2011)。
+- 沉默 PDS 打斷類胡蘿蔔素生合成,葉綠素被光氧化分解而出現明顯的光漂白,所以 PDS 被廣泛當成 VIGS 的報導基因(Zhang 等 2025)。
+- 實測的沉默程度:接 400 個核苷酸的反義片段、對照是帶 GFP 反義片段的載體,第 15 天用即時定量 PCR 量到葉片的轉錄本只剩 23%、12%、9% 與 11%,莖 26% 到 17%、根 31% 到 6%;PDS 沉默的葉片第 7 天開始漂白、第 14 天明顯(Atsumi 等 2018)。
+- 第 6 章的 12% 與 15% 是示意值,落在上面量到的 9% 到 31% 之間;**產物與轉錄本成正比也是示意**,實際上酵素量與代謝流的關係常常不是線性的。PDS 那一欄刻意讓萜類合成酶與產物都維持 100%,表達「它只證明這一批 VIGS 有效,不影響萜類」。
+
+樹木:
+
+- 歐洲雲杉的營養生長期 20 到 25 年、赤松 8 到 20 年;多數針葉樹經過 15 到 25 年幼年期才進入生殖期(Uddenberg 等 2013)。柳約 1 年、楊樹約 6 年、橡約 60 年開花(Taylor 2002)。
+- 楊樹基因體 450 到 550 Mbp、可用營養繁殖、溫帶樹中生長最快、容易轉殖(Taylor 2002);第一個完成定序的樹是黑楊,基因體 4.8 億個核苷酸(美國能源部聯合基因體研究所 2006 年 9 月 14 日發布;Tuskan 等 2006 的摘要本身沒有自稱「第一個樹木基因體」)。
+- 針葉樹的離體營養繁殖困難,體胚發生是轉殖研究的必要工具(Salaj 等 2019);松科的癒傷組織誘導困難、體胚發生頻率低(Wang 等 2025)。沒有來源說體胚發生是「唯一」途徑,頁面寫「主要靠」。
+- 馬尾松至今無法基因轉殖,所以把 PmGPPS1 的功能改在本氏菸草裡驗(Liu 等 2022),這正是本教材的主線。
+- 替代做法:Ri 質體的 T-DNA 嵌進植物基因體後誘出毛狀根,在無激素培養基上生長,基因型與表現型穩定、能長期生產次級代謝物(Gutierrez-Valdes 等 2020);世代長的作物在功能性基因體研究上卡住,毛狀根可以在做穩定轉殖株那段漫長流程之前先測基因表現與功能(Ron 等 2014);PEG 介導的原生質體轉染最常用,適合做次細胞定位與啟動子活性(Shao 等 2023)。
+
+教學示意:第 5 章的 64 個胺基酸轉運胜肽序列是自己編的,組成(絲胺酸 17%、酸性殘基 2 個、結尾連續兩個精胺酸)是程式從畫面上那條序列數出來的,刻意落在冷杉三支酵素的實測範圍內;全長 620 個胺基酸、共軛焦畫面、葉綠體的位置與數目都是示意。第 2 章 T-DNA 線性圖上五段的長度比例是為了看清楚訂的,不是實際的鹼基對數。農桿菌、質體、針筒、葉片、細胞、胞器、植株與毛狀根的樣子都是示意。本頁不能拿來當實驗條件或判讀依據。
+
+**刻意不引用**:Voinnet 等 2003(Plant J 33:949–956,p19 增強暫時表現的經典論文)已於 2015 年撤稿(Plant J. 2015;84(4):846,doi:10.1111/tpj.13066;先前另有 2015;83(4):752 的更正),撤稿原因是影像重複,公告沒有聲明結論仍然成立。本頁的 p19 機制改引 Silhavy 等 2002、量化增益改引 Jay 等 2023(同一位通訊作者在撤稿之後重做的公開取用再驗證)。頁面「資料來源」最後一條把這件事寫出來,日後維護不要把它加回去。
+
+#### 技術
+
+單一 HTML 檔(gene-function/index.html),2D canvas 動畫,用生化原理分區共用的 `assets/bio-lesson.js`(播放器)、`assets/bio-draw.js`(畫圖工具)與 `assets/bio-lesson.css`(版面),不需要建置,沒有外部依賴,不使用到站人數計數。共用工具沒有的畫法(葉片、環狀質體、農桿菌、葉綠體、針筒、長條、層析訊號)寫成本頁自己的小函式。入口卡片圖 `assets/gene-function.svg`。程式分區、每章的時間點、計算模型與修改方式見 gene-function/MAINTENANCE.md。
+
+#### 來源連結
+
+- Hwang HH, et al. Agrobacterium-mediated plant transformation: biology and applications. Arabidopsis Book. 2017;15:e0186:https://pmc.ncbi.nlm.nih.gov/articles/PMC6501860/
+- Norkunas K, et al. Improving agroinfiltration-based transient gene expression in *Nicotiana benthamiana*. Plant Methods. 2018;14:71:https://pmc.ncbi.nlm.nih.gov/articles/PMC6109318/
+- Jay F, et al. A contemporary reassessment of the enhanced transient expression system based on the tombusviral silencing suppressor protein P19. Plant J. 2023;113(1):186–204:https://pmc.ncbi.nlm.nih.gov/articles/PMC10107623/
+- Silhavy D, et al. A viral protein suppresses RNA silencing and binds silencing-generated, 21- to 25-nucleotide double-stranded RNAs. EMBO J. 2002;21(12):3070–3080:https://pmc.ncbi.nlm.nih.gov/articles/PMC125389/
+- Brückner K, Tissier A. High-level diterpene production by transient expression in *Nicotiana benthamiana*. Plant Methods. 2013;9:46:https://pmc.ncbi.nlm.nih.gov/articles/PMC3878842/
+- Gnanasekaran T, et al. Heterologous expression of the isopimaric acid pathway in *Nicotiana benthamiana*. J Biol Eng. 2015;9:24:https://pmc.ncbi.nlm.nih.gov/articles/PMC4688937/
+- Nagegowda DA, et al. Two nearly identical terpene synthases catalyze the formation of nerolidol and linalool in snapdragon flowers. Plant J. 2008;55(2):224–239:https://doi.org/10.1111/j.1365-313X.2008.03496.x (需訂閱,本頁依摘要與 Europe PMC 書目紀錄)
+- Bohlmann J, et al. Plant terpenoid synthases: molecular biology and phylogenetic analysis. Proc Natl Acad Sci USA. 1998;95(8):4126–4133:https://pmc.ncbi.nlm.nih.gov/articles/PMC22453/ ;Bohlmann J, et al. J Biol Chem. 1997;272(35):21784–21792:https://www.jbc.org/article/S0021-9258(19)65623-1/fulltext
+- Pazouki L, Niinemets Ü. Multi-substrate terpene synthases. Front Plant Sci. 2016;7:1019:https://pmc.ncbi.nlm.nih.gov/articles/PMC4940680/
+- Senthil-Kumar M, Mysore KS. Tobacco rattle virus-based virus-induced gene silencing in *Nicotiana benthamiana*. Nat Protoc. 2014;9(7):1549–1562:https://www.nature.com/articles/nprot.2014.092 (正文需訂閱,本頁只用摘要與 Springer 公開的補充檔);載體出自 Liu Y, et al. Plant J. 2002;30(4):415–429;TRV 當 VIGS 載體首見於 Ratcliff F, et al. Plant J. 2001;25(2):237–245
+- Atsumi G, et al. Sci Rep. 2018;8:14804:https://pmc.ncbi.nlm.nih.gov/articles/PMC6172274/
+- Zhang T, et al. Plants. 2025;14(2):150:https://pmc.ncbi.nlm.nih.gov/articles/PMC11768517/ ;Velásquez AC, et al. J Vis Exp. 2009;(28):1292:https://pmc.ncbi.nlm.nih.gov/articles/PMC2795700/ ;Kumagai MH, et al. Proc Natl Acad Sci USA. 1995;92(5):1679–1683:https://pmc.ncbi.nlm.nih.gov/articles/PMC42583/
+- Uddenberg D, et al. Plant Physiol. 2013;161(2):813–823:https://pmc.ncbi.nlm.nih.gov/articles/PMC3561021/ ;Taylor G. Ann Bot. 2002;90(6):681–689:https://pmc.ncbi.nlm.nih.gov/articles/PMC4240366/ ;美國能源部聯合基因體研究所 2006-09-14:https://archive.jgi.doe.gov/?p=1035
+- Liu B, et al. Tree Physiol. 2022;42(2):411–424:https://doi.org/10.1093/treephys/tpab103 ;Salaj T, et al. Front Plant Sci. 2019;10:13:https://www.frontiersin.org/articles/10.3389/fpls.2019.00013/full ;Wang Y, et al. Front Plant Sci. 2025;16:1689705:https://pmc.ncbi.nlm.nih.gov/articles/PMC12661428/
+- Gutierrez-Valdes N, et al. Front Plant Sci. 2020;11:33:https://pmc.ncbi.nlm.nih.gov/articles/PMC7064051/ ;Ron M, et al. Plant Physiol. 2014;166(2):455–469:https://pmc.ncbi.nlm.nih.gov/articles/PMC4213079/ ;Shao Y, et al. Int J Mol Sci. 2023;24(4):3633:https://pmc.ncbi.nlm.nih.gov/articles/PMC9962833/
+
+未確認:沒有找到同時報告 qPCR 轉錄量下降百分比與 GC-MS 產物下降百分比的 VIGS 萜類合成酶論文(找到的 VIGS 案例不是萜類合成酶,找到的萜類合成酶案例不是 VIGS),所以第 6 章的「轉錄本降多少產物就降多少」明確標成示意。也沒有找到同一篇裡用純單萜合成酶做「全長 GFP 進質體、去掉轉運胜肽後進細胞質」的實驗,第 5 章用的 Nagegowda 等 2008 是雙功能的 nerolidol/linalool 合成酶。Reed 與 Osbourn 2018(Plant Cell Rep 37:1431–1441,PMC6153650)是綜論,沒有當原始依據引用,但可以當第 4、5 章的補充閱讀。
 
 ## 數據畫圖(plot/)
 

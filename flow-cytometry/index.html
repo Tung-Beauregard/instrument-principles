@@ -58,6 +58,8 @@
       <li>圈選(gating):先在 FSC 對 SSC 的點圖上圈出要看的族群,再看這群細胞的螢光直方圖,用門檻分出陰性與陽性。</li>
       <li>植物 DNA 含量:用刀片在緩衝液裡切碎嫩葉放出細胞核,過約 42 μm 的尼龍網,用 PI(加 RNase)或 DAPI 染色。G1 峰的位置比較倍性(只靠 DNA 量推的稱為「DNA 倍性」);和已知含量的標準植物一起量,樣品 2C = 標準品 2C × 兩個 G1 峰位置的比,1 pg DNA 約 0.978 × 10<sup>9</sup> 個鹼基對。峰的 CV 小於 3% 算好,超過 5% 不採用。</li>
       <li>細胞分選(FACS):液流被振動打斷成液滴,含有要收的細胞的那一滴在脫離液流時帶電,經過偏轉板被拉進收集管。</li>
+      <li>進階,補償:一種染料的光會溢進別的偵測器。用只染一種顏色的對照算溢漏係數(溢漏偵測器裡陽性與陰性的中位數差 ÷ 主偵測器裡的中位數差),補償就是扣掉它,顏色多時乘上溢漏矩陣的反矩陣。補償正確的判準是陽性與陰性在溢漏偵測器的中位數相同;光子計數的誤差讓補償後的分布變寬(約和訊號的平方根成正比),補償扣不掉,判斷陽性要用少一種染料的 FMO 對照,不能憑點圖的形狀調補償。</li>
+      <li>進階,核內複製:細胞不分裂而 DNA 繼續複製,直方圖出現 4C、8C、16C 等峰(用對數橫軸看);核內複製指數 EI = Σ(複製輪數 × 該峰的細胞核比例)。阿拉伯芥 Ag-0 二倍體的葉約 2.12、莖約 1.29,人工四倍體比較低;阿拉伯芥除了花序,各組織都有核內複製。量基因體大小要用幼嫩的葉。</li>
     </ul>
   </div>
   <div class="src">
@@ -68,7 +70,9 @@
       <li>Thermo Fisher Scientific. <a href="https://www.thermofisher.com/tw/zt/home/life-science/cell-analysis/cell-analysis-learning-center/molecular-probes-school-of-fluorescence/flow-cytometry-basics/flow-cytometry-fundamentals/fluidics-flow-cytometer.html">Fluidics of a Flow Cytometer</a>(鞘液流得比樣品快、壓力加大時中間的樣品流變粗、數據變散、細胞週期與 DNA 分析要低濃度低流速)</li>
       <li>Doležel J, et al. Estimation of nuclear DNA content in plants using flow cytometry. Nat Protoc. 2007;2(9):2233–2244. <a href="https://doi.org/10.1038/nprot.2007.310">doi:10.1038/nprot.2007.310</a>(切碎法、42 μm 尼龍網、PI 要加 RNase、DAPI 偏好 AT、G1 峰調在第 200 通道、倍性與 2C 的算法、番茄標準品 2C = 1.96 pg、1 pg = 0.978 × 10<sup>9</sup> bp、CV 標準、DNA 倍性的用語)</li>
       <li>Becton Dickinson. US Patent 6,372,506 B1(2002),<a href="https://patents.google.com/patent/US6372506B1/en">Apparatus and method for verifying drop delay in a flow cytometer</a>(液流振動成液滴、細胞從雷射流到斷開點的時間差、斷開時帶電、偏轉板)</li>
-      <li>動畫裡的細胞數、點圖上各族群的位置與比例、陽性比例、流速對峰寬的影響、樣品的 DNA 含量(2C = 1.30 pg)、峰的高度與寬度、液滴大小與速度都是示意值,不是某個實驗的實測結果;番茄標準品的 2C 值(1.96 pg)取自 Doležel 等人 2007 的表 2。</li>
+      <li>Roederer M. Spectral compensation for flow cytometry: visualization artifacts, limitations, and caveats. Cytometry. 2001;45(3):194–205. <a href="https://pubmed.ncbi.nlm.nih.gov/11746088/">PMID 11746088</a>(補償正確時兩群在溢漏偵測器的中位數相同、光子計數的誤差和訊號的平方根成正比所以補償後變寬且過度補償也消不掉、對數刻度看不準中位數、FMO 對照);Maecker HT, Trotter J. Cytometry A. 2006;69:1037–1042. <a href="https://doi.org/10.1002/cyto.a.20333">doi:10.1002/cyto.a.20333</a>(單染對照要和樣品一樣亮或更亮、先設好電壓再做);Roca CP, et al. Nat Commun. 2021;12:2890. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8129071/">PMC8129071</a>(溢漏係數是陽性與陰性中位數連線的斜率、補償是乘上溢漏矩陣的反矩陣);Parks DR, et al. Cytometry A. 2006;69(6):541–551(Logicle 這類雙指數刻度,補償後的負值才畫得出來)</li>
+      <li>Pacey EK, et al. The influence of experimentally induced polyploidy on the relationships between endopolyploidy and plant function in <i>Arabidopsis thaliana</i>. Ecol Evol. 2020;10(1):198–216. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6972801/">PMC6972801</a>(核內複製指數的公式,引 Barow 與 Meister 2003;阿拉伯芥 Ag-0 葉與莖各 DNA 等級的比例,附錄表 A2、A3;PI 染色、對數刻度、每個樣品至少 5,000 個細胞核);Lee HO, et al. Genes Dev. 2009;23(21):2461–2477. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2779750/">PMC2779750</a>(核內複製是只有 S 期與 G 期、沒有細胞分裂的循環);Galbraith DW, et al. Plant Physiol. 1991;96(3):985–989. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1080875/">PMC1080875</a>(阿拉伯芥除了花序,各組織都有核內複製,程度隨組織的年齡與位置而變;只讀到摘要)。幼嫩的葉與對數橫軸見上面 Doležel 等人 2007 第 2236、2242 頁。</li>
+      <li>動畫裡的細胞數、點圖上各族群的位置與比例、陽性比例、流速對峰寬的影響、樣品的 DNA 含量(2C = 1.30 pg)、峰的高度與寬度、液滴大小與速度都是示意值,不是某個實驗的實測結果;番茄標準品的 2C 值(1.96 pg)取自 Doležel 等人 2007 的表 2。進階章節:放射光譜的形狀、濾鏡的範圍、溢漏係數 18%、每單位訊號 0.1 個光電子、電子雜訊、自發螢光、各群的亮度與細胞數都是示意(溢漏係數由模擬的單染對照算出約 17.9%);核內複製那一章各峰的比例是 Pacey 等人 2020 的實測值,峰寬、碎片與細胞的畫法是示意。</li>
     </ul>
   </div>
 </section>
@@ -230,6 +234,88 @@ const SO = { x: 430, bo: 250, ly: 120, v: 64, T: 0.4, plTop: 300, plBot: 420, kd
 const soCell = (d) => hash(d, 1) < 0.45; // 這一滴有沒有細胞
 const soGreen = (d) => hash(d, 2) < 0.45; // 細胞有沒有綠色螢光
 const soX = (y, charged) => { if (!charged || y <= SO.plTop) return SO.x; const k = Math.min(y, SO.plBot) - SO.plTop; let dx = -SO.kdx * k * k; if (y > SO.plBot) dx -= 2 * SO.kdx * (SO.plBot - SO.plTop) * (y - SO.plBot); return SO.x + dx; };
+
+// ---------- 第 9 章(進階):補償 ----------
+// 示意的模型:FITC 的光有 18% 落進 PE 偵測器(PE 落進 FITC 偵測器的很少,這裡設成 0)。偵測器量到的 = 自發螢光 + 染料的光 + 溢漏,
+// 再加上光子計數的誤差(每 1 單位訊號約 0.1 個光電子,光電子數是 Poisson 分布,標準差是它的平方根)與固定的電子雜訊。
+const CP = { s: 0.18, Q: 0.1, el: 15, afF: 100, afP: 60, pe: 5000, cv: 0.3, cof: 150 };
+const CP_BRIGHT = { dim: 1500, mid: 8000, hi: 40000 }; // FITC 陽性細胞的亮度(中位數,示意單位)
+const cpDet = (R, mu) => mu + Math.sqrt(Math.max(0, mu) / CP.Q) * gauss(R) + CP.el * gauss(R);
+// 一群細胞:染料量是對數常態(CV 約 30%);傳回每個細胞在 FITC、PE 兩個偵測器量到的值
+function cpCells(R, n, fitc, pe) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const F = fitc ? fitc * Math.exp(CP.cv * gauss(R)) : 0, P = pe ? pe * Math.exp(CP.cv * gauss(R)) : 0;
+    out.push([cpDet(R, CP.afF + F), cpDet(R, CP.afP + P + CP.s * F)]);
+  }
+  return out;
+}
+const sorted = (a) => Float64Array.from(a).sort();
+const quant = (b, p) => { const i = (b.length - 1) * p, lo = Math.floor(i), hi = Math.min(b.length - 1, lo + 1); return b[lo] + (b[hi] - b[lo]) * (i - lo); };
+const median = (a) => quant(sorted(a), 0.5);
+const rsd = (a) => { const b = sorted(a); return (quant(b, 0.8413) - quant(b, 0.1587)) / 2; }; // 穩健標準差:第 84 與第 16 百分位的差 ÷ 2
+const fmtS = (v) => (Math.round(v) < 0 ? '−' : '') + fmtN(Math.abs(v));
+// 只染 FITC 的單染對照(陽性夠亮):陽性與陰性在兩個偵測器的中位數,溢漏係數 = PE 的差 ÷ FITC 的差
+const CP_CTRL = (() => {
+  const R = rng(91), neg = cpCells(R, 800, 0, 0), pos = cpCells(R, 800, 20000, 0);
+  const c = { pF: median(pos.map((e) => e[0])), pP: median(pos.map((e) => e[1])), nF: median(neg.map((e) => e[0])), nP: median(neg.map((e) => e[1])) };
+  c.s = (c.pP - c.nP) / (c.pF - c.nF);
+  return c;
+})();
+// 樣品:陰性 1,400、只有 FITC 1,100、只有 PE 900 個細胞(同一個種子,換亮度時只有 FITC 陽性那群變)
+const cpCache = {};
+const cpSample = (b) => (cpCache[b] ||= (() => {
+  const R = rng(17), d = { neg: cpCells(R, 1400, 0, 0), fp: cpCells(R, 1100, CP_BRIGHT[b], 0), pp: cpCells(R, 900, 0, CP.pe) };
+  const f = sorted(d.fp.map((e) => e[0]));
+  d.fq = [quant(f, 0.25), quant(f, 0.5), quant(f, 0.75)];
+  return d;
+})());
+// 補償 k(0 到 1)之後,陰性與 FITC 陽性兩群在 PE 的中位數與寬度
+const cpStatCache = {};
+function cpStats(b, k) {
+  const key = `${b}|${k}`;
+  if (cpStatCache[key]) return cpStatCache[key];
+  const d = cpSample(b), pe = (arr) => arr.map(([f, p]) => p - k * f), n = pe(d.neg), f = pe(d.fp);
+  const st = { m0: median(n), m1: median(f), r0: rsd(n), r1: rsd(f) };
+  // 兩群的中位數差在誤差內才算剛好(Roederer 2001:補償正確時,溢漏偵測器裡陽性與陰性的中位數相同)
+  const tol = Math.max(st.r0, 0.35 * st.r1);
+  st.verdict = Math.abs(st.m1 - st.m0) <= tol ? ['剛好', C.mint] : st.m1 > st.m0 ? ['不足:還留著溢漏', C.amber] : ['過度:扣太多', C.red];
+  return (cpStatCache[key] = st);
+}
+// 雙指數刻度(反雙曲正弦,Logicle 一類的畫法):零附近接近線性、看得到負值,高處接近對數
+const bix = (v) => Math.asinh(v / CP.cof);
+const BX = { lo: -2.8, hi: 7.9 };
+const BX_T = [-1000, 0, 1000, 1e4, 1e5].map(bix), BX_L = ['−10³', '0', '10³', '10⁴', '10⁵'];
+// 放射光譜的形狀(示意):峰在 FITC 520 nm、PE 578 nm(Adan 等 2017),往紅光那側拖得比較長
+const emis = (l, peak, wl, wr) => Math.exp(-((l - peak) ** 2) / (2 * (l < peak ? wl : wr) ** 2));
+const EM_F = (l) => emis(l, 520, 12, 32), EM_P = (l) => emis(l, 578, 11, 24);
+const BAND_F = [515, 545], BAND_P = [564, 606]; // 兩個偵測器前面濾鏡的範圍(示意)
+
+// ---------- 第 10 章(進階):核內複製 ----------
+// 阿拉伯芥 Ag-0(二倍體與人工誘導的四倍體)各 DNA 等級的細胞核比例(%),依序 2C、4C、8C 到 512C(各自以自己的 2C 起算);
+// 葉是抽薹第一天最大的蓮座葉:Pacey 等 2020 附錄表 A2;莖:表 A3。每個樣品至少量 5,000 個細胞核,PI 染色,對數刻度
+const ENDO = {
+  leaf: { '2x': [12.02, 18.66, 23.61, 37.61, 7.15, 0.81, 0.11, 0.02, 0.02], '4x': [21.8, 24.85, 38.35, 13.99, 0.92, 0.04, 0, 0.06, 0] },
+  stem: { '2x': [13.61, 52.55, 26.06, 7.19, 0.4, 0.18, 0.01, 0, 0], '4x': [26.48, 56.77, 15.22, 1.38, 0.13, 0.02, 0, 0, 0] },
+};
+// 核內複製指數(Barow 與 Meister 2003 的 cycle value):每個細胞核平均複製了幾輪
+const eiOf = (p) => p.reduce((a, v, i) => a + i * v, 0) / p.reduce((a, v) => a + v, 0);
+const ENDO_N = 5000;
+const EU = { lo: -0.7, hi: 7.7, bw: 0.025, sd: 0.05 }; // 橫軸是 log2(DNA 量 ÷ 二倍體的 2C);峰寬(示意)
+const endoCache = {};
+function endoBins(organ, pl) {
+  const key = organ + pl;
+  if (endoCache[key]) return endoCache[key];
+  const p = ENDO[organ][pl], off = pl === '4x' ? 1 : 0, bins = [];
+  for (let j = 0; EU.lo + j * EU.bw < EU.hi; j++) {
+    const x = EU.lo + (j + 0.5) * EU.bw, nz = NOISE[(j * 7) % NOISE.length];
+    let v = 0;
+    p.forEach((pc, i) => { v += ((ENDO_N * pc) / 100) * (EU.bw / (EU.sd * Math.sqrt(2 * Math.PI))) * Math.exp(-((x - i - off) ** 2) / (2 * EU.sd * EU.sd)); });
+    bins.push({ x, v: v * nz, deb: 14 * Math.exp(-(x - EU.lo) / 0.9) * nz });
+  }
+  return (endoCache[key] = bins);
+}
+const ENDO_NAME = { leaf: '葉', stem: '莖' };
 
 const chapters = [
   {
@@ -827,11 +913,212 @@ const chapters = [
       g.text(px, 330, '(空的液滴不算;這裡是慢動作)', { size: 13, color: C.muted });
     },
   },
+  {
+    key: 'compensation', name: '進階:多色螢光的補償', dur: 18,
+    cues: [[0, 'FITC 的放射光拖著長尾巴,有一段落在 PE 偵測器的範圍裡:只染 FITC 的細胞,PE 偵測器也有訊號。這叫溢漏。'],
+      [4.5, '用只染一種顏色的對照,比陽性與陰性兩群的中位數:溢漏係數 s = PE 偵測器的差 ÷ FITC 偵測器的差。'],
+      [9, '補償就是把溢漏扣掉:PE(補償後)= PE − s × FITC。顏色多時,溢漏係數排成矩陣 S,乘上它的反矩陣。'],
+      [13.5, '補償不足,陽性斜斜往上;過度,被壓到零以下。光子計數的誤差讓分布變寬,這部分扣不掉。右邊可以調。']],
+    draw(g, t, S) {
+      const c = g.ctx, d = cpSample(S.bright);
+      // ---- 左上:放射光譜與兩個偵測器的範圍 ----
+      g.panel(24, 14, 432, 226, '放射光譜(示意)');
+      const SA = { x: 56, y: 70, w: 384, h: 118, l0: 480, l1: 680 };
+      const LX = (l) => SA.x + ((l - SA.l0) / (SA.l1 - SA.l0)) * SA.w, LY = (v) => SA.y + SA.h - v * SA.h;
+      const ba = ease(seg(t, 1.2, 2.2));
+      if (ba > 0) {
+        c.save(); c.globalAlpha = ba;
+        g.rrect(LX(BAND_F[0]), SA.y - 6, LX(BAND_F[1]) - LX(BAND_F[0]), SA.h + 6, 3, 'rgba(125,255,158,.08)', 'rgba(125,255,158,.5)', 1.2);
+        g.rrect(LX(BAND_P[0]), SA.y - 6, LX(BAND_P[1]) - LX(BAND_P[0]), SA.h + 6, 3, 'rgba(255,179,92,.08)', 'rgba(255,179,92,.5)', 1.2);
+        g.text(LX(530), SA.y - 18, '綠色偵測器', { size: 13, color: GREEN, align: 'center' });
+        g.text(LX(585), SA.y - 18, '橘黃色偵測器', { size: 13, color: ORANGE, align: 'center' });
+        c.restore();
+      }
+      const sa = ease(seg(t, 2.4, 3.4));
+      if (sa > 0) { // FITC 的光落在 PE 偵測器範圍裡的那一塊
+        c.save(); c.globalAlpha = sa; c.beginPath(); c.moveTo(LX(BAND_P[0]), LY(0));
+        for (let l = BAND_P[0]; l <= BAND_P[1]; l += 1) c.lineTo(LX(l), LY(EM_F(l)));
+        c.lineTo(LX(BAND_P[1]), LY(0)); c.closePath(); c.fillStyle = 'rgba(125,255,158,.5)'; c.fill(); c.restore();
+        g.arrow(LX(646), LY(0.5), LX(596), LY(0.1), { color: C.amber, lw: 2, head: 8, alpha: sa });
+        g.tag(LX(652), LY(0.62), '溢漏', { size: 15, color: C.amber, alpha: sa });
+      }
+      const lmax = lerp(SA.l0, SA.l1, ease(seg(t, 0.2, 2)));
+      const spec = (f) => { const pts = []; for (let l = SA.l0; l <= lmax; l += 2) pts.push([LX(l), LY(f(l))]); return pts; };
+      g.curve(spec(EM_F), GREEN, 2.6); g.curve(spec(EM_P), ORANGE, 2.6);
+      if (lmax > 530) g.text(LX(518), LY(1) + 2, 'FITC', { size: 15, weight: 700, color: GREEN, align: 'right' });
+      if (lmax > 600) g.text(LX(590), LY(0.92), 'PE', { size: 15, weight: 700, color: ORANGE });
+      g.line(SA.x, LY(0), SA.x + SA.w, LY(0), C.ink2, 1.4);
+      for (const l of [500, 550, 600, 650]) { g.line(LX(l), LY(0), LX(l), LY(0) + 5, C.ink2, 1.2); g.text(LX(l), LY(0) + 17, `${l}`, { size: 12, color: C.muted, align: 'center', mono: true }); }
+      g.text(SA.x + SA.w, LY(0) + 36, '波長(nm)', { size: 13, color: C.ink2, align: 'right' });
+      // ---- 左下:單染對照算溢漏係數,之後是補償的算式 ----
+      g.panel(24, 252, 432, 274, '');
+      const cb = ease(seg(t, 4.5, 5.3)), sb = ease(seg(t, 6, 6.8)), K = CP_CTRL;
+      if (cb > 0) {
+        c.save(); c.globalAlpha = cb;
+        g.text(40, 278, '只染 FITC 的對照', { size: 16, weight: 700, color: C.ink });
+        g.text(318, 310, 'FITC 偵測器', { size: 13, color: GREEN, align: 'right' });
+        g.text(440, 310, 'PE 偵測器', { size: 13, color: ORANGE, align: 'right' });
+        g.text(40, 340, '陽性的中位數', { size: 15, color: C.ink2 });
+        g.text(40, 370, '陰性的中位數', { size: 15, color: C.ink2 });
+        g.text(318, 340, fmtN(K.pF), { size: 16, color: C.ink, align: 'right', mono: true });
+        g.text(440, 340, fmtN(K.pP), { size: 16, color: C.ink, align: 'right', mono: true });
+        g.text(318, 370, fmtN(K.nF), { size: 16, color: C.ink, align: 'right', mono: true });
+        g.text(440, 370, fmtN(K.nP), { size: 16, color: C.ink, align: 'right', mono: true });
+        c.restore();
+      }
+      if (sb > 0) {
+        c.save(); c.globalAlpha = sb;
+        g.text(40, 408, `s = (${fmtN(K.pP)} − ${fmtN(K.nP)}) ÷ (${fmtN(K.pF)} − ${fmtN(K.nF)})`, { size: 15, color: C.ink, mono: true });
+        g.text(40, 440, `  = ${(K.s * 100).toFixed(1)}%`, { size: 20, weight: 700, color: C.amber, mono: true });
+        c.restore();
+      }
+      const ca = ease(seg(t, 9, 9.8));
+      if (ca > 0) {
+        c.save(); c.globalAlpha = ca;
+        g.text(40, 478, `補償:PE − ${S.comp}% × FITC`, { size: 17, weight: 700, color: C.mint });
+        g.text(40, 506, '多色:真的 = 量到 × S⁻¹', { size: 15, color: C.ink2, mono: false });
+        c.restore();
+      }
+      // ---- 右:FITC 對 PE 的點圖(雙指數刻度) ----
+      const PA = { x: 552, y: 30, w: 368, h: 316 };
+      const fm = (v) => BX_L[BX_T.indexOf(v)] ?? '';
+      const A = g.axes(PA.x, PA.y, PA.w, PA.h, { xmin: BX.lo, xmax: BX.hi, ymin: BX.lo, ymax: BX.hi, xticks: BX_T, yticks: BX_T, fmtX: fm, fmtY: fm, xlab: 'FITC(綠色偵測器)', ylab: 'PE(橘黃色偵測器)' });
+      g.line(A.X(0), PA.y, A.X(0), PA.y + PA.h, 'rgba(255,255,255,.12)', 1, [3, 4]);
+      const k = t < 9 ? 0 : (S.comp / 100) * ease(seg(t, 9, 11));
+      const show = ease(seg(t, 0.2, 1.4));
+      const yOf = (f, p) => A.Y(clamp(bix(p - k * f), BX.lo + 0.06, BX.hi));
+      const dots = (arr, col) => { c.fillStyle = col; for (const [f, p] of arr) c.fillRect(A.X(clamp(bix(f), BX.lo, BX.hi)) - 1.2, yOf(f, p) - 1.2, 2.4, 2.4); };
+      c.save(); c.globalAlpha = show;
+      dots(d.neg, 'rgba(185,199,192,.5)'); dots(d.pp, 'rgba(255,179,92,.62)'); dots(d.fp, 'rgba(125,255,158,.62)');
+      c.restore();
+      // 標籤放在每一群的外面:FITC 陽性那群寫在點雲的上緣(第 97 百分位)之上
+      const pv = sorted(d.fp.map(([f, p]) => p - k * f)), fx = A.X(bix(d.fq[1]));
+      const yTop = A.Y(clamp(bix(quant(pv, 0.97)), BX.lo, BX.hi));
+      if (show > 0.5) {
+        g.text(A.X(bix(CP.afF)), A.Y(bix(CP.afP)) + 38, '陰性', { size: 14, color: C.ink2, align: 'center' });
+        g.text(A.X(bix(CP.afF)) + 22, A.Y(bix(CP.pe)), 'PE 陽性', { size: 14, color: ORANGE });
+        g.text(fx, Math.max(PA.y + 10, yTop - 14), 'FITC 陽性', { size: 14, color: GREEN, align: 'center' });
+      }
+      // 中位數:陰性一條虛線,FITC 陽性一小段粗線
+      let st = null;
+      if (t >= 11) {
+        st = cpStats(S.bright, S.comp / 100);
+        const y0 = A.Y(bix(st.m0)), y1 = A.Y(clamp(bix(st.m1), BX.lo + 0.06, BX.hi));
+        g.line(PA.x, y0, PA.x + PA.w, y0, 'rgba(240,243,238,.55)', 1.4, [6, 5]);
+        g.line(A.X(bix(d.fq[0])), y1, A.X(bix(d.fq[2])), y1, C.amber, 4);
+      }
+      // 13.5 秒起,補償剛好時:在點雲右邊用括號標出補償後的寬度(中位數 ± 穩健標準差);補償不對時寬度還混著溢漏,不標
+      if (t >= 13.5 && st && st.verdict[1] === C.mint) {
+        const a = ease(seg(t, 13.5, 14.2)), bxr = A.X(bix(d.fq[2])) + 12;
+        const ya = A.Y(clamp(bix(st.m1 + st.r1), BX.lo, BX.hi)), yb = A.Y(clamp(bix(st.m1 - st.r1), BX.lo, BX.hi));
+        c.save(); c.globalAlpha = a;
+        g.line(bxr, ya, bxr, yb, C.ink, 2); g.line(bxr - 5, ya, bxr, ya, C.ink, 2); g.line(bxr - 5, yb, bxr, yb, C.ink, 2);
+        g.text(bxr + 6, (ya + yb) / 2 - 10, '變寬', { size: 15, weight: 700, color: C.ink });
+        g.text(bxr + 6, (ya + yb) / 2 + 10, '扣不掉', { size: 13, color: C.ink2 });
+        c.restore();
+      }
+      // ---- 右下:讀值 ----
+      if (t < 9) g.text(492, 424, '還沒補償:FITC 陽性的細胞斜斜往上', { size: 16, weight: 700, color: C.amber, alpha: ease(seg(t, 1.2, 2)) });
+      else if (!st) g.text(492, 424, '把溢漏扣掉……', { size: 16, weight: 700, color: C.mint });
+      else {
+        g.text(492, 424, `補償 ${S.comp}%:${st.verdict[0]}`, { size: 18, weight: 700, color: st.verdict[1] });
+        g.text(492, 456, `FITC 陽性在 PE 的中位數 ${fmtS(st.m1)}(陰性 ${fmtS(st.m0)})`, { size: 14, color: C.ink2 });
+        g.text(492, 484, `補償後的寬度:陰性 ±${fmtN(st.r0)},FITC 陽性 ±${fmtN(st.r1)}`, { size: 14, color: C.ink2 });
+        g.text(492, 512, '虛線:陰性的中位數;粗線:FITC 陽性的中位數', { size: 13, color: C.muted });
+      }
+    },
+  },
+  {
+    key: 'endoreduplication', name: '進階:核內複製', dur: 17,
+    cues: [[0, '植物細胞長大時常不再分裂,DNA 卻繼續複製:每一輪細胞核的 DNA 加倍,2C 變 4C、8C、16C。這叫核內複製。'],
+      [4.5, '所以葉片的直方圖常有一串峰,每個峰在前一個的兩倍位置;橫軸改用對數刻度,峰才會等距排開。'],
+      [9, '數每個峰有多少細胞核,算核內複製指數:EI = Σ(複製輪數 × 該峰的比例),就是平均每個細胞核複製了幾輪。'],
+      [13, '4C 峰也混著還在 G2 期的細胞核,流式分不出來;量基因體大小要用幼嫩的葉。右邊可以換器官與倍性。']],
+    draw(g, t, S) {
+      const c = g.ctx, p = ENDO[S.organ][S.endoPl], off = S.endoPl === '4x' ? 1 : 0, col = off ? C.lav : C.mint;
+      // ---- 左:細胞核一輪一輪複製(示意) ----
+      const ta = ease(seg(t, 0.2, 1));
+      g.text(36, 40, '細胞不分裂,DNA 繼續複製', { size: 18, weight: 700, color: C.ink, alpha: ta });
+      g.text(36, 70, '每一輪,細胞核的 DNA 加倍', { size: 15, color: C.ink2, alpha: ta });
+      const CXs = [60, 144, 246, 366], RC = [18, 26, 36, 48], RN = [8, 11, 15, 20], cy = 176;
+      CXs.forEach((x, i) => {
+        const a = ease(seg(t, 0.6 + i * 0.9, 1.2 + i * 0.9));
+        if (!a) return;
+        c.save(); c.globalAlpha = a;
+        if (i) g.arrow(CXs[i - 1] + RC[i - 1] + 6, cy, x - RC[i] - 6, cy, { color: C.muted, lw: 1.8, head: 7 });
+        g.circle(x, cy, RC[i], 'rgba(213,221,217,.07)', 'rgba(213,221,217,.7)', 1.6);
+        g.circle(x, cy, RN[i], 'rgba(184,164,244,.16)', 'rgba(184,164,244,.85)', 1.4);
+        const R = rng(40 + i);
+        for (let j = 0; j < 2 ** (i + 1); j++) {
+          const an = R() * Math.PI * 2, dd = Math.sqrt(R()) * RN[i] * 0.62, rot = R() * Math.PI, px = x + Math.cos(an) * dd, py = cy + Math.sin(an) * dd;
+          g.line(px - Math.cos(rot) * 3.6, py - Math.sin(rot) * 3.6, px + Math.cos(rot) * 3.6, py + Math.sin(rot) * 3.6, '#e6ece9', 1.6);
+        }
+        g.text(x, cy + 76, `${2 ** (i + 1)}C`, { size: 17, weight: 700, color: C.mint, align: 'center', mono: true });
+        c.restore();
+      });
+      // ---- 右:DNA 直方圖(對數橫軸) ----
+      const ha = ease(seg(t, 4.5, 5.3)), grow = ease(seg(t, 4.6, 7));
+      const bins = endoBins(S.organ, S.endoPl), ymax = Math.max(...bins.map((b) => b.v + b.deb)) * 1.18;
+      const ticks = [0, 1, 2, 3, 4, 5, 6, 7];
+      c.save(); c.globalAlpha = ha;
+      const A = g.axes(502, 44, 420, 238, { xmin: EU.lo, xmax: EU.hi, ymin: 0, ymax, xticks: ticks, fmtX: (v) => `${2 ** (v + 1)}C`, xlab: 'DNA 量(對數刻度,以二倍體為準)', ylab: '細胞核數' });
+      for (const b of bins) {
+        const x0 = A.X(b.x - EU.bw / 2), w = Math.max(1, A.X(b.x + EU.bw / 2) - x0 - 0.3);
+        c.fillStyle = 'rgba(125,143,136,.55)'; c.fillRect(x0, A.Y(b.deb * grow), w, A.Y(0) - A.Y(b.deb * grow));
+        c.fillStyle = off ? 'rgba(184,164,244,.85)' : 'rgba(165,243,205,.85)'; c.fillRect(x0, A.Y((b.deb + b.v) * grow), w, A.Y(b.deb * grow) - A.Y((b.deb + b.v) * grow));
+      }
+      if (grow > 0.9) p.forEach((v, i) => {
+        if (v < 0.5 || i + off > 7) return;
+        const top = Math.max(...bins.filter((b) => Math.abs(b.x - i - off) < 0.1).map((b) => b.v + b.deb));
+        g.text(A.X(i + off), A.Y(top) - 12, `${v >= 9.5 ? Math.round(v) : v.toFixed(1)}%`, { size: 13, weight: 700, color: col, align: 'center' });
+      });
+      if (off) {
+        g.line(A.X(0), A.Y(0), A.X(0), 52, 'rgba(240,243,238,.5)', 1.4, [5, 5]);
+        g.text(A.X(0) + 6, 58, '二倍體的 2C', { size: 13, color: C.ink2 });
+      }
+      c.restore();
+      g.text(922, 30, `阿拉伯芥 Ag-0 的${ENDO_NAME[S.organ]}(${S.endoPl === '4x' ? '四倍體' : '二倍體'})`, { size: 13, color: C.muted, align: 'right', alpha: ha });
+      // ---- 右下:核內複製指數 ----
+      const ea = ease(seg(t, 9, 9.8));
+      if (ea > 0) {
+        c.save(); c.globalAlpha = ea;
+        const colX = (j) => 610 + j * 61, rows = [376, 406, 436];
+        g.text(486, rows[0], '複製輪數', { size: 14, color: C.ink2 });
+        g.text(486, rows[1], '比例(%)', { size: 14, color: C.ink2 });
+        g.text(486, rows[2], '輪數×比例', { size: 14, color: C.ink2 });
+        const rest = p.slice(5), restP = rest.reduce((a, v) => a + v, 0), restW = rest.reduce((a, v, i) => a + (i + 5) * v, 0);
+        for (let j = 0; j <= 5; j++) {
+          const pv = j < 5 ? p[j] : restP, wv = j < 5 ? j * p[j] : restW;
+          g.text(colX(j), rows[0], j < 5 ? `${j}` : '5+', { size: 15, weight: 700, color: C.ink, align: 'center', mono: true });
+          g.text(colX(j), rows[1], pv.toFixed(1), { size: 15, color: col, align: 'center', mono: true });
+          g.text(colX(j), rows[2], wv.toFixed(1), { size: 15, color: C.ink2, align: 'center', mono: true });
+        }
+        const sumP = p.reduce((a, v) => a + v, 0), sumW = p.reduce((a, v, i) => a + i * v, 0);
+        g.text(486, 476, `EI = ${sumW.toFixed(1)} ÷ ${sumP.toFixed(1)} = ${eiOf(p).toFixed(2)}`, { size: 20, weight: 700, color: col, mono: true });
+        g.text(486, 506, '平均每個細胞核複製了幾輪', { size: 14, color: C.ink2 });
+        c.restore();
+      }
+      // ---- 左下:判讀時要注意 ----
+      const na = ease(seg(t, 13, 13.8));
+      if (na > 0) {
+        c.save(); c.globalAlpha = na;
+        g.panel(24, 300, 420, 226, '');
+        g.text(40, 330, '4C 峰 = 複製過一輪的', { size: 15, color: C.ink });
+        g.text(40, 356, '+ 還在 G2 期、還沒分裂的', { size: 15, color: C.ink });
+        g.text(40, 382, '流式只看 DNA 量,分不出兩者', { size: 13, color: C.muted });
+        g.text(40, 422, '量基因體大小:用幼嫩的葉', { size: 15, weight: 700, color: C.mint });
+        g.text(40, 448, '老葉與分化的組織核內複製多', { size: 13, color: C.muted });
+        if (off) g.text(40, 490, '四倍體:最左邊的峰在二倍體 4C 的位置', { size: 14, color: C.lav });
+        if (off) g.text(40, 514, '輪數從自己最左邊的峰算起', { size: 13, color: C.muted });
+        c.restore();
+      }
+    },
+  },
 ];
 
 createLesson({
   chapters,
-  state: { rate: 'low', size: 30, gran: 10, dye: 'go', gate: 'lym', cut: 1.8, sample: '4x', pick: 'pos' },
+  state: { rate: 'low', size: 30, gran: 10, dye: 'go', gate: 'lym', cut: 1.8, sample: '4x', pick: 'pos', comp: 18, bright: 'mid', organ: 'leaf', endoPl: '2x' },
   controls: [
     { id: 'rate', label: '樣品流速', type: 'seg', options: [{ v: 'low', label: '低' }, { v: 'mid', label: '中' }, { v: 'high', label: '高' }], chapters: ['fluidics'], restart: false },
     { id: 'size', label: '細胞大小', type: 'range', min: 0, max: 100, step: 1, format: (v) => sizeName(v), chapters: ['scatter'], restart: false },
@@ -841,6 +1128,10 @@ createLesson({
     { id: 'cut', label: '陽性門檻', type: 'range', min: 0.5, max: 3.5, step: 0.05, format: (v) => `螢光 ${fmtN(10 ** v)}`, chapters: ['gating'], restart: false },
     { id: 'sample', label: '樣品', type: 'seg', options: [{ v: '2x', label: '二倍體' }, { v: '4x', label: '四倍體' }, { v: 'mix', label: '兩株一起切' }], chapters: ['ploidy'], restart: false },
     { id: 'pick', label: '要收哪一種', type: 'seg', options: [{ v: 'pos', label: '有綠色螢光' }, { v: 'neg', label: '沒有螢光' }], chapters: ['sort'], restart: false },
+    { id: 'comp', label: '補償:從 PE 扣掉 FITC 的幾 %', type: 'range', min: 0, max: 30, step: 1, unit: '%', chapters: ['compensation'], restart: false },
+    { id: 'bright', label: 'FITC 陽性細胞的亮度', type: 'seg', options: [{ v: 'dim', label: '暗' }, { v: 'mid', label: '中' }, { v: 'hi', label: '亮' }], chapters: ['compensation'], restart: false },
+    { id: 'organ', label: '器官', type: 'seg', options: [{ v: 'leaf', label: '葉' }, { v: 'stem', label: '莖' }], chapters: ['endoreduplication'], restart: false },
+    { id: 'endoPl', label: '倍性', type: 'seg', options: [{ v: '2x', label: '二倍體' }, { v: '4x', label: '人工四倍體' }], chapters: ['endoreduplication'], restart: false },
   ],
 });
 </script>

@@ -57,6 +57,8 @@
       <li>三明治 ELISA:捕捉抗體固定在孔底,抓住樣品裡的抗原,再由認另一個位置的偵測抗體夾住;HRP 讓 TMB 變藍,加酸後轉黃,量 450 nm 的吸光度。1971 年由瑞典與荷蘭兩個團隊各自發表。</li>
       <li>定量靠同一盤的標準曲線(S 形,常用四參數曲線擬合):讀值要落在標準品的範圍內、最好在曲線中段;太濃就稀釋再測,結果乘回稀釋倍數。</li>
       <li>西方墨點法看得到大小與多出的條帶,但屬於半定量;ELISA 適合大量樣品定量,但看不出抓到的東西多大。兩種方法裡蛋白質的狀態不同(攤開與摺好),同一支抗體不一定兩邊都能用。</li>
+      <li>進階:標準曲線用四參數曲線 y = d + (a − d) ÷ (1 + (x/c)<sup>b</sup>) 擬合(a、d 是兩端平台,c 是反曲點的濃度,b 是斜率),參數用非線性最小平方求,反推 x = c × ((a − d)/(y − d) − 1)<sup>1/b</sup>。標準品要涵蓋到兩端平台附近;拿已知濃度的樣品反推,誤差在 ±20% 內(最低與最高的定量點 ±25%)才算可信,範圍外不外推。直線只在中段近似;曲線不對稱時可用五參數(5PL)。</li>
+      <li>進階:偵測能力分三層。LoB = 空白平均 + 1.645 SD(空白只有 5% 超過);LoD = LoB + 1.645 SD<sub>低濃度</sub>(在 LoD 的樣品只有 5% 低於 LoB);LoQ 還要夠準,例如反推濃度的 CV ≤ 20%,或用平均 + 10 SD。兩個 SD 相同時 LoD = 平均 + 3.29 SD,和常見的「平均 + 3 SD」接近。只重複幾次時 SD 估不準:5 次的 95% 信賴區間是估計值的 0.60 到 2.87 倍;依 CLSI EP17 的做法,廠商建立時量 60 次、實驗室驗證時 20 次。</li>
     </ul>
   </div>
   <div class="src">
@@ -67,7 +69,9 @@
       <li>OpenStax Microbiology:<a href="https://openstax.org/books/microbiology/pages/18-1-overview-of-specific-adaptive-immunity">18.1</a>(抗體的重鏈、輕鏈與可變區,IgG 約 150,000 道耳頓、兩個抗原結合位)、<a href="https://openstax.org/books/microbiology/pages/20-2-detecting-antigen-antibody-complexes">20.2</a>(西方墨點法的一級與二級抗體)、<a href="https://openstax.org/books/microbiology/pages/20-4-eias-and-elisas">20.4</a>(三明治 ELISA、用白蛋白或酪蛋白阻斷、標準曲線)</li>
       <li>Thermo Fisher Scientific 技術說明:<a href="https://www.thermofisher.com/us/en/home/life-science/protein-biology/protein-biology-learning-center/protein-biology-resource-library/pierce-protein-methods/overview-elisa.html">ELISA 概述</a>(捕捉與偵測抗體認不同的抗原決定位、TMB 被 HRP 氧化變藍、加硫酸或磷酸轉黃)、<a href="https://www.thermofisher.com/order/catalog/product/34021">1-Step TMB 受質</a>(黃色產物在 450 nm 測)、<a href="https://www.thermofisher.com/us/en/home/life-science/protein-biology/protein-biology-learning-center/protein-biology-resource-library/pierce-protein-methods/elisa-data-analysis.html">ELISA Data Analysis</a>(四參數擬合、曲線兩端誤差大、稀釋到曲線範圍內再乘回稀釋倍數)</li>
       <li>Lequin RM. Enzyme immunoassay (EIA)/enzyme-linked immunosorbent assay (ELISA). Clin Chem. 2005;51(12):2415–2418. <a href="https://doi.org/10.1373/clinchem.2005.051532">doi:10.1373/clinchem.2005.051532</a>(瑞典 Engvall 與 Perlmann、荷蘭 Schuurs 與 van Weemen 兩組各自發展,第一篇論文都在 1971 年發表);Pillai-Kastoori L, et al. Antibody validation for Western blot: By the user, for the user. J Biol Chem. 2020;295(4):926–939. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6983856/">PMC6983856</a>(用在西方墨點法的抗體不一定適合其他方法、多出的條帶可能是降解或修飾)</li>
-      <li>動畫裡的蛋白質與抗體形狀、目標蛋白的大小(60 kDa)、條帶的位置與亮度、背景與雜帶的程度、ELISA 標準品濃度、吸光度、四參數曲線的參數與讀值誤差(±0.05)都是示意值,不是某個實驗的實測結果。</li>
+      <li>Findlay JWA, Dillard RF. Appropriate calibration curve fitting in ligand binding assays. AAPS J. 2007;9(2):E260–E267. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2751416/">PMC2751416</a>(配體結合分析的反應對濃度是 S 形,四參數羅吉斯模型是公認的參考模型,不對稱時加第五個參數可能更好,加權通常有幫助;只讀到摘要);ICH M10 Bioanalytical Method Validation and Study Sample Analysis(2022)<a href="https://database.ich.org/sites/default/files/M10_Guideline_Step4_2022_0524.pdf">4.2.3 與 4.2.4.2 節</a>(至少 6 個濃度的標準品;有點靠近上下漸近線時常用 4PL 或 5PL;標準品反推值與檢查樣品的準確度在 ±20% 內,LLOQ 與 ULOQ ±25%);五參數的寫法見 <a href="https://www.graphpad.com/guides/prism/latest/curve-fitting/reg_asymmetric_dose_response_ec.htm">GraphPad Prism 說明</a>(不對稱參數等於 1 時就是 4PL)</li>
+      <li>Armbruster DA, Pry T. Limit of blank, limit of detection and limit of quantitation. Clin Biochem Rev. 2008;29(Suppl 1):S49–S52. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2556583/">PMC2556583</a>(LoB = 空白平均 + 1.645 SD、LoD = LoB + 1.645 SD<sub>低濃度</sub>、各有 5% 的偽陽性與偽陰性;LoQ 要達到偏差與不精密度的目標,CV 20% 的功能靈敏度;建立用 60 次、驗證用 20 次;傳統的平均 + 2 或 3 SD 只證明能量到「沒有」);<a href="https://clsi.org/standards/products/method-evaluation/documents/ep17/">CLSI EP17-A2</a>(2012,第二版);ICH Q2(R2)(2023)3.2.3.3 節:偵測極限 3.3σ/S、定量極限 10σ/S(σ 是讀值的 SD,S 是檢量線斜率)</li>
+      <li>動畫裡的蛋白質與抗體形狀、目標蛋白的大小(60 kDa)、條帶的位置與亮度、背景與雜帶的程度、ELISA 標準品濃度、吸光度、四參數曲線的參數與讀值誤差(±0.05)都是示意值,不是某個實驗的實測結果。進階章節的標準品(100 ng/mL 起三倍稀釋 8 點,各兩重複)、讀值的雜訊(SD = 0.004 + 讀值的 3%)、檢查樣品的濃度、空白的平均(0.06)與 SD、低濃度樣品,以及固定的亂數,也都是示意值。</li>
     </ul>
   </div>
 </section>
@@ -171,6 +175,129 @@ const SLO = STDS[0], SHI = STDS[STDS.length - 1];
 const DELTA = 0.05; // 吸光度讀值的誤差(示意)
 const NICE = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500]; // 控制項可以選的樣品濃度(ng/mL)
 const sig = (v, n = 3) => String(Number(v.toPrecision(n)));
+
+// ===== 進階章節(2026-10-27)用到的計算 =====
+const gauss = (R) => { const u = Math.max(1e-12, R()), v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }; // 標準常態亂數(Box-Muller)
+const mn = (v, d = 2) => v.toFixed(d).replace('-', '−'); // 負號用 −
+// 四參數擬合(示意的數據):標準品 100 ng/mL 起三倍稀釋 8 點,各做兩重複;
+// 讀值 = 第 6 章的示意曲線 P4 + 雜訊(SD = 0.004 + 讀值的 3%,固定的亂數,每次一樣)
+const FSTD = Array.from({ length: 8 }, (_, i) => 100 / 3 ** i);
+const FRANGE = { mid4: [2, 5], mid6: [1, 6], all: [0, 7] }; // 擬合用第幾點到第幾點(由濃到稀的索引)
+const FQC = [0.1, 1, 10, 50]; // 已知濃度的檢查樣品;讀值直接取 P4,只看擬合本身造成的誤差
+const FDATA = (() => { const R = rng(17), out = []; FSTD.forEach((x, i) => { for (let r = 0; r < 2; r++) { const y = f4(x); out.push({ i, x, y: y + (0.004 + 0.03 * y) * gauss(R) }); } }); return out; })();
+// 參數 p = [a, b, log10 c, d];m4 是四參數曲線
+const m4 = (x, p) => p[3] + (p[0] - p[3]) / (1 + 10 ** (p[1] * (Math.log10(x) - p[2])));
+function solveLin(A, b) { // 高斯消去法(部分選主元)
+  const n = b.length, M = A.map((r, i) => [...r, b[i]]);
+  for (let c = 0; c < n; c++) {
+    let pv = c;
+    for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[pv][c])) pv = r;
+    [M[c], M[pv]] = [M[pv], M[c]];
+    if (Math.abs(M[c][c]) < 1e-300) return null;
+    for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c] / M[c][c]; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+  }
+  return M.map((r, i) => r[n] / r[i]);
+}
+// Levenberg-Marquardt 非線性最小平方:從粗估值(兩端取最小與最大讀值、斜率 0.5、反曲點取對數濃度的平均)開始,
+// 每一步解 (JᵀJ + λ·diag(JᵀJ)) δ = Jᵀr;殘差平方和變小才接受並把 λ 變小,否則 λ 變大再試。記下每一步的參數做動畫
+function fit4(pts) {
+  const ys = pts.map((q) => q[1]), lx = pts.map((q) => Math.log10(q[0]));
+  let p = [Math.min(...ys), 0.5, lx.reduce((s, v) => s + v, 0) / lx.length, Math.max(...ys)];
+  const sse = (pp) => pts.reduce((s, [x, y]) => s + (y - m4(x, pp)) ** 2, 0);
+  let cur = sse(p), lam = 0.01;
+  const hist = [{ p: p.slice(), sse: cur }];
+  for (let it = 0; it < 100; it++) {
+    const JTJ = [0, 1, 2, 3].map(() => [0, 0, 0, 0]), JTr = [0, 0, 0, 0];
+    for (const [x, y] of pts) {
+      const tt = Math.log10(x) - p[2], u = 10 ** (p[1] * tt), w = 1 / (1 + u), gg = (p[0] - p[3]) * w * w * u * Math.LN10;
+      const J = [w, -gg * tt, gg * p[1], 1 - w], r = y - m4(x, p); // 對 a、b、log10 c、d 的偏導數
+      for (let i = 0; i < 4; i++) { JTr[i] += J[i] * r; for (let j = 0; j < 4; j++) JTJ[i][j] += J[i] * J[j]; }
+    }
+    let ok = false;
+    for (let k = 0; k < 12 && !ok; k++) {
+      const dl = solveLin(JTJ.map((row, i) => row.map((v, j) => (i === j ? v * (1 + lam) + 1e-12 : v))), JTr);
+      if (!dl) { lam *= 10; continue; }
+      const q = p.map((v, i) => v + dl[i]);
+      q[1] = clamp(q[1], 0.2, 6);
+      const s2 = sse(q);
+      if (Number.isFinite(s2) && s2 < cur) { const done = (cur - s2) / cur < 1e-10; p = q; cur = s2; lam = Math.max(1e-7, lam / 10); hist.push({ p: p.slice(), sse: cur }); ok = true; if (done) it = 1e9; }
+      else lam *= 10;
+    }
+    if (!ok) break;
+  }
+  return { p, sse: cur, hist };
+}
+// 直線:吸光度對 log10 濃度的最小平方直線 y = m·log10 x + k
+function fitLine(pts) {
+  const X = pts.map((q) => Math.log10(q[0])), Y = pts.map((q) => q[1]), n = X.length;
+  const mx = X.reduce((a, b) => a + b, 0) / n, my = Y.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0, sxx = 0;
+  for (let i = 0; i < n; i++) { sxy += (X[i] - mx) * (Y[i] - my); sxx += (X[i] - mx) ** 2; }
+  return { m: sxy / sxx, k: my - (sxy / sxx) * mx };
+}
+// 反推濃度:4PL 的讀值要在兩個平台之間,否則推不回來(NaN)
+const back4 = (y, p) => { const r = (p[0] - p[3]) / (y - p[3]) - 1; return (y - p[0]) * (y - p[3]) >= 0 || r <= 0 ? NaN : 10 ** p[2] * r ** (1 / p[1]); };
+const backLine = (y, L) => 10 ** ((y - L.k) / L.m);
+const FITS = {};
+function fitsFor(key) {
+  if (!FITS[key]) {
+    const [i0, i1] = FRANGE[key];
+    const pts = FDATA.filter((q) => q.i >= i0 && q.i <= i1).map((q) => [q.x, q.y]);
+    FITS[key] = { pts, lo: FSTD[i1], hi: FSTD[i0], four: fit4(pts), line: fitLine(pts) };
+  }
+  return FITS[key];
+}
+// 偵測極限(示意):空白讀值 = a(P4 的下平台 0.06)+ σB × 常態亂數;讀值的 SD 隨訊號變大:σ(y) = √(σB² + (3% × (y − a))²)
+const LZ = (() => { const R = rng(29); return Array.from({ length: 120 }, () => gauss(R)); })(); // 前 60 個給空白,後 60 個給低濃度樣品
+const sdy = (y, sb) => Math.sqrt(sb * sb + (0.03 * (y - P4.a)) ** 2);
+const df4 = (x) => { const u = (x / P4.c) ** P4.b; return ((P4.d - P4.a) * P4.b * u) / (x * (1 + u) ** 2); };
+const cvx = (x, sb) => sdy(f4(x), sb) / (x * df4(x)); // 推回濃度的變異係數(讀值的 SD 經曲線斜率換成濃度)
+function cvLimit(sb, side, lim = 0.2) { // CV 剛好等於 lim 的濃度:side −1 找低濃度那一端(LoQ),+1 找高濃度那一端
+  let lo = side < 0 ? 1e-4 : P4.c, hi = side < 0 ? P4.c : 1e4;
+  if (cvx(P4.c, sb) > lim) return NaN;
+  for (let i = 0; i < 60; i++) { const m = Math.sqrt(lo * hi); if ((cvx(m, sb) > lim) === side < 0) lo = m; else hi = m; }
+  return side < 0 ? hi : lo;
+}
+const SD_CI = { 5: [0.599, 2.874], 20: [0.760, 1.461], 60: [0.848, 1.220] }; // SD 的 95% 信賴區間 ÷ 估計值(卡方分布,自由度 n − 1)
+function lodCalc(sb, n) {
+  // 低濃度樣品放在真正的 LoD:它的讀值只有 5% 落在真正的 LoB(a + 1.645 σB)以下
+  let muL = P4.a + 3.29 * sb;
+  for (let i = 0; i < 30; i++) muL = P4.a + 1.645 * sb + 1.645 * sdy(muL, sb);
+  const sL = sdy(muL, sb);
+  const bl = LZ.slice(0, n).map((z) => P4.a + sb * z), lw = LZ.slice(60, 60 + n).map((z) => muL + sL * z);
+  const mean = (v) => v.reduce((s, x) => s + x, 0) / v.length;
+  const sd = (v) => { const m = mean(v); return Math.sqrt(v.reduce((s, x) => s + (x - m) ** 2, 0) / (v.length - 1)); };
+  const mb = mean(bl), sbE = sd(bl), mL = mean(lw), slE = sd(lw);
+  const LoB = mb + 1.645 * sbE, LoD = LoB + 1.645 * slE;
+  return { muL, sL, bl, lw, mb, sbE, mL, slE, LoB, LoD, sd3: mb + 3 * sbE, sd10: mb + 10 * sbE, loq: cvLimit(sb, -1), uloq: cvLimit(sb, 1) };
+}
+// 一行裡有上標或下標的式子:parts 是字串或 [字串, 'sup' | 'sub'];回傳寬度
+function rich(g, x, y, parts, { size = 16, color = C.ink, weight = 600, mono = false, align = 'left', alpha = 1 } = {}) {
+  const segs = parts.map((p) => (typeof p === 'string' ? [p, ''] : p));
+  const ws = segs.map(([s, k]) => { g.font(k ? size * 0.7 : size, weight, mono); return g.ctx.measureText(s).width; });
+  const w = ws.reduce((a, b) => a + b, 0);
+  let cx = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+  segs.forEach(([s, k], i) => {
+    const dy = k === 'sup' ? -size * 0.42 * g.boost : k === 'sub' ? size * 0.3 * g.boost : 0;
+    g.text(cx, y + dy, s, { size: k ? size * 0.7 : size, color, weight, mono, alpha });
+    cx += ws[i];
+  });
+  return w;
+}
+// 通過與不通過的記號(形狀不同,不只靠顏色):綠色圓圈打勾、紅色三角形加驚嘆號
+function mark(g, x, y, ok, a = 1) {
+  if (a <= 0.01) return;
+  const c = g.ctx; c.save(); c.globalAlpha *= a;
+  if (ok) {
+    g.circle(x, y, 9, C.mint);
+    c.beginPath(); c.moveTo(x - 4.5, y + 0.5); c.lineTo(x - 1.3, y + 3.8); c.lineTo(x + 4.8, y - 3.8);
+    c.strokeStyle = '#0b1111'; c.lineWidth = 2.4; c.lineCap = 'round'; c.lineJoin = 'round'; c.stroke();
+  } else {
+    c.beginPath(); c.moveTo(x, y - 10); c.lineTo(x + 10.5, y + 8.5); c.lineTo(x - 10.5, y + 8.5); c.closePath(); c.fillStyle = C.red; c.fill();
+    g.text(x, y + 2.5, '!', { size: 12, weight: 800, color: '#0b1111', align: 'center' });
+  }
+  c.restore();
+}
 
 const chapters = [
   {
@@ -661,7 +788,7 @@ const chapters = [
       const lo = inv4(Aw - DELTA), hi = inv4(Aw + DELTA);
       const wide = Number.isNaN(lo) || Number.isNaN(hi) || hi / lo > 1.6;
       const V = w > SHI ? ['高於最高的標準品', '要再多稀釋後重測', C.amber]
-        : w < SLO ? (S.dil > 1 ? ['低於最低的標準品', '少稀釋一點再測', C.amber] : ['低於最低的標準品', '樣品太稀,這個方法測不到', C.amber])
+        : w < SLO ? (S.dil > 1 ? ['低於最低的標準品', '少稀釋一點再測', C.amber] : ['低於最低的標準品', '低於檢量範圍,不能定量', C.amber])
         : wide ? ['在範圍內,但靠近曲線一端', '讀值差一點,濃度就差很多', C.amber] : ['落在曲線中段', '讀值差一點,濃度也只差一點', C.mint];
       lab(g, 606, 258, V[0], { a: fade(t, 10), color: V[2], weight: 700 });
       lab(g, 606, 282, V[1], { a: fade(t, 10), size: 14 });
@@ -747,16 +874,255 @@ const chapters = [
       }
     },
   },
+  {
+    key: 'fit4pl', name: '進階:四參數擬合', dur: 18,
+    cues: [[0, 'ELISA 的訊號有上限:濃度高到捕捉抗體都被占滿,讀值就不再增加;很低時只剩背景。在對數濃度軸上是一條 S 形曲線。'],
+      [4.5, '四參數曲線(4PL)的 a、d 是兩端平台,c 是反曲點的濃度,b 是斜率;電腦從粗估值開始,一步步調到殘差平方和最小。'],
+      [9.5, '用擬合出來的曲線把讀值反推成濃度。拿已知濃度的檢查樣品來試,反推的誤差在 ±20% 以內才算可信。'],
+      [13.5, '直線只在中段近似,兩端偏很多;4PL 也要有接近兩端平台的標準品,範圍外不能外推。曲線不對稱時可再加一個參數(5PL)。']],
+    draw(g, t, S) {
+      const F = fitsFor(S.frange), four = S.fitm === '4pl';
+      const XMIN = -1.5, XMAX = 2.3;
+      const A = g.axes(96, 44, 470, 324, { xmin: XMIN, xmax: XMAX, ymin: 0, ymax: 3.3, xticks: [-1, 0, 1, 2], yticks: [0, 1, 2, 3], xlab: '濃度(ng/mL,對數刻度)', ylab: '吸光度 A₄₅₀', fmtX: (v) => ({ '-1': '0.1', 0: '1', 1: '10', 2: '100' })[v], fmtY: (v) => String(v) });
+      const XL = (x) => A.X(clamp(Math.log10(x), XMIN, XMAX));
+      g.rrect(XL(F.lo), A.Y(0) - 7, XL(F.hi) - XL(F.lo), 7, 2, 'rgba(165,243,205,.35)'); // 擬合用到的標準品範圍
+      // 兩端平台的意思(1.5 到 4.5 秒)
+      const pl = Math.min(ease(seg(t, 1.5, 2.1)), 1 - ease(seg(t, 4.2, 4.6)));
+      if (pl > 0) {
+        g.tag(A.X(1.55), A.Y(3.13), '捕捉抗體都占滿:上平台', { size: 13, color: C.ink2, alpha: pl });
+        g.tag(A.X(-0.6), A.Y(0.45), '只剩背景:下平台', { size: 13, color: C.ink2, alpha: pl });
+      }
+      // 標準品(兩重複;實心是這次擬合用到的,空心沒用到)
+      const [i0, i1] = FRANGE[S.frange];
+      for (const q of FDATA) {
+        const a = ease(seg(t, 0.4 + (7 - q.i) * 0.4, 0.8 + (7 - q.i) * 0.4));
+        if (a <= 0) continue;
+        const used = q.i >= i0 && q.i <= i1;
+        g.ctx.save(); g.ctx.globalAlpha *= a;
+        g.circle(XL(q.x), A.Y(q.y), 5, used ? C.mint : null, used ? null : C.muted, 1.6);
+        g.ctx.restore();
+      }
+      // 擬合的曲線:4PL 沿著 Levenberg-Marquardt 每一步的參數變過去(4.5 到 8.3 秒);標準品範圍外畫虛線(外插)
+      const H = F.four.hist;
+      let p = F.four.p, step = H.length - 1;
+      if (t < 8.3 && H.length > 1) { const u = seg(t, 4.5, 8.3) * (H.length - 1), k = Math.min(H.length - 2, Math.floor(u)); p = H[k].p.map((v, j) => lerp(v, H[k + 1].p[j], ease(u - k))); step = k; }
+      const lineY = (x) => F.line.m * Math.log10(x) + F.line.k;
+      const drawFit = (yOf, col, lw, alpha, dashAll) => {
+        const ends = [XMIN, Math.log10(F.lo), Math.log10(F.hi), XMAX];
+        for (let s = 0; s < 3; s++) {
+          const pts = [];
+          for (let k = 0; k <= 60; k++) { const u = lerp(ends[s], ends[s + 1], k / 60), y = yOf(10 ** u); if (y > -0.2 && y < 3.5) pts.push([A.X(u), A.Y(clamp(y, 0, 3.3))]); }
+          g.curve(pts, col, lw, { alpha, dash: dashAll || s !== 1 ? [6, 5] : undefined });
+        }
+      };
+      const fitA = ease(seg(t, 4.5, 5));
+      if (fitA > 0) drawFit(four ? (x) => m4(x, p) : lineY, C.lav, 2.8, fitA, false);
+      // 13.6 秒起疊上另一種擬合做比較
+      const cmp = ease(seg(t, 13.6, 14.4));
+      if (cmp > 0) {
+        drawFit(four ? lineY : (x) => m4(x, F.four.p), C.amber, 2, 0.85 * cmp, true);
+        g.line(112, 62, 140, 62, C.lav, 2.8); g.text(148, 62, four ? '4PL(這次的擬合)' : '直線(這次的擬合)', { size: 13, color: C.ink2, alpha: cmp });
+        g.line(112, 84, 140, 84, C.amber, 2, [6, 5]); g.text(148, 84, four ? '直線(比較)' : '4PL(比較)', { size: 13, color: C.ink2, alpha: cmp });
+      }
+      // 4PL 的四個參數畫在圖上(8.6 秒起)
+      const [a, b, L, d] = four ? F.four.p : [0, 0, 0, 0];
+      const pa = four ? ease(seg(t, 8.6, 9.4)) : 0;
+      if (pa > 0) {
+        const xc = A.X(clamp(L, XMIN, XMAX)), yc = A.Y((a + d) / 2), sl = ((d - a) * b * Math.LN10) / 4; // 反曲點的斜率(每一個 log10 單位)
+        g.ctx.save(); g.ctx.globalAlpha *= pa;
+        for (const v of [a, d]) g.line(A.X(XMIN), A.Y(v), A.X(XMAX), A.Y(v), 'rgba(185,199,192,.5)', 1.2, [5, 5]);
+        g.line(xc, yc, xc, A.Y(0), 'rgba(184,164,244,.6)', 1.2, [4, 4]);
+        g.line(A.X(L - 0.28), A.Y((a + d) / 2 - 0.28 * sl), A.X(L + 0.28), A.Y((a + d) / 2 + 0.28 * sl), C.ink, 2);
+        g.circle(xc, yc, 5, C.lav);
+        g.ctx.restore();
+        // 兩個平台的標籤放在右邊:右下角在曲線下方是空的,左下角有低濃度的標準品
+        g.tag(A.X(XMAX) - 4, A.Y(d) - 15, 'd:上平台', { size: 13, color: C.ink2, align: 'right', alpha: pa });
+        g.tag(A.X(XMAX) - 4, A.Y(a) - 15, 'a:下平台', { size: 13, color: C.ink2, align: 'right', alpha: pa });
+        g.tag(xc + 14, yc, 'c:反曲點', { size: 13, color: C.lav, align: 'left', alpha: pa });
+        g.tag(A.X(L - 0.28) + 18, A.Y((a + d) / 2 - 0.28 * sl) + 4, 'b:斜率', { size: 13, color: C.ink, align: 'left', alpha: pa });
+      }
+      // 已知濃度的檢查樣品:從縱軸的讀值走到曲線,再往下到橫軸(9.6 秒起一個一個)
+      const back = (y) => (four ? back4(y, F.four.p) : backLine(y, F.line));
+      const res = FQC.map((x) => { const bx = back(f4(x)), inR = x >= F.lo * 0.999 && x <= F.hi * 1.001, e = (bx / x - 1) * 100; return { x, bx, inR, e, ok: inR && Number.isFinite(bx) && Math.abs(e) <= 20 }; });
+      res.forEach((r, i) => {
+        const t0 = 9.6 + i * 0.7, k1 = ease(seg(t, t0, t0 + 0.35)), k2 = ease(seg(t, t0 + 0.35, t0 + 0.7));
+        if (k1 <= 0) return;
+        const yy = A.Y(f4(r.x));
+        if (!Number.isFinite(r.bx)) { g.line(A.X(XMIN), yy, lerp(A.X(XMIN), A.X(XMAX), k1), yy, 'rgba(255,123,123,.7)', 1.4, [4, 4]); return; }
+        const xb = XL(r.bx);
+        g.line(A.X(XMIN), yy, lerp(A.X(XMIN), xb, k1), yy, 'rgba(184,164,244,.6)', 1.4, [4, 4]);
+        if (k2 > 0) g.line(xb, yy, xb, lerp(yy, A.Y(0), k2), 'rgba(184,164,244,.6)', 1.4, [4, 4]);
+        if (k2 >= 1) g.circle(xb, A.Y(0), 4.5, C.lav);
+      });
+      // 右:式子、參數與檢查樣品的反推結果
+      g.panel(596, 34, 339, 472, four ? '四參數(4PL)擬合' : '直線擬合');
+      const ra = ease(seg(t, 4.5, 5.1));
+      if (ra > 0) {
+        if (four) {
+          rich(g, 614, 80, ['y = d + (a − d) ÷ (1 + (x/c)', ['b', 'sup'], ')'], { size: 16, weight: 700, alpha: ra });
+          g.text(614, 112, `a ${mn(p[0], 3)}   b ${mn(p[1])}`, { size: 15, mono: true, alpha: ra });
+          g.text(614, 136, `c ${sig(10 ** p[2])} ng/mL   d ${mn(p[3])}`, { size: 15, mono: true, alpha: ra });
+          g.text(614, 164, t < 8.3 ? `第 ${step} 步:殘差平方和 ${H[Math.min(step, H.length - 1)].sse.toFixed(4)}` : `第 ${H.length - 1} 步收斂,殘差平方和 ${F.four.sse.toFixed(4)}`, { size: 13, color: C.muted, alpha: ra });
+        } else {
+          g.text(614, 80, 'y = m × log₁₀x + k', { size: 16, weight: 700, alpha: ra });
+          g.text(614, 112, `m ${mn(F.line.m)}   k ${mn(F.line.k)}`, { size: 15, mono: true, alpha: ra });
+          g.text(614, 164, `${F.pts.length} 個點的最小平方直線(一次算出)`, { size: 13, color: C.muted, alpha: ra });
+        }
+      }
+      const ia = ease(seg(t, 9.5, 10.1));
+      if (ia > 0) rich(g, 614, 198, four ? ['反推 x = c × ((a − d)/(y − d) − 1)', ['1/b', 'sup']] : ['反推 x = 10', ['(y − k)/m', 'sup']], { size: 14, weight: 600, color: C.ink2, alpha: ia });
+      if (ia > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ia;
+        g.text(614, 236, '已知(ng/mL)', { size: 13, color: C.muted });
+        g.text(764, 236, '反推', { size: 13, color: C.muted, align: 'right' });
+        g.text(836, 236, '誤差', { size: 13, color: C.muted, align: 'right' });
+        g.ctx.restore();
+      }
+      res.forEach((r, i) => {
+        const ra2 = ease(seg(t, 10.3 + i * 0.7, 10.7 + i * 0.7));
+        if (ra2 <= 0) return;
+        const y = 268 + i * 34;
+        g.text(614, y, String(r.x), { size: 15, mono: true, alpha: ra2 });
+        if (!Number.isFinite(r.bx)) { g.text(836, y, '推不回來', { size: 14, color: C.red, align: 'right', alpha: ra2 }); mark(g, 864, y, false, ra2); return; }
+        g.text(764, y, sig(r.bx), { size: 15, mono: true, align: 'right', alpha: ra2 });
+        g.text(836, y, `${r.e >= 0 ? '+' : '−'}${Math.abs(r.e).toFixed(0)}%`, { size: 15, mono: true, align: 'right', color: Math.abs(r.e) <= 20 ? C.ink : C.red, alpha: ra2 });
+        if (r.inR) mark(g, 864, y, r.ok, ra2);
+        else g.text(850, y, '範圍外', { size: 13, weight: 700, color: C.amber, alpha: ra2 });
+      });
+      const va = ease(seg(t, 13.2, 13.8));
+      if (va > 0) {
+        const nOK = res.filter((r) => r.ok).length, nOut = res.filter((r) => !r.inR).length;
+        g.text(614, 418, `${nOK} 個在 ±20% 內${nOut ? `,${nOut} 個在範圍外` : ''}`, { size: 15, weight: 700, color: nOK === 4 ? C.mint : C.amber, alpha: va });
+        g.text(614, 444, four ? (S.frange === 'all' ? '標準品碰到兩端平台,曲線定得住' : '兩端平台附近沒有點,a、d 定不準') : '直線只在中段接近 S 形', { size: 14, color: C.ink2, alpha: va });
+        g.text(614, 482, '允收:±20%(兩端的定量極限 ±25%,ICH M10)', { size: 12, color: C.muted, alpha: va });
+      }
+    },
+  },
+  {
+    key: 'lod', name: '進階:偵測極限與定量極限', dur: 18,
+    cues: [[0, '同一個空白(不含待測物)重複量很多次,讀值會散開成一個分布:平均是背景,標準差 SD 代表雜訊。'],
+      [4, 'LoB(空白極限)= 空白平均 + 1.645 SD:空白有 95% 落在它以下,只有 5% 會被誤判成有東西(偽陽性 α)。'],
+      [8.5, 'LoD(偵測極限)= LoB + 1.645 × 低濃度樣品的 SD:濃度在 LoD 的樣品只有 5% 會低於 LoB(偽陰性 β)。常見的簡化是平均 + 3 SD。'],
+      [13, 'LoQ(定量極限)還要求夠準,例如反推濃度的 CV ≤ 20%,或用平均 + 10 SD。右邊可以調空白的雜訊與重複次數。']],
+    draw(g, t, S) {
+      const R = lodCalc(S.bsd, S.lodn), n = S.lodn;
+      const conc = (y) => { const v = inv4(y); return Number.isFinite(v) ? `${sig(v, 2)} ng/mL` : '低於下平台'; };
+      // 左上:讀值的分布(常態曲線的高度一律畫成 1,寬窄就是 SD)
+      const X0 = 0.02, X1 = 0.2;
+      const D = g.axes(70, 40, 470, 196, { xmin: X0, xmax: X1, ymin: 0, ymax: 1.45, xticks: [0.05, 0.1, 0.15, 0.2], xlab: '吸光度 A₄₅₀(讀值)', ylab: '分布', fmtX: (v) => v.toFixed(2) });
+      const XA = (v) => D.X(clamp(v, X0, X1));
+      const gp = (m, s) => (v) => Math.exp(-0.5 * ((v - m) / s) ** 2);
+      const fillUnder = (f, v0, v1, color) => {
+        if (v1 <= v0) return;
+        const c = g.ctx; c.beginPath(); c.moveTo(D.X(v0), D.Y(0));
+        for (let k = 0; k <= 120; k++) { const v = lerp(v0, v1, k / 120); c.lineTo(D.X(v), D.Y(f(v))); }
+        c.lineTo(D.X(v1), D.Y(0)); c.closePath(); c.fillStyle = color; c.fill();
+      };
+      const curveOf = (f, col, alpha) => { const pts = []; for (let k = 0; k <= 360; k++) { const v = lerp(X0, X1, k / 360); pts.push([D.X(v), D.Y(f(v))]); } g.curve(pts, col, 2.2, { alpha }); };
+      const fB = gp(R.mb, R.sbE), fL = gp(R.mL, R.slE);
+      g.ctx.save(); g.ctx.beginPath(); g.ctx.rect(70, 30, 470, 206); g.ctx.clip();
+      const Rj = rng(5);
+      R.bl.forEach((v, i) => { // 空白:0.4 到 3.4 秒一個一個落下
+        const jy = (Rj() - 0.5) * 10, t0 = 0.4 + (3 * i) / n, a = ease(seg(t, t0, t0 + 0.3));
+        if (a > 0) g.circle(XA(v), lerp(D.Y(1.3), D.Y(0.1) + jy, a), 3.4, 'rgba(213,221,217,.75)');
+      });
+      const ba = ease(seg(t, 3.2, 3.8)), aa = ease(seg(t, 5, 5.6));
+      if (aa > 0) fillUnder(fB, R.LoB, X1, `rgba(255,209,102,${0.5 * aa})`);
+      if (ba > 0) curveOf(fB, C.ink2, ba);
+      R.lw.forEach((v, i) => { // 低濃度樣品:8.6 到 10.6 秒
+        const jy = (Rj() - 0.5) * 10, t0 = 8.6 + (2 * i) / n, a = ease(seg(t, t0, t0 + 0.3));
+        if (a > 0) g.circle(XA(v), lerp(D.Y(1.3), D.Y(0.24) + jy, a), 3.4, 'rgba(184,164,244,.8)');
+      });
+      const la = ease(seg(t, 10.6, 11.2)), bb = ease(seg(t, 11.2, 11.8));
+      if (bb > 0) fillUnder(fL, X0, R.LoB, `rgba(184,164,244,${0.45 * bb})`);
+      if (la > 0) curveOf(fL, C.lav, la);
+      g.ctx.restore();
+      if (ba > 0) g.tag(XA(R.mb - 1.3 * R.sbE), D.Y(0.6), '空白', { size: 13, color: C.ink2, align: 'right', alpha: ba });
+      if (la > 0) g.tag(XA(R.mL + 1.3 * R.slE), D.Y(0.6), '低濃度樣品', { size: 13, color: C.lav, align: 'left', alpha: la });
+      // 直線:LoB、LoD(上排標籤)、3 SD、10 SD(下排標籤)
+      const vline = (v, col, a, dash) => { if (a > 0 && v <= X1) g.line(D.X(v), D.Y(0), D.X(v), D.Y(1.3), col, 2, dash); };
+      const la1 = ease(seg(t, 4.6, 5.2)), l3 = ease(seg(t, 6.8, 7.4)), ld = ease(seg(t, 11.4, 12)), l10 = ease(seg(t, 14, 14.6));
+      vline(R.LoB, C.amber, la1); vline(R.LoD, C.mint, ld); vline(R.sd3, 'rgba(185,199,192,.8)', l3, [5, 4]); vline(R.sd10, 'rgba(185,199,192,.8)', l10, [5, 4]);
+      if (la1 > 0) g.tag(XA(R.LoB) - 4, 52, 'LoB', { size: 13, color: C.amber, align: 'right', alpha: la1 });
+      if (ld > 0) g.tag(XA(R.LoD) + 4, 52, 'LoD', { size: 13, color: C.mint, align: 'left', alpha: ld });
+      if (l3 > 0) g.tag(XA(R.sd3) + 4, 78, '3 SD', { size: 12, color: C.ink2, align: 'left', alpha: l3 });
+      if (l10 > 0) g.tag(R.sd10 <= X1 ? XA(R.sd10) + 4 : D.X(X1) - 2, 78, R.sd10 <= X1 ? '10 SD' : '10 SD 在更右邊 →', { size: 12, color: C.ink2, align: R.sd10 <= X1 ? 'left' : 'right', alpha: l10 });
+      const lg = Math.max(aa, bb);
+      if (lg > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= lg;
+        g.rrect(72, 290, 14, 12, 2, 'rgba(255,209,102,.7)'); g.text(92, 296, 'α:空白被當成有(5%)', { size: 13, color: C.ink2 });
+        if (bb > 0) { g.rrect(300, 290, 14, 12, 2, 'rgba(184,164,244,.7)'); g.text(320, 296, 'β:低濃度被漏掉(5%)', { size: 13, color: C.ink2, alpha: bb }); }
+        g.ctx.restore();
+      }
+      // 左下:反推濃度的 CV(精密度曲線),CV ≤ 20% 的最低濃度就是 LoQ
+      const pa = ease(seg(t, 12.6, 13.2));
+      if (pa > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= pa;
+        const P = g.axes(70, 330, 470, 140, { xmin: -2, xmax: 2.3, ymin: 0, ymax: 60, xticks: [-2, -1, 0, 1, 2], yticks: [0, 20, 40, 60], xlab: '濃度(ng/mL,對數刻度)', ylab: 'CV(%)', fmtX: (v) => ({ '-2': '0.01', '-1': '0.1', 0: '1', 1: '10', 2: '100' })[v], fmtY: (v) => String(v) });
+        g.line(P.X(-2), P.Y(20), P.X(2.3), P.Y(20), 'rgba(255,209,102,.7)', 1.4, [6, 5]);
+        const upto = lerp(-2, 2.3, ease(seg(t, 12.8, 14.4)));
+        let pts = [];
+        for (let k = 0; k <= 220; k++) {
+          const u = lerp(-2, 2.3, k / 220); if (u > upto) break;
+          const cv = cvx(10 ** u, S.bsd) * 100;
+          if (cv <= 60) pts.push([P.X(u), P.Y(cv)]); else { g.curve(pts, C.lav, 2.4); pts = []; }
+        }
+        g.curve(pts, C.lav, 2.4);
+        g.ctx.restore();
+        const qa = ease(seg(t, 14.4, 15));
+        if (qa > 0 && Number.isFinite(R.loq)) {
+          const xq = P.X(Math.log10(R.loq));
+          g.line(xq, P.Y(20), xq, P.Y(0), `rgba(184,164,244,${qa})`, 1.4, [3, 3]);
+          g.circle(xq, P.Y(20), 5, C.lav);
+          g.tag(xq, P.Y(20) - 18, 'LoQ', { size: 13, color: C.lav, alpha: qa });
+          const xu = P.X(clamp(Math.log10(R.uloq), -2, 2.3));
+          g.circle(xu, P.Y(20), 5, C.lav);
+          g.tag(xu - 8, P.Y(20) - 18, '上限', { size: 13, color: C.lav, align: 'right', alpha: qa });
+          const xd = P.X(Math.log10(inv4(R.LoD)));
+          if (Number.isFinite(xd)) { g.circle(xd, P.Y(0), 4.5, C.mint); g.tag(xd, P.Y(9), 'LoD', { size: 12, color: C.mint, alpha: qa }); }
+        }
+      }
+      // 右:算出來的數值
+      g.panel(574, 34, 361, 472, '算出來的數值(示意)');
+      const rowL = (y, s, a, color = C.ink2) => { if (a > 0.01) g.text(592, y, s, { size: 14, color, alpha: a }); };
+      const rowV = (y, s, a, color = C.ink) => { if (a > 0.01) g.text(592, y, s, { size: 15, weight: 700, color, mono: true, alpha: a }); };
+      const a0 = ease(seg(t, 3.4, 4));
+      rowL(82, `空白重複 ${n} 次`, a0);
+      rowV(106, `平均 ${R.mb.toFixed(4)}、SD ${R.sbE.toFixed(4)}`, a0);
+      rowL(140, 'LoB = 平均 + 1.645 × SD', la1, C.amber);
+      rowV(164, `${R.LoB.toFixed(4)} → ${conc(R.LoB)}`, la1);
+      rowL(198, 'LoD = LoB + 1.645 × SD(低濃度)', ld, C.mint);
+      rowV(222, `${R.LoD.toFixed(4)} → ${conc(R.LoD)}`, ld);
+      rowL(256, '簡化:平均 + 3 SD', l3, C.muted);
+      rowV(280, `${R.sd3.toFixed(4)} → ${conc(R.sd3)}`, l3, C.ink2);
+      const qa2 = ease(seg(t, 14.4, 15));
+      rowL(314, 'LoQ:反推濃度 CV ≤ 20% 的最低濃度', qa2, C.lav);
+      rowV(338, Number.isFinite(R.loq) ? `${sig(R.loq, 2)} ng/mL` : '沒有一處 CV ≤ 20%', qa2);
+      rowL(372, '另一種:平均 + 10 SD', l10, C.muted);
+      rowV(396, `${R.sd10.toFixed(4)} → ${conc(R.sd10)}`, l10, C.ink2);
+      const ca = ease(seg(t, 15.2, 15.8));
+      if (ca > 0) {
+        const [lo, hi] = SD_CI[n];
+        g.text(592, 434, `${n} 次估的 SD,95% 信賴區間是`, { size: 13, color: C.ink2, alpha: ca });
+        g.text(592, 456, `估計值的 ${lo.toFixed(2)} 到 ${hi.toFixed(2)} 倍`, { size: 13, color: C.ink2, alpha: ca });
+        g.text(592, 486, `模擬設定的真正 LoD:${conc(R.muL)}`, { size: 13, color: C.muted, alpha: ca });
+      }
+    },
+  },
 ];
 
 createLesson({
   chapters,
-  state: { block: true, wash: 1, conc: 8, dil: 10 },
+  state: { block: true, wash: 1, conc: 8, dil: 10, fitm: '4pl', frange: 'all', bsd: 0.01, lodn: 20 },
   controls: [
     { id: 'block', label: '阻斷(牛奶或 BSA)', type: 'seg', options: [{ v: true, label: '有' }, { v: false, label: '沒有' }], chapters: ['probe'], restart: false },
     { id: 'wash', label: '清洗', type: 'seg', options: [{ v: 0, label: '不洗' }, { v: 1, label: '洗 3 次' }, { v: 2, label: '洗太久' }], chapters: ['probe'], restart: false },
     { id: 'conc', label: '樣品實際濃度(示意)', type: 'range', min: 0, max: NICE.length - 1, step: 1, format: (v) => `${NICE[v]} ng/mL`, chapters: ['curve'], restart: false },
     { id: 'dil', label: '稀釋倍數', type: 'seg', options: [{ v: 1, label: '不稀釋' }, { v: 10, label: '10 倍' }, { v: 100, label: '100 倍' }], chapters: ['curve'], restart: false },
+    { id: 'fitm', label: '擬合方式', type: 'seg', options: [{ v: 'line', label: '直線' }, { v: '4pl', label: '四參數(4PL)' }], chapters: ['fit4pl'], restart: false },
+    { id: 'frange', label: '擬合用的標準品', type: 'seg', options: [{ v: 'mid4', label: '中段 4 點' }, { v: 'mid6', label: '6 點' }, { v: 'all', label: '全部 8 點' }], chapters: ['fit4pl'], restart: false },
+    { id: 'bsd', label: '空白的雜訊 SD(示意)', type: 'range', min: 0.004, max: 0.016, step: 0.002, format: (v) => v.toFixed(3), chapters: ['lod'], restart: false },
+    { id: 'lodn', label: '重複次數', type: 'seg', options: [{ v: 5, label: '5 次' }, { v: 20, label: '20 次' }, { v: 60, label: '60 次' }], chapters: ['lod'], restart: false },
   ],
 });
 </script>

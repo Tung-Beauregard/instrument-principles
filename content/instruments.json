@@ -21,6 +21,10 @@
       "name": "生化原理"
     },
     {
+      "id": "bio-adv",
+      "name": "生化進階"
+    },
+    {
       "id": "tools",
       "name": "工具"
     }
@@ -230,6 +234,78 @@
       "image": "./assets/proteomics.svg",
       "imageAlt": "一條胺基酸串成的胜肽斷成兩段,旁邊的碎片質譜上,兩根相鄰峰之間的距離對應一個胺基酸",
       "href": "./proteomics/"
+    },
+    {
+      "id": "transcriptomics",
+      "name": "轉錄體分析:從定序資料找出候選基因",
+      "categories": [
+        "bio-adv"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/transcriptomics.svg",
+      "imageAlt": "短的定序片段疊在基因的外顯子上,其中幾條(琥珀色)跨過內含子;右邊的火山圖裡,右上角幾個薄荷綠的點是處理後顯著上升的基因",
+      "href": "./transcriptomics/"
+    },
+    {
+      "id": "terpenoid-precursors",
+      "name": "萜類前驅物:MEP 與 MVA 兩條路",
+      "categories": [
+        "bio-adv"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/terpenoid-precursors.svg",
+      "imageAlt": "植物細胞裡,細胞質與質體各用一條路做出 5 碳積木,質體把積木送到細胞質;右邊是積木接成的三環樹脂酸骨架與一滴松脂",
+      "href": "./terpenoid-precursors/"
+    },
+    {
+      "id": "enzyme-kinetics",
+      "name": "酵素動力學:Km 與 kcat 怎麼量",
+      "categories": [
+        "bio-adv"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/enzyme-kinetics.svg",
+      "imageAlt": "一段碳鏈卡在酵素的口袋裡,做出的環狀產物飄向右邊;右邊是初速度對受質濃度的飽和曲線,虛線標出最大速度與速度一半時的受質濃度",
+      "href": "./enzyme-kinetics/"
+    },
+    {
+      "id": "population-genetics",
+      "name": "族群遺傳與產地鑑定",
+      "categories": [
+        "bio-adv"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/population-genetics.svg",
+      "imageAlt": "三群針葉樹各圍成一圈,一段查獲的木材用虛線箭頭指回其中一群,底下是依各群比例上色的分群長條圖",
+      "href": "./population-genetics/"
+    },
+    {
+      "id": "phylogenetics",
+      "name": "演化樹:從序列推親緣關係",
+      "categories": [
+        "bio-adv"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/phylogenetics.svg",
+      "imageAlt": "左邊是排好的多序列比對,其中一欄所有序列都一樣;右邊是一棵演化樹,其中一條枝特別長",
+      "href": "./phylogenetics/"
+    },
+    {
+      "id": "gene-function",
+      "name": "在植物裡驗證基因功能",
+      "categories": [
+        "bio-adv"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/gene-function.svg",
+      "imageAlt": "針筒把農桿菌的菌液推進一片葉子,葉子下方是左右邊界之間分段上色的 T-DNA,右邊是葉綠體裡亮起的綠色訊號與層析圖上新出現的一支峰",
+      "href": "./gene-function/"
     },
     {
       "id": "plot",

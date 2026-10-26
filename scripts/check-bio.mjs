@@ -1,5 +1,5 @@
-// 生化原理分區(2026-10-26)的檢查:清單裡 bio 分類的每一頁都接上共用播放器、元素齊全、分頁列一致、
-// 章節代號不重複、module 語法正確、有維護說明;頁面文字不放特定老師的名字、不用破折號。
+// 生化原理(bio,2026-10-26)與生化進階(bio-adv,2026-10-27)兩區的檢查:清單裡這兩個分類的每一頁都接上共用播放器、
+// 元素齊全、分頁列和自己那一區一致、章節代號不重複、module 語法正確、有維護說明;頁面文字不放特定老師的名字、不用破折號。
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -12,8 +12,16 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
 const { categories, instruments } = JSON.parse(read('content/instruments.json'));
 assert.ok(categories.some((c) => c.id === 'bio' && c.name === '生化原理'), '清單裡要有「生化原理」分類(id: bio)');
-const bio = instruments.filter((i) => i.categories.includes('bio') && i.status === 'ready');
-assert.ok(bio.length > 0, '生化原理分類裡沒有已完成的教材');
+// 每一區一組分頁列(nav 的 aria-label 是分區名稱);生化進階分類存在時也要有教材
+const groups = [{ id: 'bio', name: '生化原理' }, { id: 'bio-adv', name: '生化進階' }]
+  .filter((g) => categories.some((c) => c.id === g.id))
+  .map((g) => ({ ...g, items: instruments.filter((i) => i.categories.includes(g.id) && i.status === 'ready') }));
+for (const g of groups) {
+  assert.ok(categories.some((c) => c.id === g.id && c.name === g.name), `分類 ${g.id} 的名稱要是「${g.name}」`);
+  assert.ok(g.items.length > 0, `${g.name}分類裡沒有已完成的教材`);
+}
+const both = groups.length > 1 ? groups[0].items.filter((i) => groups[1].items.includes(i)) : [];
+assert.equal(both.length, 0, `教材不能同時放在兩區:${both.map((i) => i.id).join(', ')}`);
 
 // 共用檔
 for (const f of ['assets/bio-lesson.js', 'assets/bio-draw.js', 'assets/bio-lesson.css']) assert.ok(fs.existsSync(path.join(root, f)), `缺少 ${f}`);
@@ -32,10 +40,10 @@ assert.equal((player.match(/createRotateHint\(\{/g) || []).length, 1, 'bio-lesso
 assert.ok(player.includes("classList.toggle('bio-fs', on)") && player.includes("orient.lock('landscape')"), 'bio-lesson.js:全螢幕要切換 .bio-fs,手機要鎖成橫向');
 assert.ok(css.includes('html.bio-fs main.lesson{position:fixed;inset:0'), 'bio-lesson.css 缺少全螢幕的劇場模式版面');
 
-// 分頁列:← 儀器入口,然後是清單裡 bio 的每一頁(順序相同),本頁 aria-current
-const navOf = (html) => {
-  const m = html.match(/<nav class="sitenav" aria-label="生化原理">([\s\S]*?)<\/nav>/);
-  assert.ok(m, '缺少生化原理的分頁列');
+// 分頁列:← 儀器入口,然後是清單裡同一區的每一頁(順序相同),本頁 aria-current
+const navOf = (html, label) => {
+  const m = html.match(new RegExp(`<nav class="sitenav" aria-label="${label}">([\\s\\S]*?)</nav>`));
+  assert.ok(m, `缺少${label}的分頁列`);
   return [...m[1].matchAll(/<a href="([^"]+)"( aria-current="page")?>([^<]+)<\/a>/g)].map((x) => ({ href: x[1], current: !!x[2], text: x[3] }));
 };
 const NEED = ['id="stage"', 'class="cap-no"', 'class="cap-ch"', 'class="cap-tx"', 'id="btnPrev"', 'id="btnPlay"', 'id="btnNext"', 'id="prog"', 'id="chName"', 'id="chapters"', 'class="ops-body"', 'id="btnFs"'];
@@ -50,7 +58,7 @@ const hasName = (text) => {
   return false;
 };
 const DASH = /\u{2014}/u; // 破折號(UI 文案不用)
-for (const item of bio) {
+for (const { name: label, items: group } of groups) for (const item of group) {
   const dir = item.href.replace('./', '');
   const file = dir + 'index.html';
   const html = read(file);
@@ -60,9 +68,9 @@ for (const item of bio) {
   assert.ok(!html.includes('createRotateHint'), `${dir}: 轉向提示由播放器顯示,頁面不要自己呼叫 createRotateHint`);
   assert.ok(!hasName(html), `${dir}: 頁面出現了提供研究主題的老師姓名`);
   assert.ok(!DASH.test(html), `${dir}: 頁面不應出現破折號`);
-  const nav = navOf(html);
+  const nav = navOf(html, label);
   assert.equal(nav[0].href, '../', `${dir}: 分頁列第一個要是 ← 儀器入口`);
-  assert.deepEqual(nav.slice(1).map((a) => a.href), bio.map((b) => (b.id === item.id ? './' : `../${b.href.replace('./', '')}`)), `${dir}: 分頁列和清單的生化原理教材不一致`);
+  assert.deepEqual(nav.slice(1).map((a) => a.href), group.map((b) => (b.id === item.id ? './' : `../${b.href.replace('./', '')}`)), `${dir}: 分頁列和清單的${label}教材不一致`);
   assert.deepEqual(nav.filter((a) => a.current).map((a) => a.href), ['./'], `${dir}: 分頁列要標出本頁`);
   const mod = html.match(/<script type="module">([\s\S]*?)<\/script>/);
   assert.ok(mod, `${dir}: 缺少 module script`);
@@ -77,4 +85,4 @@ for (const item of bio) {
 }
 for (const f of ['index.html', 'content/instruments.json', 'INSTRUMENTS.md', 'README.md', 'AGENTS.md', 'docs/HANDOFF.md', 'docs/VALIDATION.md']) assert.ok(!hasName(read(f)), `${f} 出現了提供研究主題的老師姓名`);
 fs.rmSync(tmp, { recursive: true, force: true });
-console.log(`PASS: ${bio.length} 份生化原理教材:共用播放器、元素、分頁列、章節代號、module 語法、維護說明;頁面與文件沒有老師姓名與破折號。`);
+console.log(`PASS: ${groups.map((g) => `${g.name} ${g.items.length} 份`).join('、')}:共用播放器、元素、分頁列、章節代號、module 語法、維護說明;頁面與文件沒有老師姓名與破折號。`);

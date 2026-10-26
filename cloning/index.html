@@ -57,6 +57,9 @@
       <li>轉形:質體和勝任細胞先放冰上,再泡 42 °C 水浴 30 到 60 秒(熱休克);塗在含抗生素的培養基上,只有帶著質體的菌長得出菌落。</li>
       <li>pET 系統:表現菌株(名稱帶 DE3)帶有 T7 RNA 聚合酶的基因,平常被 LacI 擋住;加入 IPTG(常用 0.4 到 1 mM)後開始大量表現,目標蛋白可以超過菌體蛋白的一半。低溫(例如 15 到 20 °C)長時間誘導,可溶的比例常會提高。</li>
       <li>His 標籤(6 個組胺酸)會抓住鎳或鈷樹脂;用少量咪唑洗掉雜蛋白,再用高濃度咪唑把目標蛋白換下來。SDS-PAGE 看大小,西方墨點法(Western blot)用認得 His 標籤的抗體確認身分(原理見 <a href="../immunoassay/">抗體檢測</a>),最後再測酵素活性;萜類合成酶的產物怎麼認出來,見 <a href="../terpene-synthase/">萜類合成酶</a>。</li>
+      <li>進階:不用限制酶也能接。Gibson 組裝讓相鄰的兩段共用一段 15 到 30 bp 的重疊序列,5′ 外切酶把 5′ 端吃掉露出 3′ 單股、重疊處配對、聚合酶補空隙、接合酶封口,50 °C 一管同溫完成;每個接點都要接對,所以片段越多成功率越低。</li>
+      <li>進階:Golden Gate 用 IIS 型限制酶,BsaI 認 GGTCTC 卻切在辨識序列外面(上股隔 1 個、下股隔 5 個鹼基),留下 4 個鹼基的突出端。辨識序列跟著丟掉的那一小段走,產物不再被切,接錯或自接的還有切位會被切開,所以切與接能在同一管裡一直循環。突出端要各不相同也不能是回文(4 個鹼基的 256 種扣掉 16 種回文,剩 240 種);有兩個接點一樣時,中間那一段會被跳過或接上兩份。</li>
+      <li>進階:大腸桿菌少用的密碼子(例如精胺酸的 AGG、AGA,占全部密碼子 0.21% 與 0.36%)對應的 tRNA 很少,核糖體讀到會停住。做法是改成同義密碼子重新合成,或用補充稀有 tRNA 的菌株。密碼子適應指數 CAI 是各密碼子 w 值的幾何平均(w = 這個密碼子的使用比例 ÷ 同義密碼子裡最高的那一個),範圍 0 到 1;但 CAI 高不保證表現高,在 154 個同義的 GFP 變體裡 CAI 和螢光沒有相關(r = 0.14),起始密碼子附近(−4 到 +37)的 mRNA 摺疊能量解釋了 44% 的變異。</li>
     </ul>
   </div>
   <div class="src">
@@ -67,7 +70,10 @@
       <li>Novagen pET System Manual, 10th ed.(TB055)第 4、11、14、33、34、42 頁:<a href="https://mcb.berkeley.edu/labs/krantz/pdf/vectors/pET_system_manual.pdf">PDF</a>(T7 啟動子、DE3 菌株的 lacUV5 與 IPTG、IPTG 0.4 或 1 mM、目標蛋白可超過菌體蛋白一半、低溫誘導提高可溶比例、不加 IPTG 的對照);另見 Rosano GL, et al. Front Microbiol. 2014;5:172. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4029002/">PMC4029002</a>(包涵體與 15 到 25 °C 表現)。</li>
       <li>Bornhorst JA, et al. Purification of proteins using polyhistidine affinity tags. Methods Enzymol. 2000;326:245–254. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2909483/">PMC2909483</a>(6 個組胺酸、鎳與鈷樹脂、咪唑洗滌 10 到 50 mM、沖提 100 mM 以上)。</li>
       <li>實際的例子:Ma LT, et al. Unveiling Monoterpene Biosynthesis in Taiwania cryptomerioides via Functional Characterization. Plants. 2021;10(11):2404. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/">PMC8625326</a>(反轉錄做 cDNA、先接 pGEM-T Easy、再接 pET21、pET28 或 pTYB12,轉形 E. coli C41(DE3),OD600 0.6 時加 IPTG 0.4 mM、16 °C 誘導 16 到 22 小時)。</li>
-      <li>動畫裡的序列、外顯子與內含子的數目、質體上元件的位置與大小、菌落數、蛋白質的數量、表現量曲線、16 °C 與 37 °C 的可溶比例、目標蛋白的大小(約 60 kDa)與分子量標準的條帶位置都是示意,不是某個實驗的實測結果。</li>
+      <li>Gibson 組裝:Gibson DG, et al. Nat Methods. 2009;6(5):343–345. <a href="https://doi.org/10.1038/nmeth.1318">doi:10.1038/nmeth.1318</a>(原文這次沒讀到全文,只確認摘要寫的是 5′ 外切酶、聚合酶、接合酶的一管同溫反應);<a href="https://www.addgene.org/protocols/gibson-assembly/">Addgene 的 Gibson Assembly</a>(T5 外切酶從 5′ 端吃出 3′ 單股、Phusion 聚合酶補空隙、Taq 接合酶封口、50 °C 1 小時、引子各帶 30 bp 同源、超過五段成功率明顯下降);<a href="https://www.snapgene.com/guides/gibson-assembly">SnapGene 的 Gibson Assembly</a>(重疊 15 到 30 個鹼基、50 °C、簡單反應 15 分鐘、四段以上一小時以上)。</li>
+      <li>Golden Gate 組裝:Engler C, et al. PLoS ONE. 2008;3(11):e3647. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2574415/">PMC2574415</a>(IIS 型切在辨識序列外面、4 個鹼基突出、產物不含原來的切位、其他組合會被 BsaI 再切開、37 °C 5 到 30 分鐘後 50 °C 與 80 °C 各 5 分鐘、Table 1 的白藍菌落數、256 種突出端扣掉 16 種回文剩 240 種);Weber E, et al. PLoS ONE. 2011;6(2):e16765 <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3041749/">PMC3041749</a>(MoClo:接合位要 unique 與非回文、一步最多 6 個轉錄單元、37 °C 與 16 °C 循環);<a href="https://www.thermofisher.com/order/catalog/product/ER0291">Thermo Fisher Eco31I(BsaI)ER0291</a>(GGTCTC(1/5));Potapov V, et al. ACS Synth Biol. 2018;7(11):2665–2674. <a href="https://doi.org/10.1101/322297">bioRxiv 322297</a>(突出端配錯會整段多出或少掉;12 段預測 99%、實測 99.2 ± 0.6%,24 段預測 91%、實測 84 ± 5%)。</li>
+      <li>密碼子最佳化:Sharp PM, Li WH. Nucleic Acids Res. 1987;15(3):1281–1295. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC340524/">PMC340524</a>(CAI 的原始定義,這次只讀到摘要);Xia X. Evol Bioinform. 2007;3:53–58. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2684136/">PMC2684136</a>(w 與 CAI 的算式、只有一個密碼子的家族要排除);Rosano GL, et al. 2014. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4029002/">PMC4029002</a>(稀有密碼子使用頻率低於 1%、AGG 低於 0.2%、tRNA 耗盡使核糖體停住甚至脫落、Rosetta 帶 pRARE、翻譯太快反而聚集);Kane JF. Curr Opin Biotechnol. 1995;6(5):494–500(成串稀有密碼子的影響,原文沒讀到,內容依 Rosano 2014 的引用);<a href="https://www.genscript.com/tools/codon-frequency-table">GenScript 的大腸桿菌密碼子使用表</a>(各密碼子的比例與頻率);Kudla G, et al. Science. 2009;324(5924):255–258. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3902468/">PMC3902468</a>(154 個同義的 GFP、蛋白量差 250 倍、CAI 與螢光 r = 0.14、−4 到 +37 的摺疊能量解釋 44%)。</li>
+      <li>動畫裡的序列、外顯子與內含子的數目、質體上元件的位置與大小、菌落數、蛋白質的數量、表現量曲線、16 °C 與 37 °C 的可溶比例、目標蛋白的大小(約 60 kDa)與分子量標準的條帶位置都是示意,不是某個實驗的實測結果。進階章節裡,Gibson 那一章的片段長度、每個接點接對的機率 0.97 與接出的環是示意(4ⁿ 與 0.97 的次方是真的算出來的);Golden Gate 那一章的引子末端序列是為畫面設計的,突出端取自 MoClo 的接合位,接得出哪些環是用那幾組突出端實際推過的;密碼子那一章的 10 個密碼子是示意的短序列,w 與 CAI 依 GenScript 的大腸桿菌全基因體密碼子使用表算出(真正的 CAI 以高表現基因當參考組),讀完所需時間的倍數也是示意。</li>
     </ul>
   </div>
 </section>
@@ -492,6 +498,91 @@ const solFrac = (temp) => (temp <= 16 ? 0.7 : 0.25);
 function laneAmounts(S) {
   const e = S.iptg ? 1 : 0.04, sol = solFrac(S.temp);
   return [0, 0.04, e, e * sol, e * (1 - sol), S.his && S.iptg ? e * sol * 0.9 : 0];
+}
+
+// ===== 第 9 章:Gibson 組裝 =====
+// 畫面上的長度都由鹼基數換算:sc 是一個鹼基幾個 px,len 是每段畫出來的長度(示意)
+const GB = { x0: 64, sc: 6.2, len: 56, gap: 20, chew: 4, yT: 140, yB: 172, yT2: 222, yB2: 254 };
+const GB_COL = [C.backbone, C.mint, C.amber, C.blue, C.lav]; // 第一段是切開的載體(灰白)
+const GB_P = 0.97; // 每個接點接對的機率(示意)
+const supN = (n) => String(n).replace(/[-0-9]/g, (d) => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'[d === '-' ? 0 : Number(d) + 1]);
+const subN = (n) => String(n).replace(/[0-9]/g, (d) => '₀₁₂₃₄₅₆₇₈₉'[Number(d)]);
+// 4ⁿ 寫成 a × 10ᵇ
+function pow4Text(n) {
+  const v = 4 ** n, e = Math.floor(Math.log10(v));
+  return `${(v / 10 ** e).toFixed(1)} × 10${supN(e)}`;
+}
+function gbLine(g, x1, x2, y, color, lw = 5) { if (x2 - x1 > 0.6) g.line(x1, y, x2, y, color, lw); }
+// 兩股都在的地方畫配對的短虛線
+function gbPairs(g, a, b, yT, yB, X) { for (let p = a + 1.5; p < b - 0.5; p += 3) g.line(X(p), yT + 7, X(p), yB - 7, 'rgba(240,243,238,.45)', 1.8, [2, 3]); }
+// 接好的環:f 段(第一段是載體),接點用琥珀色的點
+function gbRing(g, cx, cy, r, f) {
+  g.circle(cx, cy, r, null, '#223330', 9);
+  for (let i = 0; i < f; i++) arc(g, cx, cy, r, (360 / f) * i + 4, (360 / f) * (i + 1) - 4, GB_COL[i % GB_COL.length], 9);
+  for (let i = 0; i < f; i++) { const [jx, jy] = pol(cx, cy, r, (360 / f) * i); g.circle(jx, jy, 4.5, C.amber); }
+}
+
+// ===== 第 10 章:Golden Gate =====
+// 引子的末端:tt + GGTCTC(BsaI 辨識序列) + 一個間隔鹼基 + 4 個鹼基的突出端 GGAG + 片段本身
+const GG_SEQ = 'TTGGTCTCAGGAGTCGACCTG';
+const GG_CUT_T = 9, GG_CUT_B = 13; // 上股切在第 9 個之前、下股切在第 13 個之前(GGTCTC(1/5))
+const GG_S = 30, GG_X = 172, GG_T = 112, GG_B = 174;
+const GG_D = { step: GG_S, bw: 21, bh: 23 };
+// 接點的 4 個鹼基:好的組合取自 MoClo 的接合位(Weber 2011);有重複的那一組把第 2、3 個接點設成一樣
+const GG_SETS = { ok: ['GGAG', 'AATG', 'AGGT', 'GCTT'], dup: ['GGAG', 'AATG', 'AATG', 'GCTT'] };
+// 一管裡能接出哪些環(用 node 把所有路徑列過:好的只有一種,有重複時中間那一段會被跳過或接兩份)
+const GG_OUT = {
+  ok: [{ order: [1, 2, 3], ok: true, note: '只有這一種接法' }],
+  dup: [{ order: [1, 2, 3], ok: true, note: '正確' }, { order: [1, 3], ok: false, note: '跳過第 2 段' }, { order: [1, 2, 2, 3], ok: false, note: '第 2 段接了兩份' }],
+};
+const GG_ARC = [0, 66, 133, 200]; // 主環上四個接點的角度(載體占 200 到 360 度)
+const GG_COLONY = { 5: [364, 6], 30: [1820, 1] }; // Engler 2008 Table 1:白色與藍色菌落數
+function ggRing(g, cx, cy, r, order, lw = 9) {
+  const seg0 = 360 / (order.length + 1.6); // 載體畫得寬一點
+  g.circle(cx, cy, r, null, '#223330', lw);
+  arc(g, cx, cy, r, seg0 * order.length + 3, 360 - 3, C.backbone, lw);
+  order.forEach((k, i) => arc(g, cx, cy, r, seg0 * i + 3, seg0 * (i + 1) - 3, GB_COL[k], lw));
+  for (let i = 0; i <= order.length; i++) { const [jx, jy] = pol(cx, cy, r, seg0 * i); g.circle(jx, jy, lw * 0.4, C.amber); }
+}
+
+// ===== 第 11 章:密碼子最佳化 =====
+// 大腸桿菌的密碼子使用:[同一個胺基酸裡的比例, 每一千個密碼子出現幾次](GenScript 的大腸桿菌密碼子使用表)
+// 只收這兩條示意序列用到的胺基酸家族;換序列時要一起補上新的家族
+const EC = {
+  ATG: [1.00, 26.4], GCT: [0.18, 17.1], GCC: [0.26, 24.2], GCA: [0.23, 21.2], GCG: [0.33, 30.1],
+  CGT: [0.36, 20.0], CGC: [0.36, 19.7], CGA: [0.07, 3.8], CGG: [0.11, 5.9], AGA: [0.07, 3.6], AGG: [0.04, 2.1],
+  TTA: [0.14, 14.3], TTG: [0.13, 13.0], CTT: [0.12, 11.9], CTC: [0.10, 10.2], CTA: [0.04, 4.2], CTG: [0.47, 48.4],
+  ATT: [0.49, 29.8], ATC: [0.39, 23.7], ATA: [0.11, 6.8],
+  CCT: [0.18, 7.5], CCC: [0.13, 5.4], CCA: [0.20, 8.6], CCG: [0.49, 20.9],
+  GGT: [0.35, 25.5], GGC: [0.37, 27.1], GGA: [0.13, 9.5], GGG: [0.15, 11.3], AAA: [0.74, 35.3], AAG: [0.26, 12.4],
+};
+const CODON_AA = { ATG: 'Met', GCT: 'Ala', GCC: 'Ala', GCA: 'Ala', GCG: 'Ala', CGT: 'Arg', CGC: 'Arg', CGA: 'Arg', CGG: 'Arg', AGA: 'Arg', AGG: 'Arg', TTA: 'Leu', TTG: 'Leu', CTT: 'Leu', CTC: 'Leu', CTA: 'Leu', CTG: 'Leu', ATT: 'Ile', ATC: 'Ile', ATA: 'Ile', CCT: 'Pro', CCC: 'Pro', CCA: 'Pro', CCG: 'Pro', GGT: 'Gly', GGC: 'Gly', GGA: 'Gly', GGG: 'Gly', AAA: 'Lys', AAG: 'Lys' };
+const AA_ZH = { Met: '甲硫胺酸', Ala: '丙胺酸', Arg: '精胺酸', Leu: '白胺酸', Ile: '異白胺酸', Pro: '脯胺酸', Gly: '甘胺酸', Lys: '離胺酸' };
+// 同一個胺基酸裡最高的比例
+const EC_MAX = (() => { const m = {}; for (const [c, v] of Object.entries(EC)) { const a = CODON_AA[c]; m[a] = Math.max(m[a] || 0, v[0]); } return m; })();
+const wOf = (c) => EC[c][0] / EC_MAX[CODON_AA[c]];
+const isRare = (c) => EC[c][1] < 10; // 每一千個不到 10 次,就是使用頻率低於 1%
+const SEQ_ORIG = ['ATG', 'GCT', 'AGG', 'TTA', 'ATA', 'AGA', 'CCC', 'GGA', 'CTA', 'AAG'];
+const SEQ_OPT = ['ATG', 'GCG', 'CGT', 'CTG', 'ATT', 'CGT', 'CCG', 'GGC', 'CTG', 'AAA'];
+// 只有一個密碼子的家族(Met、Trp)w 永遠是 1,不列入(Sharp 與 Li 1987;Xia 2007)
+const caiCodons = (seq) => seq.filter((c) => EC_MAX[CODON_AA[c]] < 1);
+// 前 k 個 w 的幾何平均;k 等於全部時就是這條序列的 CAI
+function caiPartial(seq, k) {
+  const use = caiCodons(seq).slice(0, Math.max(1, k));
+  return Math.exp(use.reduce((a, c) => a + Math.log(wOf(c)), 0) / use.length);
+}
+const CD_X = 76, CD_W = 86; // 密碼子的中心位置
+// 讀過一個密碼子要多久(示意):稀有的慢得多
+const codonCost = (c, help) => (isRare(c) && !help ? 3.2 : 1);
+// 小髮夾(起始密碼子附近的 mRNA 二級結構):兩條股配在一起,上面一個圈
+function hairpin(g, x, y, s, color) {
+  const w = s * 0.3;
+  g.line(x - w, y + s * 0.8, x - w, y - s * 0.1, color, 2.6);
+  g.line(x + w, y + s * 0.8, x + w, y - s * 0.1, color, 2.6);
+  const p = [];
+  for (let i = 0; i <= 22; i++) { const a = Math.PI - (i / 22) * Math.PI; p.push([x + Math.cos(a) * w, y - s * 0.1 - Math.sin(a) * s * 0.42]); }
+  g.curve(p, color, 2.6);
+  for (let i = 0; i < 3; i++) g.line(x - w + 2, y + s * 0.1 + i * s * 0.24, x + w - 2, y + s * 0.1 + i * s * 0.24, 'rgba(240,243,238,.45)', 1.6, [2, 2]);
 }
 
 const chapters = [
@@ -1091,11 +1182,292 @@ const chapters = [
       lines.forEach((s, i) => g.text(760, 330 + i * 24, s, { size: 14, color: C.ink, alpha: la }));
     },
   },
+  {
+    key: 'gibson', name: '進階:Gibson 組裝', dur: 17,
+    cues: [[0, 'Gibson 組裝不用限制酶:做 PCR 時讓相鄰的兩段共用一段 15 到 30 bp 的重疊序列。'],
+      [4.6, '5′ 外切酶從兩段的 5′ 端各吃掉一小段,露出 3′ 單股;重疊的地方互相配對。'],
+      [9, '聚合酶補上被吃掉的空隙,接合酶把兩個缺口封起來;整個反應在 50 °C 一管裡完成。'],
+      [13, '每個接點都要接對,片段越多成功率越低;右邊可以改片段數與重疊長度。']],
+    draw(g, t, S) {
+      const ov = S.gibOv, f = S.gibFrag, X = (bp) => GB.x0 + bp * GB.sc, L = GB.len;
+      const ck = ease(seg(t, 1.6, 4.6)), sl = ease(seg(t, 5.2, 8.2)), fk = ease(seg(t, 8.8, 11.4));
+      const chew = (ov + GB.chew) * ck;
+      const bOff = lerp(L + GB.gap, L - ov, sl);
+      const yT2 = lerp(GB.yT2, GB.yT, sl), yB2 = lerp(GB.yB2, GB.yB, sl);
+      // 上面的四個步驟
+      const step = t < 4.8 ? 0 : t < 8.4 ? 1 : t < 11.7 ? 2 : 3;
+      ['1 吃 5′ 端', '2 重疊配對', '3 補空隙', '4 封口'].forEach((s, i) => {
+        const x = 24 + i * 136, on = step === i;
+        g.rrect(x, 38, 128, 30, 15, on ? 'rgba(165,243,205,.18)' : 'rgba(255,255,255,.04)', on ? C.mint : C.line, 1.5);
+        g.text(x + 64, 53, s, { size: 13.5, weight: 600, color: on ? C.mint : C.muted, align: 'center' });
+      });
+      g.tag(704, 53, `重疊 ${ov} bp`, { size: 14, color: C.amber });
+      g.tag(862, 53, '50 °C 一管', { size: 14, color: C.amber });
+      // 重疊的地方(兩段各有一份同樣的序列)
+      const band = (a, b, yA, yB) => g.rrect(X(a), yA - 9, (b - a) * GB.sc, yB - yA + 18, 5, 'rgba(255,209,102,.08)', 'rgba(255,209,102,.6)');
+      band(L - ov, L, GB.yT, GB.yB);
+      if (sl < 0.99) band(bOff, bOff + ov, yT2, yB2);
+      // 第一段(切開的載體)
+      gbLine(g, X(0), X(L), GB.yT, GB_COL[0]);
+      gbLine(g, X(0), X(L - chew), GB.yB, GB_COL[0]);
+      gbPairs(g, 0, L - chew, GB.yT, GB.yB, X);
+      // 第二段
+      gbLine(g, X(bOff), X(bOff + L), yB2, GB_COL[1]);
+      gbLine(g, X(bOff + chew), X(bOff + L), yT2, GB_COL[1]);
+      gbPairs(g, bOff + chew, bOff + L, yT2, yB2, X);
+      // 重疊處配對起來
+      fade(g, seg(t, 7.2, 8.2), () => gbPairs(g, L - ov, L, GB.yT, GB.yB, X));
+      // 聚合酶補上的部分
+      if (sl >= 0.99 && fk > 0) {
+        gbLine(g, X(L), X(L + GB.chew * fk), GB.yT, C.mint);
+        gbLine(g, X(L - ov - GB.chew), X(L - ov - GB.chew + GB.chew * fk), GB.yB, C.mint);
+      }
+      // 兩個缺口:封好之前是圈,封好之後是實線
+      if (fk >= 0.99) {
+        const nick = (x, y, sealed) => { if (sealed) g.line(x - 5, y, x + 5, y, C.mint, 5); else g.circle(x, y, 4, C.bg, C.hot, 1.8); };
+        nick(X(L + GB.chew), GB.yT, t >= 12.6);
+        nick(X(L - ov), GB.yB, t >= 13.8);
+      }
+      // 標籤
+      fade(g, ease(seg(t, 0.3, 0.9)), () => {
+        g.line(40, 92, 64, 92, GB_COL[0], 5); g.text(72, 92, '切開的載體', { size: 14, color: C.ink2 });
+        g.line(196, 92, 220, 92, GB_COL[1], 5); g.text(228, 92, '要接進去的片段', { size: 14, color: C.mint });
+      });
+      const ovLab = pulse(t, 1.2, 8.6);
+      g.text(X(L - ov / 2), 112, '兩段共用的序列', { size: 13.5, weight: 600, color: C.amber, align: 'center', alpha: ovLab });
+      if (sl < 0.9) g.text(X(bOff + ov / 2), yT2 - 28, '同一段', { size: 13.5, weight: 600, color: C.amber, align: 'center', alpha: ovLab });
+      if (ck > 0.05 && sl < 0.9) {
+        g.text(X(L - chew), GB.yB + 24, '5′', { size: 15, weight: 700, color: C.hot, align: 'center' });
+        g.text(X(bOff + chew), yT2 - 24, '5′', { size: 15, weight: 700, color: C.hot, align: 'center' });
+        g.tag(X(L - chew / 2), GB.yB + 80, '露出 3′ 單股', { size: 13.5, color: C.ink2, alpha: pulse(t, 3, 5.4) });
+      }
+      // 三種酵素
+      if (t >= 1.6 && t < 5.2) {
+        const ea = Math.min(seg(t, 1.6, 2.1), 1 - seg(t, 4.8, 5.2));
+        g.blob(X(L - chew), GB.yB + 46, 42, 17, C.lav, '外切酶', { size: 12.5, alpha: ea, wobble: 1, t });
+        g.blob(X(bOff + chew), yT2 - 42, 42, 17, C.lav, '外切酶', { size: 12.5, alpha: ea, wobble: 1, t: t + 1 });
+      }
+      if (t >= 8.6 && t < 12) g.blob(X(L - ov - GB.chew / 2), GB.yB + 44, 40, 17, C.lav, '聚合酶', { size: 12.5, alpha: Math.min(seg(t, 8.6, 9.1), 1 - seg(t, 11.6, 12)), wobble: 1, t });
+      if (t >= 11.9 && t < 15) {
+        const k = ease(seg(t, 12.8, 13.6));
+        g.blob(lerp(X(L + GB.chew), X(L - ov), k), lerp(GB.yT - 38, GB.yB + 44, k), 40, 17, C.lav, '接合酶', { size: 12.5, alpha: Math.min(seg(t, 11.9, 12.3), 1 - seg(t, 14.6, 15)), wobble: 1, t });
+      }
+      g.tag(480, 252, '接好了:一條連續的雙股 DNA', { size: 15, color: C.mint, alpha: pulse(t, 14.6, 17.6) });
+      // 左下:接好的環
+      fade(g, ease(seg(t, 0.8, 1.6)), () => {
+        g.panel(24, 332, 292, 154, '要接的片段');
+        gbRing(g, 170, 418, 44, f);
+        g.text(170, 478, `載體 + ${f - 1} 段,接點 ${f} 個`, { size: 14, weight: 600, color: C.ink2, align: 'center' });
+      });
+      // 中下:重疊為什麼要夠長
+      fade(g, ease(seg(t, 2.6, 3.4)), () => {
+        g.panel(332, 332, 292, 154, '重疊為什麼要夠長');
+        g.text(348, 378, `${ov} 個鹼基排得出來的組合`, { size: 14, color: C.ink2 });
+        g.text(478, 414, `4${supN(ov)} = ${pow4Text(ov)}`, { size: 19, weight: 800, color: C.mint, align: 'center' });
+        g.text(348, 444, '同一段序列只在設計好的地方出現', { size: 13.5, color: C.ink2 });
+        g.text(348, 470, ov <= 10 ? '太短:50 °C 下也黏不牢' : ov <= 30 ? '常用的範圍' : '更長也可以,反應時間要拉長', { size: 13.5, weight: 600, color: ov <= 10 ? C.amber : C.mint });
+      });
+      // 右下:片段越多,接點越多
+      fade(g, ease(seg(t, 11.6, 12.4)), () => {
+        g.panel(640, 332, 296, 154, '片段越多,接點越多');
+        g.text(656, 378, '每個接點接對的機率 0.97(示意)', { size: 13.5, color: C.muted });
+        g.text(788, 414, `0.97${supN(f)} = ${(GB_P ** f * 100).toFixed(1)}%`, { size: 21, weight: 800, color: C.mint, align: 'center', mono: true });
+        g.text(656, 446, f <= 3 ? '2 到 3 段:50 °C 約 15 分鐘' : '4 段以上:50 °C 約 1 小時', { size: 13.5, color: C.ink2 });
+        g.text(656, 470, '不用換溫度,也不用限制酶', { size: 13.5, color: C.muted });
+      });
+    },
+  },
+  {
+    key: 'golden-gate', name: '進階:Golden Gate 組裝', dur: 18,
+    cues: [[0, 'Golden Gate 用 IIS 型限制酶:BsaI 認 GGTCTC,卻切在辨識序列外面。'],
+      [4, '上股在往外第 1 個鹼基之後、下股在第 5 個之後切開,留下 4 個鹼基的突出端。'],
+      [8, '辨識序列跟著丟掉的那一小段一起走;產物不再被切,接錯的還會被切開,所以切與接能在同一管裡一直循環。'],
+      [12.5, '每個接點的 4 個鹼基要各不相同;右邊可以換成有重複的組合,看會接出什麼。']],
+    draw(g, t, S) {
+      const set = GG_SETS[S.ggSet], outs = GG_OUT[S.ggSet], bot = complement(GG_SEQ);
+      const N = GG_SEQ.length, X = (i) => GG_X + i * GG_S;
+      const cut = t >= 4.2, dx = -GG_CUT_T * GG_S * ease(seg(t, 6.2, 7.6)), la = 1 - ease(seg(t, 5.6, 6.9));
+      const hb = (i, a = 1, sx = 0) => g.line(X(i) + sx, GG_T + 26, X(i) + sx, GG_B - 26, `rgba(240,243,238,${0.45 * a})`, 2, [2, 3]);
+      if (!cut) {
+        g.strand(GG_X, GG_T, GG_SEQ, { ...GG_D, dir: 1 });
+        g.strand(GG_X, GG_B, bot, { ...GG_D, dir: -1 });
+        for (let i = 0; i < N; i++) hb(i);
+        g.text(GG_X - 26, GG_T, '5′', { size: 14, color: C.muted, align: 'right', mono: true });
+        g.text(GG_X - 26, GG_B, '3′', { size: 14, color: C.muted, align: 'right', mono: true });
+      } else {
+        // 左邊那一小段(帶著辨識序列)淡出;留下來的片段滑到左邊,上股多出 4 個鹼基
+        if (la > 0) {
+          g.strand(GG_X, GG_T, GG_SEQ, { ...GG_D, dir: 1, from: 0, to: GG_CUT_T, alpha: la });
+          g.strand(GG_X, GG_B, bot, { ...GG_D, dir: -1, from: 0, to: GG_CUT_B, alpha: la });
+          for (let i = 0; i < GG_CUT_T; i++) hb(i, la);
+          g.text(GG_X - 26, GG_T, '5′', { size: 14, color: C.muted, align: 'right', mono: true, alpha: la });
+          g.text(GG_X - 26, GG_B, '3′', { size: 14, color: C.muted, align: 'right', mono: true, alpha: la });
+        }
+        g.strand(GG_X + dx, GG_T, GG_SEQ, { ...GG_D, dir: 1, from: GG_CUT_T, to: N });
+        g.strand(GG_X + dx, GG_B, bot, { ...GG_D, dir: -1, from: GG_CUT_B, to: N });
+        for (let i = GG_CUT_B; i < N; i++) hb(i, 1, dx);
+        g.text(X(GG_CUT_T) + dx - 24, GG_T, '5′', { size: 14, color: C.muted, align: 'right', mono: true, alpha: 1 - la });
+        g.text(X(GG_CUT_B) + dx - 24, GG_B, '3′', { size: 14, color: C.muted, align: 'right', mono: true, alpha: 1 - la });
+        // 突出端發亮
+        const gl = pulse(t, 6.4, 18.4);
+        if (gl > 0) g.rrect(X(GG_CUT_T) + dx - 14, GG_T - 10, 4 * GG_S, 46, 6, `rgba(255,209,102,${0.2 * gl})`, `rgba(255,209,102,${0.75 * gl})`);
+      }
+      // 辨識序列的框與切點
+      const bx = pulse(t, 1.2, 7.4);
+      if (bx > 0) {
+        g.rrect(X(1.5), GG_T - 12, 6 * GG_S, GG_B - GG_T + 24, 6, null, `rgba(184,164,244,${0.85 * bx})`, 2);
+        g.text(X(4.5), 92, 'GGTCTC(1/5)', { size: 13.5, weight: 700, color: C.lav, align: 'center', mono: true, alpha: bx });
+      }
+      const ca = pulse(t, 4.2, 6.6);
+      if (ca > 0) {
+        const xa = X(GG_CUT_T - 0.5), xb = X(GG_CUT_B - 0.5), ym = (GG_T + GG_B) / 2;
+        g.curve([[xa, GG_T - 16], [xa, ym], [xb, ym], [xb, GG_B + 16]], C.hot, 2.5, { alpha: ca, dash: [5, 4] });
+      }
+      g.tag(480, 56, 'IIS 型限制酶:切在辨識序列外面', { size: 14, color: C.lav, alpha: pulse(t, 1, 18.4) });
+      fade(g, ease(seg(t, 7.4, 8.1)), () => {
+        g.text(560, 116, '切下來的小段帶走辨識序列', { size: 15, weight: 600, color: C.ink2 });
+        g.text(560, 146, '留下 4 個鹼基的突出端 GGAG', { size: 15, weight: 600, color: C.amber });
+        g.text(560, 176, '接好的產物裡就沒有 BsaI 的切位', { size: 15, weight: 600, color: C.mint });
+      });
+      // 主環:載體加三段,四個接點的突出端
+      fade(g, ease(seg(t, 7.4, 8.1)), () => {
+        ggRing(g, 142, 296, 54, [1, 2, 3], 11);
+        g.text(142, 290, '要接的', { size: 13, color: C.muted, align: 'center' });
+        g.text(142, 310, '四段', { size: 13, color: C.muted, align: 'center' });
+      });
+      set.forEach((s, i) => {
+        const dup = set.filter((x) => x === s).length > 1;
+        ringLabel(g, 142, 296, 54, GG_ARC[i], s, dup ? C.red : C.amber, { dist: 24, size: 14, alpha: ease(seg(t, 8 + i * 0.3, 8.6 + i * 0.3)) });
+      });
+      if (S.ggSet === 'dup') g.tag(142, 394, '兩個接點一樣', { size: 13.5, color: C.red, alpha: ease(seg(t, 9.6, 10.2)) });
+      // 一管裡能接出哪些環
+      outs.forEach((o, i) => {
+        const a = ease(seg(t, 10.2 + i * 1.4, 11 + i * 1.4));
+        if (a <= 0) return;
+        const cx = outs.length === 1 ? 520 : 380 + i * 192;
+        fade(g, a, () => {
+          ggRing(g, cx, 290, 44, o.order, 9);
+          mark(g, cx - 62, 354, o.ok, 8);
+          g.text(cx - 46, 354, `載體-${o.order.join('-')}`, { size: 14, weight: 700, color: o.ok ? C.mint : C.red });
+          g.text(cx, 380, o.note, { size: 13.5, color: C.ink2, align: 'center' });
+        });
+      });
+      // 左下:切與接一直循環
+      fade(g, ease(seg(t, 14.4, 15.2)), () => {
+        g.panel(24, 414, 446, 106, '切與接一直循環,正確的產物越積越多');
+        mark(g, 48, 462, true, 8);
+        g.text(66, 462, '產物裡沒有切位,不會再被切', { size: 14, weight: 600, color: C.mint });
+        arcArrow(g, 48, 494, 11, 40, 330, C.amber, 3, 7);
+        g.text(66, 494, '接錯或自己接回去的還有切位,會被切開', { size: 14, color: C.amber });
+      });
+      // 右下:實測的白色菌落比例
+      fade(g, ease(seg(t, 15.2, 16)), () => {
+        const [wc, bc] = GG_COLONY[S.ggTime], pct = (100 * wc) / (wc + bc);
+        // Engler 2008 Table 1 這一列:37 °C 切接之後,再 50 °C 與 80 °C 各 5 分鐘(切掉剩下的載體、讓酵素失活)才轉形
+        g.panel(490, 414, 446, 106, '實測:切接後再 50、80 °C 各 5 分鐘,長出的菌落');
+        g.text(508, 456, `37 °C ${S.ggTime} 分鐘:白 ${wc} 個、藍 ${bc} 個`, { size: 15, weight: 600, color: C.ink2 });
+        g.rrect(508, 474, 300, 14, 7, 'rgba(90,120,255,.35)');
+        g.rrect(508, 474, 300 * (pct / 100), 14, 7, C.mint);
+        g.text(824, 481, `${pct.toFixed(1)}%`, { size: 17, weight: 800, color: C.mint, mono: true });
+        g.text(508, 508, '白色:接到片段;藍色:載體自己接回去', { size: 13, color: C.muted });
+      });
+    },
+  },
+  {
+    key: 'codon', name: '進階:密碼子最佳化', dur: 18,
+    cues: [[0, '同一個胺基酸有好幾個密碼子,大腸桿菌偏好其中幾個;植物基因裡常出現它少用的。'],
+      [4, '精胺酸的 AGG、AGA 在大腸桿菌只占 0.21% 與 0.36%,對應的 tRNA 很少,核糖體讀到會停住。'],
+      [8.5, '密碼子適應指數 CAI 是每個 w 值的幾何平均;w 是這個密碼子和同義裡最常用那一個的比例。'],
+      [13.5, 'CAI 高不保證表現高:在一組同義的 GFP 變體裡,起始密碼子附近的 mRNA 結構影響更大。']],
+    draw(g, t, S) {
+      const opt = S.codonSeq === 'opt', help = S.codonTrna, seq = opt ? SEQ_OPT : SEQ_ORIG;
+      const sx = (i) => CD_X + i * CD_W;
+      g.text(40, 44, opt ? '最佳化後:換成大腸桿菌常用的同義密碼子' : '原始序列:植物基因的開頭(示意)', { size: 15, weight: 700, color: opt ? C.mint : C.ink2 });
+      // 密碼子、胺基酸與 w
+      const nShow = Math.floor(seg(t, 0.3, 2.2) * (seq.length + 0.999));
+      const wa = ease(seg(t, 2.2, 3.6)), ra = ease(seg(t, 4, 4.8));
+      const kMul = Math.max(1, Math.round(seg(t, 10.8, 13.6) * caiCodons(seq).length));
+      const used = caiCodons(seq).slice(0, kMul);
+      let seen = 0;
+      seq.forEach((c, i) => {
+        if (i >= nShow) return;
+        const rare = isRare(c);
+        if (rare && ra > 0) g.rrect(sx(i) - 29, 106, 58, 36, 6, 'rgba(255,123,123,.10)', `rgba(255,123,123,${0.9 * ra})`, 2);
+        g.text(sx(i), 124, c, { size: 19, weight: 700, color: rare && ra > 0.5 ? C.red : C.ink, align: 'center', mono: true });
+        g.text(sx(i), 156, CODON_AA[c], { size: 14, color: C.muted, align: 'center', alpha: wa });
+        const inCai = EC_MAX[CODON_AA[c]] < 1;
+        if (inCai) seen++;
+        const lit = inCai && seen <= kMul && t >= 10.8;
+        g.text(sx(i), 180, inCai ? `w ${wOf(c).toFixed(2)}` : 'w 1', { size: 13.5, weight: lit ? 700 : 500, color: lit ? C.mint : C.ink2, align: 'center', mono: true, alpha: wa });
+        if (lit) g.line(sx(i) - 24, 194, sx(i) + 24, 194, C.mint, 2.5);
+      });
+      const nRare = seq.filter(isRare).length;
+      g.text(40, 212, `稀有密碼子(使用頻率低於 1%):${nRare} 個`, { size: 14, weight: 600, color: nRare ? C.red : C.mint, alpha: ra });
+      // 核糖體沿著序列讀
+      const rk = seg(t, 6.8, 10.6);
+      if (rk > 0) {
+        const cost = seq.map((c) => codonCost(c, help)), tot = cost.reduce((a, b) => a + b, 0);
+        let acc = 0, pos = seq.length, slow = false;
+        for (let i = 0; i < seq.length; i++) {
+          if (acc + cost[i] >= rk * tot) { pos = i + (rk * tot - acc) / cost[i]; slow = cost[i] > 1; break; }
+          acc += cost[i];
+        }
+        const rx = sx(Math.min(pos, 9.2));
+        g.line(sx(0) - 30, 90, sx(9) + 30, 90, K.rna, 3);
+        ribo(g, rx, 86);
+        if (rk < 1) g.tag(Math.min(rx, 820), 56, slow ? 'tRNA 不夠,停住' : '順順讀過去', { size: 13.5, color: slow ? C.red : C.mint });
+        else g.tag(700, 56, `讀完要 ${(tot / seq.length).toFixed(1)} 倍時間(示意)`, { size: 13.5, color: tot > 12 ? C.amber : C.mint });
+        if (help && !opt) g.tag(620, 90, '菌株補了稀有 tRNA', { size: 13.5, color: C.mint, alpha: pulse(t, 7, 17.8) });
+      }
+      // 左中:CAI
+      fade(g, ease(seg(t, 10.2, 11)), () => {
+        g.panel(24, 230, 446, 150, '密碼子適應指數 CAI');
+        g.text(42, 268, 'w = 這個密碼子的比例 ÷ 同義裡最高的', { size: 13.5, color: C.muted });
+        const Lc = caiCodons(seq).length;
+        const fml = `CAI = (w₁ × w₂ × ⋯ × w${subN(Lc)})`;
+        g.text(42, 300, fml, { size: 16, weight: 600, color: C.ink2, mono: true });
+        g.font(16, 600, true);
+        g.text(46 + g.ctx.measureText(fml).width, 290, `1/${Lc}`, { size: 11.5, color: C.ink2, mono: true });
+        g.text(136, 348, caiPartial(seq, kMul).toFixed(2), { size: 34, weight: 800, color: C.mint, align: 'center', mono: true });
+        g.text(204, 338, `已乘入 ${Math.min(kMul, used.length)} / ${Lc} 個`, { size: 13.5, color: C.muted });
+        g.text(204, 362, 'ATG 不算:它的 w 永遠是 1', { size: 13, color: C.muted });
+      });
+      // 右中:大腸桿菌少用的密碼子
+      fade(g, ease(seg(t, 4.4, 5.2)), () => {
+        g.panel(490, 230, 446, 150, '大腸桿菌的使用頻率(占全部密碼子)');
+        [['AGG', 'Arg'], ['AGA', 'Arg'], ['CTA', 'Leu'], ['ATA', 'Ile'], ['GGA', 'Gly'], ['CGT', 'Arg']].forEach(([c, a], i) => {
+          const y = 270 + i * 20, r = isRare(c), col = r ? C.red : C.mint;
+          g.text(508, y, c, { size: 14, weight: 700, color: col, mono: true });
+          g.text(556, y, AA_ZH[a], { size: 13, color: C.ink2 });
+          g.text(690, y, `${(EC[c][1] / 10).toFixed(2)}%`, { size: 13.5, color: col, align: 'right', mono: true });
+          g.rrect(702, y - 5, Math.max(2, EC[c][1] * 8.6), 10, 4, col);
+          if (!r) g.text(880, y, '常用', { size: 12.5, color: C.muted });
+        });
+      });
+      // 左下:兩個做法
+      fade(g, ease(seg(t, 14, 14.8)), () => {
+        g.panel(24, 392, 446, 128, '兩個做法');
+        g.text(42, 440, '1 改成同義密碼子,整段重新合成', { size: 14, color: C.ink2 });
+        g.text(42, 466, '2 用補充稀有 tRNA 的菌株', { size: 14, color: C.ink2 });
+        g.text(58, 488, '例如帶 pRARE 的 Rosetta', { size: 13, color: C.muted });
+        g.text(42, 510, '改太多也有風險:做太快反而摺不好', { size: 13, color: C.amber });
+      });
+      // 右下:CAI 高不保證表現高
+      fade(g, ease(seg(t, 15.4, 16.2)), () => {
+        g.panel(490, 392, 446, 128, 'CAI 高不保證表現高');
+        g.text(508, 440, '154 個同義的 GFP:CAI 與螢光', { size: 13.5, color: C.ink2 });
+        g.text(508, 464, '沒有相關(r = 0.14)', { size: 13.5, color: C.amber });
+        g.text(508, 490, '起始密碼子附近(−4 到 +37)的 mRNA', { size: 13, color: C.ink2 });
+        g.text(508, 512, '摺疊能量解釋了 44% 的變異', { size: 13, weight: 600, color: C.mint });
+        hairpin(g, 902, 466, 30, K.rna);
+      });
+    },
+  },
 ];
 
 createLesson({
   chapters,
-  state: { template: 'cdna', cut: 'two', anti: true, plasmid: true, iptg: true, his: true, temp: 16 },
+  state: { template: 'cdna', cut: 'two', anti: true, plasmid: true, iptg: true, his: true, temp: 16, gibFrag: 3, gibOv: 20, ggSet: 'ok', ggTime: 30, codonSeq: 'orig', codonTrna: false },
   controls: [
     { id: 'template', label: 'PCR 的模板', type: 'seg', options: [{ v: 'cdna', label: 'cDNA' }, { v: 'gdna', label: '基因組 DNA' }], chapters: ['cdna'], restart: false },
     { id: 'cut', label: '切法', type: 'seg', options: [{ v: 'two', label: '兩種酶' }, { v: 'one', label: '只用一種' }], chapters: ['vector'], restart: false },
@@ -1104,6 +1476,12 @@ createLesson({
     { id: 'iptg', label: '加 IPTG', type: 'toggle', chapters: ['induce', 'fold', 'confirm'], restart: false },
     { id: 'his', label: '接上 His 標籤', type: 'toggle', chapters: ['purify', 'confirm'], restart: false },
     { id: 'temp', label: '電泳樣品的誘導溫度', type: 'seg', options: [{ v: 16, label: '16 °C' }, { v: 37, label: '37 °C' }], chapters: ['confirm'], restart: false },
+    { id: 'gibFrag', label: '要接的片段數', type: 'seg', options: [{ v: 2, label: '2 段' }, { v: 3, label: '3 段' }, { v: 5, label: '5 段' }], chapters: ['gibson'], restart: false },
+    { id: 'gibOv', label: '重疊長度', type: 'range', min: 10, max: 40, step: 5, unit: ' bp', chapters: ['gibson'], restart: false },
+    { id: 'ggSet', label: '突出端的組合', type: 'seg', options: [{ v: 'ok', label: '都不一樣' }, { v: 'dup', label: '有兩個一樣' }], chapters: ['golden-gate'], restart: false },
+    { id: 'ggTime', label: '切接反應的時間', type: 'seg', options: [{ v: 5, label: '5 分鐘' }, { v: 30, label: '30 分鐘' }], chapters: ['golden-gate'], restart: false },
+    { id: 'codonSeq', label: '序列', type: 'seg', options: [{ v: 'orig', label: '原始' }, { v: 'opt', label: '最佳化後' }], chapters: ['codon'], restart: false },
+    { id: 'codonTrna', label: '用補充稀有 tRNA 的菌株', type: 'toggle', chapters: ['codon'], restart: false },
   ],
 });
 </script>

@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>萜類前驅物:MEP 與 MVA 兩條路</title>
+<meta name="description" content="用動畫看植物細胞裡做萜類 5 碳積木的兩條路:質體的 MEP 路徑與細胞質的 MVA 路徑各花多少碳與能量,接長鏈時 IPP 與 DMAPP 怎麼配,怎麼用抑制劑與同位素標記判斷萜類的碳從哪條路來,以及 P450 怎麼把雙萜骨架氧化成針葉樹的樹脂酸。可以自己換鏈長、抑制劑、標記前驅物與酵素。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="萜類前驅物:MEP 與 MVA 兩條路">
+<meta property="og:description" content="植物用質體的 MEP 路徑與細胞質的 MVA 路徑做萜類的 5 碳積木:看兩條路的碳與能量帳、抑制劑與同位素標記實驗,以及 P450 怎麼做出針葉樹的樹脂酸。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/terpenoid-precursors/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/terpenoid-precursors.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="萜類前驅物:質體與細胞質裡兩條做 5 碳積木的路徑動畫">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/terpenoid-precursors/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化進階"><a href="../">← 儀器入口</a><a href="../transcriptomics/">轉錄體分析</a><a href="./" aria-current="page">萜類前驅物</a><a href="../enzyme-kinetics/">酵素動力學</a><a href="../population-genetics/">族群遺傳</a><a href="../phylogenetics/">演化樹</a><a href="../gene-function/">基因功能驗證</a></nav></div>
+<header class="top wrap">
+  <h1>萜類前驅物 <span class="k">MEP 與 MVA 兩條路</span></h1>
+  <p class="lede">萜類的 5 碳積木 IPP 與 DMAPP 在植物細胞裡有兩個來源:質體的 MEP 路徑從丙酮酸與 G3P 開始,細胞質的 MVA 路徑從乙醯輔酶 A 開始。這一頁算兩條路的碳與能量帳,看接長鏈時兩種積木怎麼配,怎麼用抑制劑與同位素標記判斷萜類的碳從哪條路來,最後是 P450 怎麼把雙萜骨架氧化成針葉樹的樹脂酸。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="萜類前驅物動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <p class="pre">先看:<a href="../terpene-synthase/">萜類合成酶</a>(它的第 2 章講 IPP 與 DMAPP 怎麼接成 GPP、FPP、GGPP;這一頁講這兩塊積木從哪裡來、之後還有哪些修飾)</p>
+    <ul>
+      <li>兩條路:MVA 路徑在細胞質(HMGR 在內質網膜上,最後幾步與 IDI 在過氧化體),主要供應倍半萜、三萜與固醇;MEP 路徑在質體,主要供應異戊二烯、單萜、雙萜(含吉貝素)、類胡蘿蔔素與葉綠素的側鏈。被子植物的葉綠素側鏈、類胡蘿蔔素與三萜幾乎只來自各自的路,其他萜類常常兩條路都有份。</li>
+      <li>MVA:3 乙醯輔酶 A + 2 NADPH + 3 ATP → IPP + CO₂,HMGR 常是限速步驟,也是史他汀類的標的。MEP:丙酮酸 + G3P + NADPH + CTP + ATP + 4 個還原態鐵氧化還原蛋白 → IPP 或 DMAPP + CO₂,DXR 是 fosmidomycin 的標的,最後的 HDR 做出 IPP:DMAPP 約 85:15(菸草細胞)。</li>
+      <li>5n 個碳的鏈要 1 個 DMAPP 加 n − 1 個 IPP;原料裡 DMAPP 的比例 d₀ 不夠時,IDI 要把 1/n − d₀ 的原料從 IPP 轉成 DMAPP(只算單一產物的帳)。</li>
+      <li>判斷碳的來源:抑制劑只是線索,擋住一邊時另一邊也會變;同位素標記較直接。每個 5 碳單位帶標記的機率為 p 時,n 個單位的產物裡剛好 k 個帶標記的比例是 C(n,k)·p<sup>k</sup>·(1 − p)<sup>n−k</sup>。金魚草的倍半萜出現 +6,作者據此認為質體送出的是 IPP 或 DMAPP,不只是 GPP。</li>
+      <li>樹脂酸:質體裡的雙萜合成酶做出 abietadiene 等骨架,內質網上的 CYP720B 把 18 號碳氧化三次(醇、醛、酸)。火炬松的 CYP720B1 只做後兩步,西加雲杉的 CYP720B4 三步都做;雲杉莖外層的雙萜類 92% 是樹脂酸。</li>
+      <li>碳帳:從三碳化合物算起,MEP 留下 5/6 的碳,MVA 只留 5/9;把做 ATP、NADPH 用掉的糖也算進去,理論質量產率 MEP 約 30%、MVA 約 25%。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Hemmerlin A, et al. A raison d'être for two distinct pathways in the early steps of plant isoprenoid biosynthesis? Prog Lipid Res. 2012;51(2):95–148. <a href="https://doi.org/10.1016/j.plipres.2011.12.001">doi:10.1016/j.plipres.2011.12.001</a>(兩條路分在細胞質與質體、受質可以跨膜交換;被子植物在一般條件下,葉綠素的側鏈、三萜、類胡蘿蔔素幾乎只來自各自的路,其他萜類常有兩種來源;依摘要)</li>
+      <li>Tholl D, Lee S. Terpene Specialized Metabolism in <i>Arabidopsis thaliana</i>. Arabidopsis Book. 2011;9:e0143. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3268506/">PMC3268506</a>(兩條路的位置與產物、HDR 做出 IPP 與 DMAPP 約 5 到 6:1、IDI 的分區、GPP 與 GGPP 合成酶在質體、FPP 合成酶在細胞質、質體的萜類合成酶多做單萜與雙萜、細胞質的多做倍半萜)</li>
+      <li>反應式:KEGG 模組 <a href="https://www.kegg.jp/module/M00095">M00095</a>(MVA)與 <a href="https://www.kegg.jp/module/M00096">M00096</a>(MEP)的各步反應;HDR 在菸草 BY-2 細胞裡做出 IPP:DMAPP 85:15:Tritsch D, et al. FEBS Lett. 2010;584(1):129–134. <a href="https://doi.org/10.1016/j.febslet.2009.11.010">doi:10.1016/j.febslet.2009.11.010</a>(依摘要)</li>
+      <li>Dudareva N, et al. The nonmevalonate pathway supports both monoterpene and sesquiterpene formation in snapdragon flowers. Proc Natl Acad Sci USA. 2005;102(3):933–938. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC545543/">PMC545543</a>(花枝餵 [5,5-²H₂]-DOX 或 [2,2-²H₂]-MVL,GC-MS 看 +2、+4、+6;fosmidomycin 100 μM 使單萜 3 小時內少 60%、橙花叔醇較慢下降;mevinolin(即 lovastatin)對橙花叔醇幾乎沒有影響;花瓣的 MVA 路徑在甲羥戊酸之前停住;IPP 由質體單向送往細胞質)</li>
+      <li>Skorupinska-Tudek K, et al. Contribution of the mevalonate and methylerythritol phosphate pathways to the biosynthesis of dolichols in plants. J Biol Chem. 2008;283(30):21024–21035. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3258935/">PMC3258935</a>(餵 [1-¹³C] 葡萄糖時,5 碳單位的 1 號碳只經 MEP 帶標記,2、4 號碳只經 MVA,5 號碳兩條都會;約為葡萄糖標記的一半);植物最早用這種標記分出兩條路的是 Lichtenthaler HK, et al. FEBS Lett. 1997;400(3):271–274。</li>
+      <li>Ro DK, et al. Loblolly pine abietadienol/abietadienal oxidase PtAO (CYP720B1) is a multifunctional, multisubstrate cytochrome P450 monooxygenase. Proc Natl Acad Sci USA. 2005;102(22):8060–8065. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1138258/">PMC1138258</a>(18 號碳三步氧化;微粒體對 abietadiene 測不到活性、酵母中約 2%,作者認為第一步由別的酵素做);Ro DK, Bohlmann J. Phytochemistry. 2006;67(15):1572–1578(雙萜合成酶 LAS 在質體、CYP720B1 在內質網);Hamberger B, et al. Plant Physiol. 2011;157(4):1677–1695. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3327196/">PMC3327196</a>(CYP720B4 從烯一路做到酸;西加雲杉莖外層的雙萜類 92% 是樹脂酸)</li>
+      <li>Zhao L, et al. Methylerythritol phosphate pathway of isoprenoid biosynthesis. Annu Rev Biochem. 2013;82:497–530. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5031371/">PMC5031371</a>(IspH 做出 IPP:DMAPP 5:1;由葡萄糖做萜類的理論質量產率 MEP 30%、MVA 25%)</li>
+      <li>示意:細胞與胞器的形狀;分子畫成碳珠加部分官能基;第 4 章的 60 格原料池與 IDI 轉換量(只算單一產物的帳);第 5 章的時間曲線(只有「3 小時內少 60%」取自論文,其他是依論文文字畫的形狀;lovastatin 下的單萜論文沒有給);第 6 章的二項分布模型、p 值與長條(論文沒有用這個模型,長條不是實測,也沒有計入天然同位素);第 7 章的酵素形狀;第 8 章的碳與輔因子帳照反應式算,不含運輸、輔因子再生與光合作用本身的成本。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化進階・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, seg, ease, clamp, lerp } from '../assets/bio-draw.js';
+
+const S3 = Math.sqrt(3) / 2, RAD = Math.PI / 180;
+const MEPC = C.mint, MVAC = C.blue; // 兩條路的代表色:MEP 薄荷綠、MVA 藍
+const IPPC = C.mint, DMAC = C.amber; // IPP 與 DMAPP 的顏色(和萜類合成酶那一頁一樣)
+const BOND = 'rgba(213,221,217,.88)';
+const GRAY = '#8d9c96';
+
+// ================= 共用的小工具 =================
+const fin = (t, a, d = 0.6) => ease(seg(t, a, a + d));
+function alpha(g, a, fn) { if (a <= 0.01) return; g.ctx.save(); g.ctx.globalAlpha *= Math.min(1, a); fn(); g.ctx.restore(); }
+// 一行有上標的字:parts 是 [文字, 是否上標];回傳寬度
+function rich(g, x, y, parts, { size = 16, color = C.ink, weight = 600, align = 'left', alpha: al = 1, mono = false } = {}) {
+  const ctx = g.ctx;
+  const sz = (sup) => (sup ? size * 0.66 : size);
+  let w = 0;
+  for (const [s, sup] of parts) { g.font(sz(sup), weight, mono); w += ctx.measureText(s).width; }
+  let cx = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
+  for (const [s, sup] of parts) {
+    g.text(cx, sup ? y - size * 0.42 * g.boost : y, s, { size: sz(sup), weight, color, mono, alpha: al });
+    g.font(sz(sup), weight, mono); cx += ctx.measureText(s).width;
+  }
+  return w;
+}
+// 右邊的步驟清單:list 是 [標題, 說明, 從第幾秒開始];目前這一步框起來
+function steps(g, x, y, list, t, { gap = 64, w = 304 } = {}) {
+  let cur = -1;
+  list.forEach((s, i) => { if (t >= s[2]) cur = i; });
+  list.forEach(([h, d], i) => {
+    const on = i === cur, yy = y + i * gap;
+    alpha(g, cur < 0 ? 0.45 : on ? 1 : i < cur ? 0.78 : 0.4, () => {
+      if (on) g.rrect(x - 12, yy - 21, w, gap - 8, 10, 'rgba(165,243,205,.08)', C.mint, 1.4);
+      g.text(x, yy, h, { size: 15, weight: on ? 700 : 600, color: on ? C.mint : C.ink });
+      g.text(x, yy + 22, d, { size: 13, color: C.ink2 });
+    });
+  });
+}
+// 計數:小標題加一個大數字
+function count(g, x, y, label, n, color, { size = 21 } = {}) {
+  g.text(x, y, label, { size: 13, color: C.ink2 });
+  g.text(x, y + 25, String(n), { size, weight: 800, color, mono: true });
+}
+// 折線上的點:f 從 0 到 1
+function along(pts, f) {
+  const L = [];
+  let tot = 0;
+  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); L.push(d); tot += d; }
+  let s = clamp(f) * tot;
+  for (let i = 0; i < L.length; i++) {
+    if (s <= L[i] || i === L.length - 1) { const k = L[i] ? Math.min(1, s / L[i]) : 0; return [lerp(pts[i][0], pts[i + 1][0], k), lerp(pts[i][1], pts[i + 1][1], k)]; }
+    s -= L[i];
+  }
+  return pts[pts.length - 1];
+}
+// 沿著折線流動的小點;stop 以後的點不畫(被擋住)
+function flow(g, pts, t, { n = 7, speed = 0.22, color = C.mint, stop = 1, r = 4, a = 1, phase = 0 } = {}) {
+  for (let i = 0; i < n; i++) {
+    const f = (t * speed + i / n + phase) % 1;
+    if (f > stop) continue;
+    const [x, y] = along(pts, f);
+    alpha(g, a * Math.min(1, f * 8) * (stop < 1 ? Math.min(1, (stop - f) * 12) : Math.min(1, (1 - f) * 8)), () => g.circle(x, y, r, color));
+  }
+}
+function arrowLine(g, pts, color, { lw = 2.2, a = 1, dash, head = 9 } = {}) {
+  alpha(g, a, () => {
+    for (let i = 1; i < pts.length - 1; i++) g.line(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1], color, lw, dash);
+    const p = pts[pts.length - 2], q = pts[pts.length - 1];
+    g.arrow(p[0], p[1], q[0], q[1], { color, lw, head, dash });
+  });
+}
+// 圓角小框加字(流程圖的節點)
+function node(g, x, y, s, { size = 15, color = C.ink, border = C.line, bg = 'rgba(15,23,22,.92)', a = 1, bold = true } = {}) {
+  alpha(g, a, () => {
+    g.font(size, bold ? 700 : 500);
+    const w = g.ctx.measureText(s).width + 18, h = size * g.boost + 14;
+    g.rrect(x - w / 2, y - h / 2, w, h, 9, bg, border, 1.4);
+    g.text(x, y + 0.5, s, { size, weight: bold ? 700 : 500, color, align: 'center' });
+  });
+}
+const choose = (n, k) => { let r = 1; for (let i = 1; i <= k; i++) r = (r * (n - k + i)) / i; return r; };
+const binom = (n, p) => Array.from({ length: n + 1 }, (_, k) => choose(n, k) * p ** k * (1 - p) ** (n - k));
+const pct = (v, d = 0) => `${(v * 100).toFixed(d)}%`;
+
+// ================= 分子:碳畫成圓點(依來源上色),官能基寫字 =================
+// M = { P: { 原子代號: [x, y] }, T: { 原子代號: '文字' }, B: [[i, j, 鍵級, 環的中心(選用)]] }。
+// 座標以鍵長為 1、y 朝下;T 裡有字的是官能基(畫字),沒有的是碳(畫圓點)。
+// drawMol 在狀態 A 與 B 之間內插(k 從 0 到 1):位置、鍵、文字一起變;只在一邊有的原子淡入或淡出。
+// o.over[代號] 直接指定某個原子的位置(局部座標,用來畫轉動或飛走);o.col[代號] 是碳的顏色;
+// o.ring 是要圈起來的碳;o.num[代號] = [文字, dx, dy] 在碳旁邊寫編號;o.dots === false 時只畫線(骨架式)。
+// 換狀態時:只在 A 的原子前 60% 淡出、只在 B 的後 60% 淡入;斷掉的鍵前 35% 消失、新的鍵最後 35% 才出現
+// (原子還在半路時不會拉出一條長線);官能基的字在中點換,不疊在一起。o.alphaOf(代號) 可以再乘一個透明度。
+function drawMol(g, A, B, k, o) {
+  const ctx = g.ctx, b = o.b, r = o.r || Math.max(5.5, b * 0.15), fs = o.fs || 15;
+  const ids = new Set(Object.keys(A.P));
+  if (B) for (const id of Object.keys(B.P)) ids.add(id);
+  const at = {};
+  for (const id of ids) {
+    const a = A.P[id], c = B ? B.P[id] : null;
+    const p = o.over && o.over[id] ? o.over[id] : a && c ? [lerp(a[0], c[0], k), lerp(a[1], c[1], k)] : a || c;
+    const ta = a && A.T ? A.T[id] : null, tb = c && B.T ? B.T[id] : null;
+    const al = (a && c ? 1 : a ? (B ? 1 - ease(seg(k, 0, 0.6)) : 1) : ease(seg(k, 0.4, 1))) * (o.alphaOf ? o.alphaOf(id) : 1);
+    at[id] = { x: o.x + p[0] * b, y: o.y + p[1] * b, al, ta, tb, text: !!(ta || tb) };
+  }
+  g.font(fs, 700);
+  const box = {};
+  for (const [id, a] of Object.entries(at)) if (a.text) {
+    const w = Math.max(a.ta ? ctx.measureText(a.ta).width : 0, a.tb ? ctx.measureText(a.tb).width : 0);
+    box[id] = [w / 2 + 3, fs * g.boost * 0.6];
+  }
+  const cut = (id, ux, uy) => {
+    if (box[id]) { const [hw, hh] = box[id]; return Math.min(Math.abs(ux) > 1e-6 ? hw / Math.abs(ux) : 1e9, Math.abs(uy) > 1e-6 ? hh / Math.abs(uy) : 1e9); }
+    return o.dots === false ? 0 : r * 0.85;
+  };
+  const kb = (i, j) => (i < j ? `${i}|${j}` : `${j}|${i}`);
+  const bm = new Map();
+  for (const [i, j, n, cc] of A.B) bm.set(kb(i, j), [i, j, n, B ? 0 : n, cc]);
+  if (B) for (const [i, j, n, cc] of B.B) { const e = bm.get(kb(i, j)); if (e) { e[3] = n; e[4] = e[4] || cc; } else bm.set(kb(i, j), [i, j, 0, n, cc]); }
+  const w = B ? k : 0, wBreak = B ? ease(seg(k, 0, 0.35)) : 0, wForm = B ? ease(seg(k, 0.65, 1)) : 0, off = Math.max(2.6, b * 0.07);
+  ctx.save();
+  ctx.globalAlpha *= o.alpha ?? 1;
+  for (const [i, j, na, nb, cc] of bm.values()) {
+    const p = at[i], q = at[j];
+    if (!p || !q) continue;
+    const a1 = na >= 1 && nb >= 1 ? 1 : na >= 1 ? 1 - wBreak : nb >= 1 ? wForm : 0;
+    const a2 = Math.min(a1, (na >= 2 ? 1 - w : 0) + (nb >= 2 ? w : 0));
+    const al = Math.min(p.al, q.al) * (o.bondAlpha ? o.bondAlpha(i, j) : 1);
+    if (al * a1 <= 0.01) continue;
+    const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
+    const s0 = cut(i, ux, uy), s1 = cut(j, -ux, -uy);
+    if (s0 + s1 >= L - 2) continue;
+    const x0 = p.x + ux * s0, y0 = p.y + uy * s0, x1 = q.x - ux * s1, y1 = q.y - uy * s1;
+    const col = o.bondColor ? o.bondColor(i, j) : BOND, lw = o.lw || Math.max(2, b * 0.055);
+    if (cc) {
+      // 環上的雙鍵:主線在原位,第二條線往環的中心內縮
+      const cx = o.x + cc[0] * b, cy = o.y + cc[1] * b, sg = (cx - (p.x + q.x) / 2) * nx + (cy - (p.y + q.y) / 2) * ny >= 0 ? 1 : -1;
+      alpha(g, al * a1, () => g.line(x0, y0, x1, y1, col, lw));
+      alpha(g, al * a2, () => g.line(x0 + nx * sg * off * 2 + ux * L * 0.13, y0 + ny * sg * off * 2 + uy * L * 0.13, x1 + nx * sg * off * 2 - ux * L * 0.13, y1 + ny * sg * off * 2 - uy * L * 0.13, col, lw));
+    } else {
+      alpha(g, al * a1, () => g.line(x0 - nx * off * a2, y0 - ny * off * a2, x1 - nx * off * a2, y1 - ny * off * a2, col, lw));
+      alpha(g, al * a2, () => g.line(x0 + nx * off, y0 + ny * off, x1 + nx * off, y1 + ny * off, col, lw));
+    }
+  }
+  for (const [id, a] of Object.entries(at)) {
+    if (a.al <= 0.01) continue;
+    if (a.text) {
+      const draw = (s, al) => {
+        if (!s || al <= 0.01) return;
+        ctx.save(); ctx.globalAlpha *= al; g.font(fs, 700);
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.lineWidth = 5; ctx.strokeStyle = C.bg; ctx.lineJoin = 'round'; ctx.strokeText(s, a.x, a.y + 0.5);
+        ctx.fillStyle = (o.textColor && o.textColor(id)) || C.ink; ctx.fillText(s, a.x, a.y + 0.5);
+        ctx.restore();
+      };
+      if (a.ta === a.tb || !B || !a.ta || !a.tb) draw(a.ta || a.tb, a.al);
+      else { draw(a.ta, a.al * (1 - seg(k, 0.42, 0.5))); draw(a.tb, a.al * seg(k, 0.5, 0.58)); }
+      continue;
+    }
+    if (o.dots === false && !(o.only && o.only.includes(id))) continue;
+    alpha(g, a.al, () => {
+      const col = (o.col && o.col[id]) || o.color || C.backbone;
+      if (o.glow && o.glow.includes(id)) { ctx.save(); ctx.shadowColor = col; ctx.shadowBlur = 14; g.circle(a.x, a.y, r, col); ctx.restore(); }
+      g.circle(a.x, a.y, r, col, C.bg, 1.6);
+      if (o.ring && o.ring.includes(id)) g.circle(a.x, a.y, r + 5, null, C.ink, 2.2);
+      if (o.num && o.num[id]) { const [s, dx, dy] = o.num[id]; g.text(a.x + dx * b, a.y + dy * b, s, { size: 13, weight: 700, color: C.ink2, align: 'center', mono: true }); }
+    });
+  }
+  ctx.restore();
+  const pos = {};
+  for (const [id, a] of Object.entries(at)) pos[id] = [a.x, a.y];
+  return pos;
+}
+// 依時間決定畫哪兩個狀態:seq 是 [開始, 結束, 狀態 A, 狀態 B];回傳 [A, B, k, 第幾段]
+function morphAt(t, first, seq) {
+  let cur = [first, null, 0, -1];
+  for (let i = 0; i < seq.length; i++) {
+    const [t0, t1, a, b] = seq[i];
+    if (t >= t1) cur = [b, null, 0, i];
+    else if (t >= t0) { cur = [a, b, ease(seg(t, t0, t1)), i]; break; }
+    else break;
+  }
+  return cur;
+}
+const XZ = (k) => k * S3; // 鋸齒鏈第 k 個碳的 x
+const rot = (c, deg, r = 1) => [c[0] + r * Math.cos(deg * RAD), c[1] + r * Math.sin(deg * RAD)];
+const mv = (p, d, k) => [p[0] + d[0] * k, p[1] + d[1] * k];
+
+// ================= 第 1 章:兩個工廠 =================
+const GRANA = [[-60, -98], [60, -102], [-74, 78], [66, 80], [0, 128]];
+function plastid(g, cx, cy, rx, ry) {
+  const ctx = g.ctx;
+  ctx.save();
+  ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(95,211,154,.07)'; ctx.fill(); ctx.lineWidth = 2.2; ctx.strokeStyle = 'rgba(165,243,205,.62)'; ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(cx, cy, rx - 6, ry - 6, 0, 0, Math.PI * 2); ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(165,243,205,.3)'; ctx.stroke();
+  ctx.restore();
+  for (const [dx, dy] of GRANA) for (let s = 0; s < 4; s++) g.rrect(cx + dx - 17, cy + dy - 11 + s * 6, 34, 4, 2, 'rgba(95,211,154,.3)');
+}
+const PROD = {
+  mva: [['倍半萜(15 碳)', false], ['三萜(30 碳)', true], ['固醇', false]],
+  mep: [['單萜(10 碳)、異戊二烯', false], ['雙萜(20 碳)、吉貝素', false], ['類胡蘿蔔素(40 碳)', true], ['葉綠素的側鏈', true]],
+};
+function prodCard(g, t, x, y, h, title, col, items, t0) {
+  alpha(g, fin(t, t0 - 0.4), () => {
+    g.panel(x, y, 330, h, '');
+    g.text(x + 18, y + 28, title, { size: 17, weight: 700, color: col });
+  });
+  const mark = fin(t, 10, 0.6);
+  items.forEach(([s, only], i) => {
+    const a = fin(t, t0 + i * 0.4), yy = y + 64 + i * 32;
+    alpha(g, a, () => {
+      g.circle(x + 24, yy, 5.5, only ? `rgba(255,209,102,${mark})` : null, only ? C.amber : C.muted, 1.6);
+      g.text(x + 40, yy, s, { size: 15, color: C.ink });
+    });
+  });
+}
+
+// ================= 第 2 章:MVA 路徑的分子 =================
+// 碳的代號:a、b、c 是三個乙醯基,1 是羰基碳、2 是甲基碳;O、S 開頭的是官能基
+const MVF = { c1: [0, 0], c2: [XZ(1), -0.5], b1: [XZ(2), 0], a2: [XZ(3), -0.5], a1: [XZ(4), 0] };
+const dB = [-1.4, 1.8], dC = [-1.2, -2.1]; // 第二、三個乙醯輔酶 A 等待的位置(相對於反應後的位置)
+const MV = {};
+MV.m0 = {
+  P: { a2: MVF.a2, a1: MVF.a1, Oa: [XZ(4), 1], Sa: [XZ(5), -0.5],
+    b2: mv([XZ(1), -0.5], dB, 1), b1: mv(MVF.b1, dB, 1), Ob: mv([XZ(2), 1], dB, 1), Sb: mv(MVF.a2, dB, 1),
+    c1: mv(MVF.c1, dC, 1), c2: mv(MVF.c2, dC, 1), Oc: mv([-S3, -0.5], dC, 1), Sc: mv([0, 1], dC, 1) },
+  T: { Oa: 'O', Sa: 'SCoA', Ob: 'O', Sb: 'SCoA', Oc: 'O', Sc: 'SCoA' },
+  B: [['a2', 'a1', 1], ['a1', 'Oa', 2], ['a1', 'Sa', 1], ['b2', 'b1', 1], ['b1', 'Ob', 2], ['b1', 'Sb', 1], ['c2', 'c1', 1], ['c1', 'Oc', 2], ['c1', 'Sc', 1]],
+};
+MV.m1 = {
+  P: { ...MV.m0.P, b2: [XZ(1), -0.5], b1: MVF.b1, Ob: [XZ(2), 1] },
+  T: { Oa: 'O', Sa: 'SCoA', Ob: 'O', Oc: 'O', Sc: 'SCoA' },
+  B: [['b2', 'b1', 1], ['b1', 'Ob', 2], ['b1', 'a2', 1], ['a2', 'a1', 1], ['a1', 'Oa', 2], ['a1', 'Sa', 1], ['c2', 'c1', 1], ['c1', 'Oc', 2], ['c1', 'Sc', 1]],
+};
+delete MV.m1.P.Sb;
+const HMG_P = { ...MVF, b2: [XZ(2) - 0.5, S3], Ob: [XZ(2) + 0.5, S3], Oa: [XZ(4), 1], Sa: [XZ(5), -0.5], Oc: [-S3, -0.5], Sc: [0, 1] };
+MV.m2 = {
+  P: HMG_P,
+  T: { Oa: 'O', Sa: 'SCoA', Ob: 'OH', Oc: 'O', Sc: 'OH' },
+  B: [['c1', 'Oc', 2], ['c1', 'Sc', 1], ['c1', 'c2', 1], ['c2', 'b1', 1], ['b1', 'b2', 1], ['b1', 'Ob', 1], ['b1', 'a2', 1], ['a2', 'a1', 1], ['a1', 'Oa', 2], ['a1', 'Sa', 1]],
+};
+const MVA_B = [['c1', 'Oc', 2], ['c1', 'Sc', 1], ['c1', 'c2', 1], ['c2', 'b1', 1], ['b1', 'b2', 1], ['b1', 'Ob', 1], ['b1', 'a2', 1], ['a2', 'a1', 1], ['a1', 'Oa', 1]];
+const MVA_P = { ...MVF, b2: HMG_P.b2, Ob: HMG_P.Ob, Oc: HMG_P.Oc, Sc: HMG_P.Sc, Oa: [XZ(5), -0.5] };
+MV.m3 = { P: MVA_P, T: { Oa: 'OH', Ob: 'OH', Oc: 'O', Sc: 'OH' }, B: MVA_B };
+MV.m3b = { P: MVA_P, T: { Oa: 'OP', Ob: 'OH', Oc: 'O', Sc: 'OH' }, B: MVA_B };
+MV.m4 = { P: MVA_P, T: { Oa: 'OPP', Ob: 'OH', Oc: 'O', Sc: 'OH' }, B: MVA_B };
+const IPP_P = { c2: MVF.c2, b1: MVF.b1, a2: MVF.a2, a1: MVF.a1, b2: [XZ(2), 1], Oa: [XZ(5), -0.5] };
+MV.m5 = { P: IPP_P, T: { Oa: 'OPP' }, B: [['c2', 'b1', 2], ['b1', 'b2', 1], ['b1', 'a2', 1], ['a2', 'a1', 1], ['a1', 'Oa', 1]] };
+MV.m6 = { P: IPP_P, T: { Oa: 'OPP' }, B: [['c2', 'b1', 1], ['b1', 'b2', 1], ['b1', 'a2', 2], ['a2', 'a1', 1], ['a1', 'Oa', 1]] };
+const MV_COL = { a1: C.amber, a2: C.amber, b1: C.mint, b2: C.mint, c1: C.blue, c2: C.blue };
+const MV_SEQ = [[1.0, 2.4, MV.m0, MV.m1], [2.8, 4.2, MV.m1, MV.m2], [5.0, 6.4, MV.m2, MV.m3], [10.0, 10.5, MV.m3, MV.m3b], [10.6, 11.1, MV.m3b, MV.m4], [11.4, 12.8, MV.m4, MV.m5], [13.6, 14.6, MV.m5, MV.m6]];
+const MV_NAMES = ['乙醯輔酶 A × 3', '乙醯乙醯輔酶 A(4 碳)', 'HMG-CoA(6 碳)', '甲羥戊酸(6 碳)', '甲羥戊酸-5-磷酸', '甲羥戊酸-5-二磷酸', 'IPP(5 碳)', 'DMAPP(5 碳)'];
+function mvOver(i, k) {
+  const ov = {};
+  if (i === 0) ov.Sb = mv(MV.m0.P.Sb, [0.5, 0.9], k); // 第二個乙醯基的輔酶 A 離開
+  if (i === 1) ov.b2 = rot(MVF.b1, lerp(210, 120, k)); // 甲基繞著 3 號碳轉到下面,讓第三個乙醯基接上來
+  if (i === 2) {
+    ov.Sa = mv(HMG_P.Sa, [0.9, -0.8], ease(seg(k, 0, 0.6))); // 輔酶 A 離開
+    ov.Oa = rot(MVF.a1, lerp(90, -30, ease(seg(k, 0.25, 1)))); // 羰基的氧轉到右上,變成 -OH
+  }
+  if (i === 5) for (const id of ['c1', 'Oc', 'Sc']) ov[id] = mv(MV.m4.P[id], [-1.1, 0.9], k); // 羧基變成 CO₂ 飛走
+  if (i === 5) ov.Ob = mv(MV.m4.P.Ob, [0.6, 0.7], k);
+  return ov;
+}
+
+// ================= 第 3 章:MEP 路徑的分子 =================
+// p1 到 p3 是丙酮酸的 1 到 3 號碳(p1 是羧基),g1 到 g3 是 G3P 的 1 到 3 號碳(g1 是醛基)。
+// DXR 重排時 G3P 的 2、3 號碳那一段(連同 -OH 與磷酸)從 g1 搬到 p2 上:搬之前叫 d2、dO2、d3、dP,搬之後叫 g2、Og2、g3、Pg,
+// 兩組在半路交接(一組淡出、一組淡入),不讓四個原子在半路擠成一團。
+const dP = [-1.6, -1.1], dG = [0.9, 2.0];
+const DXP_P = { p3: [0, 0], p2: [XZ(1), -0.5], Op2: [XZ(1), -1.5], g1: [XZ(2), 0], Og1: [XZ(2), 1], d2: [XZ(3), -0.5], dO2: [XZ(3), -1.5], d3: [XZ(4), 0], dP: [XZ(5), -0.5] };
+const ME = {};
+ME.n0 = {
+  P: { p3: mv(DXP_P.p3, dP, 1), p2: mv(DXP_P.p2, dP, 1), Op2: mv(DXP_P.Op2, dP, 1), p1: mv([XZ(2), 0], dP, 1), Op1a: mv([XZ(2), 1], dP, 1), Op1b: mv([XZ(3), -0.5], dP, 1),
+    g1: mv(DXP_P.g1, dG, 1), Og1: mv(DXP_P.Og1, dG, 1), d2: mv(DXP_P.d2, dG, 1), dO2: mv(DXP_P.dO2, dG, 1), d3: mv(DXP_P.d3, dG, 1), dP: mv(DXP_P.dP, dG, 1) },
+  T: { Op2: 'O', Op1a: 'O⁻', Op1b: 'O', Og1: 'O', dO2: 'OH', dP: 'OP' },
+  B: [['p3', 'p2', 1], ['p2', 'Op2', 2], ['p2', 'p1', 1], ['p1', 'Op1a', 1], ['p1', 'Op1b', 2], ['g1', 'Og1', 2], ['g1', 'd2', 1], ['d2', 'dO2', 1], ['d2', 'd3', 1], ['d3', 'dP', 1]],
+};
+const DXP_B = [['p3', 'p2', 1], ['p2', 'Op2', 2], ['p2', 'g1', 1], ['g1', 'Og1', 1], ['d2', 'dO2', 1], ['d2', 'd3', 1], ['d3', 'dP', 1]];
+ME.n1 = { P: DXP_P, T: { Op2: 'O', Og1: 'OH', dO2: 'OH', dP: 'OP' }, B: [...DXP_B, ['g1', 'd2', 1]] };
+ME.n1b = { P: DXP_P, T: ME.n1.T, B: DXP_B }; // 3、4 號碳之間的鍵斷開
+const MEP_P = { p3: [0, 0], p2: [XZ(1), -0.5], g1: [XZ(2), 0], Og1: [XZ(2), 1], Op2: rot([XZ(1), -0.5], -60), g2: rot([XZ(1), -0.5], -120) };
+MEP_P.g3 = rot(MEP_P.g2, 180); MEP_P.Pg = rot(MEP_P.g3, -120); MEP_P.Og2 = rot(MEP_P.g2, -60);
+const MEP_B0 = [['p3', 'p2', 1], ['p2', 'Op2', 1], ['p2', 'g1', 1], ['g1', 'Og1', 1], ['g2', 'Og2', 1], ['g2', 'g3', 1], ['g3', 'Pg', 1]];
+ME.n2b = { P: MEP_P, T: { Op2: 'OH', Og1: 'OH', Og2: 'OH', Pg: 'OP' }, B: MEP_B0 };
+ME.n2 = { P: MEP_P, T: ME.n2b.T, B: [...MEP_B0, ['p2', 'g2', 1]] };
+ME.n3a = { P: MEP_P, T: { ...ME.n2.T, Pg: 'O-CDP' }, B: ME.n2.B };
+ME.n3b = { P: MEP_P, T: { ...ME.n3a.T, Op2: 'OP' }, B: ME.n2.B };
+ME.n3c = { P: MEP_P, T: { ...ME.n2.T, Op2: 'O', Pg: 'O' }, B: ME.n2.B, ring: true }; // 兩個磷酸接成環(畫成上方的弧)
+const HMB_P = { p2: MEP_P.p2, g2: MEP_P.g2, g3: MEP_P.g3, Pg: MEP_P.Pg, g1: rot(MEP_P.p2, 0), p3: rot(MEP_P.p2, 120) };
+HMB_P.Og1 = rot(HMB_P.g1, 60);
+ME.n4 = { P: HMB_P, T: { Og1: 'OH', Pg: 'OPP' }, B: [['p3', 'p2', 1], ['p2', 'g1', 1], ['g1', 'Og1', 1], ['p2', 'g2', 2], ['g2', 'g3', 1], ['g3', 'Pg', 1]] };
+const IPP2_P = { ...HMB_P };
+delete IPP2_P.Og1;
+ME.n5 = { P: IPP2_P, T: { Pg: 'OPP' }, B: [['p3', 'p2', 1], ['p2', 'g1', 2], ['p2', 'g2', 1], ['g2', 'g3', 1], ['g3', 'Pg', 1]] };
+const ME_COL = { p1: C.amber, p2: C.amber, p3: C.amber, g1: C.blue, g2: C.blue, g3: C.blue, d2: C.blue, d3: C.blue };
+const ME_SEQ = [[1.0, 2.6, ME.n0, ME.n1], [4.6, 5.0, ME.n1, ME.n1b], [5.0, 6.4, ME.n1b, ME.n2b], [6.4, 6.9, ME.n2b, ME.n2], [8.6, 9.0, ME.n2, ME.n3a], [9.2, 9.6, ME.n3a, ME.n3b], [9.8, 10.2, ME.n3b, ME.n3c], [10.4, 11.4, ME.n3c, ME.n4], [11.6, 12.4, ME.n4, ME.n5]];
+const ME_NAMES = ['丙酮酸 + G3P', 'DXP(5 碳)', 'DXP(5 碳)', 'MEP(5 碳,分岔)', 'MEP(5 碳,分岔)', 'CDP-ME', 'CDP-MEP', 'MEcPP', 'HMBPP', 'IPP(或 DMAPP)'];
+const FRAG = [['d2', 'g2'], ['dO2', 'Og2'], ['d3', 'g3'], ['dP', 'Pg']]; // [搬之前, 搬之後]
+function meOver(i, k) {
+  const ov = {};
+  if (i === 0) for (const id of ['p1', 'Op1a', 'Op1b']) ov[id] = mv(ME.n0.P[id], [-0.8, -1.2], k); // 丙酮酸的羧基變成 CO₂ 離開
+  if (i === 2) { // G3P 的 2、3 號碳那一段從 g1 搬到 p2 上(從上方繞過去;前一組走前 60%、後一組走後 60%)
+    const arc = (a, c, f) => [lerp(a[0], c[0], f), lerp(a[1], c[1], f) - 0.9 * Math.sin(Math.PI * f)];
+    for (const [d, gg] of FRAG) { ov[d] = arc(DXP_P[d], MEP_P[gg], 0.6 * k); ov[gg] = arc(DXP_P[d], MEP_P[gg], 0.4 + 0.6 * k); }
+    ov.Op2 = rot(DXP_P.p2, lerp(-90, -60, ease(seg(k, 0.55, 1))));
+  }
+  if (i === 7) { ov.Op2 = mv(MEP_P.Op2, [0.6, -0.6], k); ov.Og2 = mv(MEP_P.Og2, [0.5, -0.8], k); }
+  if (i === 8) ov.Og1 = mv(HMB_P.Og1, [0.7, 0.4], k);
+  return ov;
+}
+// 第 3 章最後:兩條路的 IPP 在 [1-¹³C] 葡萄糖下哪幾個碳帶標記(畫成同一種 IPP)
+const IPPS = { P: { C4: [0, 0], C3: [S3, -0.5], C5: [S3, -1.5], C2: [2 * S3, 0], C1: [3 * S3, -0.5], OP: [4 * S3, 0] }, T: { OP: 'OPP' }, B: [['C4', 'C3', 2], ['C3', 'C5', 1], ['C3', 'C2', 1], ['C2', 'C1', 1], ['C1', 'OP', 1]] };
+const IPPS_NUM = { C1: ['1', 0, -0.62], C2: ['2', 0, 0.62], C3: ['3', 0.42, 0.42], C4: ['4', 0, 0.62], C5: ['5', 0.5, 0] };
+
+// ================= 第 4 章:接長鏈 =================
+const CHAIN = {
+  2: { name: 'GPP', c: 10, enz: 'GPPS', where: 'mep', tps: '單萜合成酶', ex: '例如 pinene、limonene' },
+  3: { name: 'FPP', c: 15, enz: 'FPPS', where: 'mva', tps: '倍半萜合成酶', ex: '例如橙花叔醇(nerolidol)' },
+  4: { name: 'GGPP', c: 20, enz: 'GGPPS', where: 'mep', tps: '雙萜合成酶', ex: '例如 abietadiene' },
+};
+const D0 = { mep: 0.15, mva: 0 }; // 原料裡 DMAPP 的比例:質體的 HDR 給 15%(菸草 BY-2 細胞 85:15),細胞質的 MVA 只給 IPP
+const POOL = 60;
+const idiNeed = (n, d0) => Math.max(0, 1 / n - d0); // IDI 要轉的比例(只算這一種產物的帳)
+
+// ================= 第 5 章:抑制劑 =================
+const NAMES5 = { none: '不加藥', lova: 'lovastatin', fos: 'fosmidomycin' };
+// 放出量(對照 = 100);只有 fosmidomycin 讓單萜 3 小時內少 60% 取自論文,其餘是依論文文字畫的形狀(示意)
+const monoFos = (h) => (h <= 3 ? 100 - (60 * (1 - Math.exp(-h / 1.2))) / (1 - Math.exp(-3 / 1.2)) : 40 - 7 * (1 - Math.exp(-(h - 3) / 3)));
+const sesqFos = (h) => 100 - (52 * (1 - Math.exp(-h / 5))) / (1 - Math.exp(-12 / 5));
+const sesqLova = (h) => 100 + 1.5 * Math.sin(h * 1.3);
+const expSesqLova = (h) => 100 - (55 * (1 - Math.exp(-h / 2.5))) / (1 - Math.exp(-12 / 2.5)); // 照課本分工的預期(示意)
+
+// ================= 第 7 章:松香二烯(abietadiene)與松香酸 =================
+// 三個六員環(A、B、C)排成菲的樣子;編號照松香烷(abietane)。G18 是 18 號碳(會被氧化),其他甲基只畫成線。
+const RA = [-Math.sqrt(3), 0], RB = [0, 0], RC = [S3, -1.5];
+const AB = {
+  P: { C1: [-2 * S3, -1], C2: [-3 * S3, -0.5], C3: [-3 * S3, 0.5], C4: [-2 * S3, 1], C5: [-S3, 0.5], C10: [-S3, -0.5],
+    C6: [0, 1], C7: [S3, 0.5], C8: [S3, -0.5], C9: [0, -1], C11: [0, -2], C12: [S3, -2.5], C13: [2 * S3, -2], C14: [2 * S3, -1],
+    C15: [3 * S3, -2.5], C16: [4 * S3, -2], C17: [3 * S3, -3.5], C19: [-2 * S3 + 0.5, 1 + S3], C20: [-S3, -1.15], G18: [-2 * S3 - 0.5, 1 + S3] },
+  B: [['C1', 'C2', 1], ['C2', 'C3', 1], ['C3', 'C4', 1], ['C4', 'C5', 1], ['C5', 'C10', 1], ['C10', 'C1', 1], ['C5', 'C6', 1], ['C6', 'C7', 1], ['C7', 'C8', 2, RB], ['C8', 'C9', 1], ['C9', 'C10', 1],
+    ['C9', 'C11', 1], ['C11', 'C12', 1], ['C12', 'C13', 1], ['C13', 'C14', 2, RC], ['C14', 'C8', 1], ['C13', 'C15', 1], ['C15', 'C16', 1], ['C15', 'C17', 1], ['C4', 'C19', 1], ['C10', 'C20', 1], ['C4', 'G18', 1]],
+};
+const OX = [['CH₃', 'abietadiene', '烯'], ['CH₂OH', 'abietadienol', '醇'], ['CHO', 'abietadienal', '醛'], ['COOH', 'abietic acid', '松香酸']];
+const abState = (i) => ({ P: AB.P, B: AB.B, T: { G18: OX[i][0] } });
+const CYP = {
+  b1: { name: 'CYP720B1', tree: '火炬松', ok: [false, true, true] },
+  b4: { name: 'CYP720B4', tree: '西加雲杉', ok: [true, true, true] },
+};
+
+// ================= 第 8 章:碳帳 =================
+// 照反應式算(KEGG M00095、M00096):MEP 每個 5 碳單位用 1 個丙酮酸 + 1 個 G3P,DXS 放掉 1 個 CO₂;
+// MVA 每個單位用 3 個乙醯輔酶 A,每個乙醯輔酶 A 由丙酮酸來時放掉 1 個 CO₂,MVD 再放掉 1 個。
+function budget(route, n) {
+  if (route === 'mep') return { cin: 6 * n, co2: n, atp: n, ctp: n, nadph: n, fd: 4 * n, src: `丙酮酸 ${n} + G3P ${n}` };
+  return { cin: 9 * n, co2: 4 * n, atp: 3 * n, ctp: 0, nadph: 2 * n, fd: 0, src: `丙酮酸 ${3 * n}` };
+}
+
+let lesson = null;
+const replay = (t0) => { if (lesson) { lesson.time = t0; lesson.play(); } };
+
+const chapters = [
+  {
+    key: 'compartments', name: '細胞裡的兩個工廠', dur: 16,
+    cues: [[0, '萜類的 5 碳積木 IPP 與 DMAPP 有兩條路可做:細胞質的 MVA 路徑(甲羥戊酸路徑),和質體的 MEP 路徑(甲基赤藻糖醇磷酸路徑)。'],
+      [5, 'MVA 主要供應倍半萜、三萜與固醇;MEP 主要供應單萜、雙萜、類胡蘿蔔素、葉綠素的側鏈,以及吉貝素(一類雙萜植物激素)。'],
+      [10, '「主要」不是絕對:被子植物的葉綠素側鏈、類胡蘿蔔素與三萜幾乎只來自各自那條路,其他萜類常常兩條路都有份。'],
+      [13.5, '兩區之間也會交換原料,例如質體做的 IPP 可以送到細胞質。後面幾章看怎麼用實驗分辨。']],
+    draw(g, t) {
+      const ctx = g.ctx, a0 = fin(t, 0, 0.8);
+      alpha(g, a0, () => {
+        g.rrect(24, 26, 566, 488, 44, 'rgba(21,32,30,.35)', 'rgba(79,143,116,.9)', 3);
+        g.rrect(35, 37, 544, 466, 34, null, 'rgba(79,143,116,.4)', 1.4);
+        g.text(58, 64, '植物細胞(示意)', { size: 13, color: C.muted });
+      });
+      // 細胞質:細胞核、內質網、過氧化體
+      const a1 = fin(t, 0.4, 0.8);
+      alpha(g, a1, () => {
+        g.circle(104, 456, 38, 'rgba(127,184,255,.05)', 'rgba(127,184,255,.35)', 1.4);
+        ctx.save(); ctx.strokeStyle = 'rgba(127,184,255,.5)'; ctx.lineWidth = 2;
+        for (const rr of [50, 61, 72]) { ctx.beginPath(); ctx.arc(104, 456, rr, -1.5, -0.1); ctx.stroke(); }
+        ctx.restore();
+        g.text(186, 412, '內質網', { size: 13, color: C.ink2 });
+        g.circle(232, 104, 20, 'rgba(255,209,102,.06)', 'rgba(255,209,102,.65)', 1.6);
+        g.text(232, 140, '過氧化體', { size: 13, color: C.ink2, align: 'center' });
+        g.text(150, 214, '細胞質', { size: 15, color: C.ink2, align: 'center' });
+        g.text(150, 244, 'MVA 路徑', { size: 21, weight: 800, color: MVAC, align: 'center' });
+        g.text(150, 270, '甲羥戊酸', { size: 13, color: C.ink2, align: 'center' });
+      });
+      // 質體
+      alpha(g, fin(t, 0.8, 0.8), () => {
+        plastid(g, 432, 280, 128, 172);
+        g.text(432, 214, '質體', { size: 15, color: C.ink2, align: 'center' });
+        g.text(432, 244, 'MEP 路徑', { size: 21, weight: 800, color: MEPC, align: 'center' });
+        g.text(432, 270, '甲基赤藻糖醇磷酸', { size: 13, color: C.ink2, align: 'center' });
+      });
+      // MVA 的酵素在哪裡
+      const ta = Math.min(fin(t, 2.2), 1 - fin(t, 9.4));
+      g.tag(150, 334, 'HMGR 在內質網膜上', { size: 13.5, color: MVAC, alpha: ta });
+      g.tag(150, 168, '最後幾步在過氧化體', { size: 13.5, color: C.amber, alpha: ta });
+      // 右邊:各自主要做什麼
+      prodCard(g, t, 612, 30, 154, 'MVA 主要做', MVAC, PROD.mva, 5);
+      prodCard(g, t, 612, 198, 186, 'MEP 主要做', MEPC, PROD.mep, 6.2);
+      const lg = fin(t, 10, 0.6);
+      alpha(g, lg, () => {
+        g.circle(624, 412, 5.5, C.amber);
+        g.text(638, 412, '幾乎只來自這一條路', { size: 14, weight: 700, color: C.amber });
+        g.text(612, 440, '(被子植物,一般條件下)', { size: 13, color: C.muted });
+        g.circle(624, 474, 5.5, null, C.muted, 1.6);
+        g.text(638, 474, '常常兩條路都有份', { size: 14, color: C.ink2 });
+        g.text(612, 502, 'Hemmerlin et al. 2012', { size: 13, color: C.muted });
+      });
+      // 交換:質體做的 IPP 送到細胞質
+      const ea = fin(t, 13.5, 0.6);
+      if (ea > 0) {
+        alpha(g, ea, () => {
+          g.arrow(306, 292, 222, 292, { color: MEPC, lw: 2.4, dash: [6, 5] });
+          g.tag(236, 318, 'IPP 送出質體', { size: 13.5, color: MEPC });
+        });
+        flow(g, [[300, 292], [226, 292]], t, { n: 4, speed: 0.6, color: IPPC, r: 4.5, a: ea });
+      }
+    },
+  },
+  {
+    key: 'mva', name: 'MVA 路徑:從乙醯輔酶 A 開始', dur: 17,
+    cues: [[0, 'MVA 路徑的原料是乙醯輔酶 A(帶 2 個碳的乙醯基):兩個先接成 4 碳,再接上第三個,成為 6 碳的 HMG-CoA。'],
+      [5, 'HMG-CoA 還原酶(HMGR)用 2 個 NADPH 把它還原成甲羥戊酸。這一步常是整條路的限速步驟,也是降血脂藥史他汀類的標的。'],
+      [10, '接著花 3 個 ATP:兩次加上磷酸,第三次把羧基拆成 CO₂ 放掉,剩下 5 個碳的 IPP。'],
+      [13.5, 'MVA 只做出 IPP;IPP 異構酶(IDI)把雙鍵移一格就是 DMAPP,兩者可以互換。']],
+    draw(g, t) {
+      const o = { x: 232, y: 222, b: 60 };
+      const [A, B, k, i] = morphAt(t, MV.m0, MV_SEQ);
+      const leaving = B && i === 0 ? 'Sb' : B && i === 2 ? 'Sa' : null; // 離開的輔酶 A 早一點淡出
+      const quick = leaving ? (id) => (id === leaving ? 1 - ease(seg(k, 0, 0.35)) : 1) : null;
+      const P = drawMol(g, A, B, k, { ...o, col: MV_COL, over: B ? mvOver(i, k) : null, alphaOf: quick, alpha: fin(t, 0, 0.8) });
+      // 圖例
+      alpha(g, fin(t, 0.4), () => {
+        [[C.amber, 0], [C.mint, 1], [C.blue, 2]].forEach(([c, j]) => g.circle(44 + j * 18, 40, 6, c));
+        g.text(104, 40, '三個乙醯基的碳(羰基碳與甲基碳)', { size: 13, color: C.ink2 });
+      });
+      // 分子名稱
+      const ni = i < 0 ? 0 : B ? (k < 0.5 ? i : i + 1) : i + 1;
+      g.text(300, 424, MV_NAMES[ni], { size: 18, weight: 700, color: C.ink, align: 'center', alpha: fin(t, 0.3) });
+      // NADPH 與 ATP 飛進來
+      const tok = (t0, s, col, j) => {
+        const kk = seg(t, t0, t0 + 0.9);
+        if (kk <= 0 || kk >= 1) return;
+        const [tx, ty] = s === 'NADPH' ? P.a1 : P.b1;
+        g.tag(lerp(560, tx, ease(kk)), lerp(110 + j * 34, ty - 34, ease(kk)), s, { size: 13.5, color: col, alpha: Math.min(1, kk * 5) * (1 - seg(kk, 0.8, 1)) });
+      };
+      tok(5.0, 'NADPH', C.lav, 0); tok(5.4, 'NADPH', C.lav, 1);
+      tok(10.0, 'ATP', C.amber, 0); tok(10.6, 'ATP', C.amber, 1); tok(11.4, 'ATP', C.amber, 2);
+      // CO₂ 離開
+      const cq = seg(t, 11.6, 13.4);
+      if (cq > 0 && cq < 1) g.tag(o.x - 1.1 * o.b - 24 - 20 * cq, o.y + 1.5 * o.b - 30 * cq, 'CO₂', { size: 15, color: C.blue, alpha: Math.min(1, cq * 4) * (1 - seg(cq, 0.7, 1)) });
+      // HMGR 的提示
+      const ha = Math.min(fin(t, 6.0), 1 - fin(t, 9.6));
+      if (ha > 0) {
+        g.tag(o.x + XZ(4) * o.b - 20, o.y - 1.6 * o.b, 'HMGR:常是限速步驟', { size: 14, color: C.lav, alpha: ha });
+        g.tag(o.x + XZ(4) * o.b - 20, o.y - 1.6 * o.b - 34, '史他汀類擋這一步', { size: 14, color: C.red, alpha: ha });
+      }
+      if (t >= 13.8) g.tag(o.x + XZ(2) * o.b, o.y - 1.5 * o.b, 'IPP ⇄ DMAPP(IDI)', { size: 14.5, color: C.mint, alpha: fin(t, 13.8) });
+      // 右邊:步驟
+      steps(g, 640, 66, [['① 3 個乙醯輔酶 A → HMG-CoA', 'AACT、HMGS', 1.0], ['② HMG-CoA → 甲羥戊酸', 'HMGR・用 2 個 NADPH', 5.0], ['③ 兩次加磷酸', 'MVK、PMK・用 2 個 ATP', 10.0], ['④ 脫羧 → IPP + CO₂', 'MVD・用 1 個 ATP', 11.4], ['⑤ IPP ⇄ DMAPP', 'IDI(異構酶)', 13.6]], t);
+      // 下方:這一個 IPP 的帳
+      alpha(g, fin(t, 0.6), () => {
+        g.panel(30, 446, 570, 78, '');
+        const ac = (t >= 1 ? 2 : 0) + (t >= 2.8 ? 1 : 0), nd = t >= 5.4 ? 2 : t >= 5 ? 1 : 0, at = (t >= 10 ? 1 : 0) + (t >= 10.6 ? 1 : 0) + (t >= 11.4 ? 1 : 0);
+        count(g, 48, 468, '乙醯輔酶 A', ac, C.ink);
+        count(g, 178, 468, 'NADPH', nd, C.lav);
+        count(g, 278, 468, 'ATP', at, C.amber);
+        g.line(368, 458, 368, 512, C.line, 1.4);
+        count(g, 388, 468, '放出 CO₂', t >= 11.4 ? 1 : 0, C.blue);
+        g.text(584, 500, '一個 IPP 的帳', { size: 13, color: C.muted, align: 'right' });
+      });
+    },
+  },
+  {
+    key: 'mep', name: 'MEP 路徑:從丙酮酸與 G3P 開始', dur: 17,
+    cues: [[0, '質體裡的 MEP 路徑從丙酮酸(3 碳)與甘油醛-3-磷酸(G3P,3 碳)開始:DXS 把兩者接成 5 碳的 DXP,丙酮酸的羧基變成 CO₂。'],
+      [4.6, 'DXR 把 DXP 的碳骨架重排成分岔,再用 NADPH 還原,得到 MEP;抗生素 fosmidomycin 就是擋這一步。'],
+      [8.6, '再接上 CTP、加磷酸、閉成環,經兩步要電子的還原(質體裡由鐵氧化還原蛋白供給),最後的 HDR 同時做出 IPP 與 DMAPP。'],
+      [13, '餵 [1-¹³C] 葡萄糖時,MEP 做的單位在 1、5 號碳帶 ¹³C,MVA 做的在 2、4、5 號碳;1990 年代就是靠這種標記樣式找到 MEP。']],
+    draw(g, t) {
+      const o = { x: 250, y: 200, b: 52 };
+      const [A, B, k, i] = morphAt(t, ME.n0, ME_SEQ);
+      const swap = B && i === 2 ? (id) => (FRAG.some(([d]) => d === id) ? 1 - ease(seg(k, 0.15, 0.45)) : FRAG.some(([, gg]) => gg === id) ? ease(seg(k, 0.55, 0.85)) : 1) : null;
+      const P = drawMol(g, A, B, k, { ...o, col: ME_COL, over: B ? meOver(i, k) : null, alphaOf: swap, alpha: fin(t, 0, 0.8) * (1 - 0.55 * fin(t, 13, 0.8)) });
+      // MEcPP 的環狀二磷酸:畫成上方的弧
+      const ringA = A.ring ? (B ? 1 - k : 1) : B && B.ring ? k : 0;
+      if (ringA > 0.01 && P.Pg && P.Op2) {
+        alpha(g, ringA * (1 - 0.55 * fin(t, 13, 0.8)), () => {
+          const ctx = g.ctx, mx = (P.Pg[0] + P.Op2[0]) / 2, my = Math.min(P.Pg[1], P.Op2[1]) - 1.3 * o.b;
+          ctx.save(); ctx.beginPath(); ctx.moveTo(P.Pg[0], P.Pg[1] - 11); ctx.quadraticCurveTo(mx, my, P.Op2[0], P.Op2[1] - 11);
+          ctx.strokeStyle = BOND; ctx.lineWidth = 2.2; ctx.stroke(); ctx.restore();
+          g.tag(mx, (P.Pg[1] + P.Op2[1]) / 4 + my / 2 - 3, 'PP', { size: 14, color: C.ink });
+        });
+      }
+      // 圖例與名稱
+      alpha(g, fin(t, 0.4) * (1 - fin(t, 12.8)), () => {
+        g.circle(150, 372, 6, C.amber); g.text(162, 372, '來自丙酮酸', { size: 13, color: C.ink2 });
+        g.circle(266, 372, 6, C.blue); g.text(278, 372, '來自 G3P', { size: 13, color: C.ink2 });
+      });
+      const ni = i < 0 ? 0 : B ? (k < 0.5 ? i : i + 1) : i + 1;
+      g.text(252, 336, ME_NAMES[ni], { size: 18, weight: 700, color: C.ink, align: 'center', alpha: fin(t, 0.3) * (1 - fin(t, 12.8)) });
+      // CO₂、斷鍵與接上新鍵、fosmidomycin
+      const cq = seg(t, 1.1, 3.0);
+      if (cq > 0 && cq < 1) {
+        const p1 = mv(ME.n0.P.p1, [-0.8, -1.2], ease(seg(t, 1.0, 2.6)));
+        g.tag(o.x + p1[0] * o.b - 34, o.y + p1[1] * o.b - 22 - 16 * cq, 'CO₂', { size: 15, color: C.amber, alpha: Math.min(1, cq * 4) * (1 - seg(cq, 0.7, 1)) });
+      }
+      if (t > 4.6 && t < 5.4) g.tag(o.x + XZ(3) * o.b, o.y + 1.55 * o.b, '3、4 號碳之間斷開', { size: 13.5, color: C.red, alpha: Math.min(seg(t, 4.6, 4.8), 1 - seg(t, 5.2, 5.4)) });
+      if (t > 6.4 && t < 8.4) g.tag(o.x + XZ(1) * o.b, o.y + 1.6 * o.b, '改接到 2 號碳:骨架分岔', { size: 13.5, color: C.mint, alpha: Math.min(seg(t, 6.4, 6.7), 1 - seg(t, 8.1, 8.4)) });
+      const fa = Math.min(fin(t, 6.6), 1 - fin(t, 9.0));
+      if (fa > 0) g.tag(o.x + 4.4 * o.b, o.y - 2.3 * o.b, 'fosmidomycin 擋這一步', { size: 14, color: C.red, alpha: fa });
+      const tk = seg(t, 6.0, 6.9);
+      if (tk > 0 && tk < 1 && P.p2) g.tag(lerp(560, P.p2[0], ease(tk)), lerp(110, P.p2[1] - 30, ease(tk)), 'NADPH', { size: 13.5, color: C.lav, alpha: Math.min(1, tk * 5) * (1 - seg(tk, 0.8, 1)) });
+      // HDR 的產物比例(20 格:17 IPP、3 DMAPP)
+      const ra = fin(t, 12.0, 0.6) * (1 - 0.55 * fin(t, 13, 0.8));
+      alpha(g, ra, () => {
+        g.text(418, 118, 'HDR 做出', { size: 14, color: C.ink2 });
+        for (let q = 0; q < 20; q++) g.rrect(418 + (q % 10) * 17, 136 + Math.floor(q / 10) * 17, 14, 14, 3, q < 17 ? IPPC : DMAC);
+        g.text(418, 192, 'IPP 85 : DMAPP 15', { size: 15, weight: 700, color: C.ink, mono: true });
+        g.text(418, 214, '菸草 BY-2 細胞', { size: 13, color: C.muted });
+      });
+      // 右邊:步驟
+      steps(g, 640, 62, [['① 丙酮酸 + G3P → DXP', 'DXS・放掉 1 個 CO₂', 1.0], ['② DXP → MEP', 'DXR・用 NADPH', 4.6], ['③ → CDP-ME → MEcPP', '接 CTP、加磷酸(ATP)、成環', 8.6], ['④ → HMBPP → IPP、DMAPP', 'HDS、HDR・用 4 個還原態 Fd', 10.4], ['⑤ 碳從哪裡來', '[1-¹³C] 葡萄糖標記', 13.0]], t, { gap: 60 });
+      // 右下:這一個單位的帳
+      alpha(g, fin(t, 0.6) * (1 - fin(t, 12.8)), () => {
+        g.panel(628, 372, 316, 152, '');
+        g.text(644, 390, '一個 IPP(或 DMAPP)的帳', { size: 13, color: C.muted });
+        count(g, 644, 414, '丙酮酸', t >= 1 ? 1 : 0, C.amber, { size: 19 });
+        count(g, 724, 414, 'G3P', t >= 1 ? 1 : 0, C.blue, { size: 19 });
+        count(g, 804, 414, '放出 CO₂', t >= 1.1 ? 1 : 0, C.ink2, { size: 19 });
+        count(g, 644, 460, 'NADPH', t >= 6.4 ? 1 : 0, C.lav, { size: 19 });
+        count(g, 724, 460, 'CTP', t >= 8.6 ? 1 : 0, C.ink, { size: 19 });
+        count(g, 794, 460, 'ATP', t >= 9.2 ? 1 : 0, C.amber, { size: 19 });
+        count(g, 864, 460, 'Fd', t >= 11.6 ? 4 : t >= 10.4 ? 2 : 0, C.mint, { size: 19 });
+        g.text(644, 510, 'Fd:還原態鐵氧化還原蛋白', { size: 13, color: C.muted });
+      });
+      // 最後:[1-¹³C] 葡萄糖的標記位置
+      const ia = fin(t, 13, 0.8);
+      if (ia > 0) {
+        alpha(g, ia, () => {
+          g.panel(24, 300, 590, 224, '');
+          g.text(42, 326, '餵 [1-¹³C] 葡萄糖,看 IPP 的哪幾個碳帶 ¹³C', { size: 15, weight: 700, color: C.ink });
+          const one = (x, label, col, lab) => {
+            g.text(x + 52, 362, label, { size: 16, weight: 800, color: col, align: 'center' });
+            const col2 = {}; for (const id of ['C1', 'C2', 'C3', 'C4', 'C5']) col2[id] = lab.includes(id) ? C.hot : 'rgba(141,156,150,.75)';
+            drawMol(g, IPPS, null, 0, { x: x - 30, y: 450, b: 40, col: col2, ring: lab, num: IPPS_NUM, fs: 14 });
+          };
+          one(150, 'MVA:2、4、5 號碳', MVAC, ['C2', 'C4', 'C5']);
+          one(430, 'MEP:1、5 號碳', MEPC, ['C1', 'C5']);
+          g.circle(48, 504, 6, C.hot, null); g.text(62, 504, '帶 ¹³C 的碳(約為葡萄糖標記的一半)', { size: 13, color: C.ink2 });
+        });
+      }
+    },
+  },
+  {
+    key: 'prenyl', name: '接長鏈:IPP 與 DMAPP 要怎麼配', dur: 16,
+    cues: [[0, '接長鏈的酵素(異戊烯基轉移酶)從 1 個 DMAPP 起頭,每次頭尾相接 1 個 IPP:GPP 接 1 個,FPP 接 2 個,GGPP 接 3 個。'],
+      [4.5, '所以 5n 個碳的鏈,DMAPP 與 IPP 要 1 : (n − 1)。原料給的 DMAPP 不夠時,由 IDI 把一部分 IPP 轉成 DMAPP。'],
+      [9, '質體的 HDR 給 15% DMAPP:做 GPP 還要 IDI 轉 35%,做 GGPP 只要 10%;細胞質的 MVA 只給 IPP,做 FPP 要轉 1/3。'],
+      [13, 'GPP 與 GGPP 主要在質體做,FPP 主要在細胞質做,產物交給同一區的萜類合成酶。右邊可以換鏈長。']],
+    draw(g, t, S) {
+      const n = S.chain, ch = CHAIN[n], where = ch.where, d0 = D0[where], wcol = where === 'mep' ? MEPC : MVAC;
+      // 左上:在哪一區、一個一個接上去
+      alpha(g, fin(t, 0, 0.5), () => {
+        g.rrect(24, 30, 566, 208, 18, where === 'mep' ? 'rgba(95,211,154,.05)' : 'rgba(127,184,255,.05)', where === 'mep' ? 'rgba(165,243,205,.45)' : 'rgba(127,184,255,.45)', 1.4);
+        g.text(42, 54, where === 'mep' ? `在質體裡做(原料來自 MEP)` : `在細胞質裡做(原料來自 MVA)`, { size: 15, weight: 700, color: wcol });
+      });
+      const BW = 74, BH = 30, X0 = 54, Y0 = 104;
+      const unit = (x, y, lab, col, a = 1) => alpha(g, a, () => { g.rrect(x, y - BH / 2, BW - 4, BH, 8, col); g.text(x + (BW - 4) / 2, y, lab, { size: 13, weight: 800, color: '#0b1111', align: 'center' }); });
+      unit(X0, Y0, 'DMAPP', DMAC, fin(t, 0.2));
+      for (let j = 0; j < n - 1; j++) {
+        const t0 = 1.0 + j * 1.1, kk = ease(seg(t, t0, t0 + 0.8));
+        const qx = 420 + j * 28, qy = 80 + j * 42;
+        unit(lerp(qx, X0 + (j + 1) * BW, kk), lerp(qy, Y0, kk), 'IPP', IPPC, fin(t, 0.3 + 0.2 * j));
+        const pp = seg(t, t0 + 0.7, t0 + 1.6);
+        if (pp > 0 && pp < 1) g.text(X0 + (j + 1) * BW - 2, Y0 - 24 - 12 * pp, 'PPi', { size: 13, weight: 700, color: C.muted, align: 'center', alpha: 1 - pp });
+      }
+      const done = 1.0 + (n - 1) * 1.1;
+      const ex = X0 + Math.min(n - 1, Math.max(0, Math.floor((t - 1.0) / 1.1) + 1)) * BW;
+      g.blob(ex - 2, Y0 + 44, 44, 19, C.lav, ch.enz, { alpha: fin(t, 0.4) * (1 - 0.6 * fin(t, done + 0.2)), wobble: 1, t, size: 14 });
+      alpha(g, fin(t, done), () => {
+        g.text(X0, 194, `${ch.name}:${ch.c} 個碳`, { size: 19, weight: 800, color: C.mint });
+        g.text(X0, 220, `DMAPP 1 個 + IPP ${n - 1} 個`, { size: 14, color: C.ink2 });
+      });
+      // 左下:原料池 60 格,IDI 把一部分 IPP 轉成 DMAPP
+      const need = Math.round(POOL / n), have = Math.round(POOL * d0), flips = Math.max(0, need - have);
+      const fk = seg(t, 9.2, 12.4), nowD = have + Math.round(flips * fk);
+      alpha(g, fin(t, 4.5), () => {
+        g.text(42, 262, `原料池:${POOL} 個 5 碳單位`, { size: 15, weight: 700, color: C.ink });
+        g.text(42, 288, where === 'mep' ? '質體的 HDR:IPP 85%、DMAPP 15%' : '細胞質的 MVA:只做 IPP', { size: 14, color: wcol });
+        for (let q = 0; q < POOL; q++) {
+          const x = 44 + (q % 12) * 26, y = 304 + Math.floor(q / 12) * 26;
+          const isD = q < nowD, justNow = q >= have && q < nowD && fk < 1 && q === nowD - 1;
+          g.rrect(x, y, 21, 21, 4, isD ? DMAC : IPPC);
+          if (justNow) g.rrect(x - 3, y - 3, 27, 27, 6, null, C.ink, 2);
+        }
+        count(g, 44, 452, 'DMAPP', nowD, DMAC, { size: 22 });
+        count(g, 154, 452, 'IPP', POOL - nowD, IPPC, { size: 22 });
+        if (t >= 9.2) count(g, 250, 452, 'IDI 轉了', Math.round(flips * fk), C.ink, { size: 22 });
+      });
+      // 右上:公式
+      const F = [[4.6, () => g.text(622, 70, '5n 個碳的鏈', { size: 14, color: C.muted })],
+        [4.6, () => g.text(622, 100, 'DMAPP 1 個 + IPP (n − 1) 個', { size: 16, weight: 600 })],
+        [5.4, () => g.text(622, 136, `n = ${n}(${ch.name})`, { size: 17, weight: 800, color: C.mint, mono: true })],
+        [6.2, () => g.text(622, 170, `要的 DMAPP:1/n = ${pct(1 / n, 1)}`, { size: 15 })],
+        [7.0, () => g.text(622, 202, `原料給的:d₀ = ${pct(d0)}`, { size: 15 })],
+        [9.0, () => g.text(622, 238, `IDI 要轉:1/n − d₀ = ${pct(idiNeed(n, d0), 1)}`, { size: 16, weight: 800, color: C.amber })],
+        [9.6, () => g.text(622, 268, `60 格裡要轉 ${flips} 格`, { size: 14, color: C.ink2 })],
+        [9.6, () => g.text(622, 296, '只算這一種產物的帳', { size: 13, color: C.muted })]];
+      alpha(g, fin(t, 4.5), () => g.panel(606, 36, 338, 282, ''));
+      for (const [t0, f] of F) alpha(g, fin(t, t0), f);
+      // 右下:交給哪一類萜類合成酶
+      alpha(g, fin(t, 13, 0.7), () => {
+        g.panel(606, 334, 338, 188, '');
+        g.text(622, 362, '交給', { size: 14, color: C.muted });
+        g.text(622, 394, ch.tps, { size: 19, weight: 800, color: C.mint });
+        g.text(622, 424, where === 'mep' ? '在質體' : '在細胞質', { size: 15, color: wcol });
+        g.text(622, 452, ch.ex, { size: 14, color: C.ink2 });
+        if (n === 4) g.text(622, 482, 'GGPP 也做類胡蘿蔔素、葉綠素側鏈', { size: 13, color: C.ink2 });
+        g.text(622, 508, '機制見「萜類合成酶」教材', { size: 13, color: C.muted });
+      });
+    },
+  },
+  {
+    key: 'inhibitors', name: '抑制劑:擋住一條路會怎樣', dur: 16,
+    cues: [[0, '要知道一個萜類的碳從哪條路來,可以擋住其中一條:lovastatin 擋 MVA 的 HMGR,fosmidomycin 擋 MEP 的 DXR。'],
+      [4.5, '金魚草的花放出單萜(月桂烯等)與倍半萜橙花叔醇。照前面的分工,擋 MEP 應該只少單萜,擋 MVA 應該只少橙花叔醇。'],
+      [9, '結果:fosmidomycin 讓單萜在 3 小時內少了 60%,橙花叔醇也跟著變少,只是慢一些;lovastatin 對橙花叔醇幾乎沒有影響。'],
+      [13, '抑制劑只是線索:擋住一邊,另一邊也會跟著變(阿拉伯芥幼苗用 lovastatin 後,固醇先降、再回升到高於對照)。']],
+    draw(g, t, S) {
+      // 4.6 秒起照課本的分工加藥(預期);9 秒起畫金魚草花瓣的實際情形
+      const inh = S.inhib, applied = t >= 4.6, real = t >= 9;
+      const hx = seg(t, 4.6, 8.6) * 12, hr = clamp((t - 9) / 3.5) * 12;
+      const mono = real ? (inh === 'fos' ? monoFos(hr) : 100) : applied && inh === 'fos' ? monoFos(hx) : 100;
+      const sesq = real ? (inh === 'fos' ? sesqFos(hr) : inh === 'lova' ? sesqLova(hr) : 100) : applied && inh === 'lova' ? expSesqLova(hx) : 100;
+      const blockP = applied && inh === 'fos', blockC = applied && !real && inh === 'lova';
+      // 左邊:兩區的流程
+      alpha(g, fin(t, 0, 0.6), () => {
+        g.rrect(24, 34, 470, 186, 20, 'rgba(95,211,154,.05)', 'rgba(165,243,205,.45)', 1.4);
+        g.text(42, 58, '質體:MEP', { size: 15, weight: 700, color: MEPC });
+        g.rrect(24, 262, 470, 186, 20, 'rgba(127,184,255,.05)', 'rgba(127,184,255,.45)', 1.4);
+        g.text(42, 286, '細胞質:MVA', { size: 15, weight: 700, color: MVAC });
+      });
+      const pP = [[70, 132], [404, 132]], pC = [[70, 360], [404, 360]];
+      alpha(g, fin(t, 0.3), () => {
+        g.line(70, 132, 404, 132, 'rgba(165,243,205,.35)', 6);
+        g.line(70, 360, 404, 360, `rgba(127,184,255,${real ? 0.14 : 0.35})`, 6);
+        g.text(70, 104, 'G3P + 丙酮酸', { size: 14, color: C.ink2 });
+        g.text(70, 332, '乙醯輔酶 A', { size: 14, color: C.ink2, alpha: real ? 0.6 : 1 });
+      });
+      // 流動的原料(先畫,節點蓋在上面)
+      flow(g, pP, t, { n: 8, speed: 0.2, color: MEPC, stop: blockP ? 0.33 : 1, a: fin(t, 0.6) });
+      flow(g, pC, t, { n: 8, speed: 0.2, color: MVAC, stop: real || blockC ? 0.33 : 1, a: fin(t, 0.6) * (real ? 0.45 : 1) });
+      if (real) {
+        const ra = fin(t, 9, 0.6);
+        alpha(g, ra, () => {
+          g.arrow(312, 152, 312, 338, { color: MEPC, lw: 2.2, dash: [6, 5] });
+          g.text(326, 244, '質體送出 IPP', { size: 13.5, color: MEPC });
+        });
+        if (!blockP) flow(g, [[312, 152], [312, 338]], t, { n: 4, speed: 0.35, color: IPPC, a: ra });
+        if (!blockP) flow(g, [[312, 360], [404, 360]], t, { n: 3, speed: 0.3, color: IPPC, a: ra, phase: 0.5 });
+      }
+      alpha(g, fin(t, 0.3), () => {
+        node(g, 190, 132, 'DXR', { size: 14, color: C.lav, border: C.lav });
+        node(g, 190, 360, 'HMGR', { size: 14, color: C.lav, border: C.lav, a: real ? 0.6 : 1 });
+        node(g, 312, 132, 'IPP', { size: 14, color: IPPC });
+        node(g, 312, 360, 'IPP', { size: 14, color: IPPC });
+      });
+      // 產物(亮度照右邊曲線目前的值)
+      alpha(g, fin(t, 0.6), () => {
+        node(g, 444, 132, '單萜', { size: 15, color: C.mint, border: C.mint, a: 0.3 + 0.7 * mono / 100 });
+        node(g, 444, 360, '橙花叔醇', { size: 15, color: C.amber, border: C.amber, a: 0.3 + 0.7 * sesq / 100 });
+      });
+      if (real) alpha(g, fin(t, 9.2), () => g.tag(160, 428, '花瓣的 MVA 停在甲羥戊酸之前', { size: 13, color: MVAC }));
+      // 加藥的位置
+      const xa = fin(t, 4.6);
+      if (inh === 'fos' && xa > 0) alpha(g, xa, () => { g.text(190, 166, '✕ fosmidomycin', { size: 14, weight: 700, color: C.red, align: 'center' }); });
+      if (inh === 'lova' && xa > 0) alpha(g, xa, () => { g.text(190, 394, '✕ lovastatin', { size: 14, weight: 700, color: C.red, align: 'center' }); });
+      // 右邊:放出量對時間
+      alpha(g, fin(t, 0.8), () => g.text(560, 38, inh === 'none' ? '金魚草花:不加藥(對照)' : `金魚草花:加 ${NAMES5[inh]} 後`, { size: 15, weight: 700, color: C.ink }));
+      const A = g.axes(570, 62, 350, 214, { xmin: 0, xmax: 12, ymin: 0, ymax: 120, xticks: [0, 3, 6, 9, 12], yticks: [0, 50, 100], xlab: '加藥後(小時)', ylab: '放出量(對照 = 100)', fmtY: (v) => String(v) });
+      const curve = (f, upto, col, lw, dash, a = 1) => { const pts = []; for (let h = 0; h <= upto + 1e-9; h += 0.1) pts.push([A.X(h), A.Y(f(h))]); g.curve(pts, col, lw, { dash, alpha: a }); };
+      // 照課本分工的預期(虛線,示意)
+      const ex = seg(t, 4.6, 8.6) * 12, exA = real ? 0.4 : 1;
+      if (t >= 4.6) {
+        const flat = () => 100;
+        if (inh === 'fos') { curve(monoFos, ex, C.mint, 2, [6, 5], exA); curve(flat, ex, C.amber, 2, [6, 5], exA); }
+        else if (inh === 'lova') { curve(flat, ex, C.mint, 2, [6, 5], exA); curve(expSesqLova, ex, C.amber, 2, [6, 5], exA); }
+        else { curve(flat, ex, C.mint, 2, [6, 5], exA); curve((h) => 98, ex, C.amber, 2, [6, 5], exA); }
+      }
+      // 金魚草的結果(實線)
+      if (real) {
+        const up = clamp((t - 9) / 3.5) * 12;
+        if (inh === 'fos') { curve(monoFos, up, C.mint, 3); curve(sesqFos, up, C.amber, 3); if (up >= 3) g.tag(A.X(3) + 44, A.Y(16), '3 小時內 −60%', { size: 13.5, color: C.mint }); }
+        else if (inh === 'lova') { curve(sesqLova, up, C.amber, 3); g.text(A.X(6), A.Y(16), '單萜:論文沒有給數據', { size: 13, color: C.muted, align: 'center' }); }
+        else { curve(() => 100, up, C.mint, 3); curve(() => 98, up, C.amber, 3); }
+      }
+      alpha(g, fin(t, 1), () => {
+        g.line(570, 330, 594, 330, C.mint, 3); g.text(600, 330, '單萜', { size: 13.5, color: C.ink2 });
+        g.line(660, 330, 684, 330, C.amber, 3); g.text(690, 330, '橙花叔醇', { size: 13.5, color: C.ink2 });
+        g.line(782, 330, 806, 330, C.ink2, 2, [6, 5]); g.text(812, 330, '預期(示意)', { size: 13.5, color: C.ink2 });
+      });
+      // 右下:結論與提醒
+      if (t >= 9 && t < 13) {
+        alpha(g, Math.min(fin(t, 9.4), 1 - fin(t, 12.6, 0.4)), () => {
+          g.panel(548, 362, 396, 160, '');
+          g.text(566, 390, 'Dudareva et al. 2005', { size: 13, color: C.muted });
+          g.text(566, 420, 'fosmidomycin:單萜與橙花叔醇都少', { size: 14.5, color: C.ink });
+          g.text(566, 450, 'lovastatin:橙花叔醇幾乎不變', { size: 14.5, color: C.ink });
+          g.text(566, 482, '→ 這朵花的倍半萜碳也來自 MEP', { size: 14.5, weight: 700, color: C.mint });
+        });
+      }
+      if (t >= 13) {
+        alpha(g, fin(t, 13), () => {
+          g.panel(548, 362, 396, 160, '');
+          g.text(566, 390, '抑制劑只是線索', { size: 15, weight: 700, color: C.amber });
+          g.text(566, 420, '阿拉伯芥幼苗加 lovastatin:', { size: 14, color: C.ink });
+          g.text(566, 448, '固醇先降,再回升到高於對照', { size: 14, color: C.ink2 });
+          g.text(566, 476, '類胡蘿蔔素與葉綠素暫時變多', { size: 14, color: C.ink2 });
+          g.text(566, 504, 'Laule et al. 2003', { size: 13, color: C.muted });
+        });
+      }
+    },
+  },
+  {
+    key: 'labeling', name: '同位素標記:質譜上的 +2、+4、+6', dur: 17,
+    cues: [[0, '同位素標記直接追原料:金魚草花枝插在含 ²H₂-DOX(進 MEP)或 ²H₂-MVL(甲羥戊酸內酯,進 MVA)的糖水裡,用 GC-MS 看產物。'],
+      [4.5, '每個帶標記的 5 碳單位多 2 個氘,質量 +2:單萜由 2 個單位組成,會出現 +2、+4;倍半萜有 3 個單位,可以到 +6。'],
+      [8.5, '若每個單位帶標記的機率是 p,各種質量的比例照二項分布算(公式在左下);原料被內生的未標記原料稀釋時 p 變小。右邊可以調 p。'],
+      [12.5, 'DOX 標記了單萜與橙花叔醇,還出現 +6;MVL 只標記橙花叔醇。若質體只送出 GPP,倍半萜最多 +4,所以作者認為送出的是 IPP 或 DMAPP。']],
+    draw(g, t, S) {
+      const dox = S.pre === 'dox', p = S.p;
+      // 左上:花枝插在含標記前驅物的糖水裡
+      alpha(g, fin(t, 0, 0.6), () => {
+        const ctx = g.ctx;
+        g.rrect(64, 132, 54, 104, 10, 'rgba(255,209,102,.1)', C.ink2, 1.6);
+        g.rrect(66, 170, 50, 64, 8, 'rgba(255,209,102,.22)');
+        g.line(91, 172, 91, 70, '#4f9a74', 3);
+        g.line(91, 120, 108, 100, '#4f9a74', 2.4);
+        ctx.save();
+        for (const [dx, dy, rx, ry, c] of [[-12, -6, 13, 17, 'rgba(255,123,123,.75)'], [12, -6, 13, 17, 'rgba(255,123,123,.75)'], [0, -20, 14, 13, 'rgba(255,150,150,.85)'], [0, 6, 11, 10, 'rgba(255,209,102,.9)']]) {
+          ctx.beginPath(); ctx.ellipse(91 + dx, 62 + dy, rx, ry, 0, 0, Math.PI * 2); ctx.fillStyle = c; ctx.fill();
+        }
+        ctx.restore();
+        g.text(91, 262, dox ? '²H₂-DOX' : '²H₂-MVL', { size: 17, weight: 800, color: C.amber, align: 'center' });
+        g.text(91, 286, dox ? '進 MEP' : '進 MVA', { size: 13.5, color: C.ink2, align: 'center' });
+        g.text(91, 306, '金魚草花枝', { size: 13, color: C.muted, align: 'center' });
+      });
+      // 中上:兩區與標記從哪裡進去
+      alpha(g, fin(t, 0.6), () => {
+        g.rrect(176, 40, 240, 94, 16, 'rgba(95,211,154,.05)', 'rgba(165,243,205,.45)', 1.4);
+        g.text(192, 64, '質體:MEP', { size: 14.5, weight: 700, color: MEPC });
+        g.text(398, 108, '→ 單萜', { size: 14.5, weight: 700, color: C.mint, align: 'right' });
+        g.rrect(176, 168, 240, 94, 16, 'rgba(127,184,255,.05)', 'rgba(127,184,255,.45)', 1.4);
+        g.text(192, 192, '細胞質:MVA', { size: 14.5, weight: 700, color: MVAC });
+        g.text(398, 236, '→ 橙花叔醇', { size: 14.5, weight: 700, color: C.amber, align: 'right' });
+        g.arrow(330, 136, 330, 166, { color: IPPC, lw: 2.2 });
+        g.text(340, 151, 'IPP', { size: 13, color: IPPC });
+      });
+      const ent = dox ? [[124, 120], [196, 96]] : [[124, 196], [196, 222]];
+      alpha(g, fin(t, 1.2), () => arrowLine(g, ent, C.amber, { lw: 2.4 }));
+      flow(g, ent, t, { n: 3, speed: 0.45, color: C.amber, r: 4.5, a: fin(t, 1.6) });
+      // 左下:公式
+      alpha(g, fin(t, 8.5, 0.7), () => {
+        g.panel(24, 326, 392, 196, '');
+        g.text(40, 350, '每個 5 碳單位帶標記的機率 p', { size: 14, color: C.ink2 });
+        rich(g, 40, 384, [['P(+2k) = C(n,k)·p', false], ['k', true], ['·(1 − p)', false], ['n−k', true]], { size: 17 });
+        rich(g, 40, 418, [['被標記的比例 = 1 − (1 − p)', false], ['n', true]], { size: 15.5 });
+        const lm = dox ? 1 - (1 - p) ** 2 : 0, ls = 1 - (1 - p) ** 3;
+        g.text(40, 452, `p = ${p.toFixed(2)}`, { size: 16, weight: 800, color: C.amber, mono: true });
+        g.text(156, 452, `單萜 ${pct(lm)}・倍半萜 ${pct(ls)}`, { size: 15, weight: 700, color: C.ink });
+        g.text(40, 482, dox ? 'n:單萜 2、倍半萜 3' : 'MVL 沒有進到單萜(論文測不到)', { size: 13.5, color: C.ink2 });
+        g.text(40, 506, '長條只算標記,沒有計入天然同位素', { size: 13, color: C.muted });
+      });
+      // 右邊:兩張質譜長條圖
+      const grow = ease(seg(t, 4.6, 6.4));
+      const monoV = dox ? binom(2, p) : [1, 0, 0], sesqV = binom(3, p), ghost = [(1 - p) ** 2, 2 * p * (1 - p), p ** 2, 0];
+      const chart = (x0, base, title, tcol, labs, vals, gh) => {
+        alpha(g, fin(t, 3.8), () => {
+          g.text(x0, base - 170, title, { size: 15, weight: 700, color: tcol });
+          g.line(x0, base, 940, base, C.ink2, 1.6);
+        });
+        const n = vals.length, wb = n === 3 ? 74 : 62, gap = (940 - x0 - 30) / n;
+        const ga = gh ? fin(t, 12.5, 0.7) : 0;
+        vals.forEach((v, j) => {
+          const cx = x0 + 30 + gap * (j + 0.5), h = 128 * v * grow, h2 = gh ? 128 * gh[j] : 0;
+          alpha(g, fin(t, 3.8), () => {
+            g.rrect(cx - wb / 2, base - h, wb, h, 4, j === 0 ? 'rgba(213,221,217,.55)' : tcol);
+            g.text(cx, base + 18, labs[j][0], { size: 14, weight: 700, color: C.ink, align: 'center', mono: true });
+            if (labs[j][1]) g.text(cx, base + 37, labs[j][1], { size: 13, color: C.ink2, align: 'center', mono: true });
+            const top = ga > 0 ? Math.max(h, h2) : h;
+            if (grow > 0.2) g.text(cx, base - top - 14, pct(v), { size: 14, weight: 700, color: C.ink, align: 'center', mono: true });
+          });
+          // 虛線:假設質體只送出 GPP 時的預測
+          if (ga > 0) alpha(g, ga, () => g.line(cx - wb / 2 - 8, base - h2, cx + wb / 2 + 8, base - h2, C.ink, 2.2, [6, 4]));
+        });
+      };
+      chart(452, 216, '單萜:月桂烯的碎片 m/z 93', C.mint, [['93', '+0'], ['95', '+2'], ['97', '+4']], monoV, null);
+      chart(452, 462, '倍半萜:橙花叔醇', C.amber, [['+0', ''], ['+2', ''], ['+4', ''], ['+6', '']], sesqV, dox ? ghost : null);
+      if (dox) {
+        alpha(g, fin(t, 12.5, 0.7), () => {
+          g.text(940, 292, '虛線:假設質體只送出 GPP', { size: 13, color: C.ink2, align: 'right' });
+          g.text(940, 522, '+6 出現 → 送出的是 IPP 或 DMAPP', { size: 14, weight: 700, color: C.mint, align: 'right' });
+        });
+      } else {
+        alpha(g, fin(t, 12.5, 0.7), () => g.text(940, 522, '花瓣的 MVA 停在甲羥戊酸之前,MVL 繞過它', { size: 13.5, color: MVAC, align: 'right' }));
+      }
+    },
+  },
+  {
+    key: 'p450', name: '骨架之後:P450 做出樹脂酸', dur: 16,
+    cues: [[0, '萜類合成酶做出碳氫骨架,很多萜類還要細胞色素 P450(用 O₂ 與 NADPH 把氧接到碳上的酵素)修飾。針葉樹的樹脂酸就是一例。'],
+      [4.5, '質體裡的雙萜合成酶把 GGPP 接成 abietadiene 等骨架;內質網上的 P450 把 18 號碳的甲基連續氧化三次:醇、醛、酸,成為松香酸。'],
+      [9, '火炬松的 CYP720B1 只做後兩步,直接給 abietadiene 幾乎不反應;西加雲杉的 CYP720B4 三步都做得到。右邊可以換酵素。'],
+      [12.5, '所以組織裡幾乎都是酸:西加雲杉莖外層的雙萜類 92% 是樹脂酸。松脂裡的松節油以單萜為主,松香則主要是這些樹脂酸。']],
+    draw(g, t, S) {
+      const cy = CYP[S.cyp];
+      // 左上:質體裡的雙萜合成酶
+      alpha(g, fin(t, 0, 0.6), () => {
+        g.rrect(24, 32, 290, 176, 18, 'rgba(95,211,154,.05)', 'rgba(165,243,205,.45)', 1.4);
+        g.text(40, 56, '質體', { size: 15, weight: 700, color: MEPC });
+        node(g, 76, 104, 'GGPP', { size: 15, color: C.ink });
+        g.text(170, 154, '雙萜合成酶 LAS', { size: 13.5, color: C.lav, align: 'center' });
+      });
+      g.blob(170, 104, 34, 22, C.lav, 'LAS', { alpha: fin(t, 0.6), wobble: 1, t });
+      alpha(g, fin(t, 1.0), () => { g.arrow(112, 104, 132, 104, { color: C.ink2, lw: 2 }); g.arrow(206, 104, 230, 104, { color: C.ink2, lw: 2 }); });
+      alpha(g, fin(t, 1.6), () => {
+        g.text(240, 96, '4 種', { size: 14, weight: 700, color: C.ink });
+        g.text(240, 116, '骨架', { size: 14, weight: 700, color: C.ink });
+        g.text(40, 186, '其中之一是 abietadiene', { size: 14, color: C.ink2 });
+      });
+      // 中間:abietadiene 的氧化(18 號碳)
+      // TR:18 號碳換成下一個狀態的秒數(各 0.4 秒);TK:O₂ 與 NADPH 飛進酵素的秒數。
+      // CYP720B1 第一步做不到:4.8 秒試一次失敗,6.0 秒改給 abietadienol(直接換成醇),再做後兩步
+      const TR = cy.ok[0] ? [5.4, 6.8, 8.2] : [6.0, 7.2, 8.6], TK = cy.ok[0] ? [4.8, 6.2, 7.6] : [4.8, 6.6, 8.0];
+      let st = 0, k = 0;
+      for (const t0 of TR) { if (t >= t0 + 0.4) st++; else { if (t >= t0) k = ease(seg(t, t0, t0 + 0.4)); break; } }
+      const failTag = !cy.ok[0] && t > 5.0 && t < 6.0 ? Math.min(seg(t, 5.0, 5.3), 1 - seg(t, 5.7, 6.0)) : 0;
+      const swapTag = !cy.ok[0] && t > 6.0 && t < 8.4 ? Math.min(seg(t, 6.0, 6.3), 1 - seg(t, 8.1, 8.4)) : 0;
+      const o = { x: 548, y: 270, b: 40, dots: false, only: ['G18'], fs: 15.5, textColor: (id) => (id === 'G18' ? C.mint : C.ink) };
+      const ma = fin(t, 2.4, 0.8);
+      alpha(g, ma, () => drawMol(g, abState(st), k > 0 ? abState(st + 1) : null, k, o));
+      if (k > 0.5) st++;
+      const gx = o.x + AB.P.G18[0] * o.b, gy = o.y + AB.P.G18[1] * o.b;
+      alpha(g, ma, () => {
+        g.text(gx - 4, gy + 26, '18 號碳', { size: 13, color: C.mint, align: 'center' });
+        const nm = OX[st];
+        g.text(842, 352, nm[1], { size: 18, weight: 800, color: st === 3 ? C.mint : C.ink, align: 'center' });
+        g.text(842, 378, st === 3 ? '(松香酸,樹脂酸的一種)' : `(${nm[2]})`, { size: 13.5, color: C.ink2, align: 'center' });
+      });
+      // 內質網膜與 P450
+      alpha(g, fin(t, 3.6), () => {
+        g.line(330, 444, 940, 444, 'rgba(127,184,255,.55)', 2.4); g.line(330, 456, 940, 456, 'rgba(127,184,255,.55)', 2.4);
+        g.text(930, 432, '內質網膜', { size: 13, color: MVAC, align: 'right' });
+        g.line(420, 424, 420, 444, C.lav, 3);
+      });
+      const busy = t > 4.6 && t < 9.2;
+      g.blob(420, 398 + (busy ? Math.sin(t * 6) * 2 : 0), 62, 26, C.lav, cy.name, { alpha: fin(t, 3.8), wobble: busy ? 1 : 0, t, size: 13.5 });
+      for (const t0 of TK) {
+        const kk = seg(t, t0, t0 + 0.7);
+        if (kk > 0 && kk < 1) g.tag(lerp(318, 380, ease(kk)), lerp(300, 372, ease(kk)), 'O₂ + NADPH', { size: 13, color: C.ink, alpha: Math.min(1, kk * 5) * (1 - seg(kk, 0.75, 1)) });
+      }
+      if (failTag > 0) g.tag(494, 404, '直接給 abietadiene:幾乎不反應', { size: 13.5, color: C.red, alpha: failTag, align: 'left' });
+      if (swapTag > 0) g.tag(494, 404, '改給 abietadienol 才往下做', { size: 13.5, color: C.amber, alpha: swapTag, align: 'left' });
+      // 右邊:三步做不做得到
+      alpha(g, fin(t, 4.4), () => {
+        g.text(748, 54, `${cy.tree} ${cy.name}`, { size: 15, weight: 700, color: C.lav });
+        [['① 烯 → 醇', 0], ['② 醇 → 醛', 1], ['③ 醛 → 酸', 2]].forEach(([s, j]) => {
+          const y = 98 + j * 66, ok = cy.ok[j], shown = t >= (cy.ok[0] ? [5.8, 7.2, 8.6] : [5.6, 7.6, 9.0])[j];
+          g.rrect(740, y - 24, 204, 56, 10, 'rgba(21,32,30,.6)', shown ? (ok ? C.mint : C.red) : C.line, 1.4);
+          g.text(756, y - 4, s, { size: 15, weight: 700, color: C.ink });
+          if (shown) g.text(756, y + 18, ok ? '✓ 做得到' : '✕ 幾乎不做', { size: 13.5, weight: 700, color: ok ? C.mint : C.red });
+        });
+        if (!cy.ok[0]) g.text(748, 300, '微粒體測不到,酵母約 2%', { size: 13, color: C.ink2 });
+        else g.text(748, 300, '酵母裡從烯一路做到酸', { size: 13, color: C.ink2 });
+      });
+      // 左下:兩支酵素比一比
+      alpha(g, fin(t, 9, 0.7), () => {
+        g.panel(24, 232, 290, 190, '');
+        g.text(40, 258, '火炬松 CYP720B1', { size: 14.5, weight: 700, color: S.cyp === 'b1' ? C.lav : C.ink2 });
+        g.text(40, 282, '醇 → 醛 → 酸', { size: 13.5, color: C.ink2 });
+        g.text(40, 304, '第一步由別的酵素做(作者推測)', { size: 13, color: C.muted });
+        g.text(40, 338, '西加雲杉 CYP720B4', { size: 14.5, weight: 700, color: S.cyp === 'b4' ? C.lav : C.ink2 });
+        g.text(40, 362, '烯 → 醇 → 醛 → 酸', { size: 13.5, color: C.ink2 });
+        g.text(40, 386, '24 種雙萜都能氧化', { size: 13, color: C.muted });
+        g.text(40, 410, 'Ro 2005;Hamberger 2011', { size: 13, color: C.muted });
+      });
+      // 下方:組織裡的組成與松脂
+      alpha(g, fin(t, 12.5, 0.7), () => {
+        g.text(330, 482, '西加雲杉莖外層的雙萜類', { size: 14, color: C.ink });
+        g.text(940, 482, '醛 5%・醇 3%・烯 <1%', { size: 13.5, color: C.ink2, align: 'right' });
+        const x0 = 330, W = 610, segs = [[0.92, C.mint], [0.05, C.amber], [0.03, C.blue], [0.006, GRAY]];
+        let x = x0;
+        for (const [v, c] of segs) { g.rrect(x, 496, Math.max(2, W * v - 1), 22, 3, c); x += W * v; }
+        g.text(x0 + 12, 507, '樹脂酸 92%', { size: 14, weight: 800, color: '#0b1111' });
+        g.text(40, 452, '松脂 = 松節油(單萜為主)', { size: 13.5, color: C.ink2 });
+        g.text(40, 476, '+ 松香(樹脂酸為主)', { size: 13.5, color: C.ink2 });
+        g.text(40, 506, 'GC-MS 前,樹脂酸先甲基化', { size: 13, color: C.muted });
+      });
+    },
+  },
+  {
+    key: 'carbon', name: '從光合作用到精油與樹脂', dur: 16,
+    cues: [[0, '串起來:葉綠體固定 CO₂ 做出 G3P;質體裡的 G3P 與丙酮酸走 MEP,運到細胞質的糖經糖解後變成乙醯輔酶 A,走 MVA。'],
+      [4.5, '照反應式算碳:MEP 每個 5 碳單位用 6 個碳、放掉 1 個 CO₂;MVA 用 3 個乙醯輔酶 A,每個由丙酮酸變來時已放掉 1 個 CO₂。'],
+      [9, '從三碳化合物算起,MEP 留下 5/6 的碳,MVA 只留 5/9;連做 ATP、NADPH 的糖也算進去,理論質量產率約 30% 對 25%。'],
+      [12.5, '最後,單萜與倍半萜揮發成精油的香氣,雙萜經 P450 氧化成樹脂酸,留在松脂與木材裡。右邊可以換路徑與鏈長。']],
+    draw(g, t, S) {
+      const n = S.chain, ch = CHAIN[n], route = S.route, bud = budget(route, n), rcol = route === 'mep' ? MEPC : MVAC;
+      const onP = route === 'mep', onC = route === 'mva';
+      // 左邊:葉綠體與細胞質
+      alpha(g, fin(t, 0, 0.6), () => {
+        g.rrect(24, 30, 566, 188, 20, 'rgba(95,211,154,.05)', `rgba(165,243,205,${onP ? 0.7 : 0.35})`, onP ? 2 : 1.4);
+        g.text(40, 54, '葉綠體(質體)', { size: 15, weight: 700, color: MEPC });
+        g.rrect(24, 284, 566, 238, 20, 'rgba(127,184,255,.05)', `rgba(127,184,255,${onC ? 0.7 : 0.35})`, onC ? 2 : 1.4);
+        g.text(40, 308, '細胞質', { size: 15, weight: 700, color: MVAC });
+      });
+      const N = (x, y, s, col, t0, opt = {}) => node(g, x, y, s, { size: 15, color: col, border: col === C.ink ? C.line : col, a: fin(t, t0), ...opt });
+      const AR = (pts, t0, col = C.ink2) => arrowLine(g, pts, col, { lw: 2, a: fin(t, t0), head: 8 });
+      // 箭頭與流動的碳先畫,節點蓋在上面
+      AR([[96, 116], [140, 116]], 0.6); AR([[200, 116], [236, 116]], 1.2); AR([[302, 104], [342, 86]], 1.7); AR([[302, 128], [342, 150]], 1.7);
+      AR([[412, 84], [446, 84]], 2.2); AR([[420, 154], [446, 154]], 2.2);
+      AR([[500, 174], [500, 230]], 2.8);
+      AR([[172, 136], [172, 168], [96, 168], [96, 384]], 2.0, 'rgba(213,221,217,.6)');
+      AR([[136, 404], [176, 404]], 2.7); AR([[306, 404], [336, 404]], 3.1); AR([[400, 404], [430, 404]], 3.4); AR([[488, 404], [512, 404]], 3.6);
+      if (t > 1) {
+        flow(g, [[96, 116], [236, 116], [342, 86], [446, 84]], t, { n: 6, speed: 0.25, color: C.mint, a: fin(t, 1) * (onP ? 1 : 0.5) });
+        flow(g, [[172, 136], [172, 168], [96, 168], [96, 404], [512, 404]], t, { n: 7, speed: 0.16, color: C.blue, a: fin(t, 2.4) * (onC ? 1 : 0.5) });
+      }
+      g.text(118, 94, '光合作用', { size: 13, color: C.ink2, align: 'center', alpha: fin(t, 0.6) });
+      g.text(220, 94, '−CO₂', { size: 13, weight: 700, color: C.hot, align: 'center', alpha: fin(t, 1.2) });
+      g.text(512, 200, 'P450', { size: 13, color: C.lav, alpha: fin(t, 2.8) });
+      g.text(108, 250, '運出', { size: 13, color: C.ink2, alpha: fin(t, 2.0) });
+      g.text(156, 380, '−CO₂', { size: 13, weight: 700, color: C.hot, align: 'center', alpha: fin(t, 2.7) });
+      g.text(370, 376, '−CO₂', { size: 13, weight: 700, color: C.hot, align: 'center', alpha: fin(t, 3.2) });
+      N(68, 116, 'CO₂', C.ink, 0.3); N(172, 116, 'G3P', C.ink, 0.9); N(270, 116, 'MEP', MEPC, 1.4);
+      N(378, 84, 'GPP', C.ink, 1.9); N(382, 154, 'GGPP', C.ink, 2.0); N(486, 84, '單萜', C.mint, 2.4); N(500, 154, '雙萜骨架', C.ink, 2.5);
+      N(500, 250, '樹脂酸', C.amber, 3.0); // 內質網上的 P450 氧化(畫在兩區之間)
+      N(96, 404, '丙酮酸', C.ink, 2.4); N(244, 404, '乙醯輔酶 A', C.ink, 2.9); N(370, 404, 'MVA', MVAC, 3.2); N(460, 404, 'FPP', C.ink, 3.5); N(548, 404, '倍半萜', C.amber, 3.7);
+      // 最後:產物
+      alpha(g, fin(t, 12.5, 0.7), () => {
+        g.tag(486, 52, '精油、松節油', { size: 13.5, color: C.mint });
+        g.text(458, 250, '松香、木材抽出物', { size: 13.5, weight: 700, color: C.amber, align: 'right' });
+        g.tag(520, 456, '精油', { size: 13.5, color: C.amber });
+      });
+      // 右邊:碳的帳
+      alpha(g, fin(t, 4.5, 0.6), () => {
+        g.panel(612, 32, 332, 490, '');
+        g.text(628, 60, `做 1 個 ${ch.name}(${ch.c} 碳)`, { size: 16, weight: 800, color: C.ink });
+        g.text(628, 86, onP ? '走 MEP(質體)' : '走 MVA(細胞質)', { size: 15, weight: 700, color: rcol });
+      });
+      // 進來的碳一顆一顆排好;變成 CO₂ 的那幾顆先轉成橘色,再縮小淡出
+      const cin = bud.cin, co2 = bud.co2, per = 12, mark = ease(seg(t, 5.6, 6.2)), out = ease(seg(t, 6.6, 7.8));
+      for (let q = 0; q < cin; q++) {
+        const x = 640 + (q % per) * 24, y = 118 + Math.floor(q / per) * 24, gone = q >= cin - co2;
+        const a = fin(t, 4.6 + q * 0.02, 0.4);
+        if (gone) alpha(g, a * (1 - out), () => g.circle(x, y - 6 * out, 7.5 * (1 - 0.5 * out), mark > 0.5 ? C.hot : rcol));
+        else alpha(g, a, () => g.circle(x, y, 7.5, rcol));
+      }
+      const L = (y, s, o2, t0) => alpha(g, fin(t, t0), () => g.text(628, y, s, { size: 15, color: C.ink, ...o2 }));
+      L(224, `進來的碳:${cin}(${bud.src})`, { size: 14.5 }, 5.0);
+      L(254, `放掉 CO₂:${co2}`, { color: C.hot, weight: 700 }, 6.0);
+      L(292, `留下:${ch.c} / ${cin} = ${pct(ch.c / cin, 1)}`, { size: 19, weight: 800, color: rcol }, 7.6);
+      L(330, onP ? `ATP ${bud.atp}・CTP ${bud.ctp}・NADPH ${bud.nadph}` : `ATP ${bud.atp}・NADPH ${bud.nadph}`, { size: 14.5 }, 8.4);
+      if (onP) L(356, `還原態鐵氧化還原蛋白 ${bud.fd}`, { size: 14.5 }, 8.4);
+      L(onP ? 384 : 358, '從三碳化合物算起,只算用掉的', { size: 13, color: C.muted }, 8.4);
+      alpha(g, fin(t, 9.4), () => {
+        g.text(628, 430, '把做 ATP、NADPH 的糖也算進去,', { size: 13.5, color: C.ink2 });
+        g.text(628, 454, '理論質量產率:', { size: 13.5, color: C.ink2 });
+        g.text(628, 482, 'MEP 約 30%・MVA 約 25%', { size: 15.5, weight: 800, color: C.ink, mono: false });
+        g.text(628, 508, 'Zhao et al. 2013', { size: 13, color: C.muted });
+      });
+    },
+  },
+];
+
+lesson = createLesson({
+  chapters,
+  state: { chain: 2, inhib: 'fos', pre: 'dox', p: 0.3, cyp: 'b1', route: 'mep' },
+  controls: [
+    { id: 'chain', label: '接成多長的鏈', type: 'seg', options: [{ v: 2, label: 'GPP(10 碳)' }, { v: 3, label: 'FPP(15 碳)' }, { v: 4, label: 'GGPP(20 碳)' }], chapters: ['prenyl', 'carbon'], onChange: () => { if (lesson && lesson.chapter === 'prenyl') replay(0); } },
+    { id: 'inhib', label: '加哪一種抑制劑', type: 'seg', options: [{ v: 'none', label: '不加' }, { v: 'lova', label: 'lovastatin(擋 MVA)' }, { v: 'fos', label: 'fosmidomycin(擋 MEP)' }], chapters: ['inhibitors'], onChange: () => replay(4.4) },
+    { id: 'pre', label: '餵哪一種標記前驅物', type: 'seg', options: [{ v: 'dox', label: '²H₂-DOX(進 MEP)' }, { v: 'mvl', label: '²H₂-MVL(進 MVA)' }], chapters: ['labeling'], onChange: () => replay(1.0) },
+    { id: 'p', label: '每個單位帶標記的機率 p', type: 'range', min: 0.05, max: 0.95, step: 0.05, format: (v) => v.toFixed(2), chapters: ['labeling'] },
+    { id: 'cyp', label: '換哪一支 P450', type: 'seg', options: [{ v: 'b1', label: 'CYP720B1(火炬松)' }, { v: 'b4', label: 'CYP720B4(西加雲杉)' }], chapters: ['p450'], onChange: () => replay(4.4) },
+    { id: 'route', label: '走哪一條路', type: 'seg', options: [{ v: 'mep', label: 'MEP' }, { v: 'mva', label: 'MVA' }], chapters: ['carbon'] },
+  ],
+});
+</script>
+</body>
+</html>

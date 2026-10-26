@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="針筒把農桿菌的菌液推進一片葉子,葉子下方是左右邊界之間分段上色的 T-DNA,右邊是葉綠體裡亮起的綠色訊號與層析圖上新出現的一支峰">
+  <defs>
+    <linearGradient id="gfLeaf" x1="60" y1="70" x2="290" y2="180" gradientUnits="userSpaceOnUse"><stop stop-color="#2b4d3c"/><stop offset="1" stop-color="#132419"/></linearGradient>
+    <radialGradient id="gfWet" cx="196" cy="112" r="46" gradientUnits="userSpaceOnUse"><stop stop-color="#a5f3cd" stop-opacity=".34"/><stop offset="1" stop-color="#a5f3cd" stop-opacity="0"/></radialGradient>
+    <radialGradient id="gfGlow" cx="366" cy="78" r="46" gradientUnits="userSpaceOnUse"><stop stop-color="#7dff9e" stop-opacity=".3"/><stop offset="1" stop-color="#7dff9e" stop-opacity="0"/></radialGradient>
+  </defs>
+  <!-- 葉片 -->
+  <path d="M40 124Q170 56 300 124Q170 192 40 124Z" fill="url(#gfLeaf)" stroke="#6f9f86" stroke-width="1.6"/>
+  <g stroke="#4f9a74" stroke-width="1.6" stroke-linecap="round" opacity=".8">
+    <path d="M44 124H296"/>
+    <path d="M92 124L118 101M92 124L118 147M140 124L168 98M140 124L168 150M188 124L216 101M188 124L216 147M234 124L256 106M234 124L256 142"/>
+  </g>
+  <circle cx="196" cy="112" r="46" fill="url(#gfWet)"/>
+  <!-- 針筒 -->
+  <g stroke-linecap="round">
+    <rect x="34" y="38" width="84" height="21" rx="4" fill="#d5ddd9" fill-opacity=".1" stroke="#b9c7c0" stroke-width="1.6"/>
+    <rect x="58" y="41" width="23" height="15" rx="3" fill="#a5f3cd" fill-opacity=".55"/>
+    <path d="M32 32v33" stroke="#b9c7c0" stroke-width="2.4"/>
+    <path d="M118 48h32l14 16" stroke="#b9c7c0" stroke-width="2.4"/>
+    <path d="M168 70l12 14" stroke="#a5f3cd" stroke-width="2.4" stroke-dasharray="1 5"/>
+  </g>
+  <!-- 左右邊界之間的 T-DNA -->
+  <g>
+    <path d="M44 216h236" stroke="#d5ddd9" stroke-opacity=".28" stroke-width="3"/>
+    <g stroke-width="15" stroke-linecap="butt">
+      <path d="M48 216h14" stroke="#ff7b7b"/>
+      <path d="M72 216h56" stroke="#ffd166"/>
+      <path d="M138 216h88" stroke="#a5f3cd"/>
+      <path d="M236 216h16" stroke="#b9c7c0"/>
+      <path d="M262 216h14" stroke="#ff7b7b"/>
+    </g>
+  </g>
+  <!-- 右上:葉綠體裡亮起的綠色訊號 -->
+  <circle cx="366" cy="78" r="46" fill="url(#gfGlow)"/>
+  <g>
+    <rect x="322" y="26" width="92" height="104" rx="12" stroke="#4f8f74" stroke-width="1.3" stroke-dasharray="4 4"/>
+    <g stroke="#a5f3cd" stroke-width="1.3">
+      <ellipse cx="348" cy="54" rx="19" ry="11" transform="rotate(-16 348 54)" fill="#7dff9e" fill-opacity=".55"/>
+      <ellipse cx="388" cy="80" rx="19" ry="11" transform="rotate(12 388 80)" fill="#7dff9e" fill-opacity=".55"/>
+      <ellipse cx="346" cy="104" rx="19" ry="11" transform="rotate(8 346 104)" fill="#7dff9e" fill-opacity=".55"/>
+    </g>
+    <g stroke="#153c28" stroke-width="1.1" stroke-opacity=".65"><path d="M338 54h20M378 80h20M336 104h20"/></g>
+  </g>
+  <!-- 右下:層析圖上新出現的一支峰,下面是只有基線的對照 -->
+  <path d="M318 200h104" stroke="#5f8f78" stroke-width="1.5"/>
+  <path d="M318 200h30l3-.5 3-1.6 3-4 3-8.4 3-14 3-17 3 17 3 14 3 8.4 3 4 3 1.6 3 .5h32" stroke="#a5f3cd" stroke-width="2.3" stroke-linejoin="round"/>
+  <path d="M318 232h104" stroke="#5f8f78" stroke-width="1.5"/>
+  <path d="M318 232h104" stroke="#7d8f88" stroke-width="2" stroke-dasharray="5 4"/>
+</svg>

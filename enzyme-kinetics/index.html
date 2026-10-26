@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>酵素動力學:Km 與 kcat 怎麼量</title>
+<meta name="description" content="用動畫看酵素反應的模型與初速度、萜類合成酶的活性怎麼量(反應液上蓋戊烷收集產物、GC-MS 加內標定量)、Michaelis–Menten 曲線、kcat 與 kcat/Km、為什麼不用雙倒數圖擬合、三種抑制型態,以及一個胺基酸突變怎麼改變 kcat。可以自己調取樣時間、濃度範圍、量測誤差與抑制劑。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="酵素動力學:Km 與 kcat 怎麼量">
+<meta property="og:description" content="用動畫看初速度怎麼量、Michaelis–Menten 曲線、kcat 與 kcat/Km、為什麼不用雙倒數圖擬合、抑制劑,以及一個突變怎麼改變 kcat。以萜類合成酶的活性測定為例。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/enzyme-kinetics/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/enzyme-kinetics.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="酵素動力學:初速度對受質濃度的飽和曲線與兩種擬合方法的動畫">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/enzyme-kinetics/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化進階"><a href="../">← 儀器入口</a><a href="../transcriptomics/">轉錄體分析</a><a href="../terpenoid-precursors/">萜類前驅物</a><a href="./" aria-current="page">酵素動力學</a><a href="../population-genetics/">族群遺傳</a><a href="../phylogenetics/">演化樹</a><a href="../gene-function/">基因功能驗證</a></nav></div>
+<header class="top wrap">
+  <h1>酵素動力學 <span class="k">Km 與 kcat 怎麼量</span></h1>
+  <p class="lede">一支酵素有多快、對受質多敏感,要從「初速度對受質濃度」的曲線求出來。這份教材以萜類合成酶的活性測定為例,從反應的模型、取樣與定量,講到怎麼擬合出 Km 與 kcat、怎麼判斷結果可不可信,以及抑制劑與突變怎麼改變這些參數。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="酵素動力學動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <p class="pre">先看:<a href="../terpene-synthase/">萜類合成酶</a>、<a href="../cloning/">基因選殖與蛋白表現</a></p>
+    <ul>
+      <li>模型是 E + S ⇌ ES → E + P。動力學量的是初速度 v<sub>0</sub>:產物對時間曲線開頭直線段的斜率,這時受質還沒用掉多少、產物抑制與酵素失活也還沒有影響。實作上先做時間曲線,把反應時間定在直線段裡。</li>
+      <li>萜類合成酶的測法:緩衝液裡放酵素、GPP 與 Mg<sup>2+</sup>,上面蓋一層含內標的戊烷收集揮發的產物,搖勻後取戊烷層打進 GC-MS,用產物峰對內標峰的面積比換算產物量。</li>
+      <li>v<sub>0</sub> = V<sub>max</sub>[S] / (K<sub>m</sub> + [S]);K<sub>m</sub> 是速度到 V<sub>max</sub> 一半時的受質濃度。K<sub>m</sub> = (k<sub>−1</sub> + k<sub>cat</sub>) / k<sub>1</sub>,只有 k<sub>cat</sub> 遠小於 k<sub>−1</sub> 時才約等於 ES 的解離常數。</li>
+      <li>k<sub>cat</sub> = V<sub>max</sub> / [E]<sub>t</sub>,是每個酵素分子每秒轉換幾個受質;k<sub>cat</sub>/K<sub>m</sub> 是受質很少時的效率。萜類合成酶很慢:這裡列的四支 k<sub>cat</sub> 約每秒 0.02 到 0.5 次,文獻中酵素的中位數約每秒 10 次。</li>
+      <li>不要用雙倒數圖擬合:取倒數會把低濃度點的誤差放大(約 δ/v<sub>0</sub><sup>2</sup>)。直接用非線性迴歸擬合原始數據,而且濃度要跨過 K<sub>m</sub> 的兩側;點都在 K<sub>m</sub> 以下時,K<sub>m</sub> 與 V<sub>max</sub> 分別都估不準。</li>
+      <li>抑制劑:α = 1 + [I]/K<sub>i</sub>。競爭型 K<sub>m</sub> 變大 α 倍、V<sub>max</sub> 不變;非競爭型 V<sub>max</sub> 變小 α 倍、K<sub>m</sub> 不變;反競爭型兩者都變小 α 倍。雙倒數圖適合拿來看型態。</li>
+      <li>西加雲杉的 PsTPS-3car2 把口袋裡 596 號的 Leu 換成 Phe,主產物從 (+)-3-carene 變成 (−)-sabinene,k<sub>cat</sub> 增加約 6.6 倍,K<sub>m</sub> 幾乎不變。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Johnson KA, Goody RS. The original Michaelis constant: translation of the 1913 Michaelis–Menten paper. Biochemistry. 2011;50(39):8264–8269. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3381512/">PMC3381512</a>(1913 年用蔗糖酶、只量反應早期的速度以避開產物的影響,蔗糖的常數 16.7 mM;1925 年 Briggs 與 Haldane 的穩定態推導;1934 年 Lineweaver 與 Burk 的雙倒數圖)</li>
+      <li>Jakubowski H, Flatt P. Fundamentals of Biochemistry(LibreTexts):<a href="https://bio.libretexts.org/Bookshelves/Biochemistry/Fundamentals_of_Biochemistry_(Jakubowski_and_Flatt)/01%3A_Unit_I-_Structure_and_Catalysis/06%3A_Enzyme_Activity/6.03%3A_Kinetics_with_Enzymes">6.3 Kinetics with Enzymes</a>(初速度、Michaelis–Menten 式與 K<sub>m</sub> 的定義、k<sub>cat</sub> 與 V<sub>M</sub> = k<sub>cat</sub>E<sub>0</sub>、k<sub>cat</sub>/K<sub>M</sub> 與擴散上限 10<sup>8</sup> 到 10<sup>9</sup> M<sup>−1</sup>s<sup>−1</sup>、雙倒數圖不要用線性迴歸分析)、<a href="https://bio.libretexts.org/Bookshelves/Biochemistry/Fundamentals_of_Biochemistry_(Jakubowski_and_Flatt)/01%3A_Unit_I-_Structure_and_Catalysis/06%3A_Enzyme_Activity/6.04%3A_Enzyme_Inhibition">6.4 Enzyme Inhibition</a>(三種抑制的速率式、表觀參數與雙倒數圖的型態)</li>
+      <li>GraphPad Prism 9 Curve Fitting Guide:<a href="https://www.graphpad.com/guides/prism/latest/curve-fitting/avoidscatchard_lineweaver_burkeandsimilartransforms.htm">Avoid Scatchard, Lineweaver-Burk and similar transforms</a>(轉換會扭曲實驗誤差,應該用非線性迴歸擬合原始數據,轉換的圖只用來呈現)</li>
+      <li>Roach CR, et al. Plasticity and evolution of (+)-3-carene synthase and (−)-sabinene synthase functions of a Sitka spruce monoterpene synthase gene family associated with weevil resistance. J Biol Chem. 2014;289(34):23859–23869. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4156071/">PMC4156071</a>(500 μL 反應液含 HEPES、KCl、10 mM MgCl<sub>2</sub>、GPP,上蓋 500 μL 含 2.5 μM 異丁基苯的戊烷,30 °C 反應 10 或 20 分鐘,GPP 1 到 60 μM 共 9 個濃度,GC-MS 以內標的校正係數定量、非線性迴歸;表 1 的產物比例與表 3 的 k<sub>cat</sub>、K<sub>m</sub>)</li>
+      <li>Vardakou M, et al. Comparative analysis and validation of the malachite green assay for the high throughput biochemical characterization of terpene synthases. MethodsX. 2014;1:187–196. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4472957/">PMC4472957</a>(GC 小瓶裡反應、己烷覆蓋、用時間曲線找出直線段再做穩定態實驗;同一支酵素用三種方法量,K<sub>m</sub> 與 k<sub>cat</sub> 可以差約 7 倍,k<sub>cat</sub>/K<sub>m</sub> 卻接近)。這種單一小瓶的 GC-MS 測法來自 O'Maille PE, et al. Anal Biochem. 2004;335:210–217,<a href="https://doi.org/10.1016/j.ab.2004.09.011">doi:10.1016/j.ab.2004.09.011</a>(依摘要)。</li>
+      <li>Srividya N, et al. Functional analysis of (4S)-limonene synthase mutants reveals determinants of catalytic outcome in a model monoterpene synthase. Proc Natl Acad Sci USA. 2015;112(11):3332–3337. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4371936/">PMC4371936</a>(動力學實驗把反應時間調到受質用掉不超過 20%;K<sub>m</sub> 12.6 μM、k<sub>cat</sub> 0.037 s<sup>−1</sup>;固定金屬離子的天門冬胺酸突變後沒有活性)</li>
+      <li>Bar-Even A, et al. The moderately efficient enzyme: evolutionary and physicochemical trends shaping enzyme parameters. Biochemistry. 2011;50(21):4402–4410. <a href="https://doi.org/10.1021/bi2002289">doi:10.1021/bi2002289</a>(數千筆文獻值:k<sub>cat</sub> 中位數約 10 s<sup>−1</sup>、k<sub>cat</sub>/K<sub>m</sub> 約 10<sup>5</sup> M<sup>−1</sup>s<sup>−1</sup>;次級代謝的 k<sub>cat</sub> 中位數 2.5 s<sup>−1</sup>,依摘要與 <a href="https://bionumbers.hms.harvard.edu/bionumber.aspx?id=111415">BioNumbers</a>)</li>
+      <li>示意:第 1、2 章的時間曲線(速度、失活與產物抑制的常數)、反應瓶與層析圖的樣子;第 2 章的內標量 1.25 nmol 是由論文的 2.5 μM × 0.5 mL 算出,面積比與校正係數是示意;第 3、5、6 章以 V<sub>max</sub> = 1 的相對速度、K<sub>m</sub> = 15.8 μM 畫曲線;9 個濃度的取法、量測誤差的大小與分布(常態、固定標準差)、第 4 章從蛋白質濃度換算的數字(0.65 mg/mL、65 kDa、稀釋 50 萬倍、20 pM)、第 6 章的抑制劑濃度、第 7 章口袋與側鏈的畫法都是示意。第 4、7 章的 k<sub>cat</sub>、K<sub>m</sub> 與產物比例取自上面的論文;模擬的數據不是任何實驗的實測結果。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化進階・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, seg, ease, clamp, lerp, rng, mix } from '../assets/bio-draw.js';
+
+// ================= 數學 =================
+// 下面兩個標記之間沒有畫圖,只用到 rng、lerp、clamp;維護說明裡有用 node 抽出來驗算的方法
+// BEGIN-MATH
+// PsTPS-3car2 野生型的 Km(μM,Roach et al. 2014 表 3)。第 3、5、6 章的曲線都用它,速度以 Vmax = 1 表示(相對速度)
+const KM = 15.8;
+// Michaelis–Menten:v₀ = Vmax[S] / (Km + [S])
+const mm = (s, V, K) => (V * s) / (K + s);
+// n 個受質濃度:從 1 μM 到 top 等比排列(論文是 1 到 60 μM 的 9 個濃度,沒寫確切的值,這裡的取法是示意)
+const concs = (top, n = 9) => Array.from({ length: n }, (_, i) => top ** (i / (n - 1)));
+// 可重現的亂數:種子先打散,再丟掉前幾個(種子小的時候 xorshift 一開始的幾個數很小)
+const rand = (seed) => { const R = rng(Math.imul(seed, 2654435761) >>> 0 || 1); for (let i = 0; i < 12; i++) R(); return R; };
+// 標準常態分布(Box–Muller)
+const gauss = (R) => { let u = R(); while (u < 1e-12) u = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * R()); };
+// 一組模擬的量測:每個點加上標準差 sd 的常態誤差(誤差大小固定,不隨速度改變)
+const simulate = (S, V, K, sd, seed) => { const R = rand(seed); return S.map((s) => mm(s, V, K) + sd * gauss(R)); };
+// 非線性最小平方:K 固定時,讓殘差平方和最小的 V 有公式(V = Σ v·f ÷ Σ f²,f = [S]/(K + [S])),
+// 所以只要在 log K 上找殘差平方和最小的地方:先在 0.01 到 10⁴ μM 之間用格點找,再用黃金分割細找。
+// 最低點落在格點的最上端時(數據看起來是一條直線),Km 定不出來,edge = true
+function fitNL(S, v) {
+  const at = (lk) => {
+    const K = 10 ** lk;
+    let a = 0, b = 0;
+    for (let i = 0; i < S.length; i++) { const f = S[i] / (K + S[i]); a += v[i] * f; b += f * f; }
+    const V = a / b;
+    let r = 0;
+    for (let i = 0; i < S.length; i++) { const e = v[i] - (V * S[i]) / (K + S[i]); r += e * e; }
+    return { K, V, r };
+  };
+  const LO = -2, HI = 4, N = 120, h = (HI - LO) / N, G = (Math.sqrt(5) - 1) / 2;
+  let best = LO, br = Infinity;
+  for (let i = 0; i <= N; i++) { const lk = LO + h * i, { r } = at(lk); if (r < br) { br = r; best = lk; } }
+  let a = Math.max(LO, best - h), b = Math.min(HI, best + h);
+  let c = b - G * (b - a), d = a + G * (b - a), fc = at(c).r, fd = at(d).r;
+  for (let k = 0; k < 50; k++) {
+    if (fc < fd) { b = d; d = c; fd = fc; c = b - G * (b - a); fc = at(c).r; } else { a = c; c = d; fc = fd; d = a + G * (b - a); fd = at(d).r; }
+  }
+  const lk = (a + b) / 2, res = at(lk);
+  return { K: res.K, V: res.V, rss: res.r, edge: lk > HI - 2 * h };
+}
+// 雙倒數(Lineweaver–Burk):1/v₀ 對 1/[S] 做一般的線性迴歸,Vmax = 1/截距、Km = 斜率/截距。
+// 速度 ≤ 0 的點不能取倒數,只好拿掉;截距 ≤ 0(Vmax 無限大或負的)或斜率 ≤ 0(Km 是負的)都算「算不出來」
+function fitLB(S, v) {
+  const x = [], y = [];
+  for (let i = 0; i < S.length; i++) if (v[i] > 0) { x.push(1 / S[i]); y.push(1 / v[i]); }
+  const n = x.length, dropped = S.length - n;
+  if (n < 2) return { ok: false, K: Infinity, V: NaN, slope: NaN, icpt: NaN, dropped };
+  const mx = x.reduce((p, q) => p + q, 0) / n, my = y.reduce((p, q) => p + q, 0) / n;
+  let sxy = 0, sxx = 0;
+  for (let i = 0; i < n; i++) { sxy += (x[i] - mx) * (y[i] - my); sxx += (x[i] - mx) ** 2; }
+  const slope = sxy / sxx, icpt = my - slope * mx;
+  const ok = icpt > 0 && slope > 0;
+  return { ok, slope, icpt, V: 1 / icpt, K: icpt <= 0 ? Infinity : slope <= 0 ? 0 : slope / icpt, dropped };
+}
+// 百分位數(陣列裡可以有 Infinity)
+const pct = (arr, q) => { const a = [...arr].sort((p, r) => p - r), i = (a.length - 1) * q, lo = Math.floor(i), hi = Math.ceil(i); return a[lo] === a[hi] ? a[lo] : a[lo] + (a[hi] - a[lo]) * (i - lo); };
+// 同樣的實驗重做 n 次(每次一組新的誤差),兩種方法各自得到的 Km 分布;定不出來的當成無限大
+function repeatFits(S, V, K, sd, n, seed) {
+  const nl = [], lb = [];
+  let nlEdge = 0, lbFail = 0;
+  for (let r = 0; r < n; r++) {
+    const v = simulate(S, V, K, sd, seed * 1000 + r + 1);
+    const a = fitNL(S, v);
+    if (a.edge) nlEdge++;
+    nl.push(a.edge ? Infinity : a.K);
+    const b = fitLB(S, v);
+    if (!b.ok) lbFail++;
+    lb.push(b.K);
+  }
+  const sum = (x) => ({ lo: pct(x, 0.025), med: pct(x, 0.5), hi: pct(x, 0.975) });
+  return { nl: { ...sum(nl), fail: nlEdge }, lb: { ...sum(lb), fail: lbFail } };
+}
+// 時間曲線:d[S]/dt = −V·e^(−kd·t)·[S] / (K(1 + [P]/Kp) + [S]),[P] = [S]₀ − [S]。
+// kd 是酵素失活的速率常數,Kp 是把產物當成競爭型抑制劑時的常數(都是示意);四階 Runge–Kutta 積分,時間單位是分鐘
+function progress(S0, V, K, { kd = 0, Kp = Infinity, tmax = 60, dt = 0.05 } = {}) {
+  const f = (tt, s) => -(V * Math.exp(-kd * tt) * s) / (K * (1 + (S0 - s) / Kp) + s);
+  const out = [[0, 0]];
+  let s = S0;
+  const n = Math.round(tmax / dt);
+  for (let i = 1; i <= n; i++) {
+    const t0 = (i - 1) * dt;
+    const k1 = f(t0, s), k2 = f(t0 + dt / 2, s + (dt / 2) * k1), k3 = f(t0 + dt / 2, s + (dt / 2) * k2), k4 = f(t0 + dt, s + dt * k3);
+    s += (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
+    out.push([i * dt, S0 - s]);
+  }
+  return out;
+}
+// 時間曲線上某個時間的產物濃度(線性內插)
+const pAt = (pc, tt) => { const dt = pc[1][0], i = Math.max(0, Math.min(pc.length - 2, Math.floor(tt / dt))); return lerp(pc[i][1], pc[i + 1][1], clamp(tt / dt - i)); };
+// 三種可逆抑制,α = 1 + [I]/Ki(非競爭型假設抑制劑和 E、ES 結合的解離常數相同)
+const INHIB = {
+  comp: (s, V, K, a) => (V * s) / (a * K + s),
+  non: (s, V, K, a) => ((V / a) * s) / (K + s),
+  unc: (s, V, K, a) => (V * s) / (K + a * s),
+};
+// 表觀的 [Vmax, Km]
+const appVK = (type, V, K, a) => (type === 'comp' ? [V, a * K] : type === 'non' ? [V / a, K] : [V / a, K / a]);
+// kcat/Km 的單位換算:kcat(每分鐘)÷ Km(μM)→ M⁻¹s⁻¹
+const perMs = (kcatMin, kmUM) => kcatMin / 60 / (kmUM * 1e-6);
+// END-MATH
+
+// Roach et al. 2014(J Biol Chem 289:23859)表 3 的 kcat(每分鐘)與 Km(μM),表 1 的產物比例(%):
+// 依序是 (+)-3-carene、(−)-sabinene、terpinolene、其他。兩組都是「野生型」與「596 號換掉的突變」
+const FAM = {
+  car: { name: 'PsTPS-3car2', mutName: 'L596F', aaW: 'Leu', aaM: 'Phe', wt: { kcat: 5.86, km: 15.8, prod: [67.5, 6.9, 15.4, 10.2] }, mut: { kcat: 38.57, km: 15.3, prod: [12.3, 37.4, 35.4, 14.9] } },
+  sab: { name: 'PsTPS-sab', mutName: 'F596L', aaW: 'Phe', aaM: 'Leu', wt: { kcat: 32.68, km: 35.7, prod: [1.3, 44.7, 35.9, 18.1] }, mut: { kcat: 4.95, km: 31.6, prod: [28.6, 18.7, 24.9, 27.8] } },
+};
+const PROD = ['(+)-3-carene', '(−)-sabinene', 'terpinolene', '其他'];
+// 第 4 章 kcat/Km 數線上的萜類合成酶(M⁻¹s⁻¹):檸檬烯合成酶(Srividya et al. 2015)、PsTPS-3car2、
+// 青蒿的 β-farnesene 合成酶(Vardakou et al. 2014 放射性方法的 10.3 mM⁻¹s⁻¹)、PsTPS-sab
+const TPS_EFF = [perMs(0.037 * 60, 12.6), perMs(5.86, 15.8), 1.03e4, perMs(32.68, 35.7)];
+// 同樣四支的 kcat(每秒):0.037、5.86 ÷ 60、0.020(放射性方法)、32.68 ÷ 60
+const TPS_KCAT = [0.037, 5.86 / 60, 0.02, 32.68 / 60];
+
+// 第 1 章:受質變少、產物抑制、酵素失活一起作用的時間曲線;第 2 章:[S]₀ = 5 μM,只有受質變少(都是示意)
+const PC1 = progress(10, 0.3, KM, { kd: 0.015, Kp: 8 }), V01 = mm(10, 0.3, KM);
+const PC2 = progress(5, 0.2, KM), V02 = mm(5, 0.2, KM);
+
+// 第 5 章:同一組設定只算一次(200 次重做的擬合在設定改變時才重算)
+let cache5 = null;
+function fit5(S) {
+  const key = `${S.range}|${S.noise}|${S.seed}`;
+  if (cache5 && cache5.key === key) return cache5;
+  const conc = concs(S.range), sd = S.noise / 100;
+  const v = simulate(conc, 1, KM, sd, S.seed * 7919 + 5);
+  cache5 = { key, conc, sd, v, nl: fitNL(conc, v), lb: fitLB(conc, v), rep: repeatFits(conc, 1, KM, sd, 200, S.seed) };
+  return cache5;
+}
+
+// ================= 畫圖的小工具 =================
+// 一行有上下標的字:_{…} 是下標、^{…} 是上標(畫公式用);回傳寬度
+function rich(g, x, y, s, { size = 16, weight = 500, color = C.ink, align = 'left', mono = false, alpha = 1 } = {}) {
+  const parts = [];
+  let last = 0;
+  for (const m of s.matchAll(/([_^])\{([^}]*)\}/g)) {
+    if (m.index > last) parts.push([s.slice(last, m.index), 0]);
+    parts.push([m[2], m[1] === '_' ? 1 : 2]);
+    last = m.index + m[0].length;
+  }
+  if (last < s.length) parts.push([s.slice(last), 0]);
+  const ctx = g.ctx, fs = (k) => (k ? Math.max(12, size * 0.74) : size);
+  let w = 0;
+  const ws = parts.map(([tx, k]) => { g.font(fs(k), weight, mono); const ww = ctx.measureText(tx).width; w += ww; return ww; });
+  let cx = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.fillStyle = color; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  parts.forEach(([tx, k], i) => {
+    g.font(fs(k), weight, mono);
+    ctx.fillText(tx, cx, y + (k === 1 ? size * g.boost * 0.3 : k === 2 ? -size * g.boost * 0.36 : 0));
+    cx += ws[i];
+  });
+  ctx.restore();
+  return w;
+}
+// 座標軸(刻度字 13 px);回傳把資料座標換成畫面座標的 X、Y
+function axes(g, x, y, w, h, { xmin = 0, xmax = 1, ymin = 0, ymax = 1, xticks = [], yticks = [], xlab = '', ylab = '', fmtX = String, fmtY = String } = {}) {
+  const X = (v) => x + ((v - xmin) / (xmax - xmin)) * w;
+  const Y = (v) => y + h - ((v - ymin) / (ymax - ymin)) * h;
+  const ctx = g.ctx;
+  g.line(x, y + h, x + w, y + h, C.ink2, 1.6); g.line(x, y, x, y + h, C.ink2, 1.6);
+  for (const v of xticks) { g.line(X(v), y + h, X(v), y + h + 5, C.ink2, 1.4); g.text(X(v), y + h + 17, fmtX(v), { size: 13, color: C.muted, align: 'center', mono: true }); }
+  let tw = 0;
+  for (const v of yticks) {
+    g.line(x - 5, Y(v), x, Y(v), C.ink2, 1.4); g.line(x, Y(v), x + w, Y(v), 'rgba(255,255,255,.06)', 1);
+    g.text(x - 9, Y(v), fmtY(v), { size: 13, color: C.muted, align: 'right', mono: true });
+    g.font(13, 500, true); tw = Math.max(tw, ctx.measureText(fmtY(v)).width);
+  }
+  if (xlab) g.text(x + w / 2, y + h + 40, xlab, { size: 14, color: C.ink2, align: 'center' });
+  if (ylab) { ctx.save(); ctx.translate(x - tw - 18 - 9 * g.boost, y + h / 2); ctx.rotate(-Math.PI / 2); g.text(0, 0, ylab, { size: 14, color: C.ink2, align: 'center' }); ctx.restore(); }
+  return { X, Y };
+}
+// 只在矩形裡面畫(曲線超出座標範圍的部分切掉)
+function clipped(g, x, y, w, h, fn) { const ctx = g.ctx; ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip(); fn(); ctx.restore(); }
+// 把函式 f 從 x0 到 x1 畫成曲線
+function plotFn(g, A, f, x0, x1, color, lw, { dash, alpha = 1, n = 140 } = {}) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) { const x = lerp(x0, x1, i / n); pts.push([A.X(x), A.Y(f(x))]); }
+  g.curve(pts, color, lw, { dash, alpha });
+}
+// 透明度包起來
+function fade(g, a, fn) { if (a <= 0) return; const ctx = g.ctx; ctx.save(); ctx.globalAlpha *= Math.min(1, a); fn(); ctx.restore(); }
+// 產物(環狀的單萜)畫成六邊形
+function hexa(g, x, y, r, color, { lw = 2.2, alpha = 1, fill = null } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.beginPath();
+  for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + (i * Math.PI) / 3, px = x + r * Math.cos(a), py = y + r * Math.sin(a); if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
+  ctx.closePath(); if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.stroke(); ctx.restore();
+}
+// 受質 GPP 畫成一段鋸齒狀的碳鏈
+function zig(g, x, y, w, color, { lw = 2.6, alpha = 1, rot = 0 } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(x, y); ctx.rotate(rot); ctx.beginPath();
+  for (let i = 0; i <= 6; i++) { const px = -w / 2 + (w * i) / 6, py = i % 2 ? -w * 0.11 : w * 0.11; if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
+  ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore();
+}
+function diamond(g, x, y, r, color, alpha = 1) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.beginPath(); ctx.moveTo(x, y - r); ctx.lineTo(x + r, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r, y); ctx.closePath();
+  ctx.fillStyle = color; ctx.fill(); ctx.restore();
+}
+// Km 顯示用:定不出來寫「算不出」,太大寫「> 1000」
+const fmtK = (k) => (!Number.isFinite(k) ? '算不出' : k <= 0 ? '負的' : k >= 1000 ? '> 1000 μM' : `${k >= 100 ? k.toFixed(0) : k.toFixed(1)} μM`);
+
+// 第 2 章的反應瓶(示意):瓶身 VX 到 VX + VW、VT 到 VB;上層戊烷 214 到 330、下層反應液 330 到瓶底
+const VX = 60, VW = 140, VT = 96, VB = 470;
+function vialPath(ctx, dx) {
+  const r = 22, x0 = VX + dx, x1 = x0 + VW;
+  ctx.beginPath(); ctx.moveTo(x0, VT); ctx.lineTo(x0, VB - r); ctx.quadraticCurveTo(x0, VB, x0 + r, VB); ctx.lineTo(x1 - r, VB); ctx.quadraticCurveTo(x1, VB, x1, VB - r); ctx.lineTo(x1, VT);
+}
+const ENZ_POS = [[30, 392], [104, 374], [72, 442]];
+const GPP_POS = [[26, 352], [64, 360], [118, 414], [40, 420], [102, 452], [122, 348], [84, 404]];
+const MG_POS = [[16, 372], [52, 384], [92, 344], [130, 380], [24, 450], [60, 470 - 26], [114, 432], [88, 424]];
+// 戊烷層裡的位置排成交錯的格子,內標與產物各佔一些格子,不會疊在一起
+const IS_POS = [[50, 230], [34, 256], [98, 256], [82, 282], [66, 308], [124, 308]];
+const PROD_POS = [[82, 230], [18, 282], [114, 230], [66, 256], [34, 308], [126, 256], [50, 282], [18, 230], [114, 282], [98, 308]];
+const PRODS = PROD_POS.map(([tx, ty], i) => ({ ts: 5 + i * 0.28, e: i % 3, tx, ty }));
+// 第 2 章的層析圖(示意):[滯留時間, 高度, 是不是內標]
+const PEAKS = [[4.6, 0.82, true], [8.1, 0.56, false], [9.0, 0.12, false], [10.2, 0.26, false]];
+const chrom = (m) => PEAKS.reduce((s, [rt, h]) => s + h * Math.exp(-0.5 * ((m - rt) / 0.08) ** 2), 0) + 0.006 * Math.sin(m * 37) + 0.004 * Math.sin(m * 91 + 1);
+
+let lesson = null;
+const replay = (t0) => { if (lesson) { lesson.time = t0; lesson.play(); } };
+
+const chapters = [
+  {
+    key: 'model', name: '酵素反應的模型與初速度', dur: 16,
+    cues: [[0, '酵素(E)先和受質(S)結合成複合物 ES;ES 可以分開回去,也可以把受質變成產物(P)放出來。'],
+      [4.5, 'k₁、k₋₁、kcat 是三步的速率常數。酵素反應完被放回來,同一個分子可以一直重複做。'],
+      [9, '產物對時間的曲線開頭是直線,後來變彎:受質越來越少、產物佔住酵素(產物抑制)、酵素慢慢失去活性。'],
+      [13, '所以動力學量的是初速度 v₀:曲線開頭直線段的斜率,這時受質濃度幾乎還是一開始的值。']],
+    draw(g, t) {
+      const ctx = g.ctx, a0 = ease(seg(t, 0, 0.8)), hk = ease(seg(t, 4.5, 5.2));
+      // 左半邊(反應式、酵素、計數)在右邊的圖出現前置中,8 到 8.8 秒滑到左邊
+      ctx.save(); ctx.translate(210 * (1 - ease(seg(t, 8, 8.8))), 0);
+      // 上:反應式
+      fade(g, a0, () => {
+        // 依實際字寬排(手機上字會放大)
+        const ey = 62, kc = mix(C.muted, C.amber, hk);
+        const word = (x, s) => { g.text(x, ey, s, { size: 26, weight: 700, mono: true }); g.font(26, 700, true); return x + ctx.measureText(s).width; };
+        let x = word(44, 'E + S') + 14;
+        g.arrow(x, ey - 7, x + 72, ey - 7, { color: C.ink2, lw: 2.2, head: 8 });
+        g.arrow(x + 72, ey + 7, x, ey + 7, { color: C.ink2, lw: 2.2, head: 8 });
+        rich(g, x + 36, ey - 27, 'k_{1}', { size: 18, weight: 700, color: kc, align: 'center' });
+        rich(g, x + 36, ey + 30, 'k_{−1}', { size: 18, weight: 700, color: kc, align: 'center' });
+        x = word(x + 86, 'ES') + 14;
+        g.arrow(x, ey, x + 78, ey, { color: C.mint, lw: 2.6, head: 9 });
+        rich(g, x + 39, ey - 26, 'k_{cat}', { size: 18, weight: 700, color: kc, align: 'center' });
+        word(x + 90, 'E + P');
+      });
+      // 中:酵素一次一次做出產物
+      const ex = 250, ey2 = 272, sit = [ex, ey2 - 54];
+      g.blob(ex, ey2, 92, 60, C.lav, '', { alpha: a0, wobble: 1, t });
+      fade(g, a0, () => {
+        g.circle(ex, ey2 - 62, 27, C.bg);
+        g.text(ex, ey2 + 14, 'E', { size: 24, weight: 800, color: '#0b1111', align: 'center' });
+      });
+      let made = 0;
+      const T0 = 0.6, PER = 3.4;
+      if (t >= T0) {
+        const k = Math.floor((t - T0) / PER), u = ((t - T0) % PER) / PER, back = k % 3 === 1;
+        made = k - Math.floor((k + 1) / 3) + (!back && u >= 0.62 ? 1 : 0);
+        const from = [84, 150], to = [432, 150];
+        const pin = ease(seg(u, 0, 0.3));
+        let sx = lerp(from[0], sit[0], pin), sy = lerp(from[1], sit[1], pin) - Math.sin(pin * Math.PI) * 28;
+        if (back) {
+          const po = ease(seg(u, 0.55, 0.85));
+          sx = lerp(sx, from[0], po); sy = lerp(sy, from[1], po) - Math.sin(po * Math.PI) * 28;
+          const a = 1 - seg(u, 0.88, 1);
+          zig(g, sx, sy, 46, C.amber, { alpha: a });
+          g.text(sx, sy - 24, 'S', { size: 16, weight: 700, color: C.amber, align: 'center', alpha: a });
+          if (u > 0.56 && u < 0.95) g.tag(150, 214, '沒反應就分開(k₋₁)', { size: 14, color: C.amber, alpha: Math.min(seg(u, 0.56, 0.62), 1 - seg(u, 0.88, 0.95)) });
+        } else {
+          const cv = ease(seg(u, 0.5, 0.62)), po = ease(seg(u, 0.62, 0.92));
+          const px = lerp(sit[0], to[0], po), py = lerp(sit[1], to[1], po) - Math.sin(po * Math.PI) * 28;
+          if (cv < 1) {
+            zig(g, sx, sy, 46, C.amber, { alpha: 1 - cv });
+            g.text(sx, sy - 24, 'S', { size: 16, weight: 700, color: C.amber, align: 'center', alpha: (1 - cv) * Math.min(1, u * 8) });
+          }
+          if (cv > 0) {
+            const a = cv * (1 - seg(u, 0.9, 1));
+            hexa(g, px, py, 14, C.mint, { alpha: a, lw: 2.6 });
+            g.text(px, py - 28, 'P', { size: 16, weight: 700, color: C.mint, align: 'center', alpha: a });
+          }
+        }
+        if (u > 0.3 && u < 0.56) g.tag(ex + 132, ey2 - 66, 'ES 複合物', { size: 15, color: C.lav, alpha: Math.min(seg(u, 0.3, 0.36), 1 - seg(u, 0.5, 0.56)) });
+      }
+      // 左下:計數
+      fade(g, ease(seg(t, 4.5, 5.2)), () => {
+        g.panel(40, 384, 440, 112, '');
+        g.text(62, 418, '同一個酵素分子', { size: 15, color: C.ink2 });
+        g.text(62, 458, `已經做出 ${made} 個產物`, { size: 21, weight: 700, color: C.mint });
+      });
+      ctx.restore();
+      // 右:產物對時間
+      fade(g, ease(seg(t, 8.6, 9.4)), () => {
+        const A = axes(g, 610, 92, 300, 200, { xmax: 60, ymax: 5, xticks: [0, 20, 40, 60], yticks: [0, 2, 4], xlab: '時間(分鐘)', ylab: '產物 [P](μM)' });
+        const ta = ease(seg(t, 13, 13.8));
+        if (ta > 0) fade(g, ta, () => g.rrect(A.X(0), A.Y(5), A.X(10) - A.X(0), A.Y(0) - A.Y(5), 0, 'rgba(165,243,205,.08)'));
+        const tt = 60 * ease(seg(t, 9, 11.5));
+        const pts = [];
+        for (let m = 0; m <= tt + 1e-9; m += 0.5) pts.push([A.X(m), A.Y(pAt(PC1, m))]);
+        g.curve(pts, C.mint, 3);
+        if (ta > 0) {
+          const tEnd = 4.8 / V01;
+          g.line(A.X(0), A.Y(0), A.X(tEnd * ta), A.Y(V01 * tEnd * ta), C.amber, 2.2, [7, 5]);
+          g.tag(A.X(23), A.Y(V01 * 23) - 24, '初速度 v₀ = 斜率', { size: 15, color: C.amber, alpha: ta });
+          g.text(A.X(5), A.Y(5) + 14, '直線段', { size: 13, color: C.mint, align: 'center', alpha: ta });
+        }
+      });
+      const R = ['受質越來越少', '產物佔住酵素(產物抑制)', '酵素慢慢失去活性'];
+      fade(g, ease(seg(t, 9.4, 10)), () => g.text(560, 388, '曲線變彎的原因', { size: 15, weight: 700, color: C.ink }));
+      R.forEach((s, i) => g.text(560, 420 + i * 30, `${i + 1}. ${s}`, { size: 15, color: C.ink2, alpha: ease(seg(t, 9.8 + i * 0.7, 10.4 + i * 0.7)) }));
+    },
+  },
+  {
+    key: 'assay', name: '怎麼量:取樣、萃取與內標', dur: 17,
+    cues: [[0, '以西加雲杉的單萜合成酶為例(Roach et al. 2014):緩衝液裡放酵素、GPP 與 Mg²⁺,上面蓋一層戊烷。'],
+      [4.5, '30 °C 反應 10 到 20 分鐘。單萜幾乎不溶於水又容易揮發,會跑進上層的戊烷;最後用力搖勻,把產物萃取上來。'],
+      [9, '取戊烷層打進 GC-MS。戊烷裡有已知量的內標(異丁基苯),用產物峰對內標峰的面積比換算產物量。'],
+      [13, '事先做時間曲線,把反應時間定在直線段裡;產物濃度除以時間就是初速度。右邊可以改取樣時間。']],
+    draw(g, t, S) {
+      const ctx = g.ctx, a0 = ease(seg(t, 0, 0.8));
+      const vort = t > 8 && t < 9.3 ? Math.sin(Math.PI * seg(t, 8, 9.3)) : 0;
+      const dx = Math.sin(t * 60) * 6 * vort;
+      // 反應瓶
+      fade(g, a0, () => {
+        ctx.save(); vialPath(ctx, dx); ctx.closePath(); ctx.clip();
+        ctx.fillStyle = 'rgba(127,184,255,.12)'; ctx.fillRect(VX + dx, 214, VW, 116);
+        ctx.fillStyle = 'rgba(184,164,244,.15)'; ctx.fillRect(VX + dx, 330, VW, VB - 330);
+        g.line(VX + dx, 330, VX + VW + dx, 330, 'rgba(240,243,238,.35)', 1.2);
+        const jig = (i, amp) => [Math.sin(t * 1.3 + i * 1.7) * amp + Math.sin(t * 40 + i) * 7 * vort, Math.cos(t * 1.1 + i * 2.3) * amp + Math.cos(t * 37 + i) * 5 * vort];
+        IS_POS.forEach(([x, y], i) => { const [jx, jy] = jig(i, 3); diamond(g, VX + dx + x + jx, y + jy, 6, C.blue); });
+        MG_POS.forEach(([x, y], i) => { const [jx, jy] = jig(i + 9, 2); g.circle(VX + dx + x + jx, y + jy, 3.4, C.amber); });
+        GPP_POS.forEach(([x, y], i) => {
+          const used = i < 4 ? seg(t, 5.2 + i * 0.6, 6 + i * 0.6) : 0;
+          const [jx, jy] = jig(i + 20, 3);
+          zig(g, VX + dx + x + jx, y + jy, 22, C.backbone, { lw: 2, alpha: 1 - used, rot: i * 0.7 });
+        });
+        ENZ_POS.forEach(([x, y], i) => { const [jx, jy] = jig(i + 30, 2); g.blob(VX + dx + x + jx, y + jy, 15, 11, C.lav, '', { wobble: 1, t: t + i }); });
+        PRODS.forEach((p, i) => {
+          if (t < p.ts) return;
+          const k = ease(seg(t, p.ts, p.ts + 1.5)), [ex, ey] = ENZ_POS[p.e], [jx, jy] = jig(i + 40, 3);
+          const x = lerp(ex, p.tx, k) + jx, y = lerp(ey - 14, p.ty, k) - Math.sin(k * Math.PI) * 10 + jy;
+          hexa(g, VX + dx + x, y, 6, C.mint, { lw: 2, alpha: Math.min(1, (t - p.ts) * 4) });
+        });
+        ctx.restore();
+        vialPath(ctx, dx); ctx.lineWidth = 2; ctx.strokeStyle = C.ink2; ctx.stroke();
+        g.rrect(VX - 6 + dx, 64, VW + 12, 32, 6, '#2b3b36', C.ink2);
+      });
+      // 瓶子右邊:分層與圖例
+      fade(g, ease(seg(t, 0.6, 1.4)), () => {
+        g.text(218, 246, '上層:戊烷', { size: 15, weight: 700, color: C.blue });
+        diamond(g, 226, 272, 6, C.blue); g.text(240, 272, '內標', { size: 14, color: C.ink2 });
+        g.text(218, 352, '下層:反應液', { size: 15, weight: 700, color: C.lav });
+        g.blob(227, 380, 10, 8, C.lav, ''); g.text(244, 380, '酵素', { size: 14, color: C.ink2 });
+        zig(g, 227, 406, 18, C.backbone, { lw: 2 }); g.text(244, 406, 'GPP', { size: 14, color: C.ink2 });
+        g.circle(227, 432, 3.6, C.amber); g.text(244, 432, 'Mg²⁺', { size: 14, color: C.ink2 });
+      });
+      fade(g, ease(seg(t, 5, 5.6)), () => { hexa(g, 227, 458, 6, C.mint, { lw: 2 }); g.text(244, 458, '產物', { size: 14, color: C.ink2 }); });
+      // 瓶子下面:現在在做什麼
+      const min = Math.round(10 * seg(t, 4.5, 8));
+      const st = t < 4.5 ? '反應瓶(示意)' : t < 8 ? `30 °C・第 ${min} 分鐘` : t < 9.3 ? '搖勻,萃取產物' : '取上層打進 GC-MS';
+      g.text(VX + VW / 2, 500, st, { size: 17, weight: 700, color: t < 4.5 ? C.ink2 : C.mint, align: 'center', alpha: a0 });
+      // 右邊:論文的條件(層析圖出來前)
+      fade(g, ease(seg(t, 0.8, 1.6)) * (1 - ease(seg(t, 8.6, 9.2))), () => {
+        g.panel(400, 70, 520, 270, '');
+        g.text(422, 104, 'Roach et al. 2014 的條件', { size: 16, weight: 700, color: C.mint });
+        rich(g, 422, 146, '反應液 500 μL:HEPES 緩衝液、KCl、', { size: 16 });
+        rich(g, 422, 174, '10 mM MgCl_{2}、GPP、純化的酵素', { size: 16 });
+        rich(g, 422, 216, '上蓋 500 μL 戊烷,含 2.5 μM 異丁基苯', { size: 16, alpha: ease(seg(t, 1.6, 2.2)) });
+        rich(g, 422, 258, '30 °C 反應 10 或 20 分鐘(依酵素)', { size: 16, alpha: ease(seg(t, 4.5, 5.1)) });
+        rich(g, 422, 300, '搖勻 30 秒,離心分層', { size: 16, alpha: ease(seg(t, 7.6, 8.2)) });
+      });
+      // 右上:層析圖
+      fade(g, ease(seg(t, 9.2, 9.8)), () => {
+        const CX = 400, CW = 520, CY = 46, CH = 150, X = (m) => CX + (m / 14) * CW, Y = (v) => CY + CH - v * CH;
+        g.line(CX, CY + CH, CX + CW, CY + CH, C.ink2, 1.6);
+        for (const m of [0, 4, 8, 12]) { g.line(X(m), CY + CH, X(m), CY + CH + 5, C.ink2, 1.4); g.text(X(m), CY + CH + 17, String(m), { size: 13, color: C.muted, align: 'center', mono: true }); }
+        g.text(CX + CW / 2, CY + CH + 38, '滯留時間(分鐘)', { size: 14, color: C.ink2, align: 'center' });
+        const upto = 14 * ease(seg(t, 9.6, 11.4)), fill = ease(seg(t, 11.4, 12));
+        if (fill > 0) for (const [rt, , is] of PEAKS.slice(0, 2)) {
+          const pts = [[X(rt - 0.3), Y(0)]];
+          for (let m = rt - 0.3; m <= rt + 0.3; m += 0.02) pts.push([X(m), Y(chrom(m))]);
+          pts.push([X(rt + 0.3), Y(0)]);
+          fade(g, fill, () => { ctx.beginPath(); pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py))); ctx.closePath(); ctx.fillStyle = is ? 'rgba(127,184,255,.35)' : 'rgba(165,243,205,.35)'; ctx.fill(); });
+        }
+        const pts = [];
+        for (let m = 0; m <= upto + 1e-9; m += 0.02) pts.push([X(m), Y(chrom(m))]);
+        g.curve(pts, C.ink2, 1.8);
+        if (upto > 5) g.tag(X(4.6), Y(0.82) - 16, '內標', { size: 14, color: C.blue });
+        if (upto > 8.5) g.tag(X(8.1), Y(0.56) - 16, '產物', { size: 14, color: C.mint });
+      });
+      // 中:換算
+      fade(g, ease(seg(t, 11.4, 12)), () => {
+        g.text(400, 266, '產物量 = 峰面積比 × 內標量 ÷ 校正係數', { size: 17, weight: 700 });
+        g.text(400, 294, '峰面積比 = 產物峰 ÷ 內標峰', { size: 14, color: C.ink2 });
+        g.text(400, 318, '內標量 = 2.5 μM × 0.5 mL = 1.25 nmol', { size: 14, color: C.ink2 });
+      });
+      // 右下:時間曲線與取樣時間
+      fade(g, ease(seg(t, 13, 13.6)), () => {
+        g.text(470, 344, '[S]₀ = 5 μM 的時間曲線(示意)', { size: 13, color: C.muted });
+        const A = axes(g, 470, 362, 240, 104, { xmax: 60, ymax: 2.5, xticks: [0, 20, 40, 60], yticks: [0, 1, 2], xlab: '時間(分鐘)', ylab: '產物(μM)' });
+        g.line(A.X(0), A.Y(0), A.X(2.45 / V02), A.Y(2.45), C.ink2, 1.6, [6, 5]);
+        const pts = [];
+        for (let m = 0; m <= 60; m += 0.5) pts.push([A.X(m), A.Y(pAt(PC2, m))]);
+        g.curve(pts, C.mint, 2.6);
+        for (const m of [0, 5, 10, 20, 30, 45, 60]) g.circle(A.X(m), A.Y(pAt(PC2, m)), 3.6, C.ink);
+        const ts = S.tsamp, P = pAt(PC2, ts), used = P / 5, ratio = P / ts / V02, ok = used <= 0.2, col = ok ? C.mint : C.amber;
+        g.line(A.X(0), A.Y(0), A.X(ts), A.Y(P), col, 2.4);
+        g.circle(A.X(ts), A.Y(P), 6, col);
+        g.text(752, 370, `取樣 ${ts} 分鐘`, { size: 17, weight: 700 });
+        g.text(752, 400, `受質用掉 ${Math.round(used * 100)}%`, { size: 15, color: col });
+        g.text(752, 428, `P ÷ t = v₀ 的 ${Math.round(ratio * 100)}%`, { size: 15, color: col });
+        g.text(752, 458, ok ? '還在直線段裡' : '速度被低估了', { size: 15, weight: 700, color: col });
+      });
+    },
+  },
+  {
+    key: 'mm', name: 'Michaelis–Menten 曲線', dur: 17,
+    cues: [[0, '用 9 個受質濃度各量一個初速度(論文是 1 到 60 μM),把 v₀ 對 [S] 作圖。'],
+      [4.5, '點連起來是一條飽和曲線:v₀ = Vmax[S]/(Km + [S])。受質很多時酵素都被佔滿,速度趨近最大值 Vmax。'],
+      [8, 'Km 是速度到一半 Vmax 時的受質濃度,這支酵素約 15.8 μM;受質遠少於 Km 時,速度和 [S] 幾乎成正比。'],
+      [12.5, 'Km = (k₋₁ + kcat)/k₁,kcat 遠小於 k₋₁ 時才約等於解離常數。右邊可以換濃度範圍,看點都在 Km 以下會怎樣。']],
+    draw(g, t, S) {
+      const pts = concs(S.range);
+      const A = axes(g, 100, 54, 470, 330, { xmax: 170, ymax: 1.15, xticks: [0, 50, 100, 150], yticks: [0, 0.5, 1], xlab: '受質濃度 [S](μM)', ylab: '初速度 v₀(Vmax = 1)', fmtY: (v) => v.toFixed(1) });
+      // 曲線:量過的範圍畫實線,外面畫虛線
+      const cu = ease(seg(t, 4.5, 6.5));
+      if (cu > 0) {
+        const xe = 170 * cu, in1 = [], out = [];
+        for (let s = 0; s <= xe + 1e-9; s += 0.5) (s <= S.range ? in1 : out).push([A.X(s), A.Y(mm(s, 1, KM))]);
+        g.curve(in1, C.mint, 3);
+        if (out.length) g.curve([in1[in1.length - 1], ...out], C.mint, 2, { dash: [6, 6], alpha: 0.55 });
+      }
+      fade(g, ease(seg(t, 6.5, 7.2)), () => g.text(A.X(60), A.Y(0.16), '實線:量過的範圍;虛線:沒量到的部分', { size: 13, color: C.muted }));
+      // 低濃度時的直線(斜率 Vmax/Km)
+      const la = ease(seg(t, 9.5, 10.3));
+      if (la > 0) clipped(g, 100, 54, 470, 330, () => g.line(A.X(0), A.Y(0), A.X(19 * la), A.Y((19 * la) / KM), C.blue, 2.2, [7, 5]));
+      // Vmax
+      fade(g, ease(seg(t, 6.3, 7)), () => {
+        g.line(A.X(0), A.Y(1), A.X(170), A.Y(1), C.ink2, 1.6, [6, 6]);
+        rich(g, A.X(170) - 4, A.Y(1) - 16, 'V_{max}', { size: 17, weight: 700, color: C.ink2, align: 'right' });
+      });
+      // Km
+      fade(g, ease(seg(t, 8, 8.8)), () => {
+        g.line(A.X(0), A.Y(0.5), A.X(KM), A.Y(0.5), C.amber, 1.8, [5, 5]);
+        g.line(A.X(KM), A.Y(0.5), A.X(KM), A.Y(0), C.amber, 1.8, [5, 5]);
+        g.circle(A.X(KM), A.Y(0.5), 6, C.amber);
+        rich(g, A.X(KM) + 14, A.Y(0.5) + 24, 'K_{m} = 15.8 μM', { size: 17, weight: 700, color: C.amber });
+        rich(g, A.X(KM) + 14, A.Y(0.5) + 50, '這時 v₀ = V_{max}/2', { size: 15, color: C.amber });
+      });
+      // 點(最後畫,蓋在線上)
+      pts.forEach((s, i) => fade(g, ease(seg(t, 0.6 + i * 0.38, 1 + i * 0.38)), () => g.circle(A.X(s), A.Y(mm(s, 1, KM)), 6, C.ink, C.bg, 2)));
+      // 右:公式與意義
+      const R = 612, ra = (at) => ease(seg(t, at, at + 0.6));
+      rich(g, R, 90, 'v_{0} = V_{max}[S] / (K_{m} + [S])', { size: 19, weight: 700, alpha: ra(4.6) });
+      rich(g, R, 140, 'K_{m}:速度一半時的 [S]', { size: 16, color: C.amber, alpha: ra(8.2) });
+      fade(g, ra(9.5), () => {
+        g.line(R, 186, R + 26, 186, C.blue, 2.4, [6, 4]);
+        rich(g, R + 36, 186, '[S] ≪ K_{m}:近乎直線', { size: 15, color: C.ink });
+        rich(g, R + 36, 210, '斜率 = V_{max}/K_{m}', { size: 15, color: C.ink2 });
+        g.line(R, 248, R + 26, 248, C.ink2, 1.8, [6, 6]);
+        rich(g, R + 36, 248, '[S] ≫ K_{m}:趨近 V_{max}', { size: 15, color: C.ink });
+        rich(g, R + 36, 272, '酵素都被佔滿(飽和)', { size: 15, color: C.ink2 });
+      });
+      fade(g, ra(12.6), () => {
+        rich(g, R, 322, 'K_{m} = (k_{−1} + k_{cat}) / k_{1}', { size: 18, weight: 700 });
+        rich(g, R, 352, 'k_{cat} ≪ k_{−1} 時 K_{m} ≈ K_{d}', { size: 15, color: C.ink2 });
+        rich(g, R, 376, '(K_{d}:ES 的解離常數)', { size: 14, color: C.muted });
+      });
+      fade(g, ra(14), () => {
+        g.text(R, 426, '1913 年 Michaelis 與 Menten', { size: 14, color: C.muted });
+        g.text(R, 448, '量蔗糖酶:蔗糖的常數 16.7 mM', { size: 14, color: C.muted });
+      });
+    },
+  },
+  {
+    key: 'kcat', name: 'kcat 與催化效率', dur: 16,
+    cues: [[0, 'Vmax 和放了多少酵素有關;除以酵素總濃度 [E]ₜ 得到 kcat:每個酵素分子每秒把幾個受質變成產物。'],
+      [4.5, '[E]ₜ 由蛋白質濃度(g/L)除以分子量(g/mol)換算。PsTPS-3car2 的 kcat 是每分鐘 5.86 次,約 10 秒才做一個。'],
+      [9, '萜類合成酶是慢的酵素,這四支的 kcat 約每秒 0.02 到 0.5 次;Bar-Even et al. 2011 整理的中位數約每秒 10 次。'],
+      [12.5, 'kcat/Km 是受質很少時的效率:v₀ ≈ (kcat/Km)[E]ₜ[S];上限是分子擴散碰撞的速度,約 10⁸ 到 10⁹ M⁻¹s⁻¹。']],
+    draw(g, t) {
+      const ctx = g.ctx, la = (at) => ease(seg(t, at, at + 0.6));
+      // 左上:換算
+      g.panel(24, 22, 452, 266, '');
+      rich(g, 44, 50, '從 V_{max} 到 k_{cat}', { size: 16, weight: 700, color: C.mint, alpha: la(0.2) });
+      rich(g, 44, 88, 'k_{cat} = V_{max} ÷ [E]_{t}', { size: 20, weight: 700, alpha: la(0.6) });
+      rich(g, 44, 126, '[E]_{t} = 蛋白質濃度 ÷ 分子量', { size: 17, alpha: la(4.6) });
+      g.text(44, 154, '例(示意):0.65 mg/mL ÷ 65 kDa = 10 μM', { size: 15, color: C.ink2, alpha: la(5.2) });
+      g.text(44, 178, '稀釋 50 萬倍 → 反應裡 20 pM', { size: 15, color: C.ink2, alpha: la(5.8) });
+      rich(g, 44, 212, 'V_{max} = 117.2 pM/min(示意)', { size: 16, alpha: la(6.5) });
+      rich(g, 44, 242, 'k_{cat} = 117.2 ÷ 20 = 5.86 min^{−1}', { size: 18, weight: 700, color: C.mint, alpha: la(7.1) });
+      rich(g, 44, 270, '= 0.098 s^{−1}:約 10 秒做出一個', { size: 15, color: C.mint, alpha: la(7.7) });
+      // 右上:每個酵素分子做產物(真實時間)
+      g.panel(500, 22, 436, 266, '');
+      g.text(518, 46, '每個酵素分子做產物的速度(真實時間)', { size: 14, color: C.ink2 });
+      const tau = Math.max(0, t - 4.5);
+      [{ y: 116, name: 'PsTPS-3car2', rate: 5.86 / 60, txt: '每秒 0.098 個' }, { y: 218, name: '酵素的中位數', rate: 10, txt: '每秒約 10 個' }].forEach((r, i) => {
+        g.text(530, r.y - 36, r.name, { size: 16, weight: 700, color: i ? C.ink : C.mint });
+        g.blob(548, r.y, 22, 17, C.lav, '', { wobble: 1, t: t + i });
+        const n = tau > 0 ? Math.floor(tau * r.rate + 0.5) : 0;
+        g.text(530, r.y + 36, `${r.txt}・已做出 ${n} 個`, { size: 14, color: C.ink2 });
+        for (let k = Math.max(0, n - 80); k < n; k++) {
+          const born = (k + 0.5) / r.rate, x = 580 + (tau - born) * 50;
+          if (x > 920) continue;
+          hexa(g, x, r.y + Math.sin(k * 1.7) * 6, 4.5, i ? C.ink2 : C.mint, { lw: 1.8, alpha: 1 - seg(x, 870, 920) });
+        }
+      });
+      g.text(918, 270, `經過 ${tau.toFixed(1)} 秒`, { size: 13, color: C.muted, align: 'right', mono: true });
+      // 下(9 秒起):kcat 的數線(對數),12.4 秒換成 kcat/Km 的數線
+      const AY = 428;
+      // 一排萜類合成酶的點,上面用括號標出範圍
+      const tpsGroup = (xs) => {
+        const x0 = Math.min(...xs), x1 = Math.max(...xs);
+        xs.forEach((x) => g.circle(x, AY, 6, C.mint, C.bg, 1.5));
+        g.line(x0, AY - 18, x1, AY - 18, C.mint, 1.6); g.line(x0, AY - 18, x0, AY - 12, C.mint, 1.6); g.line(x1, AY - 18, x1, AY - 12, C.mint, 1.6);
+        g.text((x0 + x1) / 2, AY - 36, '萜類合成酶', { size: 15, weight: 700, color: C.mint, align: 'center' });
+      };
+      fade(g, la(9) * (1 - ease(seg(t, 12, 12.4))), () => {
+        rich(g, 40, 318, 'k_{cat}(每秒,對數)', { size: 16, weight: 700 });
+        g.text(936, 318, '中位數取自 Bar-Even et al. 2011', { size: 13, color: C.muted, align: 'right' });
+        const LX = (v) => 70 + ((Math.log10(v) + 2) / 5) * 840;
+        g.line(70, AY, 910, AY, C.ink2, 1.6);
+        [0.01, 0.1, 1, 10, 100, 1000].forEach((v) => { g.line(LX(v), AY - 5, LX(v), AY + 5, C.ink2, 1.4); g.text(LX(v), AY + 22, String(v), { size: 13, color: C.muted, align: 'center', mono: true }); });
+        tpsGroup(TPS_KCAT.map(LX));
+        g.circle(LX(2.5), AY, 6.5, C.ink2); g.text(LX(2.5), AY - 30, '次級代謝 2.5', { size: 15, color: C.ink2, align: 'center' });
+        g.circle(LX(10), AY, 6.5, C.ink); g.text(LX(10), AY + 50, '全部的中位數 10', { size: 15, color: C.ink, align: 'center' });
+      });
+      fade(g, la(12.4), () => {
+        rich(g, 40, 318, 'k_{cat}/K_{m}(M^{−1}s^{−1},對數)', { size: 16, weight: 700 });
+        rich(g, 936, 318, 'v₀ ≈ (k_{cat}/K_{m})[E]_{t}[S]', { size: 15, color: C.ink2, align: 'right' });
+        const LX = (v) => 70 + ((Math.log10(v) - 2) / 8) * 840;
+        g.line(70, AY, 910, AY, C.ink2, 1.6);
+        for (let e = 2; e <= 10; e++) { g.line(LX(10 ** e), AY - 5, LX(10 ** e), AY + 5, C.ink2, 1.4); if (e % 2 === 0) rich(g, LX(10 ** e), AY + 24, `10^{${e}}`, { size: 14, color: C.muted, align: 'center' }); }
+        g.rrect(LX(1e8), AY - 13, LX(1e9) - LX(1e8), 26, 4, 'rgba(127,184,255,.25)', C.blue);
+        g.text((LX(1e8) + LX(1e9)) / 2, AY - 32, '擴散的上限', { size: 15, color: C.blue, align: 'center' });
+        g.circle(LX(1e5), AY, 6.5, C.ink);
+        rich(g, LX(1e5), AY - 30, '中位數 10^{5}', { size: 15, color: C.ink, align: 'center' });
+        tpsGroup(TPS_EFF.map(LX));
+        rich(g, 40, 496, 'PsTPS-3car2:0.37 μM^{−1}min^{−1} = 0.37 × 10^{6} ÷ 60 ≈ 6.2 × 10^{3} M^{−1}s^{−1}', { size: 14, color: C.ink2 });
+      });
+    },
+  },
+  {
+    key: 'fit', name: '為什麼不用雙倒數圖擬合', dur: 18,
+    cues: [[0, '把 1/v₀ 對 1/[S] 作圖會變成直線(Lineweaver–Burk 雙倒數圖),以前常用截距與斜率求 Vmax 與 Km。'],
+      [5, '但倒數會放大誤差:v₀ 的誤差是 δ 時,1/v₀ 的誤差約 δ/v₀²。低濃度的點速度小、誤差最大,又在最右邊,最能拉動直線。'],
+      [10, '現在的做法是非線性迴歸:直接把 Michaelis–Menten 式套到原始數據,找殘差平方和最小的 Km 與 Vmax。'],
+      [14, '下方把同樣的實驗模擬 200 次,比較兩種方法的 Km。右邊可以調誤差大小、濃度範圍,或換一組誤差。']],
+    draw(g, t, S) {
+      const F = fit5(S), ctx = g.ctx, top = S.range, xs = F.conc, v = F.v;
+      // 左:原始數據
+      g.text(80, 24, '原始數據', { size: 15, weight: 700, color: C.ink });
+      const tk = { 8: [0, 2, 4, 6, 8], 30: [0, 10, 20, 30], 60: [0, 20, 40, 60], 160: [0, 50, 100, 150] }[top];
+      const A = axes(g, 80, 44, 330, 206, { xmax: top * 1.1, ymax: 1.3, xticks: tk, yticks: [0, 0.5, 1], xlab: '[S](μM)', ylab: 'v₀(相對)', fmtY: (y) => y.toFixed(1) });
+      clipped(g, 80, 44, 330, 206, () => {
+        plotFn(g, A, (s) => mm(s, 1, KM), 0, top * 1.1, C.muted, 1.8, { dash: [5, 5] });
+        if (F.lb.ok) fade(g, ease(seg(t, 7.5, 8.3)), () => plotFn(g, A, (s) => mm(s, F.lb.V, F.lb.K), 0, top * 1.1, C.amber, 2.6));
+        fade(g, ease(seg(t, 10, 10.8)), () => plotFn(g, A, (s) => mm(s, F.nl.V, F.nl.K), 0, top * 1.1, C.mint, 2.8));
+        fade(g, ease(seg(t, 11, 11.6)) * (1 - ease(seg(t, 13.6, 14.2))), () => xs.forEach((s, i) => g.line(A.X(s), A.Y(v[i]), A.X(s), A.Y(mm(s, F.nl.V, F.nl.K)), C.mint, 1.6)));
+      });
+      const pL = xs.map((s, i) => [A.X(s), A.Y(clamp(v[i], -0.1, 1.3))]);
+      pL.forEach(([x, y]) => g.circle(x, y, 4.6, C.ink, C.bg, 1.5));
+      // 右:雙倒數圖
+      const LX0 = 540, LW = 370, LY0 = 44, LH = 206, XMIN = -0.15, XMAX = 1.1, YMAX = 1.25 * (1 + KM);
+      const XL = (x) => LX0 + ((x - XMIN) / (XMAX - XMIN)) * LW, YL = (y) => LY0 + LH - (y / YMAX) * LH;
+      const ra = ease(seg(t, 1, 1.8));
+      fade(g, ra, () => {
+        rich(g, LX0, 24, '1/v_{0} = (K_{m}/V_{max})·1/[S] + 1/V_{max}', { size: 15, weight: 700 });
+        g.line(LX0, YL(0), LX0 + LW, YL(0), C.ink2, 1.6); g.line(XL(0), LY0, XL(0), LY0 + LH, C.ink2, 1.6);
+        for (const x of [0, 0.5, 1]) { g.line(XL(x), YL(0), XL(x), YL(0) + 5, C.ink2, 1.4); g.text(XL(x), YL(0) + 17, String(x), { size: 13, color: C.muted, align: 'center', mono: true }); }
+        for (const y of [10, 20]) { g.line(XL(0) - 5, YL(y), XL(0), YL(y), C.ink2, 1.4); g.line(XL(0), YL(y), LX0 + LW, YL(y), 'rgba(255,255,255,.06)', 1); g.text(XL(0) - 9, YL(y), String(y), { size: 13, color: C.muted, align: 'right', mono: true }); }
+        g.text(LX0 + LW / 2 + 20, YL(0) + 40, '1/[S](μM⁻¹)', { size: 14, color: C.ink2, align: 'center' });
+        g.text(XL(0) + 10, LY0 + 10, '1/v₀', { size: 14, color: C.ink2 });
+      });
+      // 點從左邊飛到右邊
+      const fly = ease(seg(t, 2.2, 4.4)), eb = ease(seg(t, 5, 6.2));
+      clipped(g, LX0 - 6, LY0 - 6, LW + 12, LH + 12, () => {
+        if (F.lb.ok || F.lb.dropped < xs.length - 1) fade(g, ease(seg(t, 6.4, 7.2)), () => g.line(XL(XMIN), YL(F.lb.icpt + F.lb.slope * XMIN), XL(XMAX), YL(F.lb.icpt + F.lb.slope * XMAX), C.amber, 2.6));
+        fade(g, ease(seg(t, 10.5, 11.2)), () => g.line(XL(XMIN), YL(1 / F.nl.V + (F.nl.K / F.nl.V) * XMIN), XL(XMAX), YL(1 / F.nl.V + (F.nl.K / F.nl.V) * XMAX), C.mint, 2.2, [7, 5]));
+        // 誤差棒:± δ/v₀²,v₀ 用真正的速度(誤差傳遞的預期大小),中心放在量到的點上
+        if (eb > 0) xs.forEach((s, i) => {
+          if (v[i] <= 0) return;
+          const y = 1 / v[i], half = (F.sd / mm(s, 1, KM) ** 2) * eb, x = XL(1 / s);
+          g.line(x, YL(Math.max(0, y - half)), x, YL(Math.min(YMAX * 1.1, y + half)), C.amber, 1.6);
+          g.line(x - 4, YL(Math.max(0, y - half)), x + 4, YL(Math.max(0, y - half)), C.amber, 1.6);
+          if (y + half < YMAX) g.line(x - 4, YL(y + half), x + 4, YL(y + half), C.amber, 1.6);
+        });
+      });
+      if (fly > 0) xs.forEach((s, i) => {
+        if (v[i] > 0) {
+          const y = 1 / v[i], over = y > YMAX;
+          const [x1, y1] = [XL(1 / s), YL(Math.min(y, YMAX))];
+          const [px, py] = [lerp(pL[i][0], x1, fly), lerp(pL[i][1], y1, fly)];
+          if (fly < 1) g.circle(px, py, 4.6, C.ink, C.bg, 1.5);
+          else if (over) { g.arrow(x1, LY0 + 26, x1, LY0 + 4, { color: C.red, lw: 2, head: 7 }); g.circle(x1, LY0 + 30, 4.6, C.red); }
+          else g.circle(x1, y1, 4.6, C.ink, C.bg, 1.5);
+        } else fade(g, fly, () => g.text(pL[i][0], pL[i][1] - 16, '≤ 0', { size: 13, weight: 700, color: C.red, align: 'center' }));
+      });
+      fade(g, ease(seg(t, 5.2, 5.9)), () => rich(g, XL(0.06), LY0 + 46, 'δ(1/v₀) ≈ δ/v_{0}^{2}', { size: 16, weight: 700, color: C.amber }));
+      g.tag(XL(0.53), LY0 + 14, '最右邊的點誤差最大', { size: 14, color: C.red, alpha: Math.min(ease(seg(t, 5.6, 6.2)), 1 - ease(seg(t, 9.4, 10))) });
+      // 圖例
+      const lg = [[C.muted, '真正的曲線', 0, [5, 5]], [C.amber, '雙倒數擬合', 7.5], [C.mint, '非線性擬合', 10]];
+      lg.forEach(([c, s, at, dash], i) => fade(g, at ? ease(seg(t, at, at + 0.6)) : 1, () => { g.line(80 + i * 170, 314, 108 + i * 170, 314, c, 2.6, dash); g.text(116 + i * 170, 314, s, { size: 14, color: C.ink2 }); }));
+      fade(g, ease(seg(t, 5, 5.6)), () => { g.line(600, 306, 600, 322, C.amber, 1.6); g.text(612, 314, '誤差棒:± δ/v₀²', { size: 14, color: C.ink2 }); });
+      // 下:重做 200 次
+      fade(g, ease(seg(t, 14, 14.8)), () => {
+        const R = F.rep;
+        rich(g, 40, 352, '重做 200 次:K_{m} 估計值的中間 95%', { size: 16, weight: 700 });
+        if (R.lb.fail > 0) g.text(936, 352, `雙倒數有 ${R.lb.fail} 次算不出`, { size: 13, color: C.amber, align: 'right' });
+        const KX = (k) => 330 + (Math.log10(k) / 3) * 580, AY = 486;
+        g.line(330, AY, 910, AY, C.ink2, 1.4);
+        [1, 10, 100, 1000].forEach((k) => { g.line(KX(k), AY, KX(k), AY + 5, C.ink2, 1.4); g.text(KX(k), AY + 18, k === 1000 ? '1000 μM' : String(k), { size: 13, color: C.muted, align: 'center', mono: true }); });
+        g.line(KX(KM), 374, KX(KM), AY, C.ink, 1.4, [4, 4]);
+        g.text(KX(KM), 370, '真值 15.8', { size: 13, color: C.ink, align: 'center' });
+        [['非線性擬合', C.mint, R.nl, F.nl, 410], ['雙倒數擬合', C.amber, R.lb, F.lb, 458]].forEach(([nm, col, r, cur, y]) => {
+          g.text(40, y - 11, nm, { size: 16, weight: 700, color: col });
+          const kk = nm === '雙倒數擬合' && !cur.ok ? (cur.K === 0 ? 0 : Infinity) : cur.edge ? Infinity : cur.K;
+          rich(g, 40, y + 12, `這次 K_{m} = ${fmtK(kk)}`, { size: 14, color: C.ink2 });
+          const lo = Number.isFinite(r.lo) && r.lo > 0 ? clamp(KX(r.lo), 330, 910) : 330, hi = Number.isFinite(r.hi) ? clamp(KX(r.hi), 330, 910) : 910;
+          g.rrect(lo, y - 7, Math.max(4, hi - lo), 14, 7, col === C.mint ? 'rgba(165,243,205,.45)' : 'rgba(255,209,102,.45)', col);
+          if (!Number.isFinite(r.hi) || r.hi > 1000) g.arrow(906, y, 930, y, { color: col, lw: 2, head: 8 });
+          if (!(r.lo > 1)) g.arrow(334, y, 310, y, { color: col, lw: 2, head: 8 });
+          if (Number.isFinite(r.med) && r.med > 1 && r.med < 1000) g.circle(KX(r.med), y, 5, col, C.bg, 1.5);
+        });
+      });
+    },
+  },
+  {
+    key: 'inhibit', name: '抑制劑的三種型態', dur: 17,
+    cues: [[0, '抑制劑讓酵素變慢。依它和酵素的哪一種形式結合分成三型;α = 1 + [I]/Ki,Ki 是抑制劑的解離常數。'],
+      [4.5, '競爭型:Km 變大 α 倍、Vmax 不變;非競爭型:Vmax 變小 α 倍、Km 不變;反競爭型:兩者都變小 α 倍。'],
+      [9, '競爭型只和游離的酵素結合(和受質搶口袋),受質夠多就擠得掉;反競爭型只和 ES 結合;非競爭型兩種都結合。'],
+      [13, '雙倒數圖上三型很好認:交在 y 軸、交在 x 軸、互相平行;適合拿來看,數值仍用非線性擬合。右邊可以換型態與濃度。']],
+    draw(g, t, S) {
+      const type = S.inh, a = lerp(1, 1 + S.ii, ease(seg(t, 1.5, 4)));
+      const f = INHIB[type], [Va, Ka] = appVK(type, 1, KM, a);
+      // 左:v₀ 對 [S]
+      const A = axes(g, 80, 44, 340, 226, { xmax: 100, ymax: 1.1, xticks: [0, 25, 50, 75, 100], yticks: [0, 0.5, 1], xlab: '[S](μM)', ylab: 'v₀(相對)', fmtY: (y) => y.toFixed(1) });
+      plotFn(g, A, (s) => mm(s, 1, KM), 0, 100, C.muted, 2.2);
+      plotFn(g, A, (s) => f(s, 1, KM, a), 0, 100, C.amber, 3.2);
+      // 圖例放在左上(曲線從左下往右上長,這一角是空的)
+      g.line(A.X(3), A.Y(1.06), A.X(9), A.Y(1.06), C.muted, 2.2); g.text(A.X(11), A.Y(1.06), '沒有抑制劑', { size: 13, color: C.muted });
+      g.line(A.X(38), A.Y(1.06), A.X(44), A.Y(1.06), C.amber, 3.2); g.text(A.X(46), A.Y(1.06), '加抑制劑', { size: 13, color: C.amber });
+      fade(g, ease(seg(t, 4.2, 4.9)), () => {
+        g.line(A.X(0), A.Y(Va), A.X(100), A.Y(Va), C.amber, 1.4, [5, 5]);
+        if (Ka <= 100) {
+          g.line(A.X(Ka), A.Y(Va / 2), A.X(Ka), A.Y(0), C.amber, 1.4, [5, 5]);
+          g.circle(A.X(Ka), A.Y(Va / 2), 5, C.amber);
+        }
+      });
+      // 右:雙倒數圖
+      const LX0 = 560, LW = 350, LY0 = 44, LH = 226, XMIN = -0.25, XMAX = 0.5;
+      const ii = [0, 0.5, 1].map((k) => 1 + (a - 1) * k);
+      const lines = ii.map((al) => { const [v, kk] = appVK(type, 1, KM, al); return [kk / v, 1 / v]; });
+      const YMAX = Math.max(10, ...lines.map(([m, b]) => b + m * XMAX)) * 1.08;
+      const XL = (x) => LX0 + ((x - XMIN) / (XMAX - XMIN)) * LW, YL = (y) => LY0 + LH - (y / YMAX) * LH;
+      fade(g, ease(seg(t, 4.6, 5.4)), () => {
+        g.text(LX0, 24, '雙倒數圖(只拿來看型態)', { size: 15, weight: 700 });
+        g.line(LX0, YL(0), LX0 + LW, YL(0), C.ink2, 1.6); g.line(XL(0), LY0, XL(0), LY0 + LH, C.ink2, 1.6);
+        for (const x of [-0.2, 0, 0.2, 0.4]) { g.line(XL(x), YL(0), XL(x), YL(0) + 5, C.ink2, 1.4); g.text(XL(x), YL(0) + 17, String(x), { size: 13, color: C.muted, align: 'center', mono: true }); }
+        g.text(LX0 + LW / 2, YL(0) + 40, '1/[S](μM⁻¹)', { size: 14, color: C.ink2, align: 'center' });
+        g.text(XL(0) + 10, LY0 + 10, '1/v₀', { size: 14, color: C.ink2 });
+        clipped(g, LX0, LY0, LW, LH, () => lines.forEach(([m, b], i) => g.line(XL(XMIN), YL(b + m * XMIN), XL(XMAX), YL(b + m * XMAX), i ? C.amber : C.muted, i === 2 ? 2.8 : 1.8, i === 1 ? [6, 5] : undefined)));
+        const pat = type === 'comp' ? '交在 y 軸上' : type === 'non' ? '交在 x 軸上' : '互相平行';
+        if (S.ii > 0) {
+          if (type === 'comp') g.circle(XL(0), YL(1), 6, C.ink);
+          else if (type === 'non') g.circle(XL(-1 / KM), YL(0), 6, C.ink);
+          g.tag(XL(-0.14), LY0 + 40, pat, { size: 15, color: C.amber });
+        }
+        ['實線:[I]', '虛線:[I]/2', '灰線:沒有 I'].forEach((s, i) => g.text(LX0 + 6, LY0 + 76 + i * 22, s, { size: 13, color: i === 2 ? C.muted : C.amber }));
+      });
+      // 左下:抑制劑和誰結合
+      fade(g, ease(seg(t, 8.8, 9.6)), () => {
+        g.text(40, 346, '抑制劑(I)和誰結合', { size: 15, weight: 700 });
+        const bindE = type !== 'unc', bindES = type !== 'comp';
+        g.blob(120, 420, 46, 34, C.lav, 'E', { size: 18, wobble: 1, t });
+        g.blob(320, 420, 46, 34, C.lav, 'ES', { size: 18, wobble: 1, t: t + 1 });
+        zig(g, 320, 382, 34, C.amber, { lw: 2.6 });
+        g.arrow(178, 414, 258, 414, { color: C.ink2, lw: 2, head: 7 }); g.arrow(258, 428, 178, 428, { color: C.ink2, lw: 2, head: 7 });
+        g.text(218, 396, '+ S', { size: 14, color: C.ink2, align: 'center' });
+        const iBlob = (x, y) => { g.circle(x, y, 13, C.red); g.text(x, y + 0.5, 'I', { size: 15, weight: 800, color: '#0b1111', align: 'center' }); };
+        if (bindE) iBlob(type === 'comp' ? 120 : 164, type === 'comp' ? 386 : 446);
+        if (bindES) iBlob(364, 446);
+        g.text(120, 482, bindE ? (type === 'comp' ? '會結合(佔住口袋)' : '會結合') : '不結合', { size: 14, color: bindE ? C.red : C.muted, align: 'center' });
+        g.text(320, 482, bindES ? '會結合' : '不結合', { size: 14, color: bindES ? C.red : C.muted, align: 'center' });
+      });
+      // 右下:公式與表觀參數
+      const rows = [['comp', '競爭型', 'v_{0} = V_{max}[S] ÷ (αK_{m} + [S])'], ['non', '非競爭型', 'v_{0} = (V_{max}/α)[S] ÷ (K_{m} + [S])'], ['unc', '反競爭型', 'v_{0} = V_{max}[S] ÷ (K_{m} + α[S])']];
+      fade(g, ease(seg(t, 4.5, 5.2)), () => {
+        rows.forEach(([k, nm, fx], i) => {
+          const on = k === type, y = 358 + i * 32;
+          g.text(470, y, nm, { size: 15, weight: on ? 700 : 500, color: on ? C.amber : C.muted });
+          rich(g, 560, y, fx, { size: 16, weight: on ? 700 : 500, color: on ? C.ink : C.muted });
+        });
+        rich(g, 470, 466, `α = 1 + [I]/K_{i} = ${a.toFixed(1)}`, { size: 17, weight: 700 });
+        rich(g, 470, 498, `K_{m,app} = ${Ka.toFixed(1)} μM、V_{max,app} = ${Va.toFixed(2)}`, { size: 16, color: C.mint });
+      });
+    },
+  },
+  {
+    key: 'mutant', name: '一個突變怎麼改變參數', dur: 17,
+    cues: [[0, '西加雲杉有兩支很像的單萜合成酶:PsTPS-3car2 主要做 (+)-3-carene,PsTPS-sab 主要做 (−)-sabinene。'],
+      [4.5, '口袋裡的 596 號胺基酸,3car2 是 Leu、sab 是 Phe。把 3car2 的 Leu 換成 Phe,主產物就變成 sabinene。'],
+      [9.5, 'kcat 從每分鐘 5.86 升到 38.57(約 6.6 倍),Km 幾乎不變(15.8 與 15.3 μM);sab 反過來換,kcat 降約 6.6 倍。'],
+      [14, '萜類合成酶教材裡,臺灣杉的 Tyr 換成 Phe 改變了產物;這裡一個側鏈同時改變了產物與 kcat。右邊可以換方向。']],
+    draw(g, t, S) {
+      const ctx = g.ctx, F = FAM[S.dir], other = FAM[S.dir === 'car' ? 'sab' : 'car'];
+      const mo = ease(seg(t, 4.8, 7.2));
+      const kc = lerp(F.wt.kcat, F.mut.kcat, mo), km = lerp(F.wt.km, F.mut.km, mo);
+      // 左上:每個酵素每分鐘的產物對 [GPP]
+      const A = axes(g, 84, 44, 380, 230, { xmax: 150, ymax: 45, xticks: [0, 50, 100, 150], yticks: [0, 20, 40], xlab: '[GPP](μM)', ylab: '每分鐘的產物(每個酵素)' });
+      g.rrect(A.X(1), 44, A.X(60) - A.X(1), 230, 0, 'rgba(165,243,205,.05)');
+      g.text(A.X(30.5), 58, '論文量的範圍', { size: 13, color: C.muted, align: 'center' });
+      fade(g, 0.35 * ease(seg(t, 11, 12)), () => { plotFn(g, A, (s) => mm(s, other.wt.kcat, other.wt.km), 0, 150, C.muted, 1.6); plotFn(g, A, (s) => mm(s, other.mut.kcat, other.mut.km), 0, 150, C.muted, 1.6, { dash: [4, 4] }); });
+      plotFn(g, A, (s) => mm(s, F.wt.kcat, F.wt.km), 0, 150, C.ink2, 2.2, { dash: [7, 5] });
+      if (mo > 0) plotFn(g, A, (s) => mm(s, kc, km), 0, 150, C.mint, 3.2);
+      fade(g, ease(seg(t, 9.5, 10.3)), () => {
+        for (const [e, col] of [[F.wt, C.ink2], [F.mut, C.mint]]) {
+          g.line(A.X(0), A.Y(e.kcat), A.X(150), A.Y(e.kcat), col, 1.2, [3, 5]);
+          g.circle(A.X(e.km), A.Y(e.kcat / 2), 5.5, col);
+          g.line(A.X(e.km), A.Y(e.kcat / 2), A.X(e.km), A.Y(0), col, 1.2, [3, 4]);
+          rich(g, A.X(150) - 2, A.Y(e.kcat) - 12, `k_{cat} ${e.kcat}`, { size: 14, color: col, align: 'right', weight: 700 });
+        }
+      });
+      g.text(A.X(150) - 2, A.Y(mm(150, F.wt.kcat, F.wt.km)) + 16, `野生型(${F.aaW})`, { size: 13, color: C.ink2, align: 'right' });
+      // 突變的名字放在曲線上方;會壓到 kcat 虛線時移到虛線上方
+      let ly = A.Y(mm(70, F.mut.kcat, F.mut.km)) - 20;
+      if (Math.abs(ly - A.Y(F.mut.kcat)) < 12) ly = A.Y(F.mut.kcat) - 14;
+      fade(g, mo, () => g.text(A.X(70), ly, `${F.mutName}(${F.aaM})`, { size: 14, weight: 700, color: C.mint, align: 'right' }));
+      // 右上:產物比例
+      g.text(520, 26, `${F.name} 的產物(%)`, { size: 15, weight: 700 });
+      fade(g, ease(seg(t, 4.8, 5.4)), () => { g.rrect(752, 18, 12, 10, 2, C.mint); g.text(770, 23, F.mutName, { size: 13, color: C.ink2 }); });
+      g.rrect(842, 18, 12, 10, 2, 'rgba(185,199,192,.45)'); g.text(860, 23, '野生型', { size: 13, color: C.ink2 });
+      PROD.forEach((p, i) => {
+        const y = 66 + i * 44, w0 = F.wt.prod[i], w1 = lerp(w0, F.mut.prod[i], mo);
+        g.text(520, y + 4, p, { size: 14, color: C.ink2 });
+        g.rrect(640, y - 9, 2.6 * w0, 8, 3, 'rgba(185,199,192,.45)');
+        if (mo > 0) g.rrect(640, y + 3, Math.max(2, 2.6 * w1), 10, 3, C.mint);
+        // 數字寫成「野生型 → 突變」
+        const lx = 648 + 2.6 * Math.max(w0, F.mut.prod[i]);
+        g.text(lx, y + 2, w0.toFixed(1), { size: 13, color: C.ink2, mono: true });
+        if (mo > 0) { g.font(13, 500, true); g.text(lx + ctx.measureText(w0.toFixed(1)).width + 4, y + 2, `→ ${w1.toFixed(1)}`, { size: 13, color: C.mint, mono: true, alpha: mo }); }
+      });
+      // 右下:參數表
+      fade(g, ease(seg(t, 9.5, 10.3)), () => {
+        g.panel(520, 236, 416, 192, '');
+        const cx = [700, 800, 890];
+        ['野生型', F.mutName, '倍數'].forEach((h, i) => g.text(cx[i], 260, h, { size: 15, weight: 700, color: i === 1 ? C.mint : C.ink2, align: 'center' }));
+        const rowsP = [['k_{cat}', F.wt.kcat, F.mut.kcat, 2], ['K_{m}', F.wt.km, F.mut.km, 1], ['k_{cat}/K_{m}', F.wt.kcat / F.wt.km, F.mut.kcat / F.mut.km, 2]];
+        rowsP.forEach(([nm, w, m, d], i) => {
+          const y = 296 + i * 34;
+          rich(g, 536, y, nm, { size: 16, weight: 700 });
+          g.text(cx[0], y, w.toFixed(d), { size: 15, color: C.ink2, align: 'center', mono: true });
+          g.text(cx[1], y, m.toFixed(d), { size: 15, weight: 700, color: C.mint, align: 'center', mono: true });
+          g.text(cx[2], y, `× ${(m / w).toFixed(2)}`, { size: 15, color: Math.abs(Math.log(m / w)) > 0.4 ? C.amber : C.ink2, align: 'center', mono: true });
+        });
+        rich(g, 536, 404, '單位:min^{−1}、μM、μM^{−1}min^{−1}', { size: 13, color: C.muted });
+      });
+      fade(g, ease(seg(t, 10.5, 11.2)), () => {
+        const kr = F.mut.km / F.wt.km, kmTxt = Math.abs(1 - kr) < 0.05 ? '幾乎不變' : `只差約 ${Math.round(Math.abs(1 - kr) * 100)}%`;
+        rich(g, 520, 456, `k_{cat} 變了約 ${Math.max(F.mut.kcat / F.wt.kcat, F.wt.kcat / F.mut.kcat).toFixed(1)} 倍,K_{m} ${kmTxt}`, { size: 16, weight: 700, color: C.mint });
+        g.text(520, 484, '作者推測差在最後幾步與產物離開口袋', { size: 13, color: C.muted });
+      });
+      // 左下:596 號在口袋裡(同源模型,示意)
+      fade(g, ease(seg(t, 4.5, 5.2)), () => {
+        g.text(40, 356, 'helix J 的 596 號(依同源模型,示意)', { size: 13, color: C.muted });
+        ctx.save(); ctx.translate(150, 448); ctx.rotate(-0.32);
+        g.rrect(-120, -14, 220, 28, 14, 'rgba(184,164,244,.18)', 'rgba(184,164,244,.6)');
+        ctx.strokeStyle = 'rgba(184,164,244,.45)'; ctx.lineWidth = 1.3;
+        for (let s = -110; s < 92; s += 12) { ctx.beginPath(); ctx.moveTo(s, -13); ctx.lineTo(s + 7, 13); ctx.stroke(); }
+        ctx.restore();
+        const cat = [394, 448], H = [214, 420];
+        hexa(g, cat[0], cat[1], 24, C.hot, { lw: 2.6, fill: 'rgba(255,154,92,.14)' });
+        g.text(cat[0], cat[1], '+', { size: 20, weight: 800, color: C.hot, align: 'center' });
+        g.text(cat[0], cat[1] + 42, 'α-terpinyl 陽離子', { size: 13, color: C.hot, align: 'center' });
+        const phe = (S.dir === 'car') === (mo >= 0.5);
+        const aRes = mo < 0.5 ? 1 - seg(mo, 0.3, 0.5) : seg(mo, 0.5, 0.7);
+        fade(g, aRes, () => {
+          if (phe) {
+            g.line(H[0], H[1], 262, 436, C.lav, 3);
+            hexa(g, 284, 440, 16, C.lav, { lw: 2.6 });
+            g.line(300, 442, cat[0] - 24, cat[1], C.amber, 1.6, [4, 4]);
+            g.text(336, 424, '< 4 Å', { size: 15, weight: 700, color: C.amber, align: 'center' });
+            g.text(272, 482, 'Phe', { size: 16, weight: 700, color: C.lav, align: 'center' });
+          } else {
+            g.line(H[0], H[1], 246, 434, C.lav, 3); g.line(246, 434, 264, 418, C.lav, 3); g.line(246, 434, 262, 454, C.lav, 3);
+            g.line(270, 436, cat[0] - 24, cat[1], C.amber, 1.6, [4, 4]);
+            g.text(320, 422, '> 5 Å', { size: 15, weight: 700, color: C.amber, align: 'center' });
+            g.text(252, 482, 'Leu', { size: 16, weight: 700, color: C.lav, align: 'center' });
+          }
+        });
+        g.circle(H[0], H[1], 5, C.lav);
+      });
+    },
+  },
+];
+
+lesson = createLesson({
+  chapters,
+  state: { tsamp: 10, range: 60, noise: 3, seed: 1, inh: 'comp', ii: 2, dir: 'car' },
+  controls: [
+    { id: 'tsamp', label: '取樣時間', type: 'range', min: 5, max: 60, step: 5, unit: ' 分鐘', chapters: ['assay'], onChange: () => { if (lesson && lesson.time < 13.6) replay(13.6); } },
+    { id: 'range', label: '受質濃度範圍(9 個點)', type: 'seg', options: [{ v: 8, label: '1 到 8 μM' }, { v: 30, label: '1 到 30 μM' }, { v: 60, label: '1 到 60 μM(論文)' }, { v: 160, label: '1 到 160 μM' }], chapters: ['mm', 'fit'], onChange: () => { if (!lesson) return; if (lesson.chapter === 'mm' && lesson.time < 9) replay(9); if (lesson.chapter === 'fit' && lesson.time < 14.8) replay(14.8); } },
+    { id: 'noise', label: '量測誤差(Vmax 的幾 %)', type: 'range', min: 0, max: 10, step: 1, format: (v) => `${v}%`, chapters: ['fit'], onChange: () => { if (lesson && lesson.time < 14.8) replay(14.8); } },
+    { id: 'reseed', label: '換一組誤差', type: 'button', chapters: ['fit'], onClick: (S) => { S.seed = (S.seed % 97) + 1; if (lesson && lesson.time < 14.8) replay(14.8); } },
+    { id: 'inh', label: '抑制型態', type: 'seg', options: [{ v: 'comp', label: '競爭型' }, { v: 'non', label: '非競爭型' }, { v: 'unc', label: '反競爭型' }], chapters: ['inhibit'], onChange: () => { if (lesson && lesson.time < 5.4) replay(5.4); } },
+    { id: 'ii', label: '抑制劑濃度 [I]/Ki', type: 'range', min: 0, max: 5, step: 0.5, format: (v) => `${v}`, chapters: ['inhibit'], onChange: () => { if (lesson && lesson.time < 5.4) replay(5.4); } },
+    { id: 'dir', label: '596 號換成什麼', type: 'seg', options: [{ v: 'car', label: '3car2:Leu → Phe' }, { v: 'sab', label: 'sab:Phe → Leu' }], chapters: ['mutant'], onChange: () => replay(4.4) },
+  ],
+});
+</script>
+</body>
+</html>

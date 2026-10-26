@@ -56,6 +56,8 @@
       <li>每個循環理論上把數量加倍,通常做 25 到 35 輪;後段原料用完,數量不再加倍(平原期)。</li>
       <li>洋菜膠電泳:DNA 帶負電,往正極移動,短的片段跑得遠;和已知長度的分子量標準比對就知道產物長度。</li>
       <li>qPCR 每輪量一次螢光,起始量越多越早超過門檻(Ct 越小);效率 100% 時,起始量差 10 倍,Ct 差約 3.32 輪。</li>
+      <li>進階:引子的 Tm 有兩種估法。Wallace 規則 2(A+T) + 4(G+C) 只看組成;最近鄰法(SantaLucia 1998)把相鄰兩對鹼基的 ΔH°、ΔS° 加起來,再依鹽與引子濃度算出 Tm,同一條引子在 50 mM 與 1 M Na⁺ 下差將近 15 °C。預測只供設計參考,黏合溫度要用實驗決定;引子的 3′ 端不要和自己或另一條引子互補,否則會形成引子二聚體。</li>
+      <li>進階:相對定量的 2<sup>−ΔΔCt</sup> 法(Livak 與 Schmittgen 2001)假設目標基因與參考基因的效率都接近 100%;效率不同時改用 Pfaffl 2001 以實測效率當底數的比值。用 SYBR Green 時要看熔解曲線(−dF/dT):一個窄而尖的峰表示產物單純,70 多 °C 的矮寬峰多半是引子二聚體。</li>
     </ul>
   </div>
   <div class="src">
@@ -64,8 +66,11 @@
       <li>Lorenz TC. Polymerase Chain Reaction: Basic Protocol Plus Troubleshooting and Optimization Strategies. J Vis Exp. 2012;(63):3998. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4846334/">PMC4846334</a>(變性 94 到 98 °C、黏合約比 Tm 低 5 °C、Taq 最適 70 到 80 °C、25 到 35 輪、引子 15 到 30 個鹼基、條件太寬鬆會出現梯子狀的非專一產物)</li>
       <li>Lee PY, et al. Agarose Gel Electrophoresis for the Separation of DNA Fragments. J Vis Exp. 2012;(62):e3923. <a href="https://www.jove.com/t/3923">jove.com/t/3923</a>(DNA 骨架帶負電往正極移動、移動距離和片段大小的對數成反比)</li>
       <li>Zipper H, et al. Investigations on DNA intercalation and surface binding by SYBR Green I. Nucleic Acids Res. 2004;32(12):e103. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC484200/">PMC484200</a>(對雙股 DNA 有選擇性、結合後螢光大增)</li>
-      <li>Bustin SA, et al. The MIQE Guidelines. Clin Chem. 2009;55(4):611–622;斜率與效率的換算 E = 10<sup>−1/斜率</sup> − 1(斜率 −3.32 為 100%),見 <a href="https://www.agilent.com/store/biocalculators/calcSlopeEfficiency.jsp">Agilent 的換算說明</a>。</li>
-      <li>動畫裡的序列、引子熔解溫度(58 °C)、產物長度(450 bp)、膠的跑速、平原期的上限與 qPCR 曲線都是示意值,不是某個實驗的實測結果。</li>
+      <li>Bustin SA, et al. The MIQE Guidelines. Clin Chem. 2009;55(4):611–622;斜率與效率的換算 E = 10<sup>−1/斜率</sup> − 1(斜率 −3.32 為 100%),見 <a href="https://www.agilent.com/store/biocalculators/calcSlopeEfficiency.jsp">Agilent 的換算說明</a>。MIQE 也寫到:ΔΔCq 法要兩個基因的效率相近;Tm 的預測只供初步設計,黏合溫度要用實驗決定。</li>
+      <li>SantaLucia J Jr. A unified view of polymer, dumbbell, and oligonucleotide DNA nearest-neighbor thermodynamics. Proc Natl Acad Sci USA. 1998;95(4):1460–1465. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC19045/">PMC19045</a>(表 2 的統一參數與兩端起始項、鹽校正 0.368 × N × ln[Na⁺]、Tm 公式裡的 C<sub>T</sub>/4)。計算條件取 <a href="https://primer3.org/manual.html">Primer3 說明文件</a>的預設(寡核苷酸 50 nM;一價離子 50 mM、Mg²⁺ 1.5 mM、dNTP 0.6 mM,Mg²⁺ 依 von Ahsen 2001 換算成等效 Na⁺);算出的值和 <a href="https://biopython.org/docs/latest/api/Bio.SeqUtils.MeltingTemp.html">Biopython MeltingTemp 文件</a>的範例相同,Wallace 規則適用 14 到 20 nt 也見該文件。</li>
+      <li>Livak KJ, Schmittgen TD. Analysis of relative gene expression data using real-time quantitative PCR and the 2<sup>−ΔΔCT</sup> method. Methods. 2001;25(4):402–408. <a href="https://doi.org/10.1006/meth.2001.1262">doi:10.1006/meth.2001.1262</a>;Pfaffl MW. A new mathematical model for relative quantification in real-time RT-PCR. Nucleic Acids Res. 2001;29(9):e45. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC55695/">PMC55695</a>(以實測效率當底數的比值,E = 10<sup>−1/斜率</sup>;兩個基因的 E 都是 2 時才化簡成 ΔΔ 法。原文的 E 是每輪的倍數,頁面寫成 1 + E)</li>
+      <li>Thermo Fisher Scientific. <a href="https://www.thermofisher.com/content/dam/LifeTech/Documents/PDFs/PG1503-PJ9169-CO019861-Update-qPCR-Handbook-branding-Americas-FLR.pdf">Real-time PCR handbook</a>(2016)(ΔΔCt 法要兩個基因效率相同,相對效率圖斜率小於 0.1 可接受;效率 90% 到 110%;熔解曲線上專一產物是一個窄峰,引子二聚體是 70 多 °C 的矮寬峰,模板越少越常見);Ririe KM, et al. Product differentiation by analysis of DNA melting curves during the polymerase chain reaction. Anal Biochem. 1997;245(2):154–160. <a href="https://doi.org/10.1006/abio.1996.9916">doi:10.1006/abio.1996.9916</a>(熔解曲線的形狀與位置由 GC 含量、長度與序列決定,Tm 差不到 2 °C 也分得出)</li>
+      <li>動畫裡的序列、引子熔解溫度(58 °C)、產物長度(450 bp)、膠的跑速、平原期的上限與 qPCR 曲線都是示意值,不是某個實驗的實測結果。進階章節的四條引子序列、qPCR 相對定量的 Ct(效率 100% 時目標基因 25、參考基因 18)與處理組 0.7 倍的上樣量、熔解曲線的 Tm(目標產物 84.5 °C、引子二聚體 76.5 °C、另一個產物 88 °C)與峰的寬度、高度也是示意值。</li>
     </ul>
   </div>
 </section>
@@ -96,6 +101,121 @@ const yieldOf = (a) => clamp(1 - (a - (TM - 3)) / 6);
 const verdict = (a) => (nonspec(a) > 0.3 ? ['太低:也黏到不完全配對的位置', C.red] : yieldOf(a) < 0.5 ? ['太高:引子黏不住,產物很少', C.amber] : ['剛好:只黏在完全配對的位置', C.mint]);
 const NMAX = 1e12; // 平原期的上限(示意)
 const copies = (n, n0, max = NMAX) => (n0 * 2 ** n) / (1 + (n0 * (2 ** n - 1)) / max);
+
+// ===== 進階章節(2026-10-27)用到的計算 =====
+// 引子的 Tm:SantaLucia 1998(PNAS 95:1460)的統一參數,條件是 1 M NaCl。每一組是 [ΔH° kcal/mol, ΔS° cal/(K·mol), ΔG°37 kcal/mol]:
+// ΔH°、ΔS° 取原文表 2,ΔG°37 取表 1。鍵是上面那一股 5′→3′ 的兩個鹼基;同一組從互補股讀(例如 CA 與 TG)數字相同
+const NNP = {
+  AA: [-7.9, -22.2, -1.00], TT: [-7.9, -22.2, -1.00], AT: [-7.2, -20.4, -0.88], TA: [-7.2, -21.3, -0.58],
+  CA: [-8.5, -22.7, -1.45], TG: [-8.5, -22.7, -1.45], GT: [-8.4, -22.4, -1.44], AC: [-8.4, -22.4, -1.44],
+  CT: [-7.8, -21.0, -1.28], AG: [-7.8, -21.0, -1.28], GA: [-8.2, -22.2, -1.30], TC: [-8.2, -22.2, -1.30],
+  CG: [-10.6, -27.2, -2.17], GC: [-9.8, -24.4, -2.24], GG: [-8.0, -19.9, -1.84], CC: [-8.0, -19.9, -1.84],
+};
+const NN_INIT = { GC: [0.1, -2.8], AT: [2.3, 4.1] }; // 起始項(表 2):兩端各算一次,看末端是 G·C 還是 A·T
+const R_GAS = 1.987, C_OLIGO = 50e-9; // 氣體常數 cal/(K·mol);寡核苷酸濃度 50 nM(Primer3 的預設),公式裡用 C/4
+// 鹽的條件換成 Na⁺ 等效濃度(mM)。PCR 緩衝液取 Primer3 的預設:一價離子 50 mM、Mg²⁺ 1.5 mM、dNTP 0.6 mM;
+// Mg²⁺ 依 von Ahsen 2001 換算(Primer3 與 Biopython 用同一式):[Na⁺]等效 = [一價] + 120 × √([Mg²⁺] − [dNTP])
+const SALT = { na50: 50, pcr: 50 + 120 * Math.sqrt(1.5 - 0.6), na1000: 1000 };
+// 示意的引子:都是 20 nt,隨機產生後依設計規則挑出來的,不對應真的基因
+const PRIMERS = {
+  good: { seq: 'CTGGATGACGAGATGGCTTG', name: '引子 A' },
+  gc: { seq: 'GGACCGCTCCTCCACAGCCG', name: '引子 B' },
+  at: { seq: 'TTCACATAAAGTAAAGTTCG', name: '引子 C' },
+  self: { seq: 'TCGGCAGGTCATTTGAATTC', name: '引子 D' },
+};
+const PAIRB = { A: 'T', T: 'A', G: 'C', C: 'G' };
+const DIMER_K = 4; // 3′ 端連續幾個鹼基和自己互補就標成問題(示意的門檻)
+function tmCalc(s, mM) {
+  const pairs = [];
+  for (let i = 0; i < s.length - 1; i++) pairs.push(NNP[s.slice(i, i + 2)]);
+  let hIn = 0, sIn = 0;
+  for (const b of [s[0], s[s.length - 1]]) { const p = b === 'G' || b === 'C' ? NN_INIT.GC : NN_INIT.AT; hIn += p[0]; sIn += p[1]; }
+  const hNN = pairs.reduce((v, p) => v + p[0], 0), sNN = pairs.reduce((v, p) => v + p[1], 0);
+  const salt = 0.368 * (s.length - 1) * Math.log(mM / 1000); // 鹽校正只加在 ΔS°;N = 磷酸數 ÷ 2 = 長度 − 1
+  const dH = hNN + hIn, dS = sNN + sIn + salt;
+  const gc = [...s].filter((b) => b === 'G' || b === 'C').length;
+  return { pairs, hIn, sIn, hNN, sNN, salt, dH, dS, tm: (1000 * dH) / (dS + R_GAS * Math.log(C_OLIGO / 4)) - 273.15, gc, wallace: 2 * (s.length - gc) + 4 * gc };
+}
+// P 的 3′ 端往 5′ 方向數,連續幾個鹼基能和 Q(反向平行)配上;m 是 P 的最後一個鹼基配到 Q 的第幾個
+function end3Comp(P, Q) {
+  let best = { k: 0, m: -1 };
+  for (let m = 0; m < Q.length; m++) {
+    let k = 0;
+    while (k < P.length && m + k < Q.length && PAIRB[P[P.length - 1 - k]] === Q[m + k]) k++;
+    if (k > best.k) best = { k, m };
+  }
+  return best;
+}
+// qPCR 相對定量(示意):參考基因的效率固定 100%;處理組的 cDNA 上樣量是對照組的 0.7 倍(兩個基因一起受影響)。
+// Ct = ln(門檻份數 ÷ 起始份數) ÷ ln(1 + E);效率 100% 時,對照組的目標基因 Ct 25、參考基因 Ct 18
+const DD_LOAD = 0.7, DD_T = 25 * Math.LN2, DD_R = 18 * Math.LN2;
+const r2 = (v) => Math.round(v * 100) / 100; // Ct 只報到小數第二位,之後的計算都用報出來的值
+function ddctCalc(S) {
+  const Et = S.eff / 100, Er = 1, F = 2 ** S.lfc;
+  const ct = { tc: r2(DD_T / Math.log(1 + Et)), tt: r2((DD_T - Math.log(F * DD_LOAD)) / Math.log(1 + Et)), rc: r2(DD_R / Math.log(1 + Er)), rt: r2((DD_R - Math.log(DD_LOAD)) / Math.log(1 + Er)) };
+  const dC = r2(ct.tc - ct.rc), dT = r2(ct.tt - ct.rt), dd = r2(dT - dC);
+  return { Et, Er, F, ct, dC, dT, dd, livak: 2 ** -dd, pfaffl: (1 + Et) ** (ct.tc - ct.tt) / (1 + Er) ** (ct.rc - ct.rt) };
+}
+// 擴增曲線(示意):前段每輪乘 1 + E,在 Ct 剛好碰到門檻 0.2
+const ampF = (c, ct, E) => 1 / (1 + Math.exp(-(c - ct) * Math.log(1 + E) + Math.log(4)));
+// 熔解曲線(示意):[Tm °C, 寬度 °C];引子二聚體短而且長短不一,所以 Tm 低、峰寬
+const MELT = { tgt: [84.5, 0.55], dim: [76.5, 1.6], ns: [88, 0.55] };
+function meltAmp(S) {
+  const k = { hi: 0, lo: 1, ntc: 2 }[S.mtmpl];
+  if (S.msample === 'clean') return { tgt: [1, 0.8, 0][k], dim: 0, ns: 0 };
+  if (S.msample === 'dimer') return { tgt: [0.85, 0.65, 0][k], dim: [0.15, 0.35, 0.6][k], ns: 0 };
+  return { tgt: [0.65, 0.5, 0][k], dim: 0, ns: [0.35, 0.35, 0][k] };
+}
+const dsFrac = (T, [tm, w]) => 1 / (1 + Math.exp((T - tm) / w)); // 還是雙股的比例
+// 螢光 = 背景 + 各產物的雙股比例(染劑的螢光本身也隨溫度慢慢變弱,每升 1 °C 少 1.2%)
+const MELT_KEYS = ['tgt', 'dim', 'ns'];
+const meltF = (T, A) => 0.03 + (1 - 0.012 * (T - 60)) * MELT_KEYS.reduce((v, k) => v + A[k] * dsFrac(T, MELT[k]), 0);
+// −dF/dT 用解析式:第一項是染劑隨溫度變暗造成的底線,第二項是雙股分開造成的峰
+function meltParts(T, A) {
+  let base = 0, peak = 0;
+  for (const k of MELT_KEYS) { const s = dsFrac(T, MELT[k]); base += A[k] * s; peak += (A[k] * s * (1 - s)) / MELT[k][1]; }
+  peak *= 1 - 0.012 * (T - 60);
+  return { peak, d: 0.012 * base + peak };
+}
+const meltD = (T, A) => meltParts(T, A).d;
+// 峰:−dF/dT 的局部最大值,而且那裡真的有雙股在分開(第二項夠大;底線平的地方的捨入誤差不算)
+function meltPeaks(A) {
+  const out = [];
+  for (let T = 60.05; T < 94.95; T += 0.05) {
+    const { peak, d } = meltParts(T, A);
+    if (peak > 0.004 && d > meltD(T - 0.05, A) && d >= meltD(T + 0.05, A)) out.push({ T, d });
+  }
+  return out;
+}
+const mn = (v, d = 2) => v.toFixed(d).replace('-', '−'); // 負號用 −
+const fmtFold = (v) => (v >= 10 ? v.toFixed(1) : v >= 1 ? v.toFixed(2) : v.toFixed(3));
+// 一行裡有上標或下標的式子:parts 是字串或 [字串, 'sup' | 'sub'];回傳寬度
+function rich(g, x, y, parts, { size = 16, color = C.ink, weight = 600, mono = false, align = 'left', alpha = 1 } = {}) {
+  const segs = parts.map((p) => (typeof p === 'string' ? [p, ''] : p));
+  const ws = segs.map(([s, k]) => { g.font(k ? size * 0.7 : size, weight, mono); return g.ctx.measureText(s).width; });
+  const w = ws.reduce((a, b) => a + b, 0);
+  let cx = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+  segs.forEach(([s, k], i) => {
+    const dy = k === 'sup' ? -size * 0.42 * g.boost : k === 'sub' ? size * 0.3 * g.boost : 0;
+    g.text(cx, y + dy, s, { size: k ? size * 0.7 : size, color, weight, mono, alpha });
+    cx += ws[i];
+  });
+  return w;
+}
+// 通過與不通過的記號(形狀不同,不只靠顏色):綠色圓圈打勾、紅色三角形加驚嘆號
+function mark(g, x, y, ok, a = 1) {
+  if (a <= 0.01) return;
+  const c = g.ctx; c.save(); c.globalAlpha *= a;
+  if (ok) {
+    g.circle(x, y, 9, C.mint);
+    c.beginPath(); c.moveTo(x - 4.5, y + 0.5); c.lineTo(x - 1.3, y + 3.8); c.lineTo(x + 4.8, y - 3.8);
+    c.strokeStyle = '#0b1111'; c.lineWidth = 2.4; c.lineCap = 'round'; c.lineJoin = 'round'; c.stroke();
+  } else {
+    c.beginPath(); c.moveTo(x, y - 10); c.lineTo(x + 10.5, y + 8.5); c.lineTo(x - 10.5, y + 8.5); c.closePath(); c.fillStyle = C.red; c.fill();
+    g.text(x, y + 2.5, '!', { size: 12, weight: 800, color: '#0b1111', align: 'center' });
+  }
+  c.restore();
+}
 
 function ends(g, yTop, yBot) {
   g.text(X0 - 26, yTop, '5′', { size: 14, color: C.muted, align: 'right', mono: true });
@@ -418,19 +538,300 @@ const chapters = [
       }
     },
   },
+  {
+    key: 'primer', name: '進階:引子設計與 Tm', dur: 18,
+    cues: [[0, '引子常用 15 到 30 個鹼基,GC 含量 40% 到 60%,3′ 端最好是 G 或 C;一對引子的 Tm 相差不要超過 5 °C。'],
+      [4.5, 'Wallace 規則只數鹼基:Tm ≈ 2(A+T) + 4(G+C)。最近鄰法把相鄰兩對鹼基疊在一起的 ΔH、ΔS 一組一組加起來。'],
+      [10.5, '再加上兩端的起始項與鹽校正,代進 Tm = ΔH ÷ (ΔS + R ln(C/4))。鹽越多 Tm 越高;計算器的預設條件不同,結果會差幾度。'],
+      [13.5, '3′ 端和自己或另一條引子互補時,聚合酶會接著延伸,做出短短的引子二聚體。右邊可以換引子與鹽的條件。']],
+    draw(g, t, S) {
+      const P = PRIMERS[S.primer], s = P.seq, L = s.length, K = tmCalc(s, SALT[S.salt]);
+      const gcp = Math.round((100 * K.gc) / L), e3 = end3Comp(s, s);
+      const X = 196, ST = 30, Y = 72; // 第一個鹼基的位置、間距、骨架的高度
+      g.text(30, 30, `${P.name}(示意的序列)`, { size: 16, weight: 700 });
+      g.text(930, 30, `${L} nt・GC ${gcp}%`, { size: 16, weight: 700, color: C.ink2, align: 'right' });
+      const n = Math.round(L * ease(seg(t, 0, 1.5)));
+      g.strand(X, Y, s, { step: ST, dir: 1, bw: 24, bh: 26, to: n });
+      g.text(X - 24, Y + 14, '5′', { size: 15, color: C.muted, align: 'right', mono: true });
+      if (n === L) g.text(X + (L - 1) * ST + 24, Y + 14, '3′', { size: 15, color: C.muted, mono: true });
+      // Wallace:每個 A、T 算 2 °C,每個 G、C 算 4 °C
+      const wa = Math.min(ease(seg(t, 4.5, 4.9)), 1 - ease(seg(t, 6.4, 6.8)));
+      if (wa > 0) for (let i = 0; i < L; i++) {
+        const strong = s[i] === 'G' || s[i] === 'C';
+        g.text(X + i * ST, 126, strong ? '4' : '2', { size: 15, weight: 700, color: strong ? C.amber : C.ink2, align: 'center', mono: true, alpha: wa * ease(seg(t, 4.5 + i * 0.05, 4.8 + i * 0.05)) });
+      }
+      // 最近鄰法:6.6 到 10.4 秒一組一組加上去;長條是那一組相鄰兩對的穩定度 −ΔG°37
+      const kN = Math.min(L - 1, Math.floor((L - 1) * seg(t, 6.6, 10.4)));
+      const ba = ease(seg(t, 6.6, 7));
+      if (ba > 0) {
+        g.text(30, 118, '相鄰兩對的', { size: 13, color: C.ink2, alpha: ba });
+        g.text(30, 136, '穩定度 −ΔG°₃₇', { size: 13, color: C.ink2, alpha: ba });
+        g.ctx.save(); g.ctx.globalAlpha *= ba;
+        for (let i = 0; i < L - 1; i++) {
+          const cur = i === kN && t < 10.4;
+          g.rrect(X + (i + 0.5) * ST - 8, 112, 16, 13 * -K.pairs[i][2], 3, cur ? C.amber : i < kN ? 'rgba(165,243,205,.85)' : 'rgba(165,243,205,.14)');
+        }
+        if (kN < L - 1 && t < 10.4) g.rrect(X + kN * ST - 16, Y - 6, ST + 32, 40, 7, null, C.amber, 2.2);
+        g.ctx.restore();
+      }
+      // 左:Wallace 規則
+      const wp = ease(seg(t, 4.5, 5.1));
+      if (wp > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= wp;
+        g.panel(30, 158, 300, 226, 'Wallace 規則(粗估)');
+        g.text(50, 210, `A+T ${L - K.gc} 個、G+C ${K.gc} 個`, { size: 15, color: C.ink2 });
+        g.text(50, 248, `Tm ≈ 2 × ${L - K.gc} + 4 × ${K.gc}`, { size: 17, mono: true });
+        g.text(50, 300, `≈ ${K.wallace} °C`, { size: 30, weight: 800, color: C.amber });
+        g.text(50, 346, '只看組成,不管順序與鹽', { size: 13, color: C.muted });
+        g.text(50, 368, '(14 到 20 nt 的經驗法則)', { size: 13, color: C.muted });
+        g.ctx.restore();
+      }
+      // 右:最近鄰法
+      const np = ease(seg(t, 6.6, 7.2));
+      if (np > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= np;
+        g.panel(350, 158, 580, 226, '最近鄰法(SantaLucia 1998 的統一參數)');
+        const row = (y, label, value, { a = 1, color = C.ink } = {}) => {
+          if (a <= 0.01) return;
+          g.text(368, y, label, { size: 14, color: C.ink2, alpha: a });
+          g.text(912, y, value, { size: 15, color, align: 'right', mono: true, alpha: a });
+        };
+        const sg = (v) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1);
+        if (t < 10.4) {
+          const j = Math.min(kN, L - 2), p = K.pairs[j];
+          const hP = K.pairs.slice(0, kN).reduce((v, q) => v + q[0], 0), sP = K.pairs.slice(0, kN).reduce((v, q) => v + q[1], 0);
+          row(206, `第 ${j + 1} 組 ${s[j]}${s[j + 1]}`, `ΔH ${mn(p[0], 1)}、ΔS ${mn(p[1], 1)}`, { color: C.amber });
+          row(234, `前 ${kN} 組的和`, `ΔH ${mn(hP, 1)}、ΔS ${mn(sP, 1)}`);
+        } else {
+          const ends = [s[0], s[L - 1]].map((b) => (b === 'G' || b === 'C' ? 'G·C' : 'A·T')).join('、');
+          row(206, `相鄰 ${L - 1} 組的和`, `ΔH ${mn(K.hNN, 1)}、ΔS ${mn(K.sNN, 1)}`);
+          row(234, `+ 兩端起始(${ends})`, `ΔH ${sg(K.hIn)}、ΔS ${sg(K.sIn)}`, { a: ease(seg(t, 10.5, 11)) });
+          row(262, `+ 鹽校正 0.368 × ${L - 1} × ln[Na⁺]`, `ΔS ${sg(K.salt)}`, { a: ease(seg(t, 11, 11.5)) });
+          row(290, '合計', `ΔH° ${mn(K.dH, 1)}、ΔS° ${mn(K.dS, 1)}`, { a: ease(seg(t, 11.5, 12)), color: C.mint });
+          const fa = ease(seg(t, 12, 12.6));
+          g.text(368, 320, 'Tm = 1000 × ΔH° ÷ (ΔS° + R ln(C/4)) − 273.15', { size: 14, color: C.ink2, mono: true, alpha: fa });
+          g.text(368, 356, `≈ ${K.tm.toFixed(1)} °C`, { size: 30, weight: 800, color: C.mint, alpha: fa });
+          g.text(912, 346, `[Na⁺] 等效 ${Math.round(SALT[S.salt])} mM、C = 50 nM`, { size: 13, color: C.muted, align: 'right', alpha: fa });
+          g.text(912, 368, 'ΔH:kcal/mol;ΔS:cal/(K·mol)', { size: 13, color: C.muted, align: 'right', alpha: fa });
+        }
+        g.ctx.restore();
+      }
+      // 左下:設計規則的檢查
+      const checks = [
+        [1.5, L >= 15 && L <= 30, `長度 ${L} nt(建議 15 到 30)`],
+        [2.5, gcp >= 40 && gcp <= 60, `GC ${gcp}%(建議 40% 到 60%)`],
+        [3.5, s[L - 1] === 'G' || s[L - 1] === 'C', `3′ 端是 ${s[L - 1]}(最好是 G 或 C)`],
+        [14, e3.k < DIMER_K, e3.k < DIMER_K ? `3′ 端和自己最多 ${e3.k} 個鹼基互補` : `3′ 端有 ${e3.k} 個鹼基和自己互補`],
+      ];
+      checks.forEach(([a0, ok, txt], i) => {
+        const a = ease(seg(t, a0, a0 + 0.5)), y = 414 + i * 30;
+        mark(g, 44, y, ok, a);
+        if (a > 0.01) g.text(62, y, txt, { size: 15, color: ok ? C.ink : C.red, alpha: a });
+      });
+      // 右下:3′ 端和自己互補時,兩條引子對在一起、各自被延長(引子二聚體)
+      const da = ease(seg(t, 13.6, 14.2));
+      if (da <= 0) return;
+      if (e3.k < DIMER_K) {
+        g.text(530, 432, `和自己反向對齊時,3′ 端最多 ${e3.k} 個鹼基配得上`, { size: 14, color: C.ink2, alpha: da });
+        g.text(530, 460, '太短,不容易穩定配對讓聚合酶延伸', { size: 14, color: C.ink2, alpha: da });
+        g.text(530, 492, '(實際設計時,一對引子之間也要一起檢查)', { size: 13, color: C.muted, alpha: da });
+        return;
+      }
+      const sx = 566, sp = 22, yT = 440, yB = 500, p0 = e3.m - L + 10;
+      const top = s.slice(L - 10), bot = [...top].reverse().join(''); // 下面那一條:位置 p0 + j 是 s[L − 1 − j]
+      const slide = (1 - ease(seg(t, 13.6, 15))) * 240;
+      const ex = Math.floor(p0 * seg(t, 15.6, 17.2) + 1e-9); // 兩邊各接上幾個新的鹼基
+      g.ctx.save(); g.ctx.globalAlpha *= da;
+      g.text(530, 406, `兩條${P.name}的 3′ 端對在一起`, { size: 13, color: C.ink2 });
+      g.strand(sx, yT, top, { step: sp, dir: 1, bw: 17, bh: 17 });
+      g.strand(sx + p0 * sp + slide, yB, bot, { step: sp, dir: -1, bw: 17, bh: 17 });
+      g.text(sx - 14, yT + 9, '5′…', { size: 13, color: C.muted, align: 'right', mono: true });
+      g.text(sx + (p0 + 9) * sp + 14 + slide, yB - 9, '…5′', { size: 13, color: C.muted, mono: true });
+      const ea = 1 - ease(seg(t, 15.3, 15.6));
+      if (ea > 0) {
+        g.text(sx + 9 * sp + 13, yT + 9, '3′', { size: 13, color: C.muted, mono: true, alpha: ea });
+        g.text(sx + p0 * sp - 13 + slide, yB - 9, '3′', { size: 13, color: C.muted, align: 'right', mono: true, alpha: ea });
+      }
+      const pa = ease(seg(t, 15, 15.4));
+      if (pa > 0) for (let q = p0; q <= 9; q++) if (PAIRB[top[q]] === bot[q - p0]) g.line(sx + q * sp, yT + 22, sx + q * sp, yB - 22, `rgba(240,243,238,${0.6 * pa})`, 2, [2, 3]);
+      if (ex > 0) {
+        g.line(sx + 9.4 * sp, yT, sx + (9 + ex + 0.4) * sp, yT, C.mint, 4);
+        g.line(sx + (p0 - 0.4) * sp, yB, sx + (p0 - ex - 0.4) * sp, yB, C.mint, 4);
+        for (let q = 0; q < ex; q++) {
+          g.base(sx + (10 + q) * sp, yT + 2, PAIRB[bot[10 + q - p0]], { w: 17, h: 17, dir: 1 });
+          g.base(sx + (p0 - 1 - q) * sp, yB - 2, PAIRB[top[p0 - 1 - q]], { w: 17, h: 17, dir: -1 });
+        }
+      }
+      g.ctx.restore();
+      if (t >= 16) g.text(530, 528, '聚合酶把兩條都延長了:這就是引子二聚體', { size: 14, weight: 700, color: C.amber, alpha: ease(seg(t, 16, 16.6)) });
+    },
+  },
+  {
+    key: 'ddct', name: '進階:qPCR 相對定量(ΔΔCt)', dur: 18,
+    cues: [[0, '相對定量比較處理組與對照組的目標基因;每個樣品同時測一個參考基因,它的表現要先確認不受處理影響。'],
+      [4, 'ΔCt = Ct(目標)− Ct(參考)。這裡處理組的 cDNA 加得比較少,兩個基因的 Ct 一起變大,相減就抵消了。'],
+      [8.5, 'ΔΔCt = ΔCt(處理)− ΔCt(對照),倍數是 2 的 −ΔΔCt 次方(Livak 2001);前提是兩個基因的效率都接近 100%。'],
+      [13, '效率不是 100% 時,每一輪不是乘 2;Pfaffl 2001 改用實測的 1 + E 當底數。右邊可以調處理的效果與目標基因的效率。']],
+    draw(g, t, S) {
+      const D = ddctCalc(S);
+      // 左上:四條擴增曲線(實線是對照組、虛線是處理組)
+      const A = g.axes(80, 40, 380, 186, { xmin: 0, xmax: 40, ymin: 0, ymax: 1.1, xticks: [0, 10, 20, 30, 40], yticks: [0, 0.5, 1], xlab: '循環數', ylab: '螢光', fmtY: (v) => v.toFixed(1) });
+      const SER = [[D.ct.tc, D.Et, C.amber, null, '目標・對照'], [D.ct.tt, D.Et, C.amber, [7, 5], '目標・處理'], [D.ct.rc, D.Er, C.blue, null, '參考・對照'], [D.ct.rt, D.Er, C.blue, [7, 5], '參考・處理']];
+      const upto = 40 * seg(t, 0.3, 3.8);
+      g.line(A.X(0), A.Y(0.2), A.X(40), A.Y(0.2), 'rgba(255,209,102,.55)', 1.4, [6, 6]);
+      g.text(A.X(40) - 4, A.Y(0.2) - 12, '門檻', { size: 13, color: C.amber, align: 'right' });
+      for (const [ct, E, col, dash] of SER) {
+        const pts = [];
+        for (let c = 0; c <= upto + 1e-9; c += 0.2) pts.push([A.X(c), A.Y(ampF(c, ct, E))]);
+        g.curve(pts, col, 2.4, { dash });
+        if (upto >= ct) g.circle(A.X(ct), A.Y(0.2), 4.5, col);
+      }
+      SER.forEach(([, , col, dash, name], i) => { const y = 62 + i * 19; g.line(92, y, 120, y, col, 2.4, dash ? [5, 4] : undefined); g.text(128, y, name, { size: 13, color: C.ink2 }); });
+      // 左下:Ct 表與 ΔCt、ΔΔCt
+      const hit = (ct) => 0.3 + (3.5 * ct) / 40; // 曲線碰到門檻的時間
+      const hd = ease(seg(t, 0.6, 1.2));
+      g.text(290, 296, '對照組', { size: 14, color: C.ink2, align: 'center', alpha: hd });
+      g.text(400, 296, '處理組', { size: 14, color: C.ink2, align: 'center', alpha: hd });
+      g.text(56, 326, '目標基因 Ct', { size: 15, color: C.amber, alpha: hd });
+      g.text(56, 356, '參考基因 Ct', { size: 15, color: C.blue, alpha: hd });
+      const cell = (x, y, v, a, col = C.ink) => { if (a > 0.01) g.text(x, y, mn(v), { size: 17, weight: 700, color: col, align: 'center', mono: true, alpha: a }); };
+      for (const [x, y, v] of [[290, 326, D.ct.tc], [400, 326, D.ct.tt], [290, 356, D.ct.rc], [400, 356, D.ct.rt]]) cell(x, y, v, ease(seg(t, hit(v), hit(v) + 0.4)));
+      const a2 = ease(seg(t, 4, 4.8));
+      if (a2 > 0) {
+        g.line(56, 374, 450, 374, `rgba(185,199,192,${0.5 * a2})`, 1.2);
+        g.text(56, 394, 'ΔCt = 目標 − 參考', { size: 15, color: C.mint, alpha: a2 });
+        cell(290, 394, D.dC, a2, C.mint); cell(400, 394, D.dT, ease(seg(t, 4.4, 5.2)), C.mint);
+      }
+      const la = Math.min(ease(seg(t, 5, 5.6)), 1 - ease(seg(t, 8.1, 8.5)));
+      if (la > 0) {
+        g.text(56, 434, `參考基因在處理組也晚了 ${mn(D.ct.rt - D.ct.rc)} 輪:`, { size: 14, color: C.ink2, alpha: la });
+        g.text(56, 458, '處理組的 cDNA 加得比較少(示意),相減後抵消', { size: 14, color: C.ink2, alpha: la });
+      }
+      const a3 = ease(seg(t, 8.5, 9.2)), a4 = ease(seg(t, 9.6, 10.3));
+      if (a3 > 0) {
+        g.text(56, 434, 'ΔΔCt = ΔCt(處理)− ΔCt(對照)', { size: 15, color: C.ink2, alpha: a3 });
+        g.text(56, 462, `= ${mn(D.dT)} − ${mn(D.dC)} = ${mn(D.dd)}`, { size: 17, mono: true, alpha: a3 });
+      }
+      if (a4 > 0) rich(g, 56, 506, ['倍數 = 2', ['−ΔΔCt', 'sup'], ' = 2', [mn(-D.dd), 'sup'], ` ≈ ${fmtFold(D.livak)}`], { size: 20, weight: 700, color: C.amber, alpha: a4 });
+      // 右上:兩種算法的式子
+      const fa = ease(seg(t, 8.5, 9.3)), pa = ease(seg(t, 13, 13.8));
+      g.ctx.save(); g.ctx.globalAlpha *= fa; g.panel(500, 30, 435, 232, ''); g.ctx.restore();
+      g.text(520, 54, 'Livak 與 Schmittgen 2001', { size: 13, color: C.muted, alpha: fa });
+      rich(g, 520, 84, ['倍數 = 2', ['−ΔΔCt', 'sup']], { size: 19, weight: 700, alpha: fa });
+      g.text(520, 110, '前提:兩個基因每一輪都剛好加倍(效率 100%)', { size: 13, color: C.ink2, alpha: fa });
+      g.text(520, 142, 'Pfaffl 2001:用實測的效率當底數', { size: 13, color: C.muted, alpha: pa });
+      rich(g, 520, 174, ['倍數 = (1+E', ['目標', 'sub'], ')', ['ΔCt目標', 'sup'], ' ÷ (1+E', ['參考', 'sub'], ')', ['ΔCt參考', 'sup']], { size: 16, weight: 700, alpha: pa });
+      rich(g, 520, 208, ['= ', (1 + D.Et).toFixed(2), [mn(D.ct.tc - D.ct.tt), 'sup'], ' ÷ ', (1 + D.Er).toFixed(2), [mn(D.ct.rc - D.ct.rt), 'sup'], ` ≈ ${fmtFold(D.pfaffl)}`], { size: 17, weight: 700, color: C.lav, mono: true, alpha: pa });
+      g.text(520, 240, '這裡的 ΔCt 是 Ct(對照)− Ct(處理)', { size: 13, color: C.ink2, alpha: pa });
+      // 右下:兩種算法和真值比較(對數刻度,1 倍在中間)
+      const bA = ease(seg(t, 13.6, 14.6));
+      if (bA <= 0) return;
+      const X2 = (v) => 560 + ((clamp(Math.log2(v), -3, 5) + 3) / 8) * 350;
+      const err = (v) => Math.round((v / D.F - 1) * 100);
+      const pct = (e) => `${e > 0 ? '+' : e < 0 ? '−' : '±'}${Math.abs(e)}%`;
+      g.ctx.save(); g.ctx.globalAlpha *= bA;
+      g.text(512, 290, `算出來的倍數(模擬設定的真值 ${fmtFold(D.F)} 倍)`, { size: 14, color: C.ink2 });
+      g.line(560, 452, 910, 452, C.ink2, 1.4);
+      for (const v of [0.25, 1, 4, 16]) { g.line(X2(v), 452, X2(v), 457, C.ink2, 1.4); g.text(X2(v), 470, String(v), { size: 12, color: C.muted, align: 'center', mono: true }); }
+      g.line(X2(1), 312, X2(1), 452, 'rgba(185,199,192,.35)', 1);
+      for (const [v, col, y, lab] of [[D.livak, C.amber, 318, ['2', ['−ΔΔCt', 'sup']]], [D.pfaffl, C.lav, 382, ['Pfaffl(效率校正)']]]) {
+        rich(g, 560, y, lab, { size: 15, weight: 700, color: col });
+        g.text(910, y, `${fmtFold(v)} 倍(${pct(err(v))})`, { size: 15, weight: 700, color: col, align: 'right', mono: true });
+        const x1 = X2(1), x2 = X2(v);
+        g.rrect(Math.min(x1, x2), y + 17, Math.max(3, Math.abs(x2 - x1)), 18, 4, col);
+      }
+      g.line(X2(D.F), 330, X2(D.F), 424, C.mint, 2, [5, 4]);
+      g.text(X2(D.F), 438, '真值', { size: 12, color: C.mint, align: 'center' });
+      g.ctx.restore();
+      const eL = err(D.livak);
+      // 2^(−ΔΔCt) 的結果 ÷ 真值 = (真值 × 上樣比)^(ln2 ÷ ln(1+E) − 1):目標基因的 Ct 差得越多,誤差越大
+      const V = S.eff === 100 ? ['效率 100%:兩種算法一樣', C.mint]
+        : Math.abs(eL) <= 5 ? [`效率 ${S.eff}%:這組只差 ${Math.abs(eL)}%;Ct 差越多誤差越大`, C.mint]
+          : [`效率 ${S.eff}%:2^(−ΔΔCt) ${eL > 0 ? '高估' : '低估'}了 ${Math.abs(eL)}%`, C.amber];
+      g.text(512, 506, V[0], { size: 15, weight: 700, color: V[1], alpha: ease(seg(t, 14.6, 15.2)) });
+    },
+  },
+  {
+    key: 'melt', name: '進階:熔解曲線', dur: 16,
+    cues: [[0, 'qPCR 做完後,從 60 °C 慢慢升溫到 95 °C,邊升溫邊量螢光;SYBR Green I 結合在雙股 DNA 上才會大幅發亮。'],
+      [3.5, '溫度接近產物的 Tm 時,雙股大量分開、染劑離開,螢光陡降;把曲線取負的斜率 −dF/dT,陡降的地方就變成一個峰。'],
+      [8.5, '峰頂的溫度就是產物的 Tm,由長度、GC 含量與序列決定;只有一種產物時,是一個又窄又尖的峰。'],
+      [12, '引子二聚體很短,在 70 多 °C 出現矮而寬的峰,模板越少越明顯;多一個尖峰表示還有別的產物。右邊可以換樣品與模板量。']],
+    draw(g, t, S) {
+      const A = meltAmp(S);
+      const T = lerp(60, 95, seg(t, 3, 11)); // 目前的溫度
+      // 左上:雙股上的染劑,溫度過了 Tm 就分開、變暗(畫管子裡量最多的那一種雙股產物;沒有產物就不畫)
+      g.panel(30, 22, 340, 108, '雙股上的 SYBR Green I');
+      const main = MELT_KEYS.reduce((b, k) => (A[k] > (b ? A[b] : 0) ? k : b), null);
+      if (main) {
+        const m = 1 - dsFrac(T, MELT[main]);
+        g.line(56, 74 - 10 * m, 250, 74 - 10 * m + Math.sin(t * 3) * 2 * m, C.backbone, 4);
+        g.line(56, 100 + 12 * m, 250, 100 + 12 * m - Math.sin(t * 3 + 1) * 2 * m, C.backbone, 4);
+        for (let i = 0; i < 6; i++) {
+          g.ctx.save(); g.ctx.globalAlpha *= 1 - 0.7 * m;
+          g.ctx.shadowColor = '#7dff9e'; g.ctx.shadowBlur = 12 * (1 - m);
+          g.circle(72 + i * 33, 87 + m * (4 + (i % 3) * 5), 6, m < 0.5 ? '#7dff9e' : '#2f5a3c');
+          g.ctx.restore();
+        }
+        g.text(266, 87, m < 0.5 ? '雙股:發亮' : '分開:變暗', { size: 14, weight: 700, color: m < 0.5 ? '#7dff9e' : C.muted });
+      } else g.text(52, 86, '管子裡沒有雙股產物,只有背景', { size: 14, color: C.muted });
+      g.thermo(430, 30, 80, T, { lo: 50, hi: 100 });
+      // 兩張圖:左邊螢光 F,右邊 −dF/dT
+      const P1 = g.axes(100, 172, 340, 250, { xmin: 60, xmax: 95, ymin: 0, ymax: 1.1, xticks: [60, 70, 80, 90], yticks: [0, 0.5, 1], xlab: '溫度(°C)', ylab: '螢光 F(相對)', fmtY: (v) => v.toFixed(1) });
+      const P2 = g.axes(580, 172, 340, 250, { xmin: 60, xmax: 95, ymin: 0, ymax: 0.36, xticks: [60, 70, 80, 90], yticks: [0, 0.1, 0.2, 0.3], xlab: '溫度(°C)', ylab: '−dF/dT', fmtY: (v) => v.toFixed(1) });
+      const f1 = [], f2 = [];
+      for (let x = 60; x <= T + 1e-9; x += 0.1) { f1.push([P1.X(x), P1.Y(meltF(x, A))]); f2.push([P2.X(x), P2.Y(Math.min(0.36, meltD(x, A)))]); }
+      g.curve(f1, C.mint, 2.6); g.curve(f2, C.lav, 2.6);
+      g.circle(P1.X(T), P1.Y(meltF(T, A)), 5, C.mint);
+      if (t > 2.6 && t < 11.4) for (const [P, top] of [[P1, 1.1], [P2, 0.36]]) g.line(P.X(T), P.Y(0), P.X(T), P.Y(top), 'rgba(255,154,92,.6)', 1.5, [4, 4]);
+      // 峰(從曲線找局部最大值),依位置對到是哪一種產物
+      const la = ease(seg(t, 11, 11.8));
+      for (const p of meltPeaks(A)) {
+        if (p.T > T) continue;
+        const kind = Math.abs(p.T - MELT.dim[0]) < 3 ? 'dim' : Math.abs(p.T - MELT.ns[0]) < Math.abs(p.T - MELT.tgt[0]) ? 'ns' : 'tgt';
+        const x = P2.X(p.T), y = P2.Y(Math.min(0.36, p.d));
+        g.circle(x, y, 4.5, C.ink);
+        if (la <= 0.01) continue;
+        if (kind === 'tgt') { g.line(x, y, x, P2.Y(0), `rgba(184,164,244,${0.6 * la})`, 1.4, [3, 4]); g.tag(x - 12, y, `目標產物 ${p.T.toFixed(1)} °C`, { size: 13, color: C.mint, align: 'right', alpha: la }); }
+        else if (kind === 'ns') { // 標籤放在兩個峰的上方,用引線接到峰頂(放峰旁邊會擠到目標產物的峰)
+          const ly = P2.Y(0.31);
+          g.line(x, ly + 12, x, y - 6, `rgba(255,123,123,${0.7 * la})`, 1.4);
+          g.tag(Math.min(x, 870), ly, `另一個產物 ${p.T.toFixed(1)} °C`, { size: 13, color: C.red, alpha: la });
+        }
+        else g.tag(x, y - 24, `引子二聚體 約 ${Math.round(p.T)} °C`, { size: 13, color: C.amber, alpha: la });
+      }
+      // 右上:判讀
+      const k = S.mtmpl === 'ntc';
+      const V = S.msample === 'clean' ? (k ? ['平的,沒有峰', '不加模板就沒有產物:對照正常', C.mint] : ['一個窄而尖的峰', '只有一種產物(目標產物)', C.mint])
+        : S.msample === 'dimer' ? (k ? ['只有低溫的寬峰', '沒有模板時,引子彼此配對延伸', C.amber] : ['低溫多一個矮寬的峰', S.mtmpl === 'lo' ? '引子二聚體:模板少時更明顯' : '引子二聚體:模板多時比較不明顯', C.amber])
+          : (k ? ['平的,沒有峰', '不加模板:對照正常', C.mint] : ['多一個尖峰', '還有別的產物:跑膠看大小', C.red]);
+      g.panel(520, 22, 410, 108, '判讀(示意)');
+      if (t < 11) g.text(538, 74, `升溫中:${T.toFixed(1)} °C`, { size: 15, weight: 700, color: C.ink2 });
+      else {
+        g.text(538, 66, V[0], { size: 16, weight: 700, color: V[2], alpha: la });
+        g.text(538, 96, V[1], { size: 14, color: C.ink2, alpha: la });
+      }
+    },
+  },
 ];
 
 function sup(n) { return String(n).replace(/[-0-9]/g, (d) => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'[d === '-' ? 0 : Number(d) + 1]); }
 
 createLesson({
   chapters,
-  state: { anneal: 53, cycles: 40, start: 1000, agarose: 1.5, unknown: 4 },
+  state: { anneal: 53, cycles: 40, start: 1000, agarose: 1.5, unknown: 4, primer: 'good', salt: 'pcr', lfc: 3, eff: 90, msample: 'dimer', mtmpl: 'lo' },
   controls: [
     { id: 'anneal', label: '黏合溫度', type: 'range', min: 40, max: 68, step: 1, unit: ' °C', chapters: ['anneal', 'extend', 'cycles', 'gel'], restart: false },
     { id: 'cycles', label: '循環數', type: 'range', min: 1, max: 40, step: 1, unit: ' 輪', chapters: ['cycles'], restart: true },
     { id: 'start', label: '起始份數', type: 'seg', options: [{ v: 1, label: '1' }, { v: 10, label: '10' }, { v: 1000, label: '1000' }, { v: 100000, label: '10 萬' }], chapters: ['cycles'], restart: true },
     { id: 'agarose', label: '洋菜膠濃度', type: 'seg', options: [{ v: 0.8, label: '0.8%' }, { v: 1.5, label: '1.5%' }, { v: 2, label: '2%' }], chapters: ['gel'], restart: true },
     { id: 'unknown', label: '未知樣品的起始量', type: 'range', min: 2, max: 6.5, step: 0.5, format: (v) => `10${sup(v)} 份`, chapters: ['qpcr'], restart: false },
+    { id: 'primer', label: '引子(示意)', type: 'seg', options: [{ v: 'good', label: 'A 合適' }, { v: 'gc', label: 'B GC 太多' }, { v: 'at', label: 'C AT 太多' }, { v: 'self', label: 'D 會自己配對' }], chapters: ['primer'], restart: false },
+    { id: 'salt', label: '鹽的條件', type: 'seg', options: [{ v: 'na50', label: '50 mM Na⁺' }, { v: 'pcr', label: 'PCR 緩衝液' }, { v: 'na1000', label: '1 M Na⁺' }], chapters: ['primer'], restart: false },
+    { id: 'lfc', label: '處理的效果(示意)', type: 'range', min: -2, max: 4, step: 1, format: (v) => `${2 ** v} 倍`, chapters: ['ddct'], restart: false },
+    { id: 'eff', label: '目標基因的效率', type: 'range', min: 80, max: 110, step: 5, unit: '%', chapters: ['ddct'], restart: false },
+    { id: 'msample', label: '樣品(示意)', type: 'seg', options: [{ v: 'clean', label: '只有目標產物' }, { v: 'dimer', label: '有引子二聚體' }, { v: 'ns', label: '有非專一產物' }], chapters: ['melt'], restart: false },
+    { id: 'mtmpl', label: '模板量', type: 'seg', options: [{ v: 'hi', label: '多' }, { v: 'lo', label: '少' }, { v: 'ntc', label: '不加模板' }], chapters: ['melt'], restart: false },
   ],
 });
 </script>

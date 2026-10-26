@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>轉錄體分析:從定序資料找出候選基因</title>
+<meta name="description" content="用動畫看 RNA-seq 資料怎麼分析:FASTQ 與 Phred 品質分數、修剪接頭、跨內含子比對與從頭組裝、RPKM 與 TPM、DESeq2 的 size factor、生物重複與負二項變異、Benjamini–Hochberg 校正與火山圖,最後用 BLAST、Pfam 與萜類含量挑出萜類合成酶候選。可以自己調修剪門檻、k-mer 長度、重複數與 FDR 門檻。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="轉錄體分析:從定序資料找出候選基因">
+<meta property="og:description" content="用動畫看 RNA-seq 的品質分數、比對與組裝、RPKM 與 TPM、size factor、生物重複、多重檢定校正與火山圖,最後挑出萜類合成酶候選。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/transcriptomics/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/transcriptomics.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="轉錄體分析:短的 read 疊在基因上,旁邊的火山圖標出顯著上升的基因">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/transcriptomics/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化進階"><a href="../">← 儀器入口</a><a href="./" aria-current="page">轉錄體分析</a><a href="../terpenoid-precursors/">萜類前驅物</a><a href="../enzyme-kinetics/">酵素動力學</a><a href="../population-genetics/">族群遺傳</a><a href="../phylogenetics/">演化樹</a><a href="../gene-function/">基因功能驗證</a></nav></div>
+<header class="top wrap">
+  <h1>轉錄體分析 <span class="k">從定序資料找出候選基因</span></h1>
+  <p class="lede">RNA-seq 讀出幾千萬條短序列之後,要先清理品質、對回基因體或從頭組裝,再計數、標準化,用統計找出處理後真的改變的基因,最後結合序列註解與萜類含量,挑出值得選殖的萜類合成酶候選。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="轉錄體分析動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <p class="pre">先看:<a href="../sequencing/">DNA 定序</a>(RNA-seq 入門)、<a href="../terpene-synthase/">萜類合成酶</a>(找出基因、做出酵素)</p>
+    <ul>
+      <li>FASTQ 每條 read 四行:名稱、序列、+、品質。品質字元的 ASCII 碼減 33 是 Phred 分數,Q = −10·log₁₀(p):Q20 表示判讀錯的機率 1%,Q30 是 0.1%。越往 3′ 端品質越差;片段比讀長短時會讀進接頭,要先切掉接頭再修剪低品質的尾巴。</li>
+      <li>有參考基因體就把 read 對回去,跨過外顯子接點的 read 要拆成兩段、跳過內含子(STAR、HISAT2);沒有參考基因體(很多針葉樹)就從頭組裝:Trinity 把 read 切成 k-mer 接成 de Bruijn 圖。圖上的分岔有兩種來源:同一個基因的不同剪接方式(異構體),或是 k 太小時,重複的小段被黏成同一個節點。</li>
+      <li>RPKM = 計數 ÷(長度 kb × 總讀數 百萬);TPM 先除以長度,再換成占全部的比例乘一百萬,所以每個樣品的 TPM 加總都是一百萬。兩者都是樣品內的相對量,比較樣品之間要用 DESeq2 的 size factor(median of ratios),它不受少數大量增加的基因影響。</li>
+      <li>計數的變異比平均數大,負二項分布寫成 Var = μ + αμ²,也就是 CV² = 1/μ + α:讀數多時剩下個體之間的差異 α,再加深定序幫助不大,要增加生物重複(至少 3 個,6 個以上更穩)。</li>
+      <li>同時檢定幾千到幾萬個基因要做多重檢定校正:Benjamini–Hochberg 把 p 值排序,找最後一個 p₍ᵢ₎ ≤ (i/m)·q 的名次,它和前面的全部算顯著,控制偽發現率(FDR)。火山圖的橫軸是 log₂FC、縱軸是 −log₁₀(校正後 p)。</li>
+      <li>挑萜類合成酶候選:BLAST 的 E 值要小、要有 Pfam 的 N 端結構域(PF01397)與金屬結合結構域(PF03936)和 DDxxD、讀框要完整,再看處理後是否上升、和萜類含量是否一起變。序列像不代表知道產物:接著要<a href="../cloning/">選殖</a>、在大腸桿菌表現、<a href="../terpene-synthase/">加 GPP 反應確認產物</a>,並用 <a href="../pcr/">qPCR</a> 確認表現量。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Conesa A, et al. A survey of best practices for RNA-seq data analysis. Genome Biol. 2016;17:13. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4728800/">PMC4728800</a>(品質越往 3′ 端越差、要用能跨接點的比對軟體、多處比對的 read、RPKM 與 TPM 是樣品內的量、負二項分布、至少三個生物重複、用 Pfam 與 InterPro 註解)</li>
+      <li>Cock PJ, et al. The Sanger FASTQ file format. Nucleic Acids Res. 2010;38(6):1767–1771. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2847217/">PMC2847217</a>(四行、ASCII 加 33);Illumina <a href="https://www.illumina.com/science/technology/next-generation-sequencing/plan-experiments/quality-scores.html">Quality Scores</a>(Q = −10 log₁₀ e;Q20 為 1/100、Q30 為 1/1,000);Bolger AM, et al. Trimmomatic. Bioinformatics. 2014;30(15):2114–2120. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4103590/">PMC4103590</a>(片段比讀長短時讀進接頭、滑動窗格修剪)</li>
+      <li>Grabherr MG, et al. Trinity: reconstructing a full-length transcriptome without a genome from RNA-Seq data. Nat Biotechnol. 2011;29(7):644–652. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3571712/">PMC3571712</a>(節點是 k-mer、重疊 k − 1 個就連線、預設 k = 25、報出異構體);Nystedt B, et al. Nature. 2013;497:579–584. <a href="https://doi.org/10.1038/nature12211">doi:10.1038/nature12211</a>(挪威雲杉基因體約 200 億個鹼基對);Hall DE, et al. BMC Plant Biol. 2013;13:80. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3668260/">PMC3668260</a>(沒有基因體時,用組裝的轉錄體找出松樹的萜類合成酶)</li>
+      <li>Wagner GP, et al. Measurement of mRNA abundance using RNA-seq data: RPKM measure is inconsistent among samples. Theory Biosci. 2012;131(4):281–285. <a href="https://doi.org/10.1007/s12064-012-0162-3">doi:10.1007/s12064-012-0162-3</a>(TPM);Love MI, et al. DESeq2. Genome Biol. 2014;15:550. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4302049/">PMC4302049</a>(size factor 用 median of ratios、Var = μ + αμ²、Wald 檢定與 Benjamini–Hochberg 校正);Robinson MD, Oshlack A. Genome Biol. 2010;11:R25. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2864565/">PMC2864565</a>(少數基因大量表現時,只用總讀數校正會偏)</li>
+      <li>Schurch NJ, et al. How many biological replicates are needed in an RNA-seq experiment? RNA. 2016;22(6):839–851. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4878611/">PMC4878611</a>(建議至少 6 個重複,3 個重複只找得到 20% 到 40% 的差異基因);edgeR User's Guide(2026-04-25 版)2.9.2 節(CV² = 1/μ + φ;同一管 RNA 重測的計數照卜瓦松分布變;<a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html">Bioconductor</a>)</li>
+      <li>Benjamini Y, Hochberg Y. Controlling the false discovery rate. J R Stat Soc B. 1995;57(1):289–300. <a href="https://doi.org/10.1111/j.2517-6161.1995.tb02031.x">doi:10.1111/j.2517-6161.1995.tb02031.x</a>(第 3.1 節的步驟);Cui X, Churchill GA. Genome Biol. 2003;4:210. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC154570/">PMC154570</a>(火山圖)</li>
+      <li>InterPro 的 <a href="https://www.ebi.ac.uk/interpro/entry/pfam/PF01397/">PF01397</a>(萜類合成酶 N 端結構域)、<a href="https://www.ebi.ac.uk/interpro/entry/pfam/PF03936/">PF03936</a>(金屬結合結構域)與 UniProt <a href="https://www.uniprot.org/uniprotkb/O24475/entry">O24475</a>(大冷杉 pinene 合成酶);Bohlmann J, et al. PNAS. 1998;95(8):4126–4133. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC22453/">PMC22453</a>(單萜合成酶 600 到 650 個胺基酸、DDxxD、只看序列不能判定功能);Ma LT, et al. Plants. 2021;10(11):2404. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/">PMC8625326</a>(臺灣杉的 5 個候選 593 到 628 個胺基酸,用 RACE 補齊兩端)</li>
+      <li>示意:第 1 章的 read 與品質分數、第 2 章 read 的位置、第 3 章的外顯子序列、第 4 章 5 個基因的轉錄體、第 5 章 2,000 個基因與第 6 到 8 章 4,000 個基因的計數、離散度趨勢 α = 0.06 + 1/μ、12 棵樹的萜類含量,以及候選 A、B、C 的長度、結構域位置與 BLAST 結果,都是用固定亂數種子產生的示意資料,不是實驗結果。差異表現的檢定是簡化的 Wald 檢定(離散度直接用趨勢值),不是完整的 DESeq2。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化進階・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, FONT, seg, ease, clamp, lerp, rng } from '../assets/bio-draw.js';
+
+const BC = (b) => C[b] || C.N;
+const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+const fmt = (v, d = 0) => v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+function sup(n) { return String(n).replace(/[-0-9]/g, (d) => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'[d === '-' ? 0 : Number(d) + 1]); }
+// 科學記號:3.6 × 10⁻⁵
+function sci(v, d = 1) {
+  if (!(v > 0)) return '0';
+  let e = Math.floor(Math.log10(v)), m = v / 10 ** e;
+  if (Number(m.toFixed(d)) >= 10) { e += 1; m /= 10; }
+  return `${m.toFixed(d)} × 10${sup(e)}`;
+}
+const fmtP = (p) => (p >= 0.001 ? p.toFixed(p >= 0.1 ? 2 : p >= 0.01 ? 3 : 4) : sci(p));
+const wan = (v) => `${fmt(v / 1e4, v >= 1e7 ? 0 : 1)} 萬`;
+
+// ===== 計算開始(只用 rng,不碰畫面;驗算時單獨抽出這一段) =====
+// 小種子的 xorshift 前幾個數偏小,先丟掉 20 個
+const rngw = (seed) => { const R = rng(seed); for (let i = 0; i < 20; i++) R(); return R; };
+const sum = (a) => a.reduce((s, v) => s + v, 0);
+const mean = (a) => sum(a) / a.length;
+const median = (a) => { const s = [...a].sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
+// 亂數:常態(Box–Muller)、Gamma(Marsaglia 與 Tsang)、卜瓦松(λ 大時用常態近似)、負二項(Gamma 混合的卜瓦松)
+function normal(R) { let u = R(); while (u < 1e-12) u = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * R()); }
+function gammaRand(R, k) {
+  if (k < 1) return gammaRand(R, k + 1) * Math.pow(Math.max(R(), 1e-12), 1 / k);
+  const d = k - 1 / 3, c = 1 / Math.sqrt(9 * d);
+  for (;;) {
+    let x, v;
+    do { x = normal(R); v = 1 + c * x; } while (v <= 0);
+    v = v * v * v;
+    const u = R();
+    if (u < 1 - 0.0331 * x ** 4 || Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v;
+  }
+}
+function poisson(R, lam) {
+  if (lam < 30) { const L = Math.exp(-lam); let k = 0, p = 1; do { k++; p *= R(); } while (p > L); return k - 1; }
+  return Math.max(0, Math.round(lam + Math.sqrt(lam) * normal(R)));
+}
+const nbinom = (R, mu, alpha) => poisson(R, gammaRand(R, 1 / alpha) * mu * alpha);
+// 標準常態的雙尾 p 值:erfc 用 Numerical Recipes 的 erfcc(相對誤差小於 1.2 × 10⁻⁷)
+function erfc(x) {
+  const z = Math.abs(x), t = 1 / (1 + 0.5 * z);
+  const r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+  return x >= 0 ? r : 2 - r;
+}
+const pTwo = (z) => erfc(Math.abs(z) / Math.SQRT2);
+// Benjamini–Hochberg:校正後 p(和 R 的 p.adjust(p, 'BH') 相同),以及「最後一個 p₍ᵢ₎ ≤ (i/m)·q 的名次」
+function bhAdjust(p) {
+  const m = p.length, order = p.map((v, i) => i).sort((a, b) => p[a] - p[b]), adj = new Array(m);
+  let run = 1;
+  for (let r = m - 1; r >= 0; r--) { const i = order[r]; run = Math.min(run, (p[i] * m) / (r + 1)); adj[i] = run; }
+  return { adj, order };
+}
+function bhK(sortedP, q) { const m = sortedP.length; let k = 0; for (let i = 1; i <= m; i++) if (sortedP[i - 1] <= (i / m) * q) k = i; return k; }
+// DESeq2 的 size factor(median of ratios):每個基因除以它在所有樣品的幾何平均,取中位數;有 0 的基因不用
+function sizeFactors(cols) {
+  const m = cols[0].length, J = cols.length, lg = new Array(m);
+  for (let i = 0; i < m; i++) { let s = 0; for (let j = 0; j < J; j++) s += Math.log(cols[j][i]); lg[i] = s / J; }
+  return cols.map((c) => Math.exp(median(c.map((v, i) => Math.log(v) - lg[i]).filter((v, i) => Number.isFinite(lg[i]) && c[i] > 0))));
+}
+const pearson = (x, y) => { const mx = mean(x), my = mean(y); let a = 0, b = 0, c = 0; x.forEach((v, i) => { a += (v - mx) * (y[i] - my); b += (v - mx) ** 2; c += (y[i] - my) ** 2; }); return a / Math.sqrt(b * c); };
+
+// ---------- 第 1 章:一條 read 的品質與修剪 ----------
+const INSERT = 'GCTTAGCCATGGACTTCAAGGTCGATCTGCTCAAGGTTGCCTATAACG'; // 插入的片段(48 個,示意)
+const ADAPTER = 'AGATCGGAAGAG'; // Illumina TruSeq 第一讀接頭的前 12 個(cutadapt 文件)
+const READ = INSERT + ADAPTER; // 讀長 60:片段比讀長短,後 12 個讀進接頭
+const QUAL = [34, 34, 37, 37, 38, 38, 39, 39, 40, 40, 40, 39, 40, 40, 39, 40, 38, 40, 39, 39, 38, 39, 37, 38, 37, 38, 36, 37, 35, 36,
+  34, 35, 33, 31, 32, 30, 28, 30, 26, 24, 25, 21, 22, 17, 18, 13, 15, 11, 12, 11, 10, 12, 9, 8, 10, 7, 6, 8, 5, 4]; // 示意:越往 3′ 端越低
+const qChar = (q) => String.fromCharCode(q + 33); // Phred+33
+const pErr = (q) => 10 ** (-q / 10);
+const expErr = (qs) => sum(qs.map(pErr));
+// 先找接頭(前 8 個完全相同才算,示意),再照 Trimmomatic SLIDINGWINDOW 的程式:
+// 窗格平均低於門檻時,保留到這個窗格的倒數第二個鹼基,再把尾巴低於門檻的去掉
+function trimRead(seq, qs, thr, w = 4) {
+  let len = seq.length;
+  const a = seq.indexOf(ADAPTER.slice(0, 8));
+  if (a >= 0) len = a;
+  const q = qs.slice(0, len);
+  let total = 0; for (let i = 0; i < w; i++) total += q[i];
+  if (total < thr * w) return { adapterAt: a, cutAt: 0, keep: 0, win: 0 };
+  let keep = q.length, win = -1;
+  for (let i = 0; i < q.length - w; i++) { total = total - q[i] + q[i + w]; if (total < thr * w) { keep = i + w; win = i + 1; break; } }
+  let k = keep; while (k > 1 && q[k - 1] < thr) k--;
+  return { adapterAt: a, cutAt: keep, keep: k, win };
+}
+
+// ---------- 第 2 章:read 對回基因體 ----------
+const EX = [[0, 300], [300, 500], [500, 900]]; // mRNA 上三個外顯子的位置(鹼基)
+const RL = 100; // 讀長
+const SHARED = [610, 860]; // 和另一個很像的基因(TPS-b)相同的那一段(mRNA 座標,示意)
+const READS2 = (() => {
+  const R = rngw(323), out = [];
+  for (let i = 0; i < 40; i++) {
+    const s = Math.floor(R() * (900 - RL + 1)), e = s + RL;
+    const junction = EX.slice(0, 2).some(([, b]) => s < b && e > b);
+    const multi = s >= SHARED[0] && e <= SHARED[1];
+    out.push({ s, e, junction, multi });
+  }
+  return out.sort((a, b) => a.s - b.s);
+})();
+
+// ---------- 第 3 章:k-mer 與 de Bruijn 圖 ----------
+const E1 = 'ATGGCGGGTTCG', E2 = 'AGCCATGT', E3 = 'TCGGATAACCAC'; // 三個外顯子(示意)
+const ISO1 = E1 + E2 + E3, ISO2 = E1 + E3;
+const gpos1 = (j) => j; // 異構體 1 的第 j 個字在基因上的位置
+const gpos2 = (j) => (j < E1.length ? j : j + E2.length); // 異構體 2 跳過外顯子 2
+// 節點是 k-mer,兩個 k-mer 重疊 k − 1 個就連線(Trinity 的定義);同一個 k-mer 出現在基因上不同的地方時,會被黏成同一個節點
+function deBruijn(k) {
+  const occ = new Map();
+  const locs = { 1: [], 2: [] };
+  const add = (s, j, gp, iso) => {
+    const km = s.slice(j, j + k), co = Array.from({ length: k }, (_, d) => gp(j + d)), key = co.join(',');
+    const loc = { km, iso, j, key, x: mean(co), junction: co[k - 1] - co[0] !== k - 1 };
+    locs[iso].push(loc);
+    if (!occ.has(km)) occ.set(km, new Map());
+    if (!occ.get(km).has(key)) occ.get(km).set(key, loc);
+  };
+  for (let j = 0; j + k <= ISO1.length; j++) add(ISO1, j, gpos1, 1);
+  for (let j = 0; j + k <= ISO2.length; j++) add(ISO2, j, gpos2, 2);
+  const edges = new Map();
+  const link = (s) => { for (let j = 0; j + k < s.length; j++) { const a = s.slice(j, j + k), b = s.slice(j + 1, j + 1 + k); if (!edges.has(a)) edges.set(a, new Set()); edges.get(a).add(b); } };
+  link(ISO1); link(ISO2);
+  const indeg = new Map(); for (const [, set] of edges) for (const b of set) indeg.set(b, (indeg.get(b) || 0) + 1);
+  const branchK = [...edges].filter(([, set]) => set.size > 1).map(([a]) => a);
+  const mergeK = [...indeg].filter(([, d]) => d > 1).map(([a]) => a);
+  // 有沒有繞圈(有向圖的環)
+  const color = new Map(); let cycle = false;
+  const dfs = (a) => { color.set(a, 1); for (const b of edges.get(a) || []) { const c = color.get(b) || 0; if (c === 1) cycle = true; else if (c === 0) dfs(b); } color.set(a, 2); };
+  for (const a of occ.keys()) if (!color.get(a)) dfs(a);
+  const collapsed = [...occ].filter(([, m]) => m.size > 1).map(([km, m]) => ({ km, locs: [...m.values()] }));
+  return { k, nodes: occ.size, branchK, mergeK, cycle, collapsed, locs, occ };
+}
+
+// ---------- 第 4 章:RPKM 與 TPM(假設整個轉錄體只有這 5 個基因) ----------
+const TOY = [
+  { name: '短基因', kb: 0.5, a: 200, b: 200 },
+  { name: '長基因', kb: 5.0, a: 200, b: 200 },
+  { name: '肌動蛋白', kb: 1.5, a: 300, b: 300 },
+  { name: '萜類合成酶', kb: 2.0, a: 50, b: 50, up: 400 },
+  { name: 'P450', kb: 1.6, a: 100, b: 100 },
+];
+const DEPTH = { a: 10e6, b: 20e6 }; // 兩個樣品的總讀數(B 定序量是 A 的兩倍)
+function toyTable(tpsUp) {
+  const mol = { a: TOY.map((g) => g.a), b: TOY.map((g) => (tpsUp && g.up ? g.up : g.b)) };
+  const out = {};
+  for (const s of ['a', 'b']) {
+    const ml = mol[s].map((m, i) => m * TOY[i].kb), tot = sum(ml);
+    const count = ml.map((v) => (DEPTH[s] * v) / tot); // 讀數和「分子數 × 長度」成正比
+    const rpkm = count.map((c, i) => c / (TOY[i].kb * (DEPTH[s] / 1e6)));
+    const rpk = count.map((c, i) => c / TOY[i].kb), srpk = sum(rpk);
+    const tpm = rpk.map((v) => (v / srpk) * 1e6);
+    out[s] = { count, rpkm, tpm, rpk, srpk };
+  }
+  return out;
+}
+
+// ---------- 第 5 章:size factor(median of ratios) ----------
+const SF = (() => {
+  const R = rngw(515), G = 2000;
+  const base = Array.from({ length: G }, () => Math.exp(1.4 * normal(R)));
+  const up = new Set(); while (up.size < 80) up.add(Math.floor(R() * G));
+  const nA = Array.from({ length: G }, () => Math.exp(0.18 * normal(R))), nB = Array.from({ length: G }, () => Math.exp(0.18 * normal(R)));
+  const p0 = base.map((v) => v / sum(base));
+  const share0 = sum([...up].map((i) => p0[i]));
+  const N = { a: 10e6, b: 15e6 };
+  const cache = new Map();
+  function at(f) { // f:處理組裡大量上升的基因占掉的讀數比例(0 表示不變)
+    if (cache.has(f)) return cache.get(f);
+    const c = f > share0 ? (f * (1 - share0)) / (share0 * (1 - f)) : 1;
+    const pb = p0.map((v, i) => (up.has(i) ? v * c : v)), tb = sum(pb);
+    const A = p0.map((v, i) => Math.max(1, Math.round(N.a * v * nA[i]))), B = pb.map((v, i) => Math.max(1, Math.round((N.b * v * nB[i]) / tb)));
+    const [sA, sB] = sizeFactors([A, B]);
+    const totRatio = sum(B) / sum(A), sfRatio = sB / sA;
+    const lr = A.map((a, i) => Math.log2(B[i] / a));
+    const same = lr.filter((v, i) => !up.has(i));
+    const unchangedTot = 2 ** median(same.map((v) => v - Math.log2(totRatio)));
+    const unchangedSf = 2 ** median(same.map((v) => v - Math.log2(sfRatio)));
+    const shareB = sum([...up].map((i) => B[i])) / sum(B), shareA = sum([...up].map((i) => A[i])) / sum(A);
+    const res = { A, B, sA, sB, totRatio, sfRatio, lr, up, unchangedTot, unchangedSf, shareA, shareB };
+    cache.set(f, res); return res;
+  }
+  return { at, G, share0, N };
+})();
+
+// ---------- 第 6、7、8 章:差異表現的模擬資料 ----------
+// 4,000 個基因、每組最多 5 個生物重複;約 10% 的基因真的有差異。計數照負二項分布抽(平均 = size factor × 表現量,離散度 α)
+const ALPHA0 = 0.06; // 離散度的趨勢:α(μ) = 0.06 + 1/μ(示意)
+const alphaTrend = (mu) => ALPHA0 + 1 / mu;
+const SEED_DE = 22, SEED_EX = 103;
+const EXG = 11; // 第 6 章拿來看的基因
+const TPSN = 46; // BLAST 像萜類合成酶的基因數(示意)
+const DE = (() => {
+  const R = rngw(SEED_DE), M = 4000, NR = 5;
+  const sf = Array.from({ length: 2 * NR }, () => Math.exp(0.22 * normal(R)));
+  const draw = (Rg, g) => { g.alpha = alphaTrend(g.q); g.counts = Array.from({ length: 2 * NR }, (_, j) => nbinom(Rg, sf[j] * (j < NR ? g.q : g.q * 2 ** g.lfc), g.alpha)); };
+  const genes = [];
+  for (let i = 0; i < M; i++) {
+    const q = Math.max(8, Math.exp(Math.log(180) + 1.5 * normal(R)));
+    const de = R() < 0.1;
+    const lfc = de ? (R() < 0.6 ? 1 : -1) * (0.35 + -Math.log(Math.max(R(), 1e-9)) * 0.9) : 0;
+    const g = { q, de, lfc, kind: 'other' };
+    draw(R, g); genes.push(g);
+  }
+  // 指定的基因另外用自己的亂數抽,不影響其他基因
+  Object.assign(genes[EXG], { q: 260, de: true, lfc: 1, kind: 'example' }); draw(rngw(SEED_EX), genes[EXG]);
+  const R2 = rngw(4646);
+  const pool = [...Array(M).keys()].filter((i) => i !== EXG);
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(R2() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const UP = [3.0, 2.4, 1.3, 1.15, 2.1, 2.8, 0.9, 1.5], UP5 = [2.2, 1.5, 0.9, 2.6];
+  const BETA = { 0: 1, 1: 0.25, 3: 0.85, 5: 0.5, 19: 0.9 };
+  const tps = pool.slice(0, TPSN).map((gi, k) => {
+    const dom = k < 31 ? 'both' : k < 37 ? 'N' : 'C';
+    const orf = k < 19 ? 'complete' : k < 27 ? '5p' : k < 31 ? '3p' : k % 2 ? 'complete' : '5p';
+    const lfc = k < 8 ? UP[k] : k < 10 ? [-1.4, -2][k - 8] : k >= 19 && k < 23 ? UP5[k - 19] : k >= 31 && k % 3 === 0 ? 1.5 : 0;
+    const q = k === 0 ? 240 : Math.exp(Math.log(200) + 0.8 * normal(R2));
+    Object.assign(genes[gi], { q, de: lfc !== 0, lfc, kind: 'tps', k, dom, orf, beta: BETA[k] ?? 0.1 * R2() });
+    draw(R2, genes[gi]);
+    return gi;
+  });
+  const P450 = pool[TPSN]; // 候選 C:表現量也上升、也和含量相關,但是 P450
+  Object.assign(genes[P450], { q: 150, de: true, lfc: 2, kind: 'p450', beta: 0.9 }); draw(R2, genes[P450]);
+  // 另外 12 棵樹(自然變異):單萜含量與這些基因的表現量
+  const R3 = rngw(1212), T = 12;
+  const u = Array.from({ length: T }, () => normal(R3));
+  const content = u.map((v) => 3 * 2 ** (0.7 * v + 0.12 * normal(R3)));
+  const trees = new Map();
+  for (const gi of [...tps, P450]) { const g = genes[gi]; trees.set(gi, u.map((v) => g.q * 2 ** (g.beta * 0.9 * v + 0.35 * normal(R3)))); }
+  const rOf = (gi) => pearson(trees.get(gi).map(Math.log2), content.map(Math.log2));
+  const cache = new Map();
+  function at(n) { // n:每組用幾個重複(用前 n 個,所以重複越多是「再加幾棵樹」)
+    if (cache.has(n)) return cache.get(n);
+    const idx = [...Array(n).keys(), ...Array.from({ length: n }, (_, j) => NR + j)];
+    const cols = idx.map((j) => genes.map((g) => g.counts[j]));
+    const s = sizeFactors(cols);
+    const res = genes.map((g) => {
+      const na = idx.slice(0, n).map((j, c) => g.counts[j] / s[c]), nb = idx.slice(n).map((j, c) => g.counts[j] / s[n + c]);
+      const qa = mean(na) + 0.5, qb = mean(nb) + 0.5, al = alphaTrend((qa + qb) / 2);
+      // Wald 檢定:z = log₂FC ÷ 標準誤;標準誤由負二項的變異算(離散度直接用趨勢值,示意)
+      const lfc = Math.log2(qb / qa), se = Math.sqrt((1 / qa + al) / n + (1 / qb + al) / n) / Math.LN2;
+      return { lfc, se, z: lfc / se, p: pTwo(lfc / se), na, nb, qa, qb };
+    });
+    const { adj, order } = bhAdjust(res.map((r) => r.p));
+    res.forEach((r, i) => { r.padj = adj[i]; });
+    const out = { res, s, sorted: order.map((i) => res[i].p), order, n };
+    cache.set(n, out); return out;
+  }
+  return { genes, at, M, NR, sf, tps, P450, content, trees, rOf, T };
+})();
+// ===== 計算結束 =====
+
+// ================= 共用的小畫法 =================
+// 置中的鹼基方塊;字母不跟著放大(放大會撐出方塊)
+function box(g, x, y, b, { w = 20, h = 20, alpha = 1, fill, stroke } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha;
+  g.rrect(x - w / 2, y - h / 2, w, h, 4, fill || BC(b), stroke || null, 2);
+  ctx.font = `700 ${Math.min(14, w * 0.68)}px ${FONT}`; ctx.fillStyle = '#0b1111'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(b, x, y + 0.5);
+  ctx.restore();
+}
+const textW = (g, s, size, weight = 500, mono = false) => { g.font(size, weight, mono); return g.ctx.measureText(s).width; };
+// 淡入:t 從 a 到 a + d
+const fade = (t, a, d = 0.6) => ease(seg(t, a, a + d));
+function alphaDo(g, a, fn) { if (a <= 0.001) return; g.ctx.save(); g.ctx.globalAlpha *= a; fn(); g.ctx.restore(); }
+// 小小的針葉樹(生物重複用)
+function tree(g, x, y, s, col) {
+  const ctx = g.ctx;
+  ctx.beginPath(); ctx.moveTo(x, y - s); ctx.lineTo(x + s * 0.55, y + s * 0.35); ctx.lineTo(x - s * 0.55, y + s * 0.35); ctx.closePath();
+  ctx.fillStyle = col; ctx.fill();
+  g.rrect(x - s * 0.08, y + s * 0.35, s * 0.16, s * 0.3, 1, '#8f8263');
+}
+// 細的座標軸(只畫軸線與刻度,刻度字自己給)
+function axisX(g, x0, x1, y, ticks, X, lab, { size = 13 } = {}) {
+  g.line(x0, y, x1, y, C.ink2, 1.4);
+  for (const [v, s] of ticks) { g.line(X(v), y, X(v), y + 5, C.ink2, 1.2); g.text(X(v), y + 17, s, { size, color: C.muted, align: 'center', mono: true }); }
+  if (lab) g.text((x0 + x1) / 2, y + 38, lab, { size: 13, color: C.ink2, align: 'center' });
+}
+function axisY(g, x, y0, y1, ticks, Y, { size = 13, grid = 0 } = {}) {
+  g.line(x, y0, x, y1, C.ink2, 1.4);
+  for (const [v, s] of ticks) { g.line(x - 5, Y(v), x, Y(v), C.ink2, 1.2); if (grid) g.line(x, Y(v), x + grid, Y(v), 'rgba(255,255,255,.06)', 1); g.text(x - 9, Y(v), s, { size, color: C.muted, align: 'right', mono: true }); }
+}
+function yTitle(g, x, y, s) { g.ctx.save(); g.ctx.translate(x, y); g.ctx.rotate(-Math.PI / 2); g.text(0, 0, s, { size: 13, color: C.ink2, align: 'center' }); g.ctx.restore(); }
+
+// ================= 第 1 章 =================
+const FX0 = 150, FDX = 12.5;
+const fcx = (i) => FX0 + (i + 0.5) * FDX;
+const QB = 490, QH = 3.9; // 品質長條圖:Q = 0 在 y = 490
+const qy = (q) => QB - q * QH;
+const DECODE = [QUAL.indexOf(40), QUAL.indexOf(30), QUAL.indexOf(10)];
+
+// ================= 第 2 章 =================
+const MX = (p) => 160 + p * 0.74; // mRNA 上的位置
+const GX = (p) => (p < 300 ? 90 + p * 0.74 : p < 500 ? 382 + (p - 300) * 0.74 : 600 + (p - 500) * 0.74); // 基因體上的位置(內含子畫成 70 px)
+const EXGX = [[90, 312], [382, 530], [600, 896]];
+const INTRON = [[312, 382], [530, 600]];
+const MY = 150, GY = 318;
+// 把 read 排成不重疊的幾列
+function packRows(spans, gap = 5) {
+  const ends = [];
+  return spans.map(([a, b]) => { let r = ends.findIndex((e) => a > e + gap); if (r < 0) { ends.push(b); r = ends.length - 1; } else ends[r] = b; return r; });
+}
+const ROWM = packRows(READS2.map((r) => [MX(r.s), MX(r.e)]));
+const ROWG = packRows(READS2.map((r) => [GX(r.s), GX(r.e - 1e-6)]));
+// 一條 read 在基因體上的段落(跨接點的拆成兩段)
+function gPieces(r) {
+  const out = []; let s = r.s;
+  for (const [, b] of EX.slice(0, 2)) if (s < b && r.e > b) { out.push([s, b]); s = b; }
+  out.push([s, r.e]);
+  return out;
+}
+
+// ================= 第 3 章 =================
+const XC = (c) => 132 + c * 24; // 基因上的第 c 個字
+const R1Y = 170, R2Y = 216, PY1 = 296, PY2 = 344;
+const EXCOL = ['#7cc4a0', C.lav, C.blue];
+const DBG = new Map([3, 5, 7].map((k) => [k, deBruijn(k)]));
+const KREAD = ISO2.slice(6, 18); // 一條跨過接點的 read
+
+// ================= 第 6 到 8 章 =================
+const LOG2_15 = Math.log2(1.5);
+const fcLabel = (fc) => (fc === 1 ? '2' : fc === 2 ? '4' : '1.5');
+
+const chapters = [
+  {
+    key: 'fastq', name: '原始資料:FASTQ 與品質分數', dur: 18,
+    cues: [[0, '定序機器吐出 FASTQ 檔,每條 read 占四行:@ 開頭的名稱、序列、只有 + 的分隔行,以及每個鹼基一個字元的品質。'],
+      [4.5, '品質字元的 ASCII 碼減 33 就是 Phred 分數:Q = −10·log₁₀(p),p 是判讀錯的機率,所以 Q20 是 1%、Q30 是 0.1%。'],
+      [9, '越接近 3′ 端品質越差;片段比讀長短時,後面會讀進接頭(adapter)的序列,不是樣品本身。'],
+      [13.5, '修剪先切掉接頭,再用 4 個鹼基的窗格往後掃,平均低於門檻就切。右邊可以換門檻,看留下多少、預期錯幾個。']],
+    enter(S) { S.qTouched = false; },
+    draw(g, t, S) {
+      const T = S.qTouched;
+      g.text(24, 24, '一條 read 的 FASTQ 紀錄', { size: 15, weight: 700, color: C.ink2 });
+      [['名稱', 56], ['序列', 90], ['分隔', 124], ['品質', 158]].forEach(([lab, y], r) => {
+        alphaDo(g, T ? 1 : fade(t, 0.3 + r * 0.9), () => {
+          g.text(24, y, `${'①②③④'[r]} ${lab}`, { size: 15, color: C.muted });
+          if (r === 0) g.text(FX0, y, '@SIM:1:FCX:1:15:6329:1045 1:N:0:2', { size: 15, mono: true });
+          if (r === 1) for (let i = 0; i < READ.length; i++) g.text(fcx(i), y, READ[i], { size: 15, weight: 700, mono: true, color: BC(READ[i]), align: 'center' });
+          if (r === 2) g.text(FX0, y, '+', { size: 15, mono: true });
+          if (r === 3) for (let i = 0; i < READ.length; i++) g.text(fcx(i), y, qChar(QUAL[i]), { size: 15, mono: true, color: QUAL[i] < 20 ? C.amber : C.ink, align: 'center' });
+        });
+      });
+      // 接頭
+      const aa = T ? 1 : fade(t, 9.3);
+      alphaDo(g, aa, () => {
+        g.line(fcx(48) - 6, 104, fcx(59) + 6, 104, C.amber, 3);
+        g.tag(fcx(53.5), 56, '接頭(adapter)', { size: 13, color: C.amber });
+      });
+      // 解碼:字元 → Q → p(等寬字型的上下標太小,公式用一般字型)
+      const da = T ? 0 : Math.min(fade(t, 4.5), 1 - ease(seg(t, 13.2, 13.8)));
+      alphaDo(g, da, () => {
+        g.text(24, 212, 'Q = −10·log₁₀(p)', { size: 19, weight: 700 });
+        g.text(24, 244, 'p:判讀錯的機率', { size: 13, color: C.muted });
+        DECODE.forEach((i, k) => {
+          const x = 318 + k * 206, q = QUAL[i], ch = qChar(q);
+          g.line(fcx(i), 170, x + 99, 190, 'rgba(185,199,192,.45)', 1.2, [3, 3]);
+          g.rrect(x, 190, 198, 74, 10, 'rgba(21,32,30,.88)', C.line);
+          g.text(x + 12, 212, `${ch} → ${ch.charCodeAt(0)} − 33 = Q${q}`, { size: 14, mono: true });
+          g.text(x + 12, 244, `p = 10${sup(-q / 10)} = ${q >= 30 ? fmt(pErr(q), q / 10) : fmt(pErr(q), 1)}`, { size: 16, weight: 700, color: q >= 30 ? C.mint : C.amber });
+        });
+      });
+      // 品質長條圖
+      const tr = trimRead(READ, QUAL, S.qcut);
+      const ba = T ? 1 : ease(seg(t, 8.4, 9.6));
+      alphaDo(g, T ? 1 : fade(t, 8.2), () => {
+        axisY(g, FX0 - 6, QB, qy(42), [[0, '0'], [10, '10'], [20, '20'], [30, '30'], [40, '40']], qy, { grid: 750 });
+        yTitle(g, 104, qy(20), '品質 Q');
+        g.line(FX0 - 6, QB, FX0 + 60 * FDX, QB, C.ink2, 1.4);
+        g.text(FX0, 296, 'Q20:每 100 個錯 1 個   Q30:每 1,000 個錯 1 個', { size: 13, color: C.muted });
+        g.text(FX0 + 30 * FDX, QB + 18, '第 1 到 60 個鹼基(左邊是 5′ 端)', { size: 13, color: C.muted, align: 'center' });
+      });
+      const s1 = T ? 1 : ease(seg(t, 13.6, 14.3)), s2 = T ? 1 : seg(t, 14.4, 16.2), s3 = T ? 1 : ease(seg(t, 16.2, 16.8));
+      for (let i = 0; i < READ.length; i++) {
+        const q = QUAL[i], h = q * QH * ba;
+        let a = 1;
+        if (i >= 48) a = 1 - 0.78 * s1; else if (i >= tr.keep) a = 1 - 0.78 * s3;
+        alphaDo(g, a, () => g.rrect(fcx(i) - 4.5, QB - h, 9, h, 2, q >= 30 ? C.mint : q >= 20 ? rgba(C.mint, 0.55) : C.amber));
+      }
+      alphaDo(g, aa * ba, () => {
+        g.rrect(FX0 + 48 * FDX, qy(41), 12 * FDX, QB - qy(41), 4, 'rgba(255,209,102,.07)', 'rgba(255,209,102,.5)', 1.2);
+        g.text(fcx(53.5), qy(37), '讀進接頭', { size: 13, color: C.amber, align: 'center' });
+      });
+      if (t >= 13.5 || T) {
+        // 門檻線
+        g.line(FX0, qy(S.qcut), FX0 + 48 * FDX, qy(S.qcut), C.red, 1.6, [6, 4]);
+        g.tag(FX0 + 22, qy(S.qcut) - 14, `門檻 Q${S.qcut}`, { size: 13, color: C.red, align: 'left' });
+        // ① 切接頭
+        alphaDo(g, s1, () => { g.line(FX0 + 48 * FDX, qy(44), FX0 + 48 * FDX, QB + 4, C.amber, 2.2); });
+        // ② 窗格
+        const last = tr.win >= 0 ? tr.win : 48 - 4;
+        const wi = Math.min(last, Math.floor(s2 * (last + 0.999)));
+        if (s2 > 0 && s3 < 1) {
+          const m = mean(QUAL.slice(wi, wi + 4)), bad = m < S.qcut;
+          g.rrect(FX0 + wi * FDX - 1, qy(41), 4 * FDX + 2, QB - qy(41) + 2, 4, bad ? 'rgba(255,123,123,.12)' : 'rgba(165,243,205,.08)', bad ? C.red : C.mint, 2);
+          g.tag(FX0 + (wi + 2) * FDX, qy(45), `4 個平均 ${m.toFixed(1)}`, { size: 13, color: bad ? C.red : C.mint });
+        }
+        alphaDo(g, s3, () => {
+          const x = FX0 + tr.keep * FDX;
+          g.line(x, qy(44), x, QB + 4, C.red, 2.2);
+          g.tag(x, qy(45), '從這裡切掉', { size: 13, color: C.red });
+        });
+        // 結果
+        alphaDo(g, T ? 1 : fade(t, 15.2), () => {
+          const e0 = expErr(QUAL), e1 = expErr(QUAL.slice(0, tr.keep));
+          g.text(24, 206, `保留 ${tr.keep} 個鹼基(原本 60 個,接頭 12 個)`, { size: 17, weight: 700, color: C.mint });
+          g.text(24, 238, `預期錯幾個 = Σp:修剪前 ${e0.toFixed(2)} 個 → 修剪後 ${e1.toFixed(3)} 個`, { size: 15 });
+          g.text(24, 264, '門檻越高,留下的越短、但錯得越少', { size: 13, color: C.muted });
+        });
+      }
+    },
+  },
+  {
+    key: 'align', name: '有參考基因體:跨過內含子比對', dur: 16,
+    cues: [[0, '基因由外顯子與內含子組成;轉錄後內含子被剪掉,mRNA 只剩外顯子接在一起,read 就是從這些 mRNA 讀來的。'],
+      [4.5, '把 read 對回基因體時,跨過外顯子接點的 read 要拆成兩段、中間跳過整個內含子;STAR、HISAT2 這類軟體會這樣比對。'],
+      [9, '針葉樹的內含子常有幾千個鹼基,有的超過 10 萬;不會跨內含子的比對方式會漏掉這些 read。右邊可以切換看看。'],
+      [12.8, '萜類合成酶是大家族,很像的兩個基因會讓一條 read 對到兩個地方;計數時要決定只算唯一對上的,或像 RSEM 依機率分配。']],
+    enter(S) { S.spTouched = false; },
+    draw(g, t, S) {
+      const T = S.spTouched, ctx = g.ctx;
+      // 基因體上的基因
+      g.text(24, GY, '基因體', { size: 14, color: C.ink2 });
+      g.text(24, GY + 18, '(DNA)', { size: 13, color: C.muted });
+      g.line(84, GY, 912, GY, 'rgba(213,221,217,.45)', 2);
+      for (const [x0, x1] of INTRON) {
+        g.line(x0, GY, x1, GY, C.ink2, 2);
+        const xm = (x0 + x1) / 2;
+        g.line(xm - 7, GY - 8, xm - 1, GY + 8, C.ink2, 1.6); g.line(xm + 1, GY - 8, xm + 7, GY + 8, C.ink2, 1.6);
+        g.text(xm, GY + 22, '內含子', { size: 13, color: C.muted, align: 'center' });
+      }
+      EXGX.forEach(([x0, x1], k) => {
+        g.rrect(x0, GY - 8, x1 - x0, 16, 4, rgba(EXCOL[k], 0.55), EXCOL[k], 1.4);
+        g.text((x0 + x1) / 2, GY + 22, `外顯子 ${k + 1}`, { size: 13, color: C.ink2, align: 'center' });
+      });
+      // 剪接:外顯子往上接成 mRNA
+      const sp = ease(seg(t, 1, 3));
+      if (sp > 0) {
+        EXGX.forEach(([x0, x1], k) => {
+          const [a, b] = EX[k], tx0 = MX(a), tx1 = MX(b), y = lerp(GY, MY, sp);
+          g.rrect(lerp(x0, tx0, sp), y - 8, lerp(x1 - x0, tx1 - tx0, sp), 16, 4, rgba(EXCOL[k], 0.55), EXCOL[k], 1.4);
+        });
+        alphaDo(g, sp, () => { g.text(24, MY, 'mRNA', { size: 14, color: C.ink2 }); g.text(24, MY + 18, '(只剩外顯子)', { size: 13, color: C.muted }); });
+        if (t > 1.2 && t < 3.6) g.tag(450, 236, '轉錄後剪掉內含子', { size: 14, color: C.ink, alpha: Math.min(seg(t, 1.2, 1.6), 1 - seg(t, 3.2, 3.6)) });
+      }
+      // read
+      const ra = ease(seg(t, 3, 4.2));
+      const mrow = (i) => MY - 18 - ROWM[i] * 9, grow = (i) => GY - 18 - ROWG[i] * 9;
+      const multiOn = T ? 1 : fade(t, 12.8);
+      const colOf = (r) => (r.multi && multiOn > 0.5 ? C.blue : r.junction ? C.amber : C.mint);
+      READS2.forEach((r, i) => {
+        const k = T ? 1 : ease(seg(t, 4.6 + i * 0.07, 5.4 + i * 0.07));
+        const yM = mrow(i) - (1 - ra) * 30, yG = grow(i);
+        // 原來在 mRNA 上的位置留下淡淡的影子
+        alphaDo(g, ra * (k > 0 ? 0.28 : 1), () => g.rrect(MX(r.s), yM, MX(r.e) - MX(r.s), 6, 2, colOf(r)));
+        if (k <= 0) return;
+        const fail = r.junction && !S.splice;
+        const pcs = gPieces(r);
+        const y = lerp(yM, yG, k);
+        if (fail && k >= 1) {
+          // 不會跨內含子:整條硬放在基因體上,超出外顯子的部分對不上
+          const x0 = GX(r.s), w = r.e - r.s;
+          g.rrect(x0, y, w * 0.74, 6, 2, null, C.red, 1.4);
+          g.text(x0 + w * 0.37, y - 7, '×', { size: 14, weight: 700, color: C.red, align: 'center' });
+          return;
+        }
+        pcs.forEach(([a, b], p) => {
+          const x0 = lerp(MX(a), GX(a), k), x1 = lerp(MX(b), GX(b - 1e-6), k);
+          g.rrect(x0, y, Math.max(2, x1 - x0), 6, 2, colOf(r));
+          if (p > 0 && k > 0.6) {
+            const xa = GX(pcs[p - 1][1] - 1e-6), xb = GX(a);
+            ctx.save(); ctx.globalAlpha *= seg(k, 0.6, 1); ctx.beginPath(); ctx.moveTo(xa, y + 3); ctx.quadraticCurveTo((xa + xb) / 2, y - 14, xb, y + 3);
+            ctx.strokeStyle = C.amber; ctx.lineWidth = 1.2; ctx.stroke(); ctx.restore();
+          }
+        });
+      });
+      alphaDo(g, Math.min(fade(t, 5), 1 - seg(t, 8.6, 9.2)), () => g.tag(450, 236, '跨接點的 read(琥珀色)拆成兩段,中間跳過內含子', { size: 14, color: C.amber }));
+      // 計數
+      const nJ = READS2.filter((r) => r.junction).length, nM = READS2.filter((r) => r.multi).length, nAll = READS2.length;
+      alphaDo(g, T ? 1 : fade(t, 9), () => {
+        g.panel(20, 392, 508, 136, '');
+        g.text(36, 414, `這個基因的 ${nAll} 條 read 裡,${nJ} 條跨過外顯子接點`, { size: 14, color: C.ink2 });
+        const on = S.splice;
+        g.text(36, 446, `${on ? '▶' : '  '} 會跨內含子:${nAll} 條都對上`, { size: on ? 16 : 14, weight: on ? 700 : 500, color: on ? C.mint : C.muted });
+        g.text(36, 476, `${!on ? '▶' : '  '} 不會跨:只對上 ${nAll - nJ} 條,少算 ${Math.round((100 * nJ) / nAll)}%`, { size: !on ? 16 : 14, weight: !on ? 700 : 500, color: !on ? C.amber : C.muted });
+        alphaDo(g, multiOn, () => g.text(36, 506, `其中 ${nM} 條(藍色)兩個基因都對得上`, { size: 14, color: C.blue }));
+      });
+      // 很像的另一個基因
+      alphaDo(g, multiOn, () => {
+        g.panel(544, 392, 396, 136, '');
+        g.text(560, 414, '很像的另一個萜類合成酶(TPS-b)', { size: 14, color: C.ink2 });
+        const x0 = 590, x1 = 900, sx0 = x0 + 40, sx1 = sx0 + (SHARED[1] - SHARED[0]) * 0.74;
+        g.line(560, 470, 920, 470, 'rgba(213,221,217,.45)', 2);
+        g.rrect(x0, 462, x1 - x0, 16, 4, rgba(C.lav, 0.4), C.lav, 1.4);
+        g.rrect(sx0, 462, sx1 - sx0, 16, 4, rgba(C.blue, 0.45), C.blue, 1.6);
+        g.text((sx0 + sx1) / 2, 498, '這一段兩個基因幾乎一樣', { size: 13, color: C.blue, align: 'center' });
+        const xs = GX(SHARED[0]), xe = GX(SHARED[1]);
+        // 虛線只拉到框的上緣,不穿過框裡的字
+        g.line(xs, GY + 12, sx0, 390, 'rgba(127,184,255,.55)', 1.2, [4, 4]);
+        g.line(xe, GY + 12, sx1, 390, 'rgba(127,184,255,.55)', 1.2, [4, 4]);
+      });
+    },
+  },
+  {
+    key: 'assemble', name: '沒有參考基因體:從頭組裝', dur: 18,
+    cues: [[0, '沒有參考基因體時就從頭組裝。針葉樹基因體很大,挪威雲杉約 200 億個鹼基對,比阿拉伯芥大 100 多倍。'],
+      [4.5, '把每條 read 切成長度 k 的小段(k-mer);兩個 k-mer 重疊 k − 1 個就連起來,得到 de Bruijn 圖(Trinity 預設 k = 25)。'],
+      [9.5, '沿著圖走就拼回轉錄本。同一個基因的兩種剪接方式(異構體)在圖上是一個分岔再會合,Trinity 兩條都報出來。'],
+      [13.5, 'k 太小時,不同位置的相同小段被黏成同一個節點,圖會打結,拼出不存在的序列。右邊可以改 k。']],
+    enter(S) { S.kTouched = false; },
+    draw(g, t, S) {
+      const T = S.kTouched, ctx = g.ctx, D = DBG.get(S.k), k = S.k;
+      // 上方:基因體大小(第一句)
+      alphaDo(g, T ? 0 : Math.min(fade(t, 0.2), 1 - ease(seg(t, 4.2, 4.7))), () => {
+        g.text(24, 50, '挪威雲杉', { size: 15, color: C.ink2 });
+        g.rrect(132, 42, 560, 16, 4, C.mintDim);
+        g.text(700, 50, '約 200 億個鹼基對', { size: 15, weight: 700, color: C.mint });
+        g.text(24, 88, '阿拉伯芥', { size: 15, color: C.ink2 });
+        g.rrect(132, 80, 5, 16, 2, C.mintDim);
+        g.text(146, 88, '小 100 多倍', { size: 15, color: C.ink2 });
+      });
+      // 上方:一條 read 切成 k-mer(第二句)
+      const ka = T ? 0 : Math.min(fade(t, 4.6), 1 - ease(seg(t, 9.2, 9.7)));
+      alphaDo(g, ka, () => {
+        g.text(24, 40, '一條 read', { size: 15, color: C.ink2 });
+        for (let i = 0; i < KREAD.length; i++) box(g, XC(i), 40, KREAD[i], { w: 20, h: 20 });
+        const steps = Math.min(3, KREAD.length - k + 1), mv = seg(t, 5.2, 8.2) * (KREAD.length - k);
+        const p0 = Math.floor(mv);
+        g.rrect(XC(p0) - 12, 28, k * 24, 24, 6, null, C.amber, 2);
+        for (let s = 0; s < steps; s++) {
+          const y = 68 + s * 17;
+          for (let d = 0; d < k; d++) g.text(XC(s + d), y, KREAD[s + d], { size: 13, weight: 700, mono: true, color: BC(KREAD[s + d]), align: 'center' });
+        }
+        g.text(XC(KREAD.length) + 4, 66, `k = ${k}:每 ${k} 個字一個節點`, { size: 14, color: C.amber });
+        g.text(XC(KREAD.length) + 4, 90, `相鄰兩個重疊 ${k - 1} 個字`, { size: 14, color: C.ink2 });
+      });
+      // 中間:兩種異構體(外顯子 2 有或沒有)
+      const ia = T ? 1 : fade(t, 0.6);
+      alphaDo(g, ia, () => {
+        [[0, 12], [12, 20], [20, 32]].forEach(([a, b], e) => {
+          g.rrect(XC(a) - 10, 142, (b - a) * 24 - 4, 6, 3, EXCOL[e]);
+          g.text((XC(a) + XC(b - 1)) / 2, 130, `外顯子 ${e + 1}`, { size: 13, color: EXCOL[e], align: 'center' });
+        });
+        g.text(24, R1Y, '異構體 1', { size: 14, color: C.ink2 });
+        g.text(24, R2Y, '異構體 2', { size: 14, color: C.ink2 });
+        for (let c = 0; c < 32; c++) box(g, XC(c), R1Y, ISO1[c]);
+        for (let j = 0; j < ISO2.length; j++) box(g, XC(gpos2(j)), R2Y, ISO2[j]);
+        g.line(XC(11) + 12, R2Y, XC(20) - 12, R2Y, C.muted, 1.4, [4, 4]);
+        g.text((XC(11) + XC(20)) / 2, R2Y - 22, '跳過外顯子 2', { size: 13, color: C.muted, align: 'center' });
+      });
+      // de Bruijn 圖:節點依它在基因上的位置排,異構體 2 跨接點的那幾個走下面
+      const na = T ? 1 : seg(t, 5.4, 9.2);
+      const P = (L) => [XC(L.x), L.junction ? PY2 : PY1];
+      const allLocs = [...D.locs[1], ...D.locs[2].filter((L) => L.junction)];
+      const shown = (L) => T || t >= 9.2 || (L.x + 0.5) / 32 <= na;
+      alphaDo(g, T ? 1 : fade(t, 5.2), () => {
+        g.text(24, PY1, 'de Bruijn', { size: 14, color: C.ink2 });
+        g.text(24, PY1 + 18, '圖', { size: 14, color: C.ink2 });
+        for (const iso of [1, 2]) {
+          const L = D.locs[iso];
+          for (let j = 0; j + 1 < L.length; j++) {
+            if (!shown(L[j]) || !shown(L[j + 1])) continue;
+            const [x1, y1] = P(L[j]), [x2, y2] = P(L[j + 1]);
+            g.line(x1, y1, x2, y2, iso === 2 && (L[j].junction || L[j + 1].junction) ? C.blue : C.ink2, 1.6);
+          }
+        }
+        for (const L of allLocs) if (shown(L)) { const [x, y] = P(L); g.circle(x, y, 4.5, L.junction ? C.blue : C.ink2); }
+      });
+      // 沿著圖走(第三句)
+      if (!T && t >= 9.5 && t < 13.5) {
+        const L = t < 11.5 ? D.locs[1] : D.locs[2], u = t < 11.5 ? seg(t, 9.6, 11.4) : seg(t, 11.6, 13.4);
+        const f = u * (L.length - 1), j = Math.floor(f), L0 = L[j], L1 = L[Math.min(L.length - 1, j + 1)];
+        const [x0, y0] = P(L0), [x1, y1] = P(L1);
+        ctx.save(); ctx.shadowColor = C.mint; ctx.shadowBlur = 14; g.circle(lerp(x0, x1, f - j), lerp(y0, y1, f - j), 8, C.mint); ctx.restore();
+      }
+      // 分岔與會合
+      const marks = T ? 1 : fade(t, 9.4);
+      alphaDo(g, marks, () => {
+        const lab = new Map();
+        for (const km of D.branchK) { const L = [...D.occ.get(km).values()][0]; lab.set(L.key, ['分岔', L]); }
+        for (const km of D.mergeK) { const L = [...D.occ.get(km).values()].find((x) => !x.junction) || [...D.occ.get(km).values()][0]; if (!lab.has(L.key)) lab.set(L.key, ['會合', L]); }
+        for (const [, [s, L]] of lab) { const [x, y] = P(L); g.circle(x, y, 8, null, C.mint, 2); g.text(x, y + 22, s, { size: 13, color: C.mint, align: 'center' }); }
+      });
+      // 被黏在一起的小段(第四句)
+      const ca = T ? 1 : fade(t, 13.4);
+      alphaDo(g, ca, () => {
+        for (const { km, locs } of D.collapsed) {
+          const [xa, ya] = P(locs[0]), [xb, yb] = P(locs[1]);
+          const top = Math.min(ya, yb) - 18 - Math.min(36, Math.abs(xb - xa) * 0.08);
+          ctx.save(); ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.moveTo(xa, ya - 6); ctx.quadraticCurveTo((xa + xb) / 2, top - 10, xb, yb - 6); ctx.strokeStyle = C.amber; ctx.lineWidth = 1.8; ctx.stroke(); ctx.restore();
+          g.circle(xa, ya, 7, null, C.amber, 2); g.circle(xb, yb, 7, null, C.amber, 2);
+        }
+      });
+      // 下方:輸出與結論
+      alphaDo(g, T ? 1 : fade(t, 9.6), () => {
+        g.panel(20, 392, 920, 136, '');
+        g.text(36, 414, 'Trinity 的輸出(同一個基因 g1 的兩個異構體)', { size: 14, color: C.ink2 });
+        [['TRINITY_DN1_c0_g1_i1', [0, 1, 2]], ['TRINITY_DN1_c0_g1_i2', [0, 2]]].forEach(([nm, ex], r) => {
+          const y = 444 + r * 30;
+          g.text(36, y, nm, { size: 14, mono: true, color: C.ink });
+          ex.forEach((e, q) => { g.rrect(270 + q * 64, y - 9, 58, 18, 4, rgba(EXCOL[e], 0.55), EXCOL[e]); g.text(299 + q * 64, y, `${e + 1}`, { size: 13, weight: 700, color: C.ink, align: 'center' }); });
+        });
+      });
+      alphaDo(g, ca, () => {
+        const n = D.collapsed.length, nb = D.branchK.length + D.mergeK.length;
+        const x = 500;
+        g.text(x, 414, `k = ${k} 時有 ${D.nodes} 個節點`, { size: 16, weight: 700, color: n ? C.amber : C.mint });
+        if (!n) {
+          g.text(x, 444, '沒有重複的小段', { size: 15, color: C.mint });
+          g.text(x, 470, `分岔與會合共 ${nb} 處,都來自兩種剪接`, { size: 14, color: C.ink2 });
+        } else {
+          g.text(x, 444, `${n} 個小段出現在兩處,被黏成同一個節點`, { size: 15, color: C.amber });
+          g.text(x, 470, `分岔與會合共 ${nb} 處${D.cycle ? ',還會繞圈' : ''}`, { size: 14, color: C.ink2 });
+          g.text(x, 496, `例如 ${D.collapsed[0].km}(琥珀色虛線連起來的兩處)`, { size: 14, color: C.ink2 });
+        }
+      });
+    },
+  },
+  {
+    key: 'tpm', name: '長度與定序深度:RPKM 與 TPM', dur: 17,
+    cues: [[0, '每個基因數到幾條 read 是原始計數。長的基因打斷後的片段多,定序量多的樣品每個數字也大,所以原始計數不能直接比。'],
+      [4.5, 'RPKM 先除以基因長度(千鹼基)、再除以總讀數(百萬)。雙端定序時數的是片段(fragment),叫 FPKM。'],
+      [9, 'TPM 先把每個基因除以長度,再換成占全部的比例乘一百萬,所以每個樣品的 TPM 加總都是一百萬。'],
+      [13, '兩者都是樣品內的相對量。打開右邊「萜類合成酶增加 8 倍」:TPM 加總不變、RPKM 加總變了,沒變的基因也跟著變小。']],
+    enter(S) { S.tpTouched = false; },
+    draw(g, t, S) {
+      const T = S.tpTouched, D = toyTable(S.tpsUp);
+      const COLX = [170, 440, 710], BARW = 150, ROWY = (i) => 142 + i * 50;
+      const focus = T || t >= 13 ? -1 : t < 4.5 ? 0 : t < 9 ? 1 : 2;
+      const heads = [['原始計數', '數到幾條 read'], ['RPKM', '計數 ÷(長度 kb × 總讀數 百萬)'], ['TPM', '(計數 ÷ kb)占全部的比例 × 10⁶']];
+      const keys = ['count', 'rpkm', 'tpm'];
+      const fv = (c, v) => (c === 0 ? wan(v) : fmt(v));
+      // 圖例
+      g.rrect(24, 22, 14, 10, 2, C.mintDim); g.text(44, 27, `A:對照,${wan(DEPTH.a)}條 read`, { size: 13, color: C.ink2 });
+      g.rrect(24, 42, 14, 10, 2, C.mint); g.text(44, 47, `B:處理,${wan(DEPTH.b)}條 read`, { size: 13, color: C.ink2 });
+      TOY.forEach((gn, i) => {
+        g.text(24, ROWY(i) - 6, gn.name, { size: 15, color: i === 3 ? C.amber : C.ink });
+        g.text(24, ROWY(i) + 14, `${gn.kb.toFixed(1)} kb`, { size: 13, color: C.muted, mono: true });
+      });
+      keys.forEach((key, c) => {
+        const a = focus < 0 || focus === c ? 1 : 0.3;
+        alphaDo(g, a * (T ? 1 : fade(t, c === 0 ? 0.2 : c === 1 ? 4.6 : 9.1)), () => {
+          const x0 = COLX[c];
+          if (focus === c) g.rrect(x0 - 12, 52, 262, 382, 10, 'rgba(165,243,205,.05)', 'rgba(165,243,205,.25)');
+          g.text(x0, 72, heads[c][0], { size: 16, weight: 700, color: focus === c ? C.mint : C.ink });
+          g.text(x0, 94, heads[c][1], { size: 13, color: C.muted, max: 246 });
+          const vals = [...D.a[key], ...D.b[key]], mx = Math.max(...vals);
+          TOY.forEach((gn, i) => {
+            const y = ROWY(i);
+            [['a', C.mintDim, -16], ['b', C.mint, 4]].forEach(([s, col, dy]) => {
+              const v = D[s][key][i], w = Math.max(2, (v / mx) * BARW);
+              g.rrect(x0, y + dy, w, 11, 2, col);
+              g.text(x0 + w + 6, y + dy + 5.5, fv(c, v), { size: 13, mono: true, color: C.ink2 });
+            });
+          });
+          // 加總
+          g.line(x0, 382, x0 + 240, 382, C.line, 1.2);
+          g.text(x0, 400, `A ${fv(c, sum(D.a[key]))}`, { size: 13, mono: true, color: C.ink2 });
+          g.text(x0, 422, `B ${fv(c, sum(D.b[key]))}`, { size: 13, mono: true, color: c === 2 ? C.mint : C.ink2 });
+        });
+      });
+      g.text(24, 411, '加總', { size: 15, weight: 700, color: C.ink2 });
+      // 下方的例子
+      const b = D.b, i = 3, grow2 = (b.count[2] / D.a.count[2]).toFixed(1);
+      let line1 = '', line2 = '', col = C.ink;
+      if (focus === 0) { line1 = '長基因和短基因的分子一樣多,計數卻差 10 倍'; line2 = S.tpsUp ? `B 的定序量是 A 的 2 倍,但組成變了,沒變的肌動蛋白計數只多 ${grow2} 倍` : 'B 的定序量是 A 的 2 倍,每個基因的計數也多 2 倍'; }
+      else if (focus === 1) { line1 = `萜類合成酶(B):${wan(b.count[i])} ÷(${TOY[i].kb.toFixed(1)} kb × ${DEPTH.b / 1e6} 百萬)= ${fmt(b.rpkm[i])}`; line2 = S.tpsUp ? '長度與定序量都除掉了;但 B 的組成變了,沒變的基因 A、B 也不一樣高' : '長度與定序量都除掉了:長、短基因一樣高,A 與 B 一樣高'; }
+      else if (focus === 2) { line1 = `萜類合成酶(B):RPK = ${wan(b.count[i])} ÷ ${TOY[i].kb.toFixed(1)} = ${wan(b.rpk[i])};全部 RPK 加起來 ${wan(b.srpk)}`; line2 = `TPM = ${wan(b.rpk[i])} ÷ ${wan(b.srpk)} × 10⁶ = ${fmt(b.tpm[i])}`; }
+      else if (S.tpsUp) {
+        const a2 = toyTable(false);
+        line1 = `肌動蛋白其實沒變:TPM 從 ${fmt(a2.b.tpm[2])} 變成 ${fmt(b.tpm[2])}(少了 ${Math.round((100 * (a2.b.tpm[2] - b.tpm[2])) / a2.b.tpm[2])}%)`;
+        line2 = `RPKM 加總 ${fmt(sum(D.a.rpkm))} 與 ${fmt(sum(b.rpkm))} 不同;TPM 加總都是 1,000,000`; col = C.amber;
+      } else { line1 = '兩個樣品組成一樣時,RPKM 與 TPM 都能比'; line2 = '打開「萜類合成酶增加 8 倍」:處理組的組成改變'; }
+      g.text(24, 482, line1, { size: 15, weight: 700, color: col, max: 912 });
+      g.text(24, 510, line2, { size: 14, color: C.ink2, max: 912 });
+    },
+  },
+  {
+    key: 'size-factor', name: '樣品之間:size factor', dur: 17,
+    cues: [[0, '比較樣品之間還有一個問題:處理後一群基因大量表現,占掉很多讀數,其他沒變的基因分到的就變少。'],
+      [4.5, '只用總讀數(或 TPM)校正,這些沒變的基因看起來全都下降了(Robinson 與 Oshlack 2010)。'],
+      [9, 'DESeq2 的 size factor:每個基因先除以它在各樣品的幾何平均,取所有基因這個比值的中位數(median of ratios)。'],
+      [13, '中位數不會被少數大量增加的基因拉走,沒變的基因校正後仍在 1 倍附近。右邊可以改占掉的比例。']],
+    enter(S) { S.bTouched = false; },
+    draw(g, t, S) {
+      const T = S.bTouched, r = SF.at(S.boom), ctx = g.ctx;
+      // 左:讀數由哪些基因分走
+      const grow = T ? 1 : ease(seg(t, 1.2, 3.6));
+      g.text(24, 30, '讀數由哪些基因分走', { size: 15, weight: 700, color: C.ink2 });
+      [['對照 A', r.shareA, SF.N.a], ['處理 B', lerp(r.shareA, r.shareB, grow), SF.N.b]].forEach(([nm, sh, n], k) => {
+        const x = 60 + k * 140, y0 = 70, h = 300;
+        g.rrect(x, y0, 84, h, 6, rgba(C.mintDim, 0.85));
+        g.rrect(x, y0, 84, Math.max(3, h * sh), 6, C.amber);
+        g.text(x + 42, y0 + Math.max(3, h * sh) / 2, `${Math.round(sh * 100)}%`, { size: 15, weight: 700, color: '#0b1111', align: 'center' });
+        g.text(x + 42, y0 + h + 20, nm, { size: 15, color: C.ink, align: 'center' });
+        g.text(x + 42, y0 + h + 40, `${wan(n)}條`, { size: 13, color: C.muted, align: 'center' });
+      });
+      g.rrect(24, 470, 12, 12, 3, C.amber); g.text(42, 476, S.boom > 0 ? '處理後大量上升的 80 個基因' : '這 80 個基因這次沒有上升', { size: 13, color: C.ink2 });
+      g.rrect(24, 494, 12, 12, 3, C.mintDim); g.text(42, 500, '其他 1,920 個(沒有變)', { size: 13, color: C.ink2 });
+      // 右:每個基因 B ÷ A 的分布
+      const ha = T ? 1 : fade(t, 4.5);
+      const X = (v) => 390 + ((v + 1.5) / 6) * 530, Y0 = 336;
+      alphaDo(g, ha, () => {
+        g.text(380, 30, '每個基因的 B ÷ A(2,000 個基因)', { size: 15, weight: 700, color: C.ink2 });
+        const bins = new Map(), binsUp = new Map(), bw = 0.1;
+        r.lr.forEach((v, i) => { const b = Math.floor(v / bw); const m = r.up.has(i) ? binsUp : bins; m.set(b, (m.get(b) || 0) + 1); });
+        const mx = Math.max(...bins.values());
+        const hY = (n) => (n / mx) * 218;
+        for (const [m, col] of [[bins, rgba(C.mintDim, 0.95)], [binsUp, C.amber]]) for (const [b, n] of m) {
+          const v = b * bw; if (v < -1.5 || v > 4.4) continue;
+          g.rrect(X(v) + 0.5, Y0 - hY(n), (530 / 60) - 1, hY(n), 1, col);
+        }
+        axisX(g, 390, 920, Y0, [[-1, '½'], [0, '1'], [1, '2'], [2, '4'], [3, '8'], [4, '16']].map(([v, s]) => [v, `${s}`]), X, 'B 是 A 的幾倍(對數刻度)');
+      });
+      // 只看總讀數
+      const ta = T ? 1 : fade(t, 5.4);
+      const xT = X(Math.log2(r.totRatio)), xS = X(Math.log2(r.sfRatio));
+      const close = Math.abs(xT - xS) < 120;
+      alphaDo(g, ta, () => {
+        g.line(xT, 74, xT, Y0, C.amber, 2, [6, 4]);
+        g.tag(xT, 64, `總讀數比 ×${r.totRatio.toFixed(2)}`, { size: 13, color: C.amber });
+      });
+      // size factor
+      const sa = T ? 1 : fade(t, 10.2);
+      alphaDo(g, sa, () => {
+        const xs = T ? xS : lerp(xT, xS, ease(seg(t, 10.2, 12)));
+        g.line(xs, 92, xs, Y0, C.mint, 2.4);
+        g.tag(xs, close ? 104 : 64, `size factor 比 ×${(2 ** ((xs - 390) / 530 * 6 - 1.5)).toFixed(2)}`, { size: 13, color: C.mint });
+      });
+      alphaDo(g, T ? 1 : fade(t, 9), () => {
+        g.text(380, 414, 'size factor = 中位數(每個基因的計數 ÷ 它在各樣品的幾何平均)', { size: 14, color: C.ink, max: 560 });
+      });
+      // 結果
+      alphaDo(g, ta, () => {
+        const v = r.unchangedTot;
+        g.text(380, 450, `只用總讀數校正:沒變的基因變成 ${v.toFixed(2)} 倍(${v < 0.995 ? `看起來少了 ${Math.round((1 - v) * 100)}%` : '大致沒變'})`, { size: 15, weight: 700, color: C.amber, max: 560 });
+      });
+      alphaDo(g, T ? 1 : fade(t, 13), () => {
+        g.text(380, 482, `用 size factor 校正:沒變的基因是 ${r.unchangedSf.toFixed(2)} 倍`, { size: 15, weight: 700, color: C.mint, max: 560 });
+        g.text(380, 508, '前提:大部分基因在兩組之間沒有變', { size: 13, color: C.muted });
+      });
+    },
+  },
+  {
+    key: 'replicates', name: '生物重複與計數的變異', dur: 16,
+    cues: [[0, '生物重複是不同個體(例如不同棵樹),不是同一管 RNA 測兩次。至少要 3 重複才能估組內變異,6 重複以上更穩。'],
+      [4.5, '同一管 RNA 重測只有卜瓦松的變異(變異數 = 平均數);個體之間還多一項,負二項分布寫成 Var = μ + αμ²。'],
+      [9.5, '換成變異係數:CV² = 1/μ + α。讀數多時 1/μ 很小,剩下個體差異 α;這時再加深定序幫助不大,要增加重複。'],
+      [13, '右邊改重複數:左邊這個基因的範圍跟著變窄、p 值變小;重複少時,右邊每個基因的變異也估得很亂。']],
+    draw(g, t, S) {
+      const n = S.rep, D = DE.at(n), e = D.res[EXG];
+      // 左:一個基因
+      g.text(24, 26, '一個基因(真的上升 2 倍,示意)', { size: 15, weight: 700, color: C.ink2 });
+      const Y = (v) => 360 - (v / 800) * 240, gx = [150, 320];
+      alphaDo(g, fade(t, 0.3), () => {
+        axisY(g, 70, 360, 120, [[0, '0'], [200, '200'], [400, '400'], [600, '600'], [800, '800']], Y, { grid: 340 });
+        yTitle(g, 26, 240, '校正後的計數');
+        [['對照', e.na, e.qa, C.mintDim], ['處理', e.nb, e.qb, C.mint]].forEach(([nm, vals, q, col], k) => {
+          const x = gx[k];
+          for (let j = 0; j < n; j++) tree(g, x + (j - (n - 1) / 2) * 22, 70, 13, col);
+          g.text(x, 384, nm, { size: 15, color: C.ink, align: 'center' });
+          vals.forEach((v, j) => {
+            const a = fade(t, 0.8 + j * 0.25);
+            alphaDo(g, a, () => g.circle(x + (j - (n - 1) / 2) * 16, Y(v), 7, col, '#0b1111', 1.5));
+          });
+          // 平均與 95% 區間(在對數尺度算)
+          alphaDo(g, fade(t, 2.4), () => {
+            const se = Math.sqrt((1 / q + alphaTrend(q)) / n), lo = q * Math.exp(-1.96 * se), hi = q * Math.exp(1.96 * se);
+            g.line(x - 36, Y(q), x + 36, Y(q), C.ink, 2.5);
+            g.line(x + 46, Y(lo), x + 46, Y(Math.min(hi, 800)), C.ink2, 2);
+            g.line(x + 41, Y(lo), x + 51, Y(lo), C.ink2, 2); if (hi <= 800) g.line(x + 41, Y(hi), x + 51, Y(hi), C.ink2, 2);
+          });
+        });
+      });
+      alphaDo(g, fade(t, 3), () => {
+        g.text(24, 418, `每組 ${n} 棵樹:log₂FC = ${e.lfc.toFixed(2)},標準誤 ${(e.se).toFixed(2)}`, { size: 15 });
+        const sig = e.p < 0.05, ps = `p = ${fmtP(e.p)}`;
+        g.text(24, 448, ps, { size: 20, weight: 800, color: sig ? C.mint : C.amber });
+        g.text(24 + textW(g, ps, 20, 800) + 14, 448, sig ? '小於 0.05' : '大於 0.05,看不出差異', { size: 14, color: C.ink2 });
+        g.text(24, 474, '線:平均;豎線:95% 範圍', { size: 13, color: C.muted });
+      });
+      // 右:平均與變異數
+      const ra = fade(t, 4.5);
+      const X = (v) => 520 + ((v - 0.5) / 4) * 400, YV = (v) => 330 - ((v - 0) / 8.5) * 270;
+      alphaDo(g, ra, () => {
+        g.text(480, 26, `4,000 個基因在對照組的平均與變異數(${n} 重複)`, { size: 15, weight: 700, color: C.ink2, max: 460 });
+        axisX(g, 520, 920, 330, [[1, '10'], [2, '10²'], [3, '10³'], [4, '10⁴']], X, '平均計數(對數)');
+        axisY(g, 520, 330, 60, [[0, '1'], [2, '10²'], [4, '10⁴'], [6, '10⁶'], [8, '10⁸']], YV);
+        yTitle(g, 474, 195, '變異數(對數)');
+        const ctx = g.ctx; ctx.fillStyle = 'rgba(185,199,192,.42)';
+        D.res.forEach((r) => {
+          const m = mean(r.na), v = r.na.reduce((s, x) => s + (x - m) ** 2, 0) / (n - 1);
+          if (m < 3 || v <= 0) return;
+          const lx = Math.log10(m), ly = Math.log10(v);
+          if (lx < 0.5 || lx > 4.5 || ly < 0 || ly > 8.5) return;
+          ctx.fillRect(X(lx) - 1.2, YV(ly) - 1.2, 2.4, 2.4);
+        });
+        g.line(X(0.5), YV(0.5), X(4.5), YV(4.5), C.blue, 2, [6, 4]);
+        const pts = []; for (let lx = 0.5; lx <= 4.5; lx += 0.05) { const mu = 10 ** lx; pts.push([X(lx), YV(Math.log10(mu + alphaTrend(mu) * mu * mu))]); }
+        g.curve(pts, C.mint, 2.6);
+        g.tag(X(3.55), YV(3.55) + 22, '卜瓦松:變異數 = 平均', { size: 13, color: C.blue });
+        g.tag(X(2.6), YV(Math.log10(10 ** 2.6 + alphaTrend(10 ** 2.6) * 10 ** 5.2)) - 26, '負二項:μ + αμ²', { size: 13, color: C.mint });
+      });
+      // 下:CV² 拆成兩項
+      alphaDo(g, fade(t, 9.5), () => {
+        g.panel(470, 392, 470, 136, '');
+        g.text(486, 416, 'CV² = 1/μ + α(以 α = 0.1 為例)', { size: 16, weight: 700 });
+        [10, 100, 1000].forEach((mu, k) => {
+          const y = 448 + k * 26, tech = 1 / mu, bio = 0.1, sc = 800;
+          g.text(486, y, `μ = ${fmt(mu)}`, { size: 13, mono: true, color: C.ink2 });
+          g.rrect(590, y - 9, tech * sc, 18, 2, C.blue);
+          g.rrect(590 + tech * sc, y - 9, bio * sc, 18, 2, C.mint);
+          if (k === 0) { g.text(590 + (tech * sc) / 2, y, '定序', { size: 13, weight: 700, color: '#0b1111', align: 'center' }); g.text(590 + tech * sc + (bio * sc) / 2, y, '個體', { size: 13, weight: 700, color: '#0b1111', align: 'center' }); }
+          g.text(590 + (tech + bio) * sc + 10, y, `${fmt(tech, tech < 0.01 ? 3 : 2)} + 0.1`, { size: 13, mono: true, color: C.ink2 });
+        });
+      });
+    },
+  },
+  {
+    key: 'de-test', name: '差異表現:多重檢定與火山圖', dur: 18,
+    cues: [[0, '每個基因各做一次檢定:比較兩組的 log₂ 倍數變化(log₂FC)和它的標準誤,得到 p 值。'],
+      [4, '4,000 個基因一起檢定,就算全都沒變,p < 0.05 也會碰巧冒出約 200 個。要控制選出來的裡面假的占多少,叫偽發現率(FDR)。'],
+      [9, 'Benjamini–Hochberg:p 值由小排到大,第 i 個和 (i/m)·q 比,找出最後一個在線下的,它和前面的全部算顯著。'],
+      [13.5, '火山圖橫軸是 log₂FC、縱軸是 −log₁₀(校正後 p);兩個上角是變化大又顯著的基因。右邊可以改門檻與重複數。']],
+    draw(g, t, S) {
+      const n = S.rep, D = DE.at(n), q = S.fdr, fc = S.fc, ctx = g.ctx, G = DE.genes, m = D.res.length;
+      // ---- 左:p 值的分布,之後換成 BH 的排序圖 ----
+      const histA = 1 - ease(seg(t, 8.8, 9.4)), bhA = ease(seg(t, 9.2, 9.8));
+      const PX0 = 70, PX1 = 430, PY0 = 360, PY1 = 70;
+      alphaDo(g, histA, () => {
+        g.text(24, 26, '4,000 個基因的 p 值', { size: 15, weight: 700, color: C.ink2 });
+        const bins = Array.from({ length: 20 }, () => [0, 0]);
+        D.res.forEach((r, i) => { bins[Math.min(19, Math.floor(r.p * 20))][G[i].de ? 1 : 0]++; });
+        const mx = Math.max(...bins.map((b) => b[0] + b[1]));
+        const BX = (p) => PX0 + p * (PX1 - PX0), BY = (c) => PY0 - (c / mx) * (PY0 - PY1);
+        const grow = ease(seg(t, 0.4, 2.4));
+        bins.forEach(([nul, de], b) => {
+          const x = BX(b / 20) + 1, w = (PX1 - PX0) / 20 - 2;
+          g.rrect(x, BY(nul * grow), w, PY0 - BY(nul * grow), 1, rgba(C.ink2, 0.55));
+          if (de) g.rrect(x, BY((nul + de) * grow), w, BY(nul * grow) - BY((nul + de) * grow), 1, C.mint);
+        });
+        axisX(g, PX0, PX1, PY0, [[0, '0'], [0.25, '0.25'], [0.5, '0.5'], [0.75, '0.75'], [1, '1']], BX, 'p 值');
+        g.rrect(250, 96, 12, 12, 3, C.mint); g.text(268, 102, '真的有差異(模擬時知道)', { size: 13, color: C.ink2 });
+        g.rrect(250, 120, 12, 12, 3, rgba(C.ink2, 0.55)); g.text(268, 126, '沒有差異:平均攤開', { size: 13, color: C.ink2 });
+        alphaDo(g, fade(t, 4), () => {
+          g.line(BX(0.05), PY1 - 6, BX(0.05), PY0, C.amber, 2, [6, 4]);
+          g.tag(BX(0.05) + 4, PY1 - 14, 'p = 0.05', { size: 13, color: C.amber, align: 'left' });
+        });
+      });
+      const kStar = bhK(D.sorted, q);
+      alphaDo(g, bhA, () => {
+        const XN = Math.max(40, Math.ceil((kStar * 1.8) / 10) * 10), ymax = (q * XN) / m;
+        const RX = (i) => PX0 + (i / XN) * (PX1 - PX0), RY = (p) => PY0 - (Math.min(p, ymax * 1.06) / ymax) * (PY0 - PY1);
+        const ex = Math.floor(Math.log10(ymax)), unit = 10 ** ex; // 縱軸的單位,例如 10⁻³
+        g.text(24, 26, `p 值由小排到大(前 ${XN} 名)`, { size: 15, weight: 700, color: C.ink2 });
+        axisX(g, PX0, PX1, PY0, [0, 0.5, 1].map((f) => [f * XN, String(Math.round(f * XN))]), RX, '名次 i');
+        axisY(g, PX0, PY0, PY1 - 4, [[0, '0'], [ymax / 2, (ymax / 2 / unit).toFixed(1)], [ymax, (ymax / unit).toFixed(1)]], RY);
+        yTitle(g, 26, 215, `p 值(× 10${sup(ex)})`);
+        const lineK = seg(t, 9.6, 11);
+        g.line(RX(0), RY(0), lerp(RX(0), RX(XN), lineK), lerp(RY(0), RY(ymax), lineK), C.amber, 2);
+        g.tag(RX(XN * 0.62), RY(ymax * 0.62) - 22, '(i/m)·q', { size: 14, color: C.amber });
+        const show = Math.floor(seg(t, 9.8, 12) * XN);
+        for (let i = 1; i <= Math.min(XN, show); i++) {
+          const p = D.sorted[i - 1], inK = i <= kStar;
+          g.circle(RX(i), RY(p), 2.8, inK ? C.mint : rgba(C.ink2, 0.7));
+        }
+        alphaDo(g, fade(t, 12), () => {
+          g.line(RX(kStar), PY1, RX(kStar), PY0, C.mint, 1.6, [4, 4]);
+          g.tag(RX(kStar), PY1 - 14, `最後一個在線下:第 ${kStar} 名`, { size: 13, color: C.mint });
+        });
+      });
+      // ---- 右:火山圖 ----
+      const VX0 = 520, VX1 = 920, VY0 = 360, VY1 = 60, LM = 5, YM = 16;
+      const VX = (v) => VX0 + ((clamp(v, -LM, LM) + LM) / (2 * LM)) * (VX1 - VX0), VY = (v) => VY0 - (Math.min(v, YM) / YM) * (VY0 - VY1);
+      const morph = ease(seg(t, 9.4, 11));
+      const cat = t >= 13.5;
+      g.text(480, 26, morph < 0.5 ? '火山圖(縱軸先用未校正的 p)' : '火山圖', { size: 15, weight: 700, color: C.ink2 });
+      axisX(g, VX0, VX1, VY0, [[-4, '−4'], [-2, '−2'], [0, '0'], [2, '2'], [4, '4']], VX, 'log₂FC(處理 ÷ 對照)');
+      axisY(g, VX0, VY0, VY1, [[0, '0'], [5, '5'], [10, '10'], [15, '15']], VY);
+      yTitle(g, 486, 210, morph < 0.5 ? '−log₁₀(p)' : '−log₁₀(校正後 p)');
+      let up = 0, dn = 0;
+      D.res.forEach((r) => {
+        const yv = lerp(-Math.log10(Math.max(r.p, 1e-300)), -Math.log10(Math.max(r.padj, 1e-300)), morph);
+        let col = 'rgba(185,199,192,.35)';
+        if (cat) {
+          if (r.padj < q && r.lfc >= fc) { col = C.mint; up++; } else if (r.padj < q && r.lfc <= -fc) { col = C.blue; dn++; }
+        } else if (t >= 9.4 ? r.padj < q : t >= 4 && r.p < 0.05) col = t >= 9.4 ? rgba(C.mint, 0.8) : rgba(C.amber, 0.8);
+        ctx.fillStyle = col;
+        const x = VX(r.lfc), y = VY(yv);
+        if (yv > YM) { ctx.beginPath(); ctx.moveTo(x, VY1 - 6); ctx.lineTo(x - 3, VY1); ctx.lineTo(x + 3, VY1); ctx.fill(); } else ctx.fillRect(x - 1.6, y - 1.6, 3.2, 3.2);
+      });
+      if (t >= 4 && t < 9.4) { g.line(VX0, VY(-Math.log10(0.05)), VX1, VY(-Math.log10(0.05)), C.amber, 1.6, [6, 4]); g.text(VX1, VY(-Math.log10(0.05)) - 10, 'p = 0.05', { size: 13, color: C.amber, align: 'right' }); }
+      if (t >= 9.4) {
+        g.line(VX0, VY(-Math.log10(q)), VX1, VY(-Math.log10(q)), C.mint, 1.6, [6, 4]);
+        g.text(VX1, VY(-Math.log10(q)) - 10, `校正後 p = ${q}`, { size: 13, color: C.mint, align: 'right' });
+      }
+      if (cat) {
+        for (const s of [-1, 1]) g.line(VX(s * fc), VY0, VX(s * fc), VY1, C.ink2, 1.4, [4, 4]);
+        g.tag(VX1 - 4, VY1 + 28, `上調 ${up} ↑`, { size: 14, color: C.mint, align: 'right' });
+        g.tag(VX0 + 6, VY1 + 28, `下調 ${dn} ↓`, { size: 14, color: C.blue, align: 'left' });
+      }
+      // ---- 下:計數 ----
+      let rawN = 0, rawF = 0, bhN = 0, bhF = 0;
+      D.res.forEach((r, i) => { if (r.p < 0.05) { rawN++; if (!G[i].de) rawF++; } if (r.padj < q) { bhN++; if (!G[i].de) bhF++; } });
+      alphaDo(g, fade(t, 4.4), () => g.text(24, 440, `只看 p < 0.05:選出 ${rawN} 個,其中 ${rawF} 個其實沒有差異(${Math.round((100 * rawF) / rawN)}%)`, { size: 15, color: C.amber, max: 912 }));
+      alphaDo(g, fade(t, 12.2), () => g.text(24, 470, `BH 校正、FDR < ${q}:選出 ${bhN} 個,其中 ${bhF} 個沒有差異(${((100 * bhF) / Math.max(1, bhN)).toFixed(1)}%)`, { size: 15, weight: 700, color: C.mint, max: 912 }));
+      alphaDo(g, fade(t, 13.6), () => g.text(24, 500, `再加上倍數門檻 ${fcLabel(fc)} 倍:上調 ${up}、下調 ${dn}(每組 ${n} 重複;「其實沒有差異」是模擬時才知道的答案)`, { size: 13, color: C.ink2, max: 912 }));
+    },
+  },
+  {
+    key: 'candidates', name: '從候選名單到萜類合成酶', dur: 18,
+    cues: [[0, '先用 BLAST 找和已知萜類合成酶相似的序列。E 值是在這麼大的資料庫裡,碰巧得到這麼高分的預期次數,越小越可信。'],
+      [4.5, '再看 Pfam 結構域:N 端結構域(PF01397)與金屬結合結構域(PF03936),後者有抓住鎂離子的 DDxxD;讀框要完整才能選殖。'],
+      [9.5, '最後看表現量:處理後上升,而且在 12 棵樹裡和單萜含量一起變。右邊可以換候選 A、B、C。'],
+      [13.5, '序列像不代表知道產物:接著選殖、在大腸桿菌表現、加 GPP 反應、用 GC-MS 確認產物,再用 qPCR 確認表現量。']],
+    draw(g, t, S) {
+      const n = S.rep, D = DE.at(n), q = S.fdr, fc = S.fc, G = DE.genes;
+      // 左:一關一關篩
+      const tps = DE.tps.map((gi) => ({ gi, g: G[gi], r: D.res[gi] }));
+      const both = tps.filter((x) => x.g.dom === 'both'), comp = both.filter((x) => x.g.orf === 'complete');
+      const up = comp.filter((x) => x.r.padj < q && x.r.lfc >= fc), cor = up.filter((x) => DE.rOf(x.gi) >= 0.8);
+      const rows = [['組出的基因(模擬)', DE.M, 0.2], ['BLAST 像萜類合成酶', tps.length, 1.4], ['兩個結構域都有', both.length, 5], ['讀框完整', comp.length, 7.5], ['處理後上升', up.length, 10], ['和單萜含量相關', cor.length, 11.5]];
+      g.text(24, 26, '一關一關篩', { size: 15, weight: 700, color: C.ink2 });
+      rows.forEach(([lab, c, at], k) => {
+        alphaDo(g, fade(t, at), () => {
+          const y = 66 + k * 64, w = 20 + (Math.log10(c + 1) / Math.log10(DE.M + 1)) * 240;
+          g.text(24, y, lab, { size: 14, color: C.ink2 });
+          g.rrect(24, y + 12, w, 16, 4, k === rows.length - 1 ? C.mint : rgba(C.mint, 0.35 + k * 0.08));
+          g.text(24 + w + 8, y + 20, fmt(c), { size: 16, weight: 700, mono: true, color: k === rows.length - 1 ? C.mint : C.ink });
+        });
+      });
+      alphaDo(g, fade(t, 10), () => g.text(24, 458, `(校正後 p < ${q}、${fcLabel(fc)} 倍以上;r ≥ 0.8)`, { size: 13, color: C.muted }));
+      // 右上:蛋白質的地圖(參考:大冷杉 pinene 合成酶,UniProt O24475)
+      const AX = (aa) => 400 + (aa / 650) * 520;
+      const cand = S.cand, cg = cand === 'A' ? tps[0] : cand === 'B' ? tps[19] : { gi: DE.P450, g: G[DE.P450], r: D.res[DE.P450] };
+      alphaDo(g, fade(t, 0.6), () => {
+        g.text(380, 26, `候選 ${cand}`, { size: 16, weight: 800, color: C.mint });
+        const blast = cand === 'C' ? ['細胞色素 P450', 'E = 2 × 10⁻⁸⁷'] : cand === 'A' ? ['冷杉的 pinene 合成酶', 'E = 0.0'] : ['冷杉的 pinene 合成酶', 'E = 3 × 10⁻¹¹²'];
+        g.text(470, 26, `BLAST 最像:${blast[0]},${blast[1]}`, { size: 14, color: C.ink, max: 460 });
+        g.text(470, 48, cand === 'B' ? '只像後半段(前段沒有拼出來)' : '整條都對得上', { size: 13, color: C.muted });
+      });
+      alphaDo(g, fade(t, 4.6), () => {
+        const lane = (y, len, parts, label, opt = {}) => {
+          g.text(380, y - 22, label, { size: 13, color: C.ink2, max: 550 });
+          if (opt.missing) {
+            g.ctx.save(); g.ctx.setLineDash([4, 4]); g.rrect(AX(0), y - 7, AX(opt.missing) - AX(0), 14, 4, null, C.muted, 1.2); g.ctx.restore();
+            g.text((AX(0) + AX(opt.missing)) / 2, y, '沒拼出來', { size: 13, color: C.muted, align: 'center' });
+          }
+          g.rrect(AX(opt.start || 0), y - 7, AX(len) - AX(opt.start || 0), 14, 4, 'rgba(213,221,217,.18)', C.ink2, 1.2);
+          for (const [a, b, col] of parts) g.rrect(AX(a), y - 9, AX(b) - AX(a), 18, 4, col);
+          if (opt.dd) { g.line(AX(opt.dd), y - 14, AX(opt.dd), y + 12, C.amber, 2.4); g.text(AX(opt.dd) + 6, y + 20, 'DDxxD', { size: 13, weight: 700, color: C.amber }); }
+        };
+        lane(96, 628, [[1, 36, '#8f8263'], [74, 265, C.lav], [332, 566, C.mint]], '參考:大冷杉 pinene 合成酶(UniProt O24475,628 個胺基酸)', { dd: 379 });
+        if (cand === 'A') lane(170, 612, [[1, 34, '#8f8263'], [70, 258, C.lav], [322, 556, C.mint]], '候選 A:612 個胺基酸,有起始也有終止', { dd: 370 });
+        if (cand === 'B') lane(170, 628, [[230, 258, C.lav], [322, 556, C.mint]], '候選 B:前段沒有拼出來(沒有起始密碼子),只有 398 個', { dd: 370, start: 230, missing: 230 });
+        if (cand === 'C') lane(170, 512, [[40, 490, C.blue]], '候選 C:512 個胺基酸,結構域是 P450(PF00067)');
+        g.rrect(380, 210, 12, 12, 3, C.lav); g.text(397, 216, 'N 端結構域 PF01397', { size: 13, color: C.ink2 });
+        g.rrect(560, 210, 12, 12, 3, C.mint); g.text(577, 216, '金屬結合 PF03936', { size: 13, color: C.ink2 });
+        g.rrect(740, 210, 12, 12, 3, '#8f8263'); g.text(757, 216, '送進質體的轉運胜肽', { size: 13, color: C.ink2 });
+      });
+      // 右下:表現量
+      alphaDo(g, fade(t, 9.5), () => {
+        const r = cg.r;
+        g.panel(370, 234, 570, 294, '');
+        g.text(386, 256, `處理 ÷ 對照(每組 ${n} 重複):log₂FC ${r.lfc.toFixed(2)},校正後 p ${fmtP(r.padj)}`, { size: 14, color: r.padj < q && r.lfc >= fc ? C.mint : C.amber, max: 540 });
+        // 12 棵樹的散布圖
+        const ex = DE.trees.get(cg.gi), ct = DE.content, rr = DE.rOf(cg.gi);
+        const SX = (v) => 440 + ((Math.log2(v) - 0) / 3.2) * 260, SY = (v) => 476 - ((Math.log2(v) - Math.log2(cg.g.q) + 2.6) / 5.2) * 170;
+        axisX(g, 440, 700, 476, [[1, '1'], [2, '2'], [4, '4'], [8, '8']], SX, '單萜含量(mg/g,對數)');
+        axisY(g, 440, 476, 300, [], SY);
+        yTitle(g, 420, 388, '表現量(對數)');
+        const lx = ct.map(Math.log2), ly = ex.map(Math.log2), mx = mean(lx), my = mean(ly);
+        const b1 = lx.reduce((s, v, i) => s + (v - mx) * (ly[i] - my), 0) / lx.reduce((s, v) => s + (v - mx) ** 2, 0);
+        const fx = (v) => 2 ** (my + b1 * (Math.log2(v) - mx));
+        g.line(SX(1.2), SY(fx(1.2)), SX(8.5), SY(fx(8.5)), rgba(C.mint, 0.6), 2);
+        ct.forEach((c, i) => g.circle(SX(c), SY(clamp(ex[i], 2 ** (Math.log2(cg.g.q) - 2.5), 2 ** (Math.log2(cg.g.q) + 2.5))), 5.5, C.mint, '#0b1111', 1.2));
+        g.text(570, 286, `12 棵樹:r = ${rr.toFixed(2)}`, { size: 16, weight: 700, color: rr >= 0.8 ? C.mint : C.amber, align: 'center' });
+        // 檢查表
+        const ok = [['BLAST', cand !== 'C'], ['兩個結構域', cand !== 'C'], ['讀框完整', cand === 'A'], ['處理後上升', r.padj < q && r.lfc >= fc], ['和含量相關', rr >= 0.8]];
+        ok.forEach(([s, v], k) => {
+          const y = 296 + k * 30;
+          g.text(730, y, v ? '✓' : '✗', { size: 17, weight: 800, color: v ? C.mint : C.red });
+          g.text(756, y, s, { size: 14, color: v ? C.ink : C.muted });
+        });
+      });
+      alphaDo(g, fade(t, 13.5), () => {
+        const v = cand === 'A' ? ['五關都過', '優先選殖、做酵素反應', C.mint] : cand === 'B' ? ['讀框不完整', '先用 RACE 補齊 5′ 端', C.amber] : ['不是萜類合成酶', '像是下游修飾萜類的酵素', C.amber];
+        g.text(730, 460, v[0], { size: 16, weight: 800, color: v[2], max: 200 });
+        g.text(730, 488, v[1], { size: 14, color: C.ink, max: 200 });
+      });
+    },
+  },
+];
+
+const L = createLesson({
+  chapters,
+  state: { qcut: 20, splice: true, k: 5, tpsUp: false, boom: 0.4, rep: 3, fdr: 0.05, fc: 1, cand: 'A' },
+  controls: [
+    { id: 'qcut', label: '修剪門檻(4 個鹼基的平均品質)', type: 'seg', options: [15, 20, 30].map((v) => ({ v, label: `Q${v}` })), chapters: ['fastq'], onChange: (v, S) => { S.qTouched = true; } },
+    { id: 'splice', label: '比對方式', type: 'seg', options: [{ v: true, label: '會跨內含子' }, { v: false, label: '不會跨內含子' }], chapters: ['align'], onChange: (v, S) => { S.spTouched = true; } },
+    { id: 'k', label: 'k-mer 的長度 k', type: 'seg', options: [3, 5, 7].map((v) => ({ v, label: `k = ${v}` })), chapters: ['assemble'], onChange: (v, S) => { S.kTouched = true; } },
+    { id: 'tpsUp', label: '處理組的萜類合成酶增加 8 倍', type: 'toggle', chapters: ['tpm'], onChange: (v, S) => { S.tpTouched = true; } },
+    { id: 'boom', label: '處理組裡大量上升的基因占掉的讀數', type: 'seg', options: [{ v: 0, label: '不變' }, { v: 0.2, label: '約 20%' }, { v: 0.4, label: '約 40%' }], chapters: ['size-factor'], onChange: (v, S) => { S.bTouched = true; } },
+    { id: 'rep', label: '每組幾個生物重複', type: 'seg', options: [2, 3, 5].map((v) => ({ v, label: `${v} 個` })), chapters: ['replicates', 'de-test', 'candidates'] },
+    { id: 'fdr', label: 'FDR 門檻(校正後 p 小於)', type: 'seg', options: [0.01, 0.05, 0.1].map((v) => ({ v, label: String(v) })), chapters: ['de-test', 'candidates'] },
+    { id: 'fc', label: '倍數門檻', type: 'seg', options: [{ v: LOG2_15, label: '1.5 倍' }, { v: 1, label: '2 倍' }, { v: 2, label: '4 倍' }], chapters: ['de-test', 'candidates'] },
+    { id: 'cand', label: '看哪一個候選', type: 'seg', options: ['A', 'B', 'C'].map((v) => ({ v, label: `候選 ${v}` })), chapters: ['candidates'] },
+  ],
+});
+</script>
+</body>
+</html>

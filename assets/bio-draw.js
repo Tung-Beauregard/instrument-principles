@@ -174,7 +174,10 @@ export function mix(a, b, k) {
   const [r1, g1, b1] = ch(pa), [r2, g2, b2] = ch(pb);
   return `rgb(${Math.round(lerp(r1, r2, k))},${Math.round(lerp(g1, g2, k))},${Math.round(lerp(b1, b2, k))})`;
 }
-// 可重現的亂數(同一個種子每次畫出來一樣)
+// 可重現的亂數(同一個種子每次畫出來一樣)。
+// 注意:中間那一步是有號位移 `>>`(標準的 xorshift32 是 `>>>`),小的種子或相鄰的種子,開頭幾個數會很接近。
+// 需要彼此獨立的抽樣時,先把種子打散(例如乘上一個大的奇數)並丟掉前 20 個左右(population-genetics、transcriptomics 就是這樣做)。
+// 不改成 `>>>`:各教材的畫面與 MAINTENANCE.md 記下的模擬數字都建立在現在的輸出上。
 export function rng(seed = 1) {
   let s = seed >>> 0 || 1;
   return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };

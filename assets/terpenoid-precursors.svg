@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="植物細胞裡,細胞質與質體各用一條路做出 5 碳積木,質體把積木送到細胞質;右邊是積木接成的三環樹脂酸骨架與一滴松脂">
+  <defs>
+    <linearGradient id="cell" x1="24" y1="30" x2="278" y2="228" gradientUnits="userSpaceOnUse"><stop stop-color="#1f3a2d"/><stop offset="1" stop-color="#11221a"/></linearGradient>
+    <radialGradient id="glow" cx="204" cy="129" r="72" gradientUnits="userSpaceOnUse"><stop stop-color="#a5f3cd" stop-opacity=".16"/><stop offset="1" stop-color="#a5f3cd" stop-opacity="0"/></radialGradient>
+  </defs>
+  <ellipse cx="226" cy="240" rx="196" ry="11" fill="#050e0c" opacity=".45"/>
+  <!-- 植物細胞 -->
+  <rect x="24" y="30" width="254" height="198" rx="34" fill="url(#cell)" stroke="#6f9f86" stroke-width="1.8"/>
+  <rect x="32" y="38" width="238" height="182" rx="27" stroke="#4f8f74" stroke-opacity=".55" stroke-width="1.2"/>
+  <!-- 細胞質:內質網與過氧化體 -->
+  <g stroke="#7fb8ff" stroke-opacity=".5" stroke-width="1.8" stroke-linecap="round"><path d="M64.8 180.2A16 16 0 0 1 78 196M66.2 172.4A24 24 0 0 1 86 196M67.6 164.5A32 32 0 0 1 94 196"/></g>
+  <circle cx="122" cy="64" r="9" stroke="#ffd166" stroke-opacity=".7" stroke-width="1.6"/>
+  <!-- 細胞質裡 MVA 做的 5 碳單位 -->
+  <g stroke="#d5ddd9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M58 122L70 115L82 122L94 115M70 115V101"/></g>
+  <g fill="#7fb8ff"><circle cx="58" cy="122" r="4.6"/><circle cx="70" cy="115" r="4.6"/><circle cx="82" cy="122" r="4.6"/><circle cx="94" cy="115" r="4.6"/><circle cx="70" cy="101" r="4.6"/></g>
+  <!-- 質體 -->
+  <ellipse cx="204" cy="129" rx="58" ry="74" fill="#0b1910" stroke="#a5f3cd" stroke-opacity=".7" stroke-width="1.8"/>
+  <ellipse cx="204" cy="129" rx="52" ry="68" stroke="#4f8f74" stroke-opacity=".6" stroke-width="1.1"/>
+  <circle cx="204" cy="129" r="72" fill="url(#glow)"/>
+  <g fill="#4f9a74" opacity=".6"><rect x="168" y="84" width="20" height="3.4" rx="1.7"/><rect x="168" y="89" width="20" height="3.4" rx="1.7"/><rect x="168" y="94" width="20" height="3.4" rx="1.7"/><rect x="206" y="78" width="20" height="3.4" rx="1.7"/><rect x="206" y="83" width="20" height="3.4" rx="1.7"/><rect x="206" y="88" width="20" height="3.4" rx="1.7"/><rect x="170" y="160" width="20" height="3.4" rx="1.7"/><rect x="170" y="165" width="20" height="3.4" rx="1.7"/><rect x="170" y="170" width="20" height="3.4" rx="1.7"/><rect x="208" y="164" width="20" height="3.4" rx="1.7"/><rect x="208" y="169" width="20" height="3.4" rx="1.7"/><rect x="208" y="174" width="20" height="3.4" rx="1.7"/></g>
+  <!-- 質體裡 MEP 做的 5 碳單位 -->
+  <g stroke="#d5ddd9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M186 136L198 129L210 136L222 129M198 129V115"/></g>
+  <g fill="#a5f3cd"><circle cx="186" cy="136" r="4.6"/><circle cx="198" cy="129" r="4.6"/><circle cx="210" cy="136" r="4.6"/><circle cx="222" cy="129" r="4.6"/><circle cx="198" cy="115" r="4.6"/></g>
+  <!-- 質體把 IPP 送到細胞質 -->
+  <path d="M154 190H112" stroke="#a5f3cd" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round"/>
+  <path d="M117 185L110 190L117 195" stroke="#a5f3cd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="134" cy="190" r="3.6" fill="#a5f3cd"/>
+  <!-- 接成長鏈 -->
+  <g stroke="#d5ddd9" stroke-opacity=".75" stroke-width="1.8" stroke-linecap="round"><path d="M262 129L272 123L282 129L292 123L302 129"/></g>
+  <g fill="#a5f3cd" opacity=".85"><circle cx="262" cy="129" r="3"/><circle cx="272" cy="123" r="3"/><circle cx="282" cy="129" r="3"/><circle cx="292" cy="123" r="3"/><circle cx="302" cy="129" r="3"/></g>
+  <!-- 右:三環的樹脂酸骨架(18 號碳是琥珀色的點) -->
+  <g stroke="#d5ddd9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M330.6 111L315.8 119.5L315.8 136.5L330.6 145L345.3 136.5L345.3 119.5Z"/>
+    <path d="M345.3 136.5L360 145L374.7 136.5L374.7 119.5L360 111L345.3 119.5"/>
+    <path d="M360 111L360 94L374.7 85.5L389.4 94L389.4 111L374.7 119.5"/>
+    <path d="M389.4 94L404.2 85.5L418.9 94M404.2 85.5L404.2 68.5M330.6 145L339.1 159.7M330.6 145L322.1 159.7M345.3 119.5L345.3 108.5"/>
+  </g>
+  <g stroke="#a5f3cd" stroke-width="2.4" stroke-linecap="round"><path d="M370.4 122.2V133.8M385.1 96.6V108.4"/></g>
+  <circle cx="322.1" cy="159.7" r="4.8" fill="#ffd166"/>
+  <!-- 一滴松脂 -->
+  <path d="M398 172Q411 190 411 200A13 13 0 1 1 385 200Q385 190 398 172Z" fill="#ffd166" fill-opacity=".22" stroke="#ffd166" stroke-width="1.6"/>
+</svg>

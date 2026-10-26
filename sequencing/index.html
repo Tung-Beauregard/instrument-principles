@@ -57,6 +57,8 @@
       <li>Illumina 合成定序:片段在流動槽上原地放大成一叢一叢(每叢約 1,000 份);每一輪接上一個帶螢光、可逆終止的核苷酸,拍照後切掉再接下一個(動畫畫成四種螢光;較新的機型用兩種螢光的組合分辨四種鹼基)。一段只讀 50 到 300 個鹼基,但同時讀幾百萬到幾百億條。</li>
       <li>RNA-seq:把 mRNA 反轉錄成 cDNA 再定序,數每個基因被讀到幾次(依基因長度校正),比較不同樣品裡哪些基因比較活躍。</li>
       <li>奈米孔定序:單股 DNA 穿過膜上的蛋白質小孔,孔裡幾個鹼基的組合決定離子電流的大小;DNA 有多長就能讀多長,常見幾萬個鹼基。</li>
+      <li>進階:比對先用一小段完全相同的「種子」查索引找出候選位置,再延伸比較;落在重複序列、放哪裡都一樣好的 read,比對品質 MAPQ(= −10 log<sub>10</sub> 放錯位置的機率)是 0。覆蓋度 c = N × L ÷ G;read 隨機落下時,每個鹼基被蓋到的次數接近 Poisson 分布,沒蓋到的比例約 e<sup>−c</sup>(5× 約 0.7%)。例如火炬松的基因體約 220 億個鹼基,平均要 30× 就得讀 30 × 2.2 × 10<sup>10</sup> ÷ 150 ≈ 44 億條 150 個鹼基的 read。</li>
+      <li>進階:二倍體每個位置有 0/0、0/1、1/1 三種基因型,讀到變異的比例約 0%、50%、100%;用二項分布比較三種基因型讀到這堆 read 的機率,深度低時異型合子常只讀到一邊(4 條全一樣的機率 12.5%)。組裝時比 read 還長的重複序列會讓 contig 斷開;火炬松的基因體八成以上是重複序列,加入長讀長後 contig N50 從 8,206 升到 25,361 個鹼基。N50 只看長度,不代表接得對。</li>
     </ul>
   </div>
   <div class="src">
@@ -67,7 +69,12 @@
       <li>Bentley DR, et al. Accurate whole human genome sequencing using reversible terminator chemistry. Nature. 2008;456:53–59. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2581791/">PMC2581791</a>(橋式放大成叢、四種帶可切除螢光的可逆終止核苷酸、每輪照相後切掉螢光並恢復 3′-OH);Illumina 規格:<a href="https://www.illumina.com/systems/sequencing-platforms/miseq/specifications.html">MiSeq</a>(每片 2,200 萬到 2,500 萬條、最長 2 × 300)、<a href="https://www.illumina.com/systems/sequencing-platforms/novaseq-x-plus/specifications.html">NovaSeq X</a>(25B 每片 260 億到 350 億條)、<a href="https://www.illumina.com/science/technology/next-generation-sequencing/sequencing-technology/2-channel-sbs.html">2-channel SBS</a>(紅、綠兩種螢光:兩種都亮是 A、都不亮是 G)</li>
       <li>Wang Z, et al. RNA-Seq: a revolutionary tool for transcriptomics. Nat Rev Genet. 2009;10(1):57–63. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2949280/">PMC2949280</a>(RNA 轉成接上接頭的 cDNA 片段再定序、對回基因、用讀到的數目估計表現量);Foster AJ, et al. Identification of genes in Thuja plicata foliar terpenoid defenses. Plant Physiol. 2013;161(4):1993–2004. <a href="https://doi.org/10.1104/pp.112.206383">doi:10.1104/pp.112.206383</a>(比較有腺體與沒有腺體的葉子,604 個基因差 10 倍以上,其中一個萜類合成酶做出檜烯)</li>
       <li>Jain M, et al. The Oxford Nanopore MinION: delivery of nanopore sequencing to the genomics community. Genome Biol. 2016;17:239. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5124260/">PMC5124260</a>(馬達蛋白控制單股前進、電流依孔裡 3 到 6 個鹼基的組合改變、例行讀到 50 kb 以上、MinION 重 90 公克);Oxford Nanopore 官方說明:<a href="https://nanoporetech.com/platform/technology">技術</a>(讀長 20 到 4,000,000 個鹼基)、<a href="https://nanoporetech.com/platform/accuracy">準確度</a>(單次讀取 99% 以上)、<a href="https://store.nanoporetech.com/flow-cells.html">流動槽</a>(MinION 512、PromethION 2,675 個通道)</li>
-      <li>動畫裡的序列、片段與叢的數目、ddNTP 比例換成「每個位置停下的機會」與可讀長度的算法、峰的形狀與雜訊、電流的高低、RNA-seq 讀到的次數,以及比較圖中奈米孔「常見幾萬」的範圍,都是示意值,不是某次實驗的實測結果。</li>
+      <li>Lander ES, Waterman MS. Genomic mapping by fingerprinting random clones: a mathematical analysis. Genomics. 1988;2(3):231–239. <a href="https://doi.org/10.1016/0888-7543(88)90007-9">doi:10.1016/0888-7543(88)90007-9</a>(覆蓋度 c = 長度 × 數目 ÷ 基因體長度;隨機放置時島的數目約 N·e<sup>−c</sup>);Illumina 技術說明 <a href="https://www.illumina.com/documents/products/technotes/technote_coverage_calculation.pdf">Estimating Sequencing Coverage</a>(C = LN / G;照 Lander 與 Waterman 的假設,每個鹼基被讀到的次數是 Poisson 分布)</li>
+      <li>Li H, Durbin R. Fast and accurate short read alignment with Burrows–Wheeler transform. Bioinformatics. 2009;25(14):1754–1760. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2705234/">PMC2705234</a>(比對品質是 Phred 尺度的放錯機率;重複的 read 隨機放在一樣好的位置之一);Li H, et al. Genome Res. 2008;18(11):1851–1858. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2577856/">PMC2577856</a>(一樣好的位置隨機挑一個,MAPQ 給 0);Li H. BWA-MEM. <a href="https://arxiv.org/abs/1303.3997">arXiv:1303.3997</a>(先找種子再延伸);<a href="https://samtools.github.io/hts-specs/SAMv1.pdf">SAM 格式規格</a>(MAPQ = −10 log<sub>10</sub> Pr{放錯位置})</li>
+      <li>Nielsen R, et al. Genotype and SNP calling from next-generation sequencing data. Nat Rev Genet. 2011;12(6):443–451. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3593722/">PMC3593722</a>(Phred 20 是 1% 錯誤率;深度低於 5× 時常只讀到兩條染色體中的一條;深度高於 20× 時,用變異比例判讀才好用);Li H. Bioinformatics. 2011;27(21):2987–2993. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3198575/">PMC3198575</a>(基因型概似值的式子)</li>
+      <li>Compeau PEC, et al. How to apply de Bruijn graphs to genome assembly. Nat Biotechnol. 2011;29(11):987–991. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5531759/">PMC5531759</a>(節點是 k − 1 個鹼基、邊是 k-mer;重複序列);Miller JR, et al. Assembly algorithms for next-generation sequencing data. Genomics. 2010;95(6):315–327. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2874646/">PMC2874646</a>(長度 ≥ k 的重複讓路徑匯合,要有 read 從頭跨到尾才分得開;N50 的定義;不同組裝要用同一個總長才能比較)</li>
+      <li>火炬松(<i>Pinus taeda</i>):Zimin A, et al. Genetics. 2014;196(3):875–890. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3948813/">PMC3948813</a>(單一個大配子體的 DNA、約 22 Gb、contig N50 8,206 bp);Neale DB, et al. Genome Biol. 2014;15:R59. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4053751/">PMC4053751</a>(82% 是重複序列);Zimin AV, et al. GigaScience. 2017;6(1):1–4. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5437942/">PMC5437942</a>(原本只用 100 到 250 bp 的短讀長;加入約 12× 的長讀長後 contig N50 升到 25,361 bp)</li>
+      <li>動畫裡的序列、片段與叢的數目、ddNTP 比例換成「每個位置停下的機會」與可讀長度的算法、峰的形狀與雜訊、電流的高低、RNA-seq 讀到的次數、比較圖中奈米孔「常見幾萬」的範圍,以及進階章節的參考序列、read 與索引、覆蓋度的模擬(100 萬個鹼基的環狀基因體、讀長 150、固定亂數種子)、pileup 的 read(每個鹼基都當成 Q20,三種基因型事先當成一樣可能)、de Bruijn 圖的兩段序列、1 Mb 基因體的重複序列組成與「read 要比重複序列長 40 個鹼基以上才跨得過」的規則,都是示意值,不是某次實驗的實測結果。</li>
     </ul>
   </div>
 </section>
@@ -246,6 +253,148 @@ const METH = [
   { id: 'nano', name: '奈米孔', col: C.mint, x: [4, 5], y: [L10(512), L10(2675)], xmax: L10(4e6), rows: [['讀長', '常見幾萬,最長 400 萬'], ['同時讀', '512 到 2,675 個孔'], ['準確度', '單次約 99% 以上'], ['適合', '拼出完整基因體']] },
 ];
 const EXP = { 1: '10', 2: '100', 3: '1千', 4: '1萬', 5: '10萬', 6: '100萬', 7: '1000萬', 9: '10億', 11: '1000億' };
+
+// ---------- 進階 1:比對與覆蓋度 ----------
+// 上半:把 read 放回參考基因體,先用種子(一小段完全相同的序列)查出位置,再往兩邊延伸、逐個比較。序列都是示意。
+const AREF = 'ACGGATCCTAGTGACATGATCCTAGTTC'; // 第 3 到 10 與第 17 到 24 個(從 0 算)是同一段重複序列 GATCCTAG
+const AREP = [3, 17], AREPL = 8, ASK = 4; // 重複序列的起點與長度、種子長度
+const AX0 = 100, AST = 29, AYQ = 40, AY2 = 84, AY1 = 120, AYR = 160; // 參考第一個鹼基的 x 與間距;read 出發的列、read 2 與 read 1 對好後的列、參考的列
+const AREADS = [{ seq: 'AGTGACGT', seed: 2 }, { seq: 'GATCCTAG', seed: 2 }]; // read 1 只對得上一處(第 7 個鹼基和參考不同);read 2 整條落在重複序列裡
+const ax = (i) => AX0 + i * AST;
+// 種子在參考上出現的每個位置,換成 read 對齊的起點
+const ahits = (r) => { const s = r.seq.slice(r.seed, r.seed + ASK), out = []; for (let i = 0; i + ASK <= AREF.length; i++) if (AREF.slice(i, i + ASK) === s) out.push(i - r.seed); return out; };
+const AORD = [2, 3, 4, 5, 1, 6, 0, 7]; // 比較的順序:先是種子,再往兩邊
+const ASTEPS = ['① 事先把參考建成索引', '② 用種子查出候選位置', '③ 延伸,逐個鹼基比較', '④ 唯一的位置 MAPQ 高,多處一樣好給 0'];
+// 索引(畫出其中 4 種):每 4 個鹼基在參考上出現的位置。實際的比對軟體(例如 BWA)用的是另一種壓縮過的索引,這裡只畫概念
+const AIDX = ['ACGG', 'GATC', 'TCCT', 'TGAC'].map((sq) => { const at = []; for (let i = 0; i + ASK <= AREF.length; i++) if (AREF.slice(i, i + ASK) === sq) at.push(i); return [sq, at]; });
+function aRead(g, seq, p, y, alpha) { for (let j = 0; j < seq.length; j++) box(g, ax(p + j), y, seq[j], { w: 22, h: 22, alpha }); }
+function aMarks(g, seq, p, y, n) { // 前 n 個比較過的鹼基:相同畫綠點,不同畫紅叉
+  for (const j of AORD.slice(0, n)) {
+    if (seq[j] === AREF[p + j]) g.circle(ax(p + j), y, 3.5, C.mint);
+    else g.text(ax(p + j), y, '×', { size: 18, weight: 800, color: C.red, align: 'center' });
+  }
+}
+// 下半:覆蓋度的模擬。G = 100 萬 bp 的環狀基因體(沒有頭尾,每個位置被蓋到的機會一樣),read 長 150 bp,
+// 起點均勻隨機(固定種子),N = c × G ÷ L。統計整段;覆蓋度圖只畫最前面的 10 萬 bp(500 px,每 px 200 bp)。
+const CVG = 1000000, CVL = 150, CVW = 100000, CVPX = 500;
+const CVY = { 1: [8, [0, 2, 4, 6, 8]], 5: [20, [0, 5, 10, 15, 20]], 30: [60, [0, 20, 40, 60]], 100: [160, [0, 50, 100, 150]] }; // 覆蓋度圖的縱軸
+const CVH = { 1: [0, 6, [0, 2, 4, 6]], 5: [0, 15, [0, 5, 10, 15]], 30: [8, 52, [10, 30, 50]], 100: [60, 140, [60, 100, 140]] }; // 直方圖的範圍與刻度
+const cvCache = new Map();
+function cvSim(c) { // 每種深度算一次
+  if (cvCache.has(c)) return cvCache.get(c);
+  const R = rng(9100 + c), n = Math.round((c * CVG) / CVL), st = new Int32Array(n);
+  for (let i = 0; i < n; i++) st[i] = Math.floor(R() * CVG);
+  const d = new Int32Array(CVG + 1); // 差分陣列,之後改存每個位置的覆蓋度
+  for (let i = 0; i < n; i++) { const s = st[i], e = s + CVL; d[s]++; if (e <= CVG) d[e]--; else { d[CVG]--; d[0]++; d[e - CVG]--; } }
+  let run = 0, zero = 0, gaps = 0, max = 0;
+  for (let p = 0; p < CVG; p++) { run += d[p]; d[p] = run; if (run > max) max = run; }
+  const hist = new Float64Array(max + 1);
+  for (let p = 0; p < CVG; p++) { const v = d[p]; hist[v]++; if (v === 0) { zero++; if (d[(p + CVG - 1) % CVG] !== 0) gaps++; } }
+  if (zero === CVG) gaps = 1;
+  for (let v = 0; v <= max; v++) hist[v] /= CVG;
+  const wi = [], ws = []; // 蓋到前 10 萬 bp 的 read:落下的順序與在這一段的起點(跨過終點接回來的是負的)
+  for (let i = 0; i < n; i++) { const s = st[i]; if (s < CVW) { wi.push(i); ws.push(s); } else if (s + CVL > CVG) { wi.push(i); ws.push(s - CVG); } }
+  const r = { n, c: (n * CVL) / CVG, zero, gaps, hist, wi: Int32Array.from(wi), ws: Int32Array.from(ws) };
+  cvCache.set(c, r);
+  return r;
+}
+const cvBuf = new Int32Array(CVW + 1);
+let cvLast = null;
+function cvWin(sim, k) { // 前 k 條 read 落下後,畫面那 10 萬 bp 每 px 的最小、平均、最大覆蓋度
+  const key = `${sim.c}|${k}`;
+  if (cvLast && cvLast.key === key) return cvLast;
+  cvBuf.fill(0);
+  for (let j = 0; j < sim.wi.length && sim.wi[j] < k; j++) { cvBuf[Math.max(0, sim.ws[j])]++; cvBuf[Math.min(CVW, sim.ws[j] + CVL)]--; }
+  const mn = new Float32Array(CVPX), mx = new Float32Array(CVPX), mean = new Float32Array(CVPX);
+  let run = 0, zeros = 0;
+  for (let px = 0; px < CVPX; px++) {
+    const a = (px * CVW) / CVPX, b = ((px + 1) * CVW) / CVPX;
+    let lo = Infinity, hi = 0, sum = 0;
+    for (let p = a; p < b; p++) { run += cvBuf[p]; if (run < lo) lo = run; if (run > hi) hi = run; sum += run; }
+    mn[px] = lo; mx[px] = hi; mean[px] = sum / (b - a); if (lo === 0) zeros++;
+  }
+  cvLast = { key, mn, mx, mean, zeros };
+  return cvLast;
+}
+const cvPois = (k, c) => { let l = -c + k * Math.log(c); for (let i = 2; i <= k; i++) l -= Math.log(i); return Math.exp(l); };
+const supN = (n) => String(n).replace(/[-0-9]/g, (d) => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'[d === '-' ? 0 : Number(d) + 1]);
+const fmtFrac = (p) => { if (p === 0) return '0'; if (p >= 0.0995) return `${(p * 100).toFixed(1)}%`; if (p >= 0.001) return `${(p * 100).toFixed(2)}%`; const e = Math.floor(Math.log10(p)); return `${(p / 10 ** e).toFixed(1)}×10${supN(e)}`; };
+
+// ---------- 進階 2:變異判讀 ----------
+// 一個位置疊起來的 read(pileup)。每個鹼基的錯誤率都當成 1%(Q20);只考慮參考 C 與變異 T 兩種(二倍體、兩種等位基因)。
+const VREF = 'AGTCCTGCAGTTACG', VSITE = 7, VALT = 'T', VEPS = 0.01; // 參考的一小段(示意),第 8 個鹼基 C 是要判讀的位置
+const VX0 = 70, VST = 26, VGT = ['0/0', '0/1', '1/1'], VGTN = ['和參考相同', '異型合子', '同型變異'], VCOL = [C.blue, C.mint, C.amber];
+const vBin = (n, k) => { let r = 1; for (let i = 1; i <= k; i++) r = (r * (n - k + i)) / i; return r; };
+const vpT = (g) => (g === 0 ? VEPS : g === 1 ? 0.5 : 1 - VEPS); // 基因型有 g 份 T 時,一條 read 讀到 T 的機會(Li 2011 的式子,m = 2)
+const vPost = (a, d) => { const l = [0, 1, 2].map((g) => vpT(g) ** a * (1 - vpT(g)) ** (d - a)), s = l[0] + l[1] + l[2]; return l.map((x) => x / s); }; // 三種基因型事先機會相同
+const vCall = (a, d) => { const p = vPost(a, d); return p.indexOf(Math.max(...p)); };
+const vPmf = (g, d) => Array.from({ length: d + 1 }, (_, a) => vBin(d, a) * vpT(g) ** a * (1 - vpT(g)) ** (d - a)); // 讀到 a 條 T 的機率(二項分布)
+const vRight = (g, d) => vPmf(g, d).reduce((s, v, a) => s + (vCall(a, d) === g ? v : 0), 0);
+const fmtPct = (p) => (p >= 0.99995 ? '> 99.99%' : p < 0.00005 ? '< 0.01%' : `${(p * 100).toFixed(p >= 0.999 || p < 0.001 ? 2 : 1)}%`);
+const vCache = new Map();
+function vPile(g, d, seed) { // 依真實基因型抽 d 條蓋到這個位置的 read(固定種子;「重新抽一組 read」換種子)
+  const key = `${g}|${d}|${seed}`;
+  if (vCache.has(key)) return vCache.get(key);
+  const R = rng(4242 + seed * 131 + d * 17 + g * 7), reads = [];
+  for (let i = 0; i < d; i++) {
+    const s = -4 + Math.floor(R() * 12), from = Math.max(0, s), to = Math.min(VREF.length - 1, s + 11);
+    const alt = g === 2 || (g === 1 && R() < 0.5);
+    const bases = [];
+    for (let j = from; j <= to; j++) {
+      let b = j === VSITE && alt ? VALT : VREF[j];
+      if (R() < VEPS) b = j === VSITE ? (b === VALT ? VREF[j] : VALT) : 'ACGT'.replace(VREF[j], '')[Math.floor(R() * 3)]; // 定序錯誤
+      bases.push(b);
+    }
+    reads.push({ from, to, bases });
+  }
+  reads.sort((p, q) => p.from - q.from || p.to - q.to);
+  const out = { reads, a: reads.filter((r) => r.bases[VSITE - r.from] === VALT).length };
+  vCache.set(key, out);
+  return out;
+}
+
+// ---------- 進階 3:基因體組裝與 N50 ----------
+// 左:de Bruijn 圖的小例子(k = 4,節點是 3 個鹼基)。基因體上兩個地方都有重複序列 ACGTC(第 3 到 7 個,從 0 算),序列是示意。
+const DBS = ['TTGACGTCCAT', 'GGAACGTCTAG'];
+const DBROW = [[0, 0, 0, 1, 1, 1, 0, 0, 0], [2, 2, 2, 1, 1, 1, 2, 2, 2]]; // 第 i 個節點畫在上、中、下哪一列
+const dbX = (i) => 46 + i * 50, dbY = (r) => [142, 184, 226][r], DBSX = (i) => 110 + i * 22;
+// 一段一段的 contig(節點範圍):5 段(沒有 read 跨過重複)或 2 段(有長 read 跨過)
+const DBU5 = [[0, 0, 3, C.blue], [1, 0, 3, C.lav], [0, 3, 5, C.amber], [0, 5, 8, C.hot], [1, 5, 8, C.cold]];
+// 右與下:1 Mb 的基因體(示意),重複序列的長度與位置用固定種子產生;contig 在跨不過的重複序列處斷開
+const GSEG = 1000000, GANC = 20, GRL = [150, 10000, 50000], GDROP = 5000, GX0 = 500, GW = 424;
+const GREPS = (() => {
+  const R = rng(77), out = [];
+  const add = (n, gen) => { for (let i = 0; i < n; i++) out.push(Math.round(gen())); };
+  add(120, () => 30 + R() * 50); // 簡單重複,30 到 80 bp
+  add(80, () => 300 * 20 ** R()); // 中等長度,300 bp 到 6 kb(對數均勻)
+  add(20, () => 7000 + R() * 6000); // 長的,7 到 13 kb
+  out.push(38000, 46000, 72000); // 很長的 3 段
+  for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
+  const rep = out.reduce((s, v) => s + v, 0), w = Array.from({ length: out.length + 1 }, () => -Math.log(1 - R())), ws = w.reduce((s, v) => s + v, 0);
+  let pos = 0;
+  return out.map((len, i) => { pos += Math.round(((GSEG - rep) * w[i]) / ws); const r = { s: pos, len }; pos += len; return r; });
+})();
+const GREPF = GREPS.reduce((s, r) => s + r.len, 0) / GSEG;
+const gBreak = (r, L) => r.len + 2 * GANC > L; // read 要從重複序列前面 20 bp 跨到後面 20 bp 才接得過去
+const gCache = new Map();
+function gContigs(L) { // 依讀長切出的 contig(起點、終點);跨不過的重複序列不放進 contig
+  if (!gCache.has(L)) {
+    const out = []; let from = 0;
+    for (const r of GREPS) if (gBreak(r, L)) { if (r.s > from) out.push({ s: from, e: r.s }); from = r.s + r.len; }
+    if (GSEG > from) out.push({ s: from, e: GSEG });
+    gCache.set(L, out);
+  }
+  return gCache.get(L);
+}
+function gN50(lens) { // 由長到短加總,過總長一半的那一條
+  const s = [...lens].sort((a, b) => b - a), tot = s.reduce((x, v) => x + v, 0);
+  let acc = 0;
+  for (let i = 0; i < s.length; i++) { acc += s[i]; if (acc * 2 >= tot) return { n50: s[i], idx: i, tot }; }
+  return { n50: 0, idx: -1, tot };
+}
+const gx = (pos) => GX0 + (pos / GSEG) * GW;
+const fmtLen = (v) => (v < 1000 ? `${v} bp` : v < 1e6 ? `${(v / 1000).toFixed(v < 1e4 ? 1 : 0)} kb` : `${(v / 1e6).toFixed(2)} Mb`);
+const fmtRL = (L) => (L < 1000 ? `${L} bp` : `${L / 1000} kb`);
 
 const chapters = [
   {
@@ -836,11 +985,354 @@ const chapters = [
       });
     },
   },
+  {
+    key: 'align', name: '進階:比對與覆蓋度', dur: 18,
+    cues: [[0, '把短 read 放回參考基因體叫比對:先拿 read 裡一小段完全相同的「種子」查出可能的位置,再往兩邊延伸、逐個鹼基比較。'],
+      [5, 'read 落在重複序列裡時,放在哪一份都一樣好,比對品質 MAPQ(= −10 log₁₀ 放錯位置的機率)就給得很低,常是 0。'],
+      [9.5, '覆蓋度 c = N × L ÷ G(N 條 read、讀長 L、基因體長 G),是每個鹼基平均被幾條 read 蓋到。'],
+      [13.5, 'read 隨機落下,每個鹼基被蓋到的次數接近 Poisson 分布;一條都沒蓋到的比例約 e^(−c),5× 時約 0.7%。右邊可以改深度。']],
+    enter(S) { S.covTouched = false; cvSim(S.cov); },
+    draw(g, t, S) {
+      const [r1, r2] = AREADS, p1 = ahits(r1)[0], p2s = ahits(r2);
+      // 參考與重複序列
+      g.text(AX0 - 20, AYR, '參考', { size: 14, color: C.ink2, align: 'right' });
+      const ra = ease(seg(t, 5.2, 5.9));
+      if (ra > 0) for (const s0 of AREP) {
+        g.rrect(ax(s0) - 15, AYR - 16, (AREPL - 1) * AST + 30, 32, 6, rgba(C.amber, 0.1 * ra), rgba(C.amber, ra), 1.5);
+        g.text(ax(s0 + (AREPL - 1) / 2), AYR + 30, '重複序列', { size: 13, color: C.amber, align: 'center', alpha: ra });
+      }
+      for (let i = 0; i < AREF.length; i++) box(g, ax(i), AYR, AREF[i], { w: 22, h: 22 });
+      g.text(AX0 - 20, AYQ, 'read', { size: 14, color: C.ink2, align: 'right', alpha: ease(seg(t, 0.4, 1)) * (1 - seg(t, 7.2, 7.7)) });
+      // read 1:種子只出現一次,延伸後只有一個鹼基不同
+      const a1 = ease(seg(t, 0.4, 1)), m1 = ease(seg(t, 2.8, 3.6));
+      if (a1 > 0) {
+        const p = lerp(0, p1, m1), y = lerp(AYQ, AY1, m1);
+        aRead(g, r1.seq, p, y, a1);
+        const sf = ease(seg(t, 1.2, 1.7)) * (1 - 0.7 * seg(t, 5, 5.6));
+        if (sf > 0) g.rrect(ax(p + r1.seed) - 15, y - 15, (ASK - 1) * AST + 30, 30, 6, null, rgba(C.amber, sf), 2.5);
+        if (t > 1.2 && t < 2.9) g.tag(ax(8) + 4, AYQ, '種子:完全相同的一小段', { size: 13, color: C.amber, align: 'left', alpha: Math.min(seg(t, 1.2, 1.6), 1 - seg(t, 2.5, 2.9)) });
+        const la = Math.min(ease(seg(t, 1.9, 2.4)), 1 - seg(t, 3.4, 3.9));
+        if (la > 0) {
+          g.line(ax(r1.seed + 1.5), AYQ + 17, ax(p1 + r1.seed + 1.5), AYR - 18, rgba(C.amber, la), 2, [6, 5]);
+          g.rrect(ax(p1 + r1.seed) - 14, AYR - 14, (ASK - 1) * AST + 28, 28, 5, null, rgba(C.amber, la), 2);
+        }
+        if (t >= 3.6) aMarks(g, r1.seq, p1, (AY1 + AYR) / 2, 4 + Math.min(4, Math.floor((t - 3.6) / 0.3)));
+        if (t > 4.8) g.tag(ax(p1 + 8) - 4, AY1, '只有一處:MAPQ 60', { size: 14, color: C.mint, align: 'left', alpha: seg(t, 4.8, 5.2) });
+      }
+      // read 2:種子在兩個地方都出現,兩處延伸後都完全相同
+      const a2 = ease(seg(t, 5, 5.5)), m2 = ease(seg(t, 6.9, 7.7));
+      if (a2 > 0) {
+        p2s.forEach((p2) => {
+          const p = lerp(0, p2, m2), y = lerp(AYQ, AY2, m2);
+          aRead(g, r2.seq, p, y, a2 * lerp(1, 0.62, m2));
+          const sf = ease(seg(t, 5.6, 6.1)) * (1 - 0.7 * seg(t, 8.6, 9.2));
+          if (sf > 0) g.rrect(ax(p + r2.seed) - 15, y - 15, (ASK - 1) * AST + 30, 30, 6, null, rgba(C.amber, sf), 2.5);
+          const la = Math.min(ease(seg(t, 6.1, 6.6)), 1 - seg(t, 7.4, 7.9));
+          if (la > 0) {
+            g.line(ax(r2.seed + 1.5), AYQ + 17, ax(p2 + r2.seed + 1.5), AYR - 18, rgba(C.amber, la), 2, [6, 5]);
+            g.rrect(ax(p2 + r2.seed) - 14, AYR - 14, (ASK - 1) * AST + 28, 28, 5, null, rgba(C.amber, la), 2);
+          }
+          if (t >= 7.8) aMarks(g, r2.seq, p2, AY2 + 18, 4 + Math.min(4, Math.floor((t - 7.8) / 0.15)));
+        });
+        if (t > 8.6) {
+          const al = seg(t, 8.6, 9);
+          g.tag((ax(p2s[0] + 7) + ax(p2s[1])) / 2, AY2, 'MAPQ 0', { size: 14, color: C.amber, alpha: al });
+          g.text(ax(p2s[1] + 7) + 18, AY2, '放哪裡都一樣好', { size: 13, color: C.amber, alpha: al });
+        }
+      }
+      if (t > 4.6) g.text(940, AYQ, 'MAPQ = −10 log₁₀ P(放錯位置)', { size: 14, color: C.ink2, align: 'right', alpha: seg(t, 4.6, 5.2) });
+      // 下半(前 9 秒):步驟與索引,查索引時那一列反白
+      const ia = S.covTouched ? 0 : ease(seg(t, 0.6, 1.2)) * (1 - ease(seg(t, 8.9, 9.4)));
+      if (ia > 0) {
+        g.ctx.save(); g.ctx.globalAlpha = ia;
+        const stp = t < 1.2 ? 0 : t < 3.6 ? 1 : t < 4.8 ? 2 : t < 5.6 ? 3 : t < 7.7 ? 1 : t < 8.6 ? 2 : 3;
+        g.panel(20, 214, 450, 306, '比對的步驟');
+        ASTEPS.forEach((s, i) => g.text(40, 270 + i * 54, s, { size: 15, weight: i === stp ? 800 : 500, color: i === stp ? C.mint : C.ink2 }));
+        g.panel(484, 214, 456, 306, '索引:參考裡每 4 個鹼基在哪裡');
+        AIDX.forEach(([sq, at], i) => {
+          const y = 266 + i * 44, look = (sq === 'TGAC' && t >= 1.9 && t < 3.6) || (sq === 'TCCT' && t >= 6.1 && t < 7.7);
+          if (look) g.rrect(492, y - 17, 440, 34, 8, 'rgba(255,209,102,.12)', C.amber, 1.5);
+          g.text(502, y, sq, { size: 16, weight: 700, color: look ? C.amber : C.ink, mono: true });
+          for (let c = 0; c < AREF.length; c++) g.rrect(566 + c * 13, y - 7, 11, 14, 2, at.some((p) => c >= p && c < p + ASK) ? (look ? C.amber : C.mint) : 'rgba(255,255,255,.08)');
+        });
+        g.text(502, 266 + 4 * 44, `……共 ${AREF.length - ASK + 1} 段,每段都記下位置`, { size: 13, color: C.muted });
+        g.ctx.restore();
+      }
+      // 下半:覆蓋度
+      const ca = S.covTouched ? 1 : ease(seg(t, 9.3, 10.1));
+      if (ca <= 0) return;
+      g.ctx.save(); g.ctx.globalAlpha = ca;
+      const sim = cvSim(S.cov), [ym, yt] = CVY[S.cov];
+      const land = S.covTouched ? ease((performance.now() - (S.covAt || 0)) / 900) : ease(seg(t, 10.2, 13.2));
+      const k = Math.round(sim.n * land), cNow = (k * CVL) / CVG, done = k >= sim.n, tt = S.covTouched ? performance.now() / 1000 : t;
+      g.panel(20, 204, 586, 324, '');
+      g.text(36, 226, `模擬一段 G = 1,000,000 bp 的基因體(示意),讀長 L = ${CVL} bp`, { size: 13, color: C.muted });
+      g.text(36, 254, `c = N × L ÷ G = ${k.toLocaleString('en-US')} × ${CVL} ÷ 1,000,000 = ${cNow.toFixed(1)}×`, { size: 16, weight: 700, color: C.mint, mono: true, max: 556 });
+      const A = g.axes(84, 286, CVPX, 146, { xmin: 0, xmax: CVW, ymin: 0, ymax: ym, xticks: [0, 50000, 100000], yticks: yt, xlab: '位置(kb;只畫最前面的 100 kb)', ylab: '覆蓋度', fmtX: (v) => String(v / 1000) });
+      const w = cvWin(sim, k), ctx = g.ctx;
+      if (k > 0) {
+        for (let px = 0; px < CVPX; px++) if (w.mn[px] === 0) { g.rrect(84 + px, 286, 1, 146, 0, 'rgba(255,123,123,.22)'); g.rrect(84 + px, 424, 1.2, 8, 0, C.red); }
+        ctx.beginPath();
+        for (let px = 0; px < CVPX; px++) ctx.lineTo(84 + px + 0.5, A.Y(Math.min(ym, w.mx[px])));
+        for (let px = CVPX - 1; px >= 0; px--) ctx.lineTo(84 + px + 0.5, A.Y(w.mn[px]));
+        ctx.closePath(); ctx.fillStyle = 'rgba(165,243,205,.22)'; ctx.fill();
+        const pts = []; for (let px = 0; px < CVPX; px++) pts.push([84 + px + 0.5, A.Y(Math.min(ym, w.mean[px]))]);
+        g.curve(pts, C.mint, 1.6);
+        g.line(84, A.Y(cNow), 84 + CVPX, A.Y(cNow), C.amber, 1.4, [6, 5]);
+        g.line(520, 277, 542, 277, C.amber, 1.6, [5, 4]); g.text(548, 277, '平均 c', { size: 13, color: C.amber });
+      }
+      if (land > 0 && !done) for (let i = 0; i < 12; i++) { // 正在落下的 read
+        const ph = frac(tt * 1.6 + i / 12), cyc = Math.floor(tt * 1.6 + i / 12);
+        g.rrect(90 + hash(i * 31 + cyc * 7) * 480, lerp(266, 420, ph), 12, 3, 1.5, rgba(C.mint, 1 - ph));
+      }
+      const hole = k > 0 && w.zeros > 0;
+      g.text(36, 498, k > 0 && !hole ? '這一段每個鹼基都至少被一條 read 蓋到' : '紅色:一條 read 都沒蓋到的地方(空洞)', { size: 13, color: k > 0 && !hole ? C.mint : C.red });
+      // 右:每個鹼基被蓋到幾次
+      g.panel(616, 204, 324, 324, '');
+      g.text(632, 226, '每個鹼基被蓋到幾次', { size: 14, weight: 700, color: C.ink2 });
+      const [h0, h1, ht] = CVH[S.cov], ks = [];
+      for (let v = h0; v <= h1; v++) ks.push(v);
+      const top = Math.max(...ks.map((v) => cvPois(v, sim.c)), ...ks.map((v) => sim.hist[v] || 0)) * 1.15;
+      const H = g.axes(672, 246, 252, 124, { xmin: h0 - 0.5, xmax: h1 + 0.5, ymin: 0, ymax: top, xticks: ht, xlab: '被蓋到的次數', ylab: '比例' });
+      const bw = Math.max(1.5, (252 / ks.length) * 0.78);
+      if (done) ks.forEach((v) => { const y = H.Y(Math.min(top, sim.hist[v] || 0)); g.rrect(H.X(v) - bw / 2, y, bw, H.Y(0) - y, 1, 'rgba(165,243,205,.6)'); });
+      if (done) { // read 全部落下後,畫出平均為 c 的 Poisson 分布
+        const pts = ks.map((v) => [H.X(v), H.Y(cvPois(v, sim.c))]);
+        g.curve(pts, C.amber, 1.6);
+        if (ks.length <= 20) pts.forEach(([x, y]) => g.circle(x, y, 3.2, C.amber));
+      }
+      g.rrect(632, 424, 12, 12, 2, 'rgba(165,243,205,.6)'); g.text(650, 430, '模擬', { size: 13, color: C.ink2 });
+      g.line(700, 430, 722, 430, C.amber, 2); g.circle(711, 430, 3.2, C.amber); g.text(730, 430, 'Poisson 分布(平均 c)', { size: 13, color: C.ink2 });
+      if (done) {
+        g.text(632, 456, '沒蓋到的比例', { size: 13, color: C.muted });
+        g.text(632, 479, `模擬 ${fmtFrac(sim.zero / CVG)}・e^(−c) ${fmtFrac(Math.exp(-sim.c))}`, { size: 15, weight: 700, color: C.ink, mono: true });
+        const ng = sim.n * Math.exp(-sim.c);
+        g.text(632, 506, `空洞 ${sim.gaps} 段・N·e^(−c) ≈ ${ng < 0.01 ? '0' : ng < 10 ? ng.toFixed(1) : Math.round(ng)} 段`, { size: 13, color: C.ink2, mono: true });
+      } else g.text(632, 479, 'read 還在落下……', { size: 14, color: C.muted });
+      g.ctx.restore();
+    },
+  },
+  {
+    key: 'variant', name: '進階:變異判讀', dur: 18,
+    cues: [[0, '比對完,把蓋到同一個位置的 read 疊起來看(pileup)。每個鹼基有品質分數 Q = −10 log₁₀(錯誤率):Q20 是 1%,Q30 是 0.1%。'],
+      [4.5, '二倍體的每個位置有兩套:0/0 兩套都和參考相同;0/1 異型合子,約一半的 read 讀到變異;1/1 同型合子,幾乎全部是變異。'],
+      [9, '定序錯誤散在各處、比例很低,真的變異集中在同一個位置。算出三種基因型各自讀到這堆 read 的機率(二項分布),最大的就是判讀。'],
+      [13.5, '深度低時,異型合子可能剛好只讀到同一邊:4 條全一樣的機率是 2 × 0.5⁴ = 12.5%,就判錯了。右邊可以改深度和真實基因型。']],
+    enter(S) { S.vTouched = false; },
+    draw(g, t, S) {
+      const gt = S.vgt, d = S.vdepth, P = vPile(gt, d, S.vseed || 0), a = P.a, now = S.vTouched;
+      // 左:pileup
+      g.panel(20, 20, 432, 500, '');
+      g.text(36, 42, '疊起來的 read(pileup)', { size: 15, weight: 700, color: C.ink });
+      g.text(436, 42, `深度 ${d}`, { size: 15, weight: 700, color: C.mint, align: 'right' });
+      g.text(36, 66, 'Q = −10 log₁₀(錯誤率);這裡都當成 Q20 = 1%', { size: 13, color: C.muted, alpha: now ? 1 : ease(seg(t, 1, 1.6)) });
+      const vx = (j) => VX0 + j * VST, rh = Math.min(26, 352 / d), bh = Math.min(17, rh - 3), y0 = 124, yEnd = y0 + d * rh + 4;
+      g.text(VX0 - 16, 98, '參考', { size: 14, color: C.ink2, align: 'right' });
+      const sa = now ? 1 : ease(seg(t, 4.4, 5.2));
+      if (sa > 0) g.rrect(vx(VSITE) - 14, 84, 28, yEnd - 84, 6, rgba(C.amber, 0.1 * sa), rgba(C.amber, sa), 2);
+      for (let j = 0; j < VREF.length; j++) box(g, vx(j), 98, VREF[j], { w: 22, h: 22 });
+      const nShow = now ? d : Math.floor(ease(seg(t, 0.3, 3)) * d + 1e-6), ea = now ? 1 : ease(seg(t, 9, 9.8));
+      P.reads.forEach((r, i) => {
+        if (i >= nShow) return;
+        const y = y0 + i * rh + rh / 2;
+        g.rrect(vx(r.from) - 11, y - bh / 2, (r.to - r.from) * VST + 22, bh, 3, 'rgba(185,199,192,.26)');
+        r.bases.forEach((b, kk) => {
+          const j = r.from + kk;
+          if (j === VSITE || b !== VREF[j]) box(g, vx(j), y, b, { w: 20, h: bh, letter: bh >= 13 });
+          if (j !== VSITE && b !== VREF[j] && ea > 0) g.rrect(vx(j) - 13, y - bh / 2 - 3, 26, bh + 6, 4, null, rgba(C.red, ea), 2);
+        });
+      });
+      g.text(36, 504, '黃框:要判讀的位置・紅框:定序錯誤', { size: 13, color: C.ink2, alpha: now ? 1 : ease(seg(t, 9, 9.8)) });
+      // 右上:這個位置三種基因型的機率
+      const fa = now ? 1 : ease(seg(t, 4.6, 5.4));
+      if (fa > 0) {
+        g.ctx.save(); g.ctx.globalAlpha = fa;
+        g.panel(466, 20, 474, 244, '');
+        g.text(482, 42, `這個位置:共 d = ${d} 條,T 有 a = ${a} 條`, { size: 15, weight: 700, color: C.ink });
+        const sx = (f) => 572 + f * 340, mk = now ? a / d : lerp(0, a / d, ease(seg(t, 5.2, 6.6)));
+        g.text(482, 86, 'T 的比例', { size: 13, color: C.ink2 });
+        g.line(sx(0), 86, sx(1), 86, C.ink2, 2);
+        [[0, '0%'], [0.5, '50%'], [1, '100%']].forEach(([f, s]) => { g.line(sx(f), 80, sx(f), 92, C.ink2, 2); g.text(sx(f), 106, s, { size: 13, color: C.muted, align: 'center', mono: true }); });
+        const ctx = g.ctx, mx = sx(mk);
+        ctx.beginPath(); ctx.moveTo(mx, 82); ctx.lineTo(mx - 7, 70); ctx.lineTo(mx + 7, 70); ctx.closePath(); ctx.fillStyle = C.mint; ctx.fill();
+        g.text(mk > 0.8 ? mx - 12 : mx + 12, 72, `${Math.round(mk * 100)}%`, { size: 13, weight: 700, color: C.mint, align: mk > 0.8 ? 'right' : 'left', mono: true });
+        const pa = now ? 1 : ease(seg(t, 9, 10.4)), post = vPost(a, d), best = post.indexOf(Math.max(...post));
+        [0, 1, 2].forEach((gg) => {
+          const y = 136 + gg * 32, win = gg === best && pa >= 1;
+          if (win) g.rrect(474, y - 14, 458, 28, 8, 'rgba(165,243,205,.08)', C.mint, 1.5);
+          g.text(484, y, `${VGT[gg]} ${VGTN[gg]}`, { size: 14, weight: win ? 800 : 500, color: win ? C.mint : C.ink2 });
+          g.rrect(640, y - 7, 180, 14, 4, 'rgba(255,255,255,.06)');
+          if (pa > 0) g.rrect(640, y - 7, Math.max(2, 180 * post[gg] * pa), 14, 4, VCOL[gg]);
+          g.text(926, y, fmtPct(post[gg]), { size: 14, color: C.ink, align: 'right', mono: true, alpha: pa });
+        });
+        g.text(484, 226, '讀到 T 的機會 p:0/0 是 1%、0/1 是 50%、1/1 是 99%', { size: 13, color: C.muted, alpha: pa });
+        g.text(484, 248, '機率 ∝ p^a × (1 − p)^(d − a);三種基因型事先當成一樣', { size: 13, color: C.muted, alpha: pa });
+        g.ctx.restore();
+      }
+      // 右下:真實基因型與深度固定時,重做很多次會讀到幾條 T(二項分布),每一種結果會判成什麼
+      const ba = now ? 1 : ease(seg(t, 13.4, 14.4));
+      if (ba > 0) {
+        g.ctx.save(); g.ctx.globalAlpha = ba;
+        g.panel(466, 276, 474, 244, '');
+        g.text(482, 298, `真實是 ${VGT[gt]}、深度 ${d}:會讀到幾條 T`, { size: 15, weight: 700, color: C.ink });
+        const pm = vPmf(gt, d), calls = pm.map((_, kk) => vCall(kk, d)), grow = now ? 1 : ease(seg(t, 13.8, 15));
+        const B = g.axes(524, 336, 236, 110, { xmin: -0.5, xmax: d + 0.5, ymin: 0, ymax: Math.max(...pm) * 1.1, xticks: [0, d / 2, d], xlab: '讀到 T 的條數 a', ylab: '機率' });
+        const bw = Math.max(2, (236 / (d + 1)) * 0.8);
+        pm.forEach((v, kk) => {
+          const x = B.X(kk), y = B.Y(v * grow);
+          g.rrect(x - bw / 2, y, bw, B.Y(0) - y, 2, VCOL[calls[kk]]);
+          if (kk === a) g.rrect(x - bw / 2 - 2.5, Math.min(y, B.Y(0) - 3) - 2.5, bw + 5, B.Y(0) - Math.min(y, B.Y(0) - 3) + 2.5, 3, null, C.ink, 1.6);
+        });
+        [0, 1, 2].forEach((gg) => { const ks = calls.map((c, kk) => (c === gg ? kk : -1)).filter((kk) => kk >= 0); if (ks.length) g.text(B.X((ks[0] + ks[ks.length - 1]) / 2), 324, VGT[gg], { size: 13, weight: 700, color: VCOL[gg], align: 'center', mono: true }); });
+        const ok = vRight(gt, d), sa2 = now ? 1 : ease(seg(t, 15, 15.8));
+        g.text(780, 344, '判對的機率', { size: 13, color: C.muted, alpha: sa2 });
+        g.text(780, 374, fmtPct(ok), { size: 24, weight: 800, color: C.mint, mono: true, alpha: sa2 });
+        g.text(780, 404, `判錯 ${fmtPct(1 - ok)}`, { size: 14, color: C.red, mono: true, alpha: sa2 });
+        [4, 10, 30].forEach((dd, i) => g.text(780, 436 + i * 22, `${dd} 條 ${fmtPct(vRight(gt, dd))}`, { size: 13, weight: dd === d ? 800 : 500, color: dd === d ? C.ink : C.muted, mono: true, alpha: sa2 }));
+        g.text(482, 506, '長條的顏色 = 會判成哪一種;白框是這次抽到的', { size: 13, color: C.muted });
+        g.ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'assembly', name: '進階:基因體組裝與 N50', dur: 18,
+    cues: [[0, '沒有參考可對時要從頭組裝:把 read 切成長度 k 的小段(k-mer),前後重疊 k − 1 個鹼基的接起來,就是 de Bruijn 圖。'],
+      [5, '重複序列在圖上會併成同一段,走到出口就分岔;沒有 read 從頭跨到尾,只能在這裡斷開,得到一段段的 contig(連續序列)。'],
+      [10, '長讀長一條就跨過長的重複,contig 少很多也長很多。常用 N50 比較:contig 由長到短加總,過總長一半的那一條有多長。'],
+      [14, '火炬松加入長讀長後,contig N50 從 8 kb 升到 25 kb。但 N50 只看長度、不管接得對不對,丟掉短的 contig 它也會變大。']],
+    enter(S) { S.asmTouched = false; },
+    draw(g, t, S) {
+      const now = S.asmTouched, T = now ? 18 : t;
+      // 左:de Bruijn 圖的小例子
+      g.panel(20, 20, 452, 252, '');
+      g.text(36, 40, 'de Bruijn 圖(k = 4)', { size: 15, weight: 700, color: C.ink });
+      const showLong = now ? S.rlen > 150 : T >= 10, resolved = now ? S.rlen > 150 : T >= 10.8; // 長 read 出現、接回兩段
+      DBS.forEach((sq, r) => {
+        const y = 70 + r * 28, al = ease(seg(T, r ? 2.6 : 0.2, r ? 3 : 0.6));
+        if (al <= 0) return;
+        g.ctx.save(); g.ctx.globalAlpha *= al;
+        g.text(96, y, r ? '乙處' : '甲處', { size: 13, color: C.ink2, align: 'right' });
+        g.rrect(DBSX(3) - 12, y - 12, 4 * 22 + 24, 24, 5, rgba(C.amber, 0.12), C.amber, 1.4);
+        for (let i = 0; i < sq.length; i++) box(g, DBSX(i), y, sq[i], { w: 20, h: 20 });
+        g.ctx.restore();
+      });
+      if (T > 3) g.text(346, 84, 'ACGTC 出現兩次', { size: 13, color: C.amber, alpha: seg(T, 3, 3.5) });
+      const kmers = [T <= 0.6 ? 0 : Math.min(8, Math.floor(seg(T, 0.6, 2.8) * 8) + 1), T <= 2.9 ? 0 : Math.min(8, Math.floor(seg(T, 2.9, 4.6) * 8) + 1)]; // 兩處各讀過幾個 4-mer
+      [[0.6, 2.9], [2.9, 4.7]].forEach(([a0, a1], r) => { if (T > a0 && T < a1) { const i = Math.min(7, kmers[r] - 1); g.rrect(DBSX(i) - 12, 70 + r * 28 - 13, 3 * 22 + 24, 26, 5, null, C.ink, 2); } });
+      const pos = (r, i) => [dbX(i), dbY(DBROW[r][i])];
+      // 一段一段的 contig(在節點後面畫粗的半透明線)
+      const pathLine = (r, i0, i1, col, a, off = 0) => { const pts = []; for (let i = i0; i <= i1; i++) { const [x, y] = pos(r, i); pts.push([x, y + off]); } g.curve(pts, rgba(col, a), 22); };
+      const u5 = resolved ? 0 : ease(seg(T, 7.8, 8.6));
+      if (u5 > 0) DBU5.forEach(([r, i0, i1, col]) => pathLine(r, i0, i1, col, 0.3 * u5));
+      const u2 = resolved ? (now ? 1 : ease(seg(T, 10.8, 11.6))) : 0;
+      if (u2 > 0) { pathLine(0, 0, 8, C.mint, 0.3 * u2, -5); pathLine(1, 0, 8, C.blue, 0.3 * u2, 5); }
+      // 邊(箭頭)與節點
+      const fork = !resolved && T >= 7.4;
+      [0, 1].forEach((r) => {
+        for (let i = 0; i < kmers[r]; i++) {
+          const [xa, ya] = pos(r, i), [xb, yb] = pos(r, i + 1), both = i >= 3 && i < 5 && kmers[1 - r] > i;
+          const hot = fork && i === 5;
+          const ang = Math.atan2(yb - ya, xb - xa), ox = Math.cos(ang), oy = Math.sin(ang), rr = Math.abs(ox) > 0.6 ? 19 / Math.abs(ox) : 13 / Math.abs(oy);
+          g.arrow(xa + ox * rr, ya + oy * rr, xb - ox * rr, yb - oy * rr, { color: hot ? C.amber : C.ink2, lw: both ? 3.5 : 2, head: 7 });
+        }
+      });
+      if (kmers[0] >= 5 && kmers[1] >= 5) g.text(dbX(4), 162, '×2', { size: 13, weight: 700, color: C.amber, align: 'center' });
+      const has = (r, i) => kmers[r] > 0 && i <= kmers[r]; // 這個節點出現了沒
+      [0, 1].forEach((r) => {
+        for (let i = 0; i < 9; i++) {
+          const shared = i >= 3 && i <= 5;
+          if (!has(r, i) || (r === 1 && shared && has(0, i))) continue; // 共用的節點只畫一次
+          const [x, y] = pos(r, i), twice = shared && has(0, i) && has(1, i);
+          g.rrect(x - 18, y - 12, 36, 24, 6, '#1d2a27', twice ? C.amber : C.ink2, twice ? 2 : 1.5);
+          g.text(x, y + 0.5, DBS[r].slice(i, i + 3), { size: 13, weight: 700, color: C.ink, align: 'center', mono: true });
+        }
+      });
+      // 沿著圖走,走到重複序列的出口分岔
+      if (!now && T > 5 && T < 7.6) {
+        const u = seg(T, 5, 7.4) * 5, i = Math.min(4, Math.floor(u)), f = u - i, [xa, ya] = pos(0, i), [xb, yb] = pos(0, i + 1);
+        g.ctx.save(); g.ctx.shadowColor = C.mint; g.ctx.shadowBlur = 12; g.circle(lerp(xa, xb, f), lerp(ya, yb, f), 7, C.mint); g.ctx.restore();
+      }
+      if (fork) g.tag(dbX(7), dbY(1), '接哪一條?', { size: 14, color: C.amber });
+      // 長 read 跨過重複序列
+      if (showLong) {
+        const al = now ? 1 : ease(seg(T, 10, 10.8));
+        g.rrect(DBSX(1) - 10, 52, DBSX(9) - DBSX(1) + 20, 6, 3, rgba(C.mint, al));
+        g.text(DBSX(9) + 18, 55, '長 read', { size: 13, weight: 700, color: C.mint, alpha: al });
+      }
+      const st = resolved ? ['長 read 跨過重複:接回 2 段', C.mint, 14] : T >= 7.8 ? ['沒有 read 跨過重複:斷成 5 段', C.amber, 14] : ['方塊:3 個鹼基(k − 1);箭頭:一個 4-mer', C.muted, 13];
+      g.text(36, 258, st[0], { size: st[2], weight: st[2] > 13 ? 700 : 500, color: st[1] });
+      // 右:1 Mb 的基因體
+      const ga = now ? 1 : ease(seg(T, 6, 7));
+      if (ga > 0) {
+        g.ctx.save(); g.ctx.globalAlpha = ga;
+        g.panel(484, 20, 456, 252, '');
+        g.text(500, 40, '模擬一段 1 Mb 的基因體(示意)', { size: 15, weight: 700, color: C.ink });
+        g.text(500, 62, `重複序列約佔 ${Math.round(GREPF * 100)}%;紅色:比讀長還長,跨不過`, { size: 13, color: C.ink2 });
+        g.line(GX0, 106, GX0 + GW, 106, C.backbone, 2);
+        for (const r of GREPS) { const h = 3 + 3.6 * Math.log10(r.len / 30); g.rrect(gx(r.s), 104 - h, Math.max(1.2, (r.len / GSEG) * GW), h, 0, gBreak(r, S.rlen) ? C.red : 'rgba(255,209,102,.55)'); }
+        const cs = gContigs(S.rlen);
+        cs.forEach((c, i) => g.rrect(gx(c.s), i % 2 ? 126 : 116, Math.max(1, gx(c.e) - gx(c.s)), 7, 2, i % 2 ? C.blue : C.mint));
+        const nKeep = cs.filter((c) => c.e - c.s >= GDROP).length;
+        g.text(500, 152, S.drop && nKeep < cs.length ? `讀長 ${fmtRL(S.rlen)}:斷成 ${cs.length} 段,丟掉短的剩 ${nKeep} 段` : `讀長 ${fmtRL(S.rlen)}:斷成 ${cs.length} 段 contig`, { size: 14, weight: 700, color: C.mint });
+        g.text(500, 180, '讀長', { size: 13, color: C.muted });
+        g.text(720, 180, 'contig 數', { size: 13, color: C.muted, align: 'right' });
+        g.text(900, 180, S.drop ? 'N50(丟掉短的)' : 'N50', { size: 13, color: C.muted, align: 'right' });
+        GRL.forEach((L, i) => {
+          const y = 204 + i * 24, sel = L === S.rlen, lens = gContigs(L).map((c) => c.e - c.s).filter((v) => !S.drop || v >= GDROP);
+          if (sel) g.rrect(492, y - 11, 440, 22, 6, 'rgba(165,243,205,.12)', C.mint, 1.2);
+          g.text(500, y, fmtRL(L), { size: 14, color: sel ? C.ink : C.ink2, mono: true });
+          g.text(720, y, `${lens.length}`, { size: 14, color: sel ? C.ink : C.ink2, mono: true, align: 'right' });
+          g.text(900, y, fmtLen(gN50(lens).n50), { size: 14, color: sel ? C.ink : C.ink2, mono: true, align: 'right' });
+        });
+        g.ctx.restore();
+      }
+      // 下:N50
+      const na = now ? 1 : ease(seg(T, 8, 9));
+      if (na <= 0) return;
+      g.ctx.save(); g.ctx.globalAlpha = na;
+      g.panel(20, 284, 920, 236, '');
+      const lens = gContigs(S.rlen).map((c) => c.e - c.s), keep = lens.map((v) => !S.drop || v >= GDROP);
+      const tot = lens.reduce((s, v) => s + v, 0), kept = lens.filter((_, i) => keep[i]), res = gN50(kept);
+      const sortU = now ? 1 : ease(seg(T, 11.4, 12.8)), sweep = now ? 1 : ease(seg(T, 12.9, 14)), kx = 880 / tot;
+      const order = lens.map((_, i) => i).sort((i, j) => keep[j] - keep[i] || lens[j] - lens[i]);
+      const xg = [], xs = []; let acc = 0;
+      lens.forEach((v, i) => { xg[i] = 40 + acc * kx; acc += v; });
+      acc = 0; order.forEach((i) => { xs[i] = 40 + acc * kx; acc += lens[i]; });
+      g.text(36, 304, sortU > 0.5 ? 'N50:由長到短排,一條條加起來,過總長一半的那一條' : '組出來的 contig(照在基因體上的順序)', { size: 15, weight: 700, color: C.ink });
+      lens.forEach((v, i) => g.rrect(lerp(xg[i], xs[i], sortU), 352, Math.max(0.8, v * kx - 0.6), 30, 0, keep[i] ? rgba(i % 2 ? C.blue : C.mint, 0.85) : rgba(C.red, 0.2)));
+      const xh = 40 + (res.tot / 2) * kx;
+      if (S.drop && kept.length < lens.length) { // 丟掉的那一段夠寬就寫在條上,太窄就寫在條的右下
+        const xd = 40 + res.tot * kx;
+        if ((tot - res.tot) * kx > 70) g.text(xd + 6, 367, '丟掉的', { size: 13, color: C.red });
+        else g.text(920, 402, '丟掉的 ↑', { size: 13, color: C.red, align: 'right' });
+      }
+      if (sweep > 0) {
+        const xe = lerp(40, xh, sweep);
+        g.rrect(40, 348, xe - 40, 38, 0, 'rgba(255,209,102,.16)');
+        g.line(xe, 342, xe, 392, C.amber, 2);
+      }
+      if (sweep >= 1 && res.idx >= 0) {
+        const iN = order[res.idx];
+        g.rrect(xs[iN] - 1.5, 348, lens[iN] * kx + 3, 38, 2, null, C.amber, 2.5);
+        g.tag(Math.min(880, Math.max(80, xs[iN] + (lens[iN] * kx) / 2)), 334, `N50 = ${fmtLen(res.n50)}`, { size: 14, color: C.amber });
+        g.text(xh, 402, '總長的一半', { size: 13, color: C.amber, align: 'center' });
+        g.text(36, 432, `contig ${kept.length} 條・總長 ${fmtLen(res.tot)}・N50 ${fmtLen(res.n50)}`, { size: 16, weight: 700, color: C.ink, mono: true });
+      }
+      const la = now ? 1 : ease(seg(T, 14.2, 15));
+      if (la > 0) {
+        g.text(36, 462, 'N50 只看長度:接錯了一樣會變大;丟掉短的 contig,總長變小,N50 也跟著變大。', { size: 14, color: C.amber, alpha: la });
+        const all = gN50(lens).n50;
+        const line = S.drop ? (kept.length < lens.length ? [`丟掉 5 kb 以下的 ${lens.length - kept.length} 條:N50 ${fmtLen(all)} → ${fmtLen(res.n50)},總長少了 ${fmtLen(tot - res.tot)}`, C.red] : ['沒有 5 kb 以下的 contig,N50 不變', C.muted]) : ['比較不同組裝的 N50,要用同一個總長(例如基因體大小)來算。', C.muted];
+        g.text(36, 492, line[0], { size: 14, color: line[1], alpha: la });
+      }
+      g.ctx.restore();
+    },
+  },
 ];
 
 const L = createLesson({
   chapters,
-  state: { dd: 3, cyc: NC, smp: 'gland', smpLast: 'gland', np: 8, focus: 'all' },
+  state: { dd: 3, cyc: NC, smp: 'gland', smpLast: 'gland', np: 8, focus: 'all', cov: 5, vdepth: 10, vgt: 1, vseed: 0, rlen: 150, drop: false },
   controls: [
     { id: 'dd', label: 'ddNTP 比例(每個位置停下的機會)', type: 'range', min: 0, max: DD.length - 1, step: 1, format: (v) => fmtP(DD[v]), chapters: ['sanger', 'ce'], restart: false, onChange: (v, S) => { S.ddTouched = true; } },
     { id: 'cyc', label: '讀到第幾輪', type: 'range', min: 1, max: NC, step: 1, format: (v) => `第 ${v} 輪`, chapters: ['sbs'], restart: false, onChange: (v, S) => { S.cycManual = true; S.cycAt = performance.now(); } },
@@ -848,6 +1340,12 @@ const L = createLesson({
     { id: 'smp', label: '樣品', type: 'seg', options: [{ v: 'gland', label: '有腺體的葉子' }, { v: 'none', label: '沒有腺體的葉子' }], chapters: ['rnaseq'], restart: false, onChange: (v, S) => { S.smpFrom = S.smpLast; S.smpLast = v; S.smpAt = performance.now(); S.smpTouched = true; } },
     { id: 'np', label: 'DNA 往下送了幾個鹼基', type: 'range', min: 0, max: NP.length - KM, step: 1, unit: ' 個', chapters: ['nanopore'], restart: false, onChange: (v, S) => { S.npManual = true; } },
     { id: 'focus', label: '看哪一種', type: 'seg', options: [{ v: 'all', label: '全部' }, { v: 'sanger', label: 'Sanger' }, { v: 'illumina', label: 'Illumina' }, { v: 'nano', label: '奈米孔' }], chapters: ['compare'], restart: false, onChange: (v, S) => { S.focusManual = true; } },
+    { id: 'cov', label: '平均定序深度 c', type: 'seg', options: [1, 5, 30, 100].map((v) => ({ v, label: `${v}×` })), chapters: ['align'], restart: false, onChange: (v, S) => { S.covTouched = true; S.covAt = performance.now(); } },
+    { id: 'vdepth', label: '這個位置的 read 數(深度)', type: 'seg', options: [4, 10, 30].map((v) => ({ v, label: `${v} 條` })), chapters: ['variant'], restart: false, onChange: (v, S) => { S.vTouched = true; } },
+    { id: 'vgt', label: '真實基因型', type: 'seg', options: VGT.map((s, v) => ({ v, label: s })), chapters: ['variant'], restart: false, onChange: (v, S) => { S.vTouched = true; } },
+    { id: 'vre', label: '重新抽一組 read', type: 'button', chapters: ['variant'], onClick: (S) => { S.vseed = (S.vseed || 0) + 1; S.vTouched = true; } },
+    { id: 'rlen', label: '讀長', type: 'seg', options: GRL.map((v) => ({ v, label: fmtRL(v) })), chapters: ['assembly'], restart: false, onChange: (v, S) => { S.asmTouched = true; } },
+    { id: 'drop', label: '丟掉 5 kb 以下的 contig', type: 'toggle', chapters: ['assembly'], restart: false, onChange: (v, S) => { S.asmTouched = true; } },
   ],
 });
 </script>

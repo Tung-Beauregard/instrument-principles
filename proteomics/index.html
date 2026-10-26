@@ -57,6 +57,8 @@
       <li>第一次質譜(MS1)量出胜肽離子的 m/z,儀器挑訊號強的離子去撞氣體而碎裂(碰撞誘導解離 CID),主要斷在肽鍵:含 N 端的是 b 離子,含 C 端的是 y 離子。帶 1 個電荷時,b = 前 i 個殘基的質量和 + 1.00728,y = 後 i 個殘基的質量和 + 18.01056 + 1.00728。</li>
       <li>同一系列相鄰兩根峰的質量差就是一個殘基:b 系列由左讀、y 系列由右讀,讀出來都是 N 端到 C 端。實際上由電腦把資料庫裡所有蛋白質「理論上切開、碎開」,和量到的比對;母離子量得越準,候選越少。</li>
       <li>電灑游離、離子阱與串聯質譜在儀器裡怎麼做,見<a href="../lcq/">離子阱質譜</a>。</li>
+      <li>進階,定量:不標記是兩個樣品分開跑,比同一個胜肽的層析峰面積(或數譜圖),每一針的差異要靠標準化校正。SILAC 讓細胞吃重的 K(+8.014)、R(+10.008),樣品在最前面就混在一起,MS1 出現相差「重的質量 ÷ 電荷」的一對峰。TMT 的標籤總質量相同,碎裂後的報導離子(126、127……)給比例;挑母離子時混進來的離子把比例拉向 1 : 1(比例壓縮),MS3 可以去掉大部分干擾。</li>
+      <li>進階,錯誤率:把序列反轉當誘餌和目標一起搜尋,錯配落在兩邊的機會一樣,所以門檻以上的 FDR ≈ 誘餌數 ÷ 目標數。q 值是讓那一筆被接受的最低 FDR,常用 1% 當門檻。</li>
     </ul>
   </div>
   <div class="src">
@@ -67,7 +69,9 @@
       <li>Zhang Y, et al. Protein analysis by shotgun/bottom-up proteomics. Chem Rev. 2013;113(4):2343–2394. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3751594/">PMC3751594</a>(胰蛋白酶在 K、R 之後切,後面是 P 不切;胜肽依疏水性分離後直接電灑;先做全掃描、挑訊號強的離子做 MS/MS;b、y 離子來自肽鍵斷裂;用資料庫算出的理論碎片比對;通常要兩個胜肽才算認出一個蛋白質)</li>
       <li>Olsen JV, et al. Trypsin cleaves exclusively C-terminal to arginine and lysine residues. Mol Cell Proteomics. 2004;3(6):608–614. <a href="https://doi.org/10.1074/mcp.T400003-MCP200">doi:10.1074/mcp.T400003-MCP200</a>(只在 R、K 之後切;質量量得準大幅提高鑑定的可信度)。後面是 P 時通常不切見 <a href="https://web.expasy.org/peptide_cutter/peptidecutter_enzymes.html">Expasy PeptideCutter</a>;實際偶爾還是會切(Rodriguez J, et al. J Proteome Res. 2008;7(1):300–305)。</li>
       <li>Medzihradszky KF, Chalkley RJ. Lessons in de novo peptide sequencing by tandem mass spectrometry. Mass Spectrom Rev. 2015;34(1):43–63. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4367481/">PMC4367481</a>(相鄰峰的質量差就是殘基;L 與 I 在 CID 分不出來;K 與 Q 差 0.036;b1 通常量不到;y1 是 147 表示 K、175 表示 R;2+ 胜肽的碎片多半帶 1 個電荷)</li>
-      <li>動畫裡的三段蛋白質序列、層析時間與峰形(流出先後依 Browne 等 1982 的 <a href="https://web.expasy.org/protscale/pscale/HPLCTFA.html">TFA 滯留係數</a>加總排列)、離子強度、同位素峰的高度、碎片的強度,以及 2,000 條隨機產生的蛋白質資料庫(依 UniProtKB/Swiss-Prot 2026_03 的胺基酸組成)都是示意。質量數值是依上面的質量算出的,已用 Protein Prospector 的 MS-Product 與 Expasy 的 PeptideMass 核對。</li>
+      <li>Ong SE, et al. Stable isotope labeling by amino acids in cell culture, SILAC, as a simple and accurate approach to expression proteomics. Mol Cell Proteomics. 2002;1(5):376–386. <a href="https://doi.org/10.1074/mcp.M200025-MCP200">doi:10.1074/mcp.M200025-MCP200</a>(細胞吃標記的胺基酸、五次倍增後完全標記、收細胞後就把兩個樣品混在一起;原文用的是氘標記的白胺酸);重的離胺酸與精胺酸的質量差見 Unimod <a href="https://www.unimod.org/modifications_view.php?editid1=259">#259</a>(+8.014199)、<a href="https://www.unimod.org/modifications_view.php?editid1=267">#267</a>(+10.008269);TMT6plex 的標籤 +229.162932 與報導離子 126.12773、127.12476 見 <a href="https://www.unimod.org/modifications_view.php?editid1=737">#737</a>。Thompson A, et al. Tandem mass tags. Anal Chem. 2003;75(8):1895–1904(同一個胜肽接不同的標籤,在分離時完全一起走,用 MS/MS 定量)。Ting L, et al. MS3 eliminates ratio distortion in isobaric multiplexed quantitative proteomics. Nat Methods. 2011;8(11):937–940. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3205343/">PMC3205343</a>(和目標一起被挑進來的離子也碎裂,10 : 1 的比例中位數被壓縮 3.2 倍;MS3 幾乎去掉干擾,鑑定到的胜肽少 13%)。不標記與 SILAC 的比較見上面 Zhang 等 2013 第 4.1 節。</li>
+      <li>Elias JE, Gygi SP. Target-decoy search strategy for increased confidence in large-scale protein identifications by mass spectrometry. Nat Methods. 2007;4(3):207–214. <a href="https://doi.org/10.1038/nmeth1019">doi:10.1038/nmeth1019</a>(目標與誘餌合在一起搜尋比分開好);同作者 2010 年的方法說明 <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2922680/">PMC2922680</a>(反轉是最簡單、最常用的誘餌;兩邊一樣大時,錯的目標數 ≈ 誘餌數)。Käll L, et al. Assigning significance to peptides identified by tandem mass spectrometry using decoy databases. J Proteome Res. 2008;7(1):29–34. <a href="https://doi.org/10.1021/pr700600n">doi:10.1021/pr700600n</a>(FDR ≈ 門檻以上的誘餌數 ÷ 目標數;q 值的定義;分數分布的模擬設定)。Deutsch EW, et al. J Proteome Res. 2016;15(11):3961–3970. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5096969/">PMC5096969</a>(人類蛋白質體計畫的準則:蛋白質層級的 FDR 最多 1%)。</li>
+      <li>動畫裡的三段蛋白質序列、層析時間與峰形(流出先後依 Browne 等 1982 的 <a href="https://web.expasy.org/protscale/pscale/HPLCTFA.html">TFA 滯留係數</a>加總排列)、離子強度、同位素峰的高度、碎片的強度,以及 2,000 條隨機產生的蛋白質資料庫(依 UniProtKB/Swiss-Prot 2026_03 的胺基酸組成)都是示意。質量數值是依上面的質量算出的,已用 Protein Prospector 的 MS-Product 與 Expasy 的 PeptideMass 核對。進階章節:兩個樣品的比例、第 2 針的進樣量與滯留時間偏移、共分離干擾的比例與「干擾在兩個通道一樣多」、MS3 畫成完全去掉干擾、挑選視窗旁邊的離子,以及誘餌那一章的 20,000 張譜圖(分數是常態分布的模擬,30% 有正確答案,固定亂數種子)都是示意;SILAC 與 TMT 的質量是依 Unimod 算的。</li>
     </ul>
   </div>
 </section>
@@ -235,6 +239,74 @@ function rankCandidates(S) {
   return list;
 }
 const srcName = (src) => (src < 0 ? `示意蛋白質${PROTEINS[-1 - src].name}` : `隨機 #${src + 1}`);
+
+// ================= 進階:定量 =================
+// SILAC 的重胺基酸(Unimod):離胺酸 13C6 15N2 +8.014199(#259)、精胺酸 13C6 15N4 +10.008269(#267);胜肽裡每個 K、R 都換成重的
+const SILAC_K = 8.014199, SILAC_R = 10.008269;
+const countAA = (s, aa) => [...s].filter((c) => c === aa).length;
+const silacShift = (s) => SILAC_K * countAA(s, 'K') + SILAC_R * countAA(s, 'R');
+// TMT6plex(Unimod #737):每個標籤 +229.162932,接在 N 端與每個 K 上;報導離子 m/z 126.12773(樣品 A)、127.12476(樣品 B)
+const TMT_TAG = 229.162932, TMT_REP = [126.12773, 127.12476];
+const tmtM = (s) => pepMass(s) + TMT_TAG * (1 + countAA(s, 'K'));
+const SA_COL = '#a5f3cd', SB_COL = '#b8a4f4'; // 樣品 A 薄荷綠、樣品 B 淡紫
+// 同位素峰的相對高度(示意,和第 4 章一樣用 Poisson,λ = 0.000536 × M)
+const isoPat = (M) => { const lam = M * 0.000536; return [1, lam, (lam * lam) / 2, (lam * lam * lam) / 6].map((v) => v * Math.exp(-lam)); };
+// 共分離干擾(示意):f = 視窗裡混進來的離子 ÷ 全部;干擾在兩個通道一樣多,每個通道多 I = f × (A + B) ÷ (2 × (1 − f))
+const tmtI = (f, a, b) => (f * (a + b)) / (2 * (1 - f));
+const RET_SHIFT = 0.22; // 第 2 針的滯留時間偏移(分鐘,示意)
+function filledPeak(g, A, x0, x1, fn, col, alpha = 0.3) {
+  const c = g.ctx, pts = [];
+  for (let x = x0; x <= x1 + 1e-9; x += (x1 - x0) / 120) pts.push([A.X(x), A.Y(fn(x))]);
+  c.save(); c.beginPath(); c.moveTo(A.X(x0), A.Y(0)); pts.forEach(([px, py]) => c.lineTo(px, py)); c.lineTo(A.X(x1), A.Y(0)); c.closePath();
+  c.globalAlpha *= alpha; c.fillStyle = col; c.fill(); c.restore();
+  g.curve(pts, col, 2.2);
+}
+// 一支小試管(樣品)
+function vial(g, x, y, col, label) {
+  g.rrect(x - 8, y - 13, 16, 26, 5, 'rgba(255,255,255,.04)', col, 1.6);
+  g.rrect(x - 6, y - 2, 12, 13, 4, col);
+  g.text(x + 16, y, label, { size: 14, color: col });
+}
+
+// ================= 進階:誘餌資料庫(示意的模擬)=================
+// 20,000 張譜圖,其中 30% 是資料庫裡真的有的胜肽產生的(正確配對的分數 ~ 常態,平均 3.0、標準差 0.7);
+// 每張譜圖在目標與誘餌各有一個最好的錯配(分數 ~ 平均 1.0、標準差 0.7)。分數的形狀借用 Käll 等 2008 圖 5 的模擬設定。
+// 目標與誘餌合在一起搜尋(Elias 與 Gygi 的串接法),每張譜圖只留分數最高的那一個。
+const FD = { n: 20000, pc: 0.3, mu1: 3, mu0: 1, sd: 0.7, seed: 7, lo: -1, hi: 6, bw: 0.1 };
+const PSM = (() => {
+  const R = rng(FD.seed), gs = () => { const u = Math.max(1e-9, R()), v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+  const out = [];
+  for (let i = 0; i < FD.n; i++) {
+    const has = R() < FD.pc, c = FD.mu1 + FD.sd * gs(), wt = FD.mu0 + FD.sd * gs(), wd = FD.mu0 + FD.sd * gs();
+    if (has && c >= wt && c >= wd) out.push({ s: c, d: 0, ok: 1 });
+    else if (wt >= wd) out.push({ s: wt, d: 0, ok: 0 });
+    else out.push({ s: wd, d: 1, ok: 0 });
+  }
+  out.sort((a, b) => b.s - a.s);
+  // 由高分往下累計目標數 T、誘餌數 D、其實錯了的目標數 F;FDR = D ÷ T;q 值 = 從這一筆往下(門檻更低)所有 FDR 的最小值
+  let T = 0, D = 0, F = 0;
+  for (const p of out) { if (p.d) D++; else { T++; if (!p.ok) F++; } p.T = T; p.D = D; p.F = F; p.fdr = T ? D / T : 0; }
+  let q = Infinity;
+  for (let i = out.length - 1; i >= 0; i--) { q = Math.min(q, out[i].fdr); out[i].q = q; }
+  return out;
+})();
+// 門檻 thr 以上的累計數(二分搜尋;PSM 依分數由高到低排)
+function atThr(thr) {
+  let lo = 0, hi = PSM.length;
+  while (lo < hi) { const m = (lo + hi) >> 1; if (PSM[m].s >= thr) lo = m + 1; else hi = m; }
+  if (!lo) return { T: 0, D: 0, F: 0, fdr: 0, fdp: 0, q: 0 };
+  let k = lo - 1; while (k > 0 && PSM[k].d) k--; // q 值看門檻以上分數最低的那一個目標
+  const p = PSM[lo - 1];
+  return { T: p.T, D: p.D, F: p.F, fdr: p.T ? p.D / p.T : 0, fdp: p.T ? p.F / p.T : 0, q: PSM[k].q };
+}
+const FDR1 = (() => { let s = null; for (const p of PSM) if (!p.d && p.q <= 0.01) s = p.s; return s; })(); // q ≤ 1% 的最低分數
+const FD_BINS = (() => {
+  const n = Math.round((FD.hi - FD.lo) / FD.bw), b = { ok: new Array(n).fill(0), bad: new Array(n).fill(0), dec: new Array(n).fill(0), n };
+  for (const p of PSM) { const i = clamp(Math.floor((p.s - FD.lo) / FD.bw), 0, n - 1); (p.d ? b.dec : p.ok ? b.ok : b.bad)[i]++; }
+  b.max = Math.max(...b.ok.map((v, i) => v + b.bad[i]), ...b.dec);
+  return b;
+})();
+const pctS = (v) => `${(v * 100).toFixed(v < 0.1 ? 2 : 1)}%`;
 
 // ================= 章節 =================
 const TILES = Object.keys(RES).sort((a, b) => RES[a] - RES[b] || (a === 'L' ? -1 : 1));
@@ -768,18 +840,245 @@ const chapters = [
       }
     },
   },
+  {
+    key: 'quant', name: '進階:定量(一)不標記與 SILAC', dur: 17,
+    cues: [[0, '比較兩個樣品裡同一個蛋白質的量。不標記:兩個樣品分開跑,比同一個胜肽的層析峰面積;也可以數鑑定到幾張譜圖。'],
+      [5, '分開跑會帶進每一針的差異(進樣量、噴灑效率),要用全部胜肽比例的中位數來標準化。右邊可以讓第 2 針多打一些。'],
+      [9.5, 'SILAC:讓樣品 B 的細胞吃重的離胺酸(+8.014)與精胺酸(+10.008),收細胞後就和 A 混在一起處理。'],
+      [13, '同一個胜肽在 MS1 成對出現,相差的是重的質量 ÷ 電荷;兩峰的面積比就是 B : A,進樣多少都不會改變。']],
+    draw(g, t, S) {
+      const P = protOf(S), pep = pepOf(S), s = pep.seq, R0 = S.ratio, inj = 1 + S.inject / 100;
+      // ---- 左:不標記 ----
+      g.panel(24, 14, 448, 410, '不標記:兩個樣品分開跑');
+      const sa = ease(seg(t, 0.2, 1));
+      g.ctx.save(); g.ctx.globalAlpha = sa;
+      vial(g, 52, 62, SA_COL, '樣品 A'); vial(g, 52, 100, SB_COL, '樣品 B');
+      g.arrow(130, 62, 174, 62, { color: C.muted, lw: 1.8, head: 7 }); g.arrow(130, 100, 174, 100, { color: C.muted, lw: 1.8, head: 7 });
+      g.text(184, 62, '第 1 針 LC-MS', { size: 14, color: C.ink2 });
+      g.text(184, 100, `第 2 針 LC-MS${S.inject ? `(進樣 ${S.inject > 0 ? '+' : '−'}${Math.abs(S.inject)}%)` : ''}`, { size: 14, color: S.inject ? C.amber : C.ink2 });
+      g.ctx.restore();
+      const X0 = pep.rt - 1.6, X1 = pep.rt + 1.6, gr = ease(seg(t, 0.6, 3.6));
+      const hA = 1, hB = R0 * inj, top = Math.max(hA, hB) * 1.25;
+      const A = g.axes(84, 132, 368, 150, { xmin: X0, xmax: X1, ymin: 0, ymax: top, xticks: [pep.rt - 1, pep.rt, pep.rt + 1], fmtX: (v) => v.toFixed(1), xlab: '時間(分)', ylab: 'MS1 訊號' });
+      const pk = (h, c0) => (x) => gr * h * Math.exp(-((x - c0) ** 2) / (2 * SIG * SIG));
+      filledPeak(g, A, X0, X1, pk(hA, pep.rt), SA_COL); filledPeak(g, A, X0, X1, pk(hB, pep.rt + RET_SHIFT), SB_COL);
+      if (gr > 0.9) {
+        g.text(A.X(pep.rt) - 10, A.Y(hA) - 12, 'A', { size: 16, weight: 800, color: SA_COL, align: 'right' });
+        g.text(A.X(pep.rt + RET_SHIFT) + 12, A.Y(hB) - 12, 'B', { size: 16, weight: 800, color: SB_COL });
+      }
+      if (t > 3.6) g.text(40, 350, `面積比 B ÷ A = ${f2(R0 * inj)}`, { size: 17, weight: 700, color: S.inject ? C.amber : C.mint, alpha: ease(seg(t, 3.6, 4.3)) });
+      if (t > 7) {
+        const a = ease(seg(t, 7, 7.8));
+        g.text(40, 380, `÷ 全部胜肽比例的中位數 ${f2(inj)} = ${f2(R0)}`, { size: 15, color: C.mint, alpha: a });
+        g.text(40, 406, '標準化的前提:大部分蛋白質沒有變', { size: 13, color: C.muted, alpha: a });
+      }
+      // ---- 右:SILAC ----
+      g.panel(488, 14, 448, 410, 'SILAC:先混在一起再跑');
+      const ra = ease(seg(t, 9.5, 10.3)), dM = silacShift(s), mzL = pep.mz, mzH = mzL + dM / 2;
+      if (ra > 0) {
+        g.ctx.save(); g.ctx.globalAlpha = ra;
+        vial(g, 516, 62, SA_COL, 'A:一般的'); vial(g, 516, 100, SB_COL, 'B:重的 K、R');
+        g.line(640, 62, 676, 81, C.muted, 1.8); g.line(640, 100, 676, 81, C.muted, 1.8);
+        g.arrow(676, 81, 700, 81, { color: C.muted, lw: 1.8, head: 7 });
+        g.text(708, 81, '混合 → 一次 LC-MS', { size: 14, color: C.ink2 });
+        g.ctx.restore();
+        const x0 = mzL - 0.8, x1 = mzH + 2.4, iso = isoPat(pep.M), hL = 1, hH = R0, ymx = Math.max(hL, hH) * iso[0] * 1.45, mg = ease(seg(t, 10.4, 12.4));
+        const B = g.axes(548, 132, 364, 150, { xmin: x0, xmax: x1, ymin: 0, ymax: ymx, xticks: [mzL, mzH], fmtX: (v) => f2(v), xlab: 'm/z', ylab: '強度' });
+        iso.forEach((v, k) => {
+          const dx = (k * ISO) / 2;
+          g.line(B.X(mzL + dx), B.Y(0), B.X(mzL + dx), B.Y(v * hL * mg), SA_COL, 3);
+          g.line(B.X(mzH + dx), B.Y(0), B.X(mzH + dx), B.Y(v * hH * mg), SB_COL, 3);
+        });
+        if (mg > 0.9) {
+          g.text(B.X(mzL), B.Y(iso[0] * hL) - 14, '輕(A)', { size: 14, weight: 700, color: SA_COL, align: 'center' });
+          g.text(B.X(mzH), B.Y(iso[0] * hH) - 14, '重(B)', { size: 14, weight: 700, color: SB_COL, align: 'center' });
+        }
+        if (t > 13) {
+          const a = ease(seg(t, 13, 13.7)), yb = 146, nK = countAA(s, 'K'), nR = countAA(s, 'R');
+          g.ctx.save(); g.ctx.globalAlpha = a;
+          g.line(B.X(mzL), yb, B.X(mzH), yb, C.amber, 2); g.line(B.X(mzL), yb - 6, B.X(mzL), yb + 6, C.amber, 2); g.line(B.X(mzH), yb - 6, B.X(mzH), yb + 6, C.amber, 2);
+          g.text(B.X(mzL), yb - 15, `相差 ${dM.toFixed(3)} ÷ 2 = ${(dM / 2).toFixed(3)}`, { size: 14, weight: 700, color: C.amber, mono: true });
+          g.text(504, 350, `面積比 重 ÷ 輕 = ${f2(R0)}`, { size: 17, weight: 700, color: C.mint });
+          g.text(504, 380, `${nK} 個 K(+8.014)、${nR} 個 R(+10.008)`, { size: 15, color: C.ink2 });
+          g.text(504, 406, '進樣多少,兩根峰一起變大變小', { size: 13, color: C.muted });
+          g.ctx.restore();
+        }
+      }
+      // ---- 下:真的比例與跟著看的胜肽 ----
+      g.text(28, 458, `真的 B : A = ${R0} : 1`, { size: 18, weight: 700, color: C.ink });
+      g.text(28, 490, `跟著看的胜肽 ${s}(示意蛋白質${P.name},2+,m/z ${f2(pep.mz)})`, { size: 14, color: C.ink2 });
+      g.text(28, 516, '不標記也可以數每個蛋白質鑑定到幾張譜圖(spectral counting)', { size: 13, color: C.muted });
+    },
+  },
+  {
+    key: 'tmt', name: '進階:定量(二)TMT 與比例壓縮', dur: 17,
+    cues: [[0, 'TMT 是接在胜肽 N 端與離胺酸上的化學標籤;每個樣品一種,總質量都一樣,所以同一個胜肽在 MS1 疊成同一根峰。'],
+      [4.5, '碎裂時標籤斷開,放出 m/z 126、127 的報導離子,兩根的強度比就是 B : A;b、y 碎片照樣拿來鑑定胜肽。'],
+      [9.5, '可是挑母離子的視窗裡常混進別的胜肽,它們也帶標籤,報導離子一起加進來,比例被拉向 1 : 1,這叫比例壓縮。'],
+      [13.5, '再挑一根碎片做第三次質譜(MS3),可以去掉大部分干擾,代價是鑑定數少一些。右邊可以調干擾的比例。']],
+    draw(g, t, S) {
+      const pep = pepOf(S), s = pep.seq, R0 = S.ratio, M = tmtM(s), mz = mzOf(M, 2);
+      const fI = t < 9.5 ? 0 : (S.interf / 100) * ease(seg(t, 9.5, 11)), I = S.ms3 ? 0 : tmtI(fI, 1, R0);
+      // ---- 上:標籤 = 報導 + 平衡,兩個一樣重 ----
+      g.panel(24, 14, 912, 152, '');
+      // 兩個標籤畫得一樣大:報導離子差 1,平衡的那段剛好補回來。4.5 秒起報導離子從標籤上斷開(往左移出一個縫)
+      const brk = ease(seg(t, 4.5, 6.5)), RX = 120, BX0 = 172;
+      [['A', SA_COL, '126'], ['B', SB_COL, '127']].forEach(([nm, col, rep], r) => {
+        const y = 48 + r * 72, bw = 70;
+        g.text(40, y, `樣品 ${nm}`, { size: 15, weight: 700, color: col });
+        const rx = RX - brk * 14;
+        g.rrect(rx, y - 14, 46, 28, 6, col); g.text(rx + 23, y, rep, { size: 15, weight: 800, color: '#0b1111', align: 'center', mono: true });
+        g.rrect(BX0, y - 14, bw, 28, 6, 'rgba(255,255,255,.08)', C.ink2, 1.2); g.text(BX0 + bw / 2, y, '平衡', { size: 13, color: C.ink2, align: 'center' });
+        if (brk < 0.2) g.line(RX + 46, y, BX0, y, C.ink2, 2);
+        const px = BX0 + bw + 6;
+        g.line(px, y, px + 14, y, C.ink2, 2);
+        for (let i = 0; i < Math.min(6, s.length); i++) bead(g, px + 30 + i * 30, y, s[i], { r: 13, size: 13 });
+        g.text(px + 30 + 6 * 30, y, '…', { size: 16, color: C.ink2 });
+      });
+      if (brk > 0) {
+        g.line(RX + 49, 30, RX + 49, 138, C.amber, 1.8, [4, 4]);
+        g.text(RX + 58, 84, '碎裂時從這裡斷開,放出報導離子', { size: 13, color: C.amber, alpha: brk });
+      }
+      g.text(600, 52, '報導 + 平衡 = 一樣重', { size: 16, weight: 700, color: C.ink });
+      g.text(600, 80, `每個標籤 +${TMT_TAG.toFixed(3)}(N 端與每個 K)`, { size: 14, color: C.ink2 });
+      g.text(600, 116, `標記後 M = ${M.toFixed(3)}`, { size: 14, color: C.ink2, mono: true });
+      g.text(600, 142, `→ 2+ 的 m/z ${f2(mz)},A、B 疊在同一根`, { size: 14, color: C.ink2 });
+      // ---- 左中:MS1 的挑選視窗 ----
+      g.panel(24, 178, 440, 246, 'MS1:挑母離子');
+      const x0 = mz - 2.6, x1 = mz + 2.6, iso = isoPat(M);
+      const A = g.axes(76, 224, 368, 136, { xmin: x0, xmax: x1, ymin: 0, ymax: 1.3, xticks: [mz - 2, mz, mz + 2], fmtX: (v) => f2(v), xlab: 'm/z' });
+      g.rrect(A.X(mz - 1), 224, A.X(mz + 1) - A.X(mz - 1), A.Y(0) - 224, 4, 'rgba(255,209,102,.08)', 'rgba(255,209,102,.5)', 1.2);
+      g.text(A.X(mz + 1), 210, '挑選視窗 2 m/z', { size: 13, color: C.amber, align: 'right' });
+      iso.forEach((v, k) => { const x = A.X(mz + (k * ISO) / 2); g.line(x, A.Y(0), x, A.Y(v / iso[0]), C.ink, 3); });
+      g.text(A.X(mz) + 6, A.Y(1.12), 'A + B', { size: 14, weight: 700, color: C.ink });
+      if (fI > 0) { // 混進來的離子:高度依干擾比例畫(示意)
+        const hI = Math.min(1.2, (fI / (1 - fI)) * 1.35);
+        for (const [dx, k] of [[-0.62, 0.55], [0.47, 0.45]]) g.line(A.X(mz + dx), A.Y(0), A.X(mz + dx), A.Y(hI * k * 2), 'rgba(185,199,192,.85)', 3);
+        g.text(A.X(mz - 0.62) - 6, A.Y(hI * 1.1) - 4, '別的胜肽', { size: 13, color: C.ink2, align: 'right' });
+      }
+      // ---- 右中:報導離子 ----
+      g.panel(480, 178, 456, 246, S.ms3 ? 'MS3 的報導離子(只看一根碎片)' : 'MS2 的報導離子');
+      const ra = ease(seg(t, 5, 6.5));
+      if (ra > 0) {
+        const vA = 1 + I, vB = R0 + I, ymx = Math.max(vA, vB, 1) * 1.25;
+        const B = g.axes(546, 214, 360, 150, { xmin: 125.5, xmax: 127.75, ymin: 0, ymax: ymx, xticks: TMT_REP, fmtX: (v) => v.toFixed(2), xlab: 'm/z' });
+        const bar = (mzr, h, col) => {
+          const x = B.X(mzr), w = 30;
+          g.ctx.save(); g.ctx.globalAlpha = ra;
+          g.rrect(x - w / 2, B.Y(h * ra), w, B.Y(0) - B.Y(h * ra), 3, col);
+          if (I > 0) g.rrect(x - w / 2, B.Y((h + I) * ra), w, B.Y(h * ra) - B.Y((h + I) * ra), 3, 'rgba(185,199,192,.75)');
+          g.ctx.restore();
+        };
+        bar(TMT_REP[0], 1, SA_COL); bar(TMT_REP[1], R0, SB_COL);
+        if (ra > 0.9) {
+          g.text(B.X(TMT_REP[0]), B.Y(vA) - 14, '126(A)', { size: 14, weight: 700, color: SA_COL, align: 'center' });
+          g.text(B.X(TMT_REP[1]), B.Y(vB) - 14, '127(B)', { size: 14, weight: 700, color: SB_COL, align: 'center' });
+          if (I > 0) g.text(B.X(TMT_REP[1]) + 24, B.Y(vB - I / 2), '灰:干擾', { size: 13, color: C.ink2 });
+        }
+      }
+      // ---- 下:讀值 ----
+      const meas = (R0 + I) / (1 + I);
+      g.text(28, 456, `真的 B : A = ${R0} : 1`, { size: 16, weight: 700, color: C.ink });
+      if (t > 6.5) {
+        g.text(28, 488, `量到 = (B + I) ÷ (A + I) = ${f2(meas)}`, { size: 19, weight: 700, color: I > 0.005 ? C.amber : C.mint, mono: false });
+        g.text(28, 516, S.ms3 ? 'MS3:別的胜肽的報導離子幾乎都去掉了(這裡畫成完全去掉)' : `干擾 ${Math.round(fI * 100)}%:每個通道多出 I = ${I.toFixed(2)}(A 的訊號當 1)`, { size: 13, color: C.muted });
+      }
+      if (t > 13.5 && !S.ms3) g.tag(926, 488, '試試右邊的 MS3', { size: 13, color: C.ink2, align: 'right', alpha: ease(seg(t, 13.5, 14.1)) });
+    },
+  },
+  {
+    key: 'fdr', name: '進階:誘餌資料庫與錯誤率', dur: 18, drag: true,
+    cues: [[0, '資料庫比對一定有錯配:每張譜圖都會配到分數最高的胜肽,就算產生它的胜肽不在資料庫裡。門檻以上錯了多少?'],
+      [4.5, '把每條蛋白質序列反轉當誘餌,和真的(目標)一起搜尋。誘餌的胜肽不存在,配到一定是錯的;錯配落在兩邊的機會一樣。'],
+      [9.5, '所以門檻以上,錯的目標大約和誘餌一樣多:錯誤發現率 FDR ≈ 誘餌數 ÷ 目標數。門檻越低,鑑定越多,FDR 也越高。'],
+      [13.5, 'q 值是讓這一筆被接受的最低 FDR;常用 1% 當門檻。可以拖動門檻,或按右邊的「設在 FDR 1%」。']],
+    pointer(type, x, y, S) {
+      if (type === 'up' || (type === 'move' && !fdrDrag)) { if (type === 'up') fdrDrag = false; return false; }
+      if (type === 'down') { if (x < FDA.x - 10 || x > FDA.x + FDA.w + 10 || y < FDA.y - 10 || y > FDA.y + FDA.h + 10) return false; fdrDrag = true; }
+      const v = clamp(Math.round((FD.lo + ((x - FDA.x) / FDA.w) * (FD.hi - FD.lo)) / 0.05) * 0.05, 0.5, 5.5);
+      L.set('thr', Number(v.toFixed(2)));
+      return true;
+    },
+    draw(g, t, S) {
+      const c = g.ctx, P = protOf(S);
+      // ---- 上:目標與反轉的誘餌 ----
+      g.panel(24, 12, 912, 112, '');
+      const seqRow = (y, label, seq, col, a) => {
+        g.text(40, y, label, { size: 15, weight: 700, color: col, alpha: a });
+        g.font(16, 600, true);
+        const cw = c.measureText('M').width;
+        for (let i = 0; i < 30; i++) g.text(176 + i * cw, y, seq[i], { size: 16, weight: 600, mono: true, color: seq[i] === 'K' || seq[i] === 'R' ? C.amber : C.ink, alpha: a });
+        g.text(176 + 30 * cw + 4, y, '…', { size: 16, color: C.ink2, alpha: a });
+      };
+      seqRow(44, '目標', P.seq, C.ink, 1);
+      const da = ease(seg(t, 4.5, 5.3));
+      if (da > 0) {
+        seqRow(88, '誘餌(反轉)', [...P.seq].reverse().join(''), C.amber, da);
+        g.text(920, 66, '組成一樣,但不是真的蛋白質', { size: 13, color: C.ink2, align: 'right', alpha: da });
+      }
+      // ---- 中:分數分布(目標在上、誘餌在下) ----
+      const ym = Math.ceil(FD_BINS.max / 100) * 100;
+      const A = g.axes(FDA.x, FDA.y, FDA.w, FDA.h, { xmin: FD.lo, xmax: FD.hi, ymin: -ym, ymax: ym, xticks: [0, 1, 2, 3, 4, 5, 6], yticks: [-ym, 0, ym], fmtY: (v) => fint(Math.abs(v)), xlab: '比對分數(示意)', ylab: '譜圖數' });
+      const ta = ease(seg(t, 0.3, 2.5)), dg = ease(seg(t, 5, 7.5)), truth = S.truth;
+      for (let i = 0; i < FD_BINS.n; i++) {
+        const xl = A.X(FD.lo + i * FD.bw) + 0.6, w = A.X(FD.lo + (i + 1) * FD.bw) - A.X(FD.lo + i * FD.bw) - 1.2;
+        const ok = FD_BINS.ok[i] * ta, bad = FD_BINS.bad[i] * ta, dec = FD_BINS.dec[i] * dg;
+        if (truth) {
+          c.fillStyle = 'rgba(165,243,205,.8)'; c.fillRect(xl, A.Y(ok), w, A.Y(0) - A.Y(ok));
+          c.fillStyle = 'rgba(255,123,123,.75)'; c.fillRect(xl, A.Y(ok + bad), w, A.Y(ok) - A.Y(ok + bad));
+        } else { c.fillStyle = 'rgba(213,221,217,.7)'; c.fillRect(xl, A.Y(ok + bad), w, A.Y(0) - A.Y(ok + bad)); }
+        if (dec > 0) { c.fillStyle = 'rgba(255,209,102,.75)'; c.fillRect(xl, A.Y(0), w, A.Y(-dec) - A.Y(0)); }
+      }
+      g.line(FDA.x, A.Y(0), FDA.x + FDA.w, A.Y(0), C.ink2, 1.4);
+      g.text(A.X(-0.9), A.Y(ym * 0.82), truth ? '目標(綠:對、紅:錯)' : '目標', { size: 14, weight: 700, color: truth ? C.mint : C.ink });
+      if (dg > 0) g.text(A.X(-0.9), A.Y(-ym * 0.82), '誘餌(一定是錯的)', { size: 14, weight: 700, color: C.amber, alpha: dg });
+      if (t < 9.5) g.tag(A.X(4.6), A.Y(ym * 0.55), '高分的有對有錯', { size: 14, color: C.ink2, alpha: ease(seg(t, 1.5, 2.3)) });
+      // ---- 門檻與讀值 ----
+      const thA = ease(seg(t, 9.5, 10.3));
+      const px = 708, r = atThr(S.thr);
+      if (thA > 0) {
+        const xt = A.X(S.thr);
+        c.save(); c.globalAlpha = thA;
+        c.fillStyle = 'rgba(165,243,205,.07)'; c.fillRect(xt, FDA.y, FDA.x + FDA.w - xt, FDA.h);
+        g.line(xt, FDA.y - 6, xt, FDA.y + FDA.h, C.mint, 2.4);
+        g.rrect(xt - 7, FDA.y - 16, 14, 16, 4, C.mint);
+        g.text(xt + 12, FDA.y - 8, '拖動', { size: 12, color: C.muted });
+        if (t > 13.5) { const x1 = A.X(FDR1); g.line(x1, A.Y(0) - 8, x1, A.Y(0) + 8, C.lav, 3); g.text(x1, A.Y(0) + 20, '1%', { size: 13, weight: 700, color: C.lav, align: 'center' }); }
+        g.text(px, 168, `門檻:分數 ≥ ${S.thr.toFixed(2)}`, { size: 17, weight: 700, color: C.ink });
+        g.text(px, 202, `目標 ${fint(r.T)}`, { size: 16, color: C.ink });
+        g.text(px, 230, `誘餌 ${fint(r.D)}`, { size: 16, color: C.amber });
+        g.text(px, 268, `FDR ≈ ${fint(r.D)} ÷ ${fint(r.T)}`, { size: 15, color: C.ink2, mono: true });
+        g.text(px, 298, `= ${pctS(r.fdr)}`, { size: 22, weight: 800, color: r.fdr <= 0.01 ? C.mint : C.amber, mono: true });
+        if (t > 13.5) g.text(px, 334, `最低一筆的 q 值 ${pctS(r.q)}`, { size: 15, color: C.lav });
+        if (truth) g.text(px, 366, `其實錯了 ${fint(r.F)}(${pctS(r.fdp)})`, { size: 15, color: C.red });
+        c.restore();
+      }
+      if (t > 13.5) g.text(28, 516, `q ≤ 1% 的門檻:分數 ${FDR1.toFixed(2)},接受 ${fint(atThr(FDR1).T)} 個目標`, { size: 14, color: C.lav, alpha: ease(seg(t, 13.5, 14.2)) });
+      else g.text(28, 516, `模擬 ${fint(FD.n)} 張譜圖(固定亂數種子),目標與誘餌一起搜尋`, { size: 13, color: C.muted });
+    },
+  },
 ];
+const FDA = { x: 84, y: 150, w: 560, h: 280 };
+let fdrDrag = false;
 
-createLesson({
+const L = createLesson({
   chapters,
-  state: { prot: 0, pep: 1, series: 'y', tol: 0.05, bond: null },
+  state: { prot: 0, pep: 1, series: 'y', tol: 0.05, bond: null, ratio: 4, inject: 20, interf: 30, ms3: false, thr: 2.5, truth: false },
   controls: [
     // 換蛋白質時,「跟著看的胜肽」顯示的序列由播放器重新顯示(它的 format 讀 S.prot)
-    { id: 'prot', label: '蛋白質(示意序列)', type: 'seg', options: [{ v: 0, label: '甲' }, { v: 1, label: '乙' }, { v: 2, label: '丙' }], chapters: ['digest', 'lc', 'ms1', 'msms', 'read', 'db'], restart: true,
+    { id: 'prot', label: '蛋白質(示意序列)', type: 'seg', options: [{ v: 0, label: '甲' }, { v: 1, label: '乙' }, { v: 2, label: '丙' }], chapters: ['digest', 'lc', 'ms1', 'msms', 'read', 'db', 'quant', 'tmt'], restart: true,
       onChange: (v, S) => { S.bond = null; } },
-    { id: 'pep', label: '跟著看的胜肽', type: 'range', min: 1, max: 4, step: 1, format: (v, S) => `${v}:${pepOf(S, v).seq}`, chapters: ['ms1', 'msms', 'read', 'db'], restart: true, onChange: (v, S) => { S.bond = null; } },
+    { id: 'pep', label: '跟著看的胜肽', type: 'range', min: 1, max: 4, step: 1, format: (v, S) => `${v}:${pepOf(S, v).seq}`, chapters: ['ms1', 'msms', 'read', 'db', 'quant', 'tmt'], restart: true, onChange: (v, S) => { S.bond = null; } },
     { id: 'series', label: '讀哪一組', type: 'seg', options: [{ v: 'y', label: 'y 系列(由右讀)' }, { v: 'b', label: 'b 系列(由左讀)' }], chapters: ['read'], restart: true },
     { id: 'tol', label: '母離子質量的容許誤差(Da)', type: 'seg', options: [{ v: 0.5, label: '±0.5' }, { v: 0.05, label: '±0.05' }, { v: 0.005, label: '±0.005' }], chapters: ['db'], restart: false },
+    { id: 'ratio', label: '兩個樣品的真實比例 B : A', type: 'seg', options: [{ v: 1, label: '1 : 1' }, { v: 2, label: '2 : 1' }, { v: 4, label: '4 : 1' }, { v: 10, label: '10 : 1' }], chapters: ['quant', 'tmt'], restart: false },
+    { id: 'inject', label: '第 2 針的進樣量(示意)', type: 'range', min: -40, max: 40, step: 10, format: (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)}%`, chapters: ['quant'], restart: false },
+    { id: 'interf', label: '共分離的干擾', type: 'range', min: 0, max: 60, step: 5, unit: '%', chapters: ['tmt'], restart: false },
+    { id: 'ms3', label: '改用第三次質譜(MS3)', type: 'toggle', chapters: ['tmt'], restart: false },
+    { id: 'thr', label: '分數門檻', type: 'range', min: 0.5, max: 5.5, step: 0.05, format: (v) => v.toFixed(2), chapters: ['fdr'], restart: false },
+    { id: 'truth', label: '顯示答案(只有模擬才知道對錯)', type: 'toggle', chapters: ['fdr'], restart: false },
+    // 門檻設成 q ≤ 1% 的最低分數本身(滑桿只顯示到小數 2 位;之後再拖滑桿才會跳到 0.05 的倍數)
+    { id: 'fdr1', label: '設在 FDR 1%', type: 'button', onClick: (S) => { S.thr = FDR1; }, chapters: ['fdr'] },
   ],
 });
 // 資料庫在瀏覽器閒下來時先產生,到最後一章就不用等

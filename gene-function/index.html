@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>在植物裡驗證基因功能:從農桿菌浸潤到基因沉默</title>
+<meta name="description" content="大腸桿菌裡做得出產物,不代表植物裡真的這樣用。用動畫看農桿菌怎麼把 T-DNA 送進本氏菸草葉片、p19 怎麼擋住基因沉默、GC-MS 怎麼認出新的產物峰、GFP 怎麼看出酵素在質體還是細胞質,以及 VIGS 怎麼把基因關掉。可以自己調轉運胜肽、p19、上游酵素與沉默目標。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="在植物裡驗證基因功能:從農桿菌浸潤到基因沉默">
+<meta property="og:description" content="大腸桿菌裡做得出產物,不代表植物裡真的這樣用。用動畫看農桿菌浸潤、p19 抑制基因沉默、GC-MS 認產物、GFP 定位與 VIGS 沉默。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/gene-function/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/gene-function.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="在植物裡驗證基因功能:針筒把農桿菌推進菸草葉片、質體裡的酵素與層析圖上新出現的峰">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/gene-function/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化進階"><a href="../">← 儀器入口</a><a href="../transcriptomics/">轉錄體分析</a><a href="../terpenoid-precursors/">萜類前驅物</a><a href="../enzyme-kinetics/">酵素動力學</a><a href="../population-genetics/">族群遺傳</a><a href="../phylogenetics/">演化樹</a><a href="./" aria-current="page">基因功能驗證</a></nav></div>
+<header class="top wrap">
+  <h1>在植物裡驗證基因功能 <span class="k">大腸桿菌做得出來,不等於植物裡這樣用</span></h1>
+  <p class="lede">純化的酵素加上受質,測到的是「它能做什麼」。植物細胞還有胞器位置、前驅物供應與其他酵素的搭配,所以功能要回到植物裡確認:農桿菌把基因送進本氏菸草葉片暫時表現、GC-MS 比對空載體看新的峰、GFP 看酵素在哪一區,再用病毒誘導基因沉默把它關掉看產物掉多少。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="在植物裡驗證基因功能的動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <p class="pre">先看:<a href="../cloning/">基因選殖與蛋白表現</a>(在大腸桿菌裡做出酵素)、<a href="../terpene-synthase/">萜類合成酶</a>、<a href="../crispr/">CRISPR</a>、<a href="../pcr/">PCR 與電泳</a>(qPCR)。</p>
+    <ul>
+      <li>植物細胞把萜類前驅物分在兩區:質體的 MEP 途徑供應 GPP(C10)與 GGPP(C20),細胞質的 MVA 途徑供應 FPP(C15)。酵素在哪一區就只遇得到那一區的受質,所以試管裡的產物未必是植物體內的產物。金魚草兩支序列 95% 相同的酵素,細胞質那支做 nerolidol、質體那支做 linalool。</li>
+      <li>單萜與雙萜合成酶前端有一段質體轉運胜肽(冷杉的三支約 60 到 70 個胺基酸,絲胺酸占 11 到 22%、酸性殘基只有 2 到 4 個),進質體後被切掉;高度保守的連續兩個精胺酸大約就是成熟蛋白的起點。倍半萜合成酶沒有這一段,留在細胞質。</li>
+      <li>農桿菌的 T-DNA 兩端是 25 個鹼基對的邊界序列,邊界之間的東西會被送進植物細胞。雙元載體把 T-DNA 放在另一個可以複製的質體上,vir 基因留在卸掉致病性的 Ti 質體;傷口汁液的酸性(pH 5.0 到 5.8)與單環酚類(例如乙醯丁香酮)經 VirA 與 VirG 打開 vir 基因。T-DNA 不嵌進染色體也會表現幾天,這就是暫時表現。</li>
+      <li>浸潤的葉片會啟動轉錄後基因沉默:DCL4 與 DCL2 把轉殖基因的雙股 RNA 切成 21 到 22 個核苷酸的 siRNA,裝進 AGO 後切掉 mRNA,螢光從第 4 天起一路下降。番茄叢矮病毒的 p19 以二聚體夾住這些 siRNA 雙股,一起表現時第 4、7、10 天的螢光都高約一個數量級。</li>
+      <li>看產物一定要有只打空載體的對照葉片:銀杏與蓖麻的雙萜合成酶在菸草表現時,空載體的葉片在同一位置測不到產物。前驅物不夠時一起打上游的 DXS 與 GGPPS,雲杉的雙萜產量增加 3 倍、菸草的 cembratrien-ol 增加 3.5 倍。</li>
+      <li>反過來把基因關掉:TRV 的兩條 RNA 分工,TRV2 上接一段 200 到 1000 bp 的目標片段,農桿菌打進 3 週大的葉片,2 到 3 週後新長出來的葉子被沉默。沉默八氫番茄紅素去飽和酶(PDS)會擋掉類胡蘿蔔素、讓葉綠素被光氧化,葉子漂白,是這一批到底有沒有效的目視對照。</li>
+      <li>樹木的世代長:歐洲雲杉要 20 到 25 年、赤松 8 到 20 年才進入生殖期,楊樹約 6 年、橡約 60 年。楊樹是模式樹(基因體 480 到 550 Mb、插枝可繁殖、轉殖容易,第一個被定序的樹);松杉類體胚發生的效率低,馬尾松至今無法轉殖,功能改在本氏菸草裡驗。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Hwang HH, et al. Agrobacterium-mediated plant transformation: biology and applications. Arabidopsis Book. 2017;15:e0186. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6501860/">PMC6501860</a>(T-DNA 兩端是 25 個鹼基對的不完全重複邊界序列;vir 區至少七個主要基因座;雙元載體把 T-DNA 放在廣宿主範圍的複製子上、vir 基因留在卸掉致病性的 Ti 質體;傷口汁液 pH 5.0 到 5.8;最有效的 vir 誘導物是單環酚類,以乙醯丁香酮為例,經 VirA 與 VirG 雙組分系統調控;暫時表現不需要 T-DNA 嵌入,表現通常持續幾天)</li>
+      <li>Norkunas K, et al. Improving agroinfiltration-based transient gene expression in <i>Nicotiana benthamiana</i>. Plant Methods. 2018;14:71. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6109318/">PMC6109318</a>(菌液 OD600 調到 1.0,MMA 緩衝液為 10 mM MES pH 5.6、10 mM MgCl₂ 加乙醯丁香酮,最佳濃度 500 μM;以鈍頭針筒從 6 到 8 週大植株最上面三片葉的葉背注入;GUS 在第 4 天最高、第 8 天測不到;共表現 p19 使 GUS 增加 2.5 到 4 倍)</li>
+      <li>Jay F, et al. A contemporary reassessment of the enhanced transient expression system based on the tombusviral silencing suppressor protein P19. Plant J. 2023;113(1):186–204. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10107623/">PMC10107623</a>(農桿菌浸潤的表現必然被轉錄後基因沉默壓下來,伴隨轉殖基因來源的 siRNA 累積;沒有 P19 時螢光從第 4 天起下降、第 10 天幾乎看不到;P19 形成二聚體夾鉗,結合 DCL4 與 DCL2 產生的 21 到 22 個核苷酸 siRNA,擋住裝進 AGO1 與 AGO2;一起表現時第 4、7、10 天螢光約高一個數量級、mRNA 最多高約一千倍)</li>
+      <li>Silhavy D, et al. A viral protein suppresses RNA silencing and binds silencing-generated, 21- to 25-nucleotide double-stranded RNAs. EMBO J. 2002;21(12):3070–3080. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC125389/">PMC125389</a>(p19 結合 21 到 25 個核苷酸、3′ 端突出 2 個核苷酸的雙股 RNA,幾乎不結合單股、長雙股或平整末端的雙股;以隔離這些雙股 siRNA 來抑制沉默)</li>
+      <li>Brückner K, Tissier A. High-level diterpene production by transient expression in <i>Nicotiana benthamiana</i>. Plant Methods. 2013;9:46. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3878842/">PMC3878842</a>(銀杏 levopimaradiene 合成酶、蓖麻 casbene 合成酶與菸草 cembratrien-ol 合成酶;只打空 T-DNA 載體的葉片測不到產物;浸潤後 3 天開始累積、第 5 天最高;葉片浸己烷 2 分鐘萃取後 GC-MS;一起打 DXS2 與 GGPPS2 使 cembratrien-ol 增加 3.5 倍;植物宿主同時有 MVA 與 MEP 兩條途徑,胞器導向訊號的加工在植物間高度保守,不必像在大腸桿菌或酵母裡那樣處理溶解度與導向問題)</li>
+      <li>Gnanasekaran T, et al. Heterologous expression of the isopimaric acid pathway in <i>Nicotiana benthamiana</i>. J Biol Eng. 2015;9:24. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4688937/">PMC4688937</a>(歐洲雲杉的 isopimara-7,15-diene 合成酶與西加雲杉的 CYP720B4;只打 p19 的對照葉片沒有這兩個化合物的背景;浸潤後 4 天採收,葉圓片浸己烷後 GC-MS;isopimaric acid 累積 45 到 55 μg/g 乾重;一起打 DXS 與 GGPPs 使兩者各增加 3 倍)</li>
+      <li>Nagegowda DA, et al. Two nearly identical terpene synthases catalyze the formation of nerolidol and linalool in snapdragon flowers. Plant J. 2008;55(2):224–239. <a href="https://doi.org/10.1111/j.1365-313X.2008.03496.x">doi:10.1111/j.1365-313X.2008.03496.x</a>(金魚草 AmNES/LIS-1 與 AmNES/LIS-2 胺基酸序列 95% 相同;前者在細胞質做 nerolidol、後者在質體做 linalool,次細胞定位加上受質可得性決定產物;GFP 融合蛋白在阿拉伯芥原生質體暫時表現,綠色通道看 GFP、紅色通道看葉綠素自發螢光;全長的 AmNES/LIS-2 訊號在質體,從第 31 個胺基酸起的截短版改落在細胞質,前 69 個胺基酸就足以帶 GFP 進葉綠體;五個預測程式有三個把它判在細胞質)</li>
+      <li>Bohlmann J, et al. Plant terpenoid synthases: molecular biology and phylogenetic analysis. Proc Natl Acad Sci USA. 1998;95(8):4126–4133. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC22453/">PMC22453</a>(單萜與雙萜合成酶在質體、倍半萜合成酶在細胞質;質體型的以帶 N 端轉運胜肽的前驅蛋白表現,進質體後被切成成熟型;單萜合成酶約 600 到 650 個胺基酸,比倍半萜合成酶長 50 到 70 個,主要就是這一段;轉運胜肽彼此序列不像,共同點是絲胺酸與蘇胺酸偏多、酸性殘基偏少;高度保守的連續兩個精胺酸大約界定成熟蛋白的 N 端;有幾支倍半萜合成酶在試管裡能用 GPP 做出 limonene,但在細胞質遇不到質體做的 GPP);N 端的長度與組成見 Bohlmann J, et al. J Biol Chem. 1998;273(2):21784–21792 的前身 <a href="https://www.jbc.org/article/S0021-9258(19)65623-1/fulltext">1997;272(35):21784–21792</a>(冷杉三支單萜合成酶的 N 端 60 到 70 個胺基酸,絲胺酸占 11 到 22%、Asp 與 Glu 只有 2 到 4 個)</li>
+      <li>Senthil-Kumar M, Mysore KS. Tobacco rattle virus-based virus-induced gene silencing in <i>Nicotiana benthamiana</i>. Nat Protoc. 2014;9(7):1549–1562. <a href="https://www.nature.com/articles/nprot.2014.092">nprot.2014.092</a>(TRV 是雙分體正股 RNA 病毒,TRV1 與 TRV2 兩條基因體;TRV2 經改造帶一段目標基因片段,和 TRV1 一起用農桿菌接種到 3 週大的葉片;沉默出現在新長出來、沒有被接種的葉子,約 2 到 3 週;整套流程 4 週。本頁只用摘要與公開的補充檔,正文需訂閱);載體出自 Liu Y, et al. Plant J. 2002;30(4):415–429(pTRV1 與 pTRV2),TRV 當 VIGS 載體首見於 Ratcliff F, et al. Plant J. 2001;25(2):237–245</li>
+      <li>Atsumi G, et al. Analysis of the mechanisms regulating the expression of isoprenoid biosynthesis genes in hydroponically-grown <i>Nicotiana benthamiana</i> plants using virus-induced gene silencing. Sci Rep. 2018;8:14804. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6172274/">PMC6172274</a>(pTRV1 與 pTRV2-MCS,接 400 個核苷酸的反義片段;對照組是帶 GFP 反義片段的載體;第 15 天用即時定量 PCR 量到葉片的轉錄本只剩 9% 到 31%;PDS 沉默的葉片在第 7 天開始漂白、第 14 天明顯)</li>
+      <li>Zhang T, et al. Establishment of a virus-induced gene silencing system in <i>Abelmoschus manihot</i> L. Plants. 2025;14(2):150. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11768517/">PMC11768517</a>(沉默 PDS 會打斷類胡蘿蔔素生合成,葉綠素被光氧化分解而出現明顯的光漂白,所以 PDS 被廣泛當成 VIGS 的報導基因);Velásquez AC, et al. J Vis Exp. 2009;(28):1292. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2795700/">PMC2795700</a>(插入片段長度 200 到 1000 bp;本氏菸草約 2.5 週大時接種;光漂白最快在浸潤後 1.5 週出現;一定要量目標基因的轉錄本)</li>
+      <li>樹木:Uddenberg D, et al. Plant Physiol. 2013;161(2):813–823. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3561021/">PMC3561021</a>(歐洲雲杉的營養生長期 20 到 25 年、赤松 8 到 20 年;多數針葉樹經過 15 到 25 年的幼年期才進入生殖期;世代長與結實年份不規則是育種的主要障礙);Taylor G. Ann Bot. 2002;90(6):681–689. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4240366/">PMC4240366</a>(楊樹基因體 450 到 550 Mbp、可用營養繁殖、溫帶樹中生長最快、容易轉殖;柳約 1 年、楊樹約 6 年、橡約 60 年開花);美國能源部聯合基因體研究所 <a href="https://archive.jgi.doe.gov/?p=1035">2006 年 9 月 14 日發布</a>(第一個完成定序的樹是黑楊,基因體 4.8 億個核苷酸);Liu B, et al. Tree Physiol. 2022;42(2):411–424. <a href="https://doi.org/10.1093/treephys/tpab103">doi:10.1093/treephys/tpab103</a>(馬尾松至今無法基因轉殖,所以把 PmGPPS1 的功能改在本氏菸草裡驗);Salaj T, et al. Front Plant Sci. 2019;10:13. <a href="https://www.frontiersin.org/articles/10.3389/fpls.2019.00013/full">10.3389/fpls.2019.00013</a>(針葉樹的離體營養繁殖困難,體胚發生是轉殖研究的必要工具)</li>
+      <li>替代做法:Gutierrez-Valdes N, et al. Front Plant Sci. 2020;11:33. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7064051/">PMC7064051</a>(Ri 質體的 T-DNA 嵌進植物基因體後誘出毛狀根,在無激素培養基上生長,基因型與表現型穩定、能長期生產次級代謝物);Ron M, et al. Plant Physiol. 2014;166(2):455–469. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4213079/">PMC4213079</a>(世代長的作物在功能性基因體研究上卡住;毛狀根可以在做穩定轉殖株那段漫長流程之前先測基因表現與功能);Shao Y, et al. Int J Mol Sci. 2023;24(4):3633. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9962833/">PMC9962833</a>(PEG 介導的原生質體轉染最常用,適合做次細胞定位與啟動子活性);Pazouki L, Niinemets Ü. Front Plant Sci. 2016;7:1019. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4940680/">PMC4940680</a>(質體的 MEP 途徑一般供應半萜、單萜與雙萜的受質,細胞質的 MVA 途徑供應倍半萜;轉運胜肽同源性低、不易預測,有這一段不等於一定進質體,最後要靠免疫標記或螢光融合蛋白確認;植物體內的產物由酵素活性與各受質池的相對大小決定)</li>
+      <li>示意值與簡化:第 3 章的表現量曲線是示意的模型,只校準到 Jay 等 2023 的對照點(沒有 p19 時第 4 天起下降、有 p19 時第 4、7、10 天約高一個數量級),不是任何一次實驗的實測曲線;第 4 章的層析圖峰形、滯留時間與面積基準是示意,只有「空載體測不到」與「加上游酵素增加 3 到 3.5 倍」兩件事取自上面的文獻;第 5 章的 64 個胺基酸轉運胜肽序列、620 個胺基酸的全長與共軛焦畫面都是示意,組成(絲胺酸 17%、酸性殘基 2 個)是從畫面上那條序列數出來的,刻意落在冷杉三支酵素的實測範圍內;第 6 章轉錄本剩 12% 與 15%、產物峰剩 15% 是示意值,落在 Atsumi 等 2018 量到的 9% 到 31% 之間,轉錄本與產物成正比也是示意;農桿菌、質體、葉片、細胞、胞器、植株與毛狀根的樣子都是示意。本頁不能拿來當實驗條件或判讀依據。</li>
+      <li>不引用:Voinnet O, et al. Plant J. 2003;33(5):949–956 這篇 p19 的經典論文已於 2015 年撤稿(<a href="https://doi.org/10.1111/tpj.13066">Plant J. 2015;84(4):846</a>),本頁改用 Silhavy 等 2002 與 Jay 等 2023。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化進階・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, seg, ease, clamp, lerp, rng, mix } from '../assets/bio-draw.js';
+
+// ===================== 共用的小畫法(這一頁自己寫的) =====================
+const sup = (n) => String(n).replace(/[-0-9]/g, (d) => '\u{207B}\u{2070}\u{00B9}\u{00B2}\u{00B3}\u{2074}\u{2075}\u{2076}\u{2077}\u{2078}\u{2079}'[d === '-' ? 0 : Number(d) + 1]);
+const pct = (v) => `${Math.round(v * 100)}%`;
+
+// 一片葉子:尖橢圓加中肋與側脈。rot 是弧度
+function leaf(g, cx, cy, w, h, fill, { stroke = 'rgba(165,243,205,.5)', rot = 0, alpha = 1, veins = 3, lw = 1.5 } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(cx, cy); ctx.rotate(rot);
+  ctx.beginPath();
+  ctx.moveTo(-w / 2, 0);
+  ctx.bezierCurveTo(-w / 4, -h / 2, w / 4, -h / 2, w / 2, 0);
+  ctx.bezierCurveTo(w / 4, h / 2, -w / 4, h / 2, -w / 2, 0);
+  ctx.closePath();
+  ctx.fillStyle = fill; ctx.fill();
+  if (stroke) { ctx.lineWidth = lw; ctx.strokeStyle = stroke; ctx.stroke(); }
+  ctx.beginPath(); ctx.moveTo(-w / 2, 0); ctx.lineTo(w / 2, 0);
+  ctx.strokeStyle = stroke || 'rgba(0,0,0,.25)'; ctx.lineWidth = lw; ctx.stroke();
+  for (let i = 1; i <= veins; i++) {
+    const x = -w / 2 + (w * i) / (veins + 1), d = h * 0.3 * (1 - Math.abs(x) / (w / 2));
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + w * 0.1, -d); ctx.moveTo(x, 0); ctx.lineTo(x + w * 0.1, d);
+    ctx.lineWidth = lw * 0.6; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// 環狀質體:底圈加幾段上色的弧(segs 是 [起角, 迄角, 顏色])
+function plasmid(g, cx, cy, r, segs, { alpha = 1, lw = 7 } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.lineWidth = lw; ctx.strokeStyle = 'rgba(213,221,217,.3)'; ctx.stroke();
+  for (const [a0, a1, col] of segs) {
+    ctx.beginPath(); ctx.arc(cx, cy, r, a0, a1);
+    ctx.lineWidth = lw; ctx.strokeStyle = col; ctx.lineCap = 'butt'; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// 農桿菌:圓角長方形加幾條鞭毛
+function bacterium(g, x, y, w, h, { alpha = 1, t = 0, col = 'rgba(184,164,244,.28)' } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha;
+  g.rrect(x, y, w, h, h / 2, col, C.lav, 1.8);
+  for (let i = 0; i < 3; i++) {
+    const y0 = y + h * (0.28 + i * 0.22);
+    const pts = [];
+    for (let k = 0; k <= 10; k++) pts.push([x - k * 4.2, y0 + Math.sin(t * 3 + k * 0.7 + i) * 3.2 * (k / 10)]);
+    g.curve(pts, 'rgba(184,164,244,.6)', 1.6);
+  }
+  ctx.restore();
+}
+
+// 葉綠體:橢圓加幾條類囊體線
+function chloro(g, x, y, rx, ry, { alpha = 1, col = 'rgba(95,211,154,.55)', rot = 0 } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(x, y); ctx.rotate(rot);
+  ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = 1.4; ctx.strokeStyle = 'rgba(165,243,205,.55)'; ctx.stroke();
+  for (let i = -1; i <= 1; i++) {
+    ctx.beginPath(); ctx.moveTo(-rx * 0.6, ry * 0.42 * i); ctx.lineTo(rx * 0.6, ry * 0.42 * i);
+    ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(21,60,40,.6)'; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// 針筒:push 0 到 1 是推桿往前的程度
+function syringe(g, x, y, push, { alpha = 1, len = 92 } = {}) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.globalAlpha *= alpha;
+  g.rrect(x, y - 11, len, 22, 4, 'rgba(213,221,217,.14)', C.ink2, 1.6);
+  g.rrect(x + 6 + push * (len - 34), y - 8, 24, 16, 3, 'rgba(165,243,205,.55)');
+  g.line(x - 2, y - 15, x - 2, y + 15, C.ink2, 2.4);
+  g.line(x + len, y, x + len + 26, y, C.ink2, 2.6);
+  ctx.restore();
+}
+
+// 一條水平長條(轉錄本、產物、年數都用它)
+function bar(g, x, y, w, h, v, col, { bg = 'rgba(255,255,255,.07)', r = 3 } = {}) {
+  g.rrect(x, y, w, h, r, bg);
+  if (v > 0) g.rrect(x, y, Math.max(2, w * clamp(v)), h, r, col);
+}
+
+// 層析圖上的一段訊號:peaks 是 [位置, 高度];upto 是已經畫到哪個 x(0 到 1)
+function trace(g, x0, x1, y0, h, peaks, upto, col, lw = 2.4, seed = 3) {
+  const R = rng(seed), noise = [];
+  for (let i = 0; i < 260; i++) noise.push((R() - 0.5) * 2);
+  const pts = [];
+  const xe = x0 + (x1 - x0) * clamp(upto);
+  for (let x = x0; x <= xe + 0.001; x += 2) {
+    const u = (x - x0) / (x1 - x0);
+    let v = noise[Math.floor(u * 255)] * 0.012;
+    for (const [p, a] of peaks) v += a * Math.exp(-0.5 * ((u - p) / 0.016) ** 2);
+    pts.push([x, y0 - v * h]);
+  }
+  g.curve(pts, col, lw);
+}
+
+// ===================== 第 1、5 章:區室與受質 =====================
+// 有轉運胜肽就進質體、遇到 GPP(C10);沒有就留在細胞質、遇到 FPP(C15)。
+// 金魚草的 AmNES/LIS-1 與 -2 序列 95% 相同,產物分別是 nerolidol 與 linalool(Nagegowda 等 2008)。
+const LOC = {
+  1: { where: '質體', path: 'MEP 途徑', sub: 'GPP(C10)', prod: 'linalool(單萜)', gene: 'AmNES/LIS-2', col: C.mint },
+  0: { where: '細胞質', path: 'MVA 途徑', sub: 'FPP(C15)', prod: 'nerolidol(倍半萜)', gene: 'AmNES/LIS-1', col: C.amber },
+};
+
+// ===================== 第 5 章:示意的質體轉運胜肽 =====================
+// 長度與組成刻意落在 Bohlmann 等 1997 JBC 量到的範圍(60 到 70 個胺基酸、Ser 11 到 22%、Asp 加 Glu 只有 2 到 4 個),
+// 結尾是高度保守的連續兩個 Arg。序列本身是示意,不是任何一支酵素的序列。
+const TP = 'MALQTAISLPSKPFTHSFHNPNLWSKQAFNSHVPKMSVSCSAMPFSTQHLGSDVFEPKLSAVRR';
+const FULL_AA = 620; // 全長(示意;單萜合成酶約 600 到 650 個胺基酸)
+const countIn = (s, set) => [...s].filter((c) => set.includes(c)).length;
+const TP_STAT = { n: TP.length, ser: countIn(TP, 'S'), st: countIn(TP, 'ST'), acid: countIn(TP, 'DE') };
+
+// ===================== 第 3 章:表現量與基因沉默 =====================
+// 示意的模型,只校準到 Jay 等 2023 的對照點:沒有 p19 時螢光從第 4 天起下降,
+// 有 p19 時第 4、7、10 天都約高一個數量級。
+const RISE = 1.4; // T-DNA 開始表現的時間常數(天)
+const SIL = { 0: { K: 1.6, d50: 2.6, w: 1.0 }, 1: { K: 0.9, d50: 7.0, w: 2.0 } };
+const siRNA = (d, p) => 1 / (1 + Math.exp(-(d - p.d50) / p.w));
+const expr = (d, on) => { const p = SIL[on ? 1 : 0]; return (1 - Math.exp(-d / RISE)) * 10 ** (-p.K * siRNA(d, p)); };
+const DMAX = 12;
+
+// ===================== 第 4 章:上游酵素 =====================
+// Brückner 與 Tissier 2013 量到 DXS2 與 GGPPS2 讓 cembratrien-ol 增加 3.5 倍;
+// Gnanasekaran 等 2015 在雲杉的雙萜量到 3 倍。面積基準 100 是示意。
+const AREA0 = 100, BOOST = 3.5;
+const areaOf = (on) => AREA0 * (on ? BOOST : 1);
+
+// ===================== 第 6 章:VIGS =====================
+// 轉錄本剩餘比例是示意值,落在 Atsumi 等 2018 在葉片量到的 9% 到 31% 之間;
+// 產物與轉錄本成正比也是示意。
+const VIGS = {
+  empty: { name: '空載體', note: '帶 GFP 片段', leaf: '綠', tgt: 1, tps: 1, prod: 1, say: '背景:這一批的基準' },
+  pds: { name: 'PDS', note: '八氫番茄紅素去飽和酶', leaf: '白', tgt: 0.12, tps: 1, prod: 1, say: '葉子漂白:這一批有效' },
+  tps: { name: '萜類合成酶', note: '要驗的那一支', leaf: '綠', tgt: 0.15, tps: 0.15, prod: 0.15, say: '轉錄本與產物一起降' },
+};
+const VKEYS = ['empty', 'pds', 'tps'];
+
+// ===================== 第 7 章:樹木 =====================
+// 開花或結實的年齡:柳約 1、楊樹約 6、橡約 60(Taylor 2002);
+// 歐洲雲杉 20 到 25、赤松 8 到 20(Uddenberg 等 2013)。
+const TREES = [
+  ['柳', 1, 1, C.mint], ['楊樹', 6, 6, C.mint], ['赤松', 8, 20, C.amber],
+  ['歐洲雲杉', 20, 25, C.amber], ['橡', 60, 60, C.red],
+];
+
+const chapters = [
+  {
+    key: 'why', name: '為什麼要回到植物裡', dur: 16,
+    cues: [[0, '上一份教材在大腸桿菌裡做出酵素、加 GPP,測出它能做什麼。'],
+      [4, '但植物細胞分成兩區:質體用 MEP 途徑做 GPP 與 GGPP,細胞質用 MVA 途徑做 FPP。'],
+      [8.5, '酵素在哪一區,就只遇得到那一區的受質;同一支酵素放錯地方,產物就不一樣。'],
+      [12.5, '金魚草有兩支序列 95% 相同的酵素:細胞質那支做 nerolidol,質體那支做 linalool。']],
+    draw(g, t, S) {
+      const L = LOC[S.tp];
+      // 左:試管裡測到的
+      const a1 = ease(seg(t, 0, 0.8));
+      g.ctx.save(); g.ctx.globalAlpha *= a1;
+      g.panel(34, 64, 268, 452, '試管裡');
+      g.tube(168, 112, 76, 176, { fill: 0.56, liquid: 'rgba(184,164,244,.22)' });
+      g.blob(168, 234, 26, 19, C.lav, '酵素', { wobble: 1, t, size: 13 });
+      const R0 = rng(5);
+      for (let i = 0; i < 7; i++) g.circle(144 + R0() * 50, 172 + R0() * 36 + Math.sin(t * 1.2 + i) * 3, 4, C.mint);
+      g.text(168, 322, '純化的酵素 + GPP', { size: 14, color: C.ink2, align: 'center' });
+      g.arrow(168, 346, 168, 386, { color: C.ink2, lw: 2.2 });
+      g.text(168, 414, 'linalool', { size: 18, weight: 700, color: C.mint, align: 'center' });
+      g.text(168, 470, '測到的是「能做什麼」', { size: 13.5, color: C.muted, align: 'center' });
+      g.ctx.restore();
+      // 右:植物細胞的兩個區
+      const a2 = ease(seg(t, 3.6, 5));
+      if (a2 <= 0) return;
+      g.ctx.save(); g.ctx.globalAlpha *= a2;
+      g.rrect(330, 64, 596, 334, 24, 'rgba(21,32,30,.52)', C.line, 1.8);
+      g.text(348, 88, '植物細胞', { size: 14, weight: 700, color: C.ink2 });
+      // 質體畫成一個區,不畫類囊體,免得線壓到字
+      g.ctx.save();
+      g.ctx.beginPath(); g.ctx.ellipse(628, 162, 268, 62, 0, 0, Math.PI * 2);
+      g.ctx.fillStyle = 'rgba(95,211,154,.13)'; g.ctx.fill();
+      g.ctx.lineWidth = 1.6; g.ctx.strokeStyle = 'rgba(165,243,205,.45)'; g.ctx.stroke();
+      g.ctx.restore();
+      g.text(382, 140, '質體', { size: 16, weight: 700, color: C.mint });
+      g.text(382, 176, 'MEP 途徑:GPP(C10)、GGPP(C20)', { size: 14, color: C.ink2 });
+      // 細胞質
+      g.text(382, 268, '細胞質', { size: 16, weight: 700, color: C.amber });
+      g.text(382, 302, 'MVA 途徑:FPP(C15)', { size: 14, color: C.ink2 });
+      g.ctx.restore();
+      // 酵素移到選定的那一區
+      const mv = ease(seg(t, 7.6, 10));
+      if (mv > 0) {
+        const x = lerp(628, 790, mv), y = lerp(348, S.tp ? 162 : 300, mv);
+        g.blob(x, y, 30, 22, C.lav, '酵素', { wobble: 1, t, size: 13 });
+        if (mv >= 1) g.tag(x, y - 44, `遇到 ${L.sub}`, { size: 13.5, color: L.col });
+      }
+      // 結論
+      const ca = ease(seg(t, 12.2, 13.2));
+      if (ca > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ca;
+        g.panel(330, 412, 596, 104, '');
+        g.text(352, 442, `酵素在${L.where}:遇到 ${L.sub}`, { size: 15, color: C.ink2 });
+        g.text(352, 482, `做出 ${L.prod}`, { size: 19, weight: 800, color: L.col });
+        g.text(904, 442, L.gene, { size: 13.5, color: C.muted, align: 'right', mono: true });
+        g.text(904, 482, '兩支序列 95% 相同', { size: 13, color: C.muted, align: 'right' });
+        g.ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'agro', name: '農桿菌與 T-DNA', dur: 17,
+    cues: [[0, '要在植物裡表現基因,最快的方法是借農桿菌的手。'],
+      [4, '農桿菌的 Ti 質體上有一段 T-DNA,兩端是 25 個鹼基對的邊界序列;邊界之間的東西會被送進植物細胞。'],
+      [8.5, '雙元載體把 T-DNA 放在另一個質體上,vir 基因留在卸掉致病性的 Ti 質體。'],
+      [12.5, '傷口汁液的酸性與乙醯丁香酮打開 vir 基因;針筒把菌液推進葉背,T-DNA 進細胞核,不嵌進染色體也會表現幾天。']],
+    draw(g, t) {
+      const TAU = Math.PI * 2;
+      // 左:農桿菌與兩個質體
+      const a1 = ease(seg(t, 0, 0.8));
+      g.ctx.save(); g.ctx.globalAlpha *= a1;
+      bacterium(g, 74, 118, 230, 136, { t });
+      g.text(189, 94, '農桿菌', { size: 16, weight: 700, color: C.lav, align: 'center' });
+      const pa = ease(seg(t, 8.2, 9.4));
+      // 卸掉致病性的 Ti 質體(只剩 vir)
+      plasmid(g, 136, 186, 36, [[-0.9, 0.9, C.red]]);
+      g.text(136, 186, 'vir', { size: 14, weight: 700, color: C.red, align: 'center', mono: true });
+      g.text(136, 244, 'Ti 質體', { size: 13.5, color: C.ink2, align: 'center' });
+      // 雙元載體(帶 T-DNA)
+      plasmid(g, 246, 186, 36, [[-1.15, 1.15, C.mint]]);
+      g.text(246, 186, 'T-DNA', { size: 12.5, weight: 700, color: C.mint, align: 'center', mono: true });
+      g.text(246, 244, '雙元載體', { size: 13.5, color: C.ink2, align: 'center' });
+      if (pa > 0) g.tag(189, 282, '兩個質體分工', { size: 13.5, color: C.ink2, alpha: pa });
+      g.ctx.restore();
+      // 中:葉片與針筒
+      const a2 = ease(seg(t, 3.4, 4.4));
+      if (a2 > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= a2;
+        leaf(g, 512, 196, 248, 132, 'rgba(95,211,154,.16)');
+        const push = ease(seg(t, 11.8, 13.6));
+        syringe(g, 348, 168, push, { len: 86 });
+        g.text(391, 140, '鈍頭針筒', { size: 13.5, color: C.ink2, align: 'center' });
+        // 浸潤開的那一塊(針尖在 x 460,浸潤從那裡散開)
+        const wet = ease(seg(t, 12.6, 14.6));
+        if (wet > 0) { g.ctx.save(); g.ctx.globalAlpha *= wet; chloro(g, 506, 180, 58 * wet, 30 * wet, { col: 'rgba(165,243,205,.3)' }); g.ctx.restore(); }
+        g.text(512, 288, '本氏菸草的葉背', { size: 14.5, color: C.ink2, align: 'center' });
+        g.ctx.restore();
+      }
+      // 中下:傷口訊號打開 vir
+      const a3 = ease(seg(t, 11.6, 12.6));
+      if (a3 > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= a3;
+        g.text(352, 312, 'pH 5.0 到 5.8 的傷口汁液', { size: 13.5, color: C.amber });
+        g.text(352, 334, '+ 乙醯丁香酮', { size: 13.5, color: C.amber });
+        g.arrow(352, 352, 352, 384, { color: C.amber, lw: 2.2 });
+        g.text(352, 400, 'VirA 與 VirG 打開 vir', { size: 14, weight: 700, color: C.amber });
+        g.ctx.restore();
+      }
+      // 右:細胞核
+      const a4 = ease(seg(t, 13.4, 14.6));
+      if (a4 > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= a4;
+        g.rrect(748, 108, 176, 162, 18, 'rgba(21,32,30,.6)', C.line, 1.6);
+        g.circle(836, 190, 50, 'rgba(127,184,255,.14)', C.blue, 1.6);
+        g.text(836, 190, '細胞核', { size: 14.5, weight: 700, color: C.blue, align: 'center' });
+        g.rrect(806, 228, 60, 8, 4, C.mint);
+        g.text(836, 286, '不嵌進染色體', { size: 14, weight: 700, color: C.mint, align: 'center' });
+        g.text(836, 308, '也會表現幾天', { size: 14, weight: 700, color: C.mint, align: 'center' });
+        g.ctx.restore();
+      }
+      // 下:T-DNA 的線性圖
+      const a5 = ease(seg(t, 4.2, 5.6));
+      if (a5 > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= a5;
+        const x0 = 56, x1 = 904, y = 468;
+        g.panel(40, 416, 880, 104, '');
+        g.line(x0, y, x1, y, 'rgba(213,221,217,.3)', 3);
+        const segsT = [[0, 0.085, '左邊界', C.red], [0.13, 0.4, '35S 啟動子', C.amber], [0.42, 0.78, '要表現的基因', C.mint], [0.8, 0.885, '終止子', C.ink2], [0.915, 1, '右邊界', C.red]];
+        for (const [u0, u1, nm, col] of segsT) {
+          const xa = lerp(x0, x1, u0), xb = lerp(x0, x1, u1);
+          g.rrect(xa, y - 11, xb - xa, 22, 4, mix('#0f1716', col === C.ink2 ? '#b9c7c0' : col.slice(0, 7), 0.3), col, 1.6);
+          g.text((xa + xb) / 2, y, nm, { size: 13.5, weight: 700, color: col, align: 'center' });
+        }
+        g.text(56, 438, '邊界之間的這一段會被送進植物細胞', { size: 14, color: C.ink2 });
+        g.text(904, 438, '邊界是 25 個鹼基對', { size: 13.5, color: C.red, align: 'right' });
+        g.text(56, 502, '長度比例是為了看清楚畫的,不是實際的鹼基對數', { size: 12.5, color: C.muted });
+        g.ctx.restore();
+      }
+      void TAU;
+    },
+  },
+  {
+    key: 'silencing', name: '植物會把外來基因關掉', dur: 16,
+    cues: [[0, '植物把轉殖基因當成病毒:DCL4 與 DCL2 把它的雙股 RNA 切成 21 到 22 個核苷酸的 siRNA。'],
+      [5, 'siRNA 裝進 AGO 蛋白後去切同樣序列的 mRNA,這就是轉錄後基因沉默。'],
+      [9, '番茄叢矮病毒的 p19 以二聚體夾住這些 siRNA 雙股,讓它們裝不進 AGO。'],
+      [12.5, '一起打 p19,第 4、7、10 天的螢光都高約一個數量級。右邊可以改天數與要不要打 p19。']],
+    draw(g, t, S) {
+      // 左上:沉默的機制
+      const a1 = ease(seg(t, 0, 0.8));
+      g.ctx.save(); g.ctx.globalAlpha *= a1;
+      g.panel(34, 60, 320, 228, '沉默怎麼發生');
+      const yr = 120;
+      g.line(58, yr, 330, yr, C.mint, 3.5); g.line(58, yr + 13, 330, yr + 13, C.mint, 3.5);
+      g.text(58, yr - 24, '轉殖基因的雙股 RNA', { size: 13.5, color: C.ink2 });
+      const cut = ease(seg(t, 1.4, 3.4));
+      if (cut > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= cut;
+        for (let i = 1; i < 6; i++) g.line(58 + i * 45, yr - 8, 58 + i * 45, yr + 21, C.red, 1.8, [3, 3]);
+        g.text(194, yr + 40, 'DCL4 與 DCL2 切成', { size: 13.5, color: C.red, align: 'center' });
+        g.text(194, yr + 62, '21 到 22 個核苷酸', { size: 13.5, color: C.red, align: 'center' });
+        g.ctx.restore();
+      }
+      const ago = ease(seg(t, 4.6, 6));
+      if (ago > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ago;
+        g.blob(94, 252, 30, 22, C.blue, 'AGO', { size: 13 });
+        g.rrect(76, 231, 38, 5, 2.5, C.mint);
+        g.arrow(134, 248, 182, 248, { color: C.blue, lw: 2.2 });
+        g.text(194, 240, '切掉同樣序列', { size: 13.5, color: C.blue });
+        g.text(194, 262, '的 mRNA', { size: 13.5, color: C.blue });
+        g.ctx.restore();
+      }
+      g.ctx.restore();
+      // 左下:p19 與公式
+      const a2 = ease(seg(t, 8.6, 9.6));
+      if (a2 > 0) {
+        const P = SIL[S.p19 ? 1 : 0];
+        g.ctx.save(); g.ctx.globalAlpha *= a2;
+        g.panel(34, 300, 320, 220, 'p19 做的事');
+        // 二聚體夾鉗夾住一段 siRNA 雙股
+        g.ctx.save();
+        g.ctx.globalAlpha *= S.p19 ? 1 : 0.3;
+        g.blob(92, 352, 26, 16, C.lav, '', { size: 12 });
+        g.blob(92, 384, 26, 16, C.lav, '', { size: 12 });
+        g.rrect(70, 361, 44, 5, 2.5, C.mint); g.rrect(70, 370, 44, 5, 2.5, C.mint);
+        g.ctx.restore();
+        g.text(92, 414, 'p19 二聚體', { size: 13, weight: 700, color: S.p19 ? C.lav : C.muted, align: 'center' });
+        g.text(140, 344, S.p19 ? '夾住 siRNA 雙股' : '沒有打 p19', { size: 14.5, weight: 700, color: S.p19 ? C.lav : C.muted });
+        g.text(140, 370, S.p19 ? '裝不進 AGO' : 'siRNA 照樣裝進 AGO', { size: 13.5, color: C.ink2 });
+        g.text(140, 396, S.p19 ? '沉默被擋下來' : '沉默照樣發生', { size: 13.5, color: C.ink2 });
+        g.text(52, 442, 'a(d) 是 siRNA 累積(示意模型)', { size: 12.5, color: C.muted });
+        g.text(52, 466, 'F = (1 - exp(-d/1.4))', { size: 13, color: C.ink2, mono: true });
+        g.text(52, 486, '    \u{00D7} 10^(-K \u{00D7} a(d))', { size: 13, color: C.ink2, mono: true });
+        g.text(52, 508, `K=${P.K}  d\u{00BD}=${P.d50}  w=${P.w}`, { size: 13, weight: 700, color: C.amber, mono: true });
+        g.ctx.restore();
+      }
+      // 右:時間曲線
+      const A = g.axes(438, 64, 452, 288, {
+        xmin: 0, xmax: DMAX, ymin: 0.01, ymax: 1, ylog: true,
+        xticks: [0, 2, 4, 6, 8, 10, 12], yticks: [0.01, 0.1, 1],
+        xlab: '浸潤後第幾天', ylab: '表現量(相對最高值)',
+        fmtY: (v) => (v >= 1 ? '1' : `10${sup(Math.round(Math.log10(v)))}`),
+      });
+      const upto = DMAX * ease(seg(t, 1, 8));
+      for (const on of [0, 1]) {
+        const pts = [];
+        for (let d = 0.08; d <= upto + 1e-9; d += 0.06) pts.push([A.X(d), A.Y(clamp(expr(d, on), 0.01, 1))]);
+        g.curve(pts, on ? C.mint : C.muted, on ? 3.2 : 2.2, { dash: on ? null : [6, 5], alpha: on && !S.p19 ? 0.42 : 1 });
+      }
+      g.text(878, 88, '一起打 p19', { size: 14.5, weight: 700, color: C.mint, align: 'right' });
+      g.text(878, 110, '不打 p19(虛線)', { size: 13.5, color: C.muted, align: 'right' });
+      // 游標與讀值
+      if (t > 1.2) {
+        const d = clamp(S.day, 0.4, DMAX), lo = expr(d, 0), hi = expr(d, 1), cur = S.p19 ? hi : lo;
+        g.line(A.X(d), A.Y(1), A.X(d), A.Y(0.01), C.amber, 1.6, [4, 4]);
+        g.circle(A.X(d), A.Y(clamp(cur, 0.01, 1)), 6.5, S.p19 ? C.mint : C.muted);
+        g.panel(438, 404, 452, 114, '');
+        g.text(458, 432, `第 ${d.toFixed(1)} 天`, { size: 16, weight: 700, color: C.amber });
+        g.text(458, 470, `有 p19 \u{00F7} 不打 = ${(hi / lo).toFixed(1)} 倍`, { size: 18, weight: 800, color: C.mint, mono: true });
+        g.text(458, 502, '文獻對照:第 4、7、10 天約一個數量級', { size: 13, color: C.muted });
+      }
+    },
+  },
+  {
+    key: 'product', name: '暫時表現看產物', dur: 17,
+    cues: [[0, '把萜類合成酶的基因打進本氏菸草的葉片,3 到 5 天後收葉子。'],
+      [4, '揮發的產物用固相微萃取吸附頂空,或把葉片泡進己烷萃取,再送 GC-MS。'],
+      [8.5, '只打空載體的葉片在同一個滯留時間沒有峰,新出現的那一支峰才算是這支酵素做的。'],
+      [13, '前驅物不夠時一起打上游的 DXS 與 GGPPS;雲杉與菸草的雙萜都因此多了 3 倍以上。']],
+    draw(g, t, S) {
+      const RT = 0.52; // 產物的位置(示意)
+      // 左:採樣方式
+      const a1 = ease(seg(t, 0, 0.8));
+      g.ctx.save(); g.ctx.globalAlpha *= a1;
+      g.panel(34, 60, 252, 300, '3 到 5 天後採樣');
+      leaf(g, 160, 170, 180, 76, 'rgba(95,211,154,.16)');
+      const fib = ease(seg(t, 4.2, 6));
+      if (fib > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= fib;
+        // 纖維停在葉片上方的頂空,不插進葉片
+        g.line(160, 92, 160, 116, C.ink2, 2.4); g.line(160, 114, 160, 134, C.amber, 4);
+        const R = rng(9);
+        for (let i = 0; i < 8; i++) { const k = (t * 0.5 + R()) % 1; g.circle(124 + R() * 72, 148 - k * 22, 2.6, C.mint); }
+        g.text(160, 226, '固相微萃取吸頂空', { size: 13.5, color: C.ink2, align: 'center' });
+        g.text(160, 250, '或葉片浸己烷', { size: 13.5, color: C.ink2, align: 'center' });
+        g.ctx.restore();
+      }
+      const ba = ease(seg(t, 12.6, 13.8));
+      if (ba > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ba;
+        g.text(50, 288, S.boost ? '一起打 DXS 與 GGPPS' : '只打萜類合成酶', { size: 14.5, weight: 700, color: S.boost ? C.amber : C.ink2 });
+        g.text(50, 312, S.boost ? '前驅物多了,峰高了' : '前驅物由葉片自己供應', { size: 13.5, color: C.muted });
+        g.text(50, 344, `峰面積 ${areaOf(S.boost).toFixed(0)}`, { size: 18, weight: 800, color: S.boost ? C.amber : C.mint, mono: true });
+        g.ctx.restore();
+      }
+      g.ctx.restore();
+      // 右:三條層析訊號
+      const x0 = 352, x1 = 912;
+      const upto = ease(seg(t, 1.4, 7));
+      const area = areaOf(S.boost) / AREA0;
+      const rows = [
+        ['打萜類合成酶的葉片', 148, [[RT, Math.min(1, 0.3 * area)]], C.mint, 2.8],
+        ['只打空載體的葉片', 288, [], C.muted, 2.2],
+        ['標準品', 400, [[RT, 0.46]], C.amber, 2],
+      ];
+      for (const [lab, y0, peaks, col, lw] of rows) {
+        g.line(x0, y0, x1, y0, 'rgba(255,255,255,.05)', 1);
+        trace(g, x0, x1, y0, 112, peaks, upto, col, lw, lab.length * 3 + 5);
+        g.text(x0 + 8, y0 - 20, lab, { size: 14, weight: 700, color: col });
+      }
+      // 軸
+      g.line(x0, 452, x1, 452, C.ink2, 1.6);
+      for (let i = 0; i <= 4; i++) { const x = lerp(x0, x1, i / 4); g.line(x, 452, x, 458, C.ink2, 1.4); g.text(x, 472, String(4 + i * 3), { size: 12.5, color: C.muted, align: 'center', mono: true }); }
+      g.text((x0 + x1) / 2, 496, '滯留時間(分鐘;峰形與時間都是示意)', { size: 13.5, color: C.ink2, align: 'center' });
+      // 新的峰與對照
+      const mark = ease(seg(t, 8.2, 9.4));
+      if (mark > 0) {
+        const xp = lerp(x0, x1, RT);
+        g.ctx.save(); g.ctx.globalAlpha *= mark;
+        g.line(xp, 60, xp, 440, C.ink, 1.3, [4, 5]);
+        g.ctx.restore();
+        g.tag(xp, 76, '新出現的峰', { size: 13.5, color: C.mint, alpha: mark });
+        g.tag(xp + 112, 270, '同一時間沒有峰', { size: 13.5, color: C.muted, alpha: mark });
+      }
+    },
+  },
+  {
+    key: 'gfp', name: 'GFP 看酵素在哪一區', dur: 16,
+    cues: [[0, '要知道酵素在細胞裡的哪一區,把它接上 GFP,在共軛焦顯微鏡下看。'],
+      [4, '葉綠素的自發螢光落在紅色通道;綠色和紅色疊在一起,就表示蛋白質在質體裡。'],
+      [8, '單萜合成酶前端有 60 到 70 個胺基酸的轉運胜肽:絲胺酸偏多、酸性殘基很少,結尾是連續兩個精胺酸。'],
+      [12, '把轉運胜肽去掉,綠色訊號改落在葉綠體之間的細胞質。右邊可以切換有沒有轉運胜肽。']],
+    draw(g, t, S) {
+      const has = !!S.tp;
+      // 上:融合蛋白
+      const a1 = ease(seg(t, 0, 0.8));
+      g.ctx.save(); g.ctx.globalAlpha *= a1;
+      const bx = 56, by = 76, bw = 848, bh = 34;
+      const tpW = has ? bw * 0.13 : 0;
+      const gfpX = bx + bw * 0.82, gfpW = bw * 0.18;
+      const tpsX = bx + (has ? tpW + 4 : 0), tpsW = gfpX - 4 - tpsX;
+      g.rrect(bx, by, bw, bh, 6, 'rgba(255,255,255,.04)');
+      if (has) { g.rrect(bx, by, tpW, bh, 6, 'rgba(255,209,102,.3)', C.amber, 1.6); g.text(bx + tpW / 2, by + bh / 2, '轉運胜肽', { size: 13.5, weight: 700, color: C.amber, align: 'center' }); }
+      g.rrect(tpsX, by, tpsW, bh, 6, 'rgba(184,164,244,.28)', C.lav, 1.6);
+      g.text(tpsX + tpsW / 2, by + bh / 2, '萜類合成酶', { size: 15, weight: 700, color: C.lav, align: 'center' });
+      g.rrect(gfpX, by, gfpW, bh, 6, 'rgba(95,211,154,.3)', C.mint, 1.6);
+      g.text(gfpX + gfpW / 2, by + bh / 2, 'GFP', { size: 15, weight: 700, color: C.mint, align: 'center' });
+      g.text(bx, by - 16, has ? `融合蛋白:${FULL_AA} 個胺基酸` : `融合蛋白:去掉前 ${TP_STAT.n} 個,剩 ${FULL_AA - TP_STAT.n} 個`, { size: 14, color: C.ink2 });
+      g.ctx.restore();
+      // 中:共軛焦三格
+      const panes = [['綠色通道:GFP', 60], ['紅色通道:葉綠素', 364], ['疊圖', 668]];
+      const show = ease(seg(t, 1.6, 3.2));
+      const CP = [[70, 72], [168, 46], [52, 170], [150, 148], [224, 118], [110, 214], [206, 206]]; // 葉綠體位置(格內相對座標)
+      panes.forEach(([lab, px], k) => {
+        const py = 146, pw = 232, ph = 232;
+        g.ctx.save(); g.ctx.globalAlpha *= show;
+        g.rrect(px, py, pw, ph, 12, '#060b0a', C.line, 1.6);
+        g.text(px + 8, py - 14, lab, { size: 13.5, weight: 700, color: k === 0 ? C.mint : k === 1 ? C.red : C.ink2 });
+        g.ctx.save(); g.ctx.beginPath(); g.ctx.rect(px, py, pw, ph); g.ctx.clip();
+        const redOn = k >= 1, greenOn = k === 0 || k === 2;
+        const drawRed = () => { for (const [cx, cy] of CP) chloro(g, px + cx, py + cy, 24, 15, { col: 'rgba(255,123,123,.5)', rot: (cx + cy) * 0.01 }); };
+        const drawGreen = () => {
+          const ga = ease(seg(t, k === 2 ? 4.4 : 2.4, k === 2 ? 5.6 : 3.6));
+          g.ctx.save(); g.ctx.globalAlpha *= ga;
+          if (has) {
+            // 在質體裡:綠色訊號和葉綠體同位置
+            for (const [cx, cy] of CP) chloro(g, px + cx, py + cy, 21, 13, { col: 'rgba(125,255,158,.6)', rot: (cx + cy) * 0.01 });
+          } else {
+            // 在細胞質:填滿葉綠體之間(用 destination-out 把葉綠體的位置挖掉)
+            g.ctx.save();
+            g.ctx.fillStyle = 'rgba(125,255,158,.22)'; g.ctx.fillRect(px, py, pw, ph);
+            for (const [cx, cy] of CP) { g.ctx.save(); g.ctx.globalCompositeOperation = 'destination-out'; chloro(g, px + cx, py + cy, 25, 16, { col: 'rgba(0,0,0,1)' }); g.ctx.restore(); }
+            g.ctx.restore();
+            const R = rng(13);
+            for (let i = 0; i < 26; i++) g.circle(px + 14 + R() * (pw - 28), py + 14 + R() * (ph - 28), 2.4, 'rgba(125,255,158,.55)');
+          }
+          g.ctx.restore();
+        };
+        // 在質體時綠色疊在紅色上面;在細胞質時先鋪綠色、挖掉葉綠體,再把紅色填回那些洞
+        if (has) { if (redOn) drawRed(); if (greenOn) drawGreen(); } else { if (greenOn) drawGreen(); if (redOn) drawRed(); }
+        g.ctx.restore();
+        g.ctx.restore();
+      });
+      // 疊圖的結論
+      const vd = ease(seg(t, 5.8, 6.8));
+      if (vd > 0) g.tag(784, 404, has ? '綠紅重疊:在質體' : '綠色在葉綠體之間:在細胞質', { size: 13.5, color: has ? C.mint : C.amber, alpha: vd });
+      // 下:示意序列與組成
+      const sa = ease(seg(t, 7.6, 8.8));
+      if (sa > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= sa;
+        g.panel(40, 428, 880, 92, '');
+        const sx = 58, sy = 458, step = 13.1;
+        for (let i = 0; i < TP_STAT.n; i++) {
+          const c = TP[i];
+          const col = 'STDE'.includes(c) ? ('ST'.includes(c) ? C.mint : C.red) : i >= TP_STAT.n - 2 ? C.amber : C.muted;
+          g.text(sx + i * step, sy, c, { size: 14, weight: 'ST'.includes(c) || 'DE'.includes(c) || i >= TP_STAT.n - 2 ? 700 : 500, color: col, align: 'center', mono: true });
+        }
+        g.text(sx - 4, sy + 30, `${TP_STAT.n} 個胺基酸(示意序列)`, { size: 13.5, color: C.muted });
+        g.text(360, sy + 30, `絲胺酸 ${TP_STAT.ser} 個 = ${pct(TP_STAT.ser / TP_STAT.n)}`, { size: 14.5, weight: 700, color: C.mint });
+        g.text(588, sy + 30, `酸性殘基 ${TP_STAT.acid} 個`, { size: 14.5, weight: 700, color: C.red });
+        g.text(764, sy + 30, '結尾兩個精胺酸', { size: 14.5, weight: 700, color: C.amber });
+        g.ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'vigs', name: '反過來把基因關掉', dur: 17,
+    cues: [[0, '反過來把基因關掉:病毒誘導基因沉默用 TRV 兩條 RNA,TRV2 接一段 200 到 1000 bp 的目標片段。'],
+      [4.5, '農桿菌打進 3 週大的葉片,病毒一邊複製一邊往上長;2 到 3 週後新長的葉子裡目標 mRNA 被切掉。'],
+      [9, '對照要兩種:空載體看背景,沉默八氫番茄紅素去飽和酶讓葉子漂白,證明這一批真的有效。'],
+      [13, '關掉萜類合成酶後,qPCR 看到轉錄本只剩一成多,GC-MS 的產物峰跟著矮下去。']],
+    draw(g, t, S) {
+      // 左:兩條 RNA 與時程
+      const a1 = ease(seg(t, 0, 0.8));
+      g.ctx.save(); g.ctx.globalAlpha *= a1;
+      g.panel(34, 60, 290, 212, 'TRV 的兩條 RNA');
+      g.rrect(54, 104, 250, 26, 5, 'rgba(127,184,255,.18)', C.blue, 1.6);
+      g.text(60, 117, 'TRV1:複製與移動', { size: 14, weight: 700, color: C.blue });
+      g.rrect(54, 150, 250, 26, 5, 'rgba(255,209,102,.18)', C.amber, 1.6);
+      g.text(60, 163, 'TRV2:外殼', { size: 14, weight: 700, color: C.amber });
+      // 目標片段滑進 TRV2
+      const ins = ease(seg(t, 1.6, 3));
+      if (ins > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ins;
+        g.rrect(lerp(160, 232, ins), lerp(120, 153, ins), 66, 20, 4, 'rgba(165,243,205,.55)', C.mint, 1.4);
+        g.text(lerp(193, 265, ins), lerp(130, 163, ins), '目標片段', { size: 12.5, weight: 700, color: '#0b1111', align: 'center' });
+        g.ctx.restore();
+      }
+      g.text(54, 206, '片段 200 到 1000 bp', { size: 13.5, color: C.mint });
+      g.text(54, 232, '農桿菌打進 3 週大的葉片', { size: 13.5, color: C.ink2 });
+      g.text(54, 256, '2 到 3 週後新長的葉子被沉默', { size: 13.5, color: C.ink2 });
+      g.ctx.restore();
+      // 左下:植株與往上長
+      const a2 = ease(seg(t, 4.2, 5.4));
+      if (a2 > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= a2;
+        const px = 178, base = 500;
+        g.line(px, base, px, 320, 'rgba(143,130,99,.9)', 4);
+        const grow = ease(seg(t, 5, 8.4));
+        for (let i = 0; i < 4; i++) {
+          const y = base - 34 - i * 46, k = clamp(grow * 4 - i);
+          if (k <= 0) continue;
+          const newLeaf = i >= 2;
+          const col = newLeaf ? (VIGS[S.vt].leaf === '白' ? 'rgba(240,243,238,.72)' : 'rgba(95,211,154,.3)') : 'rgba(95,211,154,.3)';
+          leaf(g, px - 46 * (i % 2 ? -1 : 1), y, 78 * k, 34 * k, col, { rot: (i % 2 ? 0.18 : -0.18) });
+        }
+        if (grow > 0.6) g.tag(px, 300, '新長出來的葉子', { size: 13, color: C.ink2, alpha: ease(seg(t, 7.4, 8.2)) });
+        g.ctx.restore();
+      }
+      // 右:三種目標
+      const cols = ease(seg(t, 8.6, 10));
+      if (cols <= 0) return;
+      VKEYS.forEach((k, i) => {
+        const V = VIGS[k], on = k === S.vt, cx = 440 + i * 180;
+        g.ctx.save(); g.ctx.globalAlpha *= cols * (on ? 1 : 0.5);
+        g.rrect(cx - 84, 60, 168, 456, 12, on ? 'rgba(165,243,205,.08)' : 'rgba(21,32,30,.55)', on ? C.mint : C.line, on ? 2 : 1.5);
+        g.text(cx, 86, V.name, { size: 15.5, weight: 700, color: on ? C.mint : C.ink, align: 'center' });
+        g.text(cx, 108, V.note, { size: 12.5, color: C.muted, align: 'center' });
+        // 葉色
+        leaf(g, cx, 160, 132, 62, V.leaf === '白' ? 'rgba(240,243,238,.72)' : 'rgba(95,211,154,.3)', { stroke: V.leaf === '白' ? 'rgba(240,243,238,.8)' : 'rgba(165,243,205,.5)' });
+        g.text(cx, 210, V.leaf === '白' ? '葉子漂白' : '葉子照樣綠', { size: 14, weight: 700, color: V.leaf === '白' ? C.ink : C.mint, align: 'center' });
+        // 目標基因的轉錄本
+        g.text(cx - 72, 250, '目標的轉錄本', { size: 13, color: C.ink2 });
+        bar(g, cx - 72, 262, 144, 16, V.tgt, V.tgt < 0.5 ? C.red : C.mint);
+        g.text(cx + 72, 296, pct(V.tgt), { size: 16, weight: 700, color: V.tgt < 0.5 ? C.red : C.mint, align: 'right', mono: true });
+        // 萜類合成酶的轉錄本
+        g.text(cx - 72, 328, '萜類合成酶', { size: 13, color: C.ink2 });
+        bar(g, cx - 72, 340, 144, 16, V.tps, V.tps < 0.5 ? C.red : C.mint);
+        g.text(cx + 72, 374, pct(V.tps), { size: 16, weight: 700, color: V.tps < 0.5 ? C.red : C.mint, align: 'right', mono: true });
+        // 產物峰
+        g.text(cx - 72, 404, 'GC-MS 的產物峰', { size: 13, color: C.ink2 });
+        const py = 466, ph = 50;
+        g.line(cx - 72, py, cx + 72, py, C.ink2, 1.4);
+        const pk = [];
+        for (let x = -72; x <= 72; x += 2) pk.push([cx + x, py - V.prod * ph * Math.exp(-0.5 * (x / 9) ** 2)]);
+        g.curve(pk, V.prod < 0.5 ? C.red : C.mint, 2.4);
+        g.text(cx, py + 22, pct(V.prod), { size: 15, weight: 700, color: V.prod < 0.5 ? C.red : C.mint, align: 'center', mono: true });
+        g.ctx.restore();
+      });
+      const sa = ease(seg(t, 12.6, 13.6));
+      if (sa > 0) g.tag(620, 36, VIGS[S.vt].say, { size: 14.5, color: C.mint, alpha: sa });
+    },
+  },
+  {
+    key: 'trees', name: '樹木的難處', dur: 16,
+    cues: [[0, '這一套方法在菸草上很快,搬到樹上就難了。'],
+      [3.5, '歐洲雲杉要 20 到 25 年才結毬果,赤松 8 到 20 年;一個世代就是一個博士班的好幾倍。'],
+      [8, '楊樹是模式樹:基因體只有 480 到 550 Mb、插枝就能繁殖、轉殖也容易,第一個被定序的樹就是它。'],
+      [12, '松杉類體胚發生的效率低,馬尾松至今轉不了,所以改在菸草裡驗功能;毛狀根與原生質體也是替代。']],
+    draw(g, t) {
+      // 左:進入生殖期的年數
+      const a1 = ease(seg(t, 0, 0.8));
+      g.ctx.save(); g.ctx.globalAlpha *= a1;
+      g.panel(34, 60, 440, 452, '');
+      g.text(54, 86, '從發芽到開花或結實', { size: 15.5, weight: 700, color: C.ink2 });
+      g.text(54, 110, '每一格 10 年', { size: 13, color: C.muted });
+      const bx = 150, bw = 264, YMAX = 70;
+      for (let y = 0; y <= 70; y += 10) { const x = bx + (y / YMAX) * bw; g.line(x, 130, x, 440, 'rgba(255,255,255,.07)', 1); g.text(x, 456, String(y), { size: 12.5, color: C.muted, align: 'center', mono: true }); }
+      g.text(bx + bw / 2, 482, '年', { size: 13.5, color: C.ink2, align: 'center' });
+      TREES.forEach(([nm, lo, hi, col], i) => {
+        const y = 154 + i * 56, k = ease(seg(t, 1 + i * 0.5, 2.2 + i * 0.5));
+        g.text(138, y + 10, nm, { size: 15, weight: 700, color: C.ink, align: 'right' });
+        const wlo = (lo / YMAX) * bw * k, whi = (hi / YMAX) * bw * k;
+        g.rrect(bx, y, Math.max(3, whi), 20, 4, 'rgba(255,255,255,.07)');
+        g.rrect(bx, y, Math.max(3, wlo), 20, 4, col);
+        if (hi > lo) g.rrect(bx + wlo, y, Math.max(2, whi - wlo), 20, 4, mix('#0f1716', col.slice(0, 7), 0.45));
+        g.text(bx + whi + 10, y + 10, lo === hi ? `約 ${lo}` : `${lo} 到 ${hi}`, { size: 14, weight: 700, color: col, mono: true, alpha: k });
+      });
+      g.ctx.restore();
+      // 右:三張卡
+      const CARDS = [
+        ['楊樹:模式樹', C.mint, ['基因體 480 到 550 Mb', '插枝就能繁殖', '轉殖容易,約 6 年開花', '第一個被定序的樹'], 7.6],
+        ['針葉樹:難轉殖', C.amber, ['離體繁殖本來就困難', '主要靠體胚發生', '再生率低、效率不穩', '馬尾松至今轉不了'], 10],
+        ['替代做法', C.lav, ['換到本氏菸草裡驗功能', '毛狀根:穩定、產代謝物', '原生質體:定位與啟動子', '先測功能再做轉殖株'], 12.4],
+      ];
+      CARDS.forEach(([h, col, lines, at], i) => {
+        const k = ease(seg(t, at, at + 1));
+        if (k <= 0) return;
+        const cy = 64 + i * 152;
+        g.ctx.save(); g.ctx.globalAlpha *= k;
+        g.rrect(496, cy, 424, 136, 12, 'rgba(21,32,30,.6)', col, 1.8);
+        g.text(516, cy + 28, h, { size: 16, weight: 700, color: col });
+        lines.forEach((ln, j) => g.text(516 + (j % 2) * 206, cy + 62 + Math.floor(j / 2) * 28, ln, { size: 13.5, color: C.ink2 }));
+        g.ctx.restore();
+      });
+    },
+  },
+];
+
+createLesson({
+  chapters,
+  state: { tp: 1, p19: 1, day: 7, boost: 0, vt: 'tps' },
+  controls: [
+    { id: 'tp', label: '前端的轉運胜肽', type: 'seg', options: [{ v: 1, label: '有' }, { v: 0, label: '沒有' }], chapters: ['why', 'gfp'], restart: false },
+    { id: 'p19', label: '一起打 p19', type: 'seg', options: [{ v: 1, label: '打' }, { v: 0, label: '不打' }], chapters: ['silencing'], restart: false },
+    { id: 'day', label: '浸潤後第幾天', type: 'range', min: 1, max: 12, step: 0.5, unit: ' 天', chapters: ['silencing'], restart: false },
+    { id: 'boost', label: '上游酵素', type: 'seg', options: [{ v: 0, label: '不打' }, { v: 1, label: 'DXS + GGPPS' }], chapters: ['product'], restart: false },
+    { id: 'vt', label: 'VIGS 的目標', type: 'seg', options: [{ v: 'empty', label: '空載體' }, { v: 'pds', label: 'PDS' }, { v: 'tps', label: '萜類合成酶' }], chapters: ['vigs'], restart: false },
+  ],
+});
+</script>
+</body>
+</html>

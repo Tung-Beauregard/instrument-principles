@@ -16,8 +16,9 @@
 
 - 本站是 W AI Studio 的儀器原理教學入口，使用繁體中文。
 - `index.html` 專責入口；每一台儀器有獨立、穩定的子目錄，使用小寫英文字與連字號。
-- 現有 `lcq/`、`gc-ms/`、`uv-vis/`、`lcq-3d/`、`nmr/`、`mass-analyzers/`、`spectroscopy/`、`chromatography/`、`plot/` 路徑不可隨意更名，2026-10-26 起生化原理分區的 `central-dogma/`、`pcr/`、`sequencing/`、`dna-markers/`、`cloning/`、`terpene-synthase/`、`crispr/`、`immunoassay/`、`flow-cytometry/`、`proteomics/` 也一樣。必須更名時，更新所有引用並保留舊網址轉向。
+- 現有 `lcq/`、`gc-ms/`、`uv-vis/`、`lcq-3d/`、`nmr/`、`mass-analyzers/`、`spectroscopy/`、`chromatography/`、`plot/` 路徑不可隨意更名，2026-10-26 起生化原理分區的 `central-dogma/`、`pcr/`、`sequencing/`、`dna-markers/`、`cloning/`、`terpene-synthase/`、`crispr/`、`immunoassay/`、`flow-cytometry/`、`proteomics/`，以及 2026-10-27 起生化進階分區的 `transcriptomics/`、`terpenoid-precursors/`、`enzyme-kinetics/`、`population-genetics/`、`phylogenetics/`、`gene-function/` 也一樣。必須更名時，更新所有引用並保留舊網址轉向。
 - 生化原理分區（使用者 2026-10-26 要求，分類 `bio`）是用 2D 動畫講分子生物學與生物化學的教材，共用 `assets/bio-lesson.js`（播放器）、`assets/bio-draw.js`（畫圖工具）與 `assets/bio-lesson.css`（版面）。這一區的分頁列只列「← 儀器入口」與這一區的教材，儀器教材的分頁列不列它們；新增或刪掉這一區的教材時，這一區每一頁的分頁列都要一起改（`scripts/check-bio.mjs` 會檢查順序和清單一致）。章節代號（網址的 `#`）是對外網址，比照 `lcq/` 不可隨意更名。頁面與文件不寫提供研究主題的老師姓名（使用者 2026-10-26 決定）；姓名也不寫進程式，`check-bio.mjs` 只放雜湊來比對。手機直拿時的轉向提示與全螢幕的劇場模式都由播放器處理，頁面不要自己呼叫 `createRotateHint`。
+- 生化進階分區（使用者 2026-10-27 要求，分類 `bio-adv`）是程度較深的同類教材（大學部高年級到研究生，帶公式與統計），共用同一套播放器與版面；分頁列自成一組，只列「← 儀器入口」與這一區的教材，和生化原理的分頁列互不列對方（`check-bio.mjs` 兩區都檢查）。進階教材「重點整理」的第一行連到對應的基礎教材。生化原理裡有七份在最後加了名稱以「進階:」開頭的章節；既有章節的代號不改，新章節一律加在最後。
 - `lcq/` 的章節 `key`（例如 `#scan`、`#adducts`）也是對外網址（2026-10-20 起網址會跟著章節改變，使用者會複製分享），一樣不可隨意更名；必須改時讓舊的 key 仍然對到同一章。
 - `lcq/` 與 `lcq-3d/` 是同一份教材「離子阱質譜」的兩個畫面：「動畫講解」與「拆開探索」（使用者 2026-10-13 決定合併）。入口與 `content/instruments.json` 只列 `lcq`；`lcq-3d/` 不在清單裡，由這兩頁分頁列的「離子阱質譜」一組互相連結，其他教材的分頁列只連到 `../lcq/`。`scripts/check-site.mjs` 的 `extraPages` 照樣檢查 `lcq-3d/`。
 - 入口頂部品牌名稱只用「儀器原理」。底部「返回主頁」連到 `https://tung-beauregard.github.io/w-studio/`。
@@ -35,7 +36,7 @@
 ## 3. 新增與更新儀器
 
 1. 先確認名稱、型號、要教的原理，以及資料來源；未知資訊不得自行補成事實。
-2. 在 `content/instruments.json` 新增唯一 `id`，`categories` 填所屬分類（質譜 `ms`、層析 `chrom`、光譜 `spec`、NMR `nmr`、生化原理 `bio`、工具 `tools`，可以好幾個；工具區放數據畫圖這類不是教材的頁面，2026-10-22 起；生化原理 2026-10-26 起）；同一分類裡依清單順序排列。
+2. 在 `content/instruments.json` 新增唯一 `id`，`categories` 填所屬分類（質譜 `ms`、層析 `chrom`、光譜 `spec`、NMR `nmr`、生化原理 `bio`、生化進階 `bio-adv`、工具 `tools`，可以好幾個；工具區放數據畫圖這類不是教材的頁面，2026-10-22 起；生化原理 2026-10-26 起；生化進階 2026-10-27 起）；同一分類裡依清單順序排列。
 3. 尚未完成的項目設 `status: "upcoming"`、`href: null`，呈現「即將加入」並且不提供假連結。
 4. 教材完成後建立獨立 `id/index.html`，測試完成才改為 `ready` 並填上 `./id/`。
 5. 同步修改 `index.html` 的靜態備援卡片，保持無 JavaScript 或 JSON 失敗時仍能瀏覽。
@@ -46,7 +47,7 @@
 ## 4. 品牌與閱讀體驗
 
 - 沿用 W AI Studio：近黑背景 `#0B1111`、薄荷綠 `#A5F3CD`、淺字 `#F0F3EE`、細框與留白。
-- 入口保持極簡：頂部「儀器原理」、依分類分區的儀器圖片與名稱連結（分區標題只寫分類名稱，使用者 2026-10-08 決定分成質譜、層析、光譜、NMR；2026-10-22 加上工具區放數據畫圖；2026-10-26 在工具區前面加上生化原理）、底部返回主頁與到站人數。
+- 入口保持極簡：頂部「儀器原理」、依分類分區的儀器圖片與名稱連結（分區標題只寫分類名稱，使用者 2026-10-08 決定分成質譜、層析、光譜、NMR；2026-10-22 加上工具區放數據畫圖；2026-10-26 在工具區前面加上生化原理；2026-10-27 在生化原理後面加上生化進階）、底部返回主頁與到站人數。
 - 不主動加入標語、介紹段落、學習指南、能力標籤、教材數量、額外導覽或首頁動畫；使用者需要時再加入。
 - 入口卡片只呈現概念圖及儀器名稱。未完成的教材可加「即將加入」，但不提供假連結。
 - 圖片及圖表附可理解的替代文字；操作有鍵盤焦點；主要按鈕在手機上容易觸及。
