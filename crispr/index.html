@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>CRISPR 基因編輯:找到位置、剪開、修補</title>
+<meta name="description" content="用動畫看 CRISPR 從細菌的免疫機制變成基因編輯工具:Cas9 怎麼先認 PAM 再比對嚮導 RNA、在哪裡剪開 DNA,細胞用 NHEJ 或 HDR 修補後基因會變成怎樣,以及怎麼設計嚮導 RNA、避開脫靶。可以自己換 DNA、修補方式與嚮導。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="CRISPR 基因編輯:找到位置、剪開、修補">
+<meta property="og:description" content="用動畫看 Cas9 怎麼找到 DNA 上的位置、剪開雙股,細胞怎麼修補,以及怎麼設計嚮導 RNA 避開脫靶。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/crispr/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/crispr.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="CRISPR 基因編輯:Cas9 帶著嚮導 RNA 找到 DNA 上的位置並剪開的動畫">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/crispr/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理"><a href="../">← 儀器入口</a><a href="../central-dogma/">中心法則</a><a href="../pcr/">PCR 與電泳</a><a href="../sequencing/">DNA 定序</a><a href="../dna-markers/">DNA 鑑定</a><a href="../cloning/">基因選殖</a><a href="../terpene-synthase/">萜類合成酶</a><a href="./" aria-current="page">CRISPR</a><a href="../immunoassay/">抗體檢測</a><a href="../flow-cytometry/">流式細胞儀</a><a href="../proteomics/">蛋白質定序</a></nav></div>
+<header class="top wrap">
+  <h1>CRISPR 基因編輯 <span class="k">找到、剪開、修補</span></h1>
+  <p class="lede">CRISPR 原本是細菌記住病毒的免疫機制。實驗室把它簡化成 Cas9 蛋白加一條嚮導 RNA:先認 PAM、比對序列,在指定的位置剪開 DNA 雙股,再靠細胞自己修補,把基因弄壞或照著模板改寫。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="CRISPR 動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <ul>
+      <li>CRISPR 是細菌的後天免疫:撐過感染的細菌把病毒 DNA 的一小段存成 CRISPR 區裡的「間隔序列」;同一種病毒再來時,轉錄出來的 RNA 帶著 Cas 蛋白找到相符的病毒 DNA 剪斷。</li>
+      <li>基因編輯工具是 Cas9 蛋白加嚮導 RNA。嚮導前面約 20 個鹼基決定位置;化膿性鏈球菌的 Cas9 先認 PAM(NGG),再從 PAM 旁邊打開雙股比對,靠近 PAM 的種子區不配對就不剪。</li>
+      <li>切點在 PAM 往回數 3 個鹼基的地方:HNH 剪和嚮導配對的那一股,RuvC 剪被擠開的另一股,DNA 雙股斷開。</li>
+      <li>NHEJ 直接接回,常多或少幾個鹼基;不是 3 的倍數就讀框位移、提早終止,常用來剔除基因。HDR 照著兩端相同的模板修,可以精準改寫,但在大部分細胞裡比 NHEJ 少得多,主要在 S 期與 G2 期進行。</li>
+      <li>設計嚮導:找 NGG,取它前面的 20 個鹼基;避開基因體裡只差一兩個鹼基、旁邊又有 PAM 的相似位置(脫靶)。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Barrangou R, et al. CRISPR provides acquired resistance against viruses in prokaryotes. Science. 2007;315(5819):1709–1712. doi:10.1126/science.1138140(受噬菌體攻擊後,細菌加入來自噬菌體基因體的新間隔序列;間隔序列和噬菌體序列相不相似,決定對哪一種有抵抗力)</li>
+      <li>Jinek M, et al. A programmable dual-RNA–guided DNA endonuclease in adaptive bacterial immunity. Science. 2012;337(6096):816–821. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6286148/">PMC6286148</a>(兩條 RNA 引導 Cas9,也可以接成一條;HNH 剪互補股、RuvC 剪另一股;在 PAM 上游 3 個鹼基處切出平整的切口;PAM 為 NGG)</li>
+      <li>Sternberg SH, et al. DNA interrogation by the CRISPR RNA-guided endonuclease Cas9. Nature. 2014;507(7490):62–67. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4106473/">PMC4106473</a>(先認 PAM 才檢查旁邊的序列;雙股從 PAM 這端開始打開;旁邊沒有 PAM 的完全相符序列會被略過,細菌自己的 CRISPR 區旁邊沒有 PAM)</li>
+      <li>Addgene. <a href="https://www.addgene.org/guides/crispr/">CRISPR Guide</a>(嚮導約 20 個鹼基;SpCas9 的 PAM 是 3′ 端的 NGG;切點在 PAM 上游 3 到 4 個鹼基;NHEJ 常造成小的插入或缺失與讀框位移;HDR 要有兩端相同的模板,效率一般不到一成,在 S 與 G2 期進行;種子區是嚮導靠 PAM 那端 8 到 10 個鹼基)</li>
+      <li>Hsu PD, et al. DNA targeting specificity of RNA-guided Cas9 nucleases. Nat Biotechnol. 2013;31(9):827–832. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3969858/">PMC3969858</a>(能不能容忍不配對,看數目、位置與分布;靠近 PAM 的不配對比較不被容忍;建議避開只差不到 3 個鹼基的脫靶位置)</li>
+      <li>用途與限制的例子:Sulis DB, et al. Science. 2023;381(6654):216–221(楊樹同時編輯最多 6 個木質素基因,碳水化合物與木質素的比值最高到野生型的 228%,製漿更有效率);美國 FDA <a href="https://www.fda.gov/news-events/press-announcements/fda-approves-first-gene-therapies-treat-patients-sickle-cell-disease">2023 年 12 月 8 日新聞稿</a>(Casgevy);MedlinePlus Genetics <a href="https://medlineplus.gov/genetics/understanding/genomicresearch/genomeediting/">What are genome editing and CRISPR-Cas9?</a>(生殖細胞與胚胎編輯);Lino CA, et al. Drug Deliv. 2018;25(1):1234–1257(遞送);Altpeter F, et al. Plant Cell. 2016;28(7):1510–1520(作物轉殖與再生)。</li>
+      <li>動畫裡的序列(基因片段、嚮導、脫靶候選)、蛋白質長度(約 300 個胺基酸)、模板兩端的長度、NHEJ 與 HDR 的比例,以及脫靶候選「會不會被剪」的判斷都是示意,依上面文獻的定性結論畫成,不是實際基因或實驗結果。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化原理・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, PAIR, seg, ease, clamp, lerp, complement } from '../assets/bio-draw.js';
+import { createRotateHint } from '../assets/mobile-panels.js';
+
+// ===================== 序列(全部是示意,不是實際的基因) =====================
+// 第 3 到 6 章共用的一段基因。上面這一股是編碼股(5′→3′),從 ATG 開始三個一組讀
+const GENE = 'ATGTGGAACGATCTTGCAAGATCTGCTCTAGGTAAATTCGAACTG';
+const PS = 9;            // 目標序列(和嚮導相同的那 20 個鹼基)從這裡開始(0 起算)
+const PAMI = PS + 20;    // PAM(AGG)的第一個字
+const CUT = PS + 17;     // 切點在這個鹼基的左邊:PAM 往回數 3 個,也就是嚮導第 17、18 個之間
+const SPACER = GENE.slice(PS, PAMI);
+const rna = (s) => s.replace(/T/g, 'U');
+const GUIDE = rna(SPACER);
+// 修補後的序列:NHEJ 的三種結果與 HDR 照模板改的結果(第 9 個密碼子 GCT 改成 TAT)
+const OUT = {
+  del1: GENE.slice(0, CUT - 1) + GENE.slice(CUT),               // 切點左邊少 1 個
+  ins1: GENE.slice(0, CUT) + GENE[CUT - 1] + GENE.slice(CUT),    // 切點多 1 個(複製左邊那一個)
+  del3: GENE.slice(0, CUT - 2) + GENE.slice(CUT + 1),            // 跨切點少 3 個(剛好一個密碼子)
+  hdr: GENE.slice(0, CUT - 2) + 'TAT' + GENE.slice(CUT + 1),
+};
+const INDEL_TXT = { del1: '少了 1 個', ins1: '多了 1 個', del3: '少了 3 個' };
+// 第 3 章:Cas9 遇到的三種 DNA(上面那一股的前 33 個鹼基)
+const SITE = {
+  match: GENE.slice(0, 33),
+  seed: GENE.slice(0, PAMI - 2) + 'GA' + GENE.slice(PAMI, 33),   // 靠近 PAM 的 2 個和嚮導不配
+  nopam: GENE.slice(0, PAMI) + 'ACT' + GENE.slice(PAMI + 3, 33), // 序列相同,但後面不是 NGG
+};
+
+// 遺傳密碼(標準密碼表,第一、二、三個字依 T、C、A、G 排列)
+const CODE = 'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';
+const AA3 = { F: 'Phe', L: 'Leu', S: 'Ser', Y: 'Tyr', C: 'Cys', W: 'Trp', P: 'Pro', H: 'His', Q: 'Gln', R: 'Arg', I: 'Ile', M: 'Met', T: 'Thr', N: 'Asn', K: 'Lys', V: 'Val', A: 'Ala', D: 'Asp', E: 'Glu', G: 'Gly', '*': '終止' };
+const NI = { T: 0, C: 1, A: 2, G: 3 };
+const aaOf = (c) => CODE[NI[c[0]] * 16 + NI[c[1]] * 4 + NI[c[2]]];
+// 從頭三個一組翻譯,遇到終止密碼子就停(終止也放進去)
+const protein = (s) => { const p = []; for (let i = 0; i + 3 <= s.length; i += 3) { const a = aaOf(s.slice(i, i + 3)); p.push(a); if (a === '*') break; } return p; };
+const PLEN = 300; // 示意:這個蛋白質大約 300 個胺基酸
+const protLen = (kind) => { const p = protein(OUT[kind]); const s = p.indexOf('*'); return s >= 0 ? s : PLEN - (GENE.length - OUT[kind].length) / 3; };
+
+// ===================== 第 3、4 章的版面 =====================
+const ST = 26, BW = 18, BH = 17, X0 = 64, YT = 300, YB = 352, LIFT = 74, YPARK = 160;
+const X = (i) => X0 + i * ST;
+const XC = X(CUT) - ST / 2; // 切點的 x
+
+// ===================== 共用的小畫法 =====================
+// 一股核酸:骨架穿過每個鹼基的位置(可以彎);xs、ys 是每個鹼基的座標
+function strandXY(g, xs, ys, seq, { dir = 1, color = C.backbone, lw = 4, bw = BW, bh = BH, from = 0, to = seq.length, alpha = 1 } = {}) {
+  if (to <= from || alpha <= 0.01) return;
+  const pts = [];
+  for (let i = from; i < to; i++) pts.push([xs[i], ys[i]]);
+  const ext = (a, b) => [a[0] + (a[0] - b[0]) * 0.4, a[1] + (a[1] - b[1]) * 0.4];
+  const line = pts.length > 1 ? [ext(pts[0], pts[1]), ...pts, ext(pts[pts.length - 1], pts[pts.length - 2])] : [[pts[0][0] - 9, pts[0][1]], [pts[0][0] + 9, pts[0][1]]];
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  g.curve(line, color, lw);
+  for (let i = from; i < to; i++) g.base(xs[i], ys[i] + (dir > 0 ? lw / 2 : -lw / 2), seq[i], { w: bw, h: bh, dir });
+  g.ctx.restore();
+}
+// 雙股 DNA(第 3、4 章):dna 是上面那一股;open(i) 是第 i 個鹼基被撐開的程度(0 到 1),dx(i) 是左右位移
+function drawDuplex(g, dna, { open = () => 0, dx = () => 0, pieces = [[0, dna.length]] } = {}) {
+  const n = dna.length, bot = complement(dna);
+  const xs = [], yt = [], yb = [];
+  for (let i = 0; i < n; i++) { xs.push(X(i) + dx(i)); yt.push(YT - LIFT * ease(open(i))); yb.push(YB); }
+  for (let i = 0; i < n; i++) { const a = 0.5 * (1 - open(i)); if (a > 0.02) g.line(xs[i], yt[i] + BH + 4, xs[i], YB - BH - 4, `rgba(240,243,238,${a})`, 2, [2, 3]); }
+  for (const [a, b] of pieces) { strandXY(g, xs, yb, bot, { dir: -1, from: a, to: b }); strandXY(g, xs, yt, dna, { dir: 1, from: a, to: b }); }
+}
+// 嚮導 RNA(前面 20 個鹼基):q 是 Cas9 對準的 PAM 位置;drop(k) 是第 k 個鹼基下到 DNA 配對的程度
+function drawGuide(g, q, drop, { alpha = 1, bob = 0 } = {}) {
+  const xs = [], ys = [];
+  for (let k = 1; k <= 20; k++) { xs.push(X(q - 21 + k)); ys.push(lerp(YPARK + bob, YT, ease(drop(k)))); }
+  strandXY(g, xs, ys, GUIDE, { color: C.amber, alpha });
+}
+// Cas9 的身體:半透明的一大塊,包住嚮導與 PAM
+function cas9Body(g, q, bob, alpha) {
+  if (alpha <= 0.01) return;
+  const x1 = X(q - 21) - 6, x2 = X(q + 2) + 40, y1 = YPARK - 34 + bob, y2 = YB + 30;
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  g.rrect(x1, y1, x2 - x1, y2 - y1, 46, 'rgba(184,164,244,.09)', 'rgba(184,164,244,.55)', 1.6);
+  g.tag(X(q + 1), y1, 'Cas9', { size: 14, color: C.lav });
+  g.ctx.restore();
+}
+// PAM 的框(上面那一股的 3 個鹼基)
+function pamBox(g, i, { color = C.mint, alpha = 1, dash, off = 0 } = {}) {
+  if (alpha <= 0.01) return;
+  g.ctx.save(); g.ctx.globalAlpha *= alpha; if (dash) g.ctx.setLineDash(dash);
+  g.rrect(X(i) + off - ST / 2 + 2, YT - 7, ST * 3 - 4, BH + 16, 6, color === C.red ? 'rgba(255,123,123,.07)' : 'rgba(165,243,205,.1)', color, 2);
+  g.ctx.restore();
+}
+function ends53(g, n, { dxL = 0, dxR = 0 } = {}) {
+  const o = { size: 14, color: C.muted, mono: true };
+  g.text(X(0) - 22 + dxL, YT, '5′', { ...o, align: 'right' }); g.text(X(n - 1) + 22 + dxR, YT, '3′', o);
+  g.text(X(0) - 22 + dxL, YB, '3′', { ...o, align: 'right' }); g.text(X(n - 1) + 22 + dxR, YB, '5′', o);
+}
+// 括號:below = 括號在東西下面(兩端朝上),字寫在括號下方
+function bracket(g, x1, x2, y, { color = C.amber, label, size = 14, alpha = 1, below = true } = {}) {
+  if (alpha <= 0.01) return;
+  const d = below ? -7 : 7;
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  g.curve([[x1, y + d], [x1, y], [x2, y], [x2, y + d]], color, 2);
+  if (label) g.text((x1 + x2) / 2, y + (below ? 18 : -18), label, { size, color, align: 'center', weight: 600 });
+  g.ctx.restore();
+}
+// 剪斷時的火花(k 從 0 到 1)
+function sparks(g, x, y, k) {
+  if (k <= 0 || k >= 1) return;
+  for (let j = 0; j < 8; j++) { const a = j * Math.PI / 4 + 0.3, r1 = 6 + 14 * k, r2 = 12 + 22 * k; g.line(x + Math.cos(a) * r1, y + Math.sin(a) * r1, x + Math.cos(a) * r2, y + Math.sin(a) * r2, `rgba(255,209,102,${1 - k})`, 2); }
+}
+// 胺基酸的小膠囊(三個字母的縮寫;終止密碼子寫「終止」)
+function aaChip(g, x, y, a, { alpha = 1, hi = null } = {}) {
+  if (alpha <= 0.01) return;
+  const stop = a === '*', col = stop ? C.red : hi || C.ink2;
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  g.rrect(x - 29, y - 12, 58, 24, 12, stop ? 'rgba(255,123,123,.16)' : hi ? 'rgba(255,255,255,.07)' : 'rgba(185,199,192,.06)', stop || hi ? col : C.line, stop || hi ? 1.8 : 1.2);
+  g.text(x, y + 0.5, AA3[a], { size: 13, weight: stop || hi ? 700 : 600, color: col, align: 'center', mono: !stop });
+  g.ctx.restore();
+}
+// 一列鹼基(第 5、6 章):items 是 [{ b, x, a, side, ins }],gap 大於 1.5 時骨架斷成左右兩段
+function drawItems(g, items, y, gap, { dir = 1, bw = 16, bh = 18, comp = false, alpha = 1, dimAfter = Infinity, glowIns = true } = {}) {
+  if (alpha <= 0.01) return;
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  for (const s of gap > 1.5 ? [0, 1] : [null]) {
+    const xs = items.filter((it) => (s === null || it.side === s) && it.a > 0.3).map((it) => it.x);
+    if (xs.length) g.line(Math.min(...xs) - bw * 0.6, y, Math.max(...xs) + bw * 0.6, y, C.backbone, 4);
+  }
+  for (const it of items) {
+    if (it.a <= 0.02) continue;
+    if (it.ins && glowIns && !comp) g.rrect(it.x - bw / 2 - 4, y - 3, bw + 8, bh + 8, 5, null, C.mint, 2);
+    g.base(it.x, y + (dir > 0 ? 2 : -2), comp ? PAIR[it.b] : it.b, { w: bw, h: bh, dir, alpha: it.a * (it.x > dimAfter ? 0.3 : 1) });
+  }
+  g.ctx.restore();
+}
+// NHEJ:兩個斷端靠攏,接口少掉或多出鹼基。回傳畫面上這一段(GENE 的 i0 到 i1-1)每個鹼基的位置與透明度
+function nhejItems(t, kind, xOf, step, i0, i1, [j0, j1], [e0, e1]) {
+  const gap = 16 * (1 - ease(seg(t, j0, j1))), ev = ease(seg(t, e0, e1));
+  const items = [];
+  for (let i = i0; i < i1; i++) {
+    let x = xOf(i) + (i < CUT ? -gap : gap), a = 1;
+    if (kind === 'del1') { if (i === CUT - 1) a = 1 - ev; if (i >= CUT) x -= step * ev; }
+    if (kind === 'del3') { if (i >= CUT - 2 && i <= CUT) a = 1 - ev; if (i > CUT) x -= 3 * step * ev; }
+    if (kind === 'ins1' && i >= CUT) x += step * ev;
+    items.push({ b: GENE[i], x, a, side: i < CUT ? 0 : 1 });
+  }
+  if (kind === 'ins1' && ev > 0) items.push({ b: GENE[CUT - 1], x: xOf(CUT), a: ev, side: 0, ins: true });
+  // 接口在哪裡(畫小三角形用)
+  const jx = kind === 'del1' ? xOf(CUT - 2) + step / 2 : kind === 'del3' ? xOf(CUT - 3) + step / 2 : xOf(CUT);
+  return { items, gap, ev, jx };
+}
+// 密碼子的底色(三個一組,深淺交錯)
+function codonBg(g, xOf, y, n, step, alpha, from = 0) {
+  if (alpha <= 0.01) return;
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  for (let c = from; c < from + n; c++) g.rrect(xOf(3 * c) - step / 2 + 1.5, y - 5, step * 3 - 3, 30, 6, c % 2 ? 'rgba(255,255,255,.13)' : 'rgba(255,255,255,.05)', null);
+  g.ctx.restore();
+}
+// 蛋白質長條:原本與修補後
+function proteinBars(g, y, kind, alpha, { w = 560, labelX = 40, x = 130, noteX } = {}) {
+  if (alpha <= 0.01) return;
+  const len = protLen(kind), short = len < PLEN - 5;
+  const nx = noteX ?? x + w + 12;
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  g.text(labelX, y, '原本', { size: 14, weight: 600, color: C.ink2 });
+  g.rrect(x, y - 9, w, 18, 9, C.mintDim);
+  g.text(nx, y, `約 ${PLEN} 個胺基酸`, { size: 14, color: C.ink2 });
+  const bw = Math.max(8, (w * len) / PLEN);
+  g.text(labelX, y + 32, '修補後', { size: 14, weight: 600, color: C.ink2 });
+  g.rrect(x, y + 23, bw, 18, 9, kind === 'hdr' ? C.mint : short ? C.red : C.amber);
+  if (kind === 'hdr') g.rrect(x + (w * 8.5) / PLEN - 3, y + 19, 6, 26, 3, C.ink);
+  if (kind === 'del3') g.rrect(x + (w * 8.5) / PLEN - 2, y + 20, 4, 24, 2, '#0f1716');
+  g.text(short ? x + bw + 12 : nx, y + 32, short ? `只有 ${len} 個就停了` : kind === 'hdr' ? `還是 ${len} 個` : `${len} 個(少 1 個)`, { size: 14, weight: 600, color: kind === 'hdr' ? C.mint : short ? C.red : C.amber });
+  g.ctx.restore();
+}
+
+// ===================== 第 1 章:細菌的 CRISPR =====================
+const SPC = ['#6fb2f5', '#b8a4f4', '#5fd39a', '#9aa8a2']; // 以前遇過的病毒留下的間隔序列
+const DNA1 = [612, 179, 420, 160, 9, 3];   // 第一隻噬菌體打進來的 DNA:起點、終點、起伏、波數
+const DNA2 = [572, 100, 400, 150, 8, 3];   // 第二隻
+function wavePts([x1, y1, x2, y2, amp, waves], k0, k1) {
+  const pts = [], n = 60;
+  for (let i = 0; i <= n; i++) { const k = lerp(k0, k1, i / n); pts.push([lerp(x1, x2, k), lerp(y1, y2, k) + amp * Math.sin(k * waves * Math.PI * 2)]); }
+  return pts;
+}
+// 噬菌體:尾巴的尖端在 (x, y),rot 是尾巴的朝向(0 是朝下)
+function phage(g, x, y, rot, alpha = 1) {
+  if (alpha <= 0.01) return;
+  const c = g.ctx;
+  c.save(); c.globalAlpha *= alpha; c.translate(x, y); c.rotate(rot);
+  for (const d of [-1, 1]) { g.line(0, -8, d * 16, 2, C.ink2, 2); g.line(d * 16, 2, d * 20, 9, C.ink2, 2); }
+  g.rrect(-5, -46, 10, 40, 3, '#22302c', C.ink2, 1.6);
+  c.beginPath();
+  for (let i = 0; i < 6; i++) { const a = (i * Math.PI) / 3, px = Math.cos(a) * 25, py = -70 + Math.sin(a) * 25; if (i) c.lineTo(px, py); else c.moveTo(px, py); }
+  c.closePath(); c.fillStyle = 'rgba(255,154,92,.16)'; c.fill(); c.lineWidth = 2; c.strokeStyle = C.hot; c.stroke();
+  g.curve([[-13, -76], [-5, -62], [5, -80], [13, -64]], C.hot, 2.2);
+  c.restore();
+}
+function diamond(g, x, y, r, fill) { const c = g.ctx; c.beginPath(); c.moveTo(x, y - r); c.lineTo(x + r, y); c.lineTo(x, y + r); c.lineTo(x - r, y); c.closePath(); c.fillStyle = fill; c.fill(); }
+// 放大的 CRISPR 區:前導序列、重複序列(菱形)、間隔序列(方塊)。u 是新的間隔序列插進來時後面整排右移的量
+function crisprArray(g, y, u, ins) {
+  g.line(124, y, 540 + u * 88, y, 'rgba(213,221,217,.35)', 2);
+  g.rrect(64, y - 12, 60, 24, 4, '#2a3a36', C.line);
+  diamond(g, 145, y, 11, C.ink2);
+  for (let j = 0; j < 4; j++) { const x = 162 + (j + u) * 88; g.rrect(x, y - 12, 54, 24, 4, SPC[j]); diamond(g, x + 71, y, 11, C.ink2); }
+  if (ins > 0) { g.ctx.save(); g.ctx.globalAlpha *= ins; g.rrect(162, y - 12, 54, 24, 4, C.hot); diamond(g, 233, y, 11, C.ink2); g.ctx.restore(); }
+}
+function miniArray(g, ins) {
+  const y = 250;
+  g.rrect(290, y - 5, 10, 10, 2, '#2a3a36', C.line, 1);
+  for (let j = 0; j < 4; j++) g.rrect(304 + (j + ins) * 13, y - 5, 9, 10, 2, SPC[j]);
+  if (ins > 0) { g.ctx.save(); g.ctx.globalAlpha *= ins; g.rrect(304, y - 5, 9, 10, 2, C.hot); g.ctx.restore(); }
+}
+
+// ===================== 第 2 章:嚮導 RNA 的支架 =====================
+const ALT = [GUIDE, 'CUUAGCAGUCAAGUCGAUGA', 'GAUCAUGAAGUUACGCAUCA']; // 換掉前 20 個鹼基(示意)
+const SITES2 = [180, 480, 780];
+// 支架:從嚮導的 3′ 端 (ax, ay) 往上,再往左做出三個髮夾
+function scaffold(g, ax, ay, alpha = 1) {
+  if (alpha <= 0.01) return;
+  const c = g.ctx, top = ay - 64;
+  c.save(); c.globalAlpha *= alpha;
+  g.curve([[ax - 8, ay], [ax + 14, ay], [ax + 24, ay - 12], [ax + 24, top + 10], [ax + 12, top], [ax - 176, top]], C.amber, 4);
+  for (const hx of [ax - 22, ax - 84, ax - 146]) {
+    c.beginPath(); c.moveTo(hx - 8, top); c.lineTo(hx - 8, top - 30); c.arc(hx, top - 30, 8, Math.PI, 0); c.lineTo(hx + 8, top);
+    c.strokeStyle = C.amber; c.lineWidth = 4; c.lineJoin = 'round'; c.stroke();
+    for (let r = 0; r < 3; r++) g.line(hx - 4, top - 8 - r * 8, hx + 4, top - 8 - r * 8, 'rgba(255,209,102,.55)', 2);
+  }
+  c.restore();
+}
+
+// ===================== 第 3 章:Cas9 怎麼移動、停下、配對 =====================
+function searchState(t, sc) {
+  let q, a = 1, docked = null;
+  if (t < 1.2) q = lerp(-10, 3, ease(t / 1.2));
+  else if (t < 3.1) { q = 3; docked = 3; }                        // 在第 3 到 5 個鹼基的 TGG 停下(假的目標)
+  else if (sc === 'nopam') q = lerp(3, 46, seg(t, 3.1, 8.8));     // 一路滑過去,不停
+  else if (t < 4.8) q = lerp(3, PAMI, ease(seg(t, 3.1, 4.8)));
+  else { q = PAMI; docked = PAMI; }
+  if (sc === 'seed' && t > 7.2) { q = lerp(PAMI, 46, ease(seg(t, 7.2, 9.4))); docked = null; }
+  if (sc === 'seed') a = 1 - seg(t, 8.4, 9.4);
+  if (sc === 'nopam') a = 1 - seg(t, 8, 8.8);
+  const drop = (k) => {
+    if (docked === 3) return k === 20 ? 0.8 * ease(seg(t, 1.5, 1.9)) * (1 - ease(seg(t, 2.6, 3))) : 0;
+    if (docked === PAMI && sc === 'match') { const s0 = 5.1 + (20 - k) * 0.2; return ease(seg(t, s0, s0 + 0.45)); }
+    if (docked === PAMI && sc === 'seed') return k === 20 ? 0.8 * ease(seg(t, 5.1, 5.5)) * (1 - ease(seg(t, 6.4, 6.9))) : 0;
+    return 0;
+  };
+  const miss = docked === 3 ? seg(t, 1.85, 2) * (1 - seg(t, 2.6, 2.8)) : docked === PAMI && sc === 'seed' ? seg(t, 5.45, 5.6) * (1 - seg(t, 6.4, 6.6)) : 0;
+  return { q, a, docked, drop, miss };
+}
+
+// ===================== 第 5、6 章的版面 =====================
+const X5 = (i) => 130 + i * 22, R1 = 104, R2 = 222, XC5 = X5(CUT) - 11;
+const X6 = (i) => 80 + (i - 12) * 26, GY = 262, DY = 116, XC6 = X6(CUT) - 13;
+
+// ===================== 第 7 章:設計嚮導 =====================
+const DSEQ = 'TCAGTTAGCATCGAACTGTATGGATCAGGTACTGATCGGTCA';
+const DPAM = [20, 26, 36]; // 三個 NGG 的 N
+const X7 = (i) => 50 + i * 21;
+const SWAP = { A: 'C', C: 'A', G: 'T', T: 'G' };
+// 每條嚮導在基因體其他地方的兩個相似位置(示意):mm 是不一樣的鹼基位置(1 到 20,20 最靠近 PAM)
+const OFF = [
+  [{ mm: [2, 6], pam: 'AGG' }, { mm: [4, 13, 17], pam: 'TGG' }],
+  [{ mm: [3, 12, 18], pam: 'CGG' }, { mm: [9], pam: 'TCA' }],
+  [{ mm: [5], pam: 'AGG' }, { mm: [15, 19], pam: 'TGG' }],
+];
+const isPam = (p) => /^[ACGT]GG$/.test(p);
+const offSeq = (s, mm) => [...s].map((b, i) => (mm.includes(i + 1) ? SWAP[b] : b)).join('');
+// 示意的判斷,依 Hsu 等人 2013 的定性結論:不配對越多越不會剪;靠近 PAM 的不配對比遠端的更不被容忍
+function rateOff({ mm, pam }) {
+  if (!isPam(pam)) return { txt: '旁邊沒有 PAM:不會被剪', col: C.mint };
+  const n = mm.length, seedN = mm.filter((k) => k >= 11).length;
+  if (n >= 3) return { txt: `差 ${n} 個:幾乎不會被剪`, col: C.mint };
+  if (seedN > 0) return { txt: `差 ${n} 個,有落在種子區:不太會被剪`, col: C.ink2 };
+  if (n === 1) return { txt: '只差 1 個:很可能被剪', col: C.red };
+  return { txt: `差 ${n} 個,都離 PAM 遠:仍可能被剪`, col: C.amber };
+}
+function guideVerdict(k) {
+  const risky = OFF[k].filter((o) => isPam(o.pam) && o.mm.length < 3);
+  if (risky.some((o) => o.mm.length === 1)) return ['有只差 1 個的相似位置:避開這一條', C.red];
+  if (risky.length) return ['有只差 2 個的相似位置:最好換一條', C.amber];
+  return ['相似位置都差 3 個以上或沒有 PAM:這條比較好', C.mint];
+}
+const xc7 = (n) => 176 + (n - 1) * 15; // 脫靶表裡第 n 個字的位置
+function seqRow(g, y, label, s, pam, mm, note, noteCol, alpha) {
+  if (alpha <= 0.01) return;
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  g.text(48, y, label, { size: 14, weight: 600, color: C.ink2 });
+  for (let n = 1; n <= 20; n++) {
+    const bad = mm.includes(n);
+    g.text(xc7(n), y, s[n - 1], { size: 15, mono: true, weight: bad ? 800 : 500, color: bad ? C.red : C.ink, align: 'center' });
+    if (bad) g.line(xc7(n) - 5, y + 13, xc7(n) + 5, y + 13, C.red, 2);
+  }
+  const okP = isPam(pam);
+  for (let j = 0; j < 3; j++) g.text(xc7(20) + 23 + j * 15, y, pam[j], { size: 15, mono: true, weight: 700, color: okP ? C.mint : C.muted, align: 'center' });
+  if (!okP) g.line(xc7(20) + 14, y, xc7(20) + 62, y, C.muted, 1.6);
+  g.text(560, y, note, { size: 14, weight: 600, color: noteCol });
+  g.ctx.restore();
+}
+// 換了嚮導就直接跳到看得到整張脫靶表的時間
+function jumpDesign() { if (L.chapter === 'design' && L.time < 14.5) L.time = 14.5; }
+
+// ===================== 第 8 章:用途與限制的小圖示 =====================
+function icon(g, kind, x, y) {
+  const c = g.ctx;
+  if (kind === 'plant') {
+    c.save(); c.beginPath(); c.moveTo(x - 20, y + 16); c.quadraticCurveTo(x - 22, y - 18, x + 20, y - 20); c.quadraticCurveTo(x + 18, y + 14, x - 20, y + 16); c.closePath();
+    c.fillStyle = 'rgba(165,243,205,.22)'; c.fill(); c.strokeStyle = C.mint; c.lineWidth = 2; c.stroke(); c.restore();
+    g.line(x - 16, y + 12, x + 14, y - 15, C.mint, 1.6);
+    g.line(x - 2, y - 2, x - 2, y - 12, C.mint, 1.2); g.line(x + 6, y - 8, x + 12, y - 4, C.mint, 1.2);
+  } else if (kind === 'lab') {
+    g.line(x - 26, y - 8, x + 26, y - 8, C.backbone, 3); g.line(x - 26, y + 8, x + 26, y + 8, C.backbone, 3);
+    for (let i = -22; i <= 22; i += 8) g.line(x + i, y - 5, x + i, y + 5, 'rgba(213,221,217,.45)', 2);
+    g.rrect(x - 10, y - 14, 20, 28, 4, 'rgba(255,123,123,.18)', C.red, 1.6);
+    g.line(x - 6, y - 8, x + 6, y + 8, C.red, 2.5); g.line(x + 6, y - 8, x - 6, y + 8, C.red, 2.5);
+  } else if (kind === 'med') {
+    g.circle(x, y, 21, 'rgba(255,123,123,.22)', C.red, 2); g.circle(x, y, 9, 'rgba(255,123,123,.1)', 'rgba(255,123,123,.65)', 1.6);
+  } else if (kind === 'off') {
+    const cols = [C.A, C.T, C.G, C.C, C.G, C.A];
+    for (let i = 0; i < 6; i++) { g.rrect(x - 27 + i * 9, y - 17, 7, 10, 2, cols[i]); g.rrect(x - 27 + i * 9, y + 5, 7, 10, 2, i === 1 ? C.N : cols[i]); }
+    g.line(x + 10, y - 22, x + 10, y - 3, C.red, 2); g.line(x + 10, y + 1, x + 10, y + 20, C.red, 2, [3, 2]);
+  } else if (kind === 'deliver') {
+    g.circle(x + 8, y, 20, 'rgba(165,243,205,.08)', C.mintDim, 2);
+    g.arrow(x - 32, y, x - 6, y, { color: C.lav });
+    g.circle(x + 10, y, 6, C.lav);
+  } else if (kind === 'law') {
+    g.line(x, y - 20, x, y + 16, C.ink2, 2.5); g.line(x - 22, y - 13, x + 22, y - 13, C.ink2, 2.5); g.line(x - 12, y + 18, x + 12, y + 18, C.ink2, 3);
+    for (const d of [-1, 1]) { g.line(x + d * 22, y - 13, x + d * 28, y + 3, C.ink2, 1.4); g.line(x + d * 22, y - 13, x + d * 16, y + 3, C.ink2, 1.4); g.curve([[x + d * 30, y + 3], [x + d * 22, y + 10], [x + d * 14, y + 3]], C.ink2, 2); }
+  }
+}
+const USES = [
+  { icon: 'plant', title: '植物育種', lines: ['同時編輯楊樹多個木質素基因,', '木材更好製漿(2023 年研究)'] },
+  { icon: 'lab', title: '基礎研究', lines: ['剔除一個基因,看生物少了它', '會怎樣,推知它的功能'] },
+  { icon: 'med', title: '醫療', lines: ['2023 年美國核准第一個', 'CRISPR 療法(鐮刀型貧血症)'] },
+];
+const LIMITS = [
+  { icon: 'off', title: '脫靶', lines: ['相似的位置也可能被剪;', '設計時要比對,做完要檢查'] },
+  { icon: 'deliver', title: '遞送', lines: ['要把工具送進對的細胞;', '許多作物的轉殖與再生是瓶頸'] },
+  { icon: 'law', title: '法規與倫理', lines: ['基因編輯作物各國規定不同;', '改人類胚胎會遺傳,多國禁止'] },
+];
+function card(g, x, y, d, a, hi) {
+  if (a <= 0.01) return;
+  g.ctx.save(); g.ctx.globalAlpha *= a;
+  g.rrect(x, y + (1 - a) * 12, 420, 130, 12, hi ? 'rgba(165,243,205,.07)' : 'rgba(21,32,30,.6)', hi ? 'rgba(165,243,205,.6)' : C.line, 1.5);
+  icon(g, d.icon, x + 54, y + 66 + (1 - a) * 12);
+  g.text(x + 104, y + 36 + (1 - a) * 12, d.title, { size: 17, weight: 700, color: C.ink });
+  d.lines.forEach((s, i) => g.text(x + 104, y + 72 + i * 28 + (1 - a) * 12, s, { size: 14, color: C.ink2 }));
+  g.ctx.restore();
+}
+
+const chapters = [
+  {
+    key: 'origin', name: '由來:細菌的免疫機制', dur: 16,
+    cues: [[0, 'CRISPR 原本是細菌對抗病毒的免疫機制。會感染細菌的病毒叫噬菌體,它把自己的 DNA 打進細菌裡。'],
+      [4.5, '有些細菌撐過感染,會擷取一小段病毒 DNA,存進自己基因體的 CRISPR 區,成為一排重複序列之間的新「間隔序列」。'],
+      [9.5, '同一種病毒再來時,細菌把這一排轉錄成 RNA、切成小段,讓 Cas 蛋白帶著和病毒相符的那一段去找。'],
+      [13.5, '找到相符的病毒 DNA 就剪斷,病毒沒辦法繁殖。CRISPR 是「成簇、規律間隔的短回文重複序列」的英文縮寫。']],
+    draw(g, t) {
+      const A = (a, b) => ease(seg(t, a, b));
+      const c = g.ctx;
+      // 細菌、環狀染色體、染色體上的 CRISPR 區
+      g.rrect(60, 64, 560, 230, 115, 'rgba(165,243,205,.05)', C.mintDim, 2);
+      g.tag(196, 100, '細菌', { size: 14, color: C.mint });
+      c.save(); c.beginPath(); c.ellipse(330, 180, 210, 70, 0, 0, Math.PI * 2); c.strokeStyle = 'rgba(213,221,217,.3)'; c.lineWidth = 3; c.stroke(); c.restore();
+      const u = A(6.2, 7.4), ins = A(7.4, 8.2);
+      miniArray(g, ins);
+      g.text(330, 272, 'CRISPR 區', { size: 13, color: C.ink2, align: 'center' });
+      // 放大的框
+      g.line(292, 258, 40, 326, 'rgba(165,243,205,.2)', 1.2, [4, 5]);
+      g.line(368, 258, 920, 326, 'rgba(165,243,205,.2)', 1.2, [4, 5]);
+      g.panel(40, 326, 880, 190, 'CRISPR 區(放大)');
+      crisprArray(g, 404, u, ins);
+      const la = A(1, 1.8) * (1 - A(10, 10.4));
+      g.text(145, 452, '重複序列', { size: 13, color: C.ink2, align: 'center', alpha: la });
+      g.text(162 + (1 + u) * 88 + 27, 452, '間隔序列', { size: 13, color: C.ink2, align: 'center', alpha: la });
+      if (ins > 0) g.tag(189, 370, '新的間隔序列(來自病毒)', { size: 14, color: C.hot, alpha: A(7.8, 8.4) });
+      // 第一隻噬菌體:停在細菌右邊,把 DNA 打進去
+      const p1 = A(0.2, 2.2), p1out = A(8.2, 9.2);
+      const p1x = lerp(880, 620, p1), p1y = lerp(110, 179, p1);
+      const inj1 = A(2.2, 4.4);
+      if (inj1 > 0) g.curve(wavePts(DNA1, 0, inj1), C.hot, 3, { alpha: 1 - p1out });
+      const cap = A(4.6, 5.2) * (1 - p1out);
+      if (cap > 0) g.curve(wavePts(DNA1, 0.52, 0.7), '#ffd2b0', 7, { alpha: cap });
+      phage(g, p1x, p1y, Math.PI / 2, 1 - p1out);
+      g.tag(p1x + 70, p1y - 50, '病毒(噬菌體)', { size: 14, color: C.hot, alpha: A(0.4, 1) * (1 - A(4, 4.6)) });
+      g.tag(500, 126, '擷取一小段', { size: 14, color: C.hot, alpha: A(4.8, 5.3) * (1 - A(6.2, 6.6)) });
+      // 擷取的那一段飛到 CRISPR 區的最前面
+      if (t > 6 && t < 7.7) {
+        const k = ease(seg(t, 6, 7.5));
+        const x = (1 - k) ** 2 * 495 + 2 * k * (1 - k) * 330 + k * k * 189, y = (1 - k) ** 2 * 160 + 2 * k * (1 - k) * 300 + k * k * 404;
+        g.rrect(x - 22, y - 7, 44, 14, 4, C.hot);
+      }
+      // 第二隻(同一種)噬菌體
+      if (t > 9.4) {
+        const p2 = A(9.5, 10.6), p2out = 0.5 * A(15, 16), inj2 = A(10.6, 11.6), cut = t >= 14.1, sep = A(14.1, 15.2), fade = 1;
+        if (inj2 > 0) {
+          if (!cut) g.curve(wavePts(DNA2, 0, inj2), C.hot, 3, { alpha: fade });
+          else {
+            g.curve(wavePts(DNA2, 0, 0.57).map(([x, y]) => [x + 20 * sep, y - 12 * sep]), C.hot, 3, { alpha: fade });
+            g.curve(wavePts(DNA2, 0.61, 1).map(([x, y]) => [x - 20 * sep, y + 12 * sep]), C.hot, 3, { alpha: fade });
+          }
+          if (t > 12.6 && !cut) g.curve(wavePts(DNA2, 0.5, 0.68), '#ffd2b0', 7, { alpha: A(12.6, 13.2) });
+        }
+        phage(g, lerp(790, 579, p2), lerp(-80, 91, p2), 0.698, A(9.4, 9.8) * (1 - p2out));
+      }
+      // 轉錄成 RNA,再切成一段一段
+      if (t > 10.4) {
+        const end = lerp(134, 596, A(10.4, 12)), sp = A(12, 12.6), ra = 1;
+        c.save(); c.globalAlpha *= ra;
+        for (let j = 0; j < 5; j++) {
+          if (j === 0 && t > 12.5) continue;
+          const xa = 145 + j * 88 + 4 * sp, xb = Math.min(233 + j * 88 - 4 * sp, end);
+          if (xb <= xa) continue;
+          g.line(xa, 456, xb, 456, C.amber, 4);
+          const sa = 162 + j * 88, sb = Math.min(sa + 54, end);
+          if (sb > sa) g.line(sa, 456, sb, 456, j === 0 ? C.hot : SPC[j - 1], 7);
+        }
+        c.restore();
+        g.text(760, 456, sp > 0.5 ? '再切成一段一段' : '轉錄成 RNA', { size: 14, color: C.amber, align: 'center', alpha: A(10.6, 11) * (1 - A(13.4, 14)) });
+      }
+      // Cas 蛋白帶著來自病毒的那一段 RNA,找到相符的病毒 DNA 剪斷
+      if (t > 12.2) {
+        const ca = A(12.2, 12.7), mv = A(13.3, 14);
+        const cx = lerp(300, 470, mv), cy = lerp(150, 116, mv) + 54 * A(14.4, 15.3); // 剪完往下讓開,看得到斷口
+        g.blob(cx, cy, 36, 26, C.lav, 'Cas9', { alpha: ca, size: 13 });
+        const k = ease(seg(t, 12.5, 13.3));
+        const fx = lerp(189, cx, k), fy = lerp(456, cy + 32, k);
+        c.save(); c.globalAlpha *= ca; g.line(fx - 22, fy, fx + 22, fy, C.hot, 6); c.restore();
+        sparks(g, 470, 124, seg(t, 14, 14.7));
+        g.tag(420, 86, '相符:剪斷', { size: 14, color: C.hot, alpha: A(14.1, 14.6) });
+      }
+    },
+  },
+  {
+    key: 'parts', name: '兩個部分:Cas9 與嚮導 RNA', dur: 13,
+    cues: [[0, '實驗室把這套機制簡化成兩個部分。第一個是 Cas9 蛋白,負責把 DNA 剪斷,像一把剪刀。'],
+      [4, '第二個是嚮導 RNA:前面約 20 個鹼基決定要去哪裡,後面的支架讓 Cas9 抓住它。天然是兩條 RNA,實驗室常接成一條。'],
+      [8.5, 'Cas9 不用換;只要換掉嚮導前面這 20 個鹼基,同一個 Cas9 就會被帶到基因體的另一個位置。']],
+    draw(g, t) {
+      const A = (a, b) => ease(seg(t, a, b));
+      const ca = A(0.2, 1.2);
+      g.blob(300, 205, 210, 108, C.lav, '', { alpha: 0.88 * ca, wobble: 0.6, t });
+      g.text(300, 150, 'Cas9', { size: 26, weight: 800, color: '#0b1111', align: 'center', alpha: ca });
+      g.tag(300, 70, 'Cas9 蛋白:負責剪斷 DNA', { size: 15, color: C.lav, alpha: A(0.6, 1.4) * (1 - A(6.4, 7)) });
+      const ga = A(4, 4.8), mv = A(6.6, 8.4);
+      const sx = lerp(330, 110, mv), sy = lerp(440, 318, mv);
+      const site = t < 10 ? 0 : t < 11.5 ? 1 : 2;
+      if (ga > 0) {
+        const flip = t > 9.5 ? 0.35 + 0.65 * clamp(Math.min(Math.abs(t - 10), Math.abs(t - 11.5)) * 5) : 1;
+        g.ctx.save(); g.ctx.globalAlpha *= ga;
+        scaffold(g, sx + 390, sy);
+        g.strand(sx, sy, ALT[t < 8.5 ? 0 : site], { step: 20, bw: 15, bh: 19, color: C.amber, alpha: flip });
+        g.ctx.restore();
+        const la = A(4.6, 5.2) * (1 - A(6.3, 6.7));
+        bracket(g, sx - 8, sx + 388, sy + 34, { color: C.amber, label: '前面 20 個鹼基:決定要去哪裡', alpha: la, size: 15 });
+        g.text(sx + 432, sy - 104, '支架:讓 Cas9 抓住', { size: 15, color: C.amber, alpha: la });
+      }
+      // 換掉前 20 個鹼基,就換一個位置
+      const pa = A(8.5, 9.2);
+      if (pa > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= pa;
+        g.line(40, 464, 920, 464, C.backbone, 3); g.line(40, 478, 920, 478, C.backbone, 3);
+        for (let x = 46; x < 920; x += 10) g.line(x, 467, x, 475, 'rgba(213,221,217,.3)', 2);
+        SITES2.forEach((x, i) => {
+          const on = i === site;
+          g.rrect(x - 60, 456, 120, 30, 6, on ? 'rgba(165,243,205,.22)' : 'rgba(255,255,255,.04)', on ? C.mint : C.line, on ? 2 : 1.2);
+          g.text(x, 506, `位置 ${'ABC'[i]}`, { size: 14, weight: on ? 700 : 500, color: on ? C.mint : C.muted, align: 'center' });
+        });
+        g.arrow(300, 352, SITES2[site], 450, { color: C.mint });
+        g.tag(540, 336, '換掉這 20 個,就換一個位置', { size: 14, color: C.amber, align: 'left' });
+        g.ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'search', name: '找位置:先認 PAM 再比對', dur: 17,
+    cues: [[0, 'Cas9 先找 PAM:緊接在目標後面的一小段序列。常用的化膿性鏈球菌 Cas9 認 NGG,N 代表任何一種鹼基。'],
+      [5, '找到 PAM 後,Cas9 從 PAM 旁邊把雙股撐開,嚮導 RNA 一個一個鹼基試著和下面那一股配對。'],
+      [9.5, '要從 PAM 這端一路配對到夠長,Cas9 才會剪;靠近 PAM 的約 10 個鹼基(種子區)一有不配對就放開。'],
+      [13, '旁邊沒有 PAM 的地方,序列完全相同也不會被檢查,細菌自己的 CRISPR 區就是這樣不被剪到。右邊可以換一段 DNA。']],
+    draw(g, t, S) {
+      const A = (a, b) => ease(seg(t, a, b));
+      const sc = S.target, dna = SITE[sc];
+      const st = searchState(t, sc), { q, a, docked } = st;
+      const bob = docked === null ? -7 * Math.abs(Math.sin(t * 8)) : 0;
+      cas9Body(g, q, bob, a);
+      const open = (i) => (docked !== null && i >= docked - 20 && i < docked ? st.drop(i - docked + 21) : 0);
+      drawDuplex(g, dna, { open });
+      ends53(g, dna.length);
+      if (docked !== null) pamBox(g, docked, { alpha: a });
+      else if (sc !== 'nopam' && t > 4.8) pamBox(g, PAMI, { alpha: 0.7 });
+      if (sc === 'nopam' && t > 5.6) {
+        pamBox(g, PAMI, { color: C.red, dash: [5, 4], alpha: seg(t, 5.6, 6) });
+        bracket(g, X(PS) - 12, X(PAMI - 1) + 12, YT - 16, { below: false, color: C.amber, label: '和嚮導相同的 20 個', alpha: seg(t, 5.6, 6) });
+      }
+      // 靠近 PAM 的那 2 個和嚮導不配
+      if (sc === 'seed' && t > 5.5) {
+        g.ctx.save(); g.ctx.globalAlpha *= seg(t, 5.5, 5.9);
+        g.rrect(X(PAMI - 2) - ST / 2 + 2, YT - 6, ST * 2 - 4, BH + 14, 5, null, C.red, 2);
+        g.ctx.restore();
+        g.text(X(PAMI - 2) + ST / 2, YT - 24, '和嚮導不配', { size: 14, weight: 700, color: C.red, align: 'center', alpha: seg(t, 6.9, 7.3) });
+      }
+      drawGuide(g, q, st.drop, { alpha: a, bob });
+      if (docked === PAMI) for (let k = 1; k <= 20; k++) { const i = docked - 21 + k; if (st.drop(k) > 0.97 && dna[i] === SPACER[k - 1]) g.line(X(i), YT + BH + 4, X(i), YB - BH - 4, 'rgba(255,209,102,.65)', 2, [2, 3]); }
+      if (st.miss > 0) { const yg = lerp(YPARK, YT, ease(0.8)) + 2 + BH; g.text(X(docked - 1), (yg + YB - 2 - BH) / 2, '×', { size: 22, weight: 800, color: C.red, align: 'center', alpha: st.miss }); }
+      // 在假的目標(第 3 到 5 個鹼基的 TGG)停下
+      if (t > 1.2 && t < 3.2) {
+        const ok = t < 1.9;
+        g.tag(X(4) + 86, 84, ok ? 'NGG:檢查旁邊' : '不配對:離開', { size: 14, color: ok ? C.mint : C.red, alpha: seg(t, 1.2, 1.4) * (1 - seg(t, 3, 3.2)) });
+      }
+      // 嚮導 RNA 的名字(Cas9 移動時)
+      const xg = X(q - 10.5);
+      if (t > 3.3 && xg > 150 && xg < 800) g.text(xg, YPARK - 22, '嚮導 RNA', { size: 14, weight: 600, color: C.amber, align: 'center', alpha: a * seg(t, 3.3, 3.7) * (1 - seg(t, 5, 5.4)) });
+      if (docked === PAMI) g.tag(X(PAMI + 1), YT - 86, '找到 PAM', { size: 14, color: C.mint, alpha: A(4.8, 5.1) * (1 - A(7.4, 7.9)) });
+      // 右上角:目前的狀況
+      let status = null;
+      if (sc === 'match' && t > 5.1) status = t < 9.4 ? ['從 PAM 這端一個一個配對', C.ink2] : ['20 個都配上:可以剪了', C.mint];
+      if (sc === 'seed' && t > 5.5) status = ['種子區不配對:放開,不剪', C.red];
+      if (sc === 'nopam' && t > 5.6) status = ['序列相同但沒有 PAM:不停下來', C.amber];
+      if (status) g.tag(936, 60, status[0], { size: 15, color: status[1], align: 'right' });
+      // 種子區、PAM 的名字、兩股的名字
+      const seedA = sc === 'match' ? A(9.6, 10.2) : sc === 'seed' ? A(5.6, 6.1) : 0;
+      bracket(g, X(PAMI - 10) - 12, X(PAMI - 1) + 12, YB + 30, { color: C.mint, label: '種子區(靠近 PAM 約 10 個)', alpha: seedA });
+      if (sc === 'nopam' && t > 5.6) g.text(X(PAMI + 1), YB + 48, '這裡不是 NGG', { size: 14, weight: 600, color: C.red, align: 'center', alpha: seg(t, 5.6, 6) });
+      else if (docked === PAMI || (sc !== 'nopam' && t > 4.8)) g.text(X(PAMI + 1), YB + 48, 'PAM', { size: 14, weight: 700, color: C.mint, align: 'center' });
+      if (sc === 'match' && t > 9.5) {
+        g.text(X(0) - 20, YB + 48, '和嚮導配對的這一股', { size: 14, color: C.ink2, alpha: A(9.6, 10.2) });
+        g.text(X(PS + 5), YT - LIFT - 26, '被擠開的這一股', { size: 14, color: C.ink2, align: 'center', alpha: A(9.6, 10.2) });
+      }
+    },
+  },
+  {
+    key: 'cut', name: '剪開:兩股都切斷', dur: 12,
+    cues: [[0, '配對完成後,Cas9 的兩個切割區各剪一股:HNH 剪和嚮導配對的那一股,RuvC 剪被擠開的另一股。'],
+      [4.5, '兩股都切在 PAM 往回數 3 個鹼基的地方,也就是嚮導第 17 和第 18 個鹼基之間,切口是平的。'],
+      [8.5, 'DNA 的雙股斷開了。細胞會趕快修補斷掉的 DNA,真正的改變就發生在修補的時候。']],
+    draw(g, t) {
+      const A = (a, b) => ease(seg(t, a, b));
+      const leave = A(6.6, 8.4), sp = A(9, 10.6) * 22, cutOn = t >= 3.2;
+      const dx = (i) => (i < CUT ? -sp : sp);
+      const open = (i) => (i >= PS && i < PAMI ? 1 - leave : 0);
+      cas9Body(g, PAMI, -60 * leave, 1 - leave);
+      drawDuplex(g, SITE.match, { open, dx, pieces: cutOn ? [[0, CUT], [CUT, 33]] : [[0, 33]] });
+      ends53(g, 33, { dxL: -sp, dxR: sp });
+      pamBox(g, PAMI, { alpha: 1 - A(8.4, 9) });
+      drawGuide(g, PAMI, () => 1 - leave, { alpha: 1 - leave });
+      for (let k = 1; k <= 20; k++) { const i = PS + k - 1, ha = 0.65 * (1 - A(6.6, 7)); if (ha > 0.02) g.line(X(i), YT + BH + 4, X(i), YB - BH - 4, `rgba(255,209,102,${ha})`, 2, [2, 3]); }
+      // 嚮導的編號
+      const na = A(4.4, 5) * (1 - A(6.4, 6.8));
+      for (const k of [1, 17, 18, 20]) g.text(X(PS + k - 1), YT - 14, String(k), { size: 13, mono: true, weight: 700, color: k === 17 || k === 18 ? C.red : C.muted, align: 'center', alpha: na });
+      // 兩個切割區
+      const ch = A(1, 2.4) * (1 - A(6.2, 6.8));
+      if (ch > 0) {
+        const sx = X(PS + 8), sy = YPARK + 20;
+        const chip = (x, y, s) => g.tag(x, y, s, { size: 14, color: '#0b1111', bg: C.lav, border: C.lav, alpha: Math.min(1, ch * 2) * (1 - A(6.2, 6.8)) });
+        chip(lerp(sx, XC - 72, ch), lerp(sy, YB + 48, ch), 'HNH');
+        chip(lerp(sx, XC - 72, ch), lerp(sy, YT - LIFT - 40, ch), 'RuvC');
+        if (ch > 0.95) { g.line(XC - 48, YB + 40, XC - 4, YB + 4, C.lav, 1.5, [3, 3]); g.line(XC - 44, YT - LIFT - 34, XC - 4, YT - LIFT - 4, C.lav, 1.5, [3, 3]); }
+      }
+      sparks(g, XC, YT - LIFT, seg(t, 3, 3.7)); sparks(g, XC, YB, seg(t, 3, 3.7));
+      const ca = A(3.6, 4) * (1 - A(8.6, 9));
+      if (ca > 0) {
+        g.line(XC, YT - LIFT - 18, XC, YB + 26, `rgba(255,123,123,${0.85 * ca})`, 1.6, [4, 4]);
+        g.text(XC, YB + 48, '切點', { size: 14, weight: 700, color: C.red, align: 'center', alpha: ca });
+        g.text(X(PAMI + 1), YB + 48, 'PAM', { size: 14, weight: 700, color: C.mint, align: 'center', alpha: ca });
+      }
+      bracket(g, XC, X(PAMI - 1) + 12, YB + 72, { color: C.amber, label: 'PAM 往回數 3 個', alpha: A(4.6, 5.2) * (1 - A(8.6, 9)) });
+      g.tag(XC, YT - 46, '雙股斷裂', { size: 15, color: C.red, alpha: A(9.6, 10.2) });
+    },
+  },
+  {
+    key: 'nhej', name: '修補(一):直接接回 NHEJ', dur: 17,
+    cues: [[0, '細胞最常用的修補方式是非同源末端接合(NHEJ):不需要模板,直接把兩個斷端接回去。'],
+      [4.5, '這種接法很快,但常出錯:接口常常少掉或多出幾個鹼基(插入或缺失)。'],
+      [9, '基因是三個鹼基一組(密碼子)讀成胺基酸;少 1 個或多 1 個,後面每一組都跟著錯開,叫讀框位移。'],
+      [13, '錯開後常提早遇到終止密碼子,蛋白質做不完整,基因等於被剔除;少 3 個時讀框不變,通常只差一個胺基酸。右邊可以換。']],
+    draw(g, t, S) {
+      const A = (a, b) => ease(seg(t, a, b));
+      const kind = S.indel, rd = A(9, 9.6);
+      g.text(130, 58, '每三個鹼基(一個密碼子)讀成一個胺基酸', { size: 14, color: C.ink2, alpha: rd });
+      g.text(920, 58, 'Met、Trp 這些是胺基酸的縮寫', { size: 13, color: C.muted, align: 'right', alpha: rd });
+      g.text(40, R1 + 9, '原本', { size: 15, weight: 700, color: C.ink2 });
+      g.text(40, R2 + 9, '修補後', { size: 15, weight: 700, color: C.ink2 });
+      // 原本的序列與切點
+      codonBg(g, X5, R1, 12, 22, rd);
+      drawItems(g, [...GENE.slice(0, 36)].map((b, i) => ({ b, x: X5(i), a: 1, side: 0 })), R1, 0);
+      g.line(XC5, R1 - 10, XC5, R1 + 28, 'rgba(255,123,123,.85)', 1.6, [4, 3]);
+      g.text(XC5, R1 - 22, '切點', { size: 13, weight: 700, color: C.red, align: 'center' });
+      // 修補:兩端靠攏、接口少掉或多出
+      const { items, gap, ev, jx } = nhejItems(t, kind, X5, 22, 0, 36, [4.5, 5.6], [5.4, 6.8]);
+      // 修補後這一列看得到幾個完整的密碼子(少 3 個時只有 11 個)
+      const nCod = Math.min(12, Math.floor((36 + OUT[kind].length - GENE.length) / 3));
+      const p0 = protein(GENE).slice(0, 12), p1 = protein(OUT[kind]).slice(0, nCod);
+      const stop = p1.indexOf('*');
+      const stopShown = stop >= 0 && t > 9.5 + stop * 0.25;
+      const dimAfter = stopShown ? X5(3 * stop + 2) + 11 : Infinity;
+      if (rd > 0) codonBg(g, X5, R2, stop >= 0 ? stop + 1 : nCod, 22, rd);
+      drawItems(g, items, R2, gap, { dimAfter });
+      drawItems(g, items, R2 + 46, gap, { dir: -1, comp: true, alpha: 1 - A(8.6, 9.4) });
+      // 修補蛋白
+      const ra = A(1.5, 2.2) * (1 - A(6.8, 7.4));
+      if (ra > 0) { g.blob(XC5, R2 + 23, 24, 34, C.lav, '', { alpha: 0.5 * ra }); g.tag(XC5, R2 - 34, '修補蛋白', { size: 14, color: C.lav, alpha: ra }); }
+      if (ev > 0.6) {
+        const ja = A(6.6, 7) * (1 - A(8.8, 9.2));
+        if (kind !== 'ins1') g.text(jx, R2 - 12, '▼', { size: 13, color: C.amber, align: 'center', alpha: A(6.6, 7) });
+        g.tag(jx, R2 - 34, INDEL_TXT[kind], { size: 14, color: C.amber, alpha: ja });
+      }
+      // 翻譯:三個一組讀成胺基酸
+      p0.forEach((a, c) => aaChip(g, X5(3 * c + 1), R1 + 44, a, { alpha: seg(t, 9.2 + c * 0.25, 9.5 + c * 0.25) }));
+      // 少 3 個時,第 9 個胺基酸(Ala)沒了,後面的胺基酸和原本一樣,只是往前挪一格,不算改變
+      const same = (a, c) => (kind === 'del3' && c >= 8 ? a === p0[c + 1] : a === p0[c]);
+      p1.forEach((a, c) => aaChip(g, X5(3 * c + 1), R2 + 44, a, { alpha: seg(t, 9.2 + c * 0.25, 9.5 + c * 0.25), hi: same(a, c) ? null : C.amber }));
+      // 蛋白質長度與結論
+      const pb = A(13, 13.8);
+      proteinBars(g, 360, kind, pb);
+      const fs = kind !== 'del3';
+      g.text(40, 470, fs ? '讀框位移,提早終止:這個基因等於被剔除' : '少 3 個 = 少一個胺基酸(Ala),讀框沒變:蛋白質可能還能用', { size: 16, weight: 700, color: fs ? C.red : C.amber, alpha: A(13.6, 14.3) });
+      g.text(920, 500, '蛋白質長度是示意', { size: 13, color: C.muted, align: 'right', alpha: pb });
+    },
+  },
+  {
+    key: 'hdr', name: '修補(二):照模板改寫 HDR', dur: 16,
+    cues: [[0, '另一種是同源重組修補(HDR):細胞照著一段序列相同的 DNA 當模板,把斷掉的地方補回去。'],
+      [5, '實驗時另外送進一段模板:兩端和切點兩側一模一樣,中間是想要的新序列,細胞照著修就寫進基因體。'],
+      [10.5, 'HDR 主要在細胞複製 DNA 的 S 期與之後的 G2 期進行,在大部分細胞裡比 NHEJ 少得多。右邊可以切換兩種修補比較。']],
+    draw(g, t, S) {
+      const A = (a, b) => ease(seg(t, a, b));
+      const hdr = S.repair === 'hdr', kind = hdr ? 'hdr' : S.indel;
+      // 右邊:修補方式
+      g.text(730, 70, hdr ? '照模板修(HDR)' : '直接接回(NHEJ)', { size: 18, weight: 700, color: hdr ? C.mint : C.amber });
+      g.text(730, 98, hdr ? '要另外送進一段模板' : '不用模板,常多或少幾個鹼基', { size: 13, color: C.muted });
+      let items, gap = 0;
+      if (hdr) {
+        // 模板:兩端和切點兩側相同,中間是新序列
+        const din = A(0.8, 3.2), dAlpha = din * (1 - 0.7 * A(9.2, 10)), dy = lerp(DY - 70, DY, din);
+        if (dAlpha > 0) {
+          const ix = [], xs = [], ys = [], ys2 = [];
+          for (let i = 16; i < 35; i++) { ix.push(i); }
+          const seq = OUT.hdr.slice(16, 35);
+          ix.forEach((i) => { xs.push(X6(i)); ys.push(dy); ys2.push(dy + 46); });
+          g.ctx.save(); g.ctx.globalAlpha *= dAlpha;
+          g.rrect(X6(CUT - 2) - 15, dy - 8, 26 * 3 + 4, 70, 8, 'rgba(165,243,205,.16)', C.mint, 2);
+          for (let j = 0; j < seq.length; j++) g.line(xs[j], dy + BH + 4, xs[j], dy + 46 - BH - 4, 'rgba(240,243,238,.45)', 2, [2, 3]);
+          strandXY(g, xs, ys, seq, {});
+          strandXY(g, xs, ys2, complement(seq), { dir: -1 });
+          g.ctx.restore();
+          const la = A(2.4, 3) * (1 - A(9, 9.6));
+          g.text(X6(19.5), dy - 26, '和左邊相同', { size: 14, color: C.ink2, align: 'center', alpha: la });
+          g.text(X6(CUT - 1), dy - 26, '想要的新序列', { size: 14, weight: 700, color: C.mint, align: 'center', alpha: la });
+          g.text(X6(30.5), dy - 26, '和右邊相同', { size: 14, color: C.ink2, align: 'center', alpha: la });
+          const hl = A(3.6, 4.4) * (1 - A(8.6, 9.2));
+          if (hl > 0) for (const i of [16, 18, 20, 22, 28, 30, 32, 34]) g.line(X6(i), dy + 52, X6(i), GY - 8, `rgba(165,243,205,${0.4 * hl})`, 1.5, [3, 4]);
+          const cp = A(6, 6.4) * (1 - A(8.4, 8.8));
+          if (cp > 0) g.arrow(X6(CUT - 1), dy + 66, X6(CUT - 1), GY - 12, { color: C.mint, alpha: cp });
+        }
+        // 基因體:斷端靠攏,切點附近照模板換成新序列
+        gap = 16 * (1 - A(5, 6));
+        const e = A(6.2, 8.2);
+        items = [];
+        for (let i = 12; i < 36; i++) {
+          const x = X6(i) + (i < CUT ? -gap : gap), side = i < CUT ? 0 : 1;
+          if (i >= CUT - 2 && i <= CUT) { items.push({ b: GENE[i], x, a: 1 - e, side }); items.push({ b: OUT.hdr[i], x, a: e, side, ins: true }); }
+          else items.push({ b: GENE[i], x, a: 1, side });
+        }
+        g.tag(XC6, GY - 36, '照模板改好了', { size: 14, color: C.mint, alpha: A(9.6, 10.2) });
+      } else {
+        g.text(X6(CUT - 1), DY + 24, '這次沒有用模板', { size: 15, color: C.muted, align: 'center', alpha: A(0.6, 1.2) });
+        const r = nhejItems(t, kind, X6, 26, 12, 36, [3.5, 4.6], [4.4, 5.8]);
+        items = r.items; gap = r.gap;
+        if (r.ev > 0.6) g.tag(r.jx, GY - 36, INDEL_TXT[kind], { size: 14, color: C.amber, alpha: A(5.6, 6) });
+      }
+      const seqOut = OUT[kind], p0 = protein(GENE), p1 = protein(seqOut);
+      const stop = p1.indexOf('*'), rd = A(10.5, 11.1);
+      const nCod = Math.min(12, Math.floor((36 + seqOut.length - GENE.length) / 3));
+      const last = stop >= 0 ? Math.min(stop, nCod - 1) : nCod - 1;
+      const same = (a, c) => (kind === 'del3' && c >= 8 ? a === p0[c + 1] : a === p0[c]);
+      if (rd > 0) codonBg(g, X6, GY, last - 3, 26, rd, 4);
+      drawItems(g, items, GY, gap, { bw: 18, bh: 17, dimAfter: stop >= 0 && t > 11 ? X6(3 * stop + 2) + 13 : Infinity, glowIns: true });
+      drawItems(g, items.filter((it) => it.a > 0.5 || !it.ins), GY + 46, gap, { dir: -1, bw: 18, bh: 17, comp: true, alpha: 1 - A(10, 10.6) });
+      for (let c = 4; c <= last; c++) aaChip(g, X6(3 * c + 1), GY + 44, p1[c], { alpha: seg(t, 10.8 + (c - 4) * 0.25, 11.1 + (c - 4) * 0.25), hi: same(p1[c], c) ? null : hdr ? C.mint : C.amber });
+      // 蛋白質與結論
+      const pb = A(12, 12.8);
+      proteinBars(g, 382, kind, pb, { w: 400, noteX: 540 });
+      const msg = hdr ? ['只改了第 9 個胺基酸(Ala → Tyr),其他照舊', C.mint] : kind === 'del3' ? ['少一個胺基酸,讀框沒變', C.amber] : ['讀框位移,提早終止:基因被剔除', C.red];
+      g.text(40, 466, msg[0], { size: 16, weight: 700, color: msg[1], alpha: A(12.6, 13.2) });
+      // 右下:同一批細胞裡兩種結果的比例(示意)
+      const ea = A(11, 11.8);
+      if (ea > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ea;
+        g.text(730, 292, '被剪的細胞裡(示意)', { size: 14, weight: 600, color: C.ink2 });
+        for (let j = 0; j < 24; j++) {
+          const isH = j === 8 || j === 19, on = isH === hdr;
+          g.circle(744 + (j % 6) * 30, 324 + Math.floor(j / 6) * 30, 10, isH ? (on ? C.mint : C.mintDim) : on ? '#c9d4cf' : '#3d4d48');
+        }
+        g.circle(740, 468, 7, C.mint); g.text(754, 468, 'HDR:常不到一成', { size: 14, color: C.mint });
+        g.circle(740, 494, 7, '#c9d4cf'); g.text(754, 494, 'NHEJ:大多數', { size: 14, color: C.ink2 });
+        g.ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'design', name: '設計嚮導 RNA', dur: 17,
+    cues: [[0, '設計嚮導:在想改的那段序列上找 NGG,取緊接在它前面的 20 個鹼基,就是嚮導序列(做成 RNA 時 T 換成 U)。'],
+      [5.5, '一段基因上常有好幾個 NGG 可以選,切點都在各自 PAM 往回數 3 個的地方。點畫面上的 PAM,或用右邊的選項換一條。'],
+      [11, '還要比對整個基因體:相似的位置只差一兩個鹼基、又差在離 PAM 遠的那端,就可能被剪到(脫靶),這種嚮導要避開。']],
+    draw(g, t, S) {
+      const A = (a, b) => ease(seg(t, a, b));
+      const k = S.pam, q = DPAM[k];
+      g.text(40, 36, t < 5.4 ? '在這段基因上找 NGG(只看上面這一股)' : '找到 3 個 NGG,每一個都可以當 PAM', { size: 15, weight: 600, color: C.ink2 });
+      g.strand(X7(0), 92, DSEQ, { step: 21, bw: 15, bh: 18, alpha: A(0, 0.8) });
+      g.text(X7(0) - 18, 92, '5′', { size: 14, color: C.muted, align: 'right', mono: true });
+      g.text(X7(41) + 18, 92, '3′', { size: 14, color: C.muted, mono: true });
+      const sx = lerp(X7(0) - 12, X7(41) + 12, seg(t, 2, 5.4));
+      if (t > 2 && t < 5.5) g.line(sx, 78, sx, 120, C.mint, 2.5);
+      DPAM.forEach((p, j) => {
+        const ap = t >= 5.4 ? 1 : clamp((sx - X7(p + 2)) / 20);
+        if (ap <= 0) return;
+        const on = j === k && t > 5.5;
+        g.ctx.save(); g.ctx.globalAlpha *= ap;
+        g.rrect(X7(p) - 10, 84, 62, 34, 6, on ? 'rgba(165,243,205,.2)' : null, on ? C.mint : 'rgba(165,243,205,.6)', on ? 2.6 : 1.5);
+        g.text(X7(p + 1), 66, `PAM ${j + 1}`, { size: 14, weight: on ? 700 : 500, color: on ? C.mint : C.ink2, align: 'center' });
+        g.ctx.restore();
+      });
+      // 選到的嚮導與切點
+      if (t > 5.5) {
+        const x1 = X7(q - 20) - 9, x2 = X7(q - 1) + 9;
+        bracket(g, x1, lerp(x1, x2, A(5.6, 6.6)), 130, { color: C.amber });
+        g.text((x1 + x2) / 2, 148, '嚮導序列(20 個)', { size: 14, weight: 600, color: C.amber, align: 'center', alpha: A(6.4, 6.9) });
+        const xcut = (X7(q - 4) + X7(q - 3)) / 2, ca = A(6.6, 7);
+        g.line(xcut, 80, xcut, 124, `rgba(255,123,123,${0.9 * ca})`, 2, [4, 3]);
+        g.text(xcut, 148, '切點', { size: 14, weight: 700, color: C.red, align: 'center', alpha: ca });
+        g.text(920, 196, '點上面的 PAM 可以換一條', { size: 13, color: C.muted, align: 'right', alpha: A(5.6, 6.2) });
+      }
+      if (t > 6.8) {
+        const gs = rna(DSEQ.slice(q - 20, q)), n = Math.round(A(6.8, 8.2) * 20);
+        g.text(40, 196, '嚮導 RNA', { size: 15, weight: 700, color: C.amber });
+        g.text(150, 196, '5′', { size: 14, color: C.muted, mono: true });
+        for (let j = 0; j < n; j++) g.text(176 + j * 15, 196, gs[j], { size: 16, weight: 700, color: C[gs[j]], mono: true, align: 'center' });
+        if (n >= 20) { g.text(474, 196, '3′', { size: 14, color: C.muted, mono: true }); g.text(500, 196, '+ 支架(不用換)', { size: 13, color: C.muted }); }
+      }
+      // 脫靶檢查
+      const pa = A(11, 11.6);
+      if (pa > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= pa;
+        g.panel(30, 226, 900, 290, '');
+        g.text(46, 248, '脫靶檢查:基因體其他地方很像的序列(示意)', { size: 14, weight: 700, color: C.ink2 });
+        g.rrect(xc7(11) - 8, 266, xc7(20) - xc7(11) + 16, 156, 6, 'rgba(165,243,205,.07)');
+        g.text((xc7(11) + xc7(20)) / 2, 278, '種子區', { size: 13, color: C.mint, align: 'center' });
+        g.text(xc7(20) + 38, 278, 'PAM', { size: 13, color: C.mint, align: 'center' });
+        g.ctx.restore();
+        const gd = DSEQ.slice(q - 20, q);
+        seqRow(g, 306, '目標', gd, DSEQ.slice(q, q + 3), [], '要剪的位置', C.mint, A(11.3, 11.8));
+        OFF[k].forEach((o, j) => { const r = rateOff(o); seqRow(g, 354 + j * 48, `相似 ${j + 1}`, offSeq(gd, o.mm), o.pam, o.mm, r.txt, r.col, A(12 + j * 0.7, 12.5 + j * 0.7)); });
+        const [vt, vc] = guideVerdict(k), va = A(13.6, 14.2);
+        g.text(48, 458, '這條嚮導:', { size: 16, weight: 700, color: C.ink, alpha: va });
+        g.text(160, 458, vt, { size: 16, weight: 700, color: vc, alpha: va });
+        g.text(48, 490, '原則:相似位置最好差 3 個以上;差在靠近 PAM 那端,比較不會被剪', { size: 13, color: C.muted, alpha: va });
+      }
+    },
+    pointer(type, x, y, S) {
+      if (type !== 'down') return false;
+      const j = DPAM.findIndex((p) => x >= X7(p) - 16 && x <= X7(p + 2) + 16 && y >= 50 && y <= 130);
+      if (j < 0) return false;
+      L.set('pam', j); // 共用播放器會同步右邊的按鈕,並呼叫 onChange(跳到看得到脫靶表的時間)
+      return true;
+    },
+  },
+  {
+    key: 'uses', name: '用途與限制', dur: 15,
+    cues: [[0, '用途很廣:植物育種、基礎研究(剔除一個基因看它做什麼)、醫療。例如同時編輯楊樹好幾個木質素基因,木材更好製漿。'],
+      [5, '2023 年美國核准第一個 CRISPR 療法:取出鐮刀型貧血症病人的造血幹細胞,在體外編輯後再輸回體內。'],
+      [10, '也有限制:可能剪到相似的位置(脫靶);工具不容易送進對的細胞;編輯作物與人類生殖細胞,各國有不同的法規。']],
+    draw(g, t) {
+      const A = (a, b) => ease(seg(t, a, b));
+      g.text(40, 40, '用途', { size: 19, weight: 700, color: C.mint });
+      g.text(500, 40, '限制', { size: 19, weight: 700, color: C.amber, alpha: A(9.8, 10.3) });
+      USES.forEach((d, i) => card(g, 40, 62 + i * 146, d, A(0.3 + i * 0.5, 0.9 + i * 0.5), i === 2 ? t > 5 && t < 10 : t < 5 && i < 2));
+      LIMITS.forEach((d, i) => card(g, 500, 62 + i * 146, d, A(10 + i * 0.6, 10.6 + i * 0.6), t > 10 + i * 0.6));
+    },
+  },
+];
+
+const L = createLesson({
+  chapters,
+  state: { target: 'match', indel: 'del1', repair: 'hdr', pam: 0 },
+  controls: [
+    { id: 'target', label: 'Cas9 遇到的這段 DNA', type: 'seg', options: [{ v: 'match', label: '完全相符' }, { v: 'seed', label: '靠近 PAM 不配對' }, { v: 'nopam', label: '旁邊沒有 PAM' }], chapters: ['search'], restart: true },
+    { id: 'indel', label: 'NHEJ 接回時', type: 'seg', options: [{ v: 'del1', label: '少 1 個' }, { v: 'ins1', label: '多 1 個' }, { v: 'del3', label: '少 3 個' }], chapters: ['nhej', 'hdr'], restart: false },
+    { id: 'repair', label: '修補方式', type: 'seg', options: [{ v: 'hdr', label: '照模板修(HDR)' }, { v: 'nhej', label: '直接接回(NHEJ)' }], chapters: ['hdr'], restart: false },
+    { id: 'pam', label: '選哪一個 PAM', type: 'seg', options: [{ v: 0, label: 'PAM 1' }, { v: 1, label: 'PAM 2' }, { v: 2, label: 'PAM 3' }], chapters: ['design'], restart: false, onChange: () => jumpDesign() },
+  ],
+});
+createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
+</script>
+</body>
+</html>

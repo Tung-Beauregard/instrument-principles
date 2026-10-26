@@ -30,6 +30,16 @@ const SHOTS = [
   { name: 'spectroscopy', url: 'spectroscopy/', wait: 18 },
   { name: 'chromatography', url: 'chromatography/', wait: 18 },
   { name: 'plot', url: 'plot/', wait: 3 },
+  { name: 'central-dogma', url: 'central-dogma/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('translation'); __lesson.time = 0.75 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'pcr', url: 'pcr/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('extend'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'sequencing', url: 'sequencing/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('ce'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'dna-markers', url: 'dna-markers/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('fingerprint'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'cloning', url: 'cloning/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('purify'); __lesson.time = 0.75 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'terpene-synthase', url: 'terpene-synthase/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('branches'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'crispr', url: 'crispr/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('search'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'immunoassay', url: 'immunoassay/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('probe'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'flow-cytometry', url: 'flow-cytometry/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('gating'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'proteomics', url: 'proteomics/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('msms'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
 ].filter((s) => !only.length || only.includes(s.name));
 
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'og-profile-'));

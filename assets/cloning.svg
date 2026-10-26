@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="從葉片取得的基因片段帶著黏性末端,接進大腸桿菌裡的環狀質體,細菌做出一團團帶 His 標籤的酵素">
+  <defs>
+    <linearGradient id="cell" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f4636"/>
+      <stop offset="1" stop-color="#10261d"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="220" cy="238" rx="190" ry="11" fill="#050e0c" opacity=".45"/>
+  <!-- 左上:葉片(基因的來源) -->
+  <path d="M40 66C48 36 78 22 102 28C98 52 72 70 40 66Z" fill="#a5f3cd" fill-opacity=".08" stroke="#5f9f80" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M40 66C60 54 80 42 102 28" stroke="#5f9f80" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M60 68V86" stroke="#a5f3cd" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="2 5"/>
+  <!-- 左:基因片段(兩端是錯開的黏性末端) -->
+  <g stroke-linecap="round">
+    <path d="M49 96H131" stroke="#a5f3cd" stroke-width="4"/>
+    <path d="M25 132H107" stroke="#a5f3cd" stroke-width="4"/>
+    <g stroke-width="6">
+      <path d="M54 100v9" stroke="#5fd39a"/><path d="M66 100v9" stroke="#f2a65a"/><path d="M78 100v9" stroke="#f0718a"/><path d="M90 100v9" stroke="#f0718a"/><path d="M102 100v9" stroke="#6fb2f5"/><path d="M114 100v9" stroke="#5fd39a"/><path d="M126 100v9" stroke="#5fd39a"/>
+      <path d="M30 128v-9" stroke="#f2a65a"/><path d="M42 128v-9" stroke="#f2a65a"/><path d="M54 128v-9" stroke="#f2a65a"/><path d="M66 128v-9" stroke="#5fd39a"/><path d="M78 128v-9" stroke="#6fb2f5"/><path d="M90 128v-9" stroke="#6fb2f5"/><path d="M102 128v-9" stroke="#f0718a"/>
+    </g>
+  </g>
+  <text x="26" y="156" fill="#9caca5" font-size="10" font-family="Consolas,monospace" letter-spacing="1">GAATTC</text>
+  <!-- 大腸桿菌 -->
+  <rect x="152" y="86" width="262" height="132" rx="66" fill="url(#cell)" stroke="#5f9f80" stroke-width="2"/>
+  <rect x="160" y="94" width="246" height="116" rx="58" stroke="#a5f3cd" stroke-opacity=".12" stroke-width="1.5"/>
+  <!-- 片段接進質體 -->
+  <path d="M136 104C160 92 182 96 200 112" stroke="#a5f3cd" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 5"/>
+  <path d="M196 104l7 10-12 1" stroke="#a5f3cd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 質體:啟動子(琥珀)、目標基因(薄荷綠)、His 標籤(青)、抗性基因(橘)、複製起點(藍) -->
+  <circle cx="236" cy="152" r="36" stroke="#d5ddd9" stroke-width="4"/>
+  <g stroke-width="9">
+    <path d="M201.1 143.3A36 36 0 0 1 206.9 130.8" stroke="#ffd166"/>
+    <path d="M212.9 124.4A36 36 0 0 1 261 126.1" stroke="#a5f3cd"/>
+    <path d="M267.2 134A36 36 0 0 1 270.2 140.9" stroke="#6ee0e6"/>
+    <path d="M267.8 168.9A36 36 0 0 1 241 187.6" stroke="#ff9a5c"/>
+    <path d="M221.4 184.9A36 36 0 0 1 204.8 170" stroke="#7fb8ff"/>
+  </g>
+  <path d="M212.4 124.3L211 135L201.9 127.2Z" fill="#ffd166"/>
+  <path d="M267.8 133.9L255.4 130L266.1 121Z" fill="#a5f3cd"/>
+  <!-- 細菌做出來的酵素(帶 His 標籤),有的已經滿出來 -->
+  <g fill="#6ee0e6">
+    <circle cx="311" cy="128" r="1.8"/><circle cx="315" cy="130" r="1.8"/><circle cx="319" cy="131" r="1.8"/>
+    <circle cx="341" cy="156" r="1.8"/><circle cx="345" cy="158" r="1.8"/><circle cx="349" cy="159" r="1.8"/>
+    <circle cx="307" cy="184" r="1.8"/><circle cx="311" cy="186" r="1.8"/><circle cx="315" cy="187" r="1.8"/>
+    <circle cx="373" cy="132" r="1.8"/><circle cx="377" cy="134" r="1.8"/><circle cx="381" cy="135" r="1.8"/>
+    <circle cx="377" cy="183" r="1.8"/><circle cx="381" cy="185" r="1.8"/><circle cx="385" cy="186" r="1.8"/>
+    <circle cx="383" cy="68" r="1.8"/><circle cx="387" cy="70" r="1.8"/><circle cx="391" cy="71" r="1.8"/>
+    <circle cx="349" cy="50" r="1.8"/><circle cx="353" cy="52" r="1.8"/><circle cx="357" cy="53" r="1.8"/>
+  </g>
+  <g fill="#a5f3cd">
+    <ellipse cx="300" cy="125" rx="10" ry="8"/>
+    <ellipse cx="330" cy="153" rx="10" ry="8"/>
+    <ellipse cx="296" cy="181" rx="10" ry="8"/>
+    <ellipse cx="362" cy="129" rx="10" ry="8"/>
+    <ellipse cx="366" cy="180" rx="10" ry="8"/>
+    <ellipse cx="392" cy="154" rx="8" ry="6.5" opacity=".8"/>
+    <ellipse cx="372" cy="65" rx="10" ry="8" opacity=".85"/>
+    <ellipse cx="338" cy="47" rx="9" ry="7" opacity=".7"/>
+    <ellipse cx="404" cy="44" rx="8" ry="6.5" opacity=".55"/>
+  </g>
+  <path d="M26 206H50M38 194V218" stroke="#526e80"/>
+</svg>

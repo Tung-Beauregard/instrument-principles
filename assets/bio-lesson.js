@@ -1,0 +1,249 @@
+// 生化原理教材共用的播放器(2026-10-26)。每份教材提供「章節」與「自己調整的控制項」,這裡負責:
+//   畫布(依實際大小與螢幕密度重設,畫面一律用邏輯座標 W × H 畫,等比例縮放置中)、
+//   播放與暫停、上一章與下一章、進度列(每章一段,點一下跳到那一章的那個時間點)、字幕(依時間換句)、
+//   章節清單、控制項(滑桿、選項、開關、按鈕,只在指定的章節出現)、網址 #章節代號(可以複製分享)、
+//   鍵盤(空白鍵播放或暫停,左右鍵換章;焦點在輸入元件時不搶)、分頁藏起來時不畫、減少動態效果時不自動播放。
+// 版面在 bio-lesson.css,畫圖小工具在 bio-draw.js。頁面上要有的元素見 createLesson 開頭的 need()。
+//
+// 用法:
+//   createLesson({
+//     W: 960, H: 540,                      // 邏輯座標
+//     state: { anneal: 58 },               // 控制項的值都放在這裡,畫圖時讀
+//     chapters: [{ key: 'denature', name: '變性', dur: 10,
+//                  cues: [[0, '第一句字幕'], [4.5, '第二句']],
+//                  draw(g, t, S) { ... },    // g 是 bio-draw.js 的 makeG(),t 是這一章的秒數
+//                  enter(S) { ... } }],      // 進到這一章時(選用)
+//     controls: [{ id: 'anneal', label: '黏合溫度', type: 'range', min: 45, max: 72, step: 1, unit: ' °C',
+//                  chapters: ['anneal', 'gel'], restart: true }],
+//   });
+// 控制項的種類:range(滑桿,format(v) 可自訂顯示)、seg(幾個選項,options: [{ v, label }])、toggle(開關)、
+//   button(onClick(S));onChange(v, S) 在值改變後呼叫。restart: true 時改了值這一章從頭播。
+//   使用者在某一章動過控制項,這一章播完就停在最後,不自動跳到下一章(讓人看清楚自己調的結果)。
+// 章節可以另外有 pointer(type, x, y, S):在畫面上按下(down)、移動(move,滑鼠或按住時)、放開(up)時呼叫,
+//   x、y 是邏輯座標;傳回 true 表示使用者動過(這一章播完停住)。要在畫面上拖動的章節加 drag: true,
+//   手指在畫布上才不會捲動頁面。畫面上的操作要改控制項的值時,用傳回的 api.set(id, v)(右邊的顯示會跟著更新)。
+// 頁面有 #btnFs 時,瀏覽器支援全螢幕就顯示全螢幕鈕(和其他教材共用 mobile-panels.js 的判斷)。
+// 傳回的 api(也掛在 globalThis.__lesson,給測試與 scripts/make-og-images.mjs 用):go(第幾章或章節代號)、play()、pause()、
+//   chapter(目前章節代號)、duration(這一章幾秒)、time(可讀可設)、state、redraw()、set(id, v, { restart })。
+// 畫面縮得很小時(手機),畫圖的字會自動放大(g.boost,最多 1.3 倍),版面要留空間。
+import { makeG, C } from './bio-draw.js';
+// 分頁列排不下時捲到目前這一頁(模組載入就會做);全螢幕共用同一套判斷
+import { fsSupported, fsElement, toggleFullscreen } from './mobile-panels.js';
+
+export function createLesson({ chapters, state = {}, controls = [], W = 960, H = 540, autoplay = true }) {
+  const need = (s) => { const e = document.querySelector(s); if (!e) throw new Error(`bio-lesson: 頁面缺少 ${s}`); return e; };
+  const canvas = need('#stage'), ctx = canvas.getContext('2d');
+  const capNo = need('#cap .cap-no'), capCh = need('#cap .cap-ch'), capTx = need('#cap .cap-tx');
+  const btnPrev = need('#btnPrev'), btnPlay = need('#btnPlay'), btnNext = need('#btnNext'), prog = need('#prog'), chName = need('#chName');
+  const list = need('#chapters'), ops = need('#ops'), opsBody = need('#ops .ops-body');
+  const S = state;
+  const g = makeG(ctx, W, H);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let ci = 0, t = 0, playing = false, last = performance.now(), touched = false, lastCue = -2;
+  const view = { s: 1, ox: 0, oy: 0 };
+
+  // 章節清單與進度列
+  const items = chapters.map((c, i) => {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<span class="no"></span><span class="nm"></span>';
+    b.querySelector('.no').textContent = String(i + 1).padStart(2, '0');
+    b.querySelector('.nm').textContent = c.name;
+    b.addEventListener('click', () => { go(i); setPlaying(true); });
+    li.append(b); list.append(li);
+    const sgm = document.createElement('button');
+    sgm.type = 'button'; sgm.className = 'sg'; sgm.style.flexGrow = String(c.dur);
+    sgm.setAttribute('aria-label', `第 ${i + 1} 章:${c.name}`);
+    sgm.innerHTML = '<i></i>';
+    sgm.addEventListener('click', (e) => {
+      const r = sgm.getBoundingClientRect();
+      const k = Math.min(0.98, Math.max(0, (e.clientX - r.left) / r.width));
+      go(i, k * c.dur); setPlaying(true);
+    });
+    prog.append(sgm);
+    return { b, sgm, fill: sgm.querySelector('i') };
+  });
+
+  // 控制項
+  const ctl = controls.map((c) => {
+    if (c.type !== 'button' && S[c.id] === undefined) S[c.id] = c.value;
+    const box = document.createElement('div');
+    box.className = 'op op-' + c.type;
+    const id = 'op-' + c.id;
+    const lab = document.createElement('label');
+    lab.className = 'op-k';
+    if (c.type === 'range') {
+      lab.htmlFor = id;
+      const nm = document.createElement('span'); nm.textContent = c.label;
+      const out = document.createElement('output'); out.className = 'op-v';
+      lab.append(nm, out);
+      const inp = document.createElement('input');
+      Object.assign(inp, { type: 'range', id, min: c.min, max: c.max, step: c.step || 1, value: S[c.id] });
+      const show = () => { out.textContent = c.format ? c.format(S[c.id], S) : `${S[c.id]}${c.unit || ''}`; inp.style.setProperty('--p', `${((S[c.id] - c.min) / (c.max - c.min)) * 100}%`); };
+      inp.addEventListener('input', () => { S[c.id] = Number(inp.value); show(); changed(c); });
+      box.append(lab, inp); show();
+      return { c, box, sync: () => { inp.value = S[c.id]; show(); } };
+    }
+    if (c.type === 'seg') {
+      lab.textContent = c.label;
+      const seg = document.createElement('div'); seg.className = 'seg'; seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', c.label);
+      const btns = c.options.map((o) => {
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = o.label;
+        b.addEventListener('click', () => { S[c.id] = o.v; sync(); changed(c); });
+        seg.append(b); return { b, o };
+      });
+      const sync = () => btns.forEach(({ b, o }) => b.setAttribute('aria-pressed', String(S[c.id] === o.v)));
+      box.append(lab, seg); sync();
+      return { c, box, sync };
+    }
+    if (c.type === 'toggle') {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'tg'; b.textContent = c.label;
+      const sync = () => b.setAttribute('aria-pressed', String(!!S[c.id]));
+      b.addEventListener('click', () => { S[c.id] = !S[c.id]; sync(); changed(c); });
+      box.append(b); sync();
+      return { c, box, sync };
+    }
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'tg'; b.textContent = c.label;
+    b.addEventListener('click', () => { if (c.onClick) c.onClick(S); changed(c); });
+    box.append(b);
+    return { c, box, sync: () => {} };
+  });
+  ctl.forEach((x) => opsBody.append(x.box));
+  function changed(c) {
+    touched = true;
+    if (c.onChange && c.type !== 'button') c.onChange(S[c.id], S);
+    // 一個控制項改了,其他看得到的控制項也重新顯示(它們的 format 可能用到這個值)
+    for (const x of ctl) if (x.c !== c && !x.box.hidden) x.sync();
+    if (c.restart) { t = 0; lastCue = -2; setPlaying(true); }
+  }
+  const refreshControls = () => {
+    const key = chapters[ci].key;
+    let any = false;
+    for (const x of ctl) { const show = !x.c.chapters || x.c.chapters.includes(key); x.box.hidden = !show; if (show) { any = true; x.sync(); } }
+    ops.hidden = !any;
+  };
+
+  function go(i, at = 0) {
+    ci = Math.max(0, Math.min(chapters.length - 1, i));
+    t = at; touched = false; lastCue = -2;
+    const c = chapters[ci];
+    if (c.enter) c.enter(S);
+    // 看過的章節由 .done 補滿;其他章節的進度歸零(往回跳時,後面的章節不能留著上次播到的長度)
+    items.forEach((it, k) => { it.b.setAttribute('aria-current', k === ci ? 'step' : 'false'); it.sgm.classList.toggle('on', k === ci); it.sgm.classList.toggle('done', k < ci); if (k !== ci) it.fill.style.width = '0%'; });
+    capNo.textContent = String(ci + 1).padStart(2, '0');
+    capCh.textContent = c.name;
+    chName.textContent = `${ci + 1} / ${chapters.length}・${c.name}`;
+    canvas.setAttribute('aria-label', `第 ${ci + 1} 章:${c.name}`);
+    refreshControls();
+    if (typeof cursor === 'function') cursor();
+    if (location.hash.slice(1) !== c.key) history.replaceState(null, '', `#${c.key}`);
+  }
+  function setPlaying(p) {
+    playing = !!p;
+    btnPlay.setAttribute('aria-pressed', String(playing));
+    btnPlay.setAttribute('aria-label', playing ? '暫停' : '播放');
+    btnPlay.querySelector('.lbl').textContent = playing ? '暫停' : '播放';
+    btnPlay.classList.toggle('playing', playing);
+  }
+  btnPlay.addEventListener('click', () => {
+    if (!playing && ci === chapters.length - 1 && t >= chapters[ci].dur - 0.01) go(0);
+    else if (!playing && t >= chapters[ci].dur - 0.01) t = 0;
+    setPlaying(!playing);
+  });
+  btnPrev.addEventListener('click', () => { go(t > 1.5 ? ci : ci - 1); });
+  // 全螢幕鈕(頁面有 #btnFs 而且瀏覽器支援時才出現;iPhone 的 Safari 不支援網頁全螢幕)
+  const btnFs = document.querySelector('#btnFs');
+  if (btnFs) {
+    btnFs.hidden = !fsSupported();
+    const syncFs = () => { const on = !!fsElement(); btnFs.setAttribute('aria-pressed', String(on)); btnFs.setAttribute('aria-label', on ? '結束全螢幕' : '全螢幕'); btnFs.classList.toggle('on', on); };
+    btnFs.addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', syncFs);
+    document.addEventListener('webkitfullscreenchange', syncFs);
+    syncFs();
+  }
+  btnNext.addEventListener('click', () => { if (ci < chapters.length - 1) go(ci + 1); });
+  addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (['input', 'select', 'textarea'].includes(tag) || e.target.isContentEditable) return;
+    if (e.key === ' ' && tag !== 'button') { e.preventDefault(); btnPlay.click(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); btnNext.click(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); btnPrev.click(); }
+  });
+  addEventListener('hashchange', () => { const k = chapters.findIndex((c) => c.key === location.hash.slice(1)); if (k >= 0 && k !== ci) go(k); });
+
+  // 畫布:實際像素跟著元素大小與螢幕密度,內容用邏輯座標等比例縮放置中
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    view.s = Math.min(w / W, h / H); view.ox = (w - W * view.s) / 2; view.oy = (h - H * view.s) / 2;
+    // 畫面縮得很小時(手機)字放大一點:每個邏輯像素小於 0.5 個 CSS 像素時開始放大,最多 1.3 倍
+    g.boost = Math.min(1.3, Math.max(1, 0.5 / (view.s / dpr)));
+  }
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+  // 點畫面:章節有 pointer(type, x, y, S) 時,把 down / move / up 換成邏輯座標交給它;傳回 true 表示使用者動過(這一章播完停住)
+  let dragging = false;
+  const pointer = (type, e) => {
+    const c = chapters[ci];
+    if (!c.pointer || (type === 'move' && !dragging && e.pointerType !== 'mouse')) return;
+    const r = canvas.getBoundingClientRect(), k = canvas.width / r.width;
+    const x = ((e.clientX - r.left) * k - view.ox) / view.s, y = ((e.clientY - r.top) * k - view.oy) / view.s;
+    if (c.pointer(type, x, y, S) === true) touched = true;
+  };
+  canvas.addEventListener('pointerdown', (e) => { dragging = true; pointer('down', e); });
+  canvas.addEventListener('pointermove', (e) => pointer('move', e));
+  addEventListener('pointerup', (e) => { if (dragging) { dragging = false; pointer('up', e); } });
+  // 章節要在畫面上拖動(drag: true)時,手指在畫布上不捲動頁面;其他時候手指在畫布上滑動照樣捲頁面
+  const cursor = () => { const c = chapters[ci]; canvas.style.cursor = c.pointer ? 'pointer' : ''; canvas.style.touchAction = c.pointer && c.drag ? 'none' : ''; };
+
+  function caption() {
+    const cues = chapters[ci].cues || [];
+    let k = -1;
+    for (let i = 0; i < cues.length; i++) if (cues[i][0] <= t + 1e-6) k = i;
+    if (k !== lastCue) { lastCue = k; capTx.textContent = k >= 0 ? cues[k][1] : ''; }
+  }
+  function draw() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(view.s, 0, 0, view.s, view.ox, view.oy);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
+    try { chapters[ci].draw(g, t, S); } catch (err) { if (!draw.err) { draw.err = true; console.error(err); } }
+    ctx.restore();
+    caption();
+    const c = chapters[ci];
+    items[ci].fill.style.width = `${Math.min(100, (t / c.dur) * 100)}%`;
+  }
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (document.hidden) return;
+    if (playing) {
+      t += dt;
+      const c = chapters[ci];
+      if (t >= c.dur) {
+        if (!touched && ci < chapters.length - 1) go(ci + 1);
+        else { t = c.dur; setPlaying(false); }
+      }
+    }
+    draw();
+  }
+  const start = chapters.findIndex((c) => c.key === decodeURIComponent(location.hash.slice(1)));
+  go(start >= 0 ? start : 0);
+  setPlaying(autoplay && !reduce);
+  requestAnimationFrame(frame);
+  // set(id, v):從畫面上的操作改控制項的值(例如在圖上拖門檻),右邊的顯示跟著更新;restart 預設不從頭播
+  const setValue = (id, v, { restart = false } = {}) => {
+    const x = ctl.find((k) => k.c.id === id);
+    S[id] = v; touched = true;
+    if (x) { x.sync(); if (x.c.onChange) x.c.onChange(v, S); for (const k of ctl) if (k !== x && !k.box.hidden) k.sync(); }
+    if (restart) { t = 0; lastCue = -2; setPlaying(true); }
+  };
+  const api = { go: (k) => go(typeof k === 'number' ? k : chapters.findIndex((c) => c.key === k)), play: () => setPlaying(true), pause: () => setPlaying(false),
+    get chapter() { return chapters[ci].key; }, get duration() { return chapters[ci].dur; }, get time() { return t; }, set time(v) { t = v; lastCue = -2; }, state: S, redraw: draw, set: setValue };
+  globalThis.__lesson = api; // 除錯與測試用
+  return api;
+}

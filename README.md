@@ -10,10 +10,11 @@
 - [質譜儀-不同分析器比較](https://tung-beauregard.github.io/instrument-principles/mass-analyzers/)
 - [層析-GC 與 HPLC](https://tung-beauregard.github.io/instrument-principles/chromatography/)
 - [光譜-光與分子](https://tung-beauregard.github.io/instrument-principles/spectroscopy/)
+- 生化原理：[中心法則](https://tung-beauregard.github.io/instrument-principles/central-dogma/)、[PCR 與電泳](https://tung-beauregard.github.io/instrument-principles/pcr/)、[DNA 定序](https://tung-beauregard.github.io/instrument-principles/sequencing/)、[DNA 鑑定與分子標記](https://tung-beauregard.github.io/instrument-principles/dna-markers/)、[基因選殖與蛋白表現](https://tung-beauregard.github.io/instrument-principles/cloning/)、[萜類合成酶](https://tung-beauregard.github.io/instrument-principles/terpene-synthase/)、[CRISPR 基因編輯](https://tung-beauregard.github.io/instrument-principles/crispr/)、[抗體檢測](https://tung-beauregard.github.io/instrument-principles/immunoassay/)、[流式細胞儀](https://tung-beauregard.github.io/instrument-principles/flow-cytometry/)、[蛋白質質譜定序](https://tung-beauregard.github.io/instrument-principles/proteomics/)
 - [數據畫圖](https://tung-beauregard.github.io/instrument-principles/plot/)（工具：把儀器匯出的檔案畫成報告用的圖）
 - [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-目前共有七份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。另有「工具」區（2026-10-22 起）放數據畫圖：把 FTIR、DSC、TGA、LCQ 質譜的檔案放進瀏覽器就畫成黑白的報告用圖，可下載 SVG 或 PNG；它不是教材，檔案只在瀏覽器裡處理。
+目前共有七份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。「生化原理」區（2026-10-26 起）有十份 2D 動畫教材，用分章動畫與可調的參數講分子生物學與生物化學的實驗原理：中心法則、PCR 與電泳、DNA 定序、DNA 鑑定與分子標記、基因選殖與蛋白表現、萜類合成酶、CRISPR 基因編輯、抗體檢測（西方墨點法與 ELISA）、流式細胞儀、蛋白質質譜定序；這一區不用 WebGL。另有「工具」區（2026-10-22 起）放數據畫圖：把 FTIR、DSC、TGA、LCQ 質譜的檔案放進瀏覽器就畫成黑白的報告用圖，可下載 SVG 或 PNG；它不是教材，檔案只在瀏覽器裡處理。
 
 離子阱質譜有兩個畫面：「動畫講解」（`lcq/`）與「拆開探索」（`lcq-3d/`）。拆開探索原本是另一份教材「LCQ 離子之旅」，2026-10-13 併入；入口只列一張卡片，兩個畫面由分頁列的「離子阱質譜」一組互相切換，網址都沒有變。
 
@@ -30,6 +31,9 @@ assets/
   mobile-panels.js         手機版的面板收合：控制面板、譜與說明收成畫面右緣的「‹」把手，點了才彈出；全螢幕鈕；直拿時建議轉成橫式；分頁列排不下時捲到目前這一頁
   mobile-panels.css        右緣把手、停靠區與轉向提示的樣式（只在手機尺寸作用）
   analyzer-fields.js       四種質量分析器的電場示意：四極柱與離子阱是翻轉的馬鞍、飛行時間是坡道地形、Orbitrap 是紡錘與碗（GC-MS 與質譜儀-不同分析器比較）
+  bio-lesson.js            生化原理的共用播放器：章節、字幕、播放列、章節清單、「自己調整」的選項、全螢幕、網址 # 跳章
+  bio-draw.js              生化原理的 2D 畫圖工具：鹼基與雙股、試管、溫度計、座標軸、曲線、標籤、配色
+  bio-lesson.css           生化原理的頁面版面：桌機左畫面右側欄，手機直拿單欄，手機橫拿畫面在左、字幕與章節在右
   og/*.jpg                 各頁的分享預覽圖（1200 × 630），由 scripts/make-og-images.mjs 產生
   *.svg                    品牌與儀器概念示意
 content/
@@ -53,6 +57,17 @@ plot/parsers.js            數據畫圖的讀檔：.spc、.asp、PerkinElmer 的
 plot/figure.js             數據畫圖的 SVG 繪圖：座標軸、光譜疊圖、DSC、TGA 與 DTG、質譜棒狀圖
 plot/app.js                數據畫圖的頁面邏輯：拖放、檔案清單、各圖的設定、匯出
 plot/MAINTENANCE.md        數據畫圖的程式結構、檔案格式、算法與修改方式
+central-dogma/             生化原理：中心法則（DNA 複製、轉錄、轉譯）
+pcr/                       生化原理：PCR 與電泳（含 qPCR）；這一區的範本
+sequencing/                生化原理：DNA 定序（Sanger、Illumina、奈米孔、RNA-seq）
+dna-markers/               生化原理：DNA 鑑定與分子標記（SSR、葉綠體標記、親子與雜交鑑定、木材與油品溯源）
+cloning/                   生化原理：基因選殖與蛋白表現（cDNA、載體、轉形、誘導、純化）
+terpene-synthase/          生化原理：萜類合成酶（前驅物、碳陽離子反應、產物鑑定）
+crispr/                    生化原理：CRISPR 基因編輯
+immunoassay/               生化原理：抗體檢測（西方墨點法與 ELISA）
+flow-cytometry/            生化原理：流式細胞儀（含植物細胞核的倍性與基因體大小）
+proteomics/                生化原理：蛋白質質譜定序
+                           以上每個資料夾都有 index.html 與 MAINTENANCE.md
 scripts/check-site.mjs     資料、相對連結與靜態備援檢查
 scripts/check-render-quality.mjs  各教材的 module 語法與畫質、幀率邏輯檢查
 scripts/check-camera-nav.mjs  共用視角操作的滾輪判斷與各教材接線檢查
@@ -60,6 +75,7 @@ scripts/check-mobile-panels.mjs  手機版面板收合的樣式範圍（只在�
 scripts/check-fields.mjs   四種電場示意的物理（穩定條件、射出順序、飛行時間的聚焦、Orbitrap 的頻率）與兩份教材的接線檢查
 scripts/make-og-images.mjs 重產 assets/og/ 的分享預覽圖（用本機的 Chrome 或 Edge 無頭截圖）
 scripts/check-plot.mjs     數據畫圖的讀檔與畫圖檢查（在程式裡合成各種格式的小檔案，不需要真實數據）
+scripts/check-bio.mjs      生化原理每一頁的接線檢查：共用播放器、必要元素、分頁列順序、章節代號、module 語法、維護說明
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
 INSTRUMENTS.md             各儀器功能、數據與示意說明
@@ -109,6 +125,7 @@ node scripts/check-camera-nav.mjs
 node scripts/check-mobile-panels.mjs
 node scripts/check-fields.mjs
 node scripts/check-plot.mjs
+node scripts/check-bio.mjs
 ```
 
 另需實際檢查：桌面與手機入口排版、每份教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
@@ -137,7 +154,13 @@ node scripts/make-og-images.mjs http://127.0.0.1:8000/
 
 手機上（寬度 760 px 以下，或高度 500 px 以下的橫拿畫面），UV-Vis、NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC、GC-MS 六份教材用 `assets/mobile-panels.js` 把控制面板、譜與說明收起來（2026-10-22）。2026-10-24 起收起的面板只剩畫面右緣的「‹」小把手，上面直排「調整」「圖譜」「說明」，點了面板才從右邊彈出、排在把手左邊，再點一次收回；按「掃描」「收訊」這類按鈕時譜會自動彈出。瀏覽器支援全螢幕時（Android 的 Chrome 等；iPhone 的 Safari 不支援網頁全螢幕），把手最下面有全螢幕鈕。面板展開時，3D 的主角會移到沒被擋住的地方；橫拿時標題縮成一行，其餘整片留給 3D；直拿的觸控手機會提示一次建議轉成橫式。導覽中把手藏起來，結束後回到原本的收合狀態。桌機與平板的版面不變。離子阱質譜的兩個畫面直拿時只多了轉向提示，版面照舊；手機橫拿時，拆開探索的控制面板也收成右緣的「調整」把手，動畫講解在播放中幾秒沒操作就讓出上下兩條（點一下就回來），全螢幕用它自己播放列上的按鈕。手機橫拿時寬度常常不到 760 px（作者的 Galaxy S23 Ultra 橫拿是 742×298），所以橫拿的版面一律看方向與高度，不看寬度。分頁列排不下時會捲到目前這一頁。
 
-維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)。
+維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)；生化原理：[中心法則](./central-dogma/MAINTENANCE.md)、[PCR 與電泳](./pcr/MAINTENANCE.md)、[DNA 定序](./sequencing/MAINTENANCE.md)、[DNA 鑑定](./dna-markers/MAINTENANCE.md)、[基因選殖](./cloning/MAINTENANCE.md)、[萜類合成酶](./terpene-synthase/MAINTENANCE.md)、[CRISPR](./crispr/MAINTENANCE.md)、[抗體檢測](./immunoassay/MAINTENANCE.md)、[流式細胞儀](./flow-cytometry/MAINTENANCE.md)、[蛋白質定序](./proteomics/MAINTENANCE.md)。
+
+## 生化原理的播放器
+
+生化原理的十頁共用 `assets/bio-lesson.js`：每頁只寫章節（名稱、長度、字幕時間點、畫面）與「自己調整」的選項，播放、暫停、上一章與下一章、進度條、章節清單、字幕、全螢幕與網址 `#章節代號` 都由播放器處理。畫布用 960 × 540 的邏輯座標，依畫面大小等比例縮放；手機上畫面很小時字會放大一些（最多 1.3 倍）。使用者動過選項或點過畫面，這一章播完就停住，不自動跳下一章。鍵盤：空白鍵播放或暫停、左右鍵換章。偏好減少動態效果時不自動播放。
+
+版面：桌機畫面在左、選項與章節在右；手機直拿是單欄，選項排在畫面下方；手機橫拿（高度 500 px 以下）畫面在左，字幕、選項與章節在右邊一欄，頁首收起。播放列最右邊是全螢幕鈕（iPhone 的 Safari 不支援網頁全螢幕時不顯示）。
 
 ## 品牌與資料來源
 

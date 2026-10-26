@@ -1,6 +1,6 @@
 # 儀器原理
 
-用互動 3D 動畫說明實驗室儀器的原理。
+用互動 3D 動畫說明實驗室儀器的原理;「生化原理」一區用 2D 動畫講分子生物學與生物化學的實驗原理。
 
 ## 離子阱質譜原理(以 LCQ Deca XP 為例)
 
@@ -535,6 +535,541 @@ HPLC:
 - ACE 1.7 µm 管柱(耐壓 1,000 bar):https://www.hplc.eu/Downloads/ACE_1_7_Flyer.pdf
 
 HPLC 成分的 kw 與 S、茨維特色帶的速度、GC 與 HPLC 的外觀都是示意;壓力的數字是由文獻的例子換算的推估,不是某一支管柱的實測。
+
+## 生化原理
+
+入口的「生化原理」一區(2026-10-26 起)用 2D 動畫講分子生物學與生物化學的實驗原理,共十份,共用 `assets/bio-lesson.js`(播放器)、`assets/bio-draw.js`(畫圖)與 `assets/bio-lesson.css`(版面),不需要 WebGL。每份分成幾章,有字幕與「自己調整」的選項;章節代號就是網址的 `#`。動畫裡的序列、濃度、峰的位置多半是示意,各節分別列出哪些數值有來源、哪些是示意。程式結構見各資料夾的 MAINTENANCE.md。
+
+### 中心法則(`central-dogma/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/central-dogma/
+
+生化原理分區的教材,版型同 `pcr/`:七章 2D 動畫加字幕,共 113 秒。從 DNA 的雙股結構講起,接著是複製叉上的分工、Meselson 與 Stahl 證明半保留複製的離心實驗、轉錄、真核生物的 RNA 加工、核糖體的轉譯,最後用人類 β 球蛋白基因(HBB)的開頭看改一個鹼基會造成哪一種點突變。
+
+- 第 1 章 DNA 的結構:雙股螺旋攤平成梯子,看糖與磷酸的骨架、A 與 T 兩個氫鍵、G 與 C 三個氫鍵、兩股反向平行與 5′、3′ 端
+- 第 2 章 DNA 複製:解旋酶、引子酶與 RNA 引子、前導股與延遲股(岡崎片段)、引子換成 DNA、接合酶
+- 第 3 章 半保留複製:實驗步驟,上排是實際結果、下排是選的假說的預測;控制項「世代數」(0 到 4 代)與「對照的假說」(半保留、全保留、分散),每一代標示相符或不符
+- 第 4 章 轉錄:啟動子、轉錄泡泡、只讀模板股、不需要引子、U 代替 T;做出的 mRNA 和編碼股上下對照
+- 第 5 章 RNA 加工:5′ 帽、poly(A) 尾、剪接體剪掉內含子、成熟 mRNA 經核孔送出
+- 第 6 章 轉譯:核糖體、tRNA 的反密碼子、肽鍵、移位、E/P/A 位、終止密碼子與釋放因子;左上的密碼表標出正在讀的密碼子
+- 第 7 章 突變:控制項「要改的位置」(第 2 到第 9 個密碼子的每個鹼基)與「換成」(A、U、G、C),依標準遺傳密碼表算出新的胺基酸,分成同義、錯義、無義,第 20 個鹼基換成 U 時說明這是鐮刀型紅血球疾病的變異
+- 文字以台灣高中畢業看得懂為準
+
+#### 數值與示意
+
+DNA 的結構(OpenStax Biology 2e 14.2):糖與磷酸構成骨架、鹼基在內側;兩股反向平行,一端有游離的 5′ 磷酸、另一端是 3′-OH,5′、3′ 是糖上碳的編號(磷酸接在 5′ 碳,3′ 碳接 OH);A 與 T 兩個氫鍵、G 與 C 三個;每對相距 0.34 nm、每圈 3.4 nm、10 個鹼基對、直徑 2 nm。
+
+複製(OpenStax Biology 2e 14.4,大腸桿菌):解旋酶打斷鹼基對之間的氫鍵;引子酶做約 5 到 10 個核苷酸的 RNA 引子;DNA 聚合酶只能往 5′→3′ 方向接、需要游離的 3′-OH;連續合成的是前導股,做成岡崎片段的是延遲股,每段都要一個引子;DNA pol I 移除引子並補上 DNA,接合酶形成磷酸雙酯鍵把缺口接起來;每秒約 1000 個核苷酸。真核生物每秒 50 到 100 個,引子由 RNase H 移除(14.5,表 14.2;頁面沒有用到)。
+
+Meselson 與 Stahl(1958,PNAS 44:671–682,依掃描全文):
+
+- 大腸桿菌 B 株在 36 °C、以氯化銨為唯一氮源的葡萄糖培養基生長;在含 100 µg/mL、同位素純度 96.5% 的 ¹⁵NH₄Cl 培養基裡長 14 代,再加入十倍過量的 ¹⁴NH₄Cl 換成 ¹⁴N(第 673 至 674 頁);世代時間 0.81 與 0.85 小時(圖 3)。
+- 離心:裂解液加進 pH 8.5 的 CsCl 溶液,密度 1.71 g/cm³,在 Spinco model E 超高速離心機以 140,000 × g(44,770 rpm)、25 °C 離心 20 小時;DNA 帶在密度 1.71 g/cm³ 附近,用紫外光吸收照片與微密度計記錄(第 676 頁)。¹⁴N 與 ¹⁵N DNA 兩帶的浮力密度差 0.014 g/cm³(圖 2,第 673 頁)。
+- 結果:取樣點 0、0.3、0.7、1.0、1.1、1.5、1.9、2.5、3.0、4.1 代(圖 4,第 675 頁);滿一代時只有半標記的中間帶,之後只有半標記與未標記兩種,滿兩代時兩者各半(第 676 頁);中間帶位在兩帶之間 50 ± 2%(圖 4 說明)。
+- 加熱(100 °C 30 分鐘)讓半標記 DNA 分成兩種密度相差 0.015 g/cm³ 的次單位,作者據此排除 Delbrück 的(分散式)複製方案(第 681 頁)。作者也寫明還沒證明這些次單位就是單股(第 678 頁);頁面只說「符合半保留複製」。
+- 三種假說的定義見 OpenStax 14.3(第 1 代只有中間帶「表示半保留或分散」,第 2 代的兩條帶只有半保留解釋得了)。頁面的預測帶是依假說推算:第 n 代(n ≥ 1)全保留是重帶佔 1/2ⁿ、輕帶佔其餘;分散是一條帶,重的比例 1/2ⁿ;半保留是中間帶佔 2/2ⁿ、輕帶佔其餘。相符與否依此判定:全保留只有第 0 代相符,分散第 0、1 代相符。
+
+轉錄與加工:模板股、與 mRNA 序列相同(T 換成 U)的編碼股、啟動子(OpenStax Biology 2e 15.2);RNA 聚合酶不需要引子、RNA 由 5′ 往 3′ 合成(OpenStax Microbiology 11.3);5′ 端加 7-甲基鳥苷的帽、3′ 端由 poly(A) 聚合酶加約 200 個 A,兩者都保護 mRNA,帽幫助轉譯開始,poly(A) 尾是運出細胞核所需蛋白質的結合處;內含子由剪接體在細胞核裡移除並分解(OpenStax Biology 2e 15.4)。
+
+轉譯(OpenStax Biology 2e 15.1、15.5):64 個密碼子裡 61 個對應胺基酸、3 個終止,AUG 是甲硫胺酸也是起始密碼子;核糖體有 A、P、E 三個位置,反密碼子和密碼子配對,肽鍵形成後核糖體往 mRNA 的 3′ 端移一個密碼子,空的 tRNA 從 E 位離開;遇到 UAA、UAG、UGA 時由釋放因子讓多肽鏈脫離。細菌的起始 tRNA 帶甲醯甲硫胺酸,頁面簡化寫 Met。
+
+遺傳密碼:頁面的 `CODE_AAS` 與 NCBI 第 1 號標準密碼表逐一比對 64 個密碼子,完全相同(2026-10-26)。胺基酸中文名用台灣常用名稱(丙胺酸、精胺酸、天門冬醯胺、天門冬胺酸、半胱胺酸、麩醯胺酸、麩胺酸、甘胺酸、組胺酸、異白胺酸、白胺酸、離胺酸、甲硫胺酸、苯丙胺酸、脯胺酸、絲胺酸、蘇胺酸、色胺酸、酪胺酸、纈胺酸)。
+
+突變:點突變、同義(silent)、錯義、無義的定義依 OpenStax Microbiology 11.5。HBB 用 NM_000518.5 的編碼序列(CDS 51..494,444 nt,含終止密碼子,所以是 147 個胺基酸)前 27 個鹼基:AUG GUG CAU CUG ACU CCU GAG GAG AAG,翻成 Met Val His Leu Thr Pro Glu Glu Lys。鐮刀型紅血球的變異是 c.20A>T、p.Glu7Val,從成熟蛋白質算起稱為 Glu6Val(ClinVar VCV000015333、dbSNP rs334);MedlinePlus 寫成第 6 個位置的麩胺酸換成纈胺酸。頁面可選的 96 種改法(24 個位置 × 4 種鹼基)中,24 種沒變、17 種同義、52 種錯義、3 種無義(第 19、22 個鹼基 G→U 與第 25 個 A→U,都變成 UAG)。
+
+教學示意:第 4、6 章的序列(啟動子 TAGCTA,mRNA 為 GCC AUG GCU UUC AAA GGC UGG UAA)與第 2 章模板的序列是自訂的;螺旋與梯子的比例、引子與岡崎片段的長度、複製叉與聚合酶的速度、轉錄泡泡的大小、酵素與核糖體的形狀大小、尾巴畫成 12 個 A、離心管裡帶的位置與粗細都是示意;「實際結果」那一排是依論文描述的結果畫成整數代的理想帶,不是論文照片的數位化。
+
+#### 技術
+
+單一 HTML 檔(central-dogma/index.html),共用 assets/bio-lesson.js、assets/bio-draw.js、assets/bio-lesson.css 與 assets/mobile-panels.*,2D canvas 繪圖,不需要建置,不使用到站人數計數;入口卡片圖是 assets/central-dogma.svg。程式分區與修改方式見 central-dogma/MAINTENANCE.md。
+
+#### 來源連結
+
+- OpenStax Biology 2e(Clark MA, et al., 2018)14.2 DNA Structure and Sequencing:https://openstax.org/books/biology-2e/pages/14-2-dna-structure-and-sequencing
+- 14.3 Basics of DNA Replication(三種假說、Meselson 與 Stahl,圖 14.12、14.13):https://openstax.org/books/biology-2e/pages/14-3-basics-of-dna-replication
+- 14.4 DNA Replication in Prokaryotes(表 14.1):https://openstax.org/books/biology-2e/pages/14-4-dna-replication-in-prokaryotes
+- 14.5 DNA Replication in Eukaryotes(表 14.2):https://openstax.org/books/biology-2e/pages/14-5-dna-replication-in-eukaryotes
+- 15.1 The Genetic Code:https://openstax.org/books/biology-2e/pages/15-1-the-genetic-code
+- 15.2 Prokaryotic Transcription:https://openstax.org/books/biology-2e/pages/15-2-prokaryotic-transcription
+- 15.4 RNA Processing in Eukaryotes:https://openstax.org/books/biology-2e/pages/15-4-rna-processing-in-eukaryotes
+- 15.5 Ribosomes and Protein Synthesis:https://openstax.org/books/biology-2e/pages/15-5-ribosomes-and-protein-synthesis
+- OpenStax Microbiology(Parker N, et al., 2016)11.3 RNA Transcription:https://openstax.org/books/microbiology/pages/11-3-rna-transcription ;11.5 Mutations:https://openstax.org/books/microbiology/pages/11-5-mutations
+- Meselson M, Stahl FW. The replication of DNA in Escherichia coli. PNAS 1958;44(7):671–682. doi:10.1073/pnas.44.7.671:https://pmc.ncbi.nlm.nih.gov/articles/PMC528642/
+- NCBI The Genetic Codes, table 1:https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?chapter=tgencodes#SG1
+- HBB mRNA NM_000518.5:https://www.ncbi.nlm.nih.gov/nuccore/NM_000518.5
+- ClinVar VCV000015333(HBB c.20A>T,p.Glu7Val):https://www.ncbi.nlm.nih.gov/clinvar/variation/15333/
+- MedlinePlus Genetics, HBB gene:https://medlineplus.gov/genetics/gene/hbb/
+
+示意的序列、比例、速度與帶的形狀見上一段;頁面裡的數值以外的動畫細節都不是實測。
+
+### PCR 與電泳(`pcr/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/pcr/
+
+教學內容:PCR 的三個步驟與循環倍增、黏合溫度對專一性的影響、洋菜膠電泳判讀產物長度、qPCR 的 Ct 值與標準曲線。
+
+| 項目 | 內容 | 狀態與來源 |
+|---|---|---|
+| 起始變性 | 94 到 98 °C;每個循環的變性 10 到 60 秒通常足夠 | Lorenz 2012,J Vis Exp (63):3998,第 6 節(PMC4846334) |
+| 黏合溫度 | 約比引子的 Tm 低 5 °C;引子 Tm 最好 52 到 58 °C(可放寬到 45 到 65 °C) | Lorenz 2012,第 1、6 節 |
+| 延伸 | Taq 聚合酶最適 70 到 80 °C,前 2 kb 約 1 分鐘、之後每多 1 kb 多 1 分鐘;頁面寫「72 °C 左右」是常用值 | Lorenz 2012,第 6 節 |
+| 循環數 | 25 到 35 輪 | Lorenz 2012,第 6 節 |
+| 引子長度 | 15 到 30 個鹼基(動畫畫成 6 個) | Lorenz 2012,第 1 節;畫法是示意 |
+| 非專一產物 | 條件太寬鬆(例如黏合溫度太低)會出現梯子狀或抹開的條帶;太嚴格沒有產物 | Lorenz 2012,摘要與第 7 節 |
+| Taq 的來源 | 耐熱細菌 *Thermus aquaticus* | Lorenz 2012,摘要 |
+| 電泳 | DNA 骨架帶負電往正極移動;移動距離與片段大小的對數成反比 | Lee PY, et al. 2012,J Vis Exp (62):e3923 |
+| SYBR Green I | 對雙股 DNA 有選擇性,結合後螢光大增 | Zipper H, et al. 2004,Nucleic Acids Res 32:e103(PMC484200,摘要) |
+| qPCR 效率 | E = 10^(−1/斜率) − 1;斜率 −3.32 為 100%,起始量差 10 倍 Ct 差約 3.32 輪 | Agilent 斜率換算說明;MIQE(Bustin 2009,Clin Chem 55:611) |
+| 示意值 | 序列、引子 Tm 58 °C、產物 450 bp、雜帶長度、平原期上限 1×10¹²、膠的跑速、qPCR 曲線形狀與門檻 | 示意,不是實驗結果 |
+
+### DNA 定序(`sequencing/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/sequencing/
+
+教學內容:定序在做什麼(讀長與通量);Sanger 鏈終止法(ddNTP 讓新股隨機停下、毛細管電泳依長度排隊、雷射讀出末端顏色);Illumina 合成定序(打斷接上接頭、流動槽上橋式放大成叢、每輪接上一個帶螢光的可逆終止核苷酸、拍照、切掉);RNA-seq(mRNA 反轉錄成 cDNA 後定序、以讀到的次數比較基因表現);奈米孔定序(單股穿過蛋白質孔、離子電流隨孔裡的鹼基組合改變);三種方法的讀長、同時讀幾條、準確度與適合的用途。
+
+| 項目 | 內容 | 狀態與來源 |
+|---|---|---|
+| 鏈終止 | ddNTP 的糖少了 3′-OH,接上後鏈不能再延長;終止物的比例要讓只有一部分鏈接上(1977 年 ddNTP 對 dNTP 約 100) | Sanger F, et al. PNAS 1977;74(12):5463–5467(PMC431765),第 5463 頁;方法見第 5464 頁 |
+| 螢光與毛細管電泳 | 四種 ddNTP 各帶一種螢光;毛細管電泳依大小分開,差一個鹼基也分得出;雷射讀出末端顏色,依序就是序列;A 配 T、G 配 C | OpenStax Biology 2e,14.2 DNA Structure and Sequencing(Sanger Dideoxy Chain Termination Method 段落) |
+| Sanger 讀長與準確度 | 讀長可到約 1,000 bp,單一鹼基準確度最高約 99.999%;一次 96 或 384 根毛細管;小規模的工作仍以 Sanger 為主 | Shendure J, et al. Nat Biotechnol 2008;26:1135–1145(doi:10.1038/nbt1486),第 1135、1141 頁 |
+| 商用毛細管的讀長 | 一般 650 到 900 個鹼基;峰隨時間擴散變寬,長片段難和只短一個鹼基的分開 | Gamble R, et al. Electrophoresis 2026;47(1):5–12(PMC12827225),引言 |
+| ddNTP 比例的效果 | 頁面把比例換成「每接一個鹼基被終止的機會 p」(0.02% 到 5% 八檔),長度 n 的片段量 = 5000 × p × (1 − p)ⁿ(以偵測下限為 1),可判讀需要 2 倍,毛細管上限取 900 個鹼基;結果 0.1% 到 0.2% 約讀到 800 到 900,太多或太少都讀得比較短 | 示意模型(幾何分布推算);只依據 Sanger 1977「只讓部分鏈接上」與 Gamble 2026 的讀長範圍,數字不是實驗值 |
+| Illumina 的叢 | 片段兩端接上接頭(幾百 bp);表面的兩種引子讓複製品留在原地(橋式放大);每叢約 1,000 份;叢直徑約 1 微米 | Shendure 2008 第 1138 頁(Fig. 2b);Bentley DR, et al. Nature 2008;456:53–59(PMC2581791),Fig. 1 |
+| 可逆終止合成定序 | 3′-O-疊氮甲基可逆終止核苷酸,四種各帶可切除的螢光;一起加入,每輪只接一個;雷射激發後照相;TCEP 切掉螢光並恢復 3′-OH | Bentley 2008,「DNA sequencing using reversible terminators and clonal single molecule arrays」一節;Shendure 2008 第 1139 頁(Fig. 3b) |
+| Illumina 讀長的限制 | 訊號衰減與不同步(例如螢光或終止基沒切乾淨)限制讀長 | Shendure 2008 第 1139 頁 |
+| Illumina 規格 | MiSeq(Reagent Kit v3)每片 2,200 萬到 2,500 萬條,最長 2 × 300;NovaSeq X Plus 25B 流動槽每片 260 億到 350 億條,2 × 50 到 2 × 150(1.5B 可做 2 × 300),2 × 150 時 85% 以上的鹼基高於 Q30 | Illumina 規格頁(2026-10-26 查):miseq/specifications、novaseq-x-plus/specifications |
+| 兩種螢光 | 新機型用紅、綠兩種螢光與兩張照片分辨四種鹼基(兩種都亮 A、紅 C、綠 T、都不亮 G;各機型不一定相同);動畫畫成四種顏色 | Illumina「2-Channel SBS Technology」頁 |
+| RNA-seq | RNA 轉成接上接頭的 cDNA 片段,定序得到 30 到 400 bp 的 read;對回參考基因體或轉錄本;以落在外顯子上的 read 數(依長度校正)估計表現量;可比較不同組織 | Wang Z, et al. Nat Rev Genet 2009;10:57–63(PMC2949280),「RNA-Seq technology and benefits」「Defining transcription level」 |
+| 柏科樹葉的例子 | 比較有腺體與沒有腺體(天然變異株)的 *Thuja plicata* 葉子:600 多個基因在有腺體的葉子裡高(604 個 contig 差 10 倍以上);其中一個萜類合成酶做出 α-側柏酮的前身檜烯 | Foster AJ, et al. Plant Physiol 2013;161(4):1993–2004(doi:10.1104/pp.112.206383),摘要與結果;計數方法是 Illumina 的 3′ 端短片段定序(tag profiling) |
+| 奈米孔原理 | 蛋白質孔嵌在不導電的高分子膜上;電壓讓離子電流通過孔;馬達蛋白把雙股拆開、把單股送進孔並控制速度;不同鹼基組合造成特定的電流變化;鹼基判讀演算法翻成序列 | Oxford Nanopore「Nanopore sequencing technology」與「Flow cells and nanopores」頁(2026-10-26 查) |
+| 孔裡的鹼基數 | 電流由 3 到 6 個鹼基的組合決定(頁面畫成 5 個) | Jain M, et al. Genome Biol 2016;17:239(PMC5124260),「DNA strand sequencing using the Oxford Nanopore MinION」 |
+| 奈米孔讀長 | 只受 DNA 本身長度限制,20 到 4,000,000 個鹼基;例行讀到 50 kb 以上 | Oxford Nanopore 技術頁;Jain 2016 Conclusions |
+| 奈米孔準確度 | 2016 年單次約 92%;目前單次 99% 以上(最新模型 99.75%);多讀幾次的共識序列可以更準 | Jain 2016 Outlook;Oxford Nanopore「Accuracy」頁 |
+| 奈米孔通量與機身 | MinION 一片 2,048 個孔、512 個一組控制,重 90 公克;MinION 流動槽 512 個通道、PromethION 流動槽 2,675 個通道 | Jain 2016;Oxford Nanopore 線上商店的流動槽頁 |
+| 示意值 | 所有序列、反應管裡的材料畫法、八份新股停的位置、峰的形狀與雜訊、N 的判斷規則、毛細管跑速、叢的數目、橋的形狀、Illumina 的六叢序列、RNA-seq 的讀取次數、電流高低、單股前進速度、比較圖中奈米孔「常見幾萬」的範圍 | 示意,不是實驗結果 |
+
+### DNA 鑑定與分子標記(`dna-markers/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/dna-markers/
+
+臺灣森林遺傳與林木改良研究常用的分子標記技術:用細胞核的 SSR(簡單重複序列,又叫微衛星)分辨每一棵樹,把查獲的木材比對回被砍的樹(個體鑑定)、判斷親本與雜交;用葉綠體 DNA 分辨物種,檢查加工過的木材與油品的原料(產品鑑定)。生化原理分區的動畫教材,版型和 PCR 與電泳相同。
+
+- 8 章,共 127 秒:為什麼 DNA 能鑑定、SSR 的重複次數、讀出基因型(毛細管電泳的峰)、DNA 指紋(木材比對回樹頭)、親子鑑定、雜交與葉綠體 DNA、葉綠體 DNA 份數多、檢查苦茶油的原料
+- 可以自己調:甲樹的重複次數、樣品樹、比對的位點數(1 到 28)、候選父本、植物類群(被子植物或針葉樹)、樣品(新鮮葉片、乾燥木材、油)、油品(小果油茶油、大果油茶油、兩種種子混榨、市售標示小果)
+- 文字以台灣高中畢業看得懂為準
+
+#### 原理重點
+
+- SSR:1 到幾個鹼基的短序列連續重複(微衛星的重複單位在 1 到 10 個核苷酸;Vieira 2016)。DNA 複製時聚合酶滑動,重複次數就多一個或少一個,所以個體之間常常不同;在重複區兩側設計 18 到 25 個鹼基的引子做 PCR,產物長度反映重複次數;是共顯性、多等位的標記(Vieira 2016,Definition and genome occurrence 與 Genotyping 兩節)。
+- 分型:一條引子的 5′ 端帶螢光,PCR 產物加上已知長度的標準片段做毛細管電泳,雷射激發後記成峰,可以分辨相差一個鹼基的片段(Thermo Fisher fragment analysis)。紅檜與臺灣扁柏的系統用螢光引子與 ABI 3500(GeneScan 600 LIZ)、ABI 3130XL(GeneScan 500 ROX)分析(Huang 2022、2020 的 Materials and methods)。
+- 二倍體每個位點有兩個等位基因,各來自母本與父本;同型合子一個峰,異型合子兩個峰(OpenStax Biology 2e 12.2 的同型合子、異型合子定義)。
+- 個體鑑定:單一位點的 PI = Σ(各基因型頻率)²,是隨機兩個個體在這個位點基因型相同的機率;多個位點的 CPI 是各位點 PI 相乘,每個連鎖群只取 PI 最低的一個位點,讓相乘的位點彼此不連鎖(Huang 2022)。這個估計假設比較的是不相干的個體;理論的 PI 常比實際觀察的低,近親(兄弟姊妹)的 PI 可以當保守的上限(Waits 2001)。
+- 信心水準:CL = (1 − CPI)^N,N 是個體數;法院常用 99.99%、99% 或 95%(Huang 2022)。頁面由此解出 N = ln(CL) ÷ ln(1 − CPI)。
+- 親子鑑定(排除法):親子在共顯性標記的每個位點至少共有一個等位基因;候選親本在任何一個位點都對不上就排除,實務上常要兩個位點不符才算有效,以防判讀錯誤、突變或不擴增的等位基因(Jones 2010,Box 1 與 Exclusion 一節)。
+- 雜交:物種之間有固定差異的等位基因時,F1 在這些位點同時帶有兩個物種的等位基因;多個位點可以再分出 F2 與回交(Anderson & Thompson 2002)。葉綠體 SSR 可用來判斷雜交的方向(Wheeler 2014)。
+- 葉綠體 DNA:通常單親遺傳、幾乎不重組,所以一棵樹多半只有一種型(Wheeler 2014;少數物種有雙親傳遞)。胞器 DNA 大多由母本遺傳,約三分之一研究過的物種有雙親傳遞的跡象(Greiner 2015,Box 3);針葉樹的葉綠體 DNA 由父本遺傳(Neale 1989),扁柏屬 *C. obtusa* × *C. pisifera* 的 4 個雜交後代,葉綠體與粒線體 DNA 都和父本 *C. pisifera* 相同(Kondo 1998)。葉綠體 SSR 多為 A/T 單鹼基重複(Vieira 2016;Wheeler 2014)。
+- 份數:葉片細胞的葉綠體 DNA 可超過 10,000 份(Morley & Nielsen 2016 的摘要);核 DNA 每個位點兩份。乾燥木材的 DNA 多半已降解,短而份數多的序列(葉綠體、粒線體、重複的核序列)最容易驗到(Deguilloux 2002 的摘要)。精製油的 DNA 極少又嚴重斷裂,粗油與冷壓油比較多;油品的 PCR 產物常設計在 200 bp 以下(Xia 2025)。
+- 苦茶油:臺灣的苦茶油原料是大果油茶(油茶 *Camellia oleifera*)與小果油茶(短柱山茶 *C. brevistyla*)的種子(農業部)。兩個葉綠體 SSR 標記分辨這兩種;小果油茶的後代與母樹基因型相同(母系遺傳穩定);製油的每一步都能判讀,最好的檢查點在粗油之前;並驗出兩款臺灣在地苦茶油是用進口種子榨的(Food Anal Methods 2023 的摘要)。
+
+#### 數值與示意
+
+有出處:
+
+- 紅檜(*Chamaecyparis formosensis*):36 個多型 SSR 位點(9 個新開發、27 個已發表),每個位點 2 到 27 個等位基因、平均 7.916;單一位點 PI 0.114 到 0.897、平均 0.431;最多 28 個不連鎖位點,CPI 1.652 × 10⁻¹²,99.99% 信心下可分辨 6,000 萬棵,全臺族群 32.06 ± 3.20 百萬棵;最少 6 個位點,CPI 1.728 × 10⁻⁵,95% 信心下可分辨 2,900 棵;36 個位點中 23 個偏離哈溫平衡(Huang 2022,Results 的 Developing *C. formosensis* individual identification system 一節)。
+- 臺灣扁柏(*Chamaecyparis taiwanensis*):23 個 gSSR 加 12 個 EST-SSR,系統用 30 個不連鎖位點,CPI 5.596 × 10⁻¹²,99.99% 信心下可分辨 1,800 萬棵;盜伐案用 19 個不連鎖位點,把 3 件查獲木材比對回 3 棵被害木;乾燥木材 22 個樣品 7 個成功(31.81%),每個樣品要抽兩次以上(Huang 2020,摘要與 Results;結論段寫五件木材,和摘要、結果的三件不一致,頁面用三件)。
+- 頁面算的「分辨全臺紅檜所需」累積機率:−ln(0.9999) ÷ 32.06 × 10⁶ ≈ 3.1 × 10⁻¹²(由論文的 CL 公式與族群數換算,計算推估)。
+- 葉片細胞的葉綠體 DNA 可超過 10,000 份(Morley & Nielsen 2016)。
+
+示意(頁面「資料來源」最後一條也有寫):
+
+- 序列、重複次數、兩側固定序列 84 bp(產物 = 84 + 2 × CA 個數)、所有等位基因長度與基因型(第 1 到 6 章)。
+- 每個位點的 PI:論文逐位點的值在表格圖片裡,頁面改用示意值。28 個值落在 0.114 到 0.861、平均 0.435,由小到大排;前 6 個相乘 1.72 × 10⁻⁵、28 個相乘 1.65 × 10⁻¹²,對上論文的 1.728 × 10⁻⁵ 與 1.652 × 10⁻¹²。可分辨棵數往下取兩位有效數字。
+- 毛細管電泳的到達時間、峰寬與峰高;標準片段只畫 90、100、110 bp。
+- 第 7 章各樣品的份數、完整比例與斷裂方式(份數縮小很多,只為了比較核與葉綠體)。
+- 苦茶油兩個葉綠體 SSR 的長度(標記 1:小果 152、大果 146 bp;標記 2:小果 203、大果 211 bp)、混榨時帶的強弱、製油流程各步驟的 DNA 量。論文全文沒有讀到,標記名稱與實際長度未確認。
+
+教學示意:這份教材的序列、長度、機率曲線與電泳結果都是示意,不是實驗數據,不可用於實樣鑑定。
+
+#### 技術
+
+單一 HTML 檔(dna-markers/index.html),用共用的 assets/bio-lesson.js(播放器)與 assets/bio-draw.js(畫圖工具)在 2D canvas 繪圖,不需要建置,不使用到站人數計數。入口卡片概念圖 assets/dna-markers.svg。程式分區與修改方式見 dna-markers/MAINTENANCE.md。
+
+#### 來源連結
+
+- Huang CJ, et al. 2022, Sci Rep 12:4126(紅檜):https://pmc.ncbi.nlm.nih.gov/articles/PMC8904461/
+- Huang CJ, et al. 2020, Sci Rep 10:22095(臺灣扁柏、盜伐案):https://pmc.ncbi.nlm.nih.gov/articles/PMC7744516/
+- Vieira MLC, et al. 2016, Genet Mol Biol 39(3):312–328:https://pmc.ncbi.nlm.nih.gov/articles/PMC5004837/
+- Thermo Fisher, How to Conduct Fragment Analysis:https://www.thermofisher.com/us/en/home/life-science/sequencing/sequencing-learning-center/capillary-electrophoresis-information/how-conduct-fragment-analysis.html
+- OpenStax Biology 2e, 12.2 Characteristics and Traits:https://openstax.org/books/biology-2e/pages/12-2-characteristics-and-traits
+- Jones AG, et al. 2010, Mol Ecol Resour 10:6–30:https://doi.org/10.1111/j.1755-0998.2009.02778.x
+- Waits LP, et al. 2001, Mol Ecol 10:249–256:https://doi.org/10.1046/j.1365-294x.2001.01185.x
+- Anderson EC, Thompson EA 2002, Genetics 160:1217–1229:https://pmc.ncbi.nlm.nih.gov/articles/PMC1462008/
+- Wheeler GL, et al. 2014, Appl Plant Sci 2(12):1400059:https://pmc.ncbi.nlm.nih.gov/articles/PMC4259455/
+- Kondo T, et al. 1998, Breed Sci 48:177–179:https://doi.org/10.1270/jsbbs1951.48.177
+- Neale DB, et al. 1989, PNAS 86:9347–9349:https://pmc.ncbi.nlm.nih.gov/articles/PMC298492/
+- Greiner S, et al. 2015, BioEssays 37:80–94:https://pmc.ncbi.nlm.nih.gov/articles/PMC4305268/
+- Morley SA, Nielsen BL 2016, Front Plant Sci 7:57:https://pmc.ncbi.nlm.nih.gov/articles/PMC4740508/
+- Deguilloux MF, et al. 2002, Proc R Soc B 269:1039–1046:https://pmc.ncbi.nlm.nih.gov/articles/PMC1690996/
+- Xia Y, et al. 2025, Foods 14(18):3186:https://pmc.ncbi.nlm.nih.gov/articles/PMC12469460/
+- Food Anal Methods 2023;16(11–12):1635–1645(苦茶油的葉綠體 SSR,只讀到摘要):https://doi.org/10.1007/s12161-023-02532-2
+- 農業部特用作物資料(大果油茶與小果油茶的學名):https://kmweb.moa.gov.tw/subject/subject.php?id=35465 (另一份林業研究專訊把小果種寫成細葉油茶 *C. tenuifolia*,分類有分歧;頁面依農業部與苦茶油那篇用 *C. brevistyla*。農業部那份是 PDF,內容由搜尋引擎的摘錄確認,PDF 的中文字沒能抽出來逐字核對)
+
+### 基因選殖與蛋白表現(`cloning/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/cloning/
+
+生化原理分區的教材,版型同 `pcr/`:八章 2D 動畫加字幕,共 129 秒。從「為什麼要讓細菌做酵素」講起,依序是 cDNA、限制酶與接合酶把基因接進質體、熱休克轉形與抗生素篩選、pET 系統的 IPTG 誘導、溫度與包涵體、His 標籤的金屬親和層析,最後用 SDS-PAGE 與西方墨點法確認。例子用臺灣杉單萜合成酶的研究(Ma LT, et al. 2021)。
+
+- 第 1 章 目的:植物細胞裡目標酵素很少;基因接進質體、送進大腸桿菌、大量做出酵素,再加受質看產物
+- 第 2 章 取得基因:外顯子與內含子、轉錄與剪接、反轉錄酶做 cDNA、PCR 放大從 ATG 到終止密碼的一段;控制項「PCR 的模板」(cDNA 或基因組 DNA)
+- 第 3 章 載體:質體的複製起點、抗性基因、T7 啟動子、His 標籤與插入位置;EcoRI 在 GAATTC 錯開切斷、黏性末端配對、接合酶補上兩個缺口;控制項「切法」(兩種酶,或只用一種)
+- 第 4 章 轉形與篩選:冰上、42 °C 熱休克、塗在含康黴素的培養基上、隔夜長出菌落;控制項「培養基加抗生素」「加入質體」
+- 第 5 章 誘導:DE3 菌株染色體上的 T7 RNA 聚合酶基因被 LacI 擋住,IPTG 讓 LacI 離開,T7 RNA 聚合酶大量轉錄目標基因;控制項「加 IPTG」
+- 第 6 章 溫度:37 °C 與 16 °C 並排,快速合成的長鏈黏成包涵體、慢慢做的摺好,打破細胞離心後看可溶與沉澱;控制項「加 IPTG」
+- 第 7 章 純化:His 標籤抓住鎳或鈷、咪唑洗滌與沖提、組胺酸側鏈與咪唑是同一種環;控制項「接上 His 標籤」
+- 第 8 章 確認:SDS-PAGE 六道(標準、未誘導、誘導、可溶、沉澱、純化),轉印後用抗 His 的抗體只讓目標蛋白顯色;控制項「加 IPTG」「接上 His 標籤」「電泳樣品的誘導溫度」
+- 文字以台灣高中畢業看得懂為準
+
+#### 數值與示意
+
+為什麼要用 cDNA:植物基因的編碼序列被內含子打斷,內含子要在轉譯前精確剪掉(OpenStax Biology 2e 15.4);從 mRNA 用反轉錄酶做出的 cDNA 沒有內含子(OpenStax Microbiology 12.1;OpenStax Biology 2e 17.1 的 RT-PCR)。「大腸桿菌沒有剪接內含子的機制,所以要用 cDNA」這句在 Tymoczko 等《Biochemistry: A Short Course》3e 第 41.3 節,只在搜尋摘要讀到原句(出版社頁面連不上),頁面的字幕依 OpenStax 的內容改寫。
+
+限制酶與接合酶:限制酶在 4 到 6 個鹼基、多半是回文的位置切斷,錯開切時留下互補的單股突出(黏性末端),接合酶以共價鍵接回骨架(OpenStax Microbiology 12.1;OpenStax Biology 2e 17.1 寫 2 或 4 個鹼基的突出)。EcoRI 認 G^AATTC、HindIII 認 A^AGCTT(Thermo Fisher 產品頁 ER0271、ER0501);頁面上 AATT 的突出由切點推得。兩端用兩種酶時只有一種接法;只用一種酶時基因可以正反兩種方向接進去,質體也會自己接回去,需要去磷酸化或篩選(Addgene blog, Plasmids 101: Restriction Cloning, 2016-02-18)。質體元件的作用:複製起點讓細菌複製質體、抗性基因讓帶質體的菌在抗生素下活下來、插入位置有多個限制酶切位、啟動子決定插入基因的轉錄(Addgene Molecular Biology Reference)。
+
+轉形:Addgene 的熱休克流程是勝任細胞與 DNA 在冰上 20 到 30 分鐘、42 °C 水浴 30 到 60 秒(常以 45 秒最好)、回冰 2 分鐘、加 SOC 或 LB 在 37 °C 搖 45 分鐘、塗在含抗生素的 LB 培養基、37 °C 隔夜;頁面字幕只用「冰上、42 °C 30 到 60 秒」。只有帶質體的菌在含抗生素的培養基上長得出來(OpenStax Biology 2e 17.1 圖 17.7;OpenStax Microbiology 12.1)。每個菌落通常是一個細胞分裂出來的(JoVE Science Education〈Pure Cultures and Streak Plating〉,只在搜尋摘要讀到)。康黴素是例子:pET 手冊 p.19 的誘導對照表列 pET-28b(+) 帶康黴素抗性;Ma LT 2021 用的是 pET21(安比西林)或 pET28(康黴素)。
+
+pET 系統(Novagen pET System Manual, 10th ed., TB055):目標基因接在強的 T7 啟動子後面,提供 T7 RNA 聚合酶才表現,全力誘導時目標蛋白在誘導後幾小時內可超過菌體蛋白的 50%(p.4);T7lac 啟動子下游有 lac 操縱子,載體自己帶 lacI,LacI 同時擋住染色體上 lacUV5 啟動子的 T7 RNA 聚合酶基因與載體上的 T7lac 啟動子(p.11);DE3 菌株是 λDE3 溶原菌,帶 lacI、lacUV5 啟動子與 T7 RNA 聚合酶的基因,加 IPTG 誘導(p.14);OD600 0.4 到 1(建議 0.6、約 3 小時)時加 IPTG,一般 T7 啟動子 0.4 mM、T7lac 1 mM,再培養 2 到 3 小時(p.33);同一瓶分兩半、一半不加 IPTG 當對照(p.42)。IPTG 是乳糖的不可分解類似物(Rosano 等 2014)。C41(DE3) 是由 BL21(DE3) 篩選來、適合不好表現的蛋白的菌株(同上)。
+
+溫度與可溶比例:37 °C 時有些蛋白堆成包涵體,30 °C 時較多可溶、有活性的蛋白;有時低溫(15 到 20 °C)長時間(例如過夜)誘導可溶的產量最好;降低合成速率的條件通常提高可溶比例;可溶不一定代表摺疊正確(pET 手冊 p.34)。包涵體是蛋白質聚集的團塊,包涵體問題嚴重時建議在 15 到 25 °C 表現,慢一點讓新合成的蛋白有時間摺好(Rosano 等 2014)。頁面的可溶比例 16 °C 70%、37 °C 25% 是示意,只表示方向。
+
+His 標籤與 IMAC(Bornhorst 等 2000):組胺酸是和固定化金屬結合最強的胺基酸,靠側鏈的咪唑環配位;常用 6 個組胺酸;Ni²⁺-NTA 與 Co²⁺ 樹脂留兩個配位位置給標籤;洗滌用低濃度咪唑(Ni-NTA 10 到 50 mM、鈷樹脂約 10 mM),沖提用高濃度咪唑(Ni-NTA 100 mM 以上、鈷樹脂 50 mM 以上),咪唑和標籤搶金屬;表現量高時一步可達約 95% 純度。pET 手冊 p.7 的標籤表:His•Tag 6、8 或 10 個胺基酸,用金屬螯合層析純化,也有單株抗體可做西方墨點法。
+
+確認:SDS 蓋住蛋白質原本的電荷,讓聚丙烯醯胺膠只依大小分開,小的跑得快,與分子量標準比對,用考馬斯藍或銀染(OpenStax Microbiology 12.2)。西方墨點法把膠上的蛋白轉印到硝化纖維膜,一級抗體抓目標蛋白,二級抗體帶酵素或螢光,加呈色受質顯出位置(OpenStax Microbiology 20.2)。
+
+實例(Ma LT, et al. 2021, Plants 10:2404,PMC8625326,方法段):臺灣杉組織抽 RNA,1 µg 用 SuperScript III 反轉錄;Phusion 聚合酶與專一引子放大,5′ 與 3′ RACE 補全長,接進 pGEM-T Easy 定序;開放讀框(去掉預測的質體轉運胜肽)再接進 pTYB12、pET21 或 pET28,轉形 E. coli C41(DE3);LB 37 °C 長到 OD600 0.6,加 IPTG 到 0.4 mM,16 °C 誘導 16 到 22 小時;用 TALON Superflow(鈷)或幾丁質樹脂純化,以膠體電泳與西方墨點法確認;GPP 為受質時 TcTPS13、14 做香葉醇(geraniol),TcTPS15 做沉香醇(linalool),TcTPS16 做 β-蒎烯,TcTPS17 沒有單萜產物。頁面只用到「臺灣杉的萜類合成酶就是這樣找出各自做哪一種單萜」與流程上的數值。
+
+規格與數值的狀態:
+
+| 畫面上的內容 | 出現的地方 | 狀態 | 依據 |
+| --- | --- | --- | --- |
+| EcoRI G^AATTC、切在 G 與 A 之間、留下 AATT 突出 | 第 3 章序列放大、字幕、重點整理 | 原廠資料(突出序列由切點推得) | Thermo Fisher ER0271 |
+| HindIII A^AGCTT | 第 3 章結果面板 | 原廠資料 | Thermo Fisher ER0501 |
+| 兩種酶定方向;一種酶會反接、自接 | 第 3 章結果面板與控制項 | 實驗指南 | Addgene Plasmids 101 |
+| 42 °C 30 到 60 秒、冰上、37 °C 隔夜 | 第 4 章字幕、溫度計、標籤 | 實驗指南 | Addgene Bacterial Transformation |
+| 康黴素 | 第 4 章 | 原廠資料(舉例) | pET 手冊 p.19 |
+| DE3、lacUV5、LacI 同時擋兩處、IPTG | 第 5 章 | 原廠資料 | pET 手冊 p.11、p.14 |
+| OD600 約 0.6 | 第 5 章字幕 | 原廠資料、實例 | pET 手冊 p.33;Ma LT 2021 |
+| IPTG 0.4 到 1 mM | 重點整理 | 原廠資料、實例 | pET 手冊 p.33;Ma LT 2021(0.4 mM) |
+| 可超過菌體蛋白一半 | 第 5 章字幕、右邊長條 | 原廠資料;長條上升的曲線是示意 | pET 手冊 p.4 |
+| 37 °C 誘導約 2 到 3 小時;16 °C 16 到 22 小時 | 第 6 章標題 | 原廠資料、實例 | pET 手冊 p.33;Ma LT 2021 |
+| 低溫提高可溶比例、可溶不一定有活性 | 第 6 章字幕 | 原廠資料、文獻 | pET 手冊 p.34;Rosano 2014 |
+| 可溶 70%(16 °C)、25%(37 °C) | 第 6 章離心管、第 8 章可溶與沉澱兩道 | 示意 | 只表示方向 |
+| 6 個組胺酸、鎳或鈷樹脂 | 第 7 章 | 文獻 | Bornhorst 2000;pET 手冊 p.7 |
+| 咪唑洗 10 到 50 mM、沖提 100 mM 以上 | 第 7 章右下 | 文獻(Ni-NTA 的範圍) | Bornhorst 2000 |
+| 目標蛋白 60 kDa | 第 8 章 | 示意 | 單萜合成酶的實際大小沒有查證 |
+| 分子量標準 250、150、100、75、50、37、25、20、15、10 kDa 與位置 | 第 8 章 | 示意(數值是常見的一組) | 位置用 log 分子量線性換算 |
+| 序列 `VEC`、`TOPF`;外顯子與內含子的數目與長度;質體元件的位置 | 第 2、3 章 | 示意 | |
+| 菌落 28 個、8 隻菌裡 2 隻吃進質體、培養皿上的菌數 | 第 4 章 | 示意 | |
+| 核糖體數與速度、長鏈命運的比例、蛋白質數量 | 第 5、6、7 章 | 示意 | |
+
+#### 技術
+
+單一 HTML 檔(cloning/index.html),2D canvas,用生化原理分區共用的 `assets/bio-lesson.js`(播放器)、`assets/bio-draw.js`(畫圖工具)、`assets/bio-lesson.css`(版面),不需要建置、沒有外部依賴、不使用到站人數計數。七個控制項都是 `restart: false`,`draw(g, t, S)` 只依時間與狀態畫,改了立刻反映。程式結構、各章時間軸與控制項見 cloning/MAINTENANCE.md。入口概念圖 `assets/cloning.svg`。
+
+#### 來源連結
+
+讀到內容的(2026-10-26):
+
+- OpenStax Biology 2e 17.1 Biotechnology:https://openstax.org/books/biology-2e/pages/17-1-biotechnology
+- OpenStax Biology 2e 15.4 RNA Processing in Eukaryotes:https://openstax.org/books/biology-2e/pages/15-4-rna-processing-in-eukaryotes
+- OpenStax Microbiology 12.1 Microbes and the Tools of Genetic Engineering:https://openstax.org/books/microbiology/pages/12-1-microbes-and-the-tools-of-genetic-engineering
+- OpenStax Microbiology 12.2 Visualizing and Characterizing DNA, RNA, and Protein:https://openstax.org/books/microbiology/pages/12-2-visualizing-and-characterizing-dna-rna-and-protein
+- OpenStax Microbiology 20.2 Detecting Antigen-Antibody Complexes:https://openstax.org/books/microbiology/pages/20-2-detecting-antigen-antibody-complexes
+- Addgene, Molecular Biology Reference(Plasmid elements):https://www.addgene.org/mol-bio-reference/plasmid-background/
+- Addgene, Bacterial Transformation protocol:https://www.addgene.org/protocols/bacterial-transformation/
+- Addgene blog, Plasmids 101: Restriction Cloning(2016-02-18):https://blog.addgene.org/plasmids-101-restriction-cloning
+- Thermo Fisher EcoRI(ER0271):https://www.thermofisher.com/order/catalog/product/ER0271;HindIII(ER0501):https://www.thermofisher.com/order/catalog/product/ER0501
+- Novagen pET System Manual, 10th ed.(TB055,PDF 的文字抽出後讀,頁碼依頁首):https://mcb.berkeley.edu/labs/krantz/pdf/vectors/pET_system_manual.pdf
+- Bornhorst JA, et al. Purification of proteins using polyhistidine affinity tags. Methods Enzymol. 2000;326:245–254. PMC2909483:https://pmc.ncbi.nlm.nih.gov/articles/PMC2909483/
+- Rosano GL, et al. Recombinant protein expression in Escherichia coli: advances and challenges. Front Microbiol. 2014;5:172. PMC4029002:https://pmc.ncbi.nlm.nih.gov/articles/PMC4029002/(只讀了前三分之一,包涵體、溫度、C41 的段落)
+- Ma LT, et al. Unveiling Monoterpene Biosynthesis in Taiwania cryptomerioides via Functional Characterization. Plants. 2021;10(11):2404. PMC8625326:https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/
+
+只在搜尋摘要看到、沒有讀到原文的:Tymoczko 等《Biochemistry: A Short Course》3e 第 41.3 節(細菌不能剪接內含子,所以表現真核基因要用 cDNA;出版社頁面 DNS 失敗);JoVE Science Education〈Pure Cultures and Streak Plating〉(菌落視為單一細胞的後代)。NEB 的 EcoRI、HindIII 產品頁回 403、REBASE 憑證錯誤,改用 Thermo Fisher 的產品頁;NCBI Bookshelf 的 Lodish《Molecular Cell Biology》要求人機驗證,沒有讀,SDS-PAGE 改以 OpenStax Microbiology 12.2 為準。pET 手冊第 11 版(哈佛的 PDF)字型無法抽出文字,改讀第 10 版。
+
+### 萜類合成酶(`terpene-synthase/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/terpene-synthase/
+
+樹木精油裡的 pinene、limonene、linalool、geraniol 怎麼來:5 碳的 IPP 與 DMAPP 頭尾相接成 GPP,萜類合成酶在口袋裡拉走二磷酸,讓帶正電的碳鏈轉動、成環,最後放掉 H⁺ 或接上水;同一個 GPP 依酵素口袋的形狀走到不同產物,口袋裡的一個胺基酸也能改變產物。後半以臺灣杉的研究為例:從轉錄體找候選基因、選殖、在大腸桿菌表現、加 GPP 反應、SPME 收集、GC-MS 對照標準品,並看到序列最像 α-pinene 合成酶的基因實際做出 geraniol。生化原理分區的動畫教材,版型和 PCR 與電泳相同。
+
+- 7 章,共 117 秒:精油裡的萜類、5 碳積木 IPP 與 DMAPP、口袋裡發生什麼事、同一個 GPP 不同產物、一個胺基酸的差別、找出基因與做出酵素、看層析圖認產物
+- 可以自己調:接幾個 5 碳單位(GPP、FPP、GGPP)、酵素(geraniol、linalool、β-pinene 合成酶)、口袋旁的胺基酸(Tyr 或 Phe)、基因(TcTPS13 到 17)
+- 文字以台灣高中畢業看得懂為準;結構式是線條式,原子編號照 GPP,動畫裡的分子可以由一個狀態漸變到下一個
+
+#### 原理重點
+
+- 積木:IPP 異構成 DMAPP,接長鏈的酵素(異戊烯基轉移酶)把兩者接成 GPP(10 碳),再接 IPP 成 FPP(15 碳)、GGPP(20 碳);GPP 做單萜、FPP 做倍半萜、GGPP 做雙萜(Bohlmann 1998,引言與 Enzymology and Mechanism of Terpenoid Cyclization 一節)。鏈延長是 1′-4(頭尾相接):DMAPP 的二磷酸離開成烯丙基陽離子,IPP 的雙鍵接上去成三級碳陽離子,再放掉 H⁺;口袋底的大胺基酸像一把「尺」決定鏈長(Christianson 2017,Prenyltransferases 一節與 Figure 11)。
+- 拉走二磷酸:萜類合成酶要二價金屬離子,通常是 Mg²⁺ 或 Mn²⁺,裸子植物的酵素偏好 Mn²⁺;DDxxD 序列固定金屬離子(Bohlmann 1998)。第一類萜類環化酶用三個 Mg²⁺ 引發二磷酸離開,這三個離子由 DDXXD 與 NSE/DTE 兩段序列固定,二磷酸卡在口袋口(Christianson 2017,第一類萜類環化酶的概論與 (+)-Bornyl Diphosphate Synthase 一節)。臺灣杉的反應液加的是 10 μM MnCl₂(Ma 2021,3.5 節)。
+- 成環:GPP 的 2、3 號碳雙鍵是反式,1 號碳碰不到 6 號碳;二磷酸先離開、再接到 3 號碳成 linalyl 二磷酸(LPP),2、3 號碳之間變成單鍵才能轉動,再離開後 1 號碳與 6 號碳接成六員環,得到 α-terpinyl 陽離子(Christianson 2017,Monoterpene Cyclases 一節與 Figure 30;Bohlmann 1998)。
+- 結尾:碳陽離子放掉 H⁺ 成烯類(α-terpinyl 陽離子放掉 H⁺ 是 limonene),或被水接上成醇類(α-terpineol)(Bohlmann 1998)。geraniol 合成酶在 ¹⁸O 水中做出含 ¹⁸O 的 geraniol,氧來自水(Iijima 2004 的摘要)。
+- 分岔:α-terpinyl 陽離子再接出四員環成 pinyl 陽離子,放掉環上或甲基上的 H⁺ 分別是 α-pinene、β-pinene;口袋的形狀是反應的模板,決定中間物能採取的形狀(Christianson 2017)。很多酵素以固定比例做出多種產物,冷杉的 pinene 合成酶做出 α- 與 β-pinene 約 2:3(Bohlmann 1998)。頁面的路線圖(geranyl 陽離子 → geraniol、linalool;LPP → α-terpinyl 陽離子 → limonene、terpinolene、pinyl 陽離子 → α-、β-pinene)是單萜常見的路線,依上述兩篇綜述的機制畫成。
+- 一個胺基酸:兩支臺灣杉單萜合成酶(Tc-αPIN/TEO 與 Tc-TEO)胺基酸序列約 97% 相似、產物不同;Tc-αPIN/TEO 的 Y327、Y429、Y575 換成 Phe 後不再偏好 α-pinene,作者認為 Tyr 的羥基是形成雙環產物所需(Hsu 2015 的摘要)。另一個推測:臺灣杉的 α-pinene 合成酶在區域 1 的位置是 Cys、β-pinene 合成酶(TcTPS16)是 Ser,作者寫機制要再以實驗確認;冷杉 pinene 合成酶的 C372S、F579W 突變則偏向 α-pinene,方向相反(Ma 2021,2.3 節;冷杉的部分是 Ma 2021 引述 Hyatt & Croteau 2005,原文未核對)。
+- 找基因與確認功能:Ma 2021 從臺灣杉針葉、毬果、木材的轉錄體以 BLASTx 搜尋,挑出 5 個候選(毬果 3 個、針葉 2 個;木材的片段短於 500 bp 不用),RACE 取得全長,選殖進 pGEM-T Easy 定序,再放進 pTYB12、pET21 或 pET28,必要時去掉質體轉運胜肽;在大腸桿菌 C41(DE3) 中 37 °C 養到 OD600 0.6,加 0.4 mM IPTG,16 °C 誘導 16 到 22 小時,純化(TALON 或 chitin);20 μL GPP 加 50 μL 酵素於 500 μL 緩衝液(50 mM HEPES pH 7.2、100 mM KCl、10 μM MnCl₂、5% 甘油、2 mM DTT),30 °C 1 小時;75 μm Carboxen-PDMS 纖維在室溫吸頂空 20 分鐘,注射口 250 °C 脫附,PolarisQ 離子阱 GC-MS、DB-5 管柱,60 °C 起每分鐘 5 °C 到 130 °C、每分鐘 30 °C 到 260 °C 停 5 分鐘;標準品 200 ppm,並比對 NIST 與 Wiley 資料庫(3.2 到 3.5 節)。
+- 序列像不代表產物一樣:TcTPS13、15、16 的 BLAST 最佳結果都是紅檜 α-pinene 合成酶(GenBank ABW80964),TcTPS14 是日本扁柏 terpinolene 合成酶,TcTPS17 是臺灣杉已知的單萜合成酶(表 1);實際產物 TcTPS13、14 是 geraniol,TcTPS15 是 linalool,TcTPS16 是 β-pinene,TcTPS17 測不到單萜產物(2.3 節)。Bohlmann 1998 也寫到,只靠序列比對無法判定新酵素的功能。臺灣杉的葉與木材精油裡,單萜醇只有微量(Ma 2021,2.4 節),頁面沒有提這一點。
+
+#### 數值與示意
+
+有出處:
+
+- 碳數:單萜 10、倍半萜 15、雙萜 20(Bohlmann 1998)。
+- 滯留時間(DB-5,上述升溫程式):geraniol 12.46 與 12.48 分(TcTPS13、14 共同的產物)、linalool 8.44 分、β-pinene 5.61 分(Ma 2021,2.3 節與圖 3、4)。頁面把 geraniol 畫在 12.47 分、寫「約 12.5 分」。
+- 質譜(70 eV,NIST WebBook 的 JCAMP 檔,取 m/z 39 以上、相對強度 3% 以上的峰,外加分子離子):geraniol 基峰 m/z 69,41(60)、68(21)、67(16)、93(14)、123(14),分子離子 154 約 1.2%;linalool 基峰 71,93(76)、55(64)、43(60)、41(56)、69(43)、80(32)、121(23),154 約 0.4%;β-pinene 基峰 93,41(61)、69(35)、39(32)、91(31)、77(28)、79(27)、121(11),136 約 8%。
+- Tc-αPIN/TEO 與 Tc-TEO 約 97% 相似;突變位置 Y327、Y429、Y575(Hsu 2015 的摘要)。
+
+示意(頁面「資料來源」最後一條也有寫):
+
+- 酵素與口袋的形狀、螺旋、金屬離子與側鏈的位置;第 3、5 章把立體的轉動畫在平面上(第 5 章 7 號碳從環的右側繞進環中央,實際是從環的上方靠近)。
+- 第 2 章口袋底的位置、IPP 進來的方式與時間;第 4 章路線圖的版面。
+- 第 5 章的長條高度(Tyr 0.72、Phe 0.2),只表示 α-pinene 變少的方向,論文摘要沒有比例;也沒有畫比例變高的是哪一種產物。
+- 第 7 章層析圖的峰形、峰高與雜訊(高斯峰 σ = 0.06 分);只有滯留時間是論文的值。質譜是 NIST 資料庫的譜,不是該研究的實測譜。
+- 第 1 章臺灣杉小枝的樣子。
+
+教學示意:這份教材的層析圖與質譜是用來說明「對照標準品與資料庫」的做法,不是實驗數據,不可用於實樣鑑定。
+
+#### 技術
+
+單一 HTML 檔(terpene-synthase/index.html),用共用的 assets/bio-lesson.js(播放器)與 assets/bio-draw.js(畫圖工具)在 2D canvas 繪圖,結構式由頁面裡的 `mol()` 畫;不需要建置,不使用到站人數計數。入口卡片概念圖 assets/terpene-synthase.svg。程式分區與修改方式見 terpene-synthase/MAINTENANCE.md。
+
+#### 來源連結
+
+- Ma LT, et al. 2021, Plants 10(11):2404(臺灣杉 TcTPS13 到 17):https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/
+- Hsu LJ, et al. 2015, Tree Genet Genomes 11:796(只讀到摘要):https://doi.org/10.1007/s11295-014-0796-z
+- Bohlmann J, et al. 1998, Proc Natl Acad Sci USA 95(8):4126–4133:https://pmc.ncbi.nlm.nih.gov/articles/PMC22453/
+- Christianson DW 2017, Chem Rev 117(17):11570–11648:https://pmc.ncbi.nlm.nih.gov/articles/PMC5599884/
+- Iijima Y, et al. 2004, Plant Physiol 134:370–379(geraniol 的氧來自水,只讀到摘要,頁面沒有列):https://doi.org/10.1104/pp.103.032946
+- Degenhardt J, et al. 2009, Phytochemistry 70:1621–1637(單萜與倍半萜合成酶的綜述,只讀到摘要,頁面沒有列):https://doi.org/10.1016/j.phytochem.2009.07.030
+- Hyatt DC, Croteau R 2005, Arch Biochem Biophys 439:222–233(冷杉 pinene 合成酶的突變,只讀到摘要,摘要沒有寫 C372S、F579W 的結果):https://doi.org/10.1016/j.abb.2005.05.017
+- GenBank ABW80964(紅檜 α-pinene 合成酶,未發表的序列登錄):https://www.ncbi.nlm.nih.gov/protein/ABW80964.1
+- NIST Chemistry WebBook 質譜:geraniol https://webbook.nist.gov/cgi/cbook.cgi?ID=C106241&Mask=200 ;linalool https://webbook.nist.gov/cgi/cbook.cgi?ID=C78706&Mask=200 ;β-pinene https://webbook.nist.gov/cgi/cbook.cgi?ID=C127913&Mask=200
+
+### CRISPR 基因編輯(`crispr/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/crispr/
+
+從細菌對抗噬菌體的免疫機制講起:細菌把病毒 DNA 的一小段存成 CRISPR 區裡的間隔序列,下次用轉錄出來的 RNA 帶著 Cas 蛋白認出並剪斷病毒。接著是實驗室的工具:Cas9 蛋白加一條嚮導 RNA,Cas9 先認 PAM、再從 PAM 旁邊打開雙股比對嚮導,配對夠長才在 PAM 往回數 3 個鹼基的地方把兩股剪斷;細胞用 NHEJ 直接接回(常有插入或缺失,讀框位移而剔除基因)或用 HDR 照模板修(精準改寫,但少得多)。最後是怎麼設計嚮導 RNA、避開脫靶,以及用途與限制。
+
+- 8 章,約 2 分鐘,每章有字幕;最後一章之後停住
+- 第 3 章可以換 Cas9 遇到的 DNA:完全相符、靠近 PAM 有不配對、旁邊沒有 PAM
+- 第 5 章可以換 NHEJ 接回時少 1 個、多 1 個或少 3 個,看密碼子與蛋白質長度怎麼變
+- 第 6 章可以切換照模板修(HDR)與直接接回(NHEJ)
+- 第 7 章點畫面上的 PAM(或用右邊的選項)換一條嚮導,看切點與脫靶檢查的結果
+- 文字以台灣高中畢業看得懂為準
+
+#### 數值與示意
+
+- PAM:化膿性鏈球菌(*Streptococcus pyogenes*)的 Cas9 認 5′-NGG-3′,在非目標股、緊接在目標序列的 3′ 端(Jinek 等 2012 Fig. 4;Sternberg 等 2014;Addgene 的 PAM 表寫 SpCas9 為 3′ NGG)。SpCas9 也會以約五分之一的效率切 NAG(Hsu 等 2013),頁面沒有提。
+- 嚮導:約 20 個鹼基決定目標(Addgene;Jinek 等 2012 寫 crRNA 5′ 端的 20 個鹼基可以和目標配對)。天然是 crRNA 與 tracrRNA 兩條 RNA,可以接成一條(Jinek 等 2012 Fig. 5;Addgene 稱 gRNA 是兩者的合成融合)。
+- 找位置的順序:先認 PAM 才檢查旁邊的序列,雙股從 PAM 這端開始打開、往遠端延伸;旁邊沒有 PAM 的完全相符序列會被略過,細菌自己 CRISPR 區裡的相符序列旁邊沒有 PAM,所以不會剪到自己(Sternberg 等 2014,摘要與討論)。
+- 種子區:靠 PAM 那端約 10 個鹼基。Addgene 寫 8 到 10 個,Sternberg 等 2014 寫 8 到 12 個;Jinek 等 2012 在試管內測到靠 PAM 那端至少要連續配對 13 個,遠端連續 6 個不配仍可以切(Fig. 3)。頁面寫「約 10 個」。
+- 切點:兩股都切在 PAM 上游 3 個鹼基(嚮導第 17 與 18 個之間),質體切割產生平整切口;HNH 剪和嚮導互補的那一股,RuvC 樣區剪另一股(Jinek 等 2012 Fig. 1、2)。Addgene 寫約 3 到 4 個鹼基。
+- NHEJ:有效率但容易出錯,常在切點造成小的插入或缺失;不是 3 的倍數時讀框位移,常提早出現終止密碼子而失去功能,但剔除的效果要實驗確認(Addgene,Generating a Knockout)。三個鹼基一個密碼子、插入一兩個鹼基改變讀框、插入三個時蛋白質仍做得出來(OpenStax Biology 2e 15.1,Figure 15.4 是密碼表)。
+- HDR:照著和切點兩側序列相同的模板修;效率一般低於修改過的對偶基因的 10%,大部分雙股斷裂仍由 NHEJ 修;在 S 與 G2 期進行;模板裡要加上防止再被剪的改動(Addgene,Small Precision Edits)。頁面寫「在大部分細胞裡比 NHEJ 少得多」「常不到一成」。
+- 脫靶:能不能容忍不配對,看數目、位置與分布;靠近 PAM 的不配對比遠端的更不被容忍;3 個以上分散的不配對多半測不到切割;建議避開不到 3 個不配又帶 NGG 或 NAG 的相似位置(Hsu 等 2013)。頁面「會不會被剪」的五種說法是依這些定性結論訂的示意規則,不是任何軟體的打分。
+- 由來:受噬菌體攻擊後,細菌加入來自噬菌體基因體的新間隔序列,間隔序列和噬菌體序列的相似度決定對哪一種有抵抗力(Barrangou 等 2007,摘要);新的間隔序列主要加在靠前導序列的那一端(Horvath 等 2008),第 1 章依此畫在最前面。CRISPR 是 clustered regularly interspaced short palindromic repeats 的縮寫,頁面譯為「成簇、規律間隔的短回文重複序列」(MedlinePlus)。
+- 用途與限制的例子:楊樹同時編輯最多 6 個木質素生合成基因,碳水化合物與木質素的比值最高到野生型的 228%,製漿更有效率(Sulis 等 2023,摘要);2023-12-08 美國 FDA 核准第一個用 CRISPR/Cas9 的療法 Casgevy,取出 12 歲以上鐮刀型貧血症病人的造血幹細胞編輯後輸回(FDA 新聞稿);改到生殖細胞或胚胎會遺傳給後代,美國與許多國家目前不允許(MedlinePlus,2022-03-22 更新);遞送是 CRISPR 在體內使用最難的關卡(Lino 等 2018,摘要);作物的基因編輯仰賴轉殖與再生,這兩步是瓶頸(Altpeter 等 2016,摘要)。
+
+教學示意:所有序列(第 3 到 6 章共用的 45 個鹼基「基因」、第 2 章換的兩組嚮導、第 7 章的 42 個鹼基與脫靶候選)都是為畫面設計的,不是實際基因;蛋白質全長約 300 個胺基酸、模板兩端各 8 個鹼基、24 個細胞裡 2 個走 HDR、R 環每 0.2 秒配一個鹼基、Cas9 與支架的形狀都是示意。NHEJ 只畫少 1、多 1、少 3 三種常見類型。第 7 章只看上面這一股的 NGG。不可用於實際挑選嚮導或判斷脫靶。
+
+#### 技術
+
+單一 HTML 檔(crispr/index.html),2D canvas 動畫,用生化原理分區共用的 assets/bio-lesson.js(播放器)、assets/bio-draw.js(畫圖工具)、assets/bio-lesson.css(版面),不需要建置,不使用到站人數計數。程式分區與修改方式見 crispr/MAINTENANCE.md。
+
+#### 來源連結
+
+- Barrangou R, et al. CRISPR provides acquired resistance against viruses in prokaryotes. Science. 2007;315(5819):1709–1712. doi:10.1126/science.1138140(摘要)
+- Horvath P, et al. Diversity, activity, and evolution of CRISPR loci in *Streptococcus thermophilus*. J Bacteriol. 2008;190(4):1401–1412:https://pmc.ncbi.nlm.nih.gov/articles/PMC2238196/
+- Jinek M, et al. A programmable dual-RNA–guided DNA endonuclease in adaptive bacterial immunity. Science. 2012;337(6096):816–821:https://pmc.ncbi.nlm.nih.gov/articles/PMC6286148/ (Fig. 1 切點與平整切口、Fig. 2 HNH 與 RuvC、Fig. 3 配對長度與種子區、Fig. 4 PAM、Fig. 5 單一嚮導)
+- Sternberg SH, et al. DNA interrogation by the CRISPR RNA-guided endonuclease Cas9. Nature. 2014;507(7490):62–67:https://pmc.ncbi.nlm.nih.gov/articles/PMC4106473/ (摘要、討論、Fig. 4c 圖說)
+- Addgene, CRISPR Guide:https://www.addgene.org/guides/crispr/ (CRISPR Overview、Basic Mechanisms、Cas Enzymes and PAM Sequences、Generating a Knockout、Small Precision Edits、Glossary)
+- Hsu PD, et al. DNA targeting specificity of RNA-guided Cas9 nucleases. Nat Biotechnol. 2013;31(9):827–832:https://pmc.ncbi.nlm.nih.gov/articles/PMC3969858/
+- OpenStax Biology 2e, 15.1 The Genetic Code:https://openstax.org/books/biology-2e/pages/15-1-the-genetic-code
+- Sulis DB, et al. Multiplex CRISPR editing of wood for sustainable fiber production. Science. 2023;381(6654):216–221. doi:10.1126/science.add4514(摘要)
+- U.S. FDA, FDA Approves First Gene Therapies to Treat Patients with Sickle Cell Disease(2023-12-08):https://www.fda.gov/news-events/press-announcements/fda-approves-first-gene-therapies-treat-patients-sickle-cell-disease
+- MedlinePlus Genetics, What are genome editing and CRISPR-Cas9?:https://medlineplus.gov/genetics/understanding/genomicresearch/genomeediting/
+- Lino CA, et al. Delivering CRISPR: a review of the challenges and approaches. Drug Deliv. 2018;25(1):1234–1257:https://pmc.ncbi.nlm.nih.gov/articles/PMC6058482/ (摘要)
+- Altpeter F, et al. Advancing crop transformation in the era of genome editing. Plant Cell. 2016;28(7):1510–1520. doi:10.1105/tpc.16.00196(摘要)
+
+Doudna JA、Charpentier E. 2014 Science 346:1258096 的綜論全文這次讀不到(出版社網站擋自動讀取),只確認了摘要,頁面沒有引用。
+
+### 抗體檢測:西方墨點法與 ELISA(`immunoassay/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/immunoassay/
+
+從抗體的構造講起(Y 字形、重鏈與輕鏈、可變區專一地抓住抗原決定位,一級抗體認目標、二級抗體認一級抗體並帶著酵素),接著是西方墨點法的三步(SDS-PAGE 依大小分開、用電轉印到膜上、阻斷與抗體偵測後用冷光拍下條帶),再來是三明治 ELISA(捕捉抗體、偵測抗體、HRP 讓 TMB 變色、讀 450 nm 吸光度)與標準曲線定量,最後比較兩種方法。版型和 PCR 與電泳相同(共用 `assets/bio-lesson.js`)。
+
+- 7 章,共 106 秒,每章有字幕;最後一章播完停住
+- 第 4 章「自己調整」:阻斷(有、沒有)與清洗(不洗、洗 3 次、洗太久),左邊放大的膜表面與右邊拍到的膜跟著變(背景、雜帶、條帶亮度)
+- 第 6 章「自己調整」:樣品實際濃度(0.1 到 500 ng/mL)與稀釋倍數(不稀釋、10 倍、100 倍),看讀值落在標準曲線哪裡、推回的濃度、讀值差 ±0.05 時濃度的範圍,以及要不要再稀釋
+- 文字以台灣高中畢業看得懂為準
+
+#### 數值與示意
+
+抗體:
+
+- 抗體單體由四條鏈組成,兩條相同的重鏈、兩條相同的輕鏈,用雙硫鍵連成 Y 字形;Y 的兩個手臂是 Fab 區,末端的可變區是抗原結合的位置,柄是 Fc 區;IgG 有兩個抗原結合位、分子量約 150,000 道耳頓(OpenStax Microbiology 18.1,內文與 Figure 18.6 的表)。抗體認的是抗原表面露出的一小塊(抗原決定位,epitope),一個蛋白質抗原常有好幾個抗原決定位(同節,Figure 18.4 圖說)。
+- 西方墨點法用一級抗體認目標蛋白,再用帶著分子信標(酵素或螢光分子)的二級抗體認一級抗體(OpenStax Microbiology 20.2,Western blot 段落)。二級抗體是針對一級抗體做的抗體,例如用兔子的 IgG 免疫山羊得到山羊抗兔抗體,常接 HRP 或螢光染料(Thermo Fisher〈How to Select a Secondary Antibody〉)。頁面第 1 章的「酵素或螢光分子」與「酵素 HRP」依此。
+
+SDS-PAGE:
+
+- SDS 是陰離子清潔劑,和疏水區結合使蛋白質的二、三、四級結構變性,並帶上淨負電,使電荷質量比固定;樣品緩衝液要加還原劑(DTT 或 β-巰基乙醇)切斷雙硫鍵(Bio-Rad Tech Note 3133,第 1 頁 SDS-PAGE Conditions for MW Determination)。大部分多肽以固定的重量比結合 SDS(每 1 克多肽約 1.4 克 SDS);樣品在過量 SDS 與硫醇試劑中加熱到 70 到 100 °C 時雙硫鍵被切開(Thermo Fisher〈Overview of Electrophoresis〉)。頁面寫「每單位質量帶的負電差不多」「和質量成比例的負電」依此;溫度計畫到 95 °C 是示意(在上述範圍內;Mahmood 與 Yang 的步驟是 100 °C 加熱 5 分鐘)。
+- 帶 SDS 的蛋白質往正極移動,質量小的跑得快;膠的孔洞大小和聚丙烯醯胺濃度成反比(Thermo Fisher〈Overview of Electrophoresis〉)。
+- 估分子量:和分子量標準跑同一片膠,以 log 分子量對相對移動距離(Rf)作圖內插;只有在一段範圍內是直線,誤差約 ±10%,醣蛋白、很酸或很鹼的蛋白會跑得不照分子量(Bio-Rad Tech Note 3133,第 1 到 3 頁)。頁面的分子量標準 250、150、100、75、50、37、25、20、15、10 kDa 取自該文件 Figure 1 的 Precision Plus Protein 標準;條帶位置用 log 分子量線性對應是示意(實際兩端會彎)。
+
+轉印、阻斷與偵測(Mahmood 與 Yang 2012):
+
+- 轉印時膜放在膠與正極之間,帶負電的蛋白質從膠移到膜上;膜有硝化纖維素與 PVDF 兩種,PVDF 機械強度較好、可重複偵測,但背景較高(Theory 的 Blotting 段;Technique 的 Electrotransfer 段)。
+- 阻斷用 5% BSA 或脫脂奶粉(溶在 TBST),防止抗體非專一地黏在膜上;一級抗體與二級抗體之後各用 TBST 洗 3 次、每次 5 分鐘;清洗減少背景、洗掉沒結合的抗體,但洗太久訊號也會變弱(Technique 的 Blocking and antibody incubation 段;Theory 的 Washing, blocking and antibody incubation 段)。頁面控制項「洗 3 次」與「洗太久時條帶變淡」依此。
+- 二級抗體通常接 HRP,加 ECL 試劑後用底片記錄;背景太高常是抗體濃度太高或洗得不夠(Theory 與 Troubleshooting 段)。化學冷光受質是最靈敏的偵測方式,也可以用 CCD 數位影像系統取代底片(Thermo Fisher〈Overview of Western Blotting〉)。
+- 西方墨點法的結果通常只算半定量(Theory 的 Quantification 段)。
+- 頁面裡沒有阻斷、不洗、洗太久時背景與條帶的亮度是示意,只表現方向(背景變亮、多出雜帶、條帶變淡),不是實測數據;目標蛋白 60 kDa 也是示意。
+
+ELISA:
+
+- 三明治 ELISA:先把一級抗體加進微孔盤的每一孔(靠疏水作用黏在塑膠上),洗掉沒黏上的,再加阻斷用的蛋白(例如白蛋白或牛奶的酪蛋白);加入樣品,抗原被抓住,洗後加入接了酵素、認抗原上其他抗原決定位的二級抗體,最後加無色的受質,酵素把它變成有顏色的產物;最常用的酵素是鹼性磷酸酶與 HRP;顏色用分光光度計量吸光度,和抓到的抗原量成正比;部分孔放已知量的抗原做標準曲線;靈敏度可到每毫升奈克等級(OpenStax Microbiology 20.4,ELISA 段落與 Figure 20.24 圖說)。
+- 捕捉抗體與偵測抗體要認兩個不重疊的抗原決定位;偵測可以用直接標記的抗體,或用標記的二級抗體;TMB 被 HRP 氧化成藍色,加硫酸或磷酸後變黃(Thermo Fisher〈ELISA 概述〉)。藍色產物的吸收峰 370 與 652 nm,加酸變黃後在 450 nm 測(Thermo Fisher 1-Step TMB 產品頁,34021)。終止液是 0.16 M 硫酸,55 mL 約夠 5 個 96 孔盤(Thermo Fisher N600 產品頁)。頁面「96 孔的孔盤」「加酸」「450 nm」依此。
+- 定量:每一盤都做標準曲線,用曲線擬合軟體,四參數算法擬合最好;落在曲線上下兩端的讀值誤差較大,樣品要稀釋到曲線範圍內,算濃度時乘回稀釋倍數;每個標準品與樣品做二或三重複,CV 小於 20%(Thermo Fisher〈ELISA Data Analysis〉)。配體結合分析的反應對濃度通常是 S 形,四參數羅吉斯模型是公認的參考模型(Findlay 與 Dillard 2007 的摘要)。
+- 四參數曲線:A = d + (a − d) / (1 + (x / c)^b),a 是濃度為 0 時的吸光度(下平台)、d 是很濃時的吸光度(上平台)、c 是中點的濃度、b 決定陡度;和 GraphPad Prism 的「[Agonist] vs. response, Variable slope」寫法 Y = Bottom + X^HillSlope × (Top − Bottom) / (X^HillSlope + EC50^HillSlope) 相同。頁面取 a 0.06、b 1.15、c 4 ng/mL、d 3.0,標準品 10 ng/mL 起兩倍稀釋到 0.156 ng/mL,讀值誤差 ±0.05:都是示意值,不是某個試劑組的數據。用這組數值算:5 ng/mL 的吸光度 1.72,讀值 ±0.05 反推 4.7 到 5.3 ng/mL;0.2 ng/mL 的吸光度 0.15,反推約 0.10 到 0.30 ng/mL(上下界差 3 倍,所以頁面說靠近曲線一端時誤差大);第 5 章的 A₄₅₀ 1.29 是 3 ng/mL 代入同一條曲線。
+- 頁面「靠近曲線一端」的判斷:讀值 ±0.05 反推的上下界比值超過 1.6,或推不出邊界(示意的門檻)。
+- ELISA 與 EIA 由瑞典斯德哥爾摩大學 Peter Perlmann 與 Eva Engvall 的團隊、荷蘭 Anton Schuurs 與 Bauke van Weemen 的團隊各自同時發展(Lequin 2005 摘要);兩組的第一篇論文:Engvall 與 Perlmann,Immunochemistry 1971 年 9 月;Van Weemen 與 Schuurs,FEBS Letters 1971 年 6 月(PubMed 書目)。
+
+兩種方法比較:
+
+- 「一片膠十幾到二十幾道」:依 Bio-Rad Tech Note 3133 第 4 頁 Criterion 膠的梳子規格(12+2、18、26 孔)。
+- 在膜上看到一條預期大小的條帶,不一定代表抗體專一;多出的條帶可能是蛋白降解或修飾造成的;用在西方墨點法的抗體不一定適合其他方法(Pillai-Kastoori 等 2020,Validating antibody specificity 與 Orthogonal and independent approaches 兩段)。頁面第 7 章「較小的條帶:可能是被切斷的片段」與「同一支抗體不一定兩種方法都能用」依此;「西方墨點法的蛋白質被 SDS 攤開、ELISA 抓的是摺好的原樣」是依兩種方法的步驟(SDS 變性與否)寫的說明,原文沒有這樣比較。
+
+教學示意:抗體、蛋白質、SDS 的形狀與大小,蛋白質摺疊與攤開的樣子,樣品的條帶與亮度,背景與雜帶,ELISA 的標準品濃度、吸光度、四參數曲線的參數與讀值誤差,都是為了說明原理設定的,不是實測結果,不可用於判讀實際的實驗。
+
+#### 技術
+
+單一 HTML 檔(immunoassay/index.html),2D canvas 繪圖,共用 `assets/bio-lesson.js`(播放器)、`assets/bio-draw.js`(畫圖小工具)、`assets/bio-lesson.css`(版面),不需要建置。程式分區與修改方式見 immunoassay/MAINTENANCE.md。
+
+#### 來源連結
+
+- Mahmood T, Yang PC. Western blot: technique, theory, and trouble shooting. N Am J Med Sci. 2012;4(9):429–434. doi:10.4103/1947-2714.100998:https://pmc.ncbi.nlm.nih.gov/articles/PMC3456489/
+- Bio-Rad Tech Note 3133, Molecular Weight Determination by SDS-PAGE(Bulletin 3133):https://www.bio-rad.com/webroot/web/pdf/lsr/literature/Bulletin_3133.pdf
+- OpenStax Microbiology 18.1 Overview of Specific Adaptive Immunity:https://openstax.org/books/microbiology/pages/18-1-overview-of-specific-adaptive-immunity
+- OpenStax Microbiology 20.2 Detecting Antigen-Antibody Complexes:https://openstax.org/books/microbiology/pages/20-2-detecting-antigen-antibody-complexes
+- OpenStax Microbiology 20.4 EIAs and ELISAs:https://openstax.org/books/microbiology/pages/20-4-eias-and-elisas
+- Thermo Fisher, Overview of Electrophoresis:https://www.thermofisher.com/us/en/home/life-science/protein-biology/protein-biology-learning-center/protein-biology-resource-library/pierce-protein-methods/overview-electrophoresis.html
+- Thermo Fisher, Overview of Western Blotting:https://www.thermofisher.com/us/en/home/life-science/protein-biology/protein-biology-learning-center/protein-biology-resource-library/pierce-protein-methods/overview-western-blotting.html
+- Thermo Fisher, How to Select a Secondary Antibody:https://www.thermofisher.com/us/en/home/life-science/antibodies/secondary-antibodies/secondary-antibody-selection-guide.html
+- Thermo Fisher, ELISA 概述(Overview of ELISA):https://www.thermofisher.com/us/en/home/life-science/protein-biology/protein-biology-learning-center/protein-biology-resource-library/pierce-protein-methods/overview-elisa.html
+- Thermo Fisher, ELISA Data Analysis:https://www.thermofisher.com/us/en/home/life-science/protein-biology/protein-biology-learning-center/protein-biology-resource-library/pierce-protein-methods/elisa-data-analysis.html
+- Thermo Fisher, 1-Step TMB ELISA Substrate Solutions(34021):https://www.thermofisher.com/order/catalog/product/34021
+- Thermo Fisher, Stop Solution for TMB Substrates(N600):https://www.thermofisher.com/order/catalog/product/N600
+- Findlay JWA, Dillard RF. Appropriate calibration curve fitting in ligand binding assays. AAPS J. 2007;9(2):E260–E267:https://pmc.ncbi.nlm.nih.gov/articles/PMC2751416/
+- GraphPad Prism Curve Fitting Guide, [Agonist] vs. response, Variable slope:https://graphpad.com/guides/prism/latest/curve-fitting/reg_dr_stim_variable_2.htm
+- Lequin RM. Enzyme immunoassay (EIA)/enzyme-linked immunosorbent assay (ELISA). Clin Chem. 2005;51(12):2415–2418:https://doi.org/10.1373/clinchem.2005.051532
+- Engvall E, Perlmann P. Enzyme-linked immunosorbent assay (ELISA). Quantitative assay of immunoglobulin G. Immunochemistry. 1971;8(9):871–874. doi:10.1016/0019-2791(71)90454-x
+- Van Weemen BK, Schuurs AHWM. Immunoassay using antigen-enzyme conjugates. FEBS Lett. 1971;15(3):232–236:https://pubmed.ncbi.nlm.nih.gov/11945853/
+- Pillai-Kastoori L, et al. Antibody validation for Western blot: By the user, for the user. J Biol Chem. 2020;295(4):926–939:https://pmc.ncbi.nlm.nih.gov/articles/PMC6983856/
+
+未確認:Lequin 2005、Findlay 與 Dillard 2007 只讀到摘要(全文需要訂閱或沒有讀到);Engvall 與 Perlmann 1971、Van Weemen 與 Schuurs 1971 只核對了書目,沒有讀到全文。頁面只用到這幾篇摘要與書目層級的內容(發展的團隊與年份、S 形曲線與四參數模型)。
+
+### 流式細胞儀(`flow-cytometry/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/flow-cytometry/
+
+教學內容:流體聚焦讓細胞排成一列通過雷射、前向與側向散射光的意義、抗體上的螢光經分色鏡與濾鏡分到不同的光電倍增管、FSC 對 SSC 點圖的圈選與螢光直方圖的陰性陽性、植物細胞核的 DNA 含量(切碎法、PI 或 DAPI 染色、G1 與 G2 峰、倍性與 2C 值的算法)、靜電液滴分選。
+
+| 項目 | 內容 | 狀態與來源 |
+|---|---|---|
+| 每秒量多少 | 一般的流式細胞儀每秒約 10,000 個細胞;頁面標題寫「一秒量幾千個」,字幕寫「幾千到上萬」 | McKinnon KM 2018,Curr Protoc Immunol 120:5.1.1–5.1.11(PMC5939936),Mass Cytometers 一節的比較 |
+| 植物細胞核的速度 | 細胞核濃度低,每秒常只有 20 到 50 個;一般寫法是每秒 100 到 1,000 個 | Doležel J, et al. 2007,Nat Protoc 2:2233–2244,第 2238 頁 Step 2A(ii) 與第 2233 頁引言 |
+| 流體聚焦 | 鞘液(鹽水或 PBS)流得比樣品快,把樣品擠成中心的細流,細胞排成一列 | Adan A, et al. 2017,Crit Rev Biotechnol 37:163–176,Fluidic system(early online 版第 2 頁);Thermo Fisher「Fluidics of a Flow Cytometer」 |
+| 流速與準度 | 加壓或提高流速時中心流變粗、可能同時通過多個細胞、數據變散;DNA 含量與細胞週期分析用低流速、低濃度;免疫表型這類定性測量可用高流速 | Thermo Fisher「Fluidics of a Flow Cytometer」;Adan 2017 Fluidic system;Doležel 2007 第 2238 頁(流速太高峰變寬、CV 變大) |
+| 前向散射 FSC | 沿雷射方向收集,主要是繞射光,正比於細胞表面積或大小(只是大致) | Adan 2017 Optical system 與 Figure 2;McKinnon 2018 Introduction |
+| 側向散射 SSC | 約 90° 收集,反映顆粒與內部複雜度 | Adan 2017 Optical system;McKinnon 2018 |
+| 偵測器 | FSC 光較強,常用光二極體;SSC 與螢光較弱,用光電倍增管(PMT);光變成電流再變成電壓脈衝,細胞在光束中心時最高 | Adan 2017 Signal detection(第 3 頁);PMT 可把單一光子的能量放大數百萬倍、光二極體用在最亮的前向散射見 Thermo Fisher「Optics of a Flow Cytometer」(https://www.thermofisher.com/tw/zt/home/life-science/cell-analysis/cell-analysis-learning-center/molecular-probes-school-of-fluorescence/flow-cytometry-basics/flow-cytometry-fundamentals/optics-flow-cytometer.html) |
+| 濾鏡與分色鏡 | 帶通濾鏡只讓一段波長通過;長通、短通;分色鏡反射一段波長、讓其他通過,把光導到各偵測器 | Adan 2017 Optical system;McKinnon 2018;Thermo Fisher「Optics of a Flow Cytometer」(525/30 只讓 510 到 540 nm 通過、500LP 分色鏡讓 500 nm 以上穿過並反射 500 nm 以下) |
+| 螢光染料 | FITC 激發/放射約 495/520 nm(綠)、PE 約 565/578 nm(橘黃),都能被 488 nm 的氬離子雷射激發;螢光強度正比於結合上去的染料量 | Adan 2017 第 1、5 頁 |
+| 圈選與直方圖 | 在 FSC 對 SSC 圖上圈出淋巴球等族群,之後只看圈內細胞的螢光;直方圖橫軸是訊號、縱軸是細胞數;表面標記用對數刻度,DNA 用線性刻度 | Adan 2017 Data analysis、Gates and regions(第 6 頁)、Signal detection(第 3 頁) |
+| 白血球在點圖上的位置 | 顆粒球 SSC 高;淋巴球較小、顆粒少;碎片的 FSC 與 SSC 最低 | Boster Bio「Flow Cytometry Gating Strategies」;Adan 2017 Figure 8 |
+| 植物細胞核的製備 | 不量整個植物細胞(大小、形狀、細胞核位置、染劑不易進入、自發螢光);用刀片在冰的緩衝液裡切新鮮嫩葉(約 20 mg、1 ml),過 42 µm 尼龍網,加染劑 | Doležel 2007 第 2234 頁(原因與 Galbraith 的切碎法)、第 2236 到 2237 頁(材料與 Step 1A) |
+| 染劑 | PI 與 EB 插入雙股、不挑鹼基,也會染雙股 RNA,要同時加 RNase(PI 50 µg/ml、RNase 50 µg/ml);DAPI 偏好 AT,解析度高、不用 RNase,適合同一系列的倍性比較,不適合算絕對含量 | Doležel 2007 第 2235 頁與表 1、第 2237 頁 Step 1A(vi)、第 2240 頁 Step 2D(iii) |
+| G1 與 G2 峰 | 新鮮葉片通常一個大的 G1 峰、一個小的 G2 峰;G2 在 G1 的約 2 倍位置(儀器線性的檢查是 4C/2C 在 1.98 到 2.02);DNA 直方圖一般用線性刻度 | Doležel 2007 第 2237 頁(線性檢查)、第 2241 到 2242 頁 Anticipated results 與 Figure 1 |
+| 峰的品質 | CV = 峰的標準差 ÷ 峰的平均位置 × 100%;小於 3% 算好,超過 5% 不採用;CV 只在線性刻度有意義;量 5,000 個 | Doležel 2007 第 2238 到 2239 頁 Step 2A(iv)–(v) |
+| 倍性 | 外標準:把已知二倍體的 G1 調在 1,024 道的第 200 道左右;樣品倍性 = 參考倍性 × 樣品 G1 位置 ÷ 參考 G1 位置;峰重疊表示倍性相同;只靠 DNA 量推的倍性要寫「DNA 倍性」 | Doležel 2007 第 2239 頁 Step 2B、2C,第 2235 頁(用語,引 Suda et al. 2006 Taxon 55:447) |
+| 2C 值 | 內標準與樣品一起切、一起染,用 PI;樣品 2C = 標準品 2C × 樣品 G1 位置 ÷ 標準品 G1 位置;標準品與樣品相差不超過兩倍,也至少差 15 到 20% | Doležel 2007 第 2239 到 2240 頁 Step 2D |
+| 標準品 | 番茄 *Solanum lycopersicum* 'Stupické polní rané' 2C = 1.96 pg(表 2 另有蘿蔔 1.11、大豆 2.50、玉米 5.43、豌豆 9.09、黑麥 16.19、蠶豆 26.90、洋蔥 34.89 pg) | Doležel 2007 第 2235 頁表 2 |
+| 換算 | 1 pg DNA = 0.978 × 10⁹ bp | Doležel 2007 第 2240 頁 Step 2D(viii),引 Doležel et al. 2003 Cytometry A 51:127 |
+| 細胞分選 | 噴嘴振動讓液流斷成規則的液滴;含要收的細胞的液滴帶電,正電的液滴偏向負極板,沒帶電的進廢液;一滴通常只包一個細胞 | Adan 2017 Electrostatic cell sorting 與 Figure 4;McKinnon 2018 Cell Sorters;Basu S, et al. 2010,J Vis Exp (41):1546(doi:10.3791/1546,PMC3144656) |
+| 液滴延遲 | 細胞從雷射流到液滴斷開點有一段時間差,儀器在那時給電,液滴斷開後帶著電 | US Patent 6,372,506 B1(Becton Dickinson,2002)Background |
+| 示意值 | 第 1 章點圖與計數速度;第 2 章樣品流寬度、細胞間隔與分布寬度;第 3 章 FSC、SSC 與大小、顆粒的對應(線性)與三群白血球的位置;第 4 章蛋白與抗體的數量、光路的排法;第 5 章各族群的位置、大小、陽性比例(70%、15%、5%)與螢光強度;第 6、7 章峰的 CV 3%、細胞核數、G2 比例、碎片、樣品 2C = 1.30 pg(番茄的峰位置由此換算為第 301.5 通道);第 8 章液滴大小、速度、延遲與偏轉路徑 | 示意,不是實驗結果 |
+
+### 蛋白質質譜定序(`proteomics/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/proteomics/
+
+蛋白質怎麼用質譜認出來(由下而上的蛋白質體學,bottom-up proteomics):先用胰蛋白酶切成胜肽,經逆相液相層析分開、電灑游離帶上質子,第一次質譜(MS1)量出胜肽離子的 m/z,挑訊號強的離子碰撞碎裂(CID),從碎片(b 與 y 離子)相鄰峰的質量差讀出胺基酸,最後和資料庫裡「理論上切開、碎開」的胜肽比對。生化原理分區的教材,7 章,用共用播放器 `assets/bio-lesson.js`。
+
+- 第 1 章:胺基酸鏈、兩個胺基酸脫水接成肽鍵、20 種殘基的單同位素質量(框出 I 與 L 一樣重、Q 與 K 只差 0.036)
+- 第 2 章:三段示意蛋白質(甲、乙、丙)任選,胰蛋白酶沿鏈走,在 K、R 後面切、後面是 P 不切,列出每段胜肽的序列、長度與質量
+- 第 3 章:乙腈比例增加,四個胜肽依疏水性先後流出管柱,層析圖一支一支長出,出口接電灑噴針
+- 第 4 章:游標沿層析圖移到選定的胜肽,看那一刻的 MS1;放大看同位素峰間隔 0.5(2 價),算 (M + 2 × 1.007) ÷ 2,挑最強的離子
+- 第 5 章:碰撞室裡胜肽依序斷在每個肽鍵,分成 b(藍)與 y(紅)兩段並標 m/z,下方的 MS/MS 一根一根長出;點兩顆珠子之間可以自己指定斷點
+- 第 6 章:讀序列;y 系列由右往左(從 [M+H]⁺ 起)、b 系列由左往右(從 H⁺ 起),逐一標出相鄰兩點的質量差與胺基酸,格子依 N 端到 C 端填字
+- 第 7 章:2,000 條隨機蛋白質加三段示意蛋白質組成的資料庫,母離子容許誤差 ±0.5、±0.05、±0.005 Da 時的候選數,與碎片比對的前五名
+- 控制項:蛋白質(甲、乙、丙)、跟著看的胜肽(1 到 4)、讀哪一組(y 或 b)、母離子質量的容許誤差;第 5 章可點畫面
+- 文字以台灣高中畢業看得懂為準;電灑游離與離子阱本身連到「離子阱質譜」(`lcq/`)
+
+#### 數值與示意
+
+質量(單位 Da,單同位素):
+
+- 殘基質量照 Matrix Science「Amino acid reference data」:G 57.021464、A 71.037114、S 87.032028、P 97.052764、V 99.068414、T 101.047679、C 103.009185、L 與 I 113.084064、N 114.042927、D 115.026943、Q 128.058578、K 128.094963、E 129.042593、M 131.040485、H 137.058912、F 147.068414、R 156.101111、Y 163.06332、W 186.079313(頁面顯示到小數 2 位)。
+- 質子 1.007276(NIST CODATA 2022:1.0072764665789 u);水 18.010565(Unimod 元素質量 H 1.007825035、O 15.99491463 算出);¹³C 13.00335483507(NIST),同位素峰間隔 1.003355 ÷ 電荷。
+- 公式:中性胜肽 M = 殘基總和 + 18.010565;[M+zH]^z+ 的 m/z = (M + z × 1.007276) ÷ z;帶 1 個電荷的 b_i = 前 i 個殘基總和 + 1.007276,y_i = 後 i 個殘基總和 + 18.010565 + 1.007276(Matrix Science「Peptide fragmentation」:b 的 Mr = [N] + [M] − H、y 的 Mr = [C] + [M] + H,N 端基團 H、C 端基團 OH,再加質子)。互補關係 b_i + y_(n−i) = [M+H]⁺ + 1.007276。
+- 驗證:三段示意蛋白質的 12 個胜肽,b、y 與 [M+H]⁺ 和 Protein Prospector MS-Product 6.9.1 一致(最大差 0.00006,對方印到小數 4 位);切法與中性質量和 Expasy PeptideMass(Trypsin、不漏切、單同位素)一致。手算例子 VNLQDAFGIK:殘基總和 1085.586945、M 1103.597510、[M+H]⁺ 1104.6048、[M+2H]²⁺ 552.8060、b2 214.1186、y1 147.1128、y2 260.1969、y3 317.2183;y3 − y2 = 57.02146(G)、y2 − y1 = 113.08406(L 或 I)(詳見 `proteomics/MAINTENANCE.md`)。
+- 有些表格用氫原子質量 1.0078 算 b、y(例如 Medzihradszky 與 Chalkley 2015 的 Table 3),會比用質子大 0.00055(一個電子)。
+
+原理:
+
+- 20 種常見胺基酸、差在側鏈;羧基與胺基接起來放出一分子水(肽鍵);N 端、C 端:OpenStax Biology 2e 3.4 的 Amino Acids 小節。
+- 胰蛋白酶只在 R、K 的羧基端切(Olsen 等 2004,高準確度質譜下非胰蛋白酶胜肽只來自蛋白質 C 端與內部脯胺酸前的斷片);後面是 P 時通常不切(Zhang 等 2013 的 Table 1 規則「-K,R-↑-Z- not -K,R-↑-P-」、Expasy PeptideCutter),但實際上 P 前面也有相當數量的切斷(Rodriguez 等 2008),頁面寫「通常不切」。
+- 胜肽比整條蛋白質容易分離、游離與碎裂(Zhang 等 2013 第 1 節);胜肽依疏水性分離後直接從毛細管尖端電灑(第 2.5 節);胰蛋白酶胜肽在 pH 2.7 通常帶 +2(第 3.1.1 節);先做 precursor scan 找訊號強的離子,逐一留下來碎裂(第 2.6 節);CID 是加速離子去撞 target gas,最常見的是肽鍵斷裂產生的 b、y(第 2.6 節與 Figure 4);用蛋白質資料庫產生理論碎片比對,只考慮長度 6 到 50 的胰蛋白酶胜肽(第 5.1 節);一般要兩個胜肽才算鑑定到一個蛋白質(第 5.2 節)。
+- 電荷留在 N 端那段是 a、b、c,留在 C 端那段是 x、y、z;低能量 CID(三段四極柱或離子阱)主要沿主鏈斷,產生 b 與 y(Matrix Science)。離子阱裡的碰撞氣體是氦(見本站「離子阱質譜」一節)。
+- 讀序列:同一系列相鄰離子的質量差就是殘基;胰蛋白酶胜肽的 y 離子多;2+ 母離子的碎片多半帶 1 個電荷;Leu 與 Ile 在 CID 分不出來;Gln 與 Lys 差 36 mmu,量得夠準才分得開;b1 通常量不到;m/z 147 表示 C 端是 Lys、175 是 Arg(Medzihradszky 與 Chalkley 2015,第 II 節與 Table 1、Table 5 的註)。
+- 質量量得越準,候選越少:Olsen 等 2004 的摘要(高準確度使鑑定的可信度提高百倍以上)。
+
+示意(頁面「資料來源」最後一條也有寫):
+
+- 三段蛋白質序列(甲 GKVNLQDAFGIKSEDYTGWNKARHDGTAKPVSFYRELPAFVLSR、乙 GSRVLEAFDTPYKRNIGTEAVSRPEKFYAGLLVDKSQDHWLR、丙 AGVKEYTDIAKPLSGRNFEQHGAVSKRGWLTEPYLDIKSAFVQDLR)是自己編的,刻意不放 C 與 M(實驗上常被修飾),每段切出 4 個 6 個胺基酸以上的胜肽,並各有一處 K-P 或 R-P。
+- 流出時間:Browne 等 1982 的 TFA 滯留係數(Expasy ProtScale)加總後換算,rt = 10 + (加總 + 10) × 0.3 分鐘;峰寬(σ 0.32 分)、乙腈 5% 到 45%、MS1 強度、背景離子、同位素峰高度(Poisson,λ = 0.000536 × M)、碎片強度(y 比 b 強)都是示意。所有胜肽都當成帶 2 個電荷。
+- 資料庫:2,000 條隨機蛋白質(長度 150 到 579,胺基酸比例照 UniProtKB/Swiss-Prot 2026_03 的統計)加三段示意蛋白質,切成 6 到 50 個胺基酸、不漏切,共 44,347 個胜肽。例如 VNLQDAFGIK(M 1103.598)在 ±0.5、±0.05、±0.005 Da 內分別有 27、15、2 個候選;碎片在 ±0.02 內比對(只比 b 與 y),答案 17 根全對上,次高的只有 2 根。這些數字只是示範量級,不是實際搜尋的結果。
+
+教學示意:管柱裡色塊等速移動(實際上胜肽多半先停在管柱前端,等乙腈夠多才往前走);碎片只畫 1+ 的 b 與 y;比對分數只數「對上幾根」,不是搜尋引擎的計分;不可用於實樣鑑定。
+
+#### 技術
+
+單一 HTML 檔(proteomics/index.html),共用 `assets/bio-lesson.js`(播放器)、`assets/bio-draw.js`(畫圖)、`assets/bio-lesson.css`,不需要建置、沒有外部依賴;資料庫在瀏覽器裡產生(桌機約 60 毫秒,頁面載入後閒置時先做)。入口卡片圖 `assets/proteomics.svg`。程式分區、每章的時間點與修改方式見 proteomics/MAINTENANCE.md。
+
+#### 來源連結
+
+- OpenStax Biology 2e, 3.4 Proteins(Amino Acids):https://openstax.org/books/biology-2e/pages/3-4-proteins
+- Matrix Science, Amino acid reference data:https://www.matrixscience.com/help/aa_help.html
+- Matrix Science, Peptide fragmentation:https://www.matrixscience.com/help/fragmentation_help.html
+- NIST CODATA 2022 質子質量:https://physics.nist.gov/cgi-bin/cuu/Value?mpu ;Unimod 元素質量:https://www.unimod.org/masses.html ;NIST 碳的同位素質量:https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ele=C
+- Zhang Y, et al. Protein analysis by shotgun/bottom-up proteomics. Chem Rev. 2013;113(4):2343–2394:https://pmc.ncbi.nlm.nih.gov/articles/PMC3751594/
+- Olsen JV, et al. Trypsin cleaves exclusively C-terminal to arginine and lysine residues. Mol Cell Proteomics. 2004;3(6):608–614:https://doi.org/10.1074/mcp.T400003-MCP200
+- Expasy PeptideCutter 的酵素規則:https://web.expasy.org/peptide_cutter/peptidecutter_enzymes.html ;Rodriguez J, et al. Does trypsin cut before proline? J Proteome Res. 2008;7(1):300–305:https://doi.org/10.1021/pr0705035
+- Medzihradszky KF, Chalkley RJ. Lessons in de novo peptide sequencing by tandem mass spectrometry. Mass Spectrom Rev. 2015;34(1):43–63:https://pmc.ncbi.nlm.nih.gov/articles/PMC4367481/
+- Tripet B, et al. J Chromatogr A. 2007;1141(2):212–225:https://pmc.ncbi.nlm.nih.gov/articles/PMC2722105/ ;Browne CA, et al. Anal Biochem. 1982;124:201–208 的 TFA 滯留係數:https://web.expasy.org/protscale/pscale/HPLCTFA.html
+- UniProtKB/Swiss-Prot 2026_03 統計:https://web.expasy.org/docs/relnotes/relstat.html
+- 驗證用的工具:Protein Prospector MS-Product(https://prospector.ucsf.edu/prospector/cgi-bin/msform.cgi?form=msproduct)、Expasy PeptideMass(https://web.expasy.org/peptide_mass/)
+
+未確認:Steen H, Mann M. Nat Rev Mol Cell Biol. 2004;5:699–711 與 Aebersold R, Mann M. Nature. 2003;422:198–207 全文需訂閱,這次沒有讀到內文,沒有拿來當依據。三段蛋白質序列、流出時間、強度、資料庫都是示意。
 
 ## 數據畫圖(plot/)
 

@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>中心法則:DNA 怎麼複製、怎麼變成蛋白質</title>
+<meta name="description" content="用動畫看 DNA 的雙股結構、複製叉上的分工、Meselson 與 Stahl 證明半保留複製的離心實驗、轉錄與 RNA 加工、核糖體的轉譯,以及改一個鹼基會造成哪一種突變。可以自己調世代數、換假說對照,也可以挑位置改鹼基。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="中心法則:DNA 怎麼複製、怎麼變成蛋白質">
+<meta property="og:description" content="用動畫看 DNA 怎麼複製、怎麼轉錄成 mRNA、再由核糖體轉譯成蛋白質;可以自己調世代數看 Meselson 與 Stahl 的離心結果,也可以改一個鹼基看結果。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/central-dogma/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/central-dogma.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="中心法則:DNA 雙股螺旋、轉錄出的 mRNA 與核糖體接出的胺基酸鏈">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/central-dogma/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理"><a href="../">← 儀器入口</a><a href="./" aria-current="page">中心法則</a><a href="../pcr/">PCR 與電泳</a><a href="../sequencing/">DNA 定序</a><a href="../dna-markers/">DNA 鑑定</a><a href="../cloning/">基因選殖</a><a href="../terpene-synthase/">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/">抗體檢測</a><a href="../flow-cytometry/">流式細胞儀</a><a href="../proteomics/">蛋白質定序</a></nav></div>
+<header class="top wrap">
+  <h1>中心法則 <span class="k">DNA 複製、轉錄、轉譯</span></h1>
+  <p class="lede">DNA 靠鹼基配對複製自己;要用到某個基因時,先轉錄成 mRNA,再由核糖體照著三個一組的密碼子接出蛋白質。可以自己調世代數看 Meselson 與 Stahl 的離心結果,也可以改一個鹼基,看蛋白質會變成怎樣。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="中心法則動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <ul>
+      <li>DNA 是兩股反向平行的雙股螺旋:骨架是糖與磷酸,鹼基在中間配對,A 與 T 之間兩個氫鍵、G 與 C 之間三個;直徑約 2 nm,每轉一圈約 10 個鹼基對(3.4 nm)。</li>
+      <li>複製:解旋酶打開雙股,引子酶做一小段 RNA 引子(約 5 到 10 個核苷酸),DNA 聚合酶只能把核苷酸接在 3′ 端;前導股連續合成,延遲股做成一段段岡崎片段,引子換成 DNA 後由接合酶接起來。大腸桿菌每秒約接 1000 個核苷酸。</li>
+      <li>Meselson 與 Stahl(1958)讓大腸桿菌在 ¹⁵N 裡長 14 代後換到 ¹⁴N,用氯化銫密度梯度離心:第 1 代只有中間密度的一條帶,第 2 代中間與輕各一半,符合半保留複製。</li>
+      <li>轉錄:RNA 聚合酶從啟動子開始讀模板股,不需要引子;RNA 由 5′ 往 3′ 長,用 U 不用 T。真核生物的前驅 mRNA 還要加 5′ 帽、約 200 個 A 的尾巴,並剪掉內含子。</li>
+      <li>轉譯:核糖體一次讀一個密碼子,tRNA 的反密碼子和它配對並帶來胺基酸。64 個密碼子裡 61 個對應胺基酸、3 個是終止(UAA、UAG、UGA);AUG 是甲硫胺酸,也是起始。改一個鹼基常見三種結果:同義、錯義、無義突變。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Clark MA, et al. Biology 2e. OpenStax; 2018. 第 14 章 <a href="https://openstax.org/books/biology-2e/pages/14-2-dna-structure-and-sequencing">14.2</a>、<a href="https://openstax.org/books/biology-2e/pages/14-3-basics-of-dna-replication">14.3</a>、<a href="https://openstax.org/books/biology-2e/pages/14-4-dna-replication-in-prokaryotes">14.4</a>(反向平行與 5′、3′ 端,A 與 T 之間兩個、G 與 C 之間三個氫鍵,每對相距 0.34 nm、每圈 10 對、直徑 2 nm;三種複製假說;解旋酶、5 到 10 個核苷酸的 RNA 引子、聚合酶只往 5′→3′ 接且需要 3′-OH、岡崎片段、DNA pol I 與接合酶、每秒約 1000 個核苷酸)</li>
+      <li>同一本書第 15 章 <a href="https://openstax.org/books/biology-2e/pages/15-1-the-genetic-code">15.1</a>、<a href="https://openstax.org/books/biology-2e/pages/15-2-prokaryotic-transcription">15.2</a>、<a href="https://openstax.org/books/biology-2e/pages/15-4-rna-processing-in-eukaryotes">15.4</a>、<a href="https://openstax.org/books/biology-2e/pages/15-5-ribosomes-and-protein-synthesis">15.5</a>(64 個密碼子中 61 個對應胺基酸、AUG 起始;模板股與編碼股、啟動子;7-甲基鳥苷的帽、約 200 個 A 的尾巴、剪接體;核糖體的 A、P、E 位、反密碼子、終止密碼子與釋放因子)</li>
+      <li>Meselson M, Stahl FW. The replication of DNA in Escherichia coli. Proc Natl Acad Sci USA. 1958;44(7):671–682. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC528642/">PMC528642</a>(¹⁵NH₄Cl 培養 14 代後加入十倍過量的 ¹⁴NH₄Cl;CsCl 溶液 1.71 g/cm³,每分鐘 44,770 轉離心 20 小時;兩種 DNA 的密度差 0.014 g/cm³;第 1 代只有半標記的中間帶,第 2 代半標記與未標記各半)</li>
+      <li>Parker N, et al. Microbiology. OpenStax; 2016. <a href="https://openstax.org/books/microbiology/pages/11-3-rna-transcription">11.3</a>(RNA 聚合酶不需要引子)、<a href="https://openstax.org/books/microbiology/pages/11-5-mutations">11.5</a>(同義、錯義、無義突變)</li>
+      <li>標準遺傳密碼表:<a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?chapter=tgencodes#SG1">NCBI The Genetic Codes, table 1</a>;HBB 的序列 <a href="https://www.ncbi.nlm.nih.gov/nuccore/NM_000518.5">NM_000518.5</a>;鐮刀型紅血球的變異 <a href="https://www.ncbi.nlm.nih.gov/clinvar/variation/15333/">ClinVar VCV000015333</a>(c.20A&gt;T,p.Glu7Val,從成熟蛋白質算起稱為 Glu6Val)與 <a href="https://medlineplus.gov/genetics/gene/hbb/">MedlinePlus Genetics: HBB</a>。</li>
+      <li>動畫裡轉錄與轉譯用的序列(啟動子 TAGCTA,mRNA 為 GCC AUG GCU UUC AAA GGC UGG UAA)、螺旋與梯子的比例、引子與岡崎片段的長度、複製叉的速度、酵素與核糖體的形狀大小、離心管裡帶的位置與粗細都是示意,不是實測;「實際結果」那一排是依論文描述的結果畫成整數代的理想帶。HBB 的序列與密碼表是真的。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化原理・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, FONT, seg, ease, lerp, complement, rng, mix } from '../assets/bio-draw.js';
+import { createRotateHint } from '../assets/mobile-panels.js';
+
+// ===== 共用 =====
+const fin = (t, a, d = 0.7) => ease(seg(t, a, a + d)); // 從 a 秒開始淡入
+const fout = (t, a, d = 0.7) => 1 - ease(seg(t, a, a + d)); // 從 a 秒開始淡出
+const bump = (u) => (Math.abs(u) < 1 ? (1 + Math.cos(Math.PI * u)) / 2 : 0); // 平滑的小山:u = 0 時是 1,|u| ≥ 1 時是 0
+function fade(g, a, fn) { if (a <= 0.004) return; g.ctx.save(); g.ctx.globalAlpha *= a; fn(); g.ctx.restore(); }
+// 大一點的鹼基方塊(第 1 章的梯子與圖例、第 4 章的配對表);方塊裡的字不跟著放大
+function bigBase(g, x, y, w, h, b) {
+  const ctx = g.ctx;
+  g.rrect(x - w / 2, y, w, h, 5, C[b]);
+  ctx.save(); ctx.font = `800 ${Math.round(Math.min(w, h) * 0.5)}px ${FONT}`; ctx.fillStyle = '#0b1111'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(b, x, y + h / 2 + 1); ctx.restore();
+}
+// 一股核酸沿著每個鹼基自己的位置畫(骨架是折線):pts[i] = [x, y];dir 1 鹼基朝下、−1 朝上
+function strandPts(g, pts, seq, { dir = 1, color = C.backbone, lw = 4, bw = 20, bh = 22, from = 0, to = seq.length, glow } = {}) {
+  if (to <= from) return;
+  const ctx = g.ctx;
+  const ext = (i, j) => { const [x1, y1] = pts[i], [x2, y2] = pts[j], d = Math.hypot(x2 - x1, y2 - y1) || 1; return [x1 - ((x2 - x1) / d) * 10, y1 - ((y2 - y1) / d) * 10]; };
+  const s = to - from > 1 ? ext(from, from + 1) : [pts[from][0] - 10, pts[from][1]];
+  const e = to - from > 1 ? ext(to - 1, to - 2) : [pts[from][0] + 10, pts[from][1]];
+  ctx.save(); ctx.beginPath(); ctx.moveTo(s[0], s[1]);
+  for (let i = from; i < to; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.lineTo(e[0], e[1]);
+  ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke(); ctx.restore();
+  for (let i = from; i < to; i++) g.base(pts[i][0], pts[i][1] + (dir > 0 ? lw / 2 : -lw / 2), seq[i], { w: bw, h: bh, dir, glow: glow ? glow(i) : false });
+}
+
+// 標準遺傳密碼表(NCBI 第 1 號表):第一、二、三個鹼基都依 U、C、A、G 的順序,* 是終止密碼子
+const CODE_ORDER = 'UCAG';
+const CODE_AAS = 'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';
+const aaOf = (codon) => CODE_AAS[CODE_ORDER.indexOf(codon[0]) * 16 + CODE_ORDER.indexOf(codon[1]) * 4 + CODE_ORDER.indexOf(codon[2])];
+const AA = { A: ['Ala', '丙胺酸'], R: ['Arg', '精胺酸'], N: ['Asn', '天門冬醯胺'], D: ['Asp', '天門冬胺酸'], C: ['Cys', '半胱胺酸'], Q: ['Gln', '麩醯胺酸'], E: ['Glu', '麩胺酸'], G: ['Gly', '甘胺酸'], H: ['His', '組胺酸'], I: ['Ile', '異白胺酸'], L: ['Leu', '白胺酸'], K: ['Lys', '離胺酸'], M: ['Met', '甲硫胺酸'], F: ['Phe', '苯丙胺酸'], P: ['Pro', '脯胺酸'], S: ['Ser', '絲胺酸'], T: ['Thr', '蘇胺酸'], W: ['Trp', '色胺酸'], Y: ['Tyr', '酪胺酸'], V: ['Val', '纈胺酸'] };
+const aaName = (a) => (a === '*' ? '終止' : `${AA[a][1]}(${AA[a][0]})`);
+// 胺基酸的圓珠
+function aaBead(g, x, y, a) {
+  g.circle(x, y, 18, C.mint, '#0b1111', 1.5);
+  g.text(x, y + 0.5, AA[a][0], { size: 13, weight: 800, color: '#0b1111', align: 'center', max: 31 });
+}
+
+// ===== 第 1 章:DNA 的結構 =====
+const HX0 = 150, HX1 = 810, HYC = 268, HA = 66, HP = 236; // 螺旋:左右端、中線、半徑(直徑代表約 2 nm)、一圈的長度(代表 3.4 nm、10 個鹼基對)
+const HSEQ = (() => { const R = rng(5); let s = ''; for (let i = 0; i < 40; i++) s += 'ATGC'[Math.floor(R() * 4)]; return s; })();
+const LTOP = 'AGCTGA', LBOT = complement(LTOP); // 攤平的梯子:上股由左到右是 5′→3′
+const LX = (i) => 172 + i * 88, LYT = 160, LYB = 380; // 第 i 對的糖在 x;上下兩股骨架的高度
+const SPX = 724; // 右邊說明欄的左緣
+
+function helix(g, t, flat) {
+  const ph = t * 0.9, off = 0.78 * Math.PI, step = HP / 10; // 兩股錯開不到半圈,看得出大溝與小溝
+  const th = (x) => (2 * Math.PI * (x - HX0)) / HP + ph;
+  const yA = (x) => lerp(HYC + HA * Math.sin(th(x)), LYT, flat);
+  const yB = (x) => lerp(HYC + HA * Math.sin(th(x) + off), LYB, flat);
+  // 後面的骨架暗一點、細一點,鹼基對畫在中間,前面的骨架最後畫
+  const back = (yf, sh, front) => {
+    for (let x = HX0; x < HX1; x += 3) {
+      if ((Math.cos(th(x + 1.5) + sh) >= 0) !== front) continue;
+      g.line(x, yf(x), x + 3, yf(x + 3), front ? C.backbone : '#5e6d68', front ? 4.5 : 3);
+    }
+  };
+  back(yA, 0, false); back(yB, off, false);
+  for (let i = 0; HX0 + (i + 0.5) * step < HX1; i++) {
+    const x = HX0 + (i + 0.5) * step, y1 = yA(x), y2 = yB(x), ym = (y1 + y2) / 2, b = HSEQ[i % HSEQ.length];
+    g.line(x, y1, x, ym, C[b], 3); g.line(x, ym, x, y2, C[complement(b)], 3);
+  }
+  back(yA, 0, true); back(yB, off, true);
+}
+function pentagon(g, x, y, r, up) {
+  const ctx = g.ctx; ctx.beginPath();
+  for (let k = 0; k < 5; k++) { const a = (up ? -Math.PI / 2 : Math.PI / 2) + (k * 2 * Math.PI) / 5; ctx[k ? 'lineTo' : 'moveTo'](x + r * Math.cos(a), y + r * Math.sin(a)); }
+  ctx.closePath(); ctx.fillStyle = '#26372f'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = C.backbone; ctx.stroke();
+}
+function phosphate(g, x, y) { g.circle(x, y, 12, '#15232a', C.blue, 2); g.text(x, y + 0.5, 'P', { size: 12, weight: 700, color: C.blue, align: 'center' }); }
+function ladder(g, t) {
+  const n = LTOP.length, hb = fin(t, 8.6, 0.8);
+  g.line(LX(0) - 44, LYT, LX(n - 1) + 34, LYT, C.backbone, 3);
+  g.line(LX(0) - 34, LYB, LX(n - 1) + 44, LYB, C.backbone, 3);
+  for (let i = 0; i < n; i++) {
+    const x = LX(i), bt = LTOP[i];
+    g.line(x, LYT + 14, x, LYT + 26, C.backbone, 3);
+    g.line(x, LYB - 26, x, LYB - 14, C.backbone, 3);
+    bigBase(g, x, LYT + 24, 42, 54, bt);
+    bigBase(g, x, LYB - 78, 42, 54, LBOT[i]);
+    const k = bt === 'A' || bt === 'T' ? 2 : 3; // 氫鍵數
+    fade(g, hb, () => { for (let j = 0; j < k; j++) { const dx = (j - (k - 1) / 2) * 11; g.line(x + dx, LYT + 82, x + dx, LYB - 82, 'rgba(240,243,238,.85)', 2, [3, 3]); } });
+  }
+  // 上股:磷酸在糖的左邊(5′ 側);下股方向相反,磷酸在右邊
+  for (let i = 0; i < n; i++) { phosphate(g, LX(i) - 44, LYT); pentagon(g, LX(i), LYT, 16, true); phosphate(g, LX(i) + 44, LYB); pentagon(g, LX(i), LYB, 16, false); }
+  g.text(LX(n - 1) + 38, LYT, 'OH', { size: 13, weight: 700, color: C.ink2, mono: true });
+  g.text(LX(0) - 38, LYB, 'OH', { size: 13, weight: 700, color: C.ink2, mono: true, align: 'right' });
+}
+function structPanel(g, t) {
+  const x = SPX;
+  fade(g, fin(t, 4.9, 0.8), () => {
+    phosphate(g, x + 14, 150); g.text(x + 38, 150, '磷酸', { size: 15, color: C.ink2 });
+    pentagon(g, x + 14, 192, 14, true); g.text(x + 38, 192, '去氧核糖(糖)', { size: 15, color: C.ink2 });
+    bigBase(g, x + 14, 221, 22, 26, 'A'); g.text(x + 38, 234, '鹼基:A、T、G、C', { size: 15, color: C.ink2 });
+  });
+  fade(g, fin(t, 8.7, 0.8), () => {
+    [['A', 'T', 2, '兩個氫鍵', x + 40], ['G', 'C', 3, '三個氫鍵', x + 160]].forEach(([a, b, k, s, cx]) => {
+      bigBase(g, cx, 270, 24, 26, a); bigBase(g, cx, 314, 24, 26, b);
+      for (let j = 0; j < k; j++) { const dx = (j - (k - 1) / 2) * 7; g.line(cx + dx, 299, cx + dx, 311, C.ink, 2, [2, 2]); }
+      g.text(cx, 360, s, { size: 14, weight: 700, align: 'center' });
+    });
+  });
+  fade(g, fin(t, 12.6, 0.8), () => {
+    g.text(x, 404, '反向平行', { size: 17, weight: 700, color: C.mint });
+    g.text(x, 432, '5′、3′ 是糖上碳的編號', { size: 13, color: C.ink2 });
+    g.text(x, 456, '5′ 端露出磷酸', { size: 13, color: C.ink2 });
+    g.text(x, 480, '3′ 端露出 OH', { size: 13, color: C.ink2 });
+  });
+}
+function drawStructure(g, t) {
+  // 0 到 4 秒:雙股螺旋;4 秒起攤平成梯子
+  const flat = ease(seg(t, 4, 5.2));
+  fade(g, fout(t, 4.3, 1), () => helix(g, t, flat));
+  fade(g, fin(t, 0.6) * fout(t, 3.8, 0.5), () => {
+    g.text(56, 60, '雙股螺旋', { size: 22, weight: 700 });
+    const xa = 420, xb = xa + HP, yb = HYC - HA - 22;
+    g.line(xa, yb, xb, yb, C.mint, 1.6); g.line(xa, yb, xa, yb + 10, C.mint, 1.6); g.line(xb, yb, xb, yb + 10, C.mint, 1.6);
+    g.text((xa + xb) / 2, yb - 20, '轉一圈約 10 個鹼基對(3.4 nm)', { size: 15, color: C.mint, align: 'center' });
+    const xd = 852;
+    g.line(xd, HYC - HA, xd, HYC + HA, C.mint, 1.6); g.line(xd - 7, HYC - HA, xd + 7, HYC - HA, C.mint, 1.6); g.line(xd - 7, HYC + HA, xd + 7, HYC + HA, C.mint, 1.6);
+    g.text(xd, HYC + HA + 26, '直徑約 2 nm', { size: 15, color: C.mint, align: 'center' });
+  });
+  fade(g, fin(t, 4.7, 0.9), () => ladder(g, t));
+  structPanel(g, t);
+  // 12.6 秒起:方向
+  fade(g, fin(t, 12.6, 0.8), () => {
+    g.arrow(122, 104, 668, 104, { color: C.mint });
+    g.text(395, 84, '5′ → 3′', { size: 16, weight: 700, color: C.mint, align: 'center', mono: true });
+    g.arrow(668, 436, 122, 436, { color: C.mint });
+    g.text(395, 458, '3′ ← 5′', { size: 16, weight: 700, color: C.mint, align: 'center', mono: true });
+    g.text(108, LYT, '5′', { size: 18, weight: 700, align: 'right', mono: true });
+    g.text(684, LYT, '3′', { size: 18, weight: 700, mono: true });
+    g.text(100, LYB, '3′', { size: 18, weight: 700, align: 'right', mono: true });
+    g.text(684, LYB, '5′', { size: 18, weight: 700, mono: true });
+    // 第一個糖:左邊接磷酸的是 5′ 碳,右邊接下一個磷酸的是 3′ 碳
+    g.text(LX(0) - 22, LYT - 28, '5′', { size: 12, color: C.ink2, align: 'center', mono: true });
+    g.text(LX(0) + 22, LYT - 28, '3′', { size: 12, color: C.ink2, align: 'center', mono: true });
+  });
+}
+
+// ===== 第 2 章:DNA 複製 =====
+const RYT = 150, RYB = 410, RYPT = 262, RYPB = 290, RXL = 40, RXR = 924, RSTEP = 14; // 兩條模板、複製叉右邊的雙股、左右端、鹼基間距
+const RNT = RYT + 24, RNB = RYB - 24; // 新股的高度:延遲股(上)、前導股(下)
+const RSEQ = 'ATGCCGATTAGCTAGGCATCGATCCGTAAGCTTGCAGT'; // 上面那條模板的鹼基(示意)
+const rBase = (k) => RSEQ[k % RSEQ.length];
+const rx = (k) => RXL + 6 + k * RSTEP;
+const forkX = (t) => 260 + 500 * seg(t, 0.6, 12.6); // 複製叉往右走
+const PRIM = 40; // RNA 引子畫成 40 px(示意;實際約 5 到 10 個核苷酸)
+// 延遲股的岡崎片段:引子的右端(5′ 端)p、放引子的時間 put、延伸的時間 ext、延伸到哪裡 to。
+// 放引子時,引子要落在模板還是直線的那一段(p ≤ forkX(put) − 96),不然會浮在轉彎的模板外面
+const LAGF = [
+  { p: 240, put: 4.6, ext: [8.5, 9.7], to: RXL + 6 },
+  { p: 380, put: 6.2, ext: [9.7, 10.6], to: 240 },
+  { p: 520, put: 9.6, ext: [10.6, 11.6], to: 380 },
+  { p: 640, put: 12.3, ext: [12.9, 13.6], to: 520 },
+];
+// 引子換成 DNA 之後,缺口在原本引子的左端;接合酶依序把它們接起來
+const NICKS = [{ x: 200, at: 14.5 }, { x: 340, at: 15.2 }, { x: 480, at: 15.9 }];
+const LEAD0 = RXL + 16; // 前導股引子的左端
+const leadTip = (t) => (t < 8.5 ? LEAD0 + PRIM : Math.min(forkX(t) - 36, LEAD0 + PRIM + (t - 8.5) * 300));
+const primerCol = (t) => mix(C.amber, C.mint, seg(t, 13.6, 14.3)); // 引子被換成 DNA
+
+function repTemplates(g, xf) {
+  const ctx = g.ctx, ym = (RYPT + RYPB) / 2;
+  for (let k = 0; rx(k) < RXR - 4; k++) {
+    const x = rx(k), b = rBase(k), cb = complement(b);
+    if (x > xf + 6) { g.line(x, RYPT + 3, x, ym, C[b], 3); g.line(x, ym, x, RYPB - 3, C[cb], 3); }
+    else if (x < xf - 96) { g.line(x, RYT + 3, x, RYT + 10, C[b], 3); g.line(x, RYB - 3, x, RYB - 10, C[cb], 3); }
+  }
+  const path = (y0, y1) => { ctx.beginPath(); ctx.moveTo(RXL, y0); ctx.lineTo(xf - 90, y0); ctx.bezierCurveTo(xf - 40, y0, xf - 44, y1, xf, y1); ctx.lineTo(RXR, y1); };
+  ctx.save(); ctx.strokeStyle = C.backbone; ctx.lineWidth = 4; ctx.lineCap = 'round';
+  path(RYT, RYPT); ctx.stroke(); path(RYB, RYPB); ctx.stroke(); ctx.restore();
+}
+// 新股的一段(xa 到 xb):線加上朝模板那一側的短鹼基;up 是延遲股(在上面,鹼基朝上)
+function newPiece(g, xa, xb, up, col, lw = 5) {
+  if (xb - xa < 1) return;
+  const y = up ? RNT : RNB;
+  for (let k = 0; rx(k) <= xb; k++) {
+    const x = rx(k); if (x < xa) continue;
+    g.line(x, y + (up ? -3 : 3), x, y + (up ? -10 : 10), C[up ? complement(rBase(k)) : rBase(k)], 3);
+  }
+  g.line(xa, y, xb, y, col, lw);
+}
+function drawReplication(g, t) {
+  const xf = forkX(t), tip = leadTip(t);
+  repTemplates(g, xf);
+  // 前導股:開頭一個引子,之後一路連續
+  if (t >= 8.5) newPiece(g, LEAD0 + PRIM, tip, false, C.mint);
+  fade(g, fin(t, 4.6, 0.8), () => newPiece(g, LEAD0, LEAD0 + PRIM, false, primerCol(t), 6));
+  // 延遲股:每一段先有引子,再往左(遠離複製叉)延伸
+  LAGF.forEach((f) => {
+    const a = fin(t, f.put, 0.8); if (a <= 0) return;
+    const xl = lerp(f.p - PRIM, f.to, seg(t, f.ext[0], f.ext[1]));
+    if (xl < f.p - PRIM - 0.5) newPiece(g, xl, f.p - PRIM, true, C.mint);
+    fade(g, a, () => newPiece(g, f.p - PRIM, f.p, true, primerCol(t), 6));
+  });
+  // 還沒接起來的缺口(底色蓋一小格);接起來的那一下亮一下
+  NICKS.forEach((nk, j) => {
+    if (t < LAGF[j + 1].ext[1]) return;
+    if (t < nk.at) g.rrect((t < 14 ? LAGF[j].p : nk.x) - 2, RNT - 5, 4, 10, 1, C.bg);
+    const k = seg(t, nk.at, nk.at + 0.6);
+    if (k > 0 && k < 1) { g.ctx.save(); g.ctx.globalAlpha = 1 - k; g.circle(nk.x, RNT, 6 + 14 * k, null, C.mint, 2.5); g.ctx.restore(); }
+  });
+  // 酵素
+  g.blob(xf + 4, (RYPT + RYPB) / 2, 36, 27, C.lav, '解旋酶', { size: 13, wobble: 1, t });
+  [[LEAD0 + PRIM / 2, RNB - 26, 4.6], ...LAGF.map((f) => [f.p - PRIM / 2, RNT + 26, f.put])].forEach(([x, y, at]) => {
+    const a = Math.min(fin(t, at - 0.3, 0.3), fout(t, at + 0.4, 0.25));
+    if (a > 0) g.blob(x, y, 36, 22, C.lav, '引子酶', { size: 13, alpha: a, wobble: 1, t: t + 3 });
+  });
+  const la = fin(t, 8.2, 0.5);
+  if (la > 0) g.blob(tip + 8, RNB - 26, 38, 23, C.lav, '聚合酶', { size: 13, alpha: la, wobble: 1, t: t + 1 });
+  LAGF.forEach((f) => {
+    const a = Math.min(fin(t, f.ext[0] - 0.15, 0.15), fout(t, f.ext[1], 0.3)); if (a <= 0) return;
+    const xl = lerp(f.p - PRIM, f.to, seg(t, f.ext[0], f.ext[1]));
+    g.blob(xl - 4, RNT + 26, 38, 23, C.lav, '聚合酶', { size: 13, alpha: a, wobble: 1, t: t + 2 });
+    fade(g, a, () => g.arrow(xl + 122, RNT + 15, xl + 48, RNT + 15, { color: C.mint, lw: 2 }));
+  });
+  if (t >= 8.6 && tip > LEAD0 + PRIM + 90) fade(g, fin(t, 8.6), () => g.arrow(tip - 130, RNB - 15, tip - 44, RNB - 15, { color: C.mint, lw: 2 }));
+  const lg = fin(t, 13.9, 0.4);
+  if (lg > 0) {
+    let lx = NICKS[0].x;
+    for (let j = 1; j < NICKS.length; j++) lx = lerp(lx, NICKS[j].x, ease(seg(t, NICKS[j - 1].at + 0.15, NICKS[j].at - 0.1)));
+    g.blob(lx, RNT + 26, 36, 22, C.lav, '接合酶', { size: 13, alpha: lg, wobble: 1, t });
+  }
+  // 端點與標籤
+  const end = { size: 15, weight: 700, color: C.muted, mono: true };
+  g.text(24, RYT, '5′', { ...end, align: 'center' }); g.text(24, RYB, '3′', { ...end, align: 'center' });
+  g.text(950, RYPT - 1, '3′', { ...end, align: 'right' }); g.text(950, RYPB + 1, '5′', { ...end, align: 'right' });
+  fade(g, fin(t, 0.8), () => g.tag(Math.min(xf + 64, 900), 228, '複製叉', { size: 14, color: C.ink2 }));
+  fade(g, Math.min(fin(t, 5.6, 0.5), fout(t, 8.3, 0.4)), () => g.tag(230, 232, 'RNA 引子', { size: 14, color: C.amber }));
+  fade(g, fin(t, 8.8), () => g.tag(330, 444, '前導股:連續合成', { size: 14, color: C.mint }));
+  fade(g, fin(t, 9.6), () => g.tag(330, 116, '延遲股:一段一段做(岡崎片段)', { size: 14, color: C.mint }));
+  fade(g, fin(t, 1.0), () => {
+    const y = 496; let x = 40;
+    const item = (draw, s) => { draw(x, y); g.text(x + 36, y, s, { size: 13, color: C.ink2 }); g.font(13, 500); x += 36 + g.ctx.measureText(s).width + 26; };
+    item((x0, y0) => g.line(x0, y0, x0 + 26, y0, C.backbone, 4), '舊股(模板)');
+    item((x0, y0) => g.line(x0, y0, x0 + 26, y0, C.mint, 5), '新的 DNA');
+    item((x0, y0) => g.line(x0, y0, x0 + 26, y0, C.amber, 6), 'RNA 引子');
+    item((x0, y0) => g.arrow(x0, y0, x0 + 26, y0, { color: C.mint, lw: 2 }), '新股長的方向(都是 5′ → 3′)');
+  });
+}
+
+// ===== 第 3 章:Meselson 與 Stahl 的實驗 =====
+const MS_T = [6.6, 9.5, 10.8, 11.8, 12.6]; // 第 0 到 4 代的帶出現的時間
+const MODEL = { semi: '半保留', cons: '全保留', disp: '分散' };
+const msUpTo = (t) => MS_T.filter((x) => t >= x).length - 1; // 動畫進行到第幾代(還沒開始是 −1)
+const HEAVY = C.hot; // ¹⁵N 的舊股
+// 第 n 代離心後的帶:[重的比例(0 輕、0.5 中間、1 重), 佔全部 DNA 的比例]
+function msBands(model, n) {
+  if (n === 0) return [[1, 1]];
+  if (model === 'cons') return [[1, 1 / 2 ** n], [0, 1 - 1 / 2 ** n]];
+  if (model === 'disp') return [[1 / 2 ** n, 1]];
+  return n === 1 ? [[0.5, 1]] : [[0.5, 2 / 2 ** n], [0, 1 - 2 / 2 ** n]];
+}
+// 和實際結果(半保留)一不一樣:全保留只有第 0 代相同,分散到第 1 代都還是一條中間帶
+const msMatch = (model, n) => model === 'semi' || n === 0 || (model === 'disp' && n === 1);
+// 第 n 代的每一個 DNA 分子:[上股, 下股],每股 8 小段,1 是重(¹⁵N)、0 是輕(¹⁴N)
+function msMolecules(model, n) {
+  const m = 2 ** n, H = Array(8).fill(1), L = Array(8).fill(0);
+  if (n === 0) return [[H, H]];
+  if (model === 'semi') return Array.from({ length: m }, (_, i) => (i === 0 ? [H, L] : i === m - 1 ? [L, H] : [L, L]));
+  if (model === 'cons') return Array.from({ length: m }, (_, i) => (i === 0 ? [H, H] : [L, L]));
+  return Array.from({ length: m }, (_, i) => { // 分散:每個分子的 16 小段裡,重的佔 1/2ⁿ,位置隨機(固定種子)
+    const R = rng(97 + i * 13 + n * 7), slots = Array(16).fill(0);
+    for (let placed = 0; placed < 16 / m;) { const j = Math.floor(R() * 16); if (!slots[j]) { slots[j] = 1; placed++; } }
+    return [slots.slice(0, 8), slots.slice(8)];
+  });
+}
+function segBar(g, x, y, w, h, segs) {
+  const ctx = g.ctx, sw = w / segs.length;
+  segs.forEach((s, i) => {
+    const x0 = x + i * sw;
+    ctx.fillStyle = s ? HEAVY : C.mint; ctx.fillRect(x0, y, sw + 0.4, h);
+    if (s) { // 重的那一股畫斜線(不只靠顏色分辨)
+      ctx.save(); ctx.beginPath(); ctx.rect(x0, y, sw, h); ctx.clip(); ctx.strokeStyle = 'rgba(11,17,17,.55)'; ctx.lineWidth = 1.5;
+      for (let d = -h; d < sw + h; d += 5) { ctx.beginPath(); ctx.moveTo(x0 + d, y + h); ctx.lineTo(x0 + d + h, y); ctx.stroke(); }
+      ctx.restore();
+    }
+  });
+  ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(11,17,17,.7)'; ctx.strokeRect(x, y, w, h);
+}
+function msTube(g, x, top, h, bands, yL, yH, a = 1) {
+  const w = 40, r = w / 2, ctx = g.ctx;
+  ctx.save(); ctx.beginPath();
+  ctx.moveTo(x - r, top); ctx.lineTo(x - r, top + h - r); ctx.arc(x, top + h - r, r, Math.PI, 0, true); ctx.lineTo(x + r, top);
+  const gr = ctx.createLinearGradient(0, top, 0, top + h); gr.addColorStop(0, 'rgba(127,200,255,.02)'); gr.addColorStop(1, 'rgba(127,200,255,.17)');
+  ctx.fillStyle = gr; ctx.fill(); ctx.lineWidth = 1.8; ctx.strokeStyle = C.ink2; ctx.stroke(); ctx.restore();
+  g.line(x - r - 4, top, x + r + 4, top, C.ink2, 1.8);
+  for (const [f, amt] of bands) {
+    const y = lerp(yL, yH, f), th = 4 + 4 * amt;
+    ctx.save(); ctx.globalAlpha *= a; ctx.shadowColor = 'rgba(240,243,238,.9)'; ctx.shadowBlur = 4 + 10 * amt;
+    g.rrect(x - r + 5, y - th / 2, w - 10, th, th / 2, `rgba(240,243,238,${0.4 + 0.6 * amt})`);
+    ctx.restore();
+  }
+}
+function flask(g, x, y, col) {
+  const ctx = g.ctx;
+  ctx.save(); ctx.beginPath();
+  ctx.moveTo(x - 7, y - 30); ctx.lineTo(x - 7, y - 10); ctx.lineTo(x - 26, y + 22); ctx.quadraticCurveTo(x - 27, y + 28, x - 21, y + 28);
+  ctx.lineTo(x + 21, y + 28); ctx.quadraticCurveTo(x + 27, y + 28, x + 26, y + 22); ctx.lineTo(x + 7, y - 10); ctx.lineTo(x + 7, y - 30);
+  ctx.save(); ctx.clip(); ctx.globalAlpha *= 0.55; ctx.fillStyle = col; ctx.fillRect(x - 30, y + 2, 60, 30); ctx.restore();
+  ctx.lineWidth = 2; ctx.strokeStyle = C.ink2; ctx.lineJoin = 'round'; ctx.stroke(); ctx.restore();
+  g.line(x - 10, y - 30, x + 10, y - 30, C.ink2, 2);
+  for (const [dx, dy] of [[-10, 14], [4, 20], [12, 9]]) { ctx.save(); ctx.beginPath(); ctx.ellipse(x + dx, y + dy, 5, 2.6, 0.4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(11,17,17,.6)'; ctx.fill(); ctx.restore(); }
+}
+function msSteps(g, t) {
+  const steps = [
+    [0.3, '¹⁵N 養分(較重的氮)', '大腸桿菌在裡面長 14 代'],
+    [2.2, '換成 ¹⁴N(一般的氮)', '之後新做的 DNA 都是輕的'],
+    [4.6, '每過一代取一次樣', '第 0、1、2……代'],
+    [6.2, '放進氯化銫溶液離心', '每分鐘 44,770 轉,20 小時'],
+  ];
+  steps.forEach(([at, h1, h2], i) => {
+    const a = fin(t, at, 0.7); if (a <= 0) return;
+    const y = 84 + i * 114;
+    fade(g, a, () => {
+      if (i < 2) flask(g, 62, y, i === 0 ? HEAVY : C.mint);
+      else if (i === 2) for (const dx of [-16, 0, 16]) g.tube(62 + dx, y - 24, 11, 46, { fill: 0.45 });
+      else {
+        g.circle(62, y, 26, '#17221f', C.ink2, 2);
+        for (let k = 0; k < 4; k++) { const ang = t * 3 + (k * Math.PI) / 2; g.circle(62 + Math.cos(ang) * 15, y + Math.sin(ang) * 15, 5, 'rgba(127,200,255,.35)', C.ink2, 1.5); }
+        g.circle(62, y, 4, C.ink2);
+      }
+      g.text(106, y - 12, h1, { size: 15, weight: 700 });
+      g.text(106, y + 14, h2, { size: 13, color: C.muted });
+      if (i < 3) g.arrow(62, y + 38, 62, y + 74, { color: C.ink2, lw: 2 });
+    });
+  });
+}
+function msMolView(g, model, n) {
+  g.text(40, 52, `第 ${n} 代的 DNA`, { size: 18, weight: 700 });
+  g.text(40, 80, `依「${MODEL[model]}」的想法`, { size: 14, color: C.ink2 });
+  const mols = msMolecules(model, n), m = mols.length;
+  // 分子少的時候畫大一點:每格的寬 w、每股的高 h
+  const [w, h, gx] = m <= 4 ? [96, 14, 24] : m <= 8 ? [60, 11, 12] : [60, 10, 14];
+  const cols = m <= 2 ? m : m <= 4 ? 2 : 4, rows = Math.ceil(m / cols), cw = w + gx, ch = 2 * h + 24;
+  const x0 = 176 - (cols * cw) / 2 + gx / 2, y0 = 250 - (rows * ch) / 2;
+  mols.forEach(([a, b], i) => { const x = x0 + (i % cols) * cw, y = y0 + Math.floor(i / cols) * ch; segBar(g, x, y, w, h, a); segBar(g, x, y + h + 5, w, h, b); });
+  const what = n === 0 ? '1 個,兩股都是重的' : model === 'semi' ? (n === 1 ? '2 個都是一舊一新' : `2 個一舊一新,${m - 2} 個全新`) : model === 'cons' ? `1 個全舊,${m - 1} 個全新` : `${m} 個都是新舊片段混在一起`;
+  g.text(176, 398, what, { size: 14, color: C.ink, align: 'center' });
+  segBar(g, 40, 444, 30, 12, [1, 1, 1, 1]); g.text(80, 450, '¹⁵N 的舊股(重)', { size: 13, color: C.ink2 });
+  segBar(g, 40, 472, 30, 12, [0, 0, 0, 0]); g.text(80, 478, '¹⁴N 的新股(輕)', { size: 13, color: C.ink2 });
+}
+function drawMeselson(g, t, S) {
+  const n = S.gen, model = S.model, upto = msUpTo(t);
+  g.panel(20, 20, 312, 500, '');
+  fade(g, fout(t, 9.1, 0.5), () => msSteps(g, t));
+  fade(g, fin(t, 9.5, 0.6), () => msMolView(g, model, Math.min(n, Math.max(0, upto))));
+  // 右邊:上面一排是實際結果(和半保留的預測相同),下面一排是選的假說的預測
+  const X = (k) => 500 + k * 100;
+  const rowA = { top: 58, h: 150, yL: 106, yH: 162 }, rowB = { top: 292, h: 150, yL: 340, yH: 396 };
+  fade(g, fin(t, 0.3, 0.6), () => {
+    g.text(352, 34, '實際結果(Meselson 與 Stahl,1958)', { size: 15, weight: 700 });
+    g.text(352, 268, `「${MODEL[model]}」假說的預測`, { size: 15, weight: 700, color: C.ink2 });
+    for (const R of [rowA, rowB]) {
+      [['輕', R.yL], ['中', (R.yL + R.yH) / 2], ['重', R.yH]].forEach(([s, y]) => { g.text(460, y, s, { size: 13, color: C.muted, align: 'right' }); g.line(470, y, X(n) + 26, y, 'rgba(255,255,255,.08)', 1, [3, 4]); });
+    }
+    for (let k = 0; k <= n; k++) {
+      const ra = fin(t, MS_T[k], 0.6);
+      msTube(g, X(k), rowA.top, rowA.h, ra > 0 ? msBands('semi', k) : [], rowA.yL, rowA.yH, ra);
+      msTube(g, X(k), rowB.top, rowB.h, ra > 0 ? msBands(model, k) : [], rowB.yL, rowB.yH, ra);
+      g.text(X(k), rowA.top + rowA.h + 20, `第 ${k} 代`, { size: 13, color: C.ink2, align: 'center' });
+      if (ra > 0) { const ok = msMatch(model, k); g.text(X(k), rowB.top + rowB.h + 22, ok ? '✓ 相符' : '✗ 不符', { size: 14, weight: 700, color: ok ? C.mint : C.red, align: 'center', alpha: ra }); }
+    }
+  });
+  fade(g, fin(t, 5.2, 0.8), () => g.text(352, 500, '越重停得越低;¹⁵N 與 ¹⁴N 的 DNA 密度只差約 0.014 g/cm³', { size: 13, color: C.muted }));
+}
+
+// ===== 第 4 章:轉錄 =====
+const TPROM = 'TAGCTA'; // 啟動子的鹼基(示意)
+const GENE = 'GCCATGGCTTTCAAAGGCTGGTAA'; // 會被轉錄的那一段(編碼股,示意);第 6 章的 mRNA 就是它
+const TTOP = TPROM + GENE, TBOT = complement(TTOP), NP = TPROM.length;
+const TS = 28, TX0 = 74, TYC = 250, TYT = 320, TYR = 110; // 鹼基間距、第一個鹼基、編碼股與模板股的高度、離開聚合酶的 mRNA 高度
+const MRNA = GENE.replace(/T/g, 'U');
+const txX = (i) => TX0 + i * TS;
+function drawTranscription(g, t) {
+  const n = Math.min(GENE.length, Math.floor(GENE.length * seg(t, 5.6, 13.6) + 1e-6)); // 已經接上的核苷酸數
+  const ac = NP + n, bc = ac - 3.5, open = ease(seg(t, 4.4, 5.6)); // 下一個要接的位置、泡泡中心、打開的程度
+  const lift = (i) => 62 * open * bump((i - bc) / 6); // 泡泡裡編碼股被撐開的高度
+  const px = txX(bc), py = 272;
+  // 啟動子
+  fade(g, fin(t, 0.2), () => {
+    g.rrect(txX(0) - 15, TYC - 14, txX(NP - 1) - txX(0) + 30, TYT - TYC + 28, 8, 'rgba(127,184,255,.10)', 'rgba(127,184,255,.5)');
+    g.tag(txX((NP - 1) / 2), 418, '啟動子', { size: 14, color: C.blue });
+  });
+  // DNA:編碼股(上)在泡泡裡撐開,模板股(下)被聚合酶讀
+  const top = [...TTOP].map((_, i) => [txX(i), TYC - lift(i)]);
+  strandPts(g, top, TTOP, { dir: 1, glow: (i) => t >= 13 && i >= NP && TTOP[i] === 'T' });
+  g.strand(TX0, TYT, TBOT, { step: TS, dir: -1, bw: 20, bh: 22 });
+  for (let i = 0; i < TTOP.length; i++) if (lift(i) < 3) g.line(txX(i), TYC + 27, txX(i), TYT - 27, 'rgba(240,243,238,.42)', 2, [2, 3]);
+  // RNA:最後 6 個還和模板股配對,前面的從聚合酶上方離開(兩段之間的骨架穿過聚合酶)
+  if (n > 0) {
+    const hyb = 6, pts = [];
+    for (let i = 0; i < n; i++) pts.push([txX(NP + i), n - 1 - i < hyb ? TYC : TYR]);
+    strandPts(g, pts, MRNA, { dir: 1, color: C.amber, to: n, glow: (i) => t >= 9 && MRNA[i] === 'U' });
+    for (let i = Math.max(0, n - hyb); i < n; i++) g.line(txX(NP + i), TYC + 27, txX(NP + i), TYT - 27, 'rgba(240,243,238,.42)', 2, [2, 3]);
+  }
+  // RNA 聚合酶:半透明的一團蓋在泡泡上
+  fade(g, fin(t, 0.4, 0.8), () => {
+    const ctx = g.ctx; ctx.save();
+    ctx.beginPath(); ctx.ellipse(px, py, 136, 92, 0, 0, Math.PI * 2);
+    const gr = ctx.createRadialGradient(px - 40, py - 40, 10, px, py, 150); gr.addColorStop(0, 'rgba(184,164,244,.32)'); gr.addColorStop(1, 'rgba(184,164,244,.10)');
+    ctx.fillStyle = gr; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(184,164,244,.75)'; ctx.stroke(); ctx.restore();
+    g.tag(px, py + 108, 'RNA 聚合酶', { size: 14, color: C.lav });
+  });
+  // 端點與標籤
+  const end = { size: 14, color: C.muted, mono: true };
+  g.text(TX0 - 22, TYC, '5′', { ...end, align: 'right' }); g.text(TX0 - 22, TYT, '3′', { ...end, align: 'right' });
+  g.text(txX(TTOP.length - 1) + 22, TYC, '3′', end); g.text(txX(TTOP.length - 1) + 22, TYT, '5′', end);
+  if (n > 8) fade(g, fin(t, 8.2), () => { g.text(txX(NP) - 22, TYR, '5′', { ...end, align: 'right' }); g.tag(txX(NP) + 46, TYR - 34, 'mRNA', { size: 14, color: C.amber }); });
+  fade(g, Math.min(fin(t, 4.8), fout(t, 10.8, 0.5)), () => {
+    g.tag(930, TYC - 30, '編碼股', { size: 14, color: C.ink2, align: 'right' });
+    g.tag(930, TYT + 32, '模板股(聚合酶讀這一股)', { size: 14, color: C.ink2, align: 'right' });
+  });
+  fade(g, fin(t, 9.0), () => {
+    const y0 = 446;
+    g.panel(262, y0 - 10, 436, 92, '');
+    g.text(480, y0 + 10, '轉錄的配對:模板股 → RNA', { size: 14, weight: 700, color: C.ink2, align: 'center' });
+    [['A', 'U'], ['T', 'A'], ['G', 'C'], ['C', 'G']].forEach(([d, r], k) => {
+      const x = 300 + k * 104;
+      bigBase(g, x, y0 + 30, 26, 30, d); g.text(x + 30, y0 + 45, '→', { size: 16, color: C.ink2, align: 'center' }); bigBase(g, x + 60, y0 + 30, 26, 30, r);
+      if (d === 'A') g.rrect(x - 20, y0 + 25, 100, 40, 8, null, C.mint, 2);
+    });
+  });
+  fade(g, fin(t, 13.2), () => g.tag(640, 60, 'mRNA = 編碼股的序列,T 換成 U', { size: 14, color: C.amber }));
+}
+
+// ===== 第 5 章:RNA 加工 =====
+const PY = 268, PEX = [[86, 196], [296, 406], [486, 596]], PIN = [[196, 296], [406, 486]]; // 前驅 mRNA 的高度、外顯子與內含子的位置
+function drawProcessing(g, t) {
+  // 細胞核(雙層膜,右邊有一個核孔)
+  g.rrect(18, 30, 752, 470, 40, 'rgba(127,184,255,.035)', 'rgba(127,184,255,.35)', 2);
+  g.rrect(26, 38, 736, 454, 34, null, 'rgba(127,184,255,.18)', 1.5);
+  g.rrect(756, PY - 20, 22, 40, 4, C.bg);
+  g.text(52, 64, '細胞核', { size: 15, weight: 700, color: C.blue });
+  g.text(864, 64, '細胞質', { size: 15, weight: 700, color: C.ink2, align: 'center' });
+  const capK = ease(seg(t, 3.8, 4.6)), tailK = seg(t, 4.8, 6.6), arch = ease(seg(t, 8.4, 9.3)), cut = ease(seg(t, 9.6, 10.6));
+  const sh = [0, 100 * cut, 180 * cut]; // 剪掉內含子後,外顯子往左靠
+  const ctx = g.ctx;
+  // 內含子:先拱起來,再被剪下、飄走
+  PIN.forEach(([a, b], k) => {
+    const xa = a - sh[k], xb = b - sh[k + 1], gone = seg(t, 10.4, 11.4);
+    const H = 70 * arch, lift = 60 * gone, mid = (xa + xb) / 2;
+    fade(g, 1 - gone, () => {
+      ctx.save(); ctx.beginPath(); ctx.moveTo(xa, PY - lift); ctx.bezierCurveTo(xa - 18 * cut, PY - 1.3 * H - lift, xb + 18 * cut, PY - 1.3 * H - lift, xb, PY - lift);
+      ctx.strokeStyle = '#6e7c77'; ctx.lineWidth = 14; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore();
+      if (arch < 0.3) g.text(mid, PY + 34, '內含子', { size: 14, color: C.muted, align: 'center', alpha: 1 - arch / 0.3 });
+    });
+    const sa = Math.min(fin(t, 8.8, 0.4), fout(t, 10.3, 0.4));
+    if (sa > 0) g.blob(mid, PY - 4, 40, 21, C.lav, '剪接體', { size: 12.5, alpha: sa, wobble: 1, t: t + k });
+  });
+  // 外顯子
+  PEX.forEach(([a, b], k) => {
+    const x = a - sh[k];
+    g.rrect(x, PY - 15, b - a, 30, 6, C.amber);
+    g.text(x + (b - a) / 2, PY + 1, `外顯子 ${k + 1}`, { size: 14, weight: 700, color: '#0b1111', align: 'center' });
+  });
+  // 5′ 帽與 poly(A) 尾
+  g.text(48, PY, '5′', { size: 14, color: C.muted, mono: true, align: 'center', alpha: 1 - capK });
+  if (capK > 0) fade(g, capK, () => { g.circle(70, lerp(PY - 80, PY, capK), 13, C.mint, '#0b1111', 1.5); g.text(70, lerp(PY - 80, PY, capK) + 0.5, 'G', { size: 13, weight: 800, color: '#0b1111', align: 'center' }); });
+  const nA = Math.round(12 * tailK), xt = 602 - sh[2];
+  if (nA > 0) g.text(xt, PY, 'A'.repeat(nA), { size: 14, weight: 700, color: C.amber, mono: true });
+  g.font(14, 700, true);
+  g.text(xt + (nA > 0 ? ctx.measureText('A'.repeat(nA)).width : 0) + 12, PY, '3′', { size: 14, color: C.muted, mono: true });
+  // 標籤
+  fade(g, Math.min(fin(t, 0.4), fout(t, 8.2, 0.4)), () => g.text(340, PY - 52, '前驅 mRNA', { size: 16, weight: 700, color: C.ink, align: 'center' }));
+  fade(g, fin(t, 4.2), () => g.tag(40, 340, '5′ 帽:甲基化的 G', { size: 14, color: C.mint, align: 'left' }));
+  fade(g, fin(t, 6.0) * fout(t, 9.6, 0.5), () => g.tag(720, 340, 'poly(A) 尾:約 200 個 A', { size: 14, color: C.amber, align: 'right' }));
+  fade(g, fin(t, 0.6), () => {
+    g.rrect(56, 418, 34, 18, 5, C.amber); g.text(102, 427, '外顯子:留下來,接成成熟的 mRNA', { size: 14, color: C.ink2 });
+    g.line(58, 461, 88, 461, '#6e7c77', 12); g.text(102, 461, '內含子:在細胞核裡被剪掉、分解', { size: 14, color: C.ink2 });
+  });
+  fade(g, Math.min(fin(t, 10.6, 0.4), fout(t, 12.2, 0.5)), () => g.tag(250, 116, '剪下的內含子', { size: 14, color: C.muted }));
+  fade(g, fin(t, 10.9), () => g.text(300, PY - 52, '成熟 mRNA', { size: 16, weight: 700, color: C.mint, align: 'center' }));
+  fade(g, fin(t, 11.3), () => {
+    g.arrow(604, PY, 906, PY, { color: C.mint, lw: 2.2, dash: [7, 6] });
+    g.text(862, PY + 34, '經核孔送出,', { size: 13, color: C.ink2, align: 'center' });
+    g.text(862, PY + 58, '到細胞質轉譯', { size: 13, color: C.ink2, align: 'center' });
+  });
+}
+
+// ===== 第 6 章:轉譯 =====
+const TL_C = ['AUG', 'GCU', 'UUC', 'AAA', 'GGC', 'UGG', 'UAA']; // 第 4 章那段 mRNA 的密碼子(前面還有 GCC 三個不轉譯的鹼基)
+const tlX = (i) => 120 + i * 30, TLY = 420, AAY = 284; // mRNA 第 i 個鹼基、mRNA 骨架的高度、tRNA 上胺基酸的高度(= 反密碼子頂端 366 − 82)
+const cdX = (c) => tlX(3 + 3 * c + 1); // 第 c 個密碼子的中心(c 可以是小數)
+// 每一個 tRNA:到位 a、把鏈接到它的胺基酸上 b、核糖體往下一格 m(秒)
+const TL = [
+  { a: [2.0, 3.4], b: [0, 0], m: null },
+  { a: [4.6, 6.2], b: [9.0, 9.5], m: [9.5, 10.1] },
+  { a: [10.1, 10.45], b: [10.45, 10.6], m: [10.6, 10.9] },
+  { a: [10.9, 11.25], b: [11.25, 11.4], m: [11.4, 11.7] },
+  { a: [11.7, 12.05], b: [12.05, 12.2], m: [12.2, 12.5] },
+  { a: [12.5, 12.85], b: [12.85, 13.0], m: [13.0, 13.3] },
+];
+const RFT = [13.4, 14.2], REL = [14.4, 15.4], SPLIT = [15.6, 16.6]; // 釋放因子進來、鏈脫離、核糖體分開
+const ribP = (t) => TL.reduce((s, e) => s + (e.m ? seg(t, e.m[0], e.m[1]) : 0), 0); // P 位對著第幾個密碼子
+const leaveT = (k) => (k + 1 < TL.length ? TL[k + 1].m[0] + 0.1 : REL[1] - 0.2); // 空的 tRNA 什麼時候離開
+function trPos(k, t) { // tRNA k 的位置:x、往上的位移、透明度
+  const e = TL[k], u = ease(seg(t, e.a[0], e.a[1])), l = seg(t, leaveT(k), leaveT(k) + 0.9);
+  // 起始 tRNA 從正上方一小段落下(左上角是密碼表,不能從太高的地方來);其他的從右上方斜著進到 A 位
+  const [fx, fy] = k === 0 ? [0, 40] : [110, 170];
+  return { x: cdX(k) + fx * (1 - u), dy: -fy * (1 - u) - 80 * l, a: Math.min(seg(t, e.a[0], e.a[0] + 0.25), 1 - l) };
+}
+function trna(g, x, dy, k, showAA) {
+  const by = TLY - 2 - 24 - 4 - 24 + dy, col = C.blue; // by:反密碼子鹼基的頂端(mRNA 的鹼基頂端再往上 4 px 是反密碼子的底)
+  const anti = complement(TL_C[k], true);
+  g.line(x - 40, by - 2, x + 40, by - 2, col, 3.5);
+  for (let j = 0; j < 3; j++) g.base(x + (j - 1) * 30, by, anti[j], { w: 22, h: 24, dir: 1 });
+  g.line(x, by - 2, x, by - 22, col, 3);
+  g.circle(x - 20, by - 33, 11, 'rgba(127,184,255,.14)', col, 2.5);
+  g.circle(x + 20, by - 33, 11, 'rgba(127,184,255,.14)', col, 2.5);
+  g.line(x, by - 22, x, by - 64, col, 3);
+  if (showAA) aaBead(g, x, by - 82, aaOf(TL_C[k]));
+}
+function codonTable(g, active) {
+  g.panel(16, 14, 290, 184, '');
+  g.text(30, 34, '這段 mRNA 用到的密碼子', { size: 13, weight: 700, color: C.ink2 });
+  TL_C.forEach((cd, k) => {
+    const y = 58 + k * 20, a = aaOf(cd), on = k === active;
+    if (on) g.rrect(24, y - 10, 274, 20, 5, 'rgba(165,243,205,.16)');
+    g.text(32, y, cd, { size: 13, weight: 700, color: on ? C.mint : C.ink2, mono: true });
+    g.text(76, y, '→', { size: 13, color: C.muted });
+    g.text(96, y, a === '*' ? '終止' : `${AA[a][1]} ${AA[a][0]}${cd === 'AUG' ? '(也是起始)' : ''}`, { size: 13, color: on ? C.ink : C.ink2 });
+  });
+}
+function drawTranslation(g, t) {
+  const rp = ribP(t), cx = cdX(rp) + 45;
+  const sm = fin(t, 0.4, 1.0), sx = lerp(-260, 0, ease(seg(t, 0.4, 1.8))), lgA = fin(t, 3.0, 0.8), lgY = lerp(-110, 0, ease(seg(t, 3.0, 4.0)));
+  const sp = ease(seg(t, SPLIT[0], SPLIT[1]));
+  // 核糖體的小次單元(在 mRNA 下面)
+  fade(g, sm * (1 - sp), () => { const ctx = g.ctx; ctx.save(); ctx.beginPath(); ctx.ellipse(cx + sx, 448 + 40 * sp, 124, 28, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(150,175,165,.22)'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(185,199,192,.6)'; ctx.stroke(); ctx.restore(); });
+  // mRNA:三個一組畫底色
+  for (let c = 0; c < TL_C.length; c++) if (c % 2 === 0) g.rrect(cdX(c) - 44, TLY - 30, 88, 36, 6, 'rgba(255,255,255,.05)');
+  g.strand(tlX(0), TLY, MRNA, { step: 30, dir: -1, color: C.amber, bw: 22, bh: 24 });
+  g.text(tlX(0) - 26, TLY, '5′', { size: 14, color: C.muted, mono: true, align: 'right' });
+  g.text(tlX(MRNA.length - 1) + 22, TLY, '……3′', { size: 14, color: C.muted, mono: true });
+  // 大次單元(半透明,tRNA 畫在它前面)
+  fade(g, lgA * (1 - sp), () => { const ctx = g.ctx; ctx.save(); ctx.beginPath(); ctx.ellipse(cx, 332 + lgY - 90 * sp, 130, 64, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(150,175,165,.16)'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(185,199,192,.6)'; ctx.stroke(); ctx.restore(); });
+  // E、P、A 位
+  fade(g, Math.min(fin(t, 4.2), 1 - sp), () => {
+    const sites = t >= 9.6 ? [['E', -1], ['P', 0], ['A', 1]] : [['P', 0], ['A', 1]];
+    for (const [s, d] of sites) g.text(cdX(rp + d), 458, s, { size: 13, weight: 700, color: C.ink2, align: 'center', mono: true });
+  });
+  // tRNA
+  let holder = 0;
+  TL.forEach((e, k) => { if (t >= e.b[1]) holder = k; });
+  TL.forEach((e, k) => {
+    if (t < e.a[0]) return;
+    const p = trPos(k, t); if (p.a <= 0) return;
+    fade(g, p.a, () => trna(g, p.x, p.dy, k, k > 0 && t < e.b[1]));
+  });
+  // 胺基酸鏈:接在最新那個 tRNA 的胺基酸上,往左上排
+  const anchor = (k) => { const p = trPos(k, t); return [p.x, AAY + p.dy]; };
+  const nb = TL.findIndex((e, k) => k > 0 && t >= e.b[0] && t < e.b[1]); // 正在接肽鍵的是哪一個
+  const rel = ease(seg(t, REL[0], REL[1]));
+  const free = [cdX(5) + 110, AAY - 150];
+  const beads = [];
+  if (nb > 0) {
+    const u = ease(seg(t, TL[nb].b[0], TL[nb].b[1])), [ax, ay] = anchor(nb - 1), [bx, by] = anchor(nb);
+    for (let j = 0; j < nb; j++) { const d0 = nb - 1 - j, d1 = nb - j; beads.push([lerp(ax - 34 * d0, bx - 34 * d1, u), lerp(ay - 14 * d0, by - 14 * d1, u), j]); }
+  } else {
+    let [ax, ay] = anchor(holder);
+    if (rel > 0) { ax = lerp(ax, free[0], rel); ay = lerp(ay, free[1], rel); }
+    for (let j = 0; j <= holder; j++) { const d = holder - j; beads.push([ax - 34 * d, ay - 14 * d, j]); }
+  }
+  fade(g, fin(t, TL[0].a[0], 0.3), () => { // 甲硫胺酸跟著起始 tRNA 一起出現
+    for (let i = 1; i < beads.length; i++) g.line(beads[i - 1][0], beads[i - 1][1], beads[i][0], beads[i][1], C.mint, 3);
+    if (nb > 0 && beads.length) g.line(beads[beads.length - 1][0], beads[beads.length - 1][1], anchor(nb)[0], anchor(nb)[1], C.mint, 3);
+    for (const [x, y, j] of beads) aaBead(g, x, y, aaOf(TL_C[j]));
+  });
+  // 釋放因子
+  const rfIn = ease(seg(t, RFT[0], RFT[1])), rfOut = seg(t, REL[1], REL[1] + 0.6);
+  if (rfIn > 0 && rfOut < 1) g.blob(cdX(6), 340 - 160 * (1 - rfIn) - 120 * rfOut, 42, 30, C.lav, '釋放因子', { size: 12.5, alpha: Math.min(rfIn * 1.5, 1 - rfOut), wobble: 1, t });
+  // 密碼表與標籤
+  let active = -1;
+  TL.forEach((e, k) => { if (t >= e.a[0] && t < (k === 0 ? 4.4 : k === 1 ? 9.4 : e.b[1] + 0.2)) active = k; });
+  if (t >= 13.3 && t < REL[1]) active = 6;
+  codonTable(g, active);
+  fade(g, Math.min(fin(t, 0.8), fout(t, 8.6, 0.5)), () => { g.tag(cdX(0), 502, '起始密碼子 AUG', { size: 14, color: C.mint }); g.tag(cdX(2) + 20, 502, '一個密碼子 = 3 個鹼基', { size: 14, color: C.amber }); });
+  fade(g, Math.min(fin(t, 3.4), fout(t, 8.6, 0.5)), () => g.tag(cx + 136, 470, '核糖體', { size: 14, color: C.ink2, align: 'left' }));
+  fade(g, Math.min(fin(t, 6.2), fout(t, 8.9, 0.4)), () => {
+    const x = cdX(1);
+    g.tag(x + 30, AAY - 2, '胺基酸', { size: 14, color: C.mint, align: 'left' });
+    g.tag(x + 46, 336, 'tRNA', { size: 14, color: C.blue, align: 'left' });
+    g.tag(x + 52, 378, '反密碼子', { size: 14, color: C.ink, align: 'left' });
+  });
+  fade(g, Math.min(fin(t, 9.0, 0.3), fout(t, 10.2, 0.4)), () => g.tag(cdX(0) + 45, AAY - 50, '接上(肽鍵)', { size: 14, color: C.mint }));
+  fade(g, Math.min(fin(t, 9.5, 0.3), fout(t, 10.5, 0.4)), () => g.tag(124, 300, '空的 tRNA 離開', { size: 14, color: C.blue }));
+  fade(g, fin(t, 13.3), () => g.tag(cdX(6), 502, '終止密碼子', { size: 14, color: C.red }));
+  fade(g, fin(t, 15.0), () => g.tag(free[0] - 40, 40, '多肽鏈,之後摺疊成蛋白質', { size: 14, color: C.mint }));
+}
+
+// ===== 第 7 章:突變 =====
+const HBB = 'AUGGUGCAUCUGACUCCUGAGGAGAAG'; // 人類 HBB 編碼序列的前 27 個鹼基(NM_000518.5),寫成 mRNA
+const MX = (i) => 122 + i * 26 + Math.floor(i / 3) * 12; // 第 i 個鹼基的 x(每個密碼子之間多空一點)
+const MCX = (c) => MX(3 * c + 1);
+const KIND = { silent: ['同義突變', C.mint, '='], missense: ['錯義突變', C.amber, '≠'], nonsense: ['無義突變', C.red, '■'], none: ['沒有改變', C.muted, '·'] };
+function mutation(pos, base) { // pos:1 到 27
+  const i = pos - 1, c = Math.floor(i / 3), orig = HBB[i];
+  const seq = HBB.slice(0, i) + base + HBB.slice(i + 1);
+  const oc = HBB.slice(3 * c, 3 * c + 3), nc = seq.slice(3 * c, 3 * c + 3), oa = aaOf(oc), na = aaOf(nc);
+  const kind = base === orig ? 'none' : na === oa ? 'silent' : na === '*' ? 'nonsense' : 'missense';
+  return { i, c, orig, seq, oc, nc, oa, na, kind, sickle: i === 19 && base === 'U' };
+}
+function aaChip(g, x, y, a, { hl, ghost = false } = {}) {
+  if (ghost) { g.ctx.save(); g.ctx.setLineDash([4, 4]); g.rrect(x - 37, y, 74, 26, 8, null, C.muted, 1.5); g.ctx.restore(); return; }
+  const stop = a === '*';
+  g.rrect(x - 37, y, 74, 26, 8, stop ? 'rgba(255,123,123,.22)' : 'rgba(165,243,205,.12)', hl || (stop ? C.red : C.mintDim), hl ? 2.5 : 1.5);
+  g.text(x, y + 13.5, stop ? '終止' : AA[a][0], { size: 14, weight: 700, color: stop ? C.red : C.ink, align: 'center', mono: !stop, max: 66 });
+  if (!stop) g.text(x, y + 42, AA[a][1], { size: 13, color: C.ink2, align: 'center', max: 86 });
+}
+function drawMutation(g, t, S) {
+  const M = mutation(S.mutPos, S.mutBase), [kName, kCol, kSym] = KIND[M.kind];
+  const flip = ease(seg(t, 1.6, 2.4)), newAA = ease(seg(t, 2.4, 3.0)), changed = M.kind !== 'none';
+  fade(g, fin(t, 0.2, 0.8), () => {
+    g.text(20, 30, '人類 β 球蛋白基因(HBB)開頭的 9 個密碼子,寫成 mRNA', { size: 14, color: C.ink2 });
+    for (let c = 0; c < 9; c++) g.text(MCX(c), 56, String(c + 1), { size: 12, color: C.muted, align: 'center', mono: true });
+    g.text(20, 86, '原本', { size: 16, weight: 700 });
+    for (let i = 0; i < 27; i++) g.base(MX(i), 72, HBB[i], { w: 22, h: 28, dir: 1 });
+    for (let c = 0; c < 9; c++) aaChip(g, MCX(c), 108, aaOf(HBB.slice(3 * c, 3 * c + 3)));
+  });
+  fade(g, fin(t, 0.8, 0.6), () => {
+    g.text(20, 210, '突變後', { size: 16, weight: 700 });
+    for (let i = 0; i < 27; i++) {
+      if (i === M.i && changed) {
+        fade(g, 1 - flip, () => g.base(MX(i), 196, M.orig, { w: 22, h: 28, dir: 1 }));
+        fade(g, flip, () => g.base(MX(i), 196, S.mutBase, { w: 22, h: 28, dir: 1, glow: true }));
+      } else g.base(MX(i), 196, HBB[i], { w: 22, h: 28, dir: 1 });
+    }
+    const stopAt = M.kind === 'nonsense' ? M.c : 99;
+    for (let c = 0; c < 9; c++) {
+      const oa = aaOf(HBB.slice(3 * c, 3 * c + 3));
+      if (c === M.c && changed) { fade(g, 1 - newAA, () => aaChip(g, MCX(c), 232, oa)); fade(g, newAA, () => aaChip(g, MCX(c), 232, M.na, { hl: kCol })); }
+      else if (c > stopAt) { fade(g, 1 - newAA, () => aaChip(g, MCX(c), 232, oa)); fade(g, newAA, () => aaChip(g, MCX(c), 232, oa, { ghost: true })); }
+      else aaChip(g, MCX(c), 232, oa);
+    }
+    if (stopAt < 8) fade(g, newAA, () => g.text((MCX(stopAt + 1) + MCX(8)) / 2, 274, '後面都不會做出來', { size: 13, color: C.muted, align: 'center' }));
+    if (changed) fade(g, flip, () => {
+      g.arrow(MX(M.i), 164, MX(M.i), 192, { color: kCol, lw: 2 });
+      for (const y of [68, 192]) g.rrect(MCX(M.c) - 42, y, 84, 36, 8, null, kCol, 2);
+    });
+  });
+  // 結果
+  fade(g, fin(t, 2.8, 0.6), () => {
+    g.panel(20, 302, 920, 96, '');
+    g.text(40, 334, `${kSym} ${kName}`, { size: 22, weight: 800, color: kCol });
+    const k = M.i % 3 + 1;
+    g.text(220, 334, changed ? `第 ${M.c + 1} 個密碼子 ${M.oc} → ${M.nc}:${aaName(M.oa)} → ${aaName(M.na)}` : `第 ${M.c + 1} 個密碼子的第 ${k} 個鹼基原本就是 ${M.orig}`, { size: 15 });
+    const note = M.kind === 'none' ? '換一個鹼基看看。'
+      : M.kind === 'silent' ? '新密碼子還是同一種胺基酸,做出來的蛋白質不變。'
+      : M.kind === 'nonsense' ? `蛋白質做到第 ${M.c} 個胺基酸就停了(完整的鏈從開頭的甲硫胺酸算起有 147 個)。`
+      : M.sickle ? '這就是鐮刀型紅血球疾病的突變(HbS);醫學上常寫成 Glu6Val,是從成熟的蛋白質算起。'
+      : '蛋白質上這個位置換成另一種胺基酸。';
+    g.text(40, 372, note, { size: 14, color: C.ink2, max: 880 });
+  });
+  // 三種點突變
+  [['silent', 4.0, '胺基酸沒變,蛋白質一樣', '例:GAG → GAA(都是 Glu)'], ['missense', 8.0, '換成另一種胺基酸', '例:GAG → GUG(Glu → Val)'], ['nonsense', 12.0, '變成終止密碼子,提早結束', '例:AAG → UAG(終止)']].forEach(([kind, at, l1, l2], j) => {
+    const a = fin(t, at, 0.7); if (a <= 0) return;
+    const x = 20 + j * 310, y = 414, w = 300, [nm, col, sym] = KIND[kind], on = M.kind === kind;
+    fade(g, a, () => {
+      g.rrect(x, y, w, 110, 12, on ? 'rgba(21,32,30,.95)' : 'rgba(21,32,30,.6)', on ? col : C.line, on ? 2.5 : 1.5);
+      g.text(x + 16, y + 26, `${sym} ${nm}`, { size: 17, weight: 800, color: col });
+      if (on) g.text(x + w - 16, y + 26, '目前', { size: 13, weight: 700, color: col, align: 'right' });
+      g.text(x + 16, y + 58, l1, { size: 14 });
+      g.text(x + 16, y + 86, l2, { size: 13, color: C.ink2 });
+    });
+  });
+}
+
+const chapters = [
+  {
+    key: 'structure', name: 'DNA 的結構:兩股反向配對', dur: 16,
+    cues: [[0, 'DNA 是兩條長鏈繞成的雙股螺旋:直徑約 2 nm,大約每 10 個鹼基對轉一圈。'],
+      [4.2, '把螺旋攤平來看:每條鏈的骨架是糖(去氧核糖)和磷酸交替接成,鹼基接在糖上、朝向中間。'],
+      [8.5, '鹼基照規則配對:A 只和 T 配,中間兩個氫鍵;G 只和 C 配,中間三個氫鍵。'],
+      [12.5, '兩股方向相反(反向平行)。5′、3′ 是糖上碳的編號:一股從 5′ 走到 3′,另一股正好反過來。']],
+    draw: drawStructure,
+  },
+  {
+    key: 'replication', name: 'DNA 複製:複製叉上的分工', dur: 17,
+    cues: [[0, '複製時,解旋酶在「複製叉」打斷鹼基之間的氫鍵,把雙股拉開;兩條舊股各自當模板。'],
+      [4.2, 'DNA 聚合酶不能從零開始:引子酶先做一小段 RNA 引子,聚合酶再接在引子的 3′ 端後面。'],
+      [8.5, '聚合酶只能往 3′ 端接(新股從 5′ 長到 3′):前導股朝複製叉連續合成;延遲股方向相反,只能一段一段做,叫岡崎片段。'],
+      [13.5, '最後 RNA 引子被換成 DNA,接合酶把岡崎片段接成一條完整的股。']],
+    draw: drawReplication,
+  },
+  {
+    key: 'meselson', name: '半保留複製:Meselson 與 Stahl', dur: 17,
+    cues: [[0, '1958 年 Meselson 與 Stahl 讓大腸桿菌在氮源是 ¹⁵N(較重的氮)的養分裡長 14 代,DNA 都變重;再突然換成一般的 ¹⁴N。'],
+      [4.6, '每一代取樣,把 DNA 放進氯化銫溶液高速離心:DNA 會停在和自己密度相同的地方,越重停得越低。'],
+      [9.5, '第 1 代全部在中間,第 2 代中間與輕各一半:正好符合半保留複製,每個新雙股都是一條舊股配一條新股。'],
+      [13.5, '右邊可以改世代數、換假說對照:全保留在第 1 代就不符;分散的第 1 代也是一條中間帶,但第 2 代起就不符。']],
+    draw: drawMeselson,
+  },
+  {
+    key: 'transcription', name: '轉錄:照著 DNA 抄出 mRNA', dur: 17,
+    cues: [[0, '轉錄是把基因的 DNA 序列抄成 RNA。RNA 聚合酶先結合在基因前面的啟動子,那段序列標示「從這裡開始」。'],
+      [4.4, '它把雙股打開一小段,只讀其中一股(模板股),照配對規則接上核苷酸;和 DNA 聚合酶不同,它不需要引子。'],
+      [9, 'RNA 一樣從 5′ 長到 3′,但用 U(尿嘧啶)代替 T:模板股上是 A 的地方,RNA 接的是 U。'],
+      [13, '做出來的 mRNA 和另一股(編碼股)序列相同,只是 T 換成 U;聚合酶走過之後,DNA 又合回雙股。']],
+    draw: drawTranscription,
+  },
+  {
+    key: 'processing', name: 'RNA 加工:加帽、加尾、剪接', dur: 13,
+    cues: [[0, '真核生物(包括植物)剛轉錄出來的是前驅 mRNA,要在細胞核裡加工好,才送到細胞質。'],
+      [3.8, '5′ 端加上「帽」(甲基化的 G),3′ 端接上約 200 個 A 的尾巴:兩者都保護 mRNA,帽也幫助核糖體開始轉譯。'],
+      [8.4, '中間的內含子由剪接體剪掉,外顯子接起來;加工好的成熟 mRNA 才離開細胞核去轉譯。']],
+    draw: drawProcessing,
+  },
+  {
+    key: 'translation', name: '轉譯:三個鹼基換一個胺基酸', dur: 17,
+    cues: [[0, '轉譯在核糖體上進行:核糖體夾住 mRNA,從起始密碼子 AUG 開始,每次讀 3 個鹼基,也就是一個密碼子。'],
+      [4.6, 'tRNA 一端有 3 個鹼基的反密碼子,和密碼子配對;另一端帶著這個密碼子指定的胺基酸。'],
+      [9, '核糖體把新來的胺基酸接到鏈上(肽鍵),再往 3′ 方向移一個密碼子,空的 tRNA 離開。'],
+      [13.2, '讀到終止密碼子(UAA、UAG、UGA)時沒有 tRNA 對得上,釋放因子讓整條多肽鏈脫離。']],
+    draw: drawTranslation,
+  },
+  {
+    key: 'mutation', name: '突變:改一個鹼基會怎樣', dur: 16,
+    cues: [[0, '點突變:DNA 上一個鹼基被換掉,轉錄出的 mRNA 跟著改。這裡用人類 β 球蛋白基因(HBB)開頭的 9 個密碼子。'],
+      [4, '同義突變:新密碼子還是同一種胺基酸,蛋白質不變。很多胺基酸有好幾個密碼子,常常只差在第三個鹼基。'],
+      [8, '錯義突變:換成另一種胺基酸。第 7 個密碼子 GAG 變成 GUG(麩胺酸換成纈胺酸),就是鐮刀型紅血球疾病的突變。'],
+      [12, '無義突變:變成終止密碼子,蛋白質提早結束。右邊可以自己選位置和鹼基,結果照標準遺傳密碼表算。']],
+    draw: drawMutation,
+  },
+];
+
+createLesson({
+  chapters,
+  state: { gen: 2, model: 'semi', mutPos: 20, mutBase: 'U' },
+  controls: [
+    { id: 'gen', label: '世代數(換到 ¹⁴N 之後)', type: 'range', min: 0, max: 4, step: 1, format: (v) => `第 ${v} 代`, chapters: ['meselson'], restart: false },
+    { id: 'model', label: '對照的假說', type: 'seg', options: [{ v: 'semi', label: '半保留' }, { v: 'cons', label: '全保留' }, { v: 'disp', label: '分散' }], chapters: ['meselson'], restart: false },
+    { id: 'mutPos', label: '要改的位置', type: 'range', min: 4, max: 27, step: 1, format: (v) => `第 ${Math.ceil(v / 3)} 個密碼子・第 ${((v - 1) % 3) + 1} 個鹼基`, chapters: ['mutation'], restart: false },
+    { id: 'mutBase', label: '換成(mRNA 上的鹼基)', type: 'seg', options: ['A', 'U', 'G', 'C'].map((b) => ({ v: b, label: b })), chapters: ['mutation'], restart: false },
+  ],
+});
+createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
+</script>
+</body>
+</html>

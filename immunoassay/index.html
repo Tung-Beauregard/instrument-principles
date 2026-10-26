@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>抗體檢測:西方墨點法與 ELISA</title>
+<meta name="description" content="用動畫看抗體怎麼專一地抓住目標蛋白,西方墨點法怎麼依大小分開、轉印到膜上、讓目標條帶發光,以及三明治 ELISA 怎麼從顏色深淺與標準曲線算出濃度。可以自己拿掉阻斷、改清洗,調樣品濃度與稀釋倍數。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="抗體檢測:西方墨點法與 ELISA">
+<meta property="og:description" content="用動畫看抗體怎麼抓住目標蛋白,西方墨點法怎麼讓目標條帶發光,三明治 ELISA 怎麼從顏色深淺與標準曲線算出濃度。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/immunoassay/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/immunoassay.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="抗體檢測:Y 字形的抗體抓住目標蛋白、膜上發光的條帶與 ELISA 孔盤的動畫">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/immunoassay/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理"><a href="../">← 儀器入口</a><a href="../central-dogma/">中心法則</a><a href="../pcr/">PCR 與電泳</a><a href="../sequencing/">DNA 定序</a><a href="../dna-markers/">DNA 鑑定</a><a href="../cloning/">基因選殖</a><a href="../terpene-synthase/">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="./" aria-current="page">抗體檢測</a><a href="../flow-cytometry/">流式細胞儀</a><a href="../proteomics/">蛋白質定序</a></nav></div>
+<header class="top wrap">
+  <h1>抗體檢測 <span class="k">西方墨點法與 ELISA</span></h1>
+  <p class="lede">抗體能專一地抓住某一種蛋白質。西方墨點法先把蛋白質依大小分開、轉到膜上,再用抗體讓目標的條帶發光;ELISA 在孔盤裡用兩支抗體把目標夾住,從顏色深淺與標準曲線算出濃度。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="抗體檢測動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <ul>
+      <li>抗體是 Y 字形的蛋白質(最常見的 IgG 約 150 kDa):兩條重鏈、兩條輕鏈,手臂末端的可變區專一地抓住抗原表面的一小塊(抗原決定位)。一級抗體認目標,二級抗體認一級抗體,身上帶著酵素(例如 HRP)或螢光分子。</li>
+      <li>西方墨點法:SDS 讓蛋白質攤開、帶上和質量成比例的負電,在聚丙烯醯胺膠裡依大小分開,對照分子量標準(kDa)估大小;再用電把蛋白質轉到 PVDF 或硝化纖維素膜上,經過阻斷(脫脂牛奶或 BSA)、一級抗體、清洗、帶 HRP 的二級抗體、清洗,加冷光受質拍下條帶。</li>
+      <li>三明治 ELISA:捕捉抗體固定在孔底,抓住樣品裡的抗原,再由認另一個位置的偵測抗體夾住;HRP 讓 TMB 變藍,加酸後轉黃,量 450 nm 的吸光度。1971 年由瑞典與荷蘭兩個團隊各自發表。</li>
+      <li>定量靠同一盤的標準曲線(S 形,常用四參數曲線擬合):讀值要落在標準品的範圍內、最好在曲線中段;太濃就稀釋再測,結果乘回稀釋倍數。</li>
+      <li>西方墨點法看得到大小與多出的條帶,但屬於半定量;ELISA 適合大量樣品定量,但看不出抓到的東西多大。兩種方法裡蛋白質的狀態不同(攤開與摺好),同一支抗體不一定兩邊都能用。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Mahmood T, Yang PC. Western blot: technique, theory, and trouble shooting. N Am J Med Sci. 2012;4(9):429–434. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3456489/">PMC3456489</a>(膜放在膠與正極之間、PVDF 與硝化纖維素、用 5% BSA 或脫脂牛奶阻斷、TBST 清洗三次、HRP 與冷光偵測、洗太久訊號變弱、結果屬於半定量)</li>
+      <li>Bio-Rad. Molecular Weight Determination by SDS-PAGE. Tech Note 3133. <a href="https://www.bio-rad.com/webroot/web/pdf/lsr/literature/Bulletin_3133.pdf">Bulletin 3133</a>(SDS 讓蛋白質變性並帶上固定的電荷質量比、還原劑切開雙硫鍵、分子量的對數對移動距離作圖、誤差約 ±10%、250 到 10 kD 的標準)</li>
+      <li>OpenStax Microbiology:<a href="https://openstax.org/books/microbiology/pages/18-1-overview-of-specific-adaptive-immunity">18.1</a>(抗體的重鏈、輕鏈與可變區,IgG 約 150,000 道耳頓、兩個抗原結合位)、<a href="https://openstax.org/books/microbiology/pages/20-2-detecting-antigen-antibody-complexes">20.2</a>(西方墨點法的一級與二級抗體)、<a href="https://openstax.org/books/microbiology/pages/20-4-eias-and-elisas">20.4</a>(三明治 ELISA、用白蛋白或酪蛋白阻斷、標準曲線)</li>
+      <li>Thermo Fisher Scientific 技術說明:<a href="https://www.thermofisher.com/us/en/home/life-science/protein-biology/protein-biology-learning-center/protein-biology-resource-library/pierce-protein-methods/overview-elisa.html">ELISA 概述</a>(捕捉與偵測抗體認不同的抗原決定位、TMB 被 HRP 氧化變藍、加硫酸或磷酸轉黃)、<a href="https://www.thermofisher.com/order/catalog/product/34021">1-Step TMB 受質</a>(黃色產物在 450 nm 測)、<a href="https://www.thermofisher.com/us/en/home/life-science/protein-biology/protein-biology-learning-center/protein-biology-resource-library/pierce-protein-methods/elisa-data-analysis.html">ELISA Data Analysis</a>(四參數擬合、曲線兩端誤差大、稀釋到曲線範圍內再乘回稀釋倍數)</li>
+      <li>Lequin RM. Enzyme immunoassay (EIA)/enzyme-linked immunosorbent assay (ELISA). Clin Chem. 2005;51(12):2415–2418. <a href="https://doi.org/10.1373/clinchem.2005.051532">doi:10.1373/clinchem.2005.051532</a>(瑞典 Engvall 與 Perlmann、荷蘭 Schuurs 與 van Weemen 兩組各自發展,第一篇論文都在 1971 年發表);Pillai-Kastoori L, et al. Antibody validation for Western blot: By the user, for the user. J Biol Chem. 2020;295(4):926–939. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6983856/">PMC6983856</a>(用在西方墨點法的抗體不一定適合其他方法、多出的條帶可能是降解或修飾)</li>
+      <li>動畫裡的蛋白質與抗體形狀、目標蛋白的大小(60 kDa)、條帶的位置與亮度、背景與雜帶的程度、ELISA 標準品濃度、吸光度、四參數曲線的參數與讀值誤差(±0.05)都是示意值,不是某個實驗的實測結果。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化原理・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, seg, ease, clamp, lerp, rng } from '../assets/bio-draw.js';
+import { createRotateHint } from '../assets/mobile-panels.js';
+
+// 配色:一級抗體與捕捉抗體用藍,二級抗體與偵測抗體用薄荷綠,可變區(抓抗原的手臂末端)用琥珀,
+// 目標蛋白(抗原)用橘,其他蛋白用灰,阻斷用的蛋白用米色,酵素 HRP 用淡紫,雙硫鍵用淡黃
+const AB1 = C.blue, AB2 = C.mint, VAR = C.amber, AG = C.hot, OTHER = '#8a9a94', BLK = '#e3d6b3', SS = '#fff1a8';
+const TH = 0.66; // Y 字形的手臂和中軸的夾角(弧度,約 38°)
+const SN = Math.sin(TH), CS = Math.cos(TH);
+const fade = (t, a, d = 0.6) => ease(seg(t, a, a + d));
+
+// 一個抗體(Y 字形)。(x, y) 是分岔點,s 是手臂長;ang = 0 手臂朝上,π 手臂朝下。
+// hrp: 柄的末端接一個酵素。回傳兩個手臂尖端 L、R,柄的末端 F,酵素的位置 E
+function ab(g, x, y, s, col, { ang = 0, alpha = 1, tip = VAR, hrp = false, t = 0 } = {}) {
+  const ca = Math.cos(ang), sa = Math.sin(ang);
+  const P = (px, py) => [x + px * ca - py * sa, y + px * sa + py * ca];
+  const L = P(-SN * s, -CS * s), R = P(SN * s, -CS * s), F = P(0, s * 0.9), E = P(0, s * 1.3);
+  const Lm = P(-SN * s * 0.62, -CS * s * 0.62), Rm = P(SN * s * 0.62, -CS * s * 0.62);
+  if (alpha <= 0.01) return { L, R, F, E };
+  const w = Math.max(3, s * 0.2);
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  if (hrp) { g.line(F[0], F[1], E[0], E[1], C.lav, 2); g.blob(E[0], E[1], s * 0.4, s * 0.32, C.lav, '', { wobble: 0.8, t }); }
+  g.line(x, y, F[0], F[1], col, w);
+  g.line(x, y, Lm[0], Lm[1], col, w); g.line(x, y, Rm[0], Rm[1], col, w);
+  g.line(Lm[0], Lm[1], L[0], L[1], tip, w); g.line(Rm[0], Rm[1], R[0], R[1], tip, w);
+  g.ctx.restore();
+  return { L, R, F, E };
+}
+// 發光(冷光受質被 HRP 作用時)
+function glow(g, x, y, r, a, rgb = '236,255,190') {
+  if (a <= 0.01) return;
+  const ctx = g.ctx, gr = ctx.createRadialGradient(x, y, 0, x, y, r);
+  gr.addColorStop(0, `rgba(${rgb},${0.95 * a})`); gr.addColorStop(0.35, `rgba(${rgb},${0.4 * a})`); gr.addColorStop(1, `rgba(${rgb},0)`);
+  ctx.save(); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+}
+// 抗原決定位的小形狀(三角、方塊、圓點),a 是朝外的方向
+function epi(g, x, y, kind, a, r = 7, col = C.ink) {
+  const ctx = g.ctx; ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.fillStyle = col; ctx.beginPath();
+  if (kind === 'tri') { ctx.moveTo(r, 0); ctx.lineTo(-r * 0.55, -r * 0.85); ctx.lineTo(-r * 0.55, r * 0.85); ctx.closePath(); }
+  else if (kind === 'sq') ctx.rect(-r * 0.65, -r * 0.65, r * 1.3, r * 1.3);
+  else ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2);
+  ctx.fill(); ctx.restore();
+}
+// 一個蛋白質(一團),epis 是表面的抗原決定位 [[形狀, 方向], ...]
+function prot(g, x, y, rx, ry, col, { alpha = 1, epis = [], t = 0, wob = 0.7, er = 7 } = {}) {
+  if (alpha <= 0.01) return;
+  g.ctx.save(); g.ctx.globalAlpha *= alpha;
+  g.blob(x, y, rx, ry, col, '', { wobble: wob, t });
+  for (const [kind, a] of epis) epi(g, x + Math.cos(a) * (rx + 1), y + Math.sin(a) * (ry + 1), kind, a, er);
+  g.ctx.restore();
+}
+// 標籤的引線
+function lead(g, x1, y1, x2, y2, a = 1) {
+  if (a <= 0.01) return;
+  g.ctx.save(); g.ctx.globalAlpha *= a;
+  g.line(x1, y1, x2, y2, 'rgba(185,199,192,.6)', 1.4); g.circle(x2, y2, 2.6, 'rgba(220,230,225,.9)');
+  g.ctx.restore();
+}
+function lab(g, x, y, s, { a = 1, size = 15, color = C.ink2, align = 'left', weight = 600 } = {}) {
+  if (a > 0.01) g.text(x, y, s, { size, color, align, weight, alpha: a });
+}
+// SDS 分子:帶負電的圓頭加一條長尾巴(碳鏈),ang 是尾巴的方向
+function sds(g, x, y, ang, a = 1) {
+  if (a <= 0.01) return;
+  const ctx = g.ctx; ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y); ctx.rotate(ang);
+  ctx.beginPath(); ctx.moveTo(5, 0); for (let i = 1; i <= 5; i++) ctx.lineTo(5 + i * 4, i % 2 ? -3 : 3);
+  ctx.strokeStyle = C.ink2; ctx.lineWidth = 1.6; ctx.lineJoin = 'round'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fillStyle = C.blue; ctx.fill();
+  ctx.fillStyle = '#0b1111'; ctx.fillRect(-3.2, -0.9, 6.4, 1.8);
+  ctx.restore();
+}
+// 96 孔盤(8 列 × 12 行)。fill(r, c) 回傳那一孔的顏色,沒有就畫空孔;hi 是要圈起來的孔 [列, 行]
+function plate(g, x, y, p, fill, { hi } = {}) {
+  g.rrect(x, y, p * 12.8, p * 8.8, p * 0.5, '#13201d', 'rgba(185,199,192,.45)');
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 12; c++) {
+    const f = fill ? fill(r, c) : null;
+    g.circle(x + p * (0.9 + c), y + p * (0.9 + r), p * 0.36, f || '#0a1211', 'rgba(185,199,192,.35)', 1);
+  }
+  if (hi) g.circle(x + p * (0.9 + hi[1]), y + p * (0.9 + hi[0]), p * 0.62, null, C.mint, 2);
+}
+
+// 西方墨點法:分子量標準(kDa,Bio-Rad Precision Plus 那一組的數值)與條帶的位置(對數尺度,示意)
+const LADDER = [250, 150, 100, 75, 50, 37, 25, 20, 15, 10];
+const LMAX = Math.log10(330), LMIN = Math.log10(8);
+const mwPos = (mw) => (LMAX - Math.log10(mw)) / (LMAX - LMIN); // 0 是膠的上端,1 是下端
+const TARGET = 60; // 目標蛋白的大小(示意)
+const LYSATE = (() => { const R = rng(21); const out = []; for (let i = 0; i < 26; i++) out.push({ mw: 10 ** (1 + R() * 1.38), a: 0.25 + R() * 0.55, b: 0.5 + R() }); return out; })();
+// 摺好的蛋白質(畫成纏在一起的一條鏈,示意)
+const COIL = Array.from({ length: 40 }, (_, i) => { const u = i / 39; return [Math.sin(u * Math.PI * 5.3 + 0.3) * (0.62 + 0.38 * Math.cos(u * 7.3)), Math.cos(u * Math.PI * 4.1 + 1.1) * (0.7 + 0.3 * Math.sin(u * 9.1))]; });
+
+// ELISA 標準曲線(四參數,示意):A = d + (a − d) / (1 + (x / c)^b),x 是濃度(ng/mL)
+const P4 = { a: 0.06, b: 1.15, c: 4, d: 3.0 };
+const f4 = (x) => P4.d + (P4.a - P4.d) / (1 + (x / P4.c) ** P4.b);
+const inv4 = (y) => (y <= P4.a || y >= P4.d ? NaN : P4.c * ((P4.a - P4.d) / (y - P4.d) - 1) ** (1 / P4.b));
+const STDS = [0.156, 0.3125, 0.625, 1.25, 2.5, 5, 10]; // 標準品:從 10 ng/mL 每次稀釋一半(示意)
+const SLO = STDS[0], SHI = STDS[STDS.length - 1];
+const DELTA = 0.05; // 吸光度讀值的誤差(示意)
+const NICE = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500]; // 控制項可以選的樣品濃度(ng/mL)
+const sig = (v, n = 3) => String(Number(v.toPrecision(n)));
+
+const chapters = [
+  {
+    key: 'antibody', name: '抗體:Y 字形的蛋白質', dur: 15,
+    cues: [[0, '抗體是免疫系統做出來的 Y 字形蛋白質:兩條長的重鏈、兩條短的輕鏈,靠雙硫鍵連在一起。'],
+      [5, 'Y 的兩個手臂末端叫可變區;不同抗體的可變區形狀不同,各自專一地抓住抗原表面的某一小塊,叫抗原決定位(epitope)。'],
+      [10, '做檢測時,一級抗體負責認目標蛋白;二級抗體再認一級抗體,身上接著酵素或螢光分子,負責產生訊號。']],
+    draw(g, t) {
+      const hx = 220, hy = 262, s = 150, st = 140;
+      // 重鏈(兩條):手臂末端是可變區,往下並排成柄
+      for (const k of [-1, 1]) {
+        const a = ease(seg(t, k < 0 ? 0.2 : 0.5, k < 0 ? 1.6 : 1.9));
+        if (a <= 0) continue;
+        const dy = (1 - a) * 80, x = hx + k * 9;
+        const tip = [hx + k * SN * s, hy - CS * s + dy], m = [hx + k * SN * s * 0.7, hy - CS * s * 0.7 + dy];
+        g.ctx.save(); g.ctx.globalAlpha *= a;
+        g.curve([m, [x, hy + dy], [x, hy + st + dy]], AB1, 12);
+        g.curve([tip, m], VAR, 12);
+        g.ctx.restore();
+      }
+      // 輕鏈(兩條):貼在手臂外側
+      for (const k of [-1, 1]) {
+        const a = ease(seg(t, k < 0 ? 1.2 : 1.5, k < 0 ? 2.4 : 2.7));
+        if (a <= 0) continue;
+        const off = 16 + (1 - a) * 70;
+        const P = (u) => [hx + k * SN * s * u + k * CS * off, hy - CS * s * u + SN * off];
+        g.ctx.save(); g.ctx.globalAlpha *= a;
+        g.curve([P(0.42), P(0.7)], '#bcdcff', 9);
+        g.curve([P(0.7), P(1)], VAR, 9);
+        g.ctx.restore();
+      }
+      // 雙硫鍵:兩條重鏈之間、輕鏈與重鏈之間
+      const ss = ease(seg(t, 2.6, 3.2));
+      if (ss > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ss;
+        for (const y of [hy + 18, hy + 32]) g.line(hx - 14, y, hx + 14, y, SS, 3.5);
+        for (const k of [-1, 1]) { const p = [hx + k * SN * s * 0.46, hy - CS * s * 0.46]; g.line(p[0], p[1], p[0] + k * CS * 16, p[1] + SN * 16, SS, 3.5); }
+        g.ctx.restore();
+      }
+      lead(g, hx + 58, hy + 100, hx + 16, hy + 100, fade(t, 1.2)); lab(g, hx + 64, hy + 100, '重鏈', { a: fade(t, 1.2), color: AB1 });
+      lead(g, 92, 226, 137, 190, fade(t, 2.2)); lab(g, 50, 232, '輕鏈', { a: fade(t, 2.2), color: '#bcdcff' });
+      lead(g, hx + 58, hy + 25, hx + 16, hy + 25, fade(t, 3.0)); lab(g, hx + 64, hy + 25, '雙硫鍵', { a: fade(t, 3.0), color: SS });
+      lab(g, hx, hy + st + 30, '最常見的抗體 IgG', { a: fade(t, 3.4), size: 14, align: 'center' });
+      lab(g, hx, hy + st + 54, '約 150 kDa(千道耳頓,質量單位)', { a: fade(t, 3.4), size: 13, color: C.muted, align: 'center', weight: 500 });
+      // 可變區與抗原
+      lead(g, 112, 104, 131, 142, fade(t, 5)); lab(g, 40, 92, '可變區:抓抗原', { a: fade(t, 5), size: 16, color: VAR, weight: 700 });
+      const come = ease(seg(t, 5.5, 8));
+      if (come > 0) {
+        const ax = lerp(560, 349, come), ay = lerp(-40, 112, come);
+        prot(g, ax, ay, 44, 36, AG, { epis: [['tri', Math.PI * 0.75], ['sq', -Math.PI * 0.3], ['dot', Math.PI * 0.15]], t, wob: 0.5 });
+        lab(g, 404, 84, '抗原', { a: fade(t, 8), color: AG });
+        glow(g, 318, 138, 30, (1 - seg(t, 8, 9)) * (t >= 8 ? 1 : 0), '255,230,150');
+        lead(g, 374, 176, 323, 141, fade(t, 8.2)); lab(g, 378, 182, '抗原決定位', { a: fade(t, 8.2), color: C.ink });
+        lab(g, 378, 206, '(一個抗原常有好幾個)', { a: fade(t, 8.2), size: 13, color: C.muted, weight: 500 });
+      }
+      // 右:做檢測時,一級抗體認目標、二級抗體認一級抗體
+      const pa = fade(t, 10, 0.8);
+      if (pa > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= pa;
+        g.panel(570, 34, 365, 466, '做檢測時');
+        g.rrect(600, 450, 300, 14, 3, 'rgba(223,231,226,.2)', 'rgba(223,231,226,.5)');
+        lab(g, 600, 482, '膜(或孔盤的底)', { size: 13, color: C.muted, weight: 500 });
+        prot(g, 690, 432, 26, 17, AG, { epis: [['tri', -Math.PI / 2]], t, wob: 0.5 });
+        g.ctx.restore();
+        const p1 = ease(seg(t, 10.6, 11.8)), p2 = ease(seg(t, 12, 13.2));
+        const hx1 = 690 + SN * 56, hy1 = 407 - CS * 56;
+        if (p1 > 0) ab(g, hx1, hy1 - (1 - p1) * 130, 56, AB1, { ang: Math.PI, alpha: p1 });
+        const fx = hx1, fy = hy1 - 56 * 0.9;
+        const lit = ease(seg(t, 13.3, 14)) * (0.85 + 0.15 * Math.sin(t * 6));
+        const E = [];
+        if (p2 > 0) for (const k of [-1, 1]) {
+          const r = ab(g, fx + k * SN * 44, fy - 2 - CS * 44 - (1 - p2) * 120, 44, AB2, { ang: Math.PI, alpha: p2, hrp: true, t: t + k });
+          E.push(r.E);
+        }
+        for (const e of E) glow(g, e[0], e[1], 46, lit);
+        lead(g, 794, 205, 775, 214, fade(t, 12.6)); lab(g, 800, 205, '酵素 HRP', { a: fade(t, 12.6), color: C.lav });
+        lead(g, 794, 262, 770, 262, fade(t, 12.4)); lab(g, 800, 262, '二級抗體', { a: fade(t, 12.4), color: AB2 });
+        lead(g, 794, 345, 752, 345, fade(t, 11.2)); lab(g, 800, 345, '一級抗體', { a: fade(t, 11.2), color: AB1 });
+        lead(g, 794, 432, 718, 432, fade(t, 10.6)); lab(g, 800, 432, '目標蛋白', { a: fade(t, 10.6), color: AG });
+        if (lit > 0.05) g.tag(fx, 150, '產生訊號(光或顏色)', { size: 14, color: '#f4ffd8', alpha: ease(seg(t, 13.3, 14)) });
+      }
+    },
+  },
+  {
+    key: 'sds-page', name: '西方墨點法(一):SDS-PAGE 依大小分開', dur: 16,
+    cues: [[0, '西方墨點法(Western blot)第一步是 SDS-PAGE(SDS 聚丙烯醯胺凝膠電泳):把樣品裡的蛋白質依大小分開。'],
+      [3.5, '樣品先加 SDS(一種帶負電的清潔劑)並加熱,摺好的蛋白質攤開成一條長鏈,沿著鏈包滿負電。'],
+      [7, '鏈越長負電越多,每單位質量帶的負電差不多;通電後全部往正極跑,膠裡細密的網孔讓小的跑得快、大的跑得慢。'],
+      [12, '旁邊一道放分子量標準(單位 kDa,千道耳頓),比對位置就能估出每條帶大約多大。']],
+    draw(g, t) {
+      // 左:SDS 與加熱讓蛋白質攤開、包上負電
+      g.panel(30, 34, 440, 466, 'SDS 和加熱做了什麼');
+      g.thermo(384, 84, 150, lerp(25, 95, ease(seg(t, 1, 3.5))));
+      lab(g, 384, 264, '加熱', { size: 13, color: C.muted, align: 'center', weight: 500 });
+      const k = ease(seg(t, 3.5, 6));
+      const cx = 175, cy = 182, x0 = 66, x1 = 340, yL = 182;
+      const pts = COIL.map(([u, v], i) => { const f = i / (COIL.length - 1); return [lerp(cx + u * 62, x0 + f * (x1 - x0), k), lerp(cy + v * 52, yL, k) + Math.sin(t * 2 + i) * 1.2 * (1 - k)]; });
+      g.curve(pts, AG, 6);
+      const sa = fade(t, 0.4, 1) * (1 - ease(seg(t, 4.2, 5.2)));
+      const R = rng(9);
+      for (let i = 0; i < 9; i++) {
+        const a0 = (i / 9) * Math.PI * 2 + R() * 0.4, d = lerp(1.7, 1.05, ease(seg(t, 0.6 + i * 0.12, 3.2 + i * 0.1)));
+        sds(g, cx + Math.cos(a0) * 66 * d, cy + Math.sin(a0) * 56 * d, a0 + Math.PI, sa);
+      }
+      const ma = ease(seg(t, 5.2, 6.2));
+      for (let i = 1; i < COIL.length; i += 3) lab(g, pts[i][0], yL - 18, '−', { a: ma, size: 17, color: C.blue, align: 'center', weight: 800 });
+      lab(g, 66, 216, '長的鏈:負電多', { a: fade(t, 6, 0.6), size: 14 });
+      const sh = fade(t, 6.4, 0.8);
+      if (sh > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= sh;
+        g.line(66, 290, 166, 290, AG, 6);
+        for (let i = 0; i < 4; i++) lab(g, 76 + i * 27, 272, '−', { size: 17, color: C.blue, align: 'center', weight: 800 });
+        g.ctx.restore();
+        lab(g, 66, 324, '短的鏈:負電少', { a: sh, size: 14 });
+      }
+      lab(g, 66, 376, '每單位質量帶的負電差不多,', { a: fade(t, 7.2, 0.8), color: C.mint, weight: 700 });
+      lab(g, 66, 402, '所以跑多快只看大小', { a: fade(t, 7.2, 0.8), color: C.mint, weight: 700 });
+      sds(g, 70, 458, 0, fade(t, 0.4));
+      lab(g, 104, 458, 'SDS:一頭帶負電的清潔劑', { a: fade(t, 0.4), size: 13, color: C.muted, weight: 500 });
+      // 右:膠
+      const gx = 600, gy = 100, gw = 300, gh = 370;
+      const lanes = [{ x: 650, name: '標準' }, { x: 750, name: '樣品 A' }, { x: 850, name: '樣品 B' }];
+      g.rrect(gx, gy, gw, gh, 6, 'rgba(150,190,200,.12)', 'rgba(170,210,220,.35)');
+      lab(g, gx + gw / 2, 62, '負極(−)', { size: 14, align: 'center', weight: 700 });
+      lab(g, gx + gw / 2, 492, '正極(+)', { size: 14, color: C.red, align: 'center', weight: 700 });
+      for (const l of lanes) { g.rrect(l.x - 28, gy + 8, 56, 8, 2, '#05090a'); lab(g, l.x, gy - 14, l.name, { size: 13, align: 'center', weight: 500 }); }
+      const run = ease(seg(t, 8.5, 13));
+      const yAt = (mw) => gy + 20 + run * mwPos(mw) * (gh - 44);
+      for (const b of LYSATE) {
+        g.rrect(lanes[1].x - 25, yAt(b.mw) - 2, 50, 4, 2, `rgba(205,215,210,${0.12 + 0.5 * b.a})`);
+        g.rrect(lanes[2].x - 25, yAt(b.mw) - 2, 50, 4, 2, `rgba(205,215,210,${0.12 + 0.5 * clamp(b.a * b.b)})`);
+      }
+      for (const mw of LADDER) g.rrect(lanes[0].x - 25, yAt(mw) - 2.5, 50, 5, 2, C.blue);
+      const ka = fade(t, 12, 0.8);
+      lab(g, gx - 10, gy - 14, 'kDa', { a: ka, size: 13, color: C.muted, align: 'right', weight: 500 });
+      for (const mw of LADDER) lab(g, gx - 10, yAt(mw), String(mw), { a: ka, size: 13, align: 'right', weight: 500 });
+      const ba = fade(t, 10, 0.8);
+      if (ba > 0) {
+        lab(g, 926, 140, '大', { a: ba, size: 15, align: 'center' });
+        g.arrow(926, 158, 926, 420, { color: C.ink2, lw: 2, alpha: ba });
+        lab(g, 926, 440, '小', { a: ba, size: 15, align: 'center' });
+      }
+      lab(g, gx, 520, '灰色:樣品的蛋白質(實際要染色才看得到)', { a: fade(t, 9), size: 13, color: C.muted, weight: 500 });
+    },
+  },
+  {
+    key: 'transfer', name: '西方墨點法(二):轉印到膜上', dur: 12,
+    cues: [[0, '接著把膠上的蛋白質轉到一張薄膜上固定住,常用 PVDF(聚偏二氟乙烯)膜或硝化纖維素膜。'],
+      [4, '膠和膜疊在一起,外面夾濾紙和海綿,膜放在靠正極的那一側;通電後帶負電的蛋白質從膠移到膜上,緊緊黏住。'],
+      [8.5, '轉好的膜上,條帶的上下位置和膠上一樣;之後的步驟都在這張膜上進行。']],
+    draw(g, t) {
+      // 左:側面看「三明治」(負極在左、正極在右)
+      const top = 120, h = 300;
+      const layers = [
+        { x: 64, w: 10, fill: '#3d4a47', y0: top - 10, h0: h + 20 },
+        { x: 88, w: 56, fill: '#2f3d39', name: '海綿', lx: 116, ly: 446 },
+        { x: 150, w: 16, fill: 'rgba(201,211,206,.55)', name: '濾紙', lx: 158, ly: 472 },
+        { x: 172, w: 56, fill: 'rgba(150,190,200,.22)', stroke: 'rgba(170,210,220,.45)', name: '膠', lx: 200, ly: 446 },
+        { x: 234, w: 10, fill: 'rgba(238,242,238,.85)', name: '膜', lx: 239, ly: 472 },
+        { x: 250, w: 16, fill: 'rgba(201,211,206,.55)', name: '濾紙', lx: 258, ly: 446 },
+        { x: 272, w: 56, fill: '#2f3d39', name: '海綿', lx: 300, ly: 472 },
+        { x: 342, w: 10, fill: 'rgba(255,123,123,.75)', y0: top - 10, h0: h + 20 },
+      ];
+      layers.forEach((L, i) => {
+        const a = ease(seg(t, 0.2 + i * 0.35, 0.9 + i * 0.35));
+        if (a <= 0) return;
+        const dy = (1 - a) * -40;
+        g.ctx.save(); g.ctx.globalAlpha *= a;
+        g.rrect(L.x, (L.y0 || top) + dy, L.w, L.h0 || h, 2, L.fill, L.stroke);
+        if (L.name === '海綿') for (let r = 0; r < 14; r++) for (let c = 0; c < 3; c++) g.circle(L.x + 10 + c * 18 + (r % 2) * 9, top + 12 + r * 21 + dy, 2.2, 'rgba(255,255,255,.08)');
+        g.ctx.restore();
+        if (L.name) { lead(g, L.lx, L.ly - 12, L.x + L.w / 2, top + h + 2, a); lab(g, L.lx, L.ly, L.name, { a, size: 14, align: 'center', color: L.name === '膜' || L.name === '膠' ? C.ink : C.ink2 }); }
+      });
+      lab(g, 69, 94, '負極(−)', { a: fade(t, 0.2), size: 14, align: 'center', weight: 700 });
+      lab(g, 347, 94, '正極(+)', { a: fade(t, 2.6), size: 14, color: C.red, align: 'center', weight: 700 });
+      lead(g, 239, 72, 239, 116, fade(t, 1.6)); lab(g, 239, 62, 'PVDF 或硝化纖維素膜', { a: fade(t, 1.6), size: 14, align: 'center', color: C.ink });
+      // 蛋白質(條帶)從膠往膜移動
+      const mv = ease(seg(t, 4.5, 8.3));
+      const bands = [...LADDER.map((mw) => ({ mw, col: C.blue })), { mw: TARGET, col: 'rgba(205,215,210,.85)' }, { mw: 32, col: 'rgba(205,215,210,.85)' }, { mw: 120, col: 'rgba(205,215,210,.85)' }];
+      if (t > 2.4) for (const b of bands) {
+        const y = top + 14 + mwPos(b.mw) * (h - 30);
+        const x = lerp(200, 239, mv), w = lerp(34, 8, mv);
+        g.rrect(x - w / 2, y - 2.5, w, 5, 2, b.col);
+        if (mv > 0 && mv < 1) lab(g, x + w / 2 + 7, y - 1, '−', { size: 14, color: C.blue, align: 'center', weight: 800 });
+      }
+      const fa = Math.min(fade(t, 4.4), 1 - seg(t, 8.6, 9.2));
+      if (fa > 0) {
+        for (const y of [175, 285, 395]) g.arrow(260 - 60 + ((t * 40) % 30), y, 300 + ((t * 40) % 30), y, { color: C.mint, lw: 2, alpha: 0.5 * fa });
+        lab(g, 208, 30, '通電:帶負電的蛋白質往正極移動', { a: fa, size: 15, align: 'center', color: C.mint, weight: 700 });
+      }
+      // 右:正面看,膠上的條帶轉到膜上
+      const ra = fade(t, 3.6, 0.8);
+      if (ra > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ra;
+        g.panel(560, 34, 375, 466, '正面看');
+        const GX = 592, MX = 776, Y0 = 112, W = 140, H = 300;
+        g.rrect(GX, Y0, W, H, 4, 'rgba(150,190,200,.14)', 'rgba(170,210,220,.4)');
+        g.rrect(MX, Y0, W, H, 4, '#dfe7e2', 'rgba(255,255,255,.6)');
+        lab(g, GX + W / 2, 92, '膠', { size: 15, align: 'center', color: C.ink });
+        lab(g, MX + W / 2, 92, '膜', { size: 15, align: 'center', color: C.ink });
+        g.arrow(GX + W + 10, Y0 + H / 2, MX - 10, Y0 + H / 2, { color: C.mint, lw: 2.5 });
+        const yb = (mw) => Y0 + 14 + mwPos(mw) * (H - 30);
+        const lanesX = [30, 72, 112];
+        const gelA = 1 - 0.85 * mv, memA = mv;
+        for (const [li, lx] of lanesX.entries()) {
+          if (li === 0) for (const mw of LADDER) { g.rrect(GX + lx - 15, yb(mw) - 2, 30, 4, 2, `rgba(127,184,255,${gelA})`); g.rrect(MX + lx - 15, yb(mw) - 2, 30, 4, 2, `rgba(52,98,200,${memA})`); }
+          else for (const b of LYSATE) { const a = li === 1 ? b.a : clamp(b.a * b.b); g.rrect(GX + lx - 15, yb(b.mw) - 1.5, 30, 3, 1.5, `rgba(205,215,210,${(0.1 + 0.5 * a) * gelA})`); g.rrect(MX + lx - 15, yb(b.mw) - 1.5, 30, 3, 1.5, `rgba(60,72,68,${(0.15 + 0.6 * a) * memA})`); }
+        }
+        const da = fade(t, 8.8, 0.8);
+        if (da > 0) {
+          for (const mw of [150, 75, 37, 20]) g.line(GX + W + 4, yb(mw), MX - 4, yb(mw), `rgba(165,243,205,${0.6 * da})`, 1.4, [4, 4]);
+          lab(g, (GX + W + MX) / 2 + 2, 446, '上下位置一樣', { a: da, size: 15, align: 'center', color: C.mint, weight: 700 });
+        }
+        g.ctx.restore();
+      }
+    },
+  },
+  {
+    key: 'probe', name: '西方墨點法(三):阻斷、抗體與冷光', dur: 17,
+    cues: [[0, '膜很會黏蛋白質,抗體也會被黏住。所以先用脫脂牛奶或 BSA(牛血清白蛋白)把膜上空著的地方蓋滿,這步叫阻斷。'],
+      [4.5, '加一級抗體,它只抓目標蛋白;洗掉沒抓到東西的,再加接了 HRP(辣根過氧化酶)的二級抗體,再洗一次。'],
+      [9.5, '最後加冷光受質(被 HRP 作用後會發光的試劑):只有目標蛋白的位置亮起來,用底片或相機拍下來。'],
+      [13.5, '右邊可以拿掉阻斷或改清洗:沒阻斷、沒洗乾淨,整張膜都會亮;洗太久,連抓好的抗體也被洗掉,條帶變淡。']],
+    draw(g, t, S) {
+      // ===== 左:放大看膜的表面 =====
+      g.panel(30, 30, 530, 478, '放大看膜的表面');
+      const MY = 420;
+      g.rrect(50, MY, 470, 18, 3, 'rgba(223,231,226,.16)', 'rgba(223,231,226,.45)');
+      lab(g, 530, MY + 9, '膜', { size: 14 });
+      const PROTS = [[90, 0], [160, 1], [262, 0], [400, 1], [490, 0]];
+      for (const [x, tg] of PROTS) prot(g, x, MY - 15, tg ? 20 : 17, 15, tg ? AG : OTHER, { epis: tg ? [['tri', -Math.PI / 2]] : [], t, wob: 0.5 });
+      // 1 阻斷:牛奶蛋白或 BSA 蓋住膜上的空位
+      if (S.block) [61, 118, 132, 188, 202, 216, 230, 290, 304, 318, 332, 346, 360, 374, 428, 442, 456, 513].forEach((x, i) => {
+        const k = ease(seg(t, 0.6 + i * 0.13, 1.8 + i * 0.13));
+        if (k > 0) g.circle(x + Math.sin(i * 1.7 + t) * 4 * (1 - k), lerp(120 + (i * 37) % 80, MY - 7, k), 6.5, BLK, 'rgba(0,0,0,.25)', 1);
+      });
+      const pIn = ease(seg(t, 4.6, 6.2)), sIn = ease(seg(t, 7.8, 9.0));
+      const w1 = ease(seg(t, 6.8, 7.6)), w2 = ease(seg(t, 9.0, 9.6));
+      const lit = ease(seg(t, 9.8, 11)) * (0.85 + 0.15 * Math.sin(t * 5));
+      const hrps = []; // 會發光的酵素:[x, y, 亮度]
+      // 2 一級抗體:抓住目標蛋白(洗太久時,右邊那個被洗掉)
+      const fcs = [];
+      [160, 400].forEach((tx, i) => {
+        if (pIn <= 0) return;
+        const hx = tx + SN * 40, hy = 382 - CS * 40;
+        const lost = S.wash === 2 && i === 1;
+        ab(g, hx + (lost ? w1 * 120 : 0), hy - (1 - pIn) * 220 - (lost ? w1 * 150 : 0), 40, AB1, { ang: Math.PI, alpha: lost ? 1 - w1 : 1 });
+        if (!lost) fcs.push([hx, hy - 36]);
+      });
+      // 沒有阻斷時,抗體直接橫躺著黏在膜的空位上(洗不掉):一級抗體三個、二級抗體兩個
+      if (!S.block) {
+        [[126, 16], [225, 22], [362, 20]].forEach(([x, s], i) => {
+          const k = ease(seg(t, 5 + i * 0.3, 6.2 + i * 0.3));
+          if (k > 0) ab(g, x, MY - 16 - (1 - k) * 200, s, AB1, { ang: Math.PI / 2, alpha: k });
+        });
+        [320, 452].forEach((x, i) => {
+          const k = ease(seg(t, 8 + i * 0.3, 9 + i * 0.3));
+          if (k <= 0) return;
+          const r = ab(g, x, MY - 16 - (1 - k) * 180, 18, AB2, { ang: Math.PI / 2, alpha: k, hrp: true, t: t + i });
+          if (k >= 1) hrps.push([r.E[0], r.E[1], 0.9]);
+        });
+      }
+      // 沒抓到東西的抗體:有洗就被沖走;不洗就留下來,慢慢沉到膜附近
+      const settle = (y, i) => (S.wash === 0 ? lerp(y, MY - 64 - (i % 2) * 22, ease(seg(t, 6.8, 9.5))) : y);
+      [[96, 215, 0.5], [292, 250, -2.3], [500, 205, 2.6]].forEach(([x, y, a], i) => {
+        if (pIn <= 0) return;
+        const gone = S.wash ? w1 : 0;
+        ab(g, x + Math.sin(t + i) * 6 + gone * 120, settle(y, i) - (1 - pIn) * 160 - gone * 120 + Math.cos(t * 0.8 + i) * 4, 30, AB1, { ang: a + Math.sin(t * 0.7 + i) * 0.2, alpha: 1 - gone });
+      });
+      // 3 二級抗體(帶 HRP):接在一級抗體的柄上
+      fcs.forEach(([fx, fy], i) => {
+        if (sIn <= 0) return;
+        const r = ab(g, fx - SN * 34, fy - 2 - CS * 34 - (1 - sIn) * 200, 34, AB2, { ang: Math.PI, hrp: true, t: t + i });
+        if (sIn >= 1) hrps.push([r.E[0], r.E[1], 1]);
+      });
+      [[110, 160, 0.4], [300, 150, -0.5], [480, 140, 2.2]].forEach(([x, y, a], i) => {
+        if (sIn <= 0) return;
+        const gone = S.wash ? w2 : 0;
+        const yy = S.wash === 0 ? lerp(y, MY - 100 - i * 14, ease(seg(t, 9, 11))) : y;
+        const r = ab(g, x + Math.sin(t * 0.9 + i) * 6 + gone * 120, yy - (1 - sIn) * 150 - gone * 110, 30, AB2, { ang: a + Math.sin(t * 0.6 + i) * 0.2, alpha: 1 - gone, hrp: true, t: t + i });
+        if (S.wash === 0 && sIn >= 1) hrps.push([r.E[0], r.E[1], 0.6]);
+      });
+      // 4 加冷光受質:有 HRP 的地方發光
+      for (const [x, y, k] of hrps) glow(g, x, y, 44, lit * k);
+      const wl = ['(不洗)', ' 清洗', ' 清洗(太久)'][S.wash];
+      const steps = [[0, S.block ? '1 阻斷' : '1(沒有阻斷)'], [4.5, '2 一級抗體'], [6.8, '3' + wl], [7.8, '4 二級抗體'], [9.0, '5' + wl], [9.6, '6 加冷光受質']];
+      let stp = steps[0][1]; for (const [a, s] of steps) if (t >= a) stp = s;
+      g.tag(470, 64, stp, { size: 14, color: C.ink });
+      // 圖例
+      prot(g, 64, 462, 9, 7, AG, { wob: 0 }); lab(g, 80, 462, '目標蛋白', { size: 14 });
+      prot(g, 188, 462, 9, 7, OTHER, { wob: 0 }); lab(g, 204, 462, '其他蛋白', { size: 14 });
+      if (S.block) { g.circle(312, 462, 6, BLK); lab(g, 326, 462, '阻斷用的蛋白', { size: 14, a: fade(t, 0.6) }); }
+      if (pIn > 0) { ab(g, 64, 484, 11, AB1, { alpha: pIn }); lab(g, 80, 486, '一級抗體', { size: 14, a: pIn }); }
+      if (sIn > 0) { ab(g, 188, 482, 11, AB2, { alpha: sIn }); lab(g, 204, 486, '二級抗體(帶 HRP)', { size: 14, a: sIn }); }
+
+      // ===== 右:拍到的膜 =====
+      g.panel(590, 30, 345, 478, '拍到的膜(示意)');
+      const bx = 660, by = 96, bw = 260, bh = 324;
+      g.rrect(bx, by, bw, bh, 6, '#070b0b', C.line);
+      const yB = (mw) => by + 14 + mwPos(mw) * (bh - 30);
+      const lanes = [{ x: bx + 35, name: '標準' }, { x: bx + 125, name: '樣品 A', amt: 1 }, { x: bx + 215, name: '樣品 B', amt: 0.5 }];
+      const L = ease(seg(t, 9.8, 11.5));
+      const bg = (S.block ? 0 : 0.5) + (S.wash === 0 ? 0.3 : 0);
+      const ns = clamp((S.block ? 0 : 0.5) + (S.wash === 0 ? 0.55 : 0));
+      const bandI = S.wash === 2 ? 0.42 : 1;
+      g.ctx.save(); g.ctx.beginPath(); g.ctx.rect(bx + 1, by + 1, bw - 2, bh - 2); g.ctx.clip();
+      if (bg > 0) {
+        g.rrect(bx, by, bw, bh, 0, `rgba(225,240,200,${0.4 * bg * L})`);
+        const R = rng(31);
+        for (let i = 0; i < 16; i++) glow(g, bx + R() * bw, by + R() * bh, 30 + R() * 50, (S.wash === 0 ? 0.35 : 0.15) * L * bg, '225,240,200');
+      }
+      for (const l of lanes.slice(1)) {
+        for (const [mw, k] of [[160, 0.5], [95, 0.8], [42, 0.6], [30, 0.9], [18, 0.5]]) { const a = ns * k * 0.45 * L * (0.6 + 0.4 * l.amt); if (a > 0.01) g.rrect(l.x - 27, yB(mw) - 3, 54, 6, 3, `rgba(235,255,210,${a})`); }
+        const a = l.amt * bandI * L;
+        if (a > 0.01) { g.ctx.save(); g.ctx.shadowColor = 'rgba(220,255,180,.9)'; g.ctx.shadowBlur = 14 * a; g.rrect(l.x - 27, yB(TARGET) - 4.5, 54, 9, 4, `rgba(240,255,215,${0.3 + 0.7 * a})`); g.ctx.restore(); }
+      }
+      g.ctx.restore();
+      for (const mw of LADDER) g.rrect(lanes[0].x - 24, yB(mw) - 2, 48, 4, 2, 'rgba(127,184,255,.8)');
+      for (const mw of [250, 150, 100, 75, 50, 37, 25, 15, 10]) lab(g, bx - 8, yB(mw), String(mw), { size: 13, align: 'right', weight: 500 });
+      lab(g, bx - 8, by - 14, 'kDa', { size: 13, color: C.muted, align: 'right', weight: 500 });
+      for (const l of lanes) lab(g, l.x, by - 14, l.name, { size: 13, align: 'center', weight: 500 });
+      if (L > 0) {
+        lab(g, 606, 442, '條帶在 50 到 75 kDa 之間', { a: L, size: 14, color: C.mint });
+        const V = !S.block ? (S.wash === 0 ? ['沒阻斷也沒洗:看不出條帶', '整張膜亮成一片', C.red] : S.wash === 2 ? ['沒有阻斷:背景亮、條帶又淡', '黏在膜上的抗體洗不掉', C.red] : ['沒有阻斷:整張膜都亮', '抗體直接黏在膜的空位上', C.red])
+          : S.wash === 0 ? ['沒洗:背景髒、多出雜帶', '沒抓到東西的抗體留在膜上', C.amber] : S.wash === 2 ? ['洗太久:條帶變淡', '連抓好的抗體也洗掉一些', C.amber] : ['背景乾淨,條帶清楚', '只有目標蛋白的位置發光', C.mint];
+        lab(g, 606, 470, V[0], { a: L, size: 15, color: V[2], weight: 700 });
+        lab(g, 606, 494, V[1], { a: L, size: 13, color: C.ink2, weight: 500 });
+      }
+    },
+  },
+  {
+    key: 'elisa', name: 'ELISA:三明治法', dur: 17,
+    cues: [[0, 'ELISA(酵素連結免疫吸附分析)在 96 孔的孔盤裡做:孔底先固定一層捕捉抗體,再用 BSA 這類蛋白質阻斷空位。'],
+      [4.5, '加入樣品,目標抗原被捕捉抗體抓住;洗掉其他東西後,加入偵測抗體,它抓抗原的另一個位置,把抗原夾成三明治。'],
+      [9.5, '偵測抗體帶著 HRP(或再加一層帶 HRP 的二級抗體);洗掉多的,加入 TMB 受質,HRP 把它變成藍色。'],
+      [13.5, '加酸終止反應,藍色轉成黃色;用讀盤機量 450 nm 的吸光度(溶液吸掉多少光):抓到的抗原越多,顏色越深。']],
+    draw(g, t) {
+      const X0 = 320, X1 = 600, TOP = 110, BOT = 430;
+      // 液體:樣品、偵測抗體、TMB(藍)→ 加酸(黃)
+      const fill = (a, b, c, d) => (t < a || t > d ? 0 : Math.min(ease(seg(t, a, b)), 1 - ease(seg(t, c, d))));
+      const lvl = Math.max(fill(4.5, 5, 7, 7.5), fill(7.6, 8, 9.5, 10), fill(10.2, 10.6, 99, 100));
+      const blue = ease(seg(t, 10.5, 13.3)), yel = ease(seg(t, 13.5, 14.1));
+      const liq = t < 10.2 ? 'rgba(160,215,205,.14)' : `rgba(${Math.round(lerp(70, 255, yel))},${Math.round(lerp(120, 210, yel))},${Math.round(lerp(255, 70, yel))},${lerp(0.08, 0.5, blue) + 0.06 * yel})`;
+      const solid = t < 10.2 ? null : `rgba(${Math.round(lerp(70, 255, yel))},${Math.round(lerp(120, 210, yel))},${Math.round(lerp(255, 70, yel))},${lerp(0.25, 0.9, blue)})`;
+      // 左上:96 孔盤,放大其中一孔
+      plate(g, 40, 52, 17, (r, c) => (r === 1 && c === 2 ? solid : null), { hi: [1, 2] });
+      lab(g, 149, 222, '96 孔盤:放大其中一孔', { size: 13, color: C.muted, align: 'center', weight: 500 });
+      g.arrow(264, 120, 304, 120, { color: C.mint, lw: 2 });
+      // 孔(側面剖開)
+      const well = () => { const c = g.ctx; c.beginPath(); c.moveTo(X0, TOP); c.lineTo(X0, BOT - 24); c.quadraticCurveTo(X0, BOT, X0 + 24, BOT); c.lineTo(X1 - 24, BOT); c.quadraticCurveTo(X1, BOT, X1, BOT - 24); c.lineTo(X1, TOP); };
+      g.rrect(X0 - 18, TOP - 12, X1 - X0 + 36, BOT - TOP + 32, 10, 'rgba(200,220,215,.05)', 'rgba(200,220,215,.18)');
+      if (lvl > 0) { g.ctx.save(); well(); g.ctx.closePath(); g.ctx.clip(); g.ctx.fillStyle = liq; g.ctx.fillRect(X0, lerp(BOT, 170, lvl), X1 - X0, BOT); g.ctx.restore(); }
+      g.ctx.save(); well(); g.ctx.strokeStyle = C.ink2; g.ctx.lineWidth = 3; g.ctx.stroke(); g.ctx.restore();
+      // 1 捕捉抗體固定在孔底;2 阻斷
+      const CAP = [365, 430, 495, 560];
+      CAP.forEach((x, i) => { const k = ease(seg(t, 0.3 + i * 0.2, 1.6 + i * 0.2)); if (k > 0) ab(g, x, 396 - (1 - k) * 240, 34, AB1, { alpha: k }); });
+      [334, 398, 462, 527, 588].forEach((x, i) => { const k = ease(seg(t, 2.2 + i * 0.2, 3.4 + i * 0.2)); if (k > 0) g.circle(x, lerp(170, BOT - 7, k), 6.5, BLK, 'rgba(0,0,0,.25)', 1); });
+      // 3 樣品:抗原被抓住,其他蛋白之後被洗掉
+      // [抓住後的 x, 起點 x, 起點 y, 偵測抗體從哪一側來(-1 用左下的手臂、1 用右下的手臂)]
+      const AGS = [[344.2, 380, 230, -1], [450.8, 470, 196, 1], [539.2, 560, 246, 1]];
+      AGS.forEach(([x, x0, y0], i) => {
+        const a = fade(t, 4.6, 0.5); if (a <= 0) return;
+        const k = ease(seg(t, 5.4 + i * 0.2, 6.6 + i * 0.2));
+        prot(g, lerp(x0 + Math.sin(t + i) * 8, x, k), lerp(y0 + Math.cos(t * 0.9 + i) * 6, 348, k), 17, 14, AG, { alpha: a, epis: [['tri', Math.PI / 2], ['dot', -Math.PI / 2]], t: t + i, er: 6.5 });
+      });
+      [[470, 262], [560, 226], [385, 300], [430, 190]].forEach(([x, y], i) => {
+        const a = fade(t, 4.6, 0.5) * (1 - ease(seg(t, 7, 7.5))); if (a <= 0) return;
+        prot(g, x + Math.sin(t * 0.8 + i * 2) * 8, y + Math.cos(t + i) * 6 - ease(seg(t, 7, 7.5)) * 80, 15, 12, OTHER, { alpha: a, t: t + i });
+      });
+      // 4 偵測抗體(帶 HRP)夾住抗原
+      const dIn = ease(seg(t, 7.7, 9.0));
+      const E = [];
+      if (dIn > 0) AGS.forEach(([x, , , side]) => { const r = ab(g, x - side * SN * 30, 328 - CS * 30 - (1 - dIn) * 200, 30, AB2, { ang: Math.PI, hrp: true, t: t + x }); E.push(r.E); });
+      [[395, 210, 0.6], [560, 175, -0.4]].forEach(([x, y, a], i) => {
+        const k = fade(t, 7.8, 0.5) * (1 - ease(seg(t, 9.5, 10))); if (k <= 0) return;
+        ab(g, x + Math.sin(t + i) * 6, y - ease(seg(t, 9.5, 10)) * 80, 26, AB2, { ang: a, alpha: k, hrp: true, t: t + i });
+      });
+      // 5 TMB:HRP 附近產生有顏色的產物,擴散開來
+      if (t > 10.4 && E.length) {
+        const sp = ease(seg(t, 10.4, 13.4)), R = rng(5);
+        g.ctx.save(); well(); g.ctx.closePath(); g.ctx.clip();
+        for (const e of E) for (let i = 0; i < 9; i++) {
+          const a = R() * Math.PI * 2, d = 14 + sp * (20 + R() * 46);
+          g.circle(e[0] + Math.cos(a) * d, Math.max(176, e[1] + Math.sin(a) * d * 0.8), 3, yel > 0.5 ? '#ffd23f' : '#5f8cff');
+        }
+        g.ctx.restore();
+      }
+      // 6 讀 450 nm 吸光度
+      const rd = fade(t, 14.5, 0.6);
+      if (rd > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= rd;
+        g.rrect(452, 44, 16, lerp(170, BOT, 0) - 44, 2, 'rgba(110,150,255,.55)');
+        g.rrect(452, 170, 16, BOT - 170, 0, 'rgba(110,150,255,.32)');
+        g.rrect(452, BOT + 22, 16, 44, 2, 'rgba(110,150,255,.2)');
+        g.rrect(440, 26, 40, 18, 4, '#2c3b37', C.ink2);
+        g.rrect(436, 490, 48, 16, 4, '#2c3b37', C.ink2);
+        g.ctx.restore();
+        lab(g, 488, 35, '450 nm 的光', { a: rd, size: 13, color: '#9fb8ff', weight: 500 });
+        lab(g, 492, 498, '偵測器', { a: rd, size: 13, color: C.muted, weight: 500 });
+        g.tag(426, 498, `A₄₅₀ = ${f4(3).toFixed(2)}`, { size: 14, color: C.amber, alpha: rd, align: 'right' });
+      }
+      // 圖例
+      const lg = [[0.3, '捕捉抗體', 'ab1'], [2.2, '阻斷用的蛋白', 'blk'], [4.6, '目標抗原', 'ag'], [4.6, '樣品裡的其他蛋白', 'oth'], [7.7, '偵測抗體 + HRP', 'ab2']];
+      lg.forEach(([a0, name, kind], i) => {
+        const a = fade(t, a0); if (a <= 0) return;
+        const y = 272 + i * 40;
+        g.ctx.save(); g.ctx.globalAlpha *= a;
+        if (kind === 'ab1') ab(g, 58, y, 12, AB1); else if (kind === 'ab2') ab(g, 58, y + 6, 11, AB2, { ang: Math.PI, hrp: true });
+        else if (kind === 'blk') g.circle(58, y, 6.5, BLK); else prot(g, 58, y, 10, 8, kind === 'ag' ? AG : OTHER, { wob: 0 });
+        g.ctx.restore();
+        lab(g, 80, y, name, { a, size: 14 });
+      });
+      // 右:步驟
+      g.panel(680, 34, 255, 470, '步驟');
+      const ST = [[0, '捕捉抗體固定在孔底'], [2.2, '阻斷空位'], [4.5, '加樣品,抗原被抓住'], [7.0, '洗'], [7.6, '加偵測抗體(帶 HRP)'], [9.5, '洗'], [10.2, '加 TMB 受質:變藍'], [13.5, '加酸終止:變黃'], [14.5, '讀 450 nm 吸光度']];
+      let cur = 0; ST.forEach(([a], i) => { if (t >= a) cur = i; });
+      ST.forEach(([a, s], i) => {
+        const y = 84 + i * 44, now = i === cur, done = i < cur;
+        g.circle(702, y, 6, done ? C.mintDim : now ? C.mint : null, now || done ? null : C.muted, 1.5);
+        lab(g, 718, y, s, { size: 14, color: now ? C.mint : done ? C.ink2 : C.muted, weight: now ? 700 : 500 });
+      });
+    },
+  },
+  {
+    key: 'curve', name: '標準曲線與定量', dur: 16,
+    cues: [[0, '同一盤放一系列已知濃度的標準品,畫成標準曲線;ELISA 的曲線是 S 形,常用四參數曲線(四個數決定的 S 形)來擬合。'],
+      [5, '未知樣品的吸光度從曲線上反推回濃度,再乘上稀釋倍數,就是原樣品的濃度。'],
+      [10, '曲線兩端變平,讀值落在那裡誤差很大;太濃要多稀釋,太稀要少稀釋,讓讀值落在曲線中段。右邊可以調調看。']],
+    draw(g, t, S) {
+      const XMIN = -1.4, XMAX = 2.8;
+      const A = g.axes(110, 60, 440, 330, { xmin: XMIN, xmax: XMAX, ymin: 0, ymax: 3.2, xticks: [-1, 0, 1, 2], yticks: [0, 1, 2, 3], xlab: '濃度(ng/mL,對數刻度)', ylab: '吸光度 A₄₅₀', fmtX: (v) => ({ '-1': '0.1', 0: '1', 1: '10', 2: '100' })[v], fmtY: (v) => String(v) });
+      const XL = (x) => A.X(clamp(Math.log10(x), XMIN, XMAX));
+      // 標準品的範圍(淺綠帶)
+      g.rrect(XL(SLO), A.Y(0) - 7, XL(SHI) - XL(SLO), 7, 2, 'rgba(165,243,205,.35)');
+      // 上下平台
+      const pa = fade(t, 10, 0.8);
+      if (pa > 0) {
+        for (const v of [P4.a, P4.d]) g.line(A.X(XMIN), A.Y(v), A.X(XMAX), A.Y(v), `rgba(185,199,192,${0.5 * pa})`, 1.2, [5, 5]);
+        lab(g, A.X(XMAX) - 4, A.Y(P4.d) - 14, '上平台', { a: pa, size: 13, color: C.muted, align: 'right', weight: 500 });
+        lab(g, A.X(XMAX) - 4, A.Y(P4.a) - 14, '下平台', { a: pa, size: 13, color: C.muted, align: 'right', weight: 500 });
+      }
+      // 四參數曲線與標準品
+      const xe = lerp(XMIN, XMAX, ease(seg(t, 2.6, 5)));
+      const pts = []; for (let x = XMIN; x <= xe + 1e-9; x += 0.02) pts.push([A.X(x), A.Y(f4(10 ** x))]);
+      g.curve(pts, C.ink2, 2.2);
+      STDS.forEach((c, i) => { const a = fade(t, 0.5 + i * 0.3, 0.4); if (a > 0) g.circle(XL(c), A.Y(f4(c) * (1 + (i % 2 ? 0.018 : -0.015))), 5.5, `rgba(165,243,205,${a})`); });
+      // 未知樣品:孔裡的濃度 = 實際濃度 ÷ 稀釋倍數
+      const conc = NICE[S.conc], w = conc / S.dil, Aw = f4(w);
+      const inRange = w >= SLO && w <= SHI;
+      const p1 = ease(seg(t, 5, 6.3)), p2 = ease(seg(t, 6.3, 7.5));
+      const cx = XL(w), cy = A.Y(Aw);
+      if (t > 4.8) {
+        g.circle(A.X(XMIN), cy, 6, C.lav);
+        if (p1 > 0) g.line(A.X(XMIN), cy, lerp(A.X(XMIN), cx, p1), cy, C.lav, 1.8, [5, 4]);
+        if (p2 > 0) { g.line(cx, cy, cx, lerp(cy, A.Y(0), p2), C.lav, 1.8, [5, 4]); g.circle(cx, cy, 6, C.lav); }
+        if (p2 >= 1) {
+          // 孔裡的濃度超出橫軸:畫一個箭頭指向那一側
+          if (Math.log10(w) < XMIN) g.arrow(cx + 30, A.Y(0) - 48, cx + 4, A.Y(0) - 48, { color: C.lav, lw: 2 });
+          if (Math.log10(w) > XMAX) g.arrow(cx - 30, A.Y(0) - 48, cx - 4, A.Y(0) - 48, { color: C.lav, lw: 2 });
+        }
+      }
+      // 讀值差一點(±0.05)時,推回的濃度落在哪個範圍
+      const ea = fade(t, 10.5, 0.8);
+      if (ea > 0) {
+        const lo = inv4(Aw - DELTA), hi = inv4(Aw + DELTA);
+        const xa = Number.isNaN(lo) ? A.X(XMIN) : XL(lo), xb = Number.isNaN(hi) ? A.X(XMAX) : XL(hi);
+        g.ctx.save(); g.ctx.globalAlpha *= ea;
+        g.line(A.X(XMIN) + 1, A.Y(Aw - DELTA), A.X(XMIN) + 1, A.Y(Aw + DELTA), C.amber, 5);
+        g.rrect(xa, A.Y(0) - 26, Math.max(4, xb - xa), 6, 3, 'rgba(255,209,102,.85)');
+        if (Number.isNaN(hi)) g.arrow(xb - 14, A.Y(0) - 23, xb + 2, A.Y(0) - 23, { color: C.amber, lw: 2 });
+        if (Number.isNaN(lo)) g.arrow(xa + 14, A.Y(0) - 23, xa - 2, A.Y(0) - 23, { color: C.amber, lw: 2 });
+        g.ctx.restore();
+      }
+      // 右上:這個樣品
+      g.panel(590, 40, 345, 330, '這個樣品(示意)');
+      lab(g, 606, 84, '實際濃度(實驗時不知道)', { size: 13, color: C.muted, weight: 500 });
+      lab(g, 606, 108, `${sig(conc)} ng/mL`, { size: 18, color: C.ink, weight: 700 });
+      lab(g, 606, 140, S.dil > 1 ? `稀釋 ${S.dil} 倍 → 孔裡 ${sig(w)} ng/mL` : `不稀釋 → 孔裡 ${sig(w)} ng/mL`, { size: 14 });
+      lab(g, 606, 166, `讀到 A₄₅₀ = ${Aw.toFixed(2)}`, { a: fade(t, 5), size: 14 });
+      const r1 = fade(t, 7.5), r2 = fade(t, 8.5);
+      if (inRange) {
+        lab(g, 606, 194, `從曲線推回:${sig(w)} ng/mL`, { a: r1, color: C.lav, weight: 700 });
+        lab(g, 606, 224, S.dil > 1 ? `× ${S.dil} = 原樣品 ${sig(w * S.dil)} ng/mL` : `原樣品 ${sig(w)} ng/mL`, { a: r2, size: 16, color: C.mint, weight: 700 });
+      } else {
+        lab(g, 606, 194, w > SHI ? `從曲線推回:超過 ${SHI} ng/mL` : `從曲線推回:低於 ${SLO} ng/mL`, { a: r1, color: C.lav, weight: 700 });
+        lab(g, 606, 224, '超出標準品範圍,不能直接算', { a: r2, size: 15, color: C.amber, weight: 700 });
+      }
+      const lo = inv4(Aw - DELTA), hi = inv4(Aw + DELTA);
+      const wide = Number.isNaN(lo) || Number.isNaN(hi) || hi / lo > 1.6;
+      const V = w > SHI ? ['高於最高的標準品', '要再多稀釋後重測', C.amber]
+        : w < SLO ? (S.dil > 1 ? ['低於最低的標準品', '少稀釋一點再測', C.amber] : ['低於最低的標準品', '樣品太稀,這個方法測不到', C.amber])
+        : wide ? ['在範圍內,但靠近曲線一端', '讀值差一點,濃度就差很多', C.amber] : ['落在曲線中段', '讀值差一點,濃度也只差一點', C.mint];
+      lab(g, 606, 258, V[0], { a: fade(t, 10), color: V[2], weight: 700 });
+      lab(g, 606, 282, V[1], { a: fade(t, 10), size: 14 });
+      lab(g, 606, 320, '淺綠帶:標準品的範圍', { size: 13, color: C.muted, weight: 500 });
+      lab(g, 606, 344, '琥珀色:讀值差 ±0.05 時推回的範圍', { a: fade(t, 10.5), size: 13, color: C.amber, weight: 500 });
+      // 右下:孔盤裡的顏色(標準品由稀到濃,加上樣品)
+      STDS.forEach((c, i) => { const a = fade(t, 0.5 + i * 0.3, 0.4); g.circle(612 + i * 36, 404, 13, `rgba(255,210,70,${clamp(f4(c) / 3) * a})`, 'rgba(185,199,192,.45)', 1); });
+      g.circle(890, 404, 13, `rgba(255,210,70,${clamp(Aw / 3) * fade(t, 5)})`, 'rgba(185,199,192,.45)', 1);
+      lab(g, 600, 440, '標準品(濃度由低到高)', { size: 13, color: C.muted, weight: 500 });
+      lab(g, 890, 440, '樣品', { size: 13, color: C.lav, align: 'center' });
+    },
+  },
+  {
+    key: 'compare', name: '兩種方法比較', dur: 13,
+    cues: [[0, '西方墨點法看得到條帶在哪裡:目標蛋白是不是預期的大小、有沒有多出別的條帶;但一片膠只跑十幾到二十幾道,結果算半定量。'],
+      [6, 'ELISA 不分大小,只量抗體抓到多少;一盤 96 孔能同時測很多樣品,配上標準曲線就算得出濃度。'],
+      [10, '兩種方法裡蛋白質的狀態也不同:西方墨點法的被 SDS 攤開,ELISA 抓的是摺好的;同一支抗體不一定兩邊都能用。']],
+    draw(g, t) {
+      const la = fade(t, 0, 0.8), ra = fade(t, 6, 0.8);
+      // 左:西方墨點法
+      g.ctx.save(); g.ctx.globalAlpha *= la;
+      g.panel(30, 30, 440, 404, '西方墨點法');
+      const bx = 96, by = 70, bw = 170, bh = 220;
+      g.rrect(bx, by, bw, bh, 5, '#070b0b', C.line);
+      const yB = (mw) => by + 10 + mwPos(mw) * (bh - 20);
+      for (const mw of LADDER) g.rrect(bx + 10, yB(mw) - 1.5, 30, 3, 1.5, 'rgba(127,184,255,.8)');
+      for (const mw of [100, 50, 25]) lab(g, bx - 6, yB(mw), String(mw), { size: 13, align: 'right', weight: 500 });
+      g.ctx.restore();
+      const ba = ease(seg(t, 1, 2.5));
+      [[75, 1], [115, 0.7], [155, 0.9]].forEach(([dx, k], i) => {
+        if (ba <= 0) return;
+        g.ctx.save(); g.ctx.shadowColor = 'rgba(220,255,180,.9)'; g.ctx.shadowBlur = 10 * ba;
+        g.rrect(bx + dx - 15, yB(TARGET) - 3.5, 30, 7, 3, `rgba(240,255,215,${ba * k})`);
+        if (i === 2) g.rrect(bx + dx - 15, yB(33) - 3, 30, 6, 3, `rgba(240,255,215,${ba * 0.55})`);
+        g.ctx.restore();
+      });
+      lead(g, 290, yB(TARGET), bx + bw + 4, yB(TARGET), fade(t, 2.2)); lab(g, 296, yB(TARGET), '約 60 kDa:大小對', { a: fade(t, 2.2), size: 14, color: C.mint });
+      lead(g, 290, yB(33), bx + bw + 4, yB(33), fade(t, 3)); lab(g, 296, yB(33), '較小的條帶:', { a: fade(t, 3), size: 14, color: C.amber });
+      lab(g, 296, yB(33) + 22, '可能是被切斷的片段', { a: fade(t, 3), size: 13, color: C.ink2, weight: 500 });
+      const pro = (x, y, s, good, a) => {
+        if (a <= 0.01) return;
+        g.ctx.save(); g.ctx.globalAlpha *= a;
+        if (good) g.circle(x, y, 6, C.mint);
+        else { g.ctx.beginPath(); g.ctx.moveTo(x, y - 7); g.ctx.lineTo(x + 7, y + 6); g.ctx.lineTo(x - 7, y + 6); g.ctx.closePath(); g.ctx.fillStyle = C.amber; g.ctx.fill(); }
+        g.ctx.restore();
+        lab(g, x + 16, y, s, { a, size: 15, color: good ? C.ink : C.ink2, weight: 500 });
+      };
+      pro(56, 322, '看得到大小(對照 kDa)', true, fade(t, 2.5));
+      pro(56, 350, '多出的條帶也看得到', true, fade(t, 3.2));
+      pro(56, 378, '一片膠十幾到二十幾道', false, fade(t, 4));
+      pro(56, 406, '亮度只能半定量', false, fade(t, 4.6));
+      // 右:ELISA
+      if (ra > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= ra;
+        g.panel(490, 30, 440, 404, 'ELISA');
+        const R = rng(13), lv = Array.from({ length: 96 }, () => R());
+        const fillA = ease(seg(t, 6.6, 8.6));
+        // 前兩行是標準品(由上往下變稀,最下面是空白),其餘是樣品(示意)
+        plate(g, 512, 66, 17, (r, c) => { const k = c < 2 ? (r < 7 ? f4(STDS[6 - r]) / 3 : 0.02) : 0.15 + 0.7 * lv[r * 12 + c]; return `rgba(255,210,70,${clamp(k) * fillA})`; });
+        const A = g.axes(790, 82, 112, 112, { xmin: -1.4, xmax: 2.8, ymin: 0, ymax: 3.2 });
+        const pts = []; for (let x = -1.4; x <= 2.8; x += 0.05) pts.push([A.X(x), A.Y(f4(10 ** x))]);
+        g.curve(pts, C.ink2, 2);
+        STDS.forEach((c) => g.circle(A.X(Math.log10(c)), A.Y(f4(c)), 3.5, C.mint));
+        lab(g, 846, 226, '標準曲線', { size: 13, color: C.muted, align: 'center', weight: 500 });
+        lab(g, 512, 250, '每一孔得到一個吸光度,換成濃度', { size: 14, color: C.ink2, weight: 500 });
+        g.ctx.restore();
+        pro(516, 322, '一盤 96 孔,同時測很多樣品', true, fade(t, 7));
+        pro(516, 350, '配標準曲線算出濃度', true, fade(t, 7.6));
+        pro(516, 378, '看不出抓到的東西多大', false, fade(t, 8.2));
+      }
+      // 下:蛋白質的狀態不同
+      const na = fade(t, 10, 0.8);
+      if (na > 0) {
+        g.ctx.save(); g.ctx.globalAlpha *= na;
+        g.rrect(30, 450, 900, 76, 12, 'rgba(21,32,30,.6)', C.line);
+        g.line(66, 474, 136, 474, AG, 5);
+        for (let i = 0; i < 4; i++) lab(g, 76 + i * 18, 460, '−', { size: 14, color: C.blue, align: 'center', weight: 800 });
+        lab(g, 152, 474, '西方墨點法:被 SDS 攤開', { size: 15, color: C.ink });
+        prot(g, 506, 474, 22, 15, AG, { epis: [['tri', Math.PI / 2], ['dot', -Math.PI / 2]], wob: 0.5, t, er: 6 });
+        lab(g, 540, 474, 'ELISA:摺好的原樣', { size: 15, color: C.ink });
+        lab(g, 480, 506, '同一支抗體不一定兩種方法都能用,要挑適合該方法的抗體', { size: 14, color: C.amber, align: 'center' });
+        g.ctx.restore();
+      }
+    },
+  },
+];
+
+createLesson({
+  chapters,
+  state: { block: true, wash: 1, conc: 8, dil: 10 },
+  controls: [
+    { id: 'block', label: '阻斷(牛奶或 BSA)', type: 'seg', options: [{ v: true, label: '有' }, { v: false, label: '沒有' }], chapters: ['probe'], restart: false },
+    { id: 'wash', label: '清洗', type: 'seg', options: [{ v: 0, label: '不洗' }, { v: 1, label: '洗 3 次' }, { v: 2, label: '洗太久' }], chapters: ['probe'], restart: false },
+    { id: 'conc', label: '樣品實際濃度(示意)', type: 'range', min: 0, max: NICE.length - 1, step: 1, format: (v) => `${NICE[v]} ng/mL`, chapters: ['curve'], restart: false },
+    { id: 'dil', label: '稀釋倍數', type: 'seg', options: [{ v: 1, label: '不稀釋' }, { v: 10, label: '10 倍' }, { v: 100, label: '100 倍' }], chapters: ['curve'], restart: false },
+  ],
+});
+createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
+</script>
+</body>
+</html>

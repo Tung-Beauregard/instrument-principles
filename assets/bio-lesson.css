@@ -1,0 +1,125 @@
+/* 生化原理教材共用的版面(2026-10-26,配 bio-lesson.js)。顏色沿用入口:近黑底、薄荷綠重點、淺字。
+   桌機:左邊動畫、字幕與播放列,右邊章節與「自己調整」。手機直拿:由上往下排。手機橫拿(高度 500 px 以下):
+   標題藏起來,動畫填滿左邊的高度、字幕疊在動畫底部,右邊一欄可以捲動。 */
+:root{color-scheme:dark;font-family:"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f0f3ee;background:#0b1111;-webkit-font-smoothing:antialiased;--line:#253430;--panel:#101818;--muted:#9caca5;--mint:#a5f3cd}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.skip-link{position:fixed;top:12px;left:12px;z-index:9;padding:12px 18px;background:var(--mint);color:#0b1111;transform:translateY(-160%);text-decoration:none}
+.skip-link:focus{transform:none}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{width:min(1240px,calc(100% - 32px));margin-inline:auto}
+/* 分頁列(生化原理這一區自己一組) */
+.nav-wrap{width:min(1240px,calc(100% - 32px));margin:12px auto 0}
+.sitenav{display:flex;gap:2px;padding:3px;border-radius:10px;background:var(--panel);border:1px solid var(--line);overflow-x:auto;white-space:nowrap;max-width:max-content;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
+.sitenav a{padding:5px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--muted);text-decoration:none;flex:none}
+.sitenav a:hover{color:#f0f3ee;background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:#f0f3ee;color:#0b1111}
+header.top{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 16px;padding:16px 0 12px}
+h1{margin:0;font-size:22px;font-weight:700;letter-spacing:.06em}
+h1 .k{color:var(--mint)}
+.lede{margin:0;font-size:14px;line-height:1.7;color:var(--muted);max-width:56em}
+main.lesson{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start;padding-bottom:20px}
+.player{display:flex;flex-direction:column;gap:10px;min-width:0}
+/* 動畫與字幕是同一張卡片(.screen);橫拿手機時拆開,字幕排到右欄 */
+.screen{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0f1716}
+.stage-box{position:relative;aspect-ratio:16/9;min-height:0}
+#stage{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:manipulation}
+/* 字幕:動畫下方;章號與章名一行,字幕一到兩行 */
+.cap{border-top:1px solid var(--line);padding:9px 14px 11px;min-height:4.9em;background:#0d1514}
+.cap-h{display:flex;gap:8px;align-items:baseline;font-size:12px;color:var(--mint);letter-spacing:.08em}
+.cap-no{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace}
+.cap-tx{display:block;margin-top:3px;font-size:16px;line-height:1.6;color:#f0f3ee;text-wrap:pretty}
+/* 播放列 */
+.bar{display:flex;align-items:center;gap:8px}
+.bar button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.pb{flex:none;height:36px;min-width:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:13px}
+.pb:hover{background:#17221f}
+.pb svg{width:14px;height:14px;display:block}
+#btnPlay{min-width:84px;background:#f0f3ee;color:#0b1111;border-color:transparent;font-weight:600}
+#btnPlay .i-pause{display:none}
+#btnPlay.playing .i-play{display:none}
+#btnPlay.playing .i-pause{display:block}
+#prog{flex:1;display:flex;gap:3px;min-width:60px;height:36px;align-items:center}
+#prog .sg{flex-basis:0;min-width:6px;height:8px;padding:0;border:0;border-radius:4px;background:rgba(165,243,205,.14);position:relative;overflow:hidden}
+#prog .sg i{position:absolute;inset:0 auto 0 0;width:0;background:var(--mint)}
+#prog .sg.done i{width:100%!important;opacity:.55}
+#prog .sg.on{height:10px;background:rgba(165,243,205,.22)}
+#chName{flex:none;max-width:40%;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 全螢幕鈕(瀏覽器支援時才出現):全螢幕時換成縮小的圖示 */
+#btnFs[hidden]{display:none}
+#btnFs .i-out{display:none}
+#btnFs.on .i-in{display:none}
+#btnFs.on .i-out{display:block}
+/* 右側:自己調整、章節 */
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.box{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 14px}
+.box h2{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.14em;color:var(--muted)}
+#chapters{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+#chapters button{width:100%;display:flex;gap:10px;align-items:baseline;text-align:left;padding:7px 9px;border:0;border-radius:9px;background:none;color:#c9d4cf;font:inherit;font-size:14px;line-height:1.45;cursor:pointer}
+#chapters button:hover{background:rgba(255,255,255,.06)}
+#chapters button[aria-current="step"]{background:rgba(165,243,205,.12);color:#f0f3ee}
+#chapters .no{flex:none;font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-size:12px;color:var(--mint)}
+.ops-body{display:flex;flex-direction:column;gap:12px}
+.op-k{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:#c9d4cf;margin-bottom:6px}
+.op-v{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;color:var(--mint)}
+.op input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;cursor:pointer;margin:0;--p:50%}
+.op input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--mint) var(--p),rgba(255,255,255,.16) var(--p))}
+.op input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-7px;border-radius:50%;background:#f0f3ee;border:3px solid var(--mint)}
+.op input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:rgba(255,255,255,.16)}
+.op input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--mint)}
+.op input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#f0f3ee;border:3px solid var(--mint)}
+.seg{display:flex;flex-wrap:wrap;gap:2px;padding:3px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.seg button,.tg{border:0;background:none;color:#c9d4cf;font:inherit;font-size:13px;line-height:1.3;padding:6px 10px;border-radius:7px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:#f0f3ee;color:#0b1111}
+.tg{border:1px solid var(--line);background:rgba(255,255,255,.04);width:100%;text-align:center;padding:8px 10px}
+.tg[aria-pressed="true"]{background:rgba(165,243,205,.16);border-color:rgba(165,243,205,.5);color:#f0f3ee}
+.ops-note{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted)}
+/* 重點整理與資料來源 */
+.notes{padding:4px 0 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.notes h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#f0f3ee}
+.notes p,.notes li{font-size:14px;line-height:1.8;color:#c9d4cf}
+.notes ul{margin:0;padding-left:1.2em}
+.notes .src li{font-size:12.5px;line-height:1.7;color:var(--muted)}
+.notes .src a{color:#c9d4cf}
+footer.site{border-top:1px solid var(--line);padding:16px 0 28px;font-size:12.5px;color:var(--muted)}
+footer.site a{color:#c9d4cf}
+/* 窄螢幕(直拿手機) */
+@media (max-width:860px){
+  main.lesson{grid-template-columns:minmax(0,1fr)}
+  .side{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  #ops{order:-1}
+}
+@media (max-width:520px){
+  .wrap,.nav-wrap{width:calc(100% - 24px)}
+  h1{font-size:19px}
+  .lede{font-size:13px}
+  .cap-tx{font-size:15px}
+  #chName{display:none}
+  .pb .lbl{display:none}
+  #btnPlay{min-width:52px}
+}
+/* 手機橫拿(高度常常只剩 300 px 左右):標題藏起來,左邊是動畫與播放列,右邊上面是字幕、下面是自己調整與章節(可以捲動);
+   字幕不疊在動畫上,畫面才不會被蓋住 */
+@media (orientation:landscape) and (max-height:500px){
+  .nav-wrap{margin-top:6px}
+  .sitenav a{padding:3px 9px;font-size:12px}
+  header.top{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);padding:0}
+  main.lesson{grid-template-columns:minmax(0,1fr) min(270px,36vw);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"stage cap" "stage side" "bar side";gap:8px 10px;height:calc(100vh - 44px);height:calc(100dvh - 44px);padding:6px 0;align-items:stretch}
+  .player,.screen{display:contents}
+  .stage-box{grid-area:stage;aspect-ratio:auto;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0f1716}
+  .cap{grid-area:cap;min-height:0;border:1px solid var(--line);border-radius:12px;padding:7px 10px 8px}
+  .cap-h{font-size:11px}
+  .cap-tx{font-size:13px;line-height:1.5}
+  .bar{grid-area:bar}
+  .pb{height:32px}
+  #prog{height:32px}
+  #chName{display:none}
+  .side{grid-area:side;overflow-y:auto;overscroll-behavior:contain;min-height:0;scrollbar-width:thin}
+  .box{padding:10px 12px}
+  #chapters button{padding:5px 8px;font-size:13px}
+  .notes{padding-top:10px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}

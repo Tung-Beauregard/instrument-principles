@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>DNA 鑑定:用分子標記認出樹與油</title>
+<meta name="description" content="用動畫看 SSR(微衛星)的重複次數為什麼能分辨每一棵樹、電泳怎麼讀出基因型、多個位點的機率怎麼相乘、親子與雜交怎麼判斷,以及用葉綠體 DNA 檢查苦茶油的原料。可以自己調位點數、候選父本、樣品與油品。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="DNA 鑑定:用分子標記認出樹與油">
+<meta property="og:description" content="用動畫看 SSR(微衛星)怎麼分辨每一棵樹、把查獲的木材比對回被砍的樹、判斷親本與雜交,以及用葉綠體 DNA 檢查苦茶油的原料。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/dna-markers/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/dna-markers.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="DNA 鑑定:SSR 重複序列、電泳的峰與葉綠體 DNA 的動畫">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/dna-markers/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理"><a href="../">← 儀器入口</a><a href="../central-dogma/">中心法則</a><a href="../pcr/">PCR 與電泳</a><a href="../sequencing/">DNA 定序</a><a href="./" aria-current="page">DNA 鑑定</a><a href="../cloning/">基因選殖</a><a href="../terpene-synthase/">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/">抗體檢測</a><a href="../flow-cytometry/">流式細胞儀</a><a href="../proteomics/">蛋白質定序</a></nav></div>
+<header class="top wrap">
+  <h1>DNA 鑑定 <span class="k">用分子標記認出樹與油</span></h1>
+  <p class="lede">DNA 在某些位置,每一棵樹、每一個物種都不太一樣。比對細胞核裡的 SSR(微衛星)可以分辨每一棵樹,用來追查盜伐的木材、判斷親本與雜交;葉綠體 DNA 份數多、通常只從一個親本傳下來,適合檢查加工過的木材與油品是用哪一種植物做的。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="DNA 鑑定動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <ul>
+      <li>SSR(簡單重複序列,又叫微衛星)是一小段序列連續重複;DNA 複製時聚合酶偶爾滑動,重複次數就多一個或少一個,所以個體之間常常不同。在重複區兩側設計引子做 PCR,產物長度就反映重複次數。</li>
+      <li>二倍體的每個位點有兩個等位基因,一個來自母本、一個來自父本。帶螢光的 PCR 產物經毛細管電泳,一個峰是同型合子,兩個峰是異型合子。</li>
+      <li>個體鑑定:把每個位點「隨機兩棵相同的機率」相乘(只用彼此不連鎖的位點,而且比的是不相干的兩棵樹;近親比較容易相同)。紅檜用 28 個位點時是 1.652 × 10⁻¹²,在 99.99% 信心下可以分辨約 6,000 萬棵,多於全臺約 3,200 萬棵。乾燥木材的 DNA 少又破碎,臺灣扁柏的盜伐案 22 個樣品有 7 個驗得出來。</li>
+      <li>親子鑑定:子代每個位點都要有一個等位基因對得上母本、一個對得上父本,實務上常要兩個以上位點不符才排除。雜交第一代同時帶有兩個物種特有的等位基因。</li>
+      <li>葉綠體 DNA 份數多(一個葉片細胞可超過一萬份),通常只從一個親本傳下來:多數被子植物是母本,扁柏屬等多數針葉樹是父本。苦茶油可以用葉綠體 SSR 分辨大果油茶與小果油茶的種子。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Huang CJ, et al. SSR individual identification system construction and population genetics analysis for <i>Chamaecyparis formosensis</i>. Sci Rep. 2022;12:4126. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8904461/">PMC8904461</a>(紅檜 36 個 SSR 位點,單一位點 PI 0.114 到 0.897、平均 0.431;28 個不連鎖位點 CPI 1.652 × 10⁻¹²,99.99% 信心下可分辨 6,000 萬棵,全臺族群 3,206 ± 320 萬棵;6 個位點 CPI 1.728 × 10⁻⁵)</li>
+      <li>Huang CJ, et al. Development and technical application of SSR-based individual identification system for <i>Chamaecyparis taiwanensis</i> against illegal logging convictions. Sci Rep. 2020;10:22095. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7744516/">PMC7744516</a>(臺灣扁柏;以 19 個不連鎖位點把 3 件查獲木材比對回 3 棵被害木;乾燥木材 22 個樣品 7 個成功;螢光引子與 ABI 3130XL 片段分析)</li>
+      <li>Vieira MLC, et al. Microsatellite markers: what they mean and why they are so useful. Genet Mol Biol. 2016;39(3):312–328. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5004837/">PMC5004837</a>(聚合酶滑動、兩側引子、膠或毛細管電泳分型、葉綠體 SSR 多為 A/T 單鹼基重複);Jones AG, et al. A practical guide to methods of parentage analysis. Mol Ecol Resour. 2010;10:6–30(Box 1:親子每個位點至少共有一個等位基因,實務上常要兩個位點不符才排除)</li>
+      <li>Kondo T, et al. Breed Sci. 1998;48:177–179. <a href="https://doi.org/10.1270/jsbbs1951.48.177">doi:10.1270/jsbbs1951.48.177</a>(扁柏屬種間雜交,葉綠體與粒線體 DNA 都和父本相同);Greiner S, et al. BioEssays. 2015;37:80–94. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4305268/">PMC4305268</a>(胞器 DNA 大多由母本遺傳);Morley SA, Nielsen BL. Front Plant Sci. 2016;7:57. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4740508/">PMC4740508</a>(葉片細胞可超過一萬份);Deguilloux MF, et al. Proc R Soc B. 2002;269:1039–1046. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1690996/">PMC1690996</a>(乾燥木材裡短而份數多的序列最容易驗到)</li>
+      <li>Food Anal Methods. 2023;16(11–12):1635–1645. <a href="https://doi.org/10.1007/s12161-023-02532-2">doi:10.1007/s12161-023-02532-2</a>(兩個葉綠體 SSR 分辨大果油茶與小果油茶,製油各步驟都能判讀、最好在粗油之前檢查,並驗出兩款臺灣在地苦茶油用的是進口種子)</li>
+      <li>動畫裡的序列、重複次數、等位基因長度、各個位點的 PI(依論文的範圍與累積值選的)、親子與雜交的基因型、葉綠體 SSR 的長度、片段斷裂的比例與 DNA 量都是示意值,不是某個實驗的實測結果。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化原理・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, seg, ease, clamp, lerp, complement, rng } from '../assets/bio-draw.js';
+import { createRotateHint } from '../assets/mobile-panels.js';
+
+// ---------- 共用 ----------
+const WOOD = '#6b4f3a', WOOD_EDGE = '#9a7656', WOOD_FACE = '#c9a77c', RING = 'rgba(120,88,60,.85)';
+const OIL = 'rgba(255,209,102,.55)';
+const MOM = C.lav, DAD = C.blue; // 母本那一邊淡紫、父本那一邊淺藍(都另外寫字)
+const SUPS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+const sup = (n) => String(n).replace(/[-0-9]/g, (d) => (d === '-' ? '⁻' : SUPS[Number(d)]));
+// 1.7 × 10⁻¹² 這種寫法
+function sci(v) {
+  if (v >= 0.01) return v.toFixed(v >= 0.1 ? 2 : 3);
+  let e = Math.floor(Math.log10(v)), m = Number((v / 10 ** e).toFixed(1));
+  if (m >= 10) { m = 1; e += 1; }
+  return `${m.toFixed(1)} × 10${sup(e)}`;
+}
+// 可分辨的棵數:往下取兩位有效數字(保守的寫法);N 小於 1 時畫面另外寫「還分辨不了」
+function trees(N) {
+  const q = 10 ** Math.max(0, Math.floor(Math.log10(N)) - 1), v = Math.floor(N / q) * q;
+  if (v < 1e4) return `約 ${v.toLocaleString('zh-TW')} 棵`;
+  if (v < 1e8) return `約 ${(v / 1e4).toLocaleString('zh-TW')} 萬棵`;
+  return `約 ${(v / 1e8).toLocaleString('zh-TW')} 億棵`;
+}
+// 控制項改過之後的短轉場:回傳 0 到 1(沒改過就是 1)
+const stamp = {};
+const fresh = (k, ms = 650) => (stamp[k] === undefined ? 1 : clamp((performance.now() - stamp[k]) / ms));
+
+function fade(g, a, fn) { if (a <= 0) return; g.ctx.save(); g.ctx.globalAlpha *= a; fn(); g.ctx.restore(); }
+
+// 針葉樹與闊葉樹的小圖示:y 是樹冠中間
+function conifer(g, x, y, s = 1, color = C.mintDim) {
+  g.rrect(x - 4 * s, y + 18 * s, 8 * s, 24 * s, 2 * s, WOOD);
+  const c = g.ctx;
+  for (let k = 0; k < 3; k++) {
+    const top = y - 36 * s + k * 17 * s, w = (14 + k * 8) * s;
+    c.beginPath(); c.moveTo(x, top); c.lineTo(x + w, top + 27 * s); c.lineTo(x - w, top + 27 * s); c.closePath();
+    c.fillStyle = color; c.fill();
+  }
+}
+function broadleaf(g, x, y, s = 1, color = C.mintDim) {
+  g.rrect(x - 5 * s, y + 8 * s, 10 * s, 34 * s, 3 * s, WOOD);
+  g.circle(x - 16 * s, y + 6 * s, 17 * s, color); g.circle(x + 16 * s, y + 6 * s, 17 * s, color); g.circle(x, y - 10 * s, 22 * s, color);
+}
+// 樹頭(y 是地面)與橫躺的木材(x、y 是中心)
+function stump(g, x, y, s = 1) {
+  const c = g.ctx;
+  g.line(x - 72 * s, y, x + 72 * s, y, C.line, 2);
+  c.save();
+  c.beginPath(); c.moveTo(x - 44 * s, y); c.lineTo(x - 36 * s, y - 52 * s); c.lineTo(x + 36 * s, y - 52 * s); c.lineTo(x + 44 * s, y); c.closePath();
+  c.fillStyle = WOOD; c.fill(); c.lineWidth = 1.5; c.strokeStyle = WOOD_EDGE; c.stroke();
+  c.beginPath(); c.ellipse(x, y - 52 * s, 36 * s, 11 * s, 0, 0, Math.PI * 2); c.fillStyle = WOOD_FACE; c.fill(); c.stroke();
+  for (const r of [0.68, 0.38]) { c.beginPath(); c.ellipse(x, y - 52 * s, 36 * s * r, 11 * s * r, 0, 0, Math.PI * 2); c.strokeStyle = RING; c.lineWidth = 1.2; c.stroke(); }
+  c.restore();
+}
+function timber(g, x, y, s = 1) {
+  const c = g.ctx, L = 120 * s, R = 24 * s;
+  g.rrect(x - L / 2, y - R, L, 2 * R, 5 * s, WOOD, WOOD_EDGE);
+  for (const k of [-0.45, 0.1, 0.55]) g.line(x - L / 2 + 8 * s, y + k * R, x + L / 2 - 16 * s, y + k * R * 0.8, 'rgba(0,0,0,.25)', 1.5);
+  c.save();
+  c.beginPath(); c.ellipse(x + L / 2, y, 10 * s, R, 0, 0, Math.PI * 2); c.fillStyle = WOOD_FACE; c.fill(); c.lineWidth = 1.5; c.strokeStyle = WOOD_EDGE; c.stroke();
+  for (const r of [0.62, 0.3]) { c.beginPath(); c.ellipse(x + L / 2, y, 10 * s * r, R * r, 0, 0, Math.PI * 2); c.strokeStyle = RING; c.lineWidth = 1.2; c.stroke(); }
+  c.restore();
+}
+// 油瓶:y 是瓶底
+function bottle(g, x, y, s = 1, fill = OIL) {
+  const c = g.ctx, w = 56 * s, h = 92 * s;
+  c.save();
+  c.beginPath();
+  c.moveTo(x - w / 2, y); c.lineTo(x - w / 2, y - h * 0.6); c.quadraticCurveTo(x - w / 2, y - h * 0.78, x - w * 0.18, y - h * 0.84);
+  c.lineTo(x - w * 0.18, y - h); c.lineTo(x + w * 0.18, y - h); c.lineTo(x + w * 0.18, y - h * 0.84);
+  c.quadraticCurveTo(x + w / 2, y - h * 0.78, x + w / 2, y - h * 0.6); c.lineTo(x + w / 2, y); c.closePath();
+  c.save(); c.clip(); c.fillStyle = fill; c.fillRect(x - w / 2, y - h * 0.64, w, h * 0.64); c.restore();
+  c.lineWidth = 2; c.strokeStyle = C.ink2; c.stroke();
+  c.restore();
+  g.rrect(x - w * 0.22, y - h - 9 * s, w * 0.44, 10 * s, 2, C.mintDim);
+}
+// 打勾或打叉(畫的,不靠字型)
+function mark(g, x, y, ok, r = 11) {
+  const c = g.ctx, col = ok ? C.mint : C.red;
+  g.circle(x, y, r, ok ? 'rgba(165,243,205,.14)' : 'rgba(255,123,123,.14)', col, 1.6);
+  c.save(); c.lineWidth = 2.4; c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = col; c.beginPath();
+  if (ok) { c.moveTo(x - r * 0.45, y + r * 0.02); c.lineTo(x - r * 0.1, y + r * 0.36); c.lineTo(x + r * 0.48, y - r * 0.34); }
+  else { c.moveTo(x - r * 0.36, y - r * 0.36); c.lineTo(x + r * 0.36, y + r * 0.36); c.moveTo(x + r * 0.36, y - r * 0.36); c.lineTo(x - r * 0.36, y + r * 0.36); }
+  c.stroke(); c.restore();
+}
+// 等位基因的小方塊(數字是長度 bp)
+function chip(g, x, y, text, { fill = '#22302d', ink = C.ink, border = C.line, w = 46, h = 28, size = 15 } = {}) {
+  g.rrect(x - w / 2, y - h / 2, w, h, 6, fill, border, 1.5);
+  g.text(x, y + 1, text, { size, weight: 700, color: ink, align: 'center', mono: true });
+}
+// 電泳圖的訊號:幾個高斯峰加起來,只畫到 x1
+function trace(g, A, peaks, color, x0, x1, { sigma = 0.5, lw = 2.2, base = 0.012 } = {}) {
+  if (x1 <= x0) return;
+  const pts = [];
+  for (let x = x0; x <= x1 + 1e-9; x += 0.08) {
+    let y = base;
+    for (const [p, h] of peaks) y += h * Math.exp(-((x - p) ** 2) / (2 * sigma * sigma));
+    pts.push([A.X(x), A.Y(y)]);
+  }
+  g.curve(pts, color, lw);
+}
+// 膠上的一條帶
+function band(g, x, y, w, inten = 1) {
+  if (inten <= 0.02) return;
+  const c = g.ctx; c.save(); c.shadowColor = 'rgba(255,200,120,.8)'; c.shadowBlur = 9 * inten;
+  g.rrect(x - w / 2, y - 4, w, 8, 3, `rgba(255,232,160,${0.25 + 0.75 * inten})`); c.restore();
+}
+
+// ---------- 第 1 章:三棵樹同一段 DNA 的比對(示意序列) ----------
+const ALN = [['甲樹', 'ATGGCTTACACACA--GTCAAGTC', C.ink], ['乙樹', 'ATGACTTACACACACAGTCAAGTC', C.ink], ['別種的樹', 'ATGGCTTACACA----GTC---TC', MOM]];
+function alignRow(g, x0, y, s, step, bw, bh) {
+  g.line(x0 - step * 0.4, y, x0 + (s.length - 1) * step + step * 0.4, y, C.backbone, 4);
+  [...s].forEach((b, i) => {
+    const x = x0 + i * step;
+    if (b === '-') { g.ctx.save(); g.ctx.setLineDash([3, 3]); g.rrect(x - bw / 2, y + 2, bw, bh, 4, null, C.muted, 1.2); g.ctx.restore(); }
+    else g.base(x, y + 2, b, { w: bw, h: bh, dir: 1 });
+  });
+}
+
+// ---------- 第 2 章:SSR 位點(示意:兩側固定序列共 84 bp,每個 CA 加 2 bp) ----------
+const FL = 'TGAGT', FR = 'GTTAC', FLANK = 84;
+const bpOf = (n) => FLANK + 2 * n;
+const TPL = 'TGA' + 'CA'.repeat(4) + 'GTT', NEW = complement(TPL); // 滑動示意用的模板與新股
+
+// ---------- 第 3 章:四棵樹在同一個位點的重複次數(母本給的、父本給的) ----------
+const TREES = { A: [7, 10], B: [9, 9], C: [5, 11], D: [6, 9] }; // 長度 98/104、102/102、94/106、96/102(避開標準片段的 90、100、110)
+
+// ---------- 第 4 章:每個位點「隨機兩棵相同」的機率(示意值) ----------
+// 落在論文報告的 0.114 到 0.897 之間(平均 0.435,論文 0.431),依小到大排;
+// 前 6 個相乘 1.72 × 10⁻⁵、28 個相乘 1.65 × 10⁻¹²,接近論文的 1.728 × 10⁻⁵ 與 1.652 × 10⁻¹²
+const PI = [0.114, 0.13, 0.15, 0.17, 0.19, 0.24, 0.263, 0.284, 0.304, 0.324, 0.344, 0.365, 0.385, 0.405, 0.425, 0.446, 0.466, 0.486, 0.517, 0.547, 0.577, 0.608, 0.638, 0.669, 0.709, 0.75, 0.8, 0.861];
+const CPI = PI.map((_, i) => PI.slice(0, i + 1).reduce((a, v) => a * v, 1));
+const NEED = -Math.log(0.9999) / 32.06e6; // 要在 99.99% 信心下分辨約 3,206 萬棵,累積機率要低於這個值
+const canTell = (p) => Math.log(0.9999) / Math.log1p(-p); // 論文的 CL = (1 − CPI)^N 解出 N
+const R4 = rng(42);
+const FP = PI.map(() => { const a = R4(), b = R4(); return [Math.min(a, b), Math.max(a, b)]; });
+const SAME = new Set([0, 2, 3, 7, 11, 12, 16, 19, 21, 22, 25, 26]); // 別棵樹剛好和樹頭相同的位點(示意)
+const FP2 = FP.map((p, i) => (SAME.has(i) ? p : [(p[0] + 0.41) % 1, (p[1] + 0.63) % 1].sort((a, b) => a - b)));
+
+// ---------- 第 5 章:五個位點的基因型(示意) ----------
+const MOTHER = [[98, 104], [150, 158], [211, 215], [120, 132], [176, 180]];
+const CHILD = [[98, 100], [158, 162], [207, 215], [128, 132], [172, 180]]; // 子代的基因型(小的寫前面)
+const FROM_MOM = [98, 158, 215, 132, 180]; // 子代從母本拿到的那一個
+const NEED_DAD = [100, 162, 207, 128, 172]; // 所以父本一定要有的那一個
+const FATHERS = {
+  甲: [[94, 96], [154, 162], [207, 219], [124, 136], [172, 184]],
+  乙: [[100, 106], [162, 166], [203, 207], [128, 128], [168, 172]],
+  丙: [[100, 102], [162, 162], [207, 211], [124, 128], [176, 184]],
+};
+
+// ---------- 第 6 章:兩個物種的特有等位基因(示意) ----------
+const SP_A = [[120, 124], [201, 205], [152, 152]], SP_B = [[140, 148], [213, 217], [160, 164]];
+const F1 = [[124, 140], [201, 217], [152, 160]];
+
+// ---------- 第 7 章:各種樣品裡「要 PCR 的那一段」的份數與完整比例(示意) ----------
+const SAMPLES = {
+  leaf: { name: '新鮮葉片', nuc: 8, cp: 80, keep: 0.9 },
+  wood: { name: '乾燥木材', nuc: 6, cp: 60, keep: 0.15 },
+  oil: { name: '油', nuc: 2, cp: 20, keep: 0.1 },
+};
+function intactSet(n, keep, seed) { // 依固定的亂數決定哪幾份還完整
+  const R = rng(seed), idx = [...Array(n).keys()].map((i) => [R(), i]).sort((a, b) => a[0] - b[0]);
+  return new Set(idx.slice(0, Math.round(n * keep)).map((v) => v[1]));
+}
+
+// ---------- 第 8 章:兩個葉綠體 SSR 標記在兩種油茶的長度(示意) ----------
+const CP1 = { small: 152, large: 146 }, CP2 = { small: 203, large: 211 };
+const OILS = {
+  small: { name: '小果油茶油', claim: '已知:小果油茶的種子', bands: { small: 1 }, verdict: ['兩個標記都只有小果油茶的帶:原料單一', C.mint] },
+  large: { name: '大果油茶油', claim: '已知:大果油茶的種子', bands: { large: 1 }, verdict: ['兩個標記都只有大果油茶的帶:原料單一', C.mint] },
+  mix: { name: '兩種種子混榨', claim: '已知:兩種種子混在一起', bands: { small: 1, large: 0.55 }, verdict: ['兩種的帶都有:混了兩種種子', C.amber] },
+  shop: { name: '市售苦茶油', claim: '標示:臺灣小果油茶', bands: { large: 1 }, verdict: ['標示小果油茶,卻只有大果油茶的帶:和標示不符', C.red] },
+};
+
+const chapters = [
+  {
+    key: 'markers', name: '為什麼 DNA 能鑑定', dur: 15,
+    cues: [[0, '同一種的兩棵樹,DNA 大部分相同,只在某些位置不一樣;不同物種之間,不一樣的位置更多。'],
+      [5, '差別有幾種:一個鹼基不同、多或少一小段(插入或缺失,InDel),或一小段序列重複的次數不同。'],
+      [10, '這些找得出差異、可以拿來比對的位置叫「分子標記」;比對夠多個,能分辨物種,甚至分辨每一棵樹。']],
+    draw(g, t) {
+      const X0 = 236, ST = 26;
+      ALN.forEach(([name, s, col], k) => {
+        const y = 150 + k * 72;
+        fade(g, ease(seg(t, 0.3 + k * 1.1, 1.3 + k * 1.1)), () => {
+          g.text(X0 - 30, y + 13, name, { size: 15, weight: 700, color: col, align: 'right' });
+          alignRow(g, X0, y, s, ST, 18, 22);
+        });
+      });
+      // 甲乙同一種
+      fade(g, ease(seg(t, 2.6, 3.4)), () => {
+        g.line(116, 152, 116, 246, C.muted, 1.6); g.line(116, 152, 124, 152, C.muted, 1.6); g.line(116, 246, 124, 246, C.muted, 1.6);
+        g.text(104, 199, '同一種', { size: 13, color: C.muted, align: 'right' });
+      });
+      // 不一樣的位置
+      const hl = [[3, 3, '一個鹼基不同', 5.2], [8, 15, '重複次數不同(SSR)', 6.6], [19, 21, '多或少一小段(InDel)', 8.0]];
+      for (const [c0, c1, label, at] of hl) {
+        const a = ease(seg(t, at, at + 0.6));
+        if (!a) continue;
+        const xa = X0 + c0 * ST - ST / 2, xb = X0 + c1 * ST + ST / 2;
+        fade(g, a, () => g.rrect(xa, 128, xb - xa, 202, 8, 'rgba(165,243,205,.07)', C.mint, 1.5));
+        g.tag((xa + xb) / 2, 104, label, { size: 14, color: C.mint, alpha: a });
+      }
+      // 用途
+      const cards = [['分辨每一棵樹', 'wood'], ['親子與雜交', 'family'], ['檢查油品原料', 'oil']];
+      cards.forEach(([label, kind], k) => {
+        const x = 70 + k * 290, y = 366, w = 240, h = 146;
+        fade(g, ease(seg(t, 10.6 + k * 0.6, 11.4 + k * 0.6)), () => {
+          g.panel(x, y, w, h, '');
+          if (kind === 'wood') { stump(g, x + 66, y + 88, 0.62); timber(g, x + 168, y + 64, 0.55); g.line(x + 100, y + 60, x + 126, y + 60, C.mint, 2, [4, 4]); }
+          else if (kind === 'family') {
+            conifer(g, x + 82, y + 44, 0.55, MOM); conifer(g, x + 158, y + 44, 0.55, DAD); conifer(g, x + 120, y + 92, 0.5);
+            g.line(x + 90, y + 66, x + 112, y + 78, C.ink2, 1.6); g.line(x + 150, y + 66, x + 128, y + 78, C.ink2, 1.6);
+          } else { bottle(g, x + 92, y + 108, 0.78); broadleaf(g, x + 160, y + 58, 0.62, C.A); }
+          g.text(x + w / 2, y + h - 18, label, { size: 15, weight: 700, color: C.ink, align: 'center' });
+        });
+      });
+    },
+  },
+  {
+    key: 'ssr', name: 'SSR:重複的次數不一樣', dur: 15,
+    cues: [[0, 'SSR(簡單重複序列,又叫微衛星)是一小段序列連續重複,例如 CA 一個接一個排下去。'],
+      [5, '複製 DNA 時聚合酶偶爾會滑動,重複就多一個或少一個;所以重複次數在個體之間常常不同。'],
+      [10, '在重複區兩側的固定序列設計一對引子做 PCR:重複次數不同,產物長度就不同。右邊可以改甲樹的重複次數。']],
+    draw(g, t, S) {
+      // 上方:先是例子,再換成「滑動」的示意
+      const ex = 1 - seg(t, 4.6, 5.2);
+      fade(g, ease(seg(t, 0, 0.8)) * ex, () => {
+        const s = FL + 'CA'.repeat(6) + FR, x0 = 230, st = 24;
+        g.text(x0 - 48, 100, '例如', { size: 15, color: C.ink2, align: 'right' });
+        g.strand(x0, 88, s, { step: st, dir: 1, bw: 18, bh: 22 });
+        const xa = x0 + 5 * st - 10, xb = x0 + 16 * st + 10;
+        g.line(xa, 122, xb, 122, C.mint, 2); g.line(xa, 116, xa, 122, C.mint, 2); g.line(xb, 116, xb, 122, C.mint, 2);
+        g.text((xa + xb) / 2, 142, '(CA) × 6:同一小段連續重複', { size: 15, weight: 700, color: C.mint, align: 'center' });
+        g.text(x0 - 14, 100, '…', { size: 16, color: C.muted, align: 'right' }); g.text(x0 + 21 * st + 14, 100, '…', { size: 16, color: C.muted });
+      });
+      fade(g, ease(seg(t, 4.8, 5.4)) * (1 - 0.35 * seg(t, 10, 10.8)), () => {
+        g.panel(120, 18, 720, 180, '');
+        g.text(138, 42, '複製時聚合酶滑動(示意)', { size: 14, weight: 700, color: C.ink2 });
+        const sx = 330, st = 26, yN = 104, yT = 172;
+        g.text(sx - 30, yN + 11, '新股', { size: 14, color: C.mint, align: 'right' });
+        g.text(sx - 30, yT - 11, '模板', { size: 14, color: C.ink2, align: 'right' });
+        g.strand(sx, yT, TPL, { step: st, dir: -1, bw: 18, bh: 20 });
+        const nA = Math.floor(seg(t, 5.3, 7.0) * 7.999), loop = ease(seg(t, 7.0, 7.8)), nB = Math.floor(seg(t, 7.8, 9.4) * 7.999);
+        const hb = (i) => g.line(sx + i * st, yN + 24, sx + i * st, yT - 24, 'rgba(240,243,238,.45)', 2, [2, 3]);
+        for (let i = 0; i < nA; i++) hb(i);
+        for (let i = 7; i < 7 + nB; i++) hb(i);
+        if (nA > 0) g.strand(sx, yN, NEW, { step: st, dir: 1, bw: 18, bh: 20, from: 0, to: nA, color: C.mint });
+        if (loop > 0) {
+          // 新股多出來的一個 GT 鼓成一個小環(在新股上方)
+          const xa = sx + 6 * st + st * 0.4, xb = sx + 7 * st - st * 0.4, xm = (xa + xb) / 2, r = 18 * loop, cy = yN - 14 - r;
+          const c = g.ctx; c.save(); c.beginPath(); c.moveTo(xa, yN);
+          c.quadraticCurveTo(xa, yN - 8, xm - r * 0.5, cy + r * 0.866);
+          c.arc(xm, cy, r, (Math.PI * 2) / 3, Math.PI / 3);
+          c.quadraticCurveTo(xb, yN - 8, xb, yN);
+          c.strokeStyle = C.mint; c.lineWidth = 4; c.lineCap = 'round'; c.lineJoin = 'round'; c.stroke(); c.restore();
+          if (loop > 0.7) g.text(xm, cy + 1, 'GT', { size: 13, weight: 800, color: C.mint, align: 'center', mono: true });
+          g.tag(xm, 34, '滑了一格:多出一個重複', { size: 13, color: C.mint, alpha: seg(t, 7.4, 8) });
+        }
+        if (nB > 0) g.strand(sx, yN, NEW, { step: st, dir: 1, bw: 18, bh: 20, from: 7, to: 7 + nB, color: C.mint });
+        if (nA > 0 && nA < 8 && nB === 0 && t < 7.0) g.blob(sx + nA * st + 4, yN - 18, 24, 15, C.lav, '', { wobble: 1, t });
+        if (nB > 0 && nB < 7) g.blob(sx + (7 + nB) * st + 4, yN - 18, 24, 15, C.lav, '', { wobble: 1, t });
+        fade(g, ease(seg(t, 9.4, 10)), () => {
+          g.text(700, 104, '下一輪複製之後', { size: 13, color: C.ink2 });
+          g.text(700, 130, 'CA × 4 → × 5', { size: 17, weight: 700, color: C.mint, mono: true });
+        });
+      });
+      // 下方:三棵樹在同一個位點
+      const rows = [['甲樹', S.rep, 262], ['乙樹', 10, 352], ['丙樹', 5, 442]];
+      const X0 = 150, ST = 20;
+      rows.forEach(([name, n, y], k) => {
+        fade(g, ease(seg(t, 0.6 + k * 1.2, 1.4 + k * 1.2)), () => {
+          const s = FL + 'CA'.repeat(n) + FR, xe = X0 + (s.length - 1) * ST;
+          g.text(40, y + 11, name, { size: 15, weight: 700, color: C.ink });
+          g.text(X0 - 16, y + 10, '…', { size: 15, color: C.muted, align: 'right' });
+          g.strand(X0, y, s, { step: ST, dir: 1, bw: 17, bh: 20 });
+          g.text(xe + 16, y + 10, '…', { size: 15, color: C.muted });
+          const xa = X0 + 5 * ST - 9, xb = X0 + (4 + 2 * n) * ST + 9;
+          g.line(xa, y + 30, xb, y + 30, C.mint, 2); g.line(xa, y + 25, xa, y + 30, C.mint, 2); g.line(xb, y + 25, xb, y + 30, C.mint, 2);
+          g.text((xa + xb) / 2, y + 45, `(CA) × ${n}`, { size: 14, weight: 700, color: C.mint, align: 'center', mono: true });
+          // 引子與 PCR 產物
+          const pa = ease(seg(t, 10.2 + k * 0.25, 10.8 + k * 0.25));
+          if (pa > 0) {
+            g.arrow(X0 - 9, y - 13, X0 + 4 * ST + 9, y - 13, { color: C.amber, lw: 5, head: 10, alpha: pa });
+            g.arrow(xe + 9, y - 13, xe - 4 * ST - 9, y - 13, { color: C.amber, lw: 5, head: 10, alpha: pa });
+            if (k === 0) g.tag(X0 + 2 * ST, y - 34, '引子', { size: 13, color: C.amber, alpha: pa });
+          }
+          // PCR 產物:兩條引子之間的這一段(框起來),長度寫在右邊
+          const pb = ease(seg(t, 11.4 + k * 0.3, 12.2 + k * 0.3));
+          if (pb > 0) {
+            fade(g, pb, () => g.rrect(X0 - 14, y - 24, xe - X0 + 28, 50, 8, 'rgba(165,243,205,.07)', C.mint, 1.4));
+            g.text(xe + 40, y + 11, `${bpOf(n)} bp`, { size: 16, weight: 700, color: C.mint, mono: true, alpha: pb });
+          }
+        });
+      });
+    },
+  },
+  {
+    key: 'genotype', name: '讀出基因型:一個峰或兩個峰', dur: 16,
+    cues: [[0, '樹的細胞裡每種染色體有兩條,一條來自母本、一條來自父本,所以每個位點有兩個等位基因(同一位置的不同版本)。'],
+      [5.5, '一條引子帶有螢光;PCR 產物在細細的毛細管裡電泳,短的先通過偵測窗,雷射照到就記下一個峰。'],
+      [11, '兩個等位基因一樣長只有一個峰(同型合子),不一樣長就有兩個峰(異型合子)。右邊可以換一棵樹。']],
+    draw(g, t, S) {
+      const [nm, np] = TREES[S.tree], bm = bpOf(nm), bp2 = bpOf(np);
+      const sw = fresh('tree');
+      // 左:這棵樹與它的一對染色體
+      conifer(g, 70, 84, 0.8);
+      g.text(112, 70, `樹 ${S.tree}`, { size: 22, weight: 700, color: C.ink });
+      g.text(112, 100, '同一個 SSR 位點', { size: 13, color: C.muted });
+      fade(g, ease(seg(t, 0.4, 1.4)), () => {
+        for (const [x, col, who, n] of [[92, MOM, '來自母本', nm], [222, DAD, '來自父本', np]]) {
+          g.text(x + 12, 158, who, { size: 14, weight: 700, color: col, align: 'center' });
+          g.rrect(x, 172, 24, 244, 12, 'rgba(255,255,255,.05)', col, 2);
+          for (let k = 0; k < 7; k++) g.line(x + 5, 190 + k * 32, x + 19, 190 + k * 32, 'rgba(240,243,238,.18)', 3);
+          g.rrect(x - 3, 284, 30, 18, 4, C.mint);
+          g.text(x + 32, 293, `(CA)×${n}`, { size: 14, weight: 700, color: C.mint, mono: true, alpha: sw });
+        }
+      });
+      fade(g, ease(seg(t, 3, 4)), () => {
+        g.text(170, 448, 'PCR 產物的長度', { size: 13, color: C.muted, align: 'center' });
+        g.text(170, 474, bm === bp2 ? `${bm} bp 與 ${bp2} bp(一樣長)` : `${Math.min(bm, bp2)} bp 與 ${Math.max(bm, bp2)} bp`, { size: 16, weight: 700, color: C.mint, align: 'center', mono: true, alpha: sw });
+      });
+      // 右上:毛細管電泳
+      const XD = 845, xs = 400;
+      fade(g, ease(seg(t, 4.6, 5.6)), () => {
+        g.tube(372, 70, 30, 52, { liquid: 'rgba(165,243,205,.3)', fill: 0.55, label: '樣品' });
+        g.rrect(xs, 96, 500, 12, 6, '#0b1414', C.ink2, 1.4);
+        g.text(xs + 8, 78, '−', { size: 16, weight: 700, color: C.ink2 });
+        g.text(892, 78, '+', { size: 16, weight: 700, color: C.red, align: 'right' });
+        const c = g.ctx; c.save(); c.shadowColor = C.blue; c.shadowBlur = 10; g.line(XD, 60, XD, 142, C.blue, 3); c.restore();
+        g.text(XD, 46, '雷射照到偵測窗', { size: 13, color: C.blue, align: 'center' });
+        g.text(620, 132, '毛細管:裡面裝著讓片段分開的介質', { size: 13, color: C.muted, align: 'center' });
+        const arrive = (s) => 6 + ((s - 88) / 24) * 4.5;
+        const pos = (s) => { if (t < 5.6) return null; const ta = arrive(s), k = (t - 5.6) / (ta - 5.6); return k <= 1 ? lerp(xs + 8, XD, k) : XD + (t - ta) * 70; };
+        const frag = (s, col, dy) => { const x = pos(s); if (x === null || x > 890) return; g.rrect(x - 7, 99 + dy, 14, 6, 3, col); };
+        for (const s of [90, 100, 110]) frag(s, C.hot, 0);
+        for (const s of new Set([bm, bp2])) { frag(s, C.mint, -1); }
+      });
+      // 右下:電泳圖
+      const A = g.axes(430, 210, 470, 190, { xmin: 88, xmax: 112, ymin: 0, ymax: 1.08, xticks: [90, 95, 100, 105, 110], xlab: '片段長度(bp)' });
+      g.text(430, 186, '綠:樣品', { size: 13, weight: 700, color: C.mint });
+      g.text(520, 186, '橘:已知長度的標準片段', { size: 13, weight: 700, color: C.hot });
+      const rv = 88 + clamp((t - 6) / 4.5) * 24;
+      const h = bm === bp2 ? [[bm, 0.95]] : [[bm, 0.55], [bp2, 0.5]];
+      const grow = t >= 10.6 ? ease(sw) : 1;
+      trace(g, A, [[90, 0.3], [100, 0.3], [110, 0.3]], C.hot, 88, rv, { lw: 1.8 });
+      trace(g, A, h.map(([p, v]) => [p, v * grow]), C.mint, 88, rv, { lw: 2.6 });
+      if (t > 6 && t < 10.6) g.line(A.X(rv), 210, A.X(rv), 400, 'rgba(127,184,255,.5)', 1.5, [4, 4]);
+      if (t >= 10.6) {
+        for (const [p, v] of h) g.text(A.X(p), A.Y(v * grow) - 14, String(p), { size: 14, weight: 700, color: C.mint, align: 'center', mono: true });
+        const a = ease(seg(t, 11, 11.8));
+        const msg = bm === bp2 ? `一個峰:同型合子(${bm} / ${bm})` : `兩個峰:異型合子(${Math.min(bm, bp2)} / ${Math.max(bm, bp2)})`;
+        g.tag(665, 476, msg, { size: 15, color: C.mint, alpha: a });
+      }
+    },
+  },
+  {
+    key: 'fingerprint', name: 'DNA 指紋:木材比對回樹頭', dur: 17,
+    cues: [[0, '盜伐案要證明查獲的木材來自哪一棵被砍的樹:木材與山上的樹頭各取 DNA,驗同一組 SSR 位點。'],
+      [4.5, '只看一個位點不夠:紅檜的各個位點,隨機兩棵樹基因型相同的機率在 0.11 到 0.90 之間。'],
+      [9, '位點之間互不連鎖(不會綁在一起遺傳)時,全部相同的機率是各位點的機率相乘,位點越多越小。右邊可以改位點數。'],
+      [13, '紅檜驗 28 個位點時約 1.7 × 10⁻¹²,99.99% 信心下可分辨約 6,000 萬棵,多於全臺約 3,200 萬棵。']],
+    draw(g, t, S) {
+      // 左上:現場
+      fade(g, ease(seg(t, 0.2, 1.2)), () => {
+        stump(g, 110, 160, 0.9);
+        g.text(110, 184, '山上的樹頭(被害木)', { size: 14, color: C.ink2, align: 'center' });
+      });
+      fade(g, ease(seg(t, 1.2, 2.2)), () => {
+        timber(g, 310, 126, 0.9);
+        g.text(310, 184, '查獲的木材', { size: 14, color: C.ink2, align: 'center' });
+      });
+      fade(g, ease(seg(t, 2.4, 3.4)), () => g.tag(210, 50, '各取 DNA,驗同一組位點', { size: 13, color: C.mint }));
+      // 位點數:9 到 13 秒從 1 長到設定值
+      const n = t < 9 ? 1 : Math.max(1, Math.round(lerp(1, S.loci, ease(seg(t, 9, 13)))));
+      const cpi = CPI[n - 1], N = canTell(cpi);
+      // 左下:指紋(每一直條是一個位點,裡面兩條短橫線是兩個等位基因的長度)
+      const bx = 118, bw = 300, colw = Math.min(30, bw / n), lw = Math.max(4, colw - 3);
+      const rows = [['樹頭', FP, 270, C.ink], ['木材', FP, 340, C.ink], ['別棵樹', FP2, 410, C.ink2]];
+      let diff = 0;
+      rows.forEach(([name, fp, y, col], r) => {
+        fade(g, ease(seg(t, 4.5 + r * 0.6, 5.3 + r * 0.6)), () => {
+          g.text(30, y, name, { size: 15, weight: 700, color: col });
+          for (let i = 0; i < n; i++) {
+            const x = bx + i * colw, other = r === 2 && !SAME.has(i);
+            g.rrect(x, y - 26, lw, 52, Math.min(3, lw / 2), 'rgba(150,190,200,.10)', other ? C.red : null, 1.2);
+            for (const p of fp[i]) g.rrect(x + 1, y - 22 + p * 42, lw - 2, 3.5, 1.5, other ? C.red : C.mint);
+          }
+        });
+      });
+      for (let i = 0; i < n; i++) if (!SAME.has(i)) diff++;
+      if (t >= 5.5) {
+        g.text(bx, 228, '位點 1', { size: 13, color: C.muted });
+        if (n > 1) g.text(bx + (n - 1) * colw + lw, 228, `位點 ${n}`, { size: 13, color: C.muted, align: 'right' });
+      }
+      fade(g, ease(seg(t, 6, 7)), () => {
+        g.text(30, 466, `木材與樹頭:${n} 個位點全部相同`, { size: 15, weight: 700, color: C.mint });
+        g.text(30, 494, diff ? `別棵樹與樹頭:${diff} 個位點不同` : `別棵樹:這 ${n} 個位點也剛好相同`, { size: 15, weight: 700, color: diff ? C.red : C.amber });
+      });
+      // 右上:數字
+      fade(g, ease(seg(t, 4.5, 5.3)), () => {
+        g.panel(470, 26, 460, 104, '');
+        g.text(488, 52, `比對 ${n} 個位點,隨機兩棵全部相同的機率`, { size: 14, color: C.ink2 });
+        g.text(488, 84, sci(cpi), { size: 22, weight: 800, color: C.mint, mono: true });
+        g.text(488, 114, N < 1 ? '99.99% 信心下:位點太少,還分辨不了' : `99.99% 信心下可分辨:${trees(N)}`, { size: 15, weight: 700, color: N >= 32.06e6 ? C.mint : C.ink });
+        // 右:累積機率對位點數(對數軸)
+        const A = g.axes(560, 172, 340, 226, { xmin: 0, xmax: 29, ymin: 1e-14, ymax: 1, ylog: true, xticks: [1, 7, 14, 21, 28], yticks: [1, 1e-4, 1e-8, 1e-12], xlab: '比對的位點數', fmtY: (v) => (v === 1 ? '1' : `10${sup(Math.round(Math.log10(v)))}`) });
+        g.text(560, 156, '全部相同的機率(對數)', { size: 13, color: C.ink2 });
+        g.line(A.X(0), A.Y(NEED), A.X(29), A.Y(NEED), C.amber, 1.6, [7, 6]);
+        g.text(A.X(0.6), A.Y(NEED) + 18, '虛線以下:可分辨全臺約 3,200 萬棵', { size: 13, color: C.amber });
+        const pts = []; for (let i = 1; i <= n; i++) pts.push([A.X(i), A.Y(CPI[i - 1])]);
+        g.curve(pts, C.mint, 2.6);
+        for (let i = 1; i < n; i++) g.circle(A.X(i), A.Y(CPI[i - 1]), 2.4, C.mintDim);
+        g.circle(A.X(n), A.Y(cpi), 6, C.mint, C.bg, 2);
+        if (t < 9) g.tag(A.X(1) + 16, A.Y(cpi) + 24, '單一位點:0.11 到 0.90', { size: 13, color: C.ink, align: 'left', alpha: seg(t, 5, 5.8) });
+        const chain = PI.slice(0, Math.min(n, 4)).map((v) => v.toFixed(3)).join(' × ') + (n > 4 ? ' × …' : '');
+        g.text(470, 470, `= ${chain}`, { size: 14, color: C.ink2, mono: true });
+        g.text(470, 496, '示意值;位點互不連鎖、兩棵樹不是近親時才能相乘', { size: 13, color: C.muted });
+      });
+    },
+  },
+  {
+    key: 'parentage', name: '親子鑑定:等位基因要對得上', dur: 16,
+    cues: [[0, '子代在每個位點的兩個等位基因,一個來自母本、一個來自父本。'],
+      [4, '已知母本時,扣掉母本給的那一個,剩下的那一個要在候選父本身上找得到。'],
+      [8.5, '有位點對不上就可以排除;實務上常要兩個以上位點對不上才排除,以防判讀錯誤或突變。'],
+      [12.5, '右邊可以換候選父本,看哪一棵在每個位點都對得上。']],
+    draw(g, t, S) {
+      const dad = FATHERS[S.father], sw = fresh('father');
+      // 左:家族
+      fade(g, ease(seg(t, 0, 0.8)), () => {
+        conifer(g, 66, 84, 0.78, MOM); g.text(66, 140, '母本(已知)', { size: 14, weight: 700, color: MOM, align: 'center' });
+        conifer(g, 130, 236, 0.7); g.text(130, 286, '子代', { size: 14, weight: 700, color: C.ink, align: 'center' });
+        g.line(80, 154, 118, 196, MOM, 2);
+      });
+      fade(g, ease(seg(t, 4, 4.8)), () => {
+        conifer(g, 194, 84, 0.78, DAD); g.text(194, 140, `候選父本 ${S.father}`, { size: 14, weight: 700, color: DAD, align: 'center' });
+        g.line(180, 154, 142, 196, DAD, 2, [5, 4]);
+      });
+      // 右:五個位點的表
+      const cx = (i) => 420 + i * 112, Y = { mom: 128, kid: 228, dad: 328 };
+      fade(g, ease(seg(t, 0.3, 1.1)), () => {
+        for (let i = 0; i < 5; i++) g.text(cx(i), 70, `位點 ${i + 1}`, { size: 14, color: C.ink2, align: 'center' });
+        g.text(270, Y.mom, '母本', { size: 15, weight: 700, color: MOM });
+        g.text(270, Y.kid, '子代', { size: 15, weight: 700, color: C.ink });
+      });
+      let bad = 0;
+      for (let i = 0; i < 5; i++) {
+        const x = cx(i);
+        const a1 = ease(seg(t, 0.5 + i * 0.15, 1.3 + i * 0.15));
+        const link = ease(seg(t, 1.6 + i * 0.45, 2.2 + i * 0.45));
+        fade(g, a1, () => {
+          MOTHER[i].forEach((v, k) => chip(g, x + (k ? 25 : -25), Y.mom, String(v), { border: link > 0 && v === FROM_MOM[i] ? MOM : C.line, ink: v === FROM_MOM[i] && link > 0 ? MOM : C.ink }));
+          CHILD[i].forEach((v, k) => {
+            const fromMom = v === FROM_MOM[i];
+            chip(g, x + (k ? 25 : -25), Y.kid, String(v), { border: link > 0 ? (fromMom ? MOM : DAD) : C.line, ink: link > 0 ? (fromMom ? MOM : DAD) : C.ink });
+          });
+        });
+        if (link > 0) {
+          const km = MOTHER[i].indexOf(FROM_MOM[i]), kk = CHILD[i].indexOf(FROM_MOM[i]);
+          g.line(x + (km ? 25 : -25), Y.mom + 16, lerp(x + (km ? 25 : -25), x + (kk ? 25 : -25), link), lerp(Y.mom + 16, Y.kid - 16, link), MOM, 2);
+        }
+        // 候選父本
+        const ok = dad[i].includes(NEED_DAD[i]);
+        if (!ok) bad++;
+        const a2 = ease(seg(t, 4.4 + i * 0.12, 5.0 + i * 0.12));
+        fade(g, a2, () => dad[i].forEach((v, k) => chip(g, x + (k ? 25 : -25), Y.dad, String(v), { border: v === NEED_DAD[i] ? DAD : C.line, ink: v === NEED_DAD[i] ? DAD : C.ink })));
+        const chk = ease(seg(t, 5.2 + i * 0.6, 5.7 + i * 0.6)) * sw;
+        if (chk > 0) {
+          fade(g, chk, () => {
+            if (ok) {
+              const kd = dad[i].indexOf(NEED_DAD[i]), kk = CHILD[i].indexOf(NEED_DAD[i]);
+              g.line(x + (kd ? 25 : -25), Y.dad - 16, x + (kk ? 25 : -25), Y.kid + 16, DAD, 2);
+              mark(g, x, 388, true);
+            } else g.tag(x, 388, `沒有 ${NEED_DAD[i]}`, { size: 13, color: C.red, border: C.red });
+          });
+        }
+      }
+      fade(g, ease(seg(t, 4.2, 4.8)), () => g.text(270, Y.dad, `候選:${S.father}`, { size: 15, weight: 700, color: DAD }));
+      // 結論
+      const va = ease(seg(t, 8.5, 9.3)) * sw;
+      if (va > 0) {
+        const [msg, col] = bad === 0 ? ['5 個位點都對得上:不能排除它是父本', C.mint] : bad === 1 ? ['只有 1 個位點對不上:先不排除,再多驗幾個位點', C.amber] : [`${bad} 個位點對不上:排除,不是父本`, C.red];
+        g.text(600, 448, msg, { size: 17, weight: 700, color: col, align: 'center', alpha: va });
+        if (bad === 1) g.text(600, 478, '只差一個位點時,也要考慮判讀錯誤或突變', { size: 13, color: C.muted, align: 'center', alpha: va });
+      }
+    },
+  },
+  {
+    key: 'hybrid', name: '雜交與葉綠體 DNA', dur: 16,
+    cues: [[0, '兩個物種在某些位點各有自己特有的等位基因;雜交第一代(F1)在這些位點同時帶有兩種的等位基因。'],
+      [5.5, '葉綠體有自己的 DNA,通常只從一個親本傳下來,所以一棵樹多半只有一種型,只看到一個峰。'],
+      [10.5, '多數被子植物由母本傳;多數針葉樹由父本的花粉傳,扁柏屬的雜交試驗也是如此。右邊可以切換。']],
+    draw(g, t, S) {
+      const angio = S.group === 'angio', icon = angio ? broadleaf : conifer, sw = fresh('group');
+      const cols = [[170, '物種甲', '(母本)', MOM, SP_A], [480, '雜交第一代 F1', '', C.ink, F1], [790, '物種乙', '(父本)', DAD, SP_B]];
+      // 上:親本與 F1
+      cols.forEach(([x, name, role, col], k) => {
+        fade(g, ease(seg(t, k === 1 ? 2 : 0, k === 1 ? 2.8 : 0.8)), () => {
+          icon(g, x, 82, 0.78, k === 1 ? C.mintDim : col);
+          g.text(x, 140, name + role, { size: 15, weight: 700, color: col, align: 'center' });
+        });
+      });
+      fade(g, ease(seg(t, 1.2, 2)), () => {
+        g.arrow(250, 84, 410, 84, { color: MOM, lw: 2.2 }); g.arrow(710, 84, 552, 84, { color: DAD, lw: 2.2 });
+        g.text(330, 66, '結種子的一方', { size: 13, color: MOM, align: 'center' });
+        g.text(630, 66, '給花粉的一方', { size: 13, color: DAD, align: 'center' });
+      });
+      // 中:細胞核 SSR
+      fade(g, ease(seg(t, 0.4, 1.2)), () => {
+        g.text(40, 184, '細胞核 SSR:每個位點兩個等位基因', { size: 14, weight: 700, color: C.ink2 });
+        g.text(930, 184, '淡紫:物種甲特有  淺藍:物種乙特有', { size: 13, color: C.muted, align: 'right' });
+      });
+      for (let i = 0; i < 3; i++) {
+        const y = 224 + i * 40;
+        fade(g, ease(seg(t, 0.6, 1.4)), () => g.text(40, y, `位點 ${i + 1}`, { size: 13, color: C.muted }));
+        for (const [x, , , , gt] of [cols[0], cols[2]]) {
+          fade(g, ease(seg(t, 0.6 + i * 0.2, 1.4 + i * 0.2)), () => gt[i].forEach((v, k) => chip(g, x + (k ? 28 : -28), y, String(v), { fill: SP_A[i].includes(v) ? MOM : DAD, ink: '#0b1111', border: null, w: 50, h: 26 })));
+        }
+        // F1:一個從物種甲飛過來、一個從物種乙飛過來
+        F1[i].forEach((v, k) => {
+          const fromA = SP_A[i].includes(v), sx = fromA ? 170 + (SP_A[i].indexOf(v) ? 28 : -28) : 790 + (SP_B[i].indexOf(v) ? 28 : -28);
+          const p = ease(seg(t, 2.6 + i * 0.5 + k * 0.2, 3.6 + i * 0.5 + k * 0.2));
+          if (p <= 0) return;
+          chip(g, lerp(sx, 480 + (k ? 28 : -28), p), y - Math.sin(p * Math.PI) * 18, String(v), { fill: fromA ? MOM : DAD, ink: '#0b1111', border: null, w: 50, h: 26 });
+        });
+      }
+      fade(g, ease(seg(t, 4.4, 5.2)), () => g.tag(480, 342, '兩種的等位基因都有', { size: 13, color: C.ink }));
+      // 下:葉綠體(單一型,一個峰)
+      fade(g, ease(seg(t, 5.5, 6.3)), () => {
+        g.text(40, 384, '葉綠體 DNA:一棵樹多半只有一種型', { size: 14, weight: 700, color: C.ink2 });
+      });
+      const cpPlot = (x, isA, a) => fade(g, a, () => {
+        g.line(x - 70, 470, x + 70, 470, C.ink2, 1.5);
+        const px = x + (isA ? -22 : 22), col = isA ? MOM : DAD, pts = [];
+        for (let k = -40; k <= 40; k += 2) pts.push([px + k, 470 - 56 * Math.exp(-(k * k) / 60)]);
+        g.curve(pts, col, 2.6);
+        g.text(x, 492, isA ? '甲型' : '乙型', { size: 14, weight: 700, color: col, align: 'center' });
+      });
+      cpPlot(170, true, ease(seg(t, 6, 6.8)));
+      cpPlot(790, false, ease(seg(t, 6.3, 7.1)));
+      const fromMom = angio, fa = ease(seg(t, 8, 9)) * sw;
+      cpPlot(480, fromMom, fa);
+      if (fa > 0) {
+        const c = g.ctx, x0 = fromMom ? 250 : 710, x1 = fromMom ? 402 : 558;
+        const mx = (x0 + x1) / 2, col = fromMom ? MOM : DAD;
+        c.save(); c.globalAlpha *= fa; c.setLineDash([6, 5]); c.beginPath(); c.moveTo(x0, 440); c.quadraticCurveTo(mx, 404, x1, 440);
+        c.strokeStyle = col; c.lineWidth = 2; c.stroke(); c.restore();
+        g.arrow(x1 - (x1 - mx) * 0.12, 440 - 36 * 0.12, x1, 440, { color: col, lw: 2, head: 9, alpha: fa });
+      }
+      const va = ease(seg(t, 10.5, 11.3)) * sw;
+      if (va > 0) g.text(480, 522, angio ? '被子植物(例如油茶):F1 的葉綠體和母本一樣' : '針葉樹(例如扁柏屬):F1 的葉綠體和父本一樣', { size: 15, weight: 700, color: fromMom ? MOM : DAD, align: 'center', alpha: va });
+    },
+  },
+  {
+    key: 'copies', name: '葉綠體 DNA 份數多', dur: 15,
+    cues: [[0, '細胞核 DNA 每個位點只有兩份;葉綠體 DNA 份數多,一個葉片細胞裡可以超過一萬份。'],
+      [5, '乾燥的木材、榨出的油,DNA 很少又斷成小段;要 PCR 的那一段得剛好完整,才驗得到。'],
+      [10, '份數多的葉綠體 DNA 比較容易留下完整的一段,所以加工樣品要分辨物種時常用葉綠體標記。右邊可以換樣品。']],
+    draw(g, t, S) {
+      const sm = SAMPLES[S.sample], sw = fresh('sample');
+      // 左:一個葉片細胞
+      fade(g, ease(seg(t, 0, 0.8)), () => {
+        g.text(40, 34, '一個葉片細胞(示意)', { size: 14, weight: 700, color: C.ink2 });
+        g.rrect(40, 50, 370, 266, 46, 'rgba(165,243,205,.05)', C.mintDim, 2);
+        g.circle(132, 186, 64, 'rgba(240,243,238,.05)', C.ink2, 1.6);
+        g.text(132, 140, '細胞核', { size: 13, color: C.ink2, align: 'center' });
+        for (const [y, w] of [[172, 1], [204, -1]]) {
+          const pts = []; for (let x = 86; x <= 178; x += 4) pts.push([x, y + w * 5 * Math.sin((x - 86) / 14)]);
+          g.curve(pts, C.backbone, 3);
+          g.rrect(124, y - 6 + w * 5 * Math.sin(38 / 14), 16, 12, 3, C.mint);
+        }
+      });
+      const R = rng(5);
+      const cps = [[262, 96], [340, 104], [244, 156], [322, 168], [366, 132], [262, 222], [346, 236], [232, 278], [306, 288], [370, 276]];
+      cps.forEach(([x, y], k) => fade(g, ease(seg(t, 0.8 + k * 0.12, 1.4 + k * 0.12)), () => {
+        g.ctx.save(); g.ctx.beginPath(); g.ctx.ellipse(x, y, 32, 16, -0.3 + R() * 0.6, 0, Math.PI * 2);
+        g.ctx.fillStyle = 'rgba(95,211,154,.22)'; g.ctx.fill(); g.ctx.lineWidth = 1.5; g.ctx.strokeStyle = C.A; g.ctx.stroke(); g.ctx.restore();
+        for (let j = 0; j < 5; j++) g.circle(x - 17 + j * 8.5, y + (j % 2 ? 4 : -4), 3.2, null, C.mint, 1.3);
+      }));
+      fade(g, ease(seg(t, 2.2, 3)), () => {
+        g.text(410, 34, '葉綠體(右邊一顆顆)', { size: 13, color: C.A, align: 'right' });
+        g.text(40, 346, '核:每個位點 2 份', { size: 15, weight: 700, color: C.ink });
+        g.text(40, 374, '葉綠體 DNA:可超過 10,000 份', { size: 15, weight: 700, color: C.mint });
+        g.text(40, 400, '(小圈是葉綠體 DNA,畫的份數縮小很多)', { size: 13, color: C.muted });
+      });
+      // 右:樣品裡「要 PCR 的那一段」
+      const pa = ease(seg(t, 4.6, 5.4));
+      if (pa <= 0) return;
+      fade(g, pa, () => {
+        g.panel(440, 26, 490, 330, '');
+        g.text(458, 52, '樣品裡要 PCR 的那一段(示意)', { size: 14, weight: 700, color: C.ink2 });
+        g.tag(912, 52, `樣品:${sm.name}`, { size: 13, color: C.amber, align: 'right' });
+        g.text(458, 96, '核 SSR', { size: 14, weight: 700, color: C.ink });
+        g.text(458, 150, '葉綠體', { size: 14, weight: 700, color: C.mint });
+        g.text(458, 170, 'SSR', { size: 14, weight: 700, color: C.mint });
+        g.text(458, 338, '亮綠:還完整、可以 PCR 的一段;暗的已經斷開', { size: 13, color: C.muted });
+      });
+      const cut = seg(t, 5.6, 9.4); // 斷裂的進度
+      const piece = (x, y, len, tgt, broken, k, col) => { // 一段 DNA:中間 tgt 長是要 PCR 的那一段
+        const kk = broken ? clamp(cut * 1.6 - k * 0.6) : 0, gap = 7 * kk, tilt = kk * (k % 2 ? 4 : -4);
+        if (!broken || kk <= 0) {
+          g.line(x - len / 2, y, x + len / 2, y, col, 3);
+          g.rrect(x - tgt / 2, y - 3.5, tgt, 7, 3, broken ? C.mintDim : C.mint);
+          if (!broken && cut >= 1) { g.ctx.save(); g.ctx.shadowColor = C.mint; g.ctx.shadowBlur = 8; g.rrect(x - tgt / 2, y - 3.5, tgt, 7, 3, C.mint); g.ctx.restore(); }
+          return;
+        }
+        g.line(x - len / 2 - gap, y + tilt, x - 1 - gap, y - tilt * 0.3, 'rgba(213,221,217,.45)', 3);
+        g.line(x + 1 + gap, y + tilt * 0.3, x + len / 2 + gap, y - tilt, 'rgba(213,221,217,.45)', 3);
+        g.rrect(x - tgt / 2 - gap, y - 3 + tilt * 0.3, tgt / 2, 6, 2, 'rgba(79,143,116,.6)');
+        g.rrect(x + gap, y - 3 - tilt * 0.3, tgt / 2, 6, 2, 'rgba(79,143,116,.6)');
+      };
+      const seed = { leaf: 3, wood: 7, oil: 11 }[S.sample];
+      const inN = intactSet(sm.nuc, sm.keep, seed), inC = intactSet(sm.cp, sm.keep, seed + 100);
+      fade(g, pa * (0.4 + 0.6 * sw), () => {
+        for (let i = 0; i < sm.nuc; i++) piece(560 + i * 44, 96, 34, 12, !inN.has(i), (i * 7) % 5 / 5, C.backbone);
+        for (let i = 0; i < sm.cp; i++) piece(560 + (i % 10) * 34, 132 + Math.floor(i / 10) * 26, 24, 9, !inC.has(i), (i * 3) % 7 / 7, C.A);
+      });
+      // 下:完整的份數與 PCR 會不會成功
+      const ra = ease(seg(t, 9.6, 10.4)) * sw;
+      if (ra > 0) {
+        const nOk = inN.size, cOk = inC.size;
+        const nMsg = nOk === 0 ? ['核 SSR:幾乎沒有完整的一段,很難驗到', C.red] : nOk <= 1 ? [`核 SSR:只剩 ${nOk} 份完整,常常驗不到`, C.amber] : [`核 SSR:${nOk} 份完整,驗得到`, C.mint];
+        const cMsg = [`葉綠體 SSR:還有 ${cOk} 份完整,比較容易驗到`, C.mint];
+        g.tag(458, 400, nMsg[0], { size: 14, color: nMsg[1], align: 'left', alpha: ra, border: nMsg[1] });
+        g.tag(458, 438, cMsg[0], { size: 14, color: cMsg[1], align: 'left', alpha: ra, border: cMsg[1] });
+        g.text(458, 482, '完整的模板越多,PCR 越容易成功;PCR 的那一段設計得短,也比較容易完整。', { size: 13, color: C.muted, alpha: ra, max: 470 });
+      }
+    },
+  },
+  {
+    key: 'oil', name: '檢查苦茶油的原料', dur: 17,
+    cues: [[0, '臺灣的苦茶油用大果油茶(油茶)或小果油茶(短柱山茶)的種子榨成;兩種的葉綠體 SSR 長度不一樣。'],
+      [4.5, '從油裡抽出微量 DNA,用葉綠體 SSR 的引子做 PCR,電泳後和兩種油茶的對照比較長度。'],
+      [9.5, '只有一種長度表示原料單一;兩種長度都出現,表示混了另一種種子。和標示不符就是混充。'],
+      [13.5, '研究指出製油的每一步都驗得到,最好在粗油之前檢查;精製過的油 DNA 極少,不一定驗得出來。右邊可以換油。']],
+    draw(g, t, S) {
+      const o = OILS[S.oil], sw = fresh('oil');
+      // 上:流程
+      const steps = [84, 254, 424, 594]; // 油瓶、抽 DNA、PCR、電泳四個圖示的中心
+      const act = (k) => (t >= 4.5 + k * 1.2 && t < 5.9 + k * 1.2 ? 1 : 0);
+      fade(g, ease(seg(t, 0, 0.8)), () => {
+        bottle(g, 84, 116, 0.78); g.text(84, 138, o.name, { size: 14, weight: 700, color: C.ink, align: 'center', alpha: sw });
+      });
+      fade(g, ease(seg(t, 4.5, 5.2)), () => {
+        for (let k = 0; k < 3; k++) g.arrow(steps[k] + 50, 82, steps[k + 1] - 46, 82, { color: act(k + 1) ? C.mint : C.line, lw: 2.2 });
+        g.tube(254, 50, 30, 62, { liquid: 'rgba(165,243,205,.3)', fill: 0.4 });
+        g.text(254, 138, '抽出微量 DNA', { size: 14, color: C.ink2, align: 'center' });
+        g.rrect(396, 62, 56, 38, 6, '#22302d', act(2) ? C.mint : C.ink2, 1.6);
+        for (let k = 0; k < 3; k++) g.rrect(404 + k * 15, 50, 9, 16, 3, C.amber);
+        g.text(424, 138, '葉綠體 SSR 的 PCR', { size: 14, color: C.ink2, align: 'center' });
+        g.rrect(568, 54, 52, 58, 4, 'rgba(150,190,200,.13)', act(3) ? C.mint : C.ink2, 1.6);
+        for (const [dx, dy] of [[-12, 18], [12, 30], [-12, 40]]) g.rrect(594 + dx - 8, 54 + dy, 16, 4, 2, 'rgba(255,232,160,.85)');
+        g.text(594, 138, '電泳', { size: 14, color: C.ink2, align: 'center' });
+      });
+      if (act(0)) { const c = g.ctx; c.save(); c.shadowColor = C.mint; c.shadowBlur = 14; g.circle(84, 76, 4, C.mint); c.restore(); }
+      fade(g, ease(seg(t, 0.4, 1.2)), () => {
+        g.panel(690, 26, 240, 104, '');
+        g.text(706, 52, '這瓶油', { size: 13, color: C.muted });
+        g.text(706, 80, o.name, { size: 17, weight: 700, color: C.ink, alpha: sw });
+        g.text(706, 108, o.claim, { size: 14, color: S.oil === 'shop' ? C.amber : C.ink2, alpha: sw });
+      });
+      // 中:兩個標記的電泳
+      const gels = [[140, '標記 1', CP1, 140, 160], [540, '標記 2', CP2, 195, 220]];
+      const run = ease(seg(t, 9.6, 11.4));
+      gels.forEach(([gx, title, bp, lo, hi]) => {
+        const gy = 168, gh = 182, gw = 280, top = gy + 34;
+        const yAt = (v) => top + 8 + ((hi - v) / (hi - lo)) * (gh - 62);
+        fade(g, ease(seg(t, 1, 1.8)), () => {
+          g.rrect(gx, gy, gw, gh, 6, 'rgba(150,190,200,.10)', 'rgba(170,210,220,.35)');
+          g.text(gx + 10, gy + 14, title, { size: 13, color: C.muted });
+          const lanes = [[gx + 50, '小果對照'], [gx + 140, '大果對照'], [gx + 230, '這瓶油']];
+          for (const [lx, name] of lanes) { g.rrect(lx - 28, top - 4, 56, 7, 2, '#05090a'); g.text(lx, gy + gh + 18, name, { size: 14, color: name === '這瓶油' ? C.ink : C.ink2, align: 'center' }); }
+        });
+        const ra = ease(seg(t, 2, 3.4));
+        if (ra > 0) {
+          band(g, gx + 50, lerp(top, yAt(bp.small), ra), 52, 0.9);
+          band(g, gx + 140, lerp(top, yAt(bp.large), ra), 52, 0.9);
+          if (ra >= 1) for (const v of [bp.small, bp.large]) g.text(gx - 8, yAt(v), `${v} bp`, { size: 13, color: C.ink2, align: 'right', mono: true });
+        }
+        if (run > 0) for (const [sp, inten] of Object.entries(o.bands)) band(g, gx + 230, lerp(top, yAt(bp[sp]), run), 52, inten * (0.4 + 0.6 * sw));
+      });
+      const va = ease(seg(t, 11.4, 12.2)) * sw;
+      if (va > 0) g.text(480, 396, o.verdict[0], { size: 16, weight: 700, color: o.verdict[1], align: 'center', alpha: va });
+      // 下:製油流程與檢查點
+      const pa = ease(seg(t, 13.5, 14.4));
+      if (pa > 0) fade(g, pa, () => {
+        g.text(40, 434, '製油流程(DNA 量是示意)', { size: 13, color: C.muted });
+        const box = [[200, '種子'], [400, '壓榨'], [600, '粗油'], [800, '過濾、精製']], dna = [0.9, 0.62, 0.36, 0.05];
+        box.forEach(([x, name], k) => {
+          g.rrect(x - 66, 448, 132, 34, 8, '#1b2826', C.line);
+          g.text(x, 466, name, { size: 14, color: C.ink, align: 'center' });
+          g.rrect(x - 60, 494, 120, 8, 4, 'rgba(255,255,255,.07)'); g.rrect(x - 60, 494, Math.max(4, 120 * dna[k]), 8, 4, C.mint);
+          if (k < 3) g.arrow(x + 70, 465, x + 128, 465, { color: C.ink2, lw: 2, head: 8 });
+        });
+        g.text(40, 498, 'DNA 量', { size: 13, color: C.muted });
+        g.line(500, 440, 500, 512, C.amber, 2, [5, 4]);
+        g.tag(508, 434, '建議的檢查點:粗油之前', { size: 13, color: C.amber, align: 'left', border: C.amber });
+      });
+    },
+  },
+];
+
+createLesson({
+  chapters,
+  state: { rep: 7, tree: 'A', loci: 28, father: '甲', group: 'angio', sample: 'wood', oil: 'small' },
+  controls: [
+    { id: 'rep', label: '甲樹的重複次數', type: 'range', min: 4, max: 11, step: 1, format: (v) => `CA × ${v}`, chapters: ['ssr'], restart: false },
+    { id: 'tree', label: '樣品樹', type: 'seg', options: [{ v: 'A', label: '樹 A' }, { v: 'B', label: '樹 B' }, { v: 'C', label: '樹 C' }, { v: 'D', label: '樹 D' }], chapters: ['genotype'], restart: false, onChange: () => { stamp.tree = performance.now(); } },
+    { id: 'loci', label: '比對的位點數', type: 'range', min: 1, max: 28, step: 1, unit: ' 個', chapters: ['fingerprint'], restart: false },
+    { id: 'father', label: '候選父本', type: 'seg', options: [{ v: '甲', label: '甲' }, { v: '乙', label: '乙' }, { v: '丙', label: '丙' }], chapters: ['parentage'], restart: false, onChange: () => { stamp.father = performance.now(); } },
+    { id: 'group', label: '植物類群', type: 'seg', options: [{ v: 'angio', label: '被子植物' }, { v: 'conifer', label: '針葉樹' }], chapters: ['hybrid'], restart: false, onChange: () => { stamp.group = performance.now(); } },
+    { id: 'sample', label: '樣品', type: 'seg', options: [{ v: 'leaf', label: '新鮮葉片' }, { v: 'wood', label: '乾燥木材' }, { v: 'oil', label: '油' }], chapters: ['copies'], restart: false, onChange: () => { stamp.sample = performance.now(); } },
+    { id: 'oil', label: '油品', type: 'seg', options: [{ v: 'small', label: '小果油茶油' }, { v: 'large', label: '大果油茶油' }, { v: 'mix', label: '兩種種子混榨' }, { v: 'shop', label: '市售:標示小果' }], chapters: ['oil'], restart: false, onChange: () => { stamp.oil = performance.now(); } },
+  ],
+});
+createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
+</script>
+</body>
+</html>

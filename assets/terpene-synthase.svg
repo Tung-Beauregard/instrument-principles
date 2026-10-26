@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="臺灣杉的小枝旁,一條碳鏈鑽進萜類合成酶的口袋,口袋裡接成雙環的 pinene,右下是層析圖上的一支峰">
+  <defs>
+    <linearGradient id="enz" x1="120" y1="50" x2="290" y2="230" gradientUnits="userSpaceOnUse"><stop stop-color="#2b4d3c"/><stop offset="1" stop-color="#14281e"/></linearGradient>
+    <radialGradient id="glow" cx="206" cy="146" r="56" gradientUnits="userSpaceOnUse"><stop stop-color="#a5f3cd" stop-opacity=".22"/><stop offset="1" stop-color="#a5f3cd" stop-opacity="0"/></radialGradient>
+  </defs>
+  <ellipse cx="224" cy="240" rx="190" ry="11" fill="#050e0c" opacity=".45"/>
+  <!-- 左:臺灣杉的小枝 -->
+  <g stroke-linecap="round" stroke-width="2.4"><path d="M41.9 214Q31.2 202.6 17.2 200M41.9 214Q51.8 201.9 65.6 198.3M41.8 203.6Q33.4 190.8 20.4 185.9M41.8 203.6Q50.5 191.1 63.6 186.6M43.1 182.9Q35.5 170.6 23.3 165.6M43.1 182.9Q53.3 172.7 66.3 170.7M44.5 172.6Q37.4 160.5 25.7 155.4M44.5 172.6Q55.2 163.5 67.9 162.6M49 152.1Q45.2 139.5 35.7 132.2M49 152.1Q58.7 143.2 70.6 141.9M52 142Q47.2 130.2 37.3 124M52 142Q62.9 135.4 74.6 136.4M59.7 121.9Q58.4 110 51 101.9M59.7 121.9Q69.3 114.8 80.2 114.8M64.3 111.9Q62.6 100.4 55.3 92.9M64.3 111.9Q74.4 106.3 84.9 107.6M75.2 92Q74.5 81.3 68.2 73.7M75.2 92Q85 87.7 94.6 89.8M81.4 82.2Q82.1 71.8 77 63.9M81.4 82.2Q90.6 77.6 99.9 79.1M95.4 62.6Q95 53.1 89.6 46.3M95.4 62.6Q104.8 60.7 112.7 64.3" stroke="#4f9a74"/><path d="M42.6 224.5Q32.2 212.3 18 208.9M42.6 224.5Q50.8 210.7 64.2 204.9M42.2 193.2Q35.6 179.9 23.6 173.7M42.2 193.2Q50.4 180.9 63.2 176.3M46.5 162.3Q42.1 149.5 31.9 142.4M46.5 162.3Q55.9 152.6 68.2 150.5M55.6 131.9Q52 120 43 113.2M55.6 131.9Q66.2 125.5 77.4 126.5M69.5 101.9Q67.1 91 59.5 84.3M69.5 101.9Q80 98.1 89.7 101M88.1 72.3Q87.9 62.4 82.3 55.3M88.1 72.3Q97.7 69.5 106.2 72.6" stroke="#78c99e"/></g>
+  <path d="M44 236Q30 140 104 52" stroke="#8f8263" stroke-width="3.6" stroke-linecap="round"/>
+  <!-- 中:萜類合成酶與口袋 -->
+  <path d="M124 98C134 50 248 38 292 66C318 84 312 110 300 124C312 156 304 206 250 222C188 238 116 226 102 184C94 152 112 122 124 98Z" fill="url(#enz)" stroke="#6f9f86" stroke-width="1.6"/>
+  <g stroke="#4f8f74" stroke-width="7" stroke-linecap="round" opacity=".55"><path d="M136 196L170 214M246 210L280 188M142 92L170 72"/></g>
+  <path d="M158 112C172 92 236 86 262 100L300 78L312 94L276 122C280 156 256 192 208 196C166 200 144 176 146 146C147 130 150 120 158 112Z" fill="#0b1910" stroke="#3c684b" stroke-width="1.4"/>
+  <circle cx="206" cy="146" r="56" fill="url(#glow)"/>
+  <g fill="#ffd166"><circle cx="266" cy="110" r="3.6"/><circle cx="276" cy="102" r="3.6"/><circle cx="279" cy="114" r="3.6"/></g>
+  <g stroke="#a5f3cd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M227.7 127.5L227.7 152.5L206 165L184.3 152.5L184.3 127.5L206 115Z"/><path d="M206 115L206 140L227.7 152.5"/><path d="M206 140L193 140M206 140L197.3 130.3"/><path d="M205.4 158.9L190 150"/><path d="M206 165L206 183"/></g>
+  <!-- 右上:鑽進口袋的碳鏈 -->
+  <g stroke="#d5ddd9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M318 84L324.8 72.9L337.8 73.2L344.5 62.1L357.5 62.4L364.3 51.3L377.3 51.6L384 40.5"/><path d="M337.8 73.2L344 84.6M377.3 51.6L383.5 63"/></g>
+  <path d="M318 84L304 90" stroke="#ffd166" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="1 5"/>
+  <!-- 右下:層析圖上的一支峰 -->
+  <path d="M326 224H426" stroke="#5f8f78" stroke-width="1.6"/>
+  <path d="M326 224L326 224L328 224L330 224L332 224L334 224L336 224L338 224L340 223.9L342 223.4L344 222.1L346 219.5L348 216.4L350 215L352 216.4L354 219.5L356 222.1L358 223.4L360 223.9L362 223.8L364 223.4L366 221.9L368 218L370 209.9L372 196.7L374 180.1L376 165.8L378 160L380 165.8L382 180.1L384 196.7L386 209.9L388 218L390 221.9L392 223.4L394 223.8L396 224L398 224L400 224L402 224L404 224L406 224L408 224L410 224L412 224L414 224L416 224L418 224L420 224L422 224L424 224" stroke="#a5f3cd" stroke-width="2.2" stroke-linejoin="round"/>
+</svg>

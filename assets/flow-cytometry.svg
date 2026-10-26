@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="細胞在細細的液流裡排成一列通過雷射,散射出的光變成點圖上的兩群點,其中一群被圈起來">
+  <ellipse cx="220" cy="240" rx="190" ry="11" fill="#050e0c" opacity=".45"/>
+  <!-- 流動室:上寬下窄,鞘液包著中間的樣品流 -->
+  <path d="M74 24H166V64C166 84 134 92 130 116V226H110V116C106 92 74 84 74 64Z" fill="#14251e" stroke="#5f8f78" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M88 32V62C88 78 112 92 115 112V220M152 32V62C152 78 128 92 125 112V220" stroke="#7fb8c8" stroke-opacity=".5" stroke-width="1.4" stroke-dasharray="4 5"/>
+  <path d="M116 16H124V60L121 112H119L116 60Z" fill="#ffd166" fill-opacity=".28" stroke="#b9c7c0" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M120 112V226" stroke="#ffd166" stroke-opacity=".45" stroke-width="3"/>
+  <!-- 排成一列的細胞 -->
+  <g stroke="#a5f3cd" stroke-width="1.8" fill="#a5f3cd" fill-opacity=".14">
+    <circle cx="120" cy="84" r="5.5"/><circle cx="120" cy="128" r="5.5"/><circle cx="120" cy="208" r="5.5"/>
+  </g>
+  <!-- 雷射與通過光束的細胞 -->
+  <rect x="16" y="160" width="30" height="20" rx="5" fill="#14251e" stroke="#a5f3cd" stroke-width="1.8"/>
+  <path d="M46 170H120" stroke="#a5f3cd" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="120" cy="170" r="13" fill="#a5f3cd" fill-opacity=".18"/>
+  <circle cx="120" cy="170" r="6" fill="#f0f3ee"/>
+  <!-- 散射出去的光 -->
+  <g stroke="#d5ddd9" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".75">
+    <path d="M134 170H204"/><path d="M134 165L200 146"/><path d="M134 175L200 194"/><path d="M131 160L176 124"/>
+  </g>
+  <path d="M206 170h10M211 165l6 5-6 5" stroke="#a5f3cd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 點圖:兩群細胞,其中一群被圈起來 -->
+  <path d="M236 40V206H414" stroke="#b9c7c0" stroke-width="2" stroke-linecap="round"/>
+  <path d="M321.5 149.0h0M288.5 168.3h0M274.0 170.1h0M294.3 163.1h0M252.4 164.4h0M301.5 171.0h0M294.0 163.3h0M297.6 165.7h0M264.2 177.1h0M281.0 186.0h0M297.5 163.5h0M271.3 177.8h0M295.5 162.7h0M283.4 148.5h0M301.3 173.7h0M264.7 161.9h0M271.7 176.4h0M276.6 167.6h0M292.2 170.6h0M285.6 172.5h0M293.9 181.3h0M282.5 157.6h0M294.1 160.9h0M286.2 169.5h0M308.3 163.7h0M283.0 171.4h0" stroke="#7d8f88" stroke-width="4.2" stroke-linecap="round"/>
+  <path d="M355.5 93.1h0M342.6 108.7h0M354.2 98.1h0M365.0 82.8h0M358.5 100.1h0M356.5 110.1h0M336.6 75.7h0M361.5 91.7h0M360.6 77.5h0M346.3 86.7h0M372.3 110.6h0M352.5 96.4h0M338.5 72.5h0M344.1 69.5h0M365.2 99.8h0M354.2 81.3h0M319.5 85.6h0M349.6 112.1h0M379.9 89.4h0M362.5 103.1h0M348.1 112.4h0M331.5 70.8h0M344.8 76.3h0M365.8 109.5h0M347.4 75.2h0M341.0 57.5h0M359.2 75.5h0M369.1 85.0h0M328.5 94.6h0M354.2 107.5h0" stroke="#a5f3cd" stroke-width="4.2" stroke-linecap="round"/>
+  <ellipse cx="351" cy="90" rx="43" ry="40" stroke="#ffd166" stroke-width="1.8" stroke-dasharray="6 5"/>
+</svg>

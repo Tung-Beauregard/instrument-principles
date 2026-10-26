@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="兩支 Y 字形的抗體夾住目標蛋白,左邊是有發光條帶的膜,右邊是顏色深淺不同的孔盤">
+  <defs>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#f4ffd8" stop-opacity=".95"/>
+      <stop offset=".45" stop-color="#eaffc4" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#eaffc4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ag" cx=".38" cy=".32" r=".75">
+      <stop offset="0" stop-color="#ffb488"/>
+      <stop offset="1" stop-color="#c8693a"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="220" cy="238" rx="190" ry="11" fill="#050e0c" opacity=".45"/>
+  <!-- 左:膜上的條帶(分子量標準與兩道樣品) -->
+  <rect x="30" y="44" width="104" height="172" rx="6" fill="#070d0c" stroke="#2b3b36" stroke-width="1.5"/>
+  <path d="M42 62h18M42 80h18M42 95h18M42 106h18M42 123h18M42 136h18M42 153h18M42 162h18M42 175h18M42 194h18" stroke="#7fb8ff" stroke-width="3" stroke-linecap="round" opacity=".85"/>
+  <ellipse cx="84" cy="114" rx="24" ry="13" fill="url(#glow)"/>
+  <ellipse cx="117" cy="114" rx="18" ry="10" fill="url(#glow)" opacity=".55"/>
+  <rect x="73" y="111" width="22" height="6" rx="3" fill="#f4ffd8"/>
+  <rect x="107" y="111" width="20" height="6" rx="3" fill="#dfeec0" opacity=".65"/>
+  <text x="34" y="37" fill="#9caca5" font-size="10" font-family="Consolas,monospace">kDa</text>
+  <!-- 中:捕捉抗體(藍)與偵測抗體(綠,帶酵素)夾住目標蛋白 -->
+  <path d="M168 208H276" stroke="#2b3b36" stroke-width="5" stroke-linecap="round"/>
+  <g stroke-linecap="round" stroke-width="7">
+    <path d="M203.5 172V203M203.5 172L196 162.4M203.5 172L211 162.4" stroke="#7fb8ff"/>
+    <path d="M196 162.4L185 148.4M211 162.4L222 148.4" stroke="#ffd166"/>
+  </g>
+  <path d="M248 120c0 13-12 22-26 22s-27-8-27-21 12-23 27-23 26 9 26 22z" fill="url(#ag)" stroke="#ffffff" stroke-opacity=".35" stroke-width="1.5"/>
+  <path d="M222 148l-6-9h12z" fill="#f0f3ee"/>
+  <circle cx="222" cy="95" r="4.5" fill="#f0f3ee"/>
+  <ellipse cx="240.5" cy="32" rx="26" ry="22" fill="url(#glow)"/>
+  <g stroke-linecap="round" stroke-width="7">
+    <path d="M240.5 67V43M240.5 67L233 76.6M240.5 67L248 76.6" stroke="#a5f3cd"/>
+    <path d="M233 76.6L222 90.6M248 76.6L259 90.6" stroke="#ffd166"/>
+  </g>
+  <path d="M240.5 43V38" stroke="#b8a4f4" stroke-width="2"/>
+  <ellipse cx="240.5" cy="32" rx="10" ry="8" fill="#b8a4f4" stroke="#ffffff" stroke-opacity=".35"/>
+  <!-- 右:孔盤,顏色由深到淺 -->
+  <rect x="300" y="112" width="112" height="104" rx="8" fill="#13201d" stroke="#b9c7c0" stroke-opacity=".45" stroke-width="1.5"/>
+  <g stroke="#b9c7c0" stroke-opacity=".35">
+    <circle cx="318" cy="134" r="9" fill="#ffd23f" fill-opacity=".95"/><circle cx="344" cy="134" r="9" fill="#ffd23f" fill-opacity=".75"/><circle cx="370" cy="134" r="9" fill="#ffd23f" fill-opacity=".5"/><circle cx="396" cy="134" r="9" fill="#ffd23f" fill-opacity=".3"/>
+    <circle cx="318" cy="164" r="9" fill="#ffd23f" fill-opacity=".85"/><circle cx="344" cy="164" r="9" fill="#ffd23f" fill-opacity=".6"/><circle cx="370" cy="164" r="9" fill="#ffd23f" fill-opacity=".38"/><circle cx="396" cy="164" r="9" fill="#ffd23f" fill-opacity=".18"/>
+    <circle cx="318" cy="194" r="9" fill="#ffd23f" fill-opacity=".7"/><circle cx="344" cy="194" r="9" fill="#ffd23f" fill-opacity=".45"/><circle cx="370" cy="194" r="9" fill="#ffd23f" fill-opacity=".25"/><circle cx="396" cy="194" r="9" fill="#0a1211"/>
+  </g>
+  <path d="M318 62V118" stroke="#6e96ff" stroke-width="6" stroke-opacity=".55" stroke-linecap="round"/>
+  <text x="328" y="72" fill="#9caca5" font-size="10" font-family="Consolas,monospace">450 nm</text>
+</svg>

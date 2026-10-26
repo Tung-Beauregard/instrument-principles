@@ -17,6 +17,10 @@
       "name": "NMR"
     },
     {
+      "id": "bio",
+      "name": "生化原理"
+    },
+    {
       "id": "tools",
       "name": "工具"
     }
@@ -106,6 +110,126 @@
       "image": "./assets/nmr.svg",
       "imageAlt": "剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意",
       "href": "./nmr/"
+    },
+    {
+      "id": "central-dogma",
+      "name": "中心法則",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/central-dogma.svg",
+      "imageAlt": "DNA 雙股螺旋轉錄成 mRNA,核糖體沿著 mRNA 接出一串胺基酸",
+      "href": "./central-dogma/"
+    },
+    {
+      "id": "pcr",
+      "name": "PCR 與電泳",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/pcr.svg",
+      "imageAlt": "分開的雙股 DNA 黏上引子,數量一輪一輪加倍,旁邊是跑出條帶的洋菜膠",
+      "href": "./pcr/"
+    },
+    {
+      "id": "sequencing",
+      "name": "DNA 定序",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/sequencing.svg",
+      "imageAlt": "一股 DNA 的鹼基對到四色峰圖的峰,旁邊是流動槽上一叢一叢發出四種顏色的 DNA",
+      "href": "./sequencing/"
+    },
+    {
+      "id": "dna-markers",
+      "name": "DNA 鑑定與分子標記",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/dna-markers.svg",
+      "imageAlt": "一段木頭的切面與一片葉子,旁邊是 DNA 的重複序列與電泳圖上的兩個峰",
+      "href": "./dna-markers/"
+    },
+    {
+      "id": "cloning",
+      "name": "基因選殖與蛋白表現",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/cloning.svg",
+      "imageAlt": "從葉片取得的基因片段帶著黏性末端,接進大腸桿菌裡的環狀質體,細菌做出一團團帶 His 標籤的酵素",
+      "href": "./cloning/"
+    },
+    {
+      "id": "terpene-synthase",
+      "name": "萜類合成酶",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/terpene-synthase.svg",
+      "imageAlt": "臺灣杉的小枝旁,一條碳鏈鑽進萜類合成酶的口袋,口袋裡接成雙環的 pinene,右下是層析圖上的一支峰",
+      "href": "./terpene-synthase/"
+    },
+    {
+      "id": "crispr",
+      "name": "CRISPR 基因編輯",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/crispr.svg",
+      "imageAlt": "Cas9 蛋白套在雙股 DNA 上,嚮導 RNA 和其中一股配對,旁邊框起來的是 PAM,兩股在同一個位置被剪開",
+      "href": "./crispr/"
+    },
+    {
+      "id": "immunoassay",
+      "name": "抗體檢測:西方墨點法與 ELISA",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/immunoassay.svg",
+      "imageAlt": "兩支 Y 字形的抗體夾住目標蛋白,左邊是有發光條帶的膜,右邊是顏色深淺不同的孔盤",
+      "href": "./immunoassay/"
+    },
+    {
+      "id": "flow-cytometry",
+      "name": "流式細胞儀",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/flow-cytometry.svg",
+      "imageAlt": "細胞在細細的液流裡排成一列通過雷射,散射出的光變成點圖上的兩群點,其中一群被圈起來",
+      "href": "./flow-cytometry/"
+    },
+    {
+      "id": "proteomics",
+      "name": "蛋白質質譜定序",
+      "categories": [
+        "bio"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/proteomics.svg",
+      "imageAlt": "一條胺基酸串成的胜肽斷成兩段,旁邊的碎片質譜上,兩根相鄰峰之間的距離對應一個胺基酸",
+      "href": "./proteomics/"
     },
     {
       "id": "plot",

@@ -1,0 +1,1113 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>基因選殖與蛋白表現:讓細菌幫你做酵素</title>
+<meta name="description" content="用動畫看怎麼從植物的 RNA 做出 cDNA、用限制酶與接合酶把基因接進質體、轉形大腸桿菌,再用 IPTG 誘導表現、His 標籤純化,最後用 SDS-PAGE 與西方墨點法確認。可以自己換切法、拿掉抗生素、關掉 IPTG、拿掉 His 標籤。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="基因選殖與蛋白表現:讓細菌幫你做酵素">
+<meta property="og:description" content="用動畫看基因怎麼接進質體、送進大腸桿菌,再用 IPTG 誘導表現、His 標籤純化,最後用 SDS-PAGE 與西方墨點法確認。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/cloning/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/cloning.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="基因選殖與蛋白表現:基因接進質體、大腸桿菌做出酵素的動畫">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/cloning/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理"><a href="../">← 儀器入口</a><a href="../central-dogma/">中心法則</a><a href="../pcr/">PCR 與電泳</a><a href="../sequencing/">DNA 定序</a><a href="../dna-markers/">DNA 鑑定</a><a href="./" aria-current="page">基因選殖</a><a href="../terpene-synthase/">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/">抗體檢測</a><a href="../flow-cytometry/">流式細胞儀</a><a href="../proteomics/">蛋白質定序</a></nav></div>
+<header class="top wrap">
+  <h1>基因選殖 <span class="k">讓細菌幫你做酵素</span></h1>
+  <p class="lede">想知道植物的某個酵素在做什麼,常見的做法是把它的基因接進質體、送進大腸桿菌,讓細菌大量做出這個蛋白質,純化之後再測功能。這份教材從取得基因一路走到確認做出來的蛋白質。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="基因選殖與蛋白表現動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <ul>
+      <li>植物的基因裡夾著內含子,大腸桿菌不會剪掉它;所以先抽 RNA,用反轉錄酶照 mRNA 做出 cDNA(沒有內含子),再用 PCR 放大目標基因(原理見 <a href="../pcr/">PCR 與電泳</a>)。</li>
+      <li>載體(質體)上有複製起點、抗生素抗性基因、啟動子與插入位置。限制酶在特定序列(例如 EcoRI 認 GAATTC)錯開切斷,留下黏性末端;DNA 接合酶把基因接進去。兩端用兩種不同的酶,基因只能照一個方向接進去。</li>
+      <li>轉形:質體和勝任細胞先放冰上,再泡 42 °C 水浴 30 到 60 秒(熱休克);塗在含抗生素的培養基上,只有帶著質體的菌長得出菌落。</li>
+      <li>pET 系統:表現菌株(名稱帶 DE3)帶有 T7 RNA 聚合酶的基因,平常被 LacI 擋住;加入 IPTG(常用 0.4 到 1 mM)後開始大量表現,目標蛋白可以超過菌體蛋白的一半。低溫(例如 15 到 20 °C)長時間誘導,可溶的比例常會提高。</li>
+      <li>His 標籤(6 個組胺酸)會抓住鎳或鈷樹脂;用少量咪唑洗掉雜蛋白,再用高濃度咪唑把目標蛋白換下來。SDS-PAGE 看大小,西方墨點法(Western blot)用認得 His 標籤的抗體確認身分(原理見 <a href="../immunoassay/">抗體檢測</a>),最後再測酵素活性;萜類合成酶的產物怎麼認出來,見 <a href="../terpene-synthase/">萜類合成酶</a>。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>OpenStax Biology 2e,<a href="https://openstax.org/books/biology-2e/pages/17-1-biotechnology">17.1 Biotechnology</a>(質體、限制酶的黏性末端、DNA 接合酶、抗生素篩選、反轉錄酶做 cDNA);OpenStax Microbiology <a href="https://openstax.org/books/microbiology/pages/12-1-microbes-and-the-tools-of-genetic-engineering">12.1</a>(cDNA 沒有內含子、限制酶的切位多是 4 到 6 個鹼基的回文序列)、<a href="https://openstax.org/books/microbiology/pages/12-2-visualizing-and-characterizing-dna-rna-and-protein">12.2</a>(SDS-PAGE)、<a href="https://openstax.org/books/microbiology/pages/20-2-detecting-antigen-antibody-complexes">20.2</a>(西方墨點法)。</li>
+      <li>Addgene:<a href="https://www.addgene.org/mol-bio-reference/plasmid-background/">Plasmid elements</a>(複製起點、抗性基因、插入位置、啟動子)、<a href="https://www.addgene.org/protocols/bacterial-transformation/">Bacterial Transformation</a>(冰上 20 到 30 分鐘、42 °C 30 到 60 秒)、<a href="https://blog.addgene.org/plasmids-101-restriction-cloning">Plasmids 101: Restriction Cloning</a>(兩種酶控制方向;只用一種酶時,基因有的正接有的反接,質體也會自己接回去)。</li>
+      <li>Novagen pET System Manual, 10th ed.(TB055)第 4、11、14、33、34、42 頁:<a href="https://mcb.berkeley.edu/labs/krantz/pdf/vectors/pET_system_manual.pdf">PDF</a>(T7 啟動子、DE3 菌株的 lacUV5 與 IPTG、IPTG 0.4 或 1 mM、目標蛋白可超過菌體蛋白一半、低溫誘導提高可溶比例、不加 IPTG 的對照);另見 Rosano GL, et al. Front Microbiol. 2014;5:172. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4029002/">PMC4029002</a>(包涵體與 15 到 25 °C 表現)。</li>
+      <li>Bornhorst JA, et al. Purification of proteins using polyhistidine affinity tags. Methods Enzymol. 2000;326:245–254. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2909483/">PMC2909483</a>(6 個組胺酸、鎳與鈷樹脂、咪唑洗滌 10 到 50 mM、沖提 100 mM 以上)。</li>
+      <li>實際的例子:Ma LT, et al. Unveiling Monoterpene Biosynthesis in Taiwania cryptomerioides via Functional Characterization. Plants. 2021;10(11):2404. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/">PMC8625326</a>(反轉錄做 cDNA、先接 pGEM-T Easy、再接 pET21、pET28 或 pTYB12,轉形 E. coli C41(DE3),OD600 0.6 時加 IPTG 0.4 mM、16 °C 誘導 16 到 22 小時)。</li>
+      <li>動畫裡的序列、外顯子與內含子的數目、質體上元件的位置與大小、菌落數、蛋白質的數量、表現量曲線、16 °C 與 37 °C 的可溶比例、目標蛋白的大小(約 60 kDa)與分子量標準的條帶位置都是示意,不是某個實驗的實測結果。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化原理・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, seg, ease, clamp, lerp, complement, rng } from '../assets/bio-draw.js';
+import { createRotateHint } from '../assets/mobile-panels.js';
+
+// 顏色:目標基因與目標蛋白一律薄荷綠;工具酵素(限制酶、接合酶、反轉錄酶、T7 RNA 聚合酶)淡紫;其他蛋白灰色
+const K = {
+  intron: '#56635e', rna: C.U, his: '#6ee0e6', ni: '#3f9a64', niLine: '#9be7b5', laci: '#9fb4c8', op: '#8fa6bd',
+  junk: ['#6f7f78', '#5d6f69', '#82918b'], cell: 'rgba(95,159,128,.06)', cellLine: '#4f8f74',
+  bug: '#18352a', bugLine: '#5f9f80', colony: '#f3e9c8', clump: '#6d7f77',
+};
+const D2R = Math.PI / 180;
+// 圓上的點:deg 從 12 點鐘方向順時針量
+const pol = (cx, cy, r, deg) => [cx + r * Math.sin(deg * D2R), cy - r * Math.cos(deg * D2R)];
+// 在 a 時淡入、b 時淡出
+const pulse = (t, a, b, f = 0.5) => Math.min(seg(t, a, a + f), 1 - seg(t, b - f, b));
+function fade(g, a, fn) { if (a <= 0.001) return; g.ctx.save(); g.ctx.globalAlpha *= Math.min(1, a); fn(); g.ctx.restore(); }
+function arc(g, cx, cy, r, d0, d1, color, lw, dash) {
+  const c = g.ctx; c.save(); c.beginPath();
+  c.arc(cx, cy, r, (d0 - 90) * D2R, (d1 - 90) * D2R, d1 < d0);
+  if (dash) c.setLineDash(dash);
+  c.strokeStyle = color; c.lineWidth = lw; c.lineCap = 'butt'; c.stroke(); c.restore();
+}
+// 帶箭頭的弧:從 d0 畫到 d1,箭頭在 d1 那一端
+function arcArrow(g, cx, cy, r, d0, d1, color, lw, head = lw * 1.25) {
+  const dir = d1 >= d0 ? 1 : -1;
+  arc(g, cx, cy, r, d0, d1 - dir * ((head * 0.7) / (r * D2R)), color, lw);
+  const th = (d1 - 90) * D2R, x = cx + r * Math.cos(th), y = cy + r * Math.sin(th);
+  const a = Math.atan2(Math.cos(th) * dir, -Math.sin(th) * dir);
+  const c = g.ctx; c.save(); c.beginPath();
+  c.moveTo(x + Math.cos(a) * head * 0.3, y + Math.sin(a) * head * 0.3);
+  c.lineTo(x - head * Math.cos(a - 0.55), y - head * Math.sin(a - 0.55));
+  c.lineTo(x - head * Math.cos(a + 0.55), y - head * Math.sin(a + 0.55));
+  c.closePath(); c.fillStyle = color; c.fill(); c.restore();
+}
+// 質體上元件的標籤:從環往外拉一條線
+function ringLabel(g, cx, cy, r, deg, text, color, { dist = 24, size = 15, alpha = 1 } = {}) {
+  const s = Math.sin(deg * D2R), co = Math.cos(deg * D2R);
+  const [x1, y1] = pol(cx, cy, r + 9, deg), [x2, y2] = pol(cx, cy, r + dist, deg);
+  const align = s > 0.3 ? 'left' : s < -0.3 ? 'right' : 'center';
+  fade(g, alpha, () => {
+    g.line(x1, y1, x2, y2, color, 1.3);
+    const tx = x2 + (align === 'left' ? 5 : align === 'right' ? -5 : 0);
+    const ty = y2 + (align === 'center' ? (co > 0 ? -11 : 11) : 0);
+    g.text(tx, ty, text, { size, weight: 600, color, align });
+  });
+}
+// 大腸桿菌:膠囊形;ring = 帶著質體
+function bug(g, x, y, w, h, { alpha = 1, rot = 0, ring = false, fill = K.bug, line = K.bugLine } = {}) {
+  fade(g, alpha, () => {
+    const c = g.ctx; c.save(); c.translate(x, y); if (rot) c.rotate(rot);
+    g.rrect(-w / 2, -h / 2, w, h, h / 2, fill, line, Math.max(1, h * 0.08));
+    if (ring) g.circle(w * 0.14, 0, Math.max(2, h * 0.24), null, C.mint, Math.max(1.3, h * 0.11));
+    c.restore();
+  });
+}
+// 其他蛋白質:灰色的幾種形狀
+function junk(g, x, y, s, kind, color) {
+  if (kind === 0) g.circle(x, y, s, color);
+  else if (kind === 1) g.rrect(x - s, y - s * 0.8, s * 2, s * 1.6, s * 0.5, color);
+  else { const c = g.ctx; c.beginPath(); c.moveTo(x, y - s); c.lineTo(x + s, y + s * 0.8); c.lineTo(x - s, y + s * 0.8); c.closePath(); c.fillStyle = color; c.fill(); }
+}
+// 彎彎曲曲的長鏈(還沒摺好的蛋白質或 mRNA);ang 是長出去的方向
+function chainLine(g, x, y, len, t, color, { amp = 4, lw = 2.4, alpha = 1, ang = Math.PI / 2 } = {}) {
+  if (len < 2) return;
+  const n = Math.max(3, Math.round(len / 5)), ca = Math.cos(ang), sa = Math.sin(ang), pts = [];
+  for (let i = 0; i <= n; i++) { const k = i / n, d = k * len, w = Math.sin(k * 10 + t * 3) * amp * Math.min(1, k * 3); pts.push([x + ca * d - sa * w, y + sa * d + ca * w]); }
+  g.curve(pts, color, lw, { alpha });
+}
+function ribo(g, x, y) {
+  const c = g.ctx; c.save(); c.fillStyle = '#c9d3ce'; c.strokeStyle = 'rgba(0,0,0,.35)'; c.lineWidth = 1;
+  c.beginPath(); c.ellipse(x, y + 5, 13, 8, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+  c.beginPath(); c.ellipse(x, y - 6, 9, 6, 0, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore();
+}
+function diamond(g, x, y, s, color) { const c = g.ctx; c.beginPath(); c.moveTo(x, y - s); c.lineTo(x + s, y); c.lineTo(x, y + s); c.lineTo(x - s, y); c.closePath(); c.fillStyle = color; c.fill(); }
+// 五角形的環(咪唑環)
+function penta(g, x, y, r, color, { fill = null, lw = 2 } = {}) {
+  const c = g.ctx; c.beginPath();
+  for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5; const px = x + r * Math.cos(a), py = y + r * Math.sin(a); if (i) c.lineTo(px, py); else c.moveTo(px, py); }
+  c.closePath(); if (fill) { c.fillStyle = fill; c.fill(); } c.strokeStyle = color; c.lineWidth = lw; c.stroke();
+}
+// 抗體:Y 字形;(x, y) 是兩隻手臂分岔的地方,rot = π 時手臂朝下
+function antibody(g, x, y, s, color, rot = 0) {
+  const c = g.ctx; c.save(); c.translate(x, y); c.rotate(rot);
+  g.line(0, 0, 0, s, color, s * 0.2); g.line(0, 0, -s * 0.62, -s * 0.72, color, s * 0.2); g.line(0, 0, s * 0.62, -s * 0.72, color, s * 0.2);
+  c.restore();
+}
+// 打勾或打叉的小圖示(不靠字型)
+function mark(g, x, y, ok, s = 9) {
+  if (ok) g.curve([[x - s, y], [x - s * 0.3, y + s * 0.7], [x + s, y - s * 0.8]], C.mint, 3);
+  else { g.line(x - s * 0.8, y - s * 0.8, x + s * 0.8, y + s * 0.8, C.red, 3); g.line(x + s * 0.8, y - s * 0.8, x - s * 0.8, y + s * 0.8, C.red, 3); }
+}
+// 一串 His 標籤(6 個組胺酸),從 (x, y) 往 ang 方向排
+function hisTail(g, x, y, r, gap, ang, { letters = false, t = 0 } = {}) {
+  for (let i = 0; i < 6; i++) {
+    const w = Math.sin(i * 1.3 + t * 2) * r * 0.25;
+    const px = x + Math.cos(ang) * gap * i - Math.sin(ang) * w, py = y + Math.sin(ang) * gap * i + Math.cos(ang) * w;
+    g.circle(px, py, r, K.his);
+    if (letters) g.text(px, py + 0.5, 'H', { size: 13, weight: 700, color: '#0b1111', align: 'center' });
+  }
+}
+
+// ===== 第 1 章:目的 =====
+const STEPS = ['取得基因', '接進載體', '轉形篩選', '誘導表現', '純化', '確認'];
+const STEP_ON = [4.7, 5.4, 6.2, 7, 10, 11.4];
+const TGT1 = [[232, 300], [86, 352]]; // 植物細胞裡的兩個目標酵素
+const CELL_PROTS = (() => {
+  const R = rng(5), out = []; let guard = 0;
+  while (out.length < 34 && guard++ < 3000) {
+    const x = 52 + R() * 228, y = 104 + R() * 280;
+    if (Math.hypot(x - 120, y - 174) < 68) continue; // 避開細胞核
+    if (Math.abs(x - 166) < 64 && Math.abs(y - 384) < 16) continue; // 避開標籤
+    if (Math.abs(x - 120) < 50 && Math.abs(y - 236) < 18) continue; // 避開「目標基因」標籤
+    if ([...TGT1, ...out.map((p) => [p.x, p.y])].some(([px, py]) => Math.hypot(px - x, py - y) < 23)) continue;
+    out.push({ x, y, k: Math.floor(R() * 3), s: 5 + R() * 4, ph: R() * 6 });
+  }
+  return out;
+})();
+const BUGS1 = [[470, 272, -0.25], [552, 254, 0.18], [616, 300, -0.12], [500, 336, 0.22], [584, 356, -0.3]];
+const ENZ1 = (() => {
+  const R = rng(9), out = []; let guard = 0;
+  while (out.length < 42 && guard++ < 4000) {
+    const x = 384 + R() * 266, y = 232 + R() * 190;
+    if (BUGS1.some(([bx, by]) => Math.abs(x - bx) < 44 && Math.abs(y - by) < 24)) continue;
+    if (out.some((p) => Math.hypot(p.x - x, p.y - y) < 17)) continue;
+    out.push({ x, y, ph: R() * 6 });
+  }
+  return out;
+})();
+
+// ===== 第 2 章:外顯子與內含子(長度是示意) =====
+const EX = [120, 100, 80, 110], IN = [90, 110, 80];
+const G0 = 135;
+const GENE = (() => { let x = G0; const ex = [], inn = []; EX.forEach((w, i) => { ex.push([x, x + w]); x += w; if (i < IN.length) { inn.push([x, x + IN[i]]); x += IN[i]; } }); return { ex, inn, end: x }; })();
+const M0 = G0 + (GENE.end - G0 - EX.reduce((a, b) => a + b, 0)) / 2;
+const MRNA = (() => { let x = M0; return EX.map((w) => { const r = [x, x + w]; x += w; return r; }); })();
+const MEND = MRNA[3][1];
+function exon(g, x1, x2, y, h, fill, n) {
+  g.rrect(x1 + 1, y - h / 2, x2 - x1 - 2, h, 4, fill);
+  if (n && x2 - x1 > 16) g.text((x1 + x2) / 2, y + 0.5, String(n), { size: 13, weight: 700, color: '#0b1111', align: 'center' });
+}
+
+// ===== 第 3 章:插入位置的示意序列 =====
+const VEC = 'ACCGTCGAATTCTGCA'; // 第 6 到 11 個是 EcoRI 的切位 GAATTC
+const TOPF = 'ACCGTCG' + 'AATTCATGGCTTCC'; // 接好之後的上股:第 7 個起是基因(切好的左端),ATG 在第 12 到 14 個
+const VBOT = complement(VEC), BOTF = complement(TOPF);
+const ZS = 24, ZX = 432, ZT = 150, ZB = 212;
+const ZD = { step: ZS, bw: 17, bh: 20 };
+const RING = { x: 190, y: 290, r: 96 };
+const RING_PARTS = [
+  { a: 212, b: 252, color: C.blue, label: '複製起點', at: 232, show: 0.6 },
+  { a: 112, b: 170, color: C.hot, arrow: true, label: '抗性基因(康黴素)', at: 141, show: 1.2 },
+  { a: 298, b: 328, color: C.amber, arrow: true, label: 'T7 啟動子', at: 313, show: 1.8 },
+  { a: 332, b: 344, color: K.his, label: 'His 標籤', at: 338, show: 3.0 },
+];
+function miniPlasmid(g, cx, cy, r, mode) {
+  g.circle(cx, cy, r, null, C.backbone, 4);
+  arcArrow(g, cx, cy, r, 288, 318, C.amber, 9);
+  arc(g, cx, cy, r, 125, 165, C.hot, 9); arc(g, cx, cy, r, 205, 235, C.blue, 9);
+  if (mode === 'fwd') arcArrow(g, cx, cy, r, -24, 34, C.mint, 9);
+  if (mode === 'rev') arcArrow(g, cx, cy, r, 34, -24, C.mint, 9);
+}
+// 第 3 章右邊的序列放大圖
+function zoomSeq(g, t) {
+  const c = g.ctx;
+  g.panel(380, 44, 556, 290, '插入位置放大(序列是示意)');
+  c.save(); c.beginPath(); c.rect(381, 45, 554, 288); c.clip();
+  const hb = (i, a = 1, dx = 0) => g.line(ZX + i * ZS + dx, ZT + 24, ZX + i * ZS + dx, ZB - 24, `rgba(240,243,238,${0.45 * a})`, 2, [2, 3]);
+  const cut = t >= 7.4;
+  g.text(ZX - 18, ZT, '5′', { size: 14, color: C.muted, align: 'right', mono: true });
+  g.text(ZX - 18, ZB, '3′', { size: 14, color: C.muted, align: 'right', mono: true });
+  if (!cut) {
+    g.strand(ZX, ZT, VEC, { ...ZD, dir: 1 });
+    g.strand(ZX, ZB, VBOT, { ...ZD, dir: -1 });
+    for (let i = 0; i < VEC.length; i++) hb(i);
+  } else {
+    // 左邊(載體)留著;右邊那一段往右移開
+    const dx = 230 * ease(seg(t, 7.6, 8.8)), ra = 1 - seg(t, 8.1, 8.8);
+    g.strand(ZX, ZT, VEC, { ...ZD, dir: 1, from: 0, to: 7 });
+    g.strand(ZX, ZB, VBOT, { ...ZD, dir: -1, from: 0, to: 11 });
+    for (let i = 0; i < 7; i++) hb(i);
+    if (ra > 0) {
+      g.strand(ZX + dx, ZT, VEC, { ...ZD, dir: 1, from: 7, to: 16, alpha: ra });
+      g.strand(ZX + dx, ZB, VBOT, { ...ZD, dir: -1, from: 11, to: 16, alpha: ra });
+      for (let i = 11; i < 16; i++) hb(i, ra, dx);
+    }
+    // 黏性末端發亮
+    const gl = pulse(t, 8.1, 10.9);
+    if (gl > 0) g.rrect(ZX + 6.55 * ZS, ZB - 25, 3.9 * ZS, 26, 5, `rgba(255,209,102,${0.22 * gl})`, `rgba(255,209,102,${0.7 * gl})`);
+    // 基因(PCR 產物,兩端已經切好)從右邊滑進來
+    if (t >= 9.2) {
+      const ix = 300 * (1 - ease(seg(t, 9.2, 10.8))), ia = seg(t, 9.2, 9.6);
+      g.strand(ZX + ix, ZT, TOPF, { ...ZD, dir: 1, from: 7, to: 21, color: C.mint, alpha: ia });
+      g.strand(ZX + ix, ZB, BOTF, { ...ZD, dir: -1, from: 11, to: 21, color: C.mint, alpha: ia });
+      for (let i = 11; i < 21; i++) hb(i, ia, ix);
+      const pa = seg(t, 10.7, 11.1);
+      for (let i = 7; i < 11; i++) hb(i, pa);
+      g.tag(ZX + 15 * ZS, 268, '基因(兩端切好的 PCR 產物)', { size: 13, color: C.mint, alpha: pulse(t, 10.1, 11.4) });
+      // 接合酶把兩個缺口(上股第 6、7 個之間,下股第 10、11 個之間)接起來
+      const top = t >= 11.9, bot = t >= 12.7;
+      const nick = (x, y, sealed) => { if (sealed) g.line(x - 4, y, x + 4, y, C.ink2, 4); else g.circle(x, y, 3.5, C.bg, C.hot, 1.5); };
+      if (pa > 0) { nick(ZX + 6.5 * ZS, ZT, top); nick(ZX + 10.5 * ZS, ZB, bot); }
+      if (t >= 11 && t < 13.4) {
+        const la = Math.min(seg(t, 11, 11.4), 1 - seg(t, 12.9, 13.3));
+        const k = ease(seg(t, 12, 12.5));
+        const lx = t < 11.6 ? lerp(ZX + 2 * ZS, ZX + 6.5 * ZS, ease(seg(t, 11, 11.6))) : lerp(ZX + 6.5 * ZS, ZX + 10.5 * ZS, k);
+        const ly = t < 12 ? ZT - 28 : lerp(ZT - 28, ZB + 28, k);
+        g.blob(lx, ly, 38, 17, C.lav, '接合酶', { alpha: la, size: 13, wobble: 1, t });
+      }
+      g.text(400, 306, 'DNA 接合酶把骨架接起來', { size: 14, weight: 600, color: C.lav, alpha: pulse(t, 11.3, 13.2) });
+      g.text(ZX + 13 * ZS, 120, 'ATG(起始密碼)', { size: 13, color: C.amber, align: 'center', alpha: pulse(t, 10.9, 13.2) });
+    }
+  }
+  // EcoRI:先把切位框起來,酵素下來坐在上面,切完離開
+  const boxA = pulse(t, 5, 8.3);
+  if (boxA > 0) {
+    g.rrect(ZX + 5.5 * ZS, ZT - 12, 6 * ZS, ZB - ZT + 24, 6, null, `rgba(184,164,244,${0.8 * boxA})`, 2);
+    g.text(ZX + 8.5 * ZS, 252, 'EcoRI 的切位:GAATTC', { size: 14, weight: 700, color: C.lav, align: 'center', alpha: boxA });
+  }
+  if (t > 5.6 && t < 8.1) {
+    const up = ease(seg(t, 7.3, 8.1));
+    const ey = t < 7.3 ? lerp(100, (ZT + ZB) / 2, ease(seg(t, 5.6, 6.6))) : lerp((ZT + ZB) / 2, 100, up);
+    g.blob(ZX + 8.5 * ZS + 150 * up, ey, 44, 22, C.lav, 'EcoRI', { alpha: Math.min(seg(t, 5.6, 6), 1 - seg(t, 7.6, 8.1)) * 0.95, size: 14, wobble: 1, t });
+  }
+  // 錯開的切口
+  const ca = pulse(t, 7.2, 8.9);
+  if (ca > 0) {
+    const xa = ZX + 6.5 * ZS, xb = ZX + 10.5 * ZS, ym = (ZT + ZB) / 2;
+    g.curve([[xa, ZT - 14], [xa, ym], [xb, ym], [xb, ZB + 14]], C.hot, 2.5, { alpha: ca, dash: [5, 4] });
+  }
+  g.tag(ZX + 8.5 * ZS, 252, '黏性末端:單股突出的 AATT', { size: 13, color: C.amber, alpha: pulse(t, 8.4, 9.9) });
+  c.restore();
+}
+function orientPanel(g, S) {
+  const two = S.cut === 'two';
+  g.panel(380, 44, 556, 290, two ? '兩端用兩種酶:EcoRI 與 HindIII' : '兩端都用 EcoRI 一種酶');
+  if (two) {
+    miniPlasmid(g, 500, 196, 62, 'fwd');
+    const [ex, ey] = pol(500, 196, 62 + 16, -26), [hx, hy] = pol(500, 196, 62 + 16, 36);
+    g.text(ex, ey - 4, 'EcoRI', { size: 13, weight: 600, color: C.lav, align: 'right' });
+    g.text(hx + 2, hy - 4, 'HindIII', { size: 13, weight: 600, color: C.lav });
+    g.text(604, 150, '兩端的黏性末端不一樣,', { size: 15, color: C.ink2 });
+    g.text(604, 176, '各自只配得上同一種酶的切口,', { size: 15, color: C.ink2 });
+    g.text(604, 202, '基因只能照一個方向接進去。', { size: 15, color: C.ink2 });
+    mark(g, 614, 250, true);
+    g.text(632, 250, '方向正確,做得出酵素', { size: 16, weight: 700, color: C.mint });
+  } else {
+    const items = [[480, 'fwd', '正向', '做得出酵素', true], [650, 'rev', '反向', '做不出這個酵素', false], [820, 'empty', '空的', '質體自己接回去', false]];
+    for (const [x, mode, a, b, ok] of items) {
+      miniPlasmid(g, x, 168, 46, mode);
+      mark(g, x - 26, 240, ok, 8);
+      g.text(x - 12, 240, a, { size: 15, weight: 700, color: ok ? C.mint : C.red });
+      g.text(x, 266, b, { size: 13, color: C.muted, align: 'center' });
+    }
+    g.text(658, 306, '兩端切口相同:方向無法控制,也會有沒接到基因的質體。', { size: 13, color: C.ink2, align: 'center' });
+  }
+}
+
+// ===== 第 4 章:轉形與篩選 =====
+const TUBE_BUGS = [[162, 214, 0.3], [207, 232, -0.4], [172, 262, -0.1], [214, 284, 0.25], [152, 300, 0.5], [190, 318, -0.3], [218, 198, 0.1], [148, 248, -0.6]];
+const PLAS4 = [[158, 190], [196, 205], [222, 252], [146, 276], [184, 292], [210, 314], [168, 330], [200, 268], [152, 228]];
+const TAKE = [[1, 1], [4, 4]]; // [質體, 細菌]:熱休克時被吃進去的兩個(示意)
+const PLATE = { x: 530, y: 300, r: 145 };
+const PLATE_CELLS = (() => {
+  const R = rng(17), out = []; let guard = 0;
+  while (out.filter((p) => p.has).length < 28 && guard++ < 6000) { // 先放帶質體的(之後長成菌落,彼此要隔開)
+    const a = R() * Math.PI * 2, d = Math.sqrt(R()) * 116, x = PLATE.x + Math.cos(a) * d, y = PLATE.y + Math.sin(a) * d;
+    if (out.some((p) => Math.hypot(p.x - x, p.y - y) < 25)) continue;
+    out.push({ x, y, rot: R() * 3, has: true, gr: 0.75 + R() * 0.5 });
+  }
+  guard = 0;
+  while (out.length < 92 && guard++ < 8000) {
+    const a = R() * Math.PI * 2, d = Math.sqrt(R()) * 122, x = PLATE.x + Math.cos(a) * d, y = PLATE.y + Math.sin(a) * d;
+    if (out.some((p) => Math.hypot(p.x - x, p.y - y) < 11)) continue;
+    out.push({ x, y, rot: R() * 3, has: false, gr: 0.75 + R() * 0.5 });
+  }
+  return out;
+})();
+const temp4 = (t) => (t < 1.6 ? 0 : t < 2 ? lerp(0, 42, (t - 1.6) / 0.4) : t < 3.4 ? 42 : t < 3.8 ? lerp(42, 0, (t - 3.4) / 0.4) : 0);
+
+// ===== 第 5 章:誘導 =====
+const PLAS5 = { x: 612, y: 236, r: 76 };
+const LACI_CHR = [143, 368];
+const LACI_PLA = pol(PLAS5.x, PLAS5.y, 46, 257);
+const IPTG5 = (() => { const R = rng(23); return Array.from({ length: 8 }, (_, k) => ({ sx: 52 + R() * 26, sy: 176 + k * 13, k, ph: R() * 6 })); })();
+const PROT5 = (() => {
+  const R = rng(31), out = []; let guard = 0;
+  while (out.length < 40 && guard++ < 4000) {
+    const x = 150 + R() * 320, y = 132 + R() * 196;
+    if (Math.hypot(x - LACI_CHR[0], y - LACI_CHR[1]) < 40) continue;
+    if (out.some((p) => Math.hypot(p.x - x, p.y - y) < 20)) continue;
+    out.push({ x, y, ph: R() * 6 });
+  }
+  return out;
+})();
+
+// ===== 第 6 章:溫度與摺疊(數量與比例都是示意) =====
+const FOLD = {
+  37: { x0: 20, nR: 6, v: 120, fate: [0, 1, 1, 1], sol: 25, col: C.hot, h: '誘導約 2 到 3 小時' },
+  16: { x0: 490, nR: 3, v: 60, fate: [0, 0, 0, 1, 0, 0], sol: 70, col: C.cold, h: '誘導 16 到 22 小時' },
+};
+const L6 = 380;
+// 核糖體一開始在 mRNA 上的位置(前 70% 平均分布),第一條長鏈約 1.3 秒(37 °C)或 3.4 秒(16 °C)放出
+const f0 = (P, i) => (0.7 * i) / P.nR;
+const SOL6 = (() => {
+  const R = rng(29), out = []; let guard = 0;
+  while (out.length < 40 && guard++ < 3000) {
+    const x = 44 + R() * 270, y = 186 + R() * 100;
+    if (out.some((p) => Math.hypot(p.x - x, p.y - y) < 21)) continue;
+    out.push({ x, y, ph: R() * 6 });
+  }
+  return out;
+})();
+const CLUMP6 = (() => { const R = rng(37); return Array.from({ length: 40 }, () => ({ a: R() * Math.PI * 2, d: Math.sqrt(R()), ang: R() * Math.PI, len: 10 + R() * 12, ph: R() * 6 })); })();
+// 每個核糖體走到 mRNA 尾端時放出一條長鏈;先算好兩種溫度下每一條放出的時間(依先後排序)
+const RELEASE = {};
+for (const temp of [37, 16]) {
+  const P = FOLD[temp], times = [];
+  for (let i = 0; i < P.nR; i++) for (let k = 0; ; k++) { const tt = ((k + 1) * L6 - f0(P, i) * L6) / P.v; if (tt > 16) break; times.push(tt); }
+  RELEASE[temp] = times.sort((a, b) => a - b);
+}
+function foldHalf(g, t, S, temp, alpha) {
+  const P = FOLD[temp], x0 = P.x0;
+  fade(g, alpha, () => {
+    g.text(x0 + 18, 50, `${temp} °C`, { size: 22, weight: 800, color: P.col });
+    g.text(x0 + 104, 52, P.h, { size: 14, color: C.muted });
+    g.text(x0 + 30, 86, 'mRNA', { size: 13, color: K.rna, mono: true });
+    const pts = []; for (let i = 0; i <= 40; i++) { const k = i / 40; pts.push([x0 + 30 + k * L6, 108 + Math.sin(k * 14) * 2]); }
+    g.curve(pts, K.rna, 3);
+    if (!S.iptg) { g.tag(x0 + 210, 210, '沒加 IPTG:幾乎不表現', { size: 14, color: C.amber }); return; }
+    // 核糖體沿著 mRNA 做出長鏈
+    for (let i = 0; i < P.nR; i++) {
+      const prog = t * P.v + f0(P, i) * L6, f = (prog % L6) / L6;
+      const x = x0 + 30 + f * L6;
+      chainLine(g, x, 120, 6 + 44 * f, t + i, C.mint, { amp: 3.2, lw: 2.2 });
+      ribo(g, x, 108);
+    }
+    // 放出來的長鏈:摺好的變成一團(留在上面),沒摺好的漂向右下的包涵體
+    let nAgg = 0, nSol = 0;
+    const sx = x0 + 30 + L6, sy = 150, cx = x0 + 372, cy = 238;
+    RELEASE[temp].forEach((tm, m) => {
+      if (tm > t) return;
+      const k = ease(clamp((t - tm) / 0.9));
+      if (P.fate[m % P.fate.length]) {
+        if (k < 1) chainLine(g, lerp(sx, cx, k), lerp(sy, cy - 20, k), 44 - 14 * k, t + m, C.mint, { amp: 3.5, lw: 2.2 });
+        else nAgg++;
+      } else {
+        const p = SOL6[nSol % SOL6.length]; nSol++;
+        const x = lerp(sx, x0 + p.x, k), y = lerp(sy, p.y, k);
+        if (k < 1) { chainLine(g, x, y - 22 * (1 - k), 44 * (1 - k), t + m, C.mint, { amp: 3.5, lw: 2.2 }); if (k > 0.5) g.blob(x, y, 9 * (k - 0.5) * 2, 7 * (k - 0.5) * 2, C.mint, ''); }
+        else g.blob(x, y + Math.sin(t * 1.4 + p.ph) * 2, 9, 7, C.mint, '');
+      }
+    });
+    if (nAgg) {
+      const rc = 9 + 5.2 * Math.sqrt(nAgg);
+      g.circle(cx, cy, rc, 'rgba(109,127,119,.35)');
+      for (let j = 0; j < Math.min(40, nAgg * 3); j++) {
+        const q = CLUMP6[j], px = cx + Math.cos(q.a) * q.d * rc * 0.8, py = cy + Math.sin(q.a) * q.d * rc * 0.8;
+        chainLine(g, px - Math.cos(q.ang) * q.len / 2, py - Math.sin(q.ang) * q.len / 2, q.len, q.ph, '#93a59d', { amp: 2.4, lw: 2, ang: q.ang });
+      }
+      if (nAgg >= 2) g.text(cx, cy + rc + 16, '包涵體', { size: 13, color: C.ink2, align: 'center' });
+    }
+  });
+}
+function foldTube(g, S, temp, alpha) {
+  const P = FOLD[temp], x0 = P.x0;
+  fade(g, alpha, () => {
+    g.text(x0 + 95, 330, '打破細胞、離心', { size: 13, color: C.muted, align: 'center' });
+    g.tube(x0 + 95, 344, 66, 150, { fill: 0.86, liquid: 'rgba(165,243,205,.07)' });
+    if (!S.iptg) { g.text(x0 + 150, 420, '幾乎沒有目標蛋白', { size: 14, color: C.amber }); return; }
+    const ns = Math.round(P.sol / 6);
+    for (let i = 0; i < ns; i++) g.circle(x0 + 76 + (i % 4) * 13, 382 + Math.floor(i / 4) * 14, 3.6, C.mint);
+    const ins = (100 - P.sol) / 100, c = g.ctx;
+    c.save(); c.beginPath(); c.ellipse(x0 + 95, 480 - 3 * ins, 8 + 17 * ins, 4 + 8 * ins, 0, 0, Math.PI * 2); c.fillStyle = '#8b9c95'; c.fill(); c.restore();
+    g.text(x0 + 150, 384, '上清液:可溶', { size: 14, weight: 600, color: C.mint });
+    g.text(x0 + 150, 406, `約 ${P.sol}%(示意)`, { size: 13, color: C.muted });
+    g.text(x0 + 150, 462, '沉澱:包涵體', { size: 14, weight: 600, color: C.ink2 });
+    g.text(x0 + 150, 484, `約 ${100 - P.sol}%`, { size: 13, color: C.muted });
+  });
+}
+
+// ===== 第 7 章:純化 =====
+const COL7 = { x: 132, y: 56, w: 76, h: 268, bedTop: 190, bedBot: 318, tipX: 170, tipY: 352 };
+const PUR = (() => {
+  const R = rng(41);
+  return Array.from({ length: 20 }, (_, i) => {
+    const kind = i < 6 ? 'target' : i < 8 ? 'loose' : 'junk';
+    return { kind, x: 144 + R() * 52, y0: 72 + R() * 72, d: R() * 2.4, v: 64 + R() * 34, yb: kind === 'target' ? 198 + R() * 50 : 262 + R() * 40, shape: Math.floor(R() * 3), ph: R() * 6, rel: R() };
+  });
+})();
+// 一個蛋白質在管柱裡的位置;out = 已經流到下面的試管
+function purPos(p, t, his) {
+  const held = (p.kind === 'target' && his) || p.kind === 'loose';
+  const start = 4 + p.d * 0.6;
+  let y = p.y0, tExit;
+  if (held) {
+    const tStop = start + (p.yb - p.y0) / p.v, tRel = p.kind === 'target' ? 11.8 + p.rel * 1.2 : 9.2 + p.rel * 1.0;
+    tExit = tRel + (COL7.tipY - p.yb) / 92;
+    if (t > start) y = t < tRel ? Math.min(p.yb, p.y0 + p.v * (t - start)) : p.yb + 92 * (t - tRel);
+    if (t < tStop) y = Math.min(y, p.y0 + p.v * Math.max(0, t - start));
+  } else {
+    tExit = start + (COL7.tipY - p.y0) / p.v;
+    if (t > start) y = p.y0 + p.v * (t - start);
+  }
+  const k = clamp((y - COL7.bedBot) / (COL7.tipY - COL7.bedBot));
+  const x = lerp(p.x + Math.sin(p.ph + y * 0.05) * 3, COL7.tipX, k);
+  return { x, y, out: y >= COL7.tipY, tExit };
+}
+const NI_X = [420, 560, 700, 840];
+
+// ===== 第 8 章:SDS-PAGE 與西方墨點法(大小與量是示意) =====
+const LX = [348, 420, 492, 564, 636, 708];
+const LANES = ['標準', '未誘導', '誘導', '可溶', '沉澱', '純化'];
+const MARK = [250, 150, 100, 75, 50, 37, 25, 20, 15, 10];
+const yAt = (k) => 100 + ((Math.log10(250) - Math.log10(k)) / (Math.log10(250) - 1)) * 350;
+const TKDA = 60;
+const BG8 = (() => { const R = rng(53); return Array.from({ length: 24 }, () => ({ k: 10 ** (Math.log10(12) + R() * (Math.log10(200) - Math.log10(12))), a: 0.15 + R() * 0.4, sol: R() > 0.2 })); })();
+const solFrac = (temp) => (temp <= 16 ? 0.7 : 0.25);
+function laneAmounts(S) {
+  const e = S.iptg ? 1 : 0.04, sol = solFrac(S.temp);
+  return [0, 0.04, e, e * sol, e * (1 - sol), S.his && S.iptg ? e * sol * 0.9 : 0];
+}
+
+const chapters = [
+  {
+    key: 'goal', name: '目的:讓細菌幫你做酵素', dur: 15,
+    cues: [[0, '植物裡的酵素量很少,又和許多其他蛋白質混在一起,很難單獨拿出來研究它在做什麼。'],
+      [4.5, '做法是把這個酵素的基因接進質體、送進大腸桿菌,細菌就會照著基因大量做出這個蛋白質。'],
+      [9.5, '純化出來的酵素加入受質,看它做出什麼產物,就知道基因的功能;臺灣杉的萜類合成酶就是這樣找出各自做哪一種單萜。']],
+    draw(g, t) {
+      // 左:植物細胞,目標酵素(綠)只有兩個,其他蛋白(灰)很多
+      fade(g, ease(seg(t, 0, 0.8)), () => {
+        g.rrect(28, 60, 276, 344, 44, 'rgba(95,211,154,.05)', '#3f7a5c', 2);
+        g.text(50, 86, '植物細胞', { size: 15, weight: 700, color: C.ink2 });
+        g.circle(120, 174, 50, 'rgba(127,184,255,.07)', '#4d6f8f', 1.6);
+        g.text(120, 142, '細胞核', { size: 13, color: C.muted, align: 'center' });
+        const pts = []; for (let i = 0; i <= 24; i++) { const k = i / 24; pts.push([84 + k * 72, 184 + Math.sin(k * 10) * 7]); }
+        g.curve(pts, C.backbone, 3);
+        g.curve(pts.slice(10, 17), C.mint, 6);
+        CELL_PROTS.forEach((p, i) => junk(g, p.x, p.y + Math.sin(t * 1.2 + p.ph) * 2, p.s, p.k, K.junk[i % 3]));
+        TGT1.forEach(([x, y], i) => g.blob(x, y + Math.sin(t * 1.3 + i) * 2, 10, 8, C.mint, ''));
+      });
+      const la = ease(seg(t, 1.2, 1.8));
+      g.tag(120, 236, '目標基因', { size: 13, color: C.mint, alpha: la });
+      fade(g, la, () => { g.line(142, 384, TGT1[1][0] + 8, TGT1[1][1] + 8, C.mint, 1.2); g.line(200, 380, TGT1[0][0] - 6, TGT1[0][1] + 8, C.mint, 1.2); });
+      g.tag(166, 384, '目標酵素:量很少', { size: 13, color: C.mint, alpha: la });
+      // 中:基因複製一份,接進質體,送進大腸桿菌
+      if (t > 4.5) {
+        const fly = ease(seg(t, 4.5, 5.6));
+        if (fly < 1) g.line(lerp(120, 410, fly) - 18, lerp(184, 120, fly), lerp(120, 410, fly) + 18, lerp(184, 120, fly), C.mint, 6);
+        const pa = ease(seg(t, 5.3, 6));
+        fade(g, pa, () => { g.circle(410, 152, 32, null, C.backbone, 5); arcArrow(g, 410, 152, 32, -40, 40, C.mint, 9); });
+        g.tag(410, 98, '接進質體', { size: 14, color: C.mint, alpha: pa });
+      }
+      const ba = ease(seg(t, 6, 6.8));
+      if (ba > 0) {
+        g.arrow(424, 192, 456, 238, { color: C.ink2, alpha: ba });
+        g.text(566, 214, '送進大腸桿菌', { size: 14, color: C.ink2, align: 'center', alpha: ba });
+        BUGS1.forEach(([x, y, r]) => bug(g, x, y, 66, 28, { rot: r, ring: true, alpha: ba }));
+      }
+      const n = Math.floor(ENZ1.length * ease(seg(t, 6.8, 9.6)));
+      for (let i = 0; i < n; i++) { const p = ENZ1[i]; g.blob(p.x, p.y + Math.sin(t * 1.5 + p.ph) * 2, 8, 6.4, C.mint, ''); }
+      g.tag(515, 446, '大量做出目標酵素', { size: 15, color: C.mint, alpha: ease(seg(t, 7.6, 8.2)) });
+      // 右:純化後測功能
+      fade(g, ease(seg(t, 9.5, 10.3)), () => {
+        g.panel(676, 60, 258, 344, '測功能');
+        g.tube(722, 100, 40, 108, { fill: 0.62, liquid: 'rgba(165,243,205,.2)' });
+        for (let i = 0; i < 6; i++) g.blob(714 + (i % 2) * 15, 160 + Math.floor(i / 2) * 13 + Math.sin(t * 2 + i) * 1.5, 5.5, 4.4, C.mint, '');
+        g.text(722, 228, '純化的酵素', { size: 13, color: C.ink2, align: 'center' });
+        const ea = ease(seg(t, 11, 11.8));
+        g.text(764, 132, '例:臺灣杉的', { size: 14, color: C.ink2, alpha: ea });
+        g.text(764, 154, '萜類合成酶', { size: 14, color: C.ink2, alpha: ea });
+        const ra = ease(seg(t, 10.4, 11.2)), go = ease(seg(t, 11.6, 12.8));
+        fade(g, ra, () => {
+          const zz = []; for (let i = 0; i <= 8; i++) zz.push([694 + i * 8.5, 300 + (i % 2 ? -7 : 7)]);
+          g.curve(zz, C.amber, 3, { alpha: 1 - 0.6 * go });
+          g.text(728, 332, '受質 GPP', { size: 13, color: C.amber, align: 'center' });
+          g.arrow(774, 300, 832, 300, { color: C.ink2 });
+          g.blob(803, 276, 16, 12, C.mint, '', { wobble: 1, t });
+          g.text(803, 252, '酵素', { size: 13, color: C.mint, align: 'center' });
+        });
+        fade(g, go, () => {
+          const hx = []; for (let i = 0; i <= 6; i++) hx.push(pol(870, 300, 18, i * 60));
+          g.curve(hx, C.mint, 3); g.line(870, 282, 870, 266, C.mint, 3);
+          g.text(870, 334, '產物', { size: 13, color: C.mint, align: 'center' });
+          g.text(805, 376, '看產物就知道功能', { size: 14, weight: 600, color: C.ink, align: 'center' });
+        });
+      });
+      // 下:接下來的步驟
+      STEPS.forEach((s, i) => {
+        const x = 40 + i * 150, on = t >= STEP_ON[i];
+        fade(g, ease(seg(t, 0.6 + i * 0.25, 1.2 + i * 0.25)), () => {
+          g.rrect(x, 472, 128, 34, 17, on ? 'rgba(165,243,205,.16)' : 'rgba(255,255,255,.04)', on ? C.mint : C.line, 1.5);
+          g.text(x + 64, 489, s, { size: 14, weight: 600, color: on ? C.mint : C.muted, align: 'center' });
+          if (i < STEPS.length - 1) g.arrow(x + 132, 489, x + 146, 489, { color: C.line, lw: 2, head: 7 });
+        });
+      });
+    },
+  },
+  {
+    key: 'cdna', name: '取得基因:從 RNA 做出 cDNA', dur: 17,
+    cues: [[0, '植物的基因裡常夾著內含子(不會變成蛋白質的片段);細胞先把基因轉錄成 RNA,再剪掉內含子,成為 mRNA。'],
+      [5, '大腸桿菌不會剪內含子,所以抽出 RNA,用反轉錄酶照 mRNA 做出 cDNA(互補 DNA),它沒有內含子。'],
+      [10.5, '再用一對專一的引子做 PCR,只放大從起始密碼 ATG 到終止密碼的這一段;PCR 的原理見本站「PCR 與電泳」。'],
+      [14, '右邊可以改成直接拿基因組 DNA 當模板,看看會出什麼問題。']],
+    draw(g, t, S) {
+      const gd = S.template === 'gdna';
+      // 第一列:染色體上的基因
+      fade(g, ease(seg(t, 0, 0.8)), () => {
+        g.text(G0, 58, '染色體上的基因(基因組 DNA)', { size: 15, weight: 700, color: C.ink2 });
+        g.line(G0 - 24, 87, GENE.end + 24, 87, C.backbone, 2); g.line(G0 - 24, 97, GENE.end + 24, 97, C.backbone, 2);
+        GENE.inn.forEach(([x1, x2]) => g.rrect(x1, 87, x2 - x1, 10, 3, K.intron));
+        GENE.ex.forEach(([x1, x2], i) => exon(g, x1, x2, 92, 22, C.mint, i + 1));
+      });
+      const ta = ease(seg(t, 0.8, 1.3));
+      g.tag((GENE.ex[1][0] + GENE.ex[1][1]) / 2, 126, '外顯子', { size: 13, color: C.mint, alpha: ta });
+      g.tag((GENE.inn[1][0] + GENE.inn[1][1]) / 2, 126, '內含子', { size: 13, color: C.ink2, alpha: ta });
+      // 第二列:轉錄,再剪接
+      const tx = ease(seg(t, 1.2, 2.6)), sp = ease(seg(t, 2.8, 4.6));
+      if (tx > 0) {
+        g.text(G0, 166, sp < 0.5 ? '轉錄出的 RNA' : '剪接後:成熟的 mRNA', { size: 15, weight: 700, color: K.rna });
+        const c = g.ctx; c.save(); c.beginPath(); c.rect(0, 150, G0 + (GENE.end - G0) * tx + 2, 90); c.clip();
+        const xs = GENE.ex.map(([x1, x2], i) => [lerp(x1, MRNA[i][0], sp), lerp(x2, MRNA[i][1], sp)]);
+        for (let j = 0; j < 3; j++) {
+          const xa = xs[j][1], xb = xs[j + 1][0];
+          if (sp <= 0) g.rrect(xa, 195.5, xb - xa, 9, 3, K.intron);
+          else if (sp < 1) {
+            const h = 40 * Math.sin(Math.min(1, sp * 1.6) * Math.PI / 2);
+            c.save(); c.globalAlpha *= 1 - sp; c.beginPath(); c.moveTo(xa, 200);
+            c.bezierCurveTo(xa - 12, 200 - h * 1.3, xb + 12, 200 - h * 1.3, xb, 200);
+            c.strokeStyle = K.intron; c.lineWidth = 8; c.lineCap = 'round'; c.stroke(); c.restore();
+          }
+        }
+        xs.forEach(([x1, x2], i) => exon(g, x1, x2, 200, 20, K.rna, i + 1));
+        c.restore();
+        g.text(MEND + 6, 200, 'AAAA', { size: 13, color: K.rna, mono: true, alpha: ease(seg(t, 4.4, 5)) });
+      }
+      g.tag(796, 164, '剪掉內含子', { size: 14, color: C.hot, alpha: pulse(t, 2.8, 5.4) });
+      // 抽出的 RNA 與反轉錄
+      const ra = ease(seg(t, 5, 5.8));
+      fade(g, ra, () => {
+        g.tube(64, 160, 30, 74, { fill: 0.5, liquid: 'rgba(232,207,90,.35)' });
+        g.text(64, 252, '抽出 RNA', { size: 13, color: C.ink2, align: 'center' });
+      });
+      g.arrow(86, 200, M0 - 10, 200, { color: K.rna, lw: 2, alpha: pulse(t, 5.2, 8) });
+      const rt = seg(t, 6, 9.6);
+      if (t > 5.6) {
+        const xEnd = MEND + 40, xr = lerp(xEnd, M0 - 6, ease(rt));
+        if (rt < 1) {
+          g.line(xr, 236, xEnd, 236, C.mint, 4);
+          for (let x = xr + 8; x < xEnd; x += 10) g.line(x, 213, x, 232, 'rgba(240,243,238,.3)', 1.5, [2, 2]);
+        } else {
+          fade(g, ease(seg(t, 9.6, 10.2)), () => MRNA.forEach(([x1, x2], i) => exon(g, x1, x2, 236, 16, C.mint, i + 1)));
+        }
+        g.blob(xr, 238, 42, 18, C.lav, '反轉錄酶', { size: 13, alpha: Math.min(seg(t, 5.6, 6.1), 1 - seg(t, 9.6, 10.2)), wobble: 1, t });
+      }
+      g.text(M0, 268, 'cDNA(互補 DNA):1 到 4 連在一起,沒有內含子', { size: 14, weight: 600, color: C.mint, alpha: ease(seg(t, 9.8, 10.4)) });
+      // 第三列:PCR
+      const L = gd ? G0 : M0, Rr = gd ? GENE.end : MEND;
+      const pa = ease(seg(t, 10.5, 11.3));
+      fade(g, pa, () => {
+        g.text(G0, 300, gd ? 'PCR:模板是基因組 DNA' : 'PCR:模板是 cDNA', { size: 15, weight: 700, color: gd ? C.red : C.ink2 });
+        g.line(L, 340, Rr, 340, C.backbone, 2); g.line(L, 352, Rr, 352, C.backbone, 2);
+        if (gd) { GENE.inn.forEach(([x1, x2]) => g.rrect(x1, 341, x2 - x1, 10, 3, K.intron)); GENE.ex.forEach(([x1, x2], i) => exon(g, x1, x2, 346, 20, C.mint, i + 1)); }
+        else MRNA.forEach(([x1, x2], i) => exon(g, x1, x2, 346, 20, C.mint, i + 1));
+      });
+      // 當模板的那一列框起來
+      const hl = pulse(t, 10.5, 13.2);
+      if (hl > 0) { if (gd) g.rrect(G0 - 30, 74, GENE.end - G0 + 60, 36, 8, null, `rgba(255,209,102,${0.8 * hl})`, 2); else g.rrect(M0 - 10, 224, MEND - M0 + 20, 25, 7, null, `rgba(255,209,102,${0.8 * hl})`, 2); }
+      const pr = ease(seg(t, 10.9, 11.6));
+      g.arrow(L - 4, 326, L + 44, 326, { color: C.amber, lw: 4, head: 9, alpha: pr });
+      g.arrow(Rr + 4, 366, Rr - 44, 366, { color: C.amber, lw: 4, head: 9, alpha: pr });
+      g.text(L + 52, 326, 'ATG', { size: 13, color: C.amber, mono: true, alpha: pr });
+      g.text(Rr - 52, 366, '終止', { size: 13, color: C.amber, align: 'right', alpha: pr });
+      if (gd) g.tag((GENE.inn[1][0] + GENE.inn[1][1]) / 2, 318, '產物裡夾著內含子', { size: 13, color: C.red, alpha: ease(seg(t, 11.4, 12)) });
+      const nCopy = 1 + Math.floor(7 * ease(seg(t, 12, 15)));
+      for (let k = 1; k < nCopy; k++) {
+        const y = 380 + k * 10;
+        if (gd) { GENE.ex.forEach(([x1, x2]) => g.line(x1 + 1, y, x2 - 1, y, C.mint, 5)); GENE.inn.forEach(([x1, x2]) => g.line(x1, y, x2, y, K.intron, 5)); }
+        else g.line(M0 + 1, y, MEND - 1, y, C.mint, 5);
+      }
+      if (nCopy > 1) g.text(Rr + 12, 385 + nCopy * 5, `${nCopy} 份(示意)`, { size: 13, color: C.muted, alpha: seg(t, 12, 12.5) });
+      // 結果:細菌照著讀
+      const ok = !gd, oa = ease(seg(t, 13.5, 14.3));
+      if (oa > 0) {
+        bug(g, 150, 494, 42, 18, { alpha: oa, ring: true });
+        fade(g, oa, () => mark(g, 192, 494, ok, 8));
+        g.text(210, 494, ok ? '細菌從 ATG 一路讀到終止密碼,做出完整的酵素' : '內含子也被當成密碼讀進去,做出來的蛋白質不對', { size: 15, weight: 600, color: ok ? C.mint : C.red, alpha: oa });
+      }
+    },
+  },
+  {
+    key: 'vector', name: '載體:把基因接進質體', dur: 17,
+    cues: [[0, '這裡用的載體是質體(細菌裡的小環狀 DNA),上面有複製起點(讓細菌複製它)、抗生素抗性基因、啟動子,和插入基因的位置。'],
+      [4.5, '限制酶只認一小段特定序列,例如 EcoRI 認 GAATTC,在那裡把兩股錯開切斷,留下單股突出的黏性末端。'],
+      [9, 'PCR 時在基因兩端加上同樣的切位,切開後黏性末端剛好互補配對,再由 DNA 接合酶把骨架接起來。'],
+      [13, '兩端用兩種不同的限制酶時,基因只能照一個方向接進去;右邊可以改成只用一種酶比較看看。']],
+    draw(g, t, S) {
+      const { x: cx, y: cy, r } = RING;
+      const gap = t < 10.9 ? 15 * ease(seg(t, 7.3, 8.4)) : 0;
+      fade(g, ease(seg(t, 0, 0.8)), () => {
+        if (gap > 0.2) arc(g, cx, cy, r, gap, 360 - gap, C.backbone, 6); else g.circle(cx, cy, r, null, C.backbone, 6);
+        for (const p of RING_PARTS) { if (p.arrow) arcArrow(g, cx, cy, r, p.a, p.b, p.color, 14); else arc(g, cx, cy, r, p.a, p.b, p.color, 14); }
+        if (t < 7.3) arc(g, cx, cy, r, -11, 11, '#e6ece9', 14);
+        g.text(cx, cy, '質體', { size: 15, weight: 700, color: C.ink2, align: 'center' });
+      });
+      for (const p of RING_PARTS) ringLabel(g, cx, cy, r, p.at, p.label, p.color, { alpha: ease(seg(t, p.show, p.show + 0.5)) });
+      ringLabel(g, cx, cy, r, 0, '插入位置', C.ink, { alpha: ease(seg(t, 2.4, 2.9)) * (1 - seg(t, 8.4, 9)) });
+      if (t >= 9.2) {
+        const k = ease(seg(t, 9.2, 10.9));
+        fade(g, seg(t, 9.2, 9.6), () => arcArrow(g, cx, cy, r + 70 * (1 - k), -16, 16, C.mint, 14));
+        ringLabel(g, cx, cy, r, 0, '目標基因', C.mint, { alpha: ease(seg(t, 10.9, 11.4)) });
+      }
+      const za = ease(seg(t, 4.3, 5)) * (1 - ease(seg(t, 13, 13.6)));
+      fade(g, za, () => zoomSeq(g, t));
+      fade(g, ease(seg(t, 13.3, 13.9)), () => orientPanel(g, S));
+    },
+  },
+  {
+    key: 'transform', name: '轉形:讓細菌吃進質體', dur: 16,
+    cues: [[0, '質體和勝任細胞(處理過、容易吃進 DNA 的大腸桿菌)先放冰上,再泡 42 °C 水浴 30 到 60 秒,這叫熱休克。'],
+      [5, '只有一小部分細菌吃進質體,所以把菌塗在含抗生素(例如康黴素)的培養基上,只有帶著抗性基因的細菌活得下來。'],
+      [10.5, '隔夜培養後長出的每個菌落,通常是一隻細菌分裂出來的,帶著同一種質體。右邊可以拿掉抗生素或質體比較。']],
+    draw(g, t, S) {
+      const temp = temp4(t), hot = t >= 1.6 && t < 3.6;
+      // 左邊的試管:塗盤之後變暗,讓視線移到培養基
+      const c = g.ctx; c.save(); c.globalAlpha *= 1 - 0.55 * ease(seg(t, 6, 7));
+      // 冰浴或水浴(試管泡在裡面,冰塊在兩旁)
+      g.rrect(104, 244, 162, 126, 16, hot ? 'rgba(255,154,92,.14)' : 'rgba(127,200,255,.10)', hot ? 'rgba(255,154,92,.55)' : 'rgba(127,200,255,.4)', 1.5);
+      if (!hot) [[110, 262], [112, 300], [110, 338], [242, 266], [244, 304], [242, 342]].forEach(([x, y]) => g.rrect(x, y, 18, 18, 4, 'rgba(200,235,255,.16)', 'rgba(200,235,255,.45)', 1));
+      g.thermo(50, 110, 230, temp, { lo: 0, hi: 50 });
+      g.tube(185, 110, 100, 240, { fill: 0.72, liquid: 'rgba(165,243,205,.12)' });
+      const took = (b) => TAKE.some(([, bb]) => bb === b) && S.plasmid && t >= 3.2;
+      TUBE_BUGS.forEach(([x, y, rot], i) => bug(g, x, y + Math.sin(t * 1.4 + i) * 1.5, 30, 13, { rot, ring: took(i) }));
+      if (S.plasmid) PLAS4.forEach(([x, y], j) => {
+        const tk = TAKE.find(([pj]) => pj === j);
+        if (tk) { const k = ease(seg(t, 2.2, 3.2)); if (k >= 1) return; const [bx, by] = TUBE_BUGS[tk[1]]; g.circle(lerp(x, bx + 4, k), lerp(y, by, k), 5, null, C.mint, 2); return; }
+        g.circle(x + Math.sin(t * 1.1 + j) * 2, y + Math.cos(t * 1.3 + j) * 2, 5, null, C.mint, 2);
+      });
+      const st = t < 1.6 ? '冰上' : t < 3.6 ? '42 °C 水浴 30 到 60 秒' : '回到冰上';
+      g.tag(185, 80, st, { size: 14, color: hot ? C.hot : C.cold, alpha: 1 - seg(t, 5.2, 5.8) });
+      if (S.plasmid) g.tag(185, 394, '兩隻吃進了質體(示意)', { size: 13, color: C.mint, alpha: pulse(t, 3.2, 6.4) });
+      c.restore();
+      // 塗到培養基上
+      const sa = ease(seg(t, 5.2, 6));
+      g.arrow(278, 300, 372, 300, { color: C.ink2, alpha: sa });
+      g.text(325, 282, '塗到培養基上', { size: 13, color: C.ink2, align: 'center', alpha: sa });
+      fade(g, ease(seg(t, 5.6, 6.4)), () => {
+        g.circle(PLATE.x, PLATE.y, PLATE.r, 'rgba(232,214,160,.08)', '#9fb3a8', 2);
+        g.circle(PLATE.x, PLATE.y, PLATE.r - 7, 'rgba(232,214,160,.10)');
+        g.tag(PLATE.x, 136, S.anti ? '培養基含康黴素(抗生素)' : '培養基沒有抗生素', { size: 14, color: S.anti ? C.amber : C.ink2 });
+      });
+      const cellA = ease(seg(t, 6.4, 7.4)), die = S.anti ? ease(seg(t, 8, 9.6)) : 0, grow = ease(seg(t, 10.4, 13.6));
+      if (!S.anti && grow > 0) { // 沒有抗生素:長成一整片
+        c.save(); c.beginPath(); c.arc(PLATE.x, PLATE.y, PLATE.r - 9, 0, Math.PI * 2); c.clip();
+        c.fillStyle = `rgba(243,233,200,${0.42 * grow})`; c.fillRect(PLATE.x - PLATE.r, PLATE.y - PLATE.r, PLATE.r * 2, PLATE.r * 2);
+        PLATE_CELLS.forEach((p) => g.circle(p.x, p.y, 7 * grow * p.gr, `rgba(243,233,200,${0.5 * grow})`));
+        c.restore();
+      }
+      PLATE_CELLS.forEach((p) => {
+        const has = p.has && S.plasmid;
+        if (S.anti && has && grow > 0) { c.save(); c.shadowColor = 'rgba(243,233,200,.6)'; c.shadowBlur = 8 * grow; g.circle(p.x, p.y, 2 + 7 * grow * p.gr, K.colony); c.restore(); return; }
+        const a = cellA * (has ? 1 : 1 - 0.75 * die) * (1 - grow * (S.anti ? 0 : 1));
+        bug(g, p.x, p.y, 10, 4.5, { rot: p.rot, alpha: a, fill: has ? C.mint : (die > 0.5 ? '#7a4f4f' : '#6f7f78'), line: 'rgba(0,0,0,0)' });
+      });
+      g.tag(PLATE.x, 470, '37 °C 隔夜培養', { size: 14, color: C.ink2, alpha: pulse(t, 10.2, 12.6) });
+      const msg = S.anti ? (S.plasmid ? ['只有帶質體的菌長成菌落(數目是示意)', C.mint] : ['沒有菌落:沒帶質體的菌都被殺死', C.amber])
+        : (S.plasmid ? ['長成一整片:有沒有質體都活著,分不出來', C.amber] : ['長成一整片:這些菌都沒有質體', C.amber]);
+      g.text(500, 494, msg[0], { size: 15, weight: 600, color: msg[1], align: 'center', alpha: ease(seg(t, 12.8, 13.5)) });
+      // 右:為什麼只長出這些
+      fade(g, ease(seg(t, 6.4, 7.2)), () => {
+        g.panel(712, 96, 226, 222, S.anti ? '抗生素篩選' : '沒有抗生素');
+        bug(g, 744, 152, 40, 18, { ring: true });
+        if (S.anti) for (let i = 0; i < 4; i++) g.circle(728 + i * 11, 134 + (i % 2) * 38, 3, C.amber);
+        g.text(776, 142, '有質體', { size: 15, weight: 700, color: C.mint });
+        g.text(776, 166, S.anti ? '抗性基因保護它' : '活得好好的', { size: 14, color: C.ink2 });
+        bug(g, 744, 232, 40, 18, { fill: '#2a3532', line: '#6f7f78' });
+        if (S.anti) mark(g, 744, 232, false, 10);
+        g.text(776, 222, '沒有質體', { size: 15, weight: 700, color: C.ink2 });
+        g.text(776, 246, S.anti ? '被抗生素殺死' : '也活得好好的', { size: 14, color: S.anti ? C.red : C.ink2 });
+        g.text(726, 292, S.anti ? '只有帶質體的菌長得出來' : '兩種都長,分不出來', { size: 13, color: C.muted });
+      });
+      // 一個菌落放大
+      if (S.anti && S.plasmid) {
+        const za = ease(seg(t, 13.6, 14.4));
+        if (za > 0) {
+          const col = PLATE_CELLS.filter((p) => p.has).reduce((a, b) => (b.x - b.y * 0.3 > a.x - a.y * 0.3 ? b : a));
+          fade(g, za, () => {
+            g.line(col.x + 8, col.y + 4, 796, 398, C.ink2, 1.2, [3, 3]);
+            g.circle(842, 404, 46, 'rgba(243,233,200,.08)', C.ink2, 1.5);
+            [[-18, -14], [6, -20], [22, -2], [-24, 8], [0, 2], [14, 18], [-8, 22]].forEach(([dx, dy], i) => bug(g, 842 + dx, 404 + dy, 18, 8, { rot: i * 0.7, ring: true }));
+            g.text(842, 466, '一個菌落', { size: 14, weight: 700, color: C.ink, align: 'center' });
+            g.text(842, 488, '同一隻菌分裂來的', { size: 13, color: C.ink2, align: 'center' });
+          });
+        }
+      }
+    },
+  },
+  {
+    key: 'induce', name: '誘導:IPTG 打開表現開關', dur: 16,
+    cues: [[0, '做好的質體再轉形到表現用的菌株(名稱帶 DE3,例如 C41(DE3)),它的染色體上多了 T7 RNA 聚合酶的基因。'],
+      [4, '平常 LacI(lac 抑制蛋白)擋住這個基因;目標基因接在 T7 啟動子後,這個啟動子只有 T7 RNA 聚合酶認得。'],
+      [8.5, '菌量長到濁度(OD600)約 0.6 時加入 IPTG(類似乳糖、但細菌分解不掉),它讓 LacI 離開 DNA。'],
+      [12.5, 'T7 RNA 聚合酶開始大量轉錄目標基因,幾小時內目標蛋白可以超過菌體蛋白的一半;右邊可以不加 IPTG 比較。']],
+    draw(g, t, S) {
+      const P = PLAS5;
+      fade(g, ease(seg(t, 0, 0.8)), () => {
+        g.rrect(28, 64, 752, 410, 150, K.cell, K.cellLine, 2);
+        g.text(404, 96, '表現用的大腸桿菌(示意,沒有照比例)', { size: 15, color: C.ink2, align: 'center' });
+      });
+      // 染色體:lacUV5 啟動子、LacI 結合的地方、T7 RNA 聚合酶的基因
+      fade(g, ease(seg(t, 0.6, 1.6)), () => {
+        g.line(92, 392, 498, 392, C.backbone, 2); g.line(92, 404, 498, 404, C.backbone, 2);
+        g.curve([[94, 391], [94, 374], [114, 374]], C.amber, 3); g.arrow(108, 374, 120, 374, { color: C.amber, lw: 3, head: 8 });
+        g.rrect(130, 390, 24, 16, 3, K.op);
+        g.rrect(170, 390, 300, 16, 4, C.lav);
+        g.text(320, 398.5, 'T7 RNA 聚合酶的基因', { size: 13, weight: 700, color: '#0b1111', align: 'center' });
+        g.text(150, 432, 'lacUV5 啟動子', { size: 13, color: C.amber, align: 'center' });
+        g.text(506, 398, '染色體', { size: 13, color: C.muted });
+      });
+      // 質體
+      fade(g, ease(seg(t, 5, 6)), () => {
+        g.circle(P.x, P.y, P.r, null, C.backbone, 5);
+        arcArrow(g, P.x, P.y, P.r, 226, 250, C.amber, 12);
+        arc(g, P.x, P.y, P.r, 253, 262, K.op, 12);
+        arc(g, P.x, P.y, P.r, 266, 278, K.his, 12);
+        arcArrow(g, P.x, P.y, P.r, 282, 400, C.mint, 12);
+        arc(g, P.x, P.y, P.r, 115, 165, C.hot, 12); arc(g, P.x, P.y, P.r, 180, 205, C.blue, 12);
+        g.text(P.x + 22, P.y + 2, '質體', { size: 13, color: C.muted, align: 'center' });
+      });
+      ringLabel(g, P.x, P.y, P.r, 236, 'T7 啟動子', C.amber, { dist: 58, alpha: ease(seg(t, 5.6, 6.2)) });
+      ringLabel(g, P.x, P.y, P.r, 0, '目標基因', C.mint, { alpha: ease(seg(t, 5.8, 6.4)) });
+      // IPTG 與 LacI
+      const go = S.iptg ? ease(seg(t, 10.1, 11)) : 0;
+      const laci = (x, y, a0) => {
+        const a = a0 * (1 - go);
+        if (a > 0) g.blob(x + 18 * go, y - 36 * go, 21, 14, K.laci, 'LacI', { alpha: a, size: 13, wobble: 0.6, t });
+      };
+      laci(LACI_CHR[0], LACI_CHR[1], ease(seg(t, 4, 4.8)));
+      laci(LACI_PLA[0], LACI_PLA[1], ease(seg(t, 6.2, 7)));
+      if (S.iptg && t >= 8.5) {
+        IPTG5.forEach((d) => {
+          const arrive = ease(seg(t, 8.6 + d.k * 0.06, 9.8 + d.k * 0.06));
+          let tx, ty;
+          if (d.k < 3) [tx, ty] = [LACI_CHR[0] - 14 + d.k * 14, LACI_CHR[1] - 16];
+          else if (d.k < 6) [tx, ty] = [LACI_PLA[0] - 14 + (d.k - 3) * 14, LACI_PLA[1] - 14];
+          else [tx, ty] = [240 + d.k * 30, 200 + Math.sin(t + d.ph) * 20];
+          let x = lerp(d.sx, tx, arrive) + Math.sin(t * 3 + d.ph) * 3 * (1 - arrive), y = lerp(d.sy, ty, arrive);
+          if (d.k < 6) { x += 18 * go; y -= 36 * go; }
+          fade(g, d.k < 6 ? 1 - go : 1 - seg(t, 11, 12), () => diamond(g, x, y, 6, C.amber));
+        });
+        g.tag(126, 150, '加入 IPTG', { size: 14, color: C.amber, alpha: pulse(t, 8.6, 11.6) });
+      }
+      if (!S.iptg && t >= 8.5) g.tag(330, 214, '沒加 IPTG:LacI 一直擋著,幾乎不表現', { size: 14, color: C.amber, alpha: ease(seg(t, 8.5, 9.1)) });
+      // T7 RNA 聚合酶:做出來、跑到質體的 T7 啟動子、沿著目標基因轉錄
+      if (S.iptg && t >= 10.4) {
+        const appear = ease(seg(t, 10.4, 11)), mv = ease(seg(t, 11.2, 12.4));
+        const [px, py] = pol(P.x, P.y, P.r, 238);
+        // 走彎的路線,避開「T7 啟動子」的標籤
+        const qb = (a, c, b, k) => (1 - k) * (1 - k) * a + 2 * (1 - k) * k * c + k * k * b;
+        g.blob(qb(260, 420, px, mv), qb(358, 236, py, mv), 21, 14, C.lav, 'T7', { alpha: appear, size: 13, wobble: 1, t });
+        const along = 290 + ((Math.max(0, t - 12.4) * 40) % 100);
+        const [bx, by] = pol(P.x, P.y, P.r, 290);
+        const [qx, qy] = t < 12.4 ? [qb(390, 440, bx, mv), qb(358, 250, by, mv)] : pol(P.x, P.y, P.r, along);
+        g.blob(qx, qy, 21, 14, C.lav, 'T7', { alpha: appear, size: 13, wobble: 1, t: t + 1 });
+        g.tag(325, 312, 'T7 RNA 聚合酶', { size: 13, color: C.lav, alpha: pulse(t, 10.5, 11.6, 0.4) });
+        [270, 292, 314].forEach((d, j) => {
+          const len = 76 * ease(seg(t, 12.4 + j * 0.35, 13.6 + j * 0.35));
+          if (len < 2) return;
+          const [bx, by] = pol(P.x, P.y, P.r + 8, d), ang = Math.atan2(by - P.y, bx - P.x) + 0.25;
+          chainLine(g, bx, by, len, t + j, K.rna, { amp: 4, lw: 2.6, ang });
+          if (len > 40) ribo(g, bx + Math.cos(ang) * len * 0.62, by + Math.sin(ang) * len * 0.62);
+        });
+        const n = Math.floor(PROT5.length * ease(seg(t, 12.8, 16)));
+        for (let i = 0; i < n; i++) { const p = PROT5[i]; g.blob(p.x, p.y + Math.sin(t * 1.5 + p.ph) * 2, 7.5, 6, C.mint, ''); }
+      }
+      // 右:目標蛋白占全部蛋白的比例(示意)
+      const frac = S.iptg ? 0.03 + 0.54 * ease(seg(t, 12.6, 16)) : 0.03;
+      g.text(870, 120, '目標蛋白', { size: 15, weight: 700, color: C.mint, align: 'center' });
+      g.text(870, 142, '占菌體蛋白', { size: 13, color: C.muted, align: 'center' });
+      g.rrect(850, 166, 40, 220, 6, 'rgba(255,255,255,.04)', C.line);
+      g.rrect(853, 166 + 220 * (1 - frac) + 3, 34, Math.max(2, 220 * frac - 6), 4, C.mint);
+      g.line(842, 276, 898, 276, C.ink2, 1.2, [3, 3]);
+      g.text(838, 276, '50%', { size: 13, color: C.muted, align: 'right', mono: true });
+      const v = !S.iptg ? '幾乎沒有' : frac > 0.5 ? '超過一半' : t < 12.6 ? '還很少' : '增加中';
+      g.text(870, 410, v, { size: 15, weight: 700, color: frac > 0.5 ? C.mint : C.ink2, align: 'center' });
+      g.text(870, 432, '(示意)', { size: 13, color: C.muted, align: 'center' });
+    },
+  },
+  {
+    key: 'fold', name: '溫度:慢慢做比較摺得好', dur: 15,
+    cues: [[0, '剛做出來的蛋白質是一條胺基酸長鏈,要摺成固定的立體形狀才有功能。'],
+      [4, '37 °C 時做得又快又多,還沒摺好的長鏈容易黏成一團(包涵體),打破細胞、離心後沉到管底。'],
+      [8.5, '降到 16 °C 左右慢慢做(常培養一整夜),長鏈比較有時間摺好,留在上清液(可溶部分)的比例較高。'],
+      [12, '可溶也不一定就有活性,最後仍要測酵素反應。右邊可以關掉 IPTG 比較。']],
+    draw(g, t, S) {
+      const aL = 1 - 0.7 * ease(seg(t, 8.3, 8.9)) * (1 - ease(seg(t, 11.8, 12.4)));
+      const aR = 1 - 0.7 * ease(seg(t, 3.8, 4.4)) * (1 - ease(seg(t, 8.3, 8.9)));
+      g.line(480, 34, 480, 520, C.line, 1.5, [4, 6]);
+      foldHalf(g, t, S, 37, aL);
+      foldHalf(g, t, S, 16, aR);
+      if (S.iptg) {
+        g.tag(480, 318, '剛做出的是長鏈,要摺成立體形狀才有功能', { size: 14, color: C.ink2, alpha: pulse(t, 0.6, 4.2) });
+        g.tag(230, 188, '還沒摺好就黏成一團', { size: 14, color: C.hot, alpha: pulse(t, 4.6, 8.4) });
+        g.tag(670, 318, '慢慢做,有時間摺好', { size: 14, color: C.cold, alpha: pulse(t, 8.9, 12) });
+      }
+      const ta = ease(seg(t, 12, 12.8));
+      foldTube(g, S, 37, ta);
+      foldTube(g, S, 16, ta);
+    },
+  },
+  {
+    key: 'purify', name: '純化:用 His 標籤抓出來', dur: 16,
+    cues: [[0, '載體在插入位置旁邊帶有 6 個組胺酸的密碼(His 標籤),基因接進去後,做出的蛋白質一端就多一小串組胺酸。'],
+      [4, '打破細胞後的上清液倒進裝了鎳或鈷樹脂的管柱:組胺酸會抓住金屬離子,目標蛋白卡在樹脂上,其他蛋白流走。'],
+      [9, '先用含少量咪唑的緩衝液洗掉黏得鬆的雜蛋白,再用高濃度咪唑把目標蛋白換下來收集。'],
+      [13, '這種方法叫固定化金屬親和層析(IMAC)。右邊可以拿掉 His 標籤,看看會怎樣。']],
+    draw(g, t, S) {
+      const his = S.his, C7 = COL7, c = g.ctx;
+      const phase = t < 4 ? -1 : t < 9 ? 0 : t < 11.5 ? 1 : 2;
+      ['1 上樣', '2 洗滌', '3 沖提'].forEach((s, i) => {
+        const on = phase === i, x = 28 + i * 86;
+        g.rrect(x, 14, 78, 28, 14, on ? 'rgba(165,243,205,.18)' : 'rgba(255,255,255,.04)', on ? C.mint : C.line, 1.5);
+        g.text(x + 39, 28, s, { size: 14, weight: 600, color: on ? C.mint : C.muted, align: 'center' });
+      });
+      // 管柱與樹脂
+      const liq = phase <= 0 ? 'rgba(184,196,190,.12)' : phase === 1 ? 'rgba(127,184,255,.10)' : 'rgba(255,209,102,.14)';
+      g.rrect(C7.x + 2, 64, C7.w - 4, C7.bedTop - 64, 4, liq);
+      g.rrect(C7.x + 2, C7.bedTop, C7.w - 4, C7.bedBot - C7.bedTop, 4, 'rgba(110,200,170,.16)');
+      for (let yy = C7.bedTop + 6; yy < C7.bedBot - 2; yy += 11) for (let xx = 140 + ((yy / 11) % 2) * 5; xx < 204; xx += 11) g.circle(xx, yy, 4.2, 'rgba(160,220,200,.22)');
+      c.save(); c.beginPath(); c.moveTo(C7.x, C7.y + 6); c.lineTo(C7.x, C7.bedBot + 6); c.lineTo(C7.tipX - 5, C7.tipY - 4); c.lineTo(C7.tipX + 5, C7.tipY - 4); c.lineTo(C7.x + C7.w, C7.bedBot + 6); c.lineTo(C7.x + C7.w, C7.y + 6);
+      c.strokeStyle = '#8fb3a6'; c.lineWidth = 1.6; c.stroke(); c.restore();
+      g.text(214, 254, '鎳或鈷樹脂', { size: 13, color: C.ink2 });
+      if (phase === 2) for (let i = 0; i < 9; i++) penta(g, 142 + (i % 3) * 24, 80 + ((t * 40 + i * 30) % 220), 4, C.amber, { lw: 1.5 });
+      // 收集用的試管
+      const shift = 90 * ease(seg(t, 11.3, 11.8));
+      const tubes = [{ x: 170 - shift, name: '流出液', n: 0, col: '#8a9a94' }, { x: 260 - shift, name: '沖提液', n: 0, col: C.mint }];
+      const flowing = t > 4.3 && t < 15.6;
+      PUR.forEach((p) => {
+        const q = purPos(p, t, his);
+        if (q.out) { tubes[q.tExit < 11.3 ? 0 : 1].n++; return; }
+        if (p.kind === 'target') {
+          g.blob(q.x, q.y, 7, 5.6, C.mint, '');
+          if (his) hisTail(g, q.x + 7, q.y + 3, 1.8, 3.2, 0.3);
+        } else junk(g, q.x, q.y, p.kind === 'loose' ? 5 : 4.6, p.shape, K.junk[p.shape]);
+      });
+      tubes.forEach((tb, i) => {
+        const lvl = i === 0 ? 0.12 + 0.5 * seg(t, 4.5, 11.3) : 0.1 + 0.42 * seg(t, 12, 15.5);
+        g.tube(tb.x, 396, 36, 74, { fill: lvl, liquid: i === 0 ? 'rgba(184,196,190,.2)' : 'rgba(255,209,102,.22)' });
+        for (let k = 0; k < tb.n; k++) g.circle(tb.x - 9 + (k % 4) * 6, 458 - Math.floor(k / 4) * 6, 2.4, tb.col);
+        g.text(tb.x, 488, tb.name, { size: 13, color: C.ink2, align: 'center' });
+      });
+      if (flowing) { const dy = ((t * 2.6) % 1) * 34; g.circle(C7.tipX, C7.tipY + 4 + dy, 2.6, 'rgba(207,233,245,.6)'); }
+      // 右上:樹脂表面放大
+      g.panel(320, 50, 618, 280, '樹脂表面放大(示意)');
+      c.save(); c.beginPath(); c.rect(321, 51, 616, 278); c.clip();
+      g.rrect(340, 300, 578, 22, 6, '#22403a', '#3f6b5f');
+      g.text(352, 311, '樹脂顆粒', { size: 13, color: C.muted });
+      NI_X.forEach((x) => { g.line(x, 300, x, 282, '#7d8f88', 3); g.circle(x, 264, 19, K.ni, K.niLine, 1.5); g.text(x, 264.5, 'Ni²⁺', { size: 13, weight: 700, color: '#eafff2', align: 'center' }); });
+      // 咪唑(沖提)
+      if (t >= 11.5) {
+        NI_X.forEach((x, i) => {
+          const land = i === 1 ? 13.0 : 11.5 + i * 0.25;
+          const k = ease(seg(t, land, land + 0.8));
+          if (k > 0) fade(g, seg(t, land, land + 0.3), () => penta(g, x, lerp(70, 234, k), 10, C.amber, { fill: 'rgba(255,209,102,.18)' }));
+        });
+        g.text(436, 232, '咪唑佔住鎳', { size: 13, weight: 600, color: C.amber, alpha: ease(seg(t, 12.3, 12.8)) });
+      }
+      // 洗滌:黏得鬆的雜蛋白被洗走
+      const lo = t < 9.4 ? ease(seg(t, 6.6, 7.4)) : 1 - seg(t, 9.8, 10.6);
+      if (lo > 0) {
+        const up = ease(seg(t, 9.4, 10.6));
+        fade(g, lo * (1 - up), () => g.line(700, 245, 700, 237, C.muted, 1.4, [2, 2]));
+        fade(g, lo, () => junk(g, 700 + up * 50, 226 - up * 50, 13, 1, K.junk[0]));
+      }
+      g.tag(700, 150, '洗掉黏得鬆的雜蛋白', { size: 14, color: C.blue, alpha: pulse(t, 9.2, 11.3) });
+      // 其他蛋白:流過去
+      const jy = lerp(110, 214, ease(seg(t, 4, 7.4))), jx = 470 - 140 * ease(seg(t, 7.4, 9));
+      fade(g, 1 - seg(t, 8.2, 9), () => { g.blob(jx, jy, 32, 23, '#6f7f78', ''); g.text(jx, jy + 0.5, '雜蛋白', { size: 13, weight: 700, color: '#0b1111', align: 'center' }); });
+      // 目標蛋白:His 標籤的末端碰到鎳就卡住
+      if (his) {
+        const yP = t < 12.6 ? lerp(96, 124, ease(seg(t, 4, 7))) : lerp(124, 40, ease(seg(t, 12.6, 14)));
+        fade(g, 1 - seg(t, 13.4, 14.2), () => {
+          if (t >= 6.8 && t < 12.6) { g.line(549, yP + 106, 547, 252, K.his, 1.5, [2, 3]); g.line(571, yP + 106, 573, 252, K.his, 1.5, [2, 3]); }
+          hisTail(g, 560, yP + 38, 10, 15, Math.PI / 2, { letters: true, t });
+          g.blob(560, yP, 46, 30, C.mint, '目標蛋白', { size: 13, wobble: 0.5, t });
+        });
+        g.tag(588, yP + 76, 'His 標籤:6 個組胺酸', { size: 13, color: K.his, align: 'left', alpha: pulse(t, 0.8, 7) });
+      } else {
+        const yP = lerp(96, 200, ease(seg(t, 4, 7.4))), x = 560 + 160 * ease(seg(t, 7.4, 9));
+        fade(g, 1 - seg(t, 8.2, 9), () => g.blob(x, yP, 46, 30, C.mint, '目標蛋白', { size: 13, wobble: 0.5, t }));
+        g.tag(560, 150, '沒有 His 標籤:抓不住', { size: 14, color: C.red, alpha: pulse(t, 7.6, 11.4) });
+      }
+      c.restore();
+      // 右下:咪唑和組胺酸是同一種環;結果
+      fade(g, ease(seg(t, 9, 9.8)), () => {
+        g.panel(320, 346, 618, 180, '');
+        g.line(346, 412, 386, 412, C.backbone, 3);
+        penta(g, 406, 412, 17, K.his, { lw: 2.5 });
+        g.text(398, 450, '組胺酸的側鏈', { size: 13, color: K.his, align: 'center' });
+        g.text(482, 412, '一樣的環', { size: 13, color: C.muted, align: 'center' });
+        penta(g, 556, 412, 17, C.amber, { lw: 2.5 });
+        g.text(556, 450, '咪唑', { size: 13, color: C.amber, align: 'center' });
+        g.text(338, 492, '高濃度咪唑能把 His 標籤從鎳上換下來', { size: 13, color: C.ink2 });
+        g.text(650, 378, '洗滌:咪唑 10 到 50 mM', { size: 14, color: C.ink2 });
+      });
+      g.text(650, 402, '沖提:咪唑 100 mM 以上', { size: 14, color: C.ink2, alpha: ease(seg(t, 11.5, 12.2)) });
+      g.text(650, 424, '(鎳樹脂常用的範圍)', { size: 13, color: C.muted, alpha: ease(seg(t, 11.5, 12.2)) });
+      const ra = ease(seg(t, 14.2, 14.9));
+      g.text(650, 466, his ? '沖提液:幾乎只有目標蛋白' : '沖提液:沒有目標蛋白', { size: 15, weight: 700, color: his ? C.mint : C.red, alpha: ra });
+      g.text(650, 490, his ? '一步就能得到很純的蛋白' : '它和雜蛋白一起流走了', { size: 13, color: C.ink2, alpha: ra });
+    },
+  },
+  {
+    key: 'confirm', name: '確認:SDS-PAGE 與西方墨點法', dur: 17,
+    cues: [[0, 'SDS-PAGE:SDS(一種清潔劑)把蛋白質攤成長條並帶負電,在聚丙烯醯胺膠裡往正極跑,小的跑得快。'],
+      [4.5, '和分子量標準比對(單位 kDa,千道耳頓):誘導後多出一條大小相符的粗條帶,純化後幾乎只剩這一條。'],
+      [9, '大小相符還不夠,西方墨點法(Western blot)把蛋白轉印到膜上,用認得 His 標籤的抗體去找,只有目標蛋白會顯色。'],
+      [13.5, '確認之後才拿去測酵素功能;抗體偵測的原理見本站「抗體檢測」。右邊可以改溫度、IPTG 與 His 標籤看膠的變化。']],
+    draw(g, t, S) {
+      const amt = laneAmounts(S), run = ease(seg(t, 0.6, 4.4)), stain = ease(seg(t, 4.4, 5.2));
+      const memIn = ease(seg(t, 9, 10.2)), dev = ease(seg(t, 12.6, 14));
+      // 膠
+      g.rrect(312, 70, 432, 400, 6, 'rgba(214,224,236,.9)', '#9fb0c0');
+      LANES.forEach((n, i) => { g.text(LX[i], 56, n, { size: 14, weight: 600, color: C.ink2, align: 'center' }); g.rrect(LX[i] - 26, 80, 52, 8, 2, '#5a6878'); });
+      g.text(306, 82, '−', { size: 16, weight: 700, color: C.ink2, align: 'right' });
+      g.text(528, 488, '正極(+)', { size: 14, weight: 700, color: C.red, align: 'center' });
+      const by = (k) => 92 + run * (yAt(k) - 92);
+      const bandR = (x, y, w, h, col) => g.rrect(x - w / 2, y - h / 2, w, h, Math.min(3, h / 2), col);
+      if (memIn < 1) {
+        g.line(316, 92 + run * 362, 740, 92 + run * 362, 'rgba(70,90,220,.55)', 3);
+        MARK.forEach((k) => { bandR(LX[0], by(k), 52, 5, k === 75 || k === 25 ? '#d24a6a' : '#4b55c8'); if (run > 0.9) g.text(304, yAt(k), String(k), { size: 13, color: C.muted, align: 'right', mono: true }); });
+        if (stain > 0) {
+          for (let i = 1; i < 6; i++) {
+            const f = [0, 1, 1, 0.85, 0.25, 0][i];
+            BG8.forEach((b) => { const a = b.a * f * (i === 4 && b.sol ? 0.2 : 1) * (i === 3 && !b.sol ? 0.2 : 1); if (a > 0.02) bandR(LX[i], by(b.k), 50, 3.2, `rgba(36,52,150,${a * stain})`); });
+            if (i === 5 && S.his && S.iptg) bandR(LX[i], by(28), 50, 3, `rgba(36,52,150,${0.08 * stain})`);
+            const m = amt[i];
+            if (m > 0.05) bandR(LX[i], by(TKDA), 52, 5 + 6 * m, `rgba(36,52,150,${(0.12 + 0.86 * m) * stain})`);
+          }
+        }
+        g.tag(528, 300, '染色後看到條帶(考馬斯藍)', { size: 13, color: '#24348c', bg: 'rgba(240,244,250,.92)', border: '#9fb0c0', alpha: pulse(t, 4.6, 7.2) });
+      }
+      // 轉印到膜上,再用抗體顯色
+      if (memIn > 0) {
+        const mx = lerp(960, 312, memIn);
+        g.rrect(mx, 70, 432, 400, 6, '#ece8df', '#bdb6a6');
+        const c = g.ctx; c.save(); c.beginPath(); c.rect(mx, 70, 432, 400); c.clip();
+        MARK.forEach((k) => bandR(LX[0] - 312 + mx, yAt(k), 52, 4, k === 75 || k === 25 ? 'rgba(210,74,106,.75)' : 'rgba(75,85,200,.7)'));
+        if (S.his) for (let i = 1; i < 6; i++) { const m = amt[i]; if (m > 0.02 && dev > 0) bandR(LX[i] - 312 + mx, yAt(TKDA), 52, 5 + 6 * m, `rgba(61,42,92,${clamp(m * 1.3) * dev})`); }
+        c.restore();
+        if (memIn >= 1) MARK.forEach((k) => g.text(304, yAt(k), String(k), { size: 13, color: C.muted, align: 'right', mono: true }));
+        g.tag(528, 300, '轉印到膜上', { size: 14, color: '#3d2a5c', bg: 'rgba(250,248,242,.95)', border: '#bdb6a6', alpha: pulse(t, 9.6, 11.4) });
+        g.tag(528, 440, S.his ? '只有目標蛋白那一條顯色' : '抗體認不到:膜上沒有條帶', { size: 14, color: S.his ? '#3d2a5c' : C.red, bg: 'rgba(250,248,242,.95)', border: '#bdb6a6', alpha: ease(seg(t, 13.6, 14.3)) });
+      }
+      // 左:SDS 的作用(前半)、抗體(後半)
+      fade(g, 1 - ease(seg(t, 8.8, 9.3)), () => {
+        g.panel(20, 70, 250, 178, 'SDS 讓蛋白質攤開');
+        const un = ease(seg(t, 2.8, 4.2));
+        fade(g, 1 - un, () => g.blob(80, 160, 30, 24, C.mint, '', { wobble: 0.6, t }));
+        for (let i = 0; i < 6; i++) {
+          const k = ease(seg(t, 1 + i * 0.2, 2.6 + i * 0.2)), a = (i / 6) * Math.PI * 2;
+          const x = lerp(80 + Math.cos(a) * 90, 80 + Math.cos(a) * 34, k), y = lerp(160 + Math.sin(a) * 60, 160 + Math.sin(a) * 28, k);
+          fade(g, (1 - un) * seg(t, 1 + i * 0.2, 1.4 + i * 0.2), () => { g.line(x, y, x + Math.cos(a) * 12, y + Math.sin(a) * 12, C.amber, 2.5); g.text(x, y, '−', { size: 13, weight: 700, color: C.blue, align: 'center' }); });
+        }
+        fade(g, un, () => {
+          chainLine(g, 44, 162, 206, 0, C.mint, { amp: 3, lw: 3, ang: 0 });
+          for (let i = 0; i < 9; i++) g.text(54 + i * 23, 146, '−', { size: 15, weight: 700, color: C.blue, align: 'center' });
+          g.text(145, 216, '帶負電,往正極跑', { size: 13, color: C.ink2, align: 'center' });
+        });
+        g.panel(20, 268, 250, 202, '大小怎麼看');
+        g.rrect(40, 300, 46, 150, 4, 'rgba(214,224,236,.18)', C.line);
+        const mv = ease(seg(t, 1.2, 4.4));
+        chainLine(g, 46, 306 + 30 * mv, 34, 0, C.mint, { amp: 2, lw: 3, ang: 0 });
+        chainLine(g, 52, 306 + 120 * mv, 22, 0, C.mint, { amp: 2, lw: 3, ang: 0 });
+        g.text(98, 306 + 30 * mv, '大', { size: 14, weight: 700, color: C.ink2 });
+        g.text(98, 306 + 120 * mv, '小', { size: 14, weight: 700, color: C.ink2 });
+        g.text(130, 330, '小的跑得快', { size: 14, color: C.ink2 });
+        g.text(130, 354, '大的跑得慢', { size: 14, color: C.ink2 });
+        g.text(130, 392, '和標準比對', { size: 14, color: C.ink2 });
+        g.text(130, 416, '就知道幾 kDa', { size: 14, color: C.ink2 });
+        g.text(130, 448, 'kDa:千道耳頓', { size: 13, color: C.muted });
+      });
+      fade(g, ease(seg(t, 9.2, 9.8)), () => {
+        g.panel(20, 70, 250, 400, '西方墨點法');
+        g.text(40, 112, '抗體只認目標蛋白', { size: 14, color: C.ink2 });
+        g.rrect(36, 400, 218, 16, 4, '#ece8df');
+        g.blob(84, 390, 30, 12, C.mint, '');
+        if (S.his) hisTail(g, 112, 380, 4.5, 8, -0.95, { t: 0 });
+        const tipX = 112 + Math.cos(-0.95) * 40, tipY = 380 + Math.sin(-0.95) * 40;
+        const k1 = ease(seg(t, 10.6, 11.6)), k2 = ease(seg(t, 11.6, 12.4));
+        const f1y = lerp(-60, tipY - 19, k1), f2y = f1y - 26 - 19;
+        if (k1 > 0) antibody(g, tipX, S.his ? f1y : lerp(-60, tipY - 60, k1), 26, C.blue, Math.PI);
+        if (k2 > 0 && S.his) {
+          antibody(g, tipX, lerp(-80, f2y, k2), 26, C.amber, Math.PI);
+          const sy = lerp(-80, f2y, k2) - 30;
+          const c = g.ctx; c.save(); if (dev > 0) { c.shadowColor = '#ff9a5c'; c.shadowBlur = 16 * dev; }
+          diamond(g, tipX, sy, 8, C.hot); c.restore();
+        }
+        if (S.his) {
+          g.text(tipX + 26, tipY - 8, '一抗', { size: 14, weight: 700, color: C.blue, alpha: k1 });
+          g.text(tipX + 26, tipY + 12, '認得 His', { size: 13, color: C.ink2, alpha: k1 });
+          g.text(tipX + 26, f2y - 4, '二抗', { size: 14, weight: 700, color: C.amber, alpha: k2 });
+          g.text(tipX + 26, f2y + 16, '帶著酵素', { size: 13, color: C.ink2, alpha: k2 });
+          g.text(tipX + 22, f2y - 48, '加受質就顯色', { size: 13, color: C.hot, alpha: dev });
+        } else { g.text(40, 160, '沒有 His 標籤,', { size: 14, color: C.red, alpha: k1 }); g.text(40, 184, '一抗找不到目標蛋白', { size: 14, color: C.red, alpha: k1 }); }
+      });
+      // 右:樣品的設定與判讀
+      g.text(760, 92, '電泳的樣品', { size: 13, color: C.muted });
+      g.text(760, 116, `誘導溫度 ${S.temp} °C`, { size: 15, weight: 600, color: C.ink2 });
+      g.text(760, 140, S.iptg ? 'IPTG:有加' : 'IPTG:沒加', { size: 15, weight: 600, color: S.iptg ? C.ink2 : C.amber });
+      g.text(760, 164, S.his ? 'His 標籤:有' : 'His 標籤:沒有', { size: 15, weight: 600, color: S.his ? C.ink2 : C.amber });
+      g.text(752, yAt(TKDA), '← 預期約 60 kDa', { size: 14, weight: 700, color: C.mint, alpha: stain });
+      g.text(760, yAt(TKDA) + 22, '(示意)', { size: 13, color: C.muted, alpha: stain });
+      const lines = t < 9 ? (S.iptg ? ['誘導後多出一條', S.temp <= 16 ? '多在可溶部分' : '多在沉澱', S.his ? '純化後只剩這一條' : '沒有 His:純化不到'] : ['沒加 IPTG,', '沒有粗條帶'])
+        : (S.his && S.iptg ? ['膜上只有', '目標蛋白顯色'] : S.his ? ['沒誘導,', '幾乎看不到'] : ['抗體認不到,', '膜上沒有條帶']);
+      const la = t < 9 ? ease(seg(t, 5.2, 5.9)) * (1 - seg(t, 8.6, 9)) : ease(seg(t, 13.6, 14.3));
+      lines.forEach((s, i) => g.text(760, 330 + i * 24, s, { size: 14, color: C.ink, alpha: la }));
+    },
+  },
+];
+
+createLesson({
+  chapters,
+  state: { template: 'cdna', cut: 'two', anti: true, plasmid: true, iptg: true, his: true, temp: 16 },
+  controls: [
+    { id: 'template', label: 'PCR 的模板', type: 'seg', options: [{ v: 'cdna', label: 'cDNA' }, { v: 'gdna', label: '基因組 DNA' }], chapters: ['cdna'], restart: false },
+    { id: 'cut', label: '切法', type: 'seg', options: [{ v: 'two', label: '兩種酶' }, { v: 'one', label: '只用一種' }], chapters: ['vector'], restart: false },
+    { id: 'anti', label: '培養基加抗生素', type: 'toggle', chapters: ['transform'], restart: false },
+    { id: 'plasmid', label: '加入質體', type: 'toggle', chapters: ['transform'], restart: false },
+    { id: 'iptg', label: '加 IPTG', type: 'toggle', chapters: ['induce', 'fold', 'confirm'], restart: false },
+    { id: 'his', label: '接上 His 標籤', type: 'toggle', chapters: ['purify', 'confirm'], restart: false },
+    { id: 'temp', label: '電泳樣品的誘導溫度', type: 'seg', options: [{ v: 16, label: '16 °C' }, { v: 37, label: '37 °C' }], chapters: ['confirm'], restart: false },
+  ],
+});
+createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
+</script>
+</body>
+</html>

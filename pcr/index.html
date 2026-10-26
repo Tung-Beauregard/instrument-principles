@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>PCR 與電泳:把一小段 DNA 複製幾十億份</title>
+<meta name="description" content="用動畫看 PCR 的變性、黏合、延伸與循環倍增,洋菜膠電泳怎麼看出產物長度,以及 qPCR 怎麼從 Ct 值推回起始量。可以自己調黏合溫度、循環數與膠濃度。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="PCR 與電泳:把一小段 DNA 複製幾十億份">
+<meta property="og:description" content="用動畫看 PCR 的變性、黏合、延伸與循環倍增,洋菜膠電泳怎麼看出產物長度,以及 qPCR 怎麼從 Ct 值推回起始量。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/pcr/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/pcr.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="PCR 與電泳:雙股 DNA 分開、引子黏上、聚合酶延伸的動畫">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/pcr/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理"><a href="../">← 儀器入口</a><a href="../central-dogma/">中心法則</a><a href="./" aria-current="page">PCR 與電泳</a><a href="../sequencing/">DNA 定序</a><a href="../dna-markers/">DNA 鑑定</a><a href="../cloning/">基因選殖</a><a href="../terpene-synthase/">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/">抗體檢測</a><a href="../flow-cytometry/">流式細胞儀</a><a href="../proteomics/">蛋白質定序</a></nav></div>
+<header class="top wrap">
+  <h1>PCR 與電泳 <span class="k">把一小段 DNA 複製幾十億份</span></h1>
+  <p class="lede">PCR 用三個溫度反覆循環,把兩條引子之間的那一段 DNA 一輪一輪加倍;做完用洋菜膠電泳看產物多長,或用 qPCR 邊做邊量,推回樣品裡原本有多少。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="PCR 動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <ul>
+      <li>PCR 的一個循環:變性(94 到 98 °C,雙股分開)、黏合(引子黏到模板,溫度約比引子的熔解溫度低 5 °C)、延伸(聚合酶照模板接上核苷酸,Taq 聚合酶最適 70 到 80 °C,常用 72 °C)。</li>
+      <li>每個循環理論上把數量加倍,通常做 25 到 35 輪;後段原料用完,數量不再加倍(平原期)。</li>
+      <li>洋菜膠電泳:DNA 帶負電,往正極移動,短的片段跑得遠;和已知長度的分子量標準比對就知道產物長度。</li>
+      <li>qPCR 每輪量一次螢光,起始量越多越早超過門檻(Ct 越小);效率 100% 時,起始量差 10 倍,Ct 差約 3.32 輪。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>Lorenz TC. Polymerase Chain Reaction: Basic Protocol Plus Troubleshooting and Optimization Strategies. J Vis Exp. 2012;(63):3998. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4846334/">PMC4846334</a>(變性 94 到 98 °C、黏合約比 Tm 低 5 °C、Taq 最適 70 到 80 °C、25 到 35 輪、引子 15 到 30 個鹼基、條件太寬鬆會出現梯子狀的非專一產物)</li>
+      <li>Lee PY, et al. Agarose Gel Electrophoresis for the Separation of DNA Fragments. J Vis Exp. 2012;(62):e3923. <a href="https://www.jove.com/t/3923">jove.com/t/3923</a>(DNA 骨架帶負電往正極移動、移動距離和片段大小的對數成反比)</li>
+      <li>Zipper H, et al. Investigations on DNA intercalation and surface binding by SYBR Green I. Nucleic Acids Res. 2004;32(12):e103. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC484200/">PMC484200</a>(對雙股 DNA 有選擇性、結合後螢光大增)</li>
+      <li>Bustin SA, et al. The MIQE Guidelines. Clin Chem. 2009;55(4):611–622;斜率與效率的換算 E = 10<sup>−1/斜率</sup> − 1(斜率 −3.32 為 100%),見 <a href="https://www.agilent.com/store/biocalculators/calcSlopeEfficiency.jsp">Agilent 的換算說明</a>。</li>
+      <li>動畫裡的序列、引子熔解溫度(58 °C)、產物長度(450 bp)、膠的跑速、平原期的上限與 qPCR 曲線都是示意值,不是某個實驗的實測結果。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">生化原理・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, seg, ease, clamp, lerp, complement, rng } from '../assets/bio-draw.js';
+import { createRotateHint } from '../assets/mobile-panels.js';
+
+// 示意用的模板:上面那一股 5′→3′,下面那一股是它的互補股(3′→5′)
+const TOP = 'ATGCGTACCTGAAGCTTG';
+const BOT = complement(TOP);
+const N = TOP.length, STEP = 30, X0 = 225;
+const BW = 20, BH = 18, GAP = 60; // 鹼基的寬與高、雙股兩條骨架的距離(配對的鹼基之間留一點空隙畫氫鍵)
+const SD = { step: STEP, bw: BW, bh: BH };
+const PL = 6; // 引子長度(示意:畫成 6 個鹼基,實際常用 18 到 25 個)
+const TM = 58; // 引子熔解溫度(示意)
+// 先照顯示的位數四捨五入再挑單位:0.9991 兆寫成 1.0 兆,不寫 9991 億
+const fmtCopies = (v) => {
+  for (const [u, name] of [[1e12, '兆'], [1e8, '億'], [1e4, '萬']]) {
+    const x = v / u, s = x.toFixed(x >= 99.95 ? 0 : 1);
+    if (Number(s) >= 1) return `${s} ${name}份`;
+  }
+  return `${Math.round(v).toLocaleString('zh-TW')} 份`;
+};
+// 黏合溫度造成的兩個效果(示意模型):太低時非專一黏合,太高時黏不住
+const nonspec = (a) => clamp((TM - 7 - a) / 6);
+const yieldOf = (a) => clamp(1 - (a - (TM - 3)) / 6);
+const verdict = (a) => (nonspec(a) > 0.3 ? ['太低:也黏到不完全配對的位置', C.red] : yieldOf(a) < 0.5 ? ['太高:引子黏不住,產物很少', C.amber] : ['剛好:只黏在完全配對的位置', C.mint]);
+const NMAX = 1e12; // 平原期的上限(示意)
+const copies = (n, n0, max = NMAX) => (n0 * 2 ** n) / (1 + (n0 * (2 ** n - 1)) / max);
+
+function ends(g, yTop, yBot) {
+  g.text(X0 - 26, yTop, '5′', { size: 14, color: C.muted, align: 'right', mono: true });
+  g.text(X0 + (N - 1) * STEP + 26, yTop, '3′', { size: 14, color: C.muted, mono: true });
+  g.text(X0 - 26, yBot, '3′', { size: 14, color: C.muted, align: 'right', mono: true });
+  g.text(X0 + (N - 1) * STEP + 26, yBot, '5′', { size: 14, color: C.muted, mono: true });
+}
+// 引子:前引子(和上股前段相同)黏在下股的左端;反引子(上股後段的互補)黏在上股的右端
+function primers(g, t, S, yTop, yBot, { arrive = 1, wobble = 0 } = {}) {
+  const yl = yieldOf(S.anneal), ns = nonspec(S.anneal);
+  const stay = lerp(0.25, 1, yl);
+  const off = (k) => (1 - arrive) * k + wobble * (1 - yl) * 18 * Math.sin(t * 5 + k);
+  // 前引子:5′→3′ 往右,貼在下股上方
+  const fy = yBot - GAP - off(60);
+  g.strand(X0, fy, TOP, { ...SD, dir: 1, from: 0, to: PL, color: C.amber, alpha: arrive < 1 ? 0.95 : stay });
+  // 反引子:貼在上股下方,5′ 在右邊
+  const ry = yTop + GAP + off(60);
+  g.strand(X0, ry, BOT, { ...SD, dir: -1, from: N - PL, to: N, color: C.amber, alpha: arrive < 1 ? 0.95 : stay });
+  // 太低時,另一條引子黏到不完全配對的地方(紅框,打叉的是沒配上的鹼基)
+  if (ns > 0 && arrive >= 1) {
+    const x = X0 + 7 * STEP, y = yBot - GAP;
+    g.ctx.save(); g.ctx.globalAlpha *= ns;
+    g.strand(x, y, 'AGCATG', { ...SD, dir: 1, color: C.red });
+    for (const k of [1, 4]) g.text(x + k * STEP, y - 14, '×', { size: 18, weight: 700, color: C.red, align: 'center' });
+    g.tag(x + 2.5 * STEP, y - 36, '不完全配對也黏上', { size: 13, color: C.red });
+    g.ctx.restore();
+  }
+}
+
+const chapters = [
+  {
+    key: 'intro', name: 'PCR 在做什麼', dur: 15,
+    cues: [[0, 'PCR(聚合酶連鎖反應)只複製 DNA 裡指定的一小段,讓它從一份變成幾十億份。'],
+      [5, '要複製哪一段,由兩條叫「引子」的短 DNA 決定:它們各自黏在目標片段的兩端。'],
+      [10, '每一輪循環數量加倍,30 輪後理論上 1 份會變成大約 10 億份。']],
+    draw(g, t) {
+      // 反應管與四種材料
+      g.tube(150, 110, 96, 270, { fill: 0.72, label: 'PCR 反應管' });
+      const R = rng(7);
+      const items = [['模板 DNA', C.backbone, 0.5], ['引子', C.amber, 1.4], ['核苷酸 dNTP', C.mint, 2.3], ['DNA 聚合酶', C.lav, 3.2]];
+      items.forEach(([name, col, at], k) => {
+        const a = ease(seg(t, at, at + 0.8));
+        if (!a) return;
+        g.ctx.save(); g.ctx.globalAlpha = a;
+        for (let i = 0; i < (k === 0 ? 3 : 7); i++) {
+          const x = 116 + R() * 68, y = 200 + R() * 160, w = Math.sin(t * 1.3 + i + k) * 3;
+          if (k === 0) g.curve([[x - 18, y + w], [x, y - 10 - w], [x + 20, y + 4 + w], [x + 34, y - 6]], col, 2.5);
+          else if (k === 1) g.line(x, y + w, x + 16, y + w, col, 4);
+          else if (k === 2) g.circle(x, y + w, 4, [C.A, C.T, C.G, C.C][i % 4]);
+          else g.blob(x, y + w, 11, 8, col, '');
+        }
+        g.line(246, 140 + k * 46, 290, 140 + k * 46, C.line, 1.5);
+        g.text(298, 140 + k * 46, name, { size: 15, color: col });
+        g.ctx.restore();
+      });
+      // 長長的模板與目標片段
+      const a2 = ease(seg(t, 5, 6.2));
+      if (a2) {
+        g.ctx.save(); g.ctx.globalAlpha = a2;
+        const y = 330, x1 = 430, x2 = 920, ta = 560, tb = 800;
+        g.line(x1, y, x2, y, C.backbone, 4); g.line(x1, y + 22, x2, y + 22, C.backbone, 4);
+        for (let x = x1 + 6; x < x2; x += 9) g.line(x, y + 4, x, y + 18, 'rgba(213,221,217,.35)', 2);
+        g.rrect(ta, y - 8, tb - ta, 38, 6, 'rgba(165,243,205,.14)', C.mint);
+        g.line(ta, y - 14, ta + 44, y - 14, C.amber, 6); g.line(tb - 44, y + 36, tb, y + 36, C.amber, 6);
+        g.text((ta + tb) / 2, y - 30, '目標片段', { size: 15, weight: 700, color: C.mint, align: 'center' });
+        g.text(ta + 22, y - 30, '引子', { size: 13, color: C.amber, align: 'center' });
+        g.text(tb - 22, y + 58, '引子', { size: 13, color: C.amber, align: 'center' });
+        g.text(x1, y + 64, '……很長的 DNA……', { size: 13, color: C.muted });
+        g.ctx.restore();
+      }
+      // 循環數與份數
+      const a3 = seg(t, 10, 14.2);
+      if (t >= 9.6) {
+        const n = Math.round(30 * a3);
+        g.panel(430, 60, 490, 150, '');
+        g.text(456, 98, `第 ${n} 輪`, { size: 20, weight: 700, color: C.ink2 });
+        g.text(456, 150, fmtCopies(2 ** n), { size: 40, weight: 800, color: C.mint });
+        g.text(456, 188, `= 1 × 2${n === 0 ? '⁰' : sup(n)}`, { size: 15, color: C.muted, mono: true });
+      }
+    },
+  },
+  {
+    key: 'denature', name: '變性:加熱讓雙股分開', dur: 10,
+    cues: [[0, '第一步是加熱到 94 到 98 °C(這裡用 95 °C)。'],
+      [3, 'DNA 兩股之間靠鹼基配對的氫鍵連在一起;溫度夠高時氫鍵斷開,雙股分成兩條單股。'],
+      [7, '分開的單股就是等一下要照著複製的「模板」。']],
+    draw(g, t) {
+      const temp = lerp(72, 95, ease(seg(t, 0, 3)));
+      g.thermo(80, 110, 260, temp);
+      const sep = ease(seg(t, 3, 7)) * 70;
+      const jig = seg(t, 2.5, 7) * (1 - seg(t, 7, 8)) * 3;
+      const yTop = 250 - sep + Math.sin(t * 17) * jig, yBot = 250 + GAP + sep + Math.cos(t * 15) * jig;
+      g.strand(X0, yTop, TOP, { ...SD, dir: 1 });
+      g.strand(X0, yBot, BOT, { ...SD, dir: -1 });
+      const b = 1 - seg(t, 3.5, 6);
+      if (b > 0) for (let i = 0; i < N; i++) g.line(X0 + i * STEP, yTop + BH + 4, X0 + i * STEP, yBot - BH - 4, `rgba(240,243,238,${0.5 * b})`, 2, [2, 3]);
+      ends(g, yTop, yBot);
+      if (t > 3.5 && t < 7.5) g.tag(X0 + 9 * STEP, 250 + GAP / 2, '氫鍵斷開', { size: 14, color: C.hot, alpha: Math.min(seg(t, 3.5, 4.2), 1 - seg(t, 6.8, 7.5)) });
+      if (t >= 7) {
+        const a = ease(seg(t, 7, 7.8));
+        g.tag(X0 + (N - 1) * STEP + 70, yTop + 12, '單股模板 1', { size: 14, color: C.ink2, align: 'left', alpha: a });
+        g.tag(X0 + (N - 1) * STEP + 70, yBot - 12, '單股模板 2', { size: 14, color: C.ink2, align: 'left', alpha: a });
+      }
+    },
+  },
+  {
+    key: 'anneal', name: '黏合:引子找到位置', dur: 12,
+    cues: [[0, '接著降溫,讓引子黏到模板上和它配對的位置。'],
+      [3.5, '引子是 15 到 30 個鹼基的短 DNA(畫面簡化成 6 個):一條黏在下股的左端,另一條黏在上股的右端,把要複製的範圍夾起來。'],
+      [8, '黏合溫度通常設得比引子的熔解溫度低 5 °C 左右:太低會黏到不完全配對的位置,太高又黏不住。右邊可以調調看。']],
+    draw(g, t, S) {
+      const temp = lerp(95, S.anneal, ease(seg(t, 0, 2.5)));
+      g.thermo(80, 110, 260, temp);
+      const yTop = 180, yBot = 380;
+      g.strand(X0, yTop, TOP, { ...SD, dir: 1 });
+      g.strand(X0, yBot, BOT, { ...SD, dir: -1 });
+      ends(g, yTop, yBot);
+      const arrive = ease(seg(t, 2.5, 6));
+      primers(g, t, S, yTop, yBot, { arrive, wobble: 1 });
+      if (arrive >= 1) {
+        const yl = lerp(0.25, 1, yieldOf(S.anneal));
+        for (let i = 0; i < PL; i++) g.line(X0 + i * STEP, yBot - GAP + BH + 4, X0 + i * STEP, yBot - BH - 4, `rgba(240,243,238,${0.5 * yl})`, 2, [2, 3]);
+        for (let i = N - PL; i < N; i++) g.line(X0 + i * STEP, yTop + BH + 4, X0 + i * STEP, yTop + GAP - BH - 4, `rgba(240,243,238,${0.5 * yl})`, 2, [2, 3]);
+      }
+      // 右上的說明框
+      const [v, col] = verdict(S.anneal);
+      g.panel(600, 26, 330, 92, '');
+      g.text(616, 50, `黏合溫度 ${S.anneal} °C・引子 Tm 約 ${TM} °C(示意)`, { size: 14, color: C.ink2 });
+      g.text(616, 88, v, { size: 17, weight: 700, color: col });
+      if (t > 2.5 && t < 6.5) g.tag(X0 + 2.5 * STEP, yBot - GAP - 26, '引子', { size: 14, color: C.amber, alpha: seg(t, 2.5, 3) });
+    },
+  },
+  {
+    key: 'extend', name: '延伸:聚合酶補上另一股', dur: 12,
+    cues: [[0, '再升溫到 72 °C 左右,DNA 聚合酶(常用耐熱的 Taq 聚合酶)從引子的尾端開始,照著模板一個一個接上配對的核苷酸。'],
+      [5.5, '聚合酶只能從新股的 5′ 端往 3′ 端接,所以兩股的新股朝相反方向長。'],
+      [9.5, '一輪結束:原本 1 個雙股變成 2 個,每個都是一條舊股(灰)加一條新股(綠)。']],
+    draw(g, t, S) {
+      const temp = lerp(S.anneal, 72, ease(seg(t, 0, 2)));
+      g.thermo(80, 110, 260, temp);
+      const yTop = 180, yBot = 380;
+      g.strand(X0, yTop, TOP, { ...SD, dir: 1 });
+      g.strand(X0, yBot, BOT, { ...SD, dir: -1 });
+      ends(g, yTop, yBot);
+      primers(g, t, S, yTop, yBot);
+      const grow = seg(t, 3, 10);
+      const n = Math.floor(grow * (N - PL + 0.999));
+      // 下股上方:新股從左往右長(接在前引子後面)
+      if (n > 0) g.strand(X0, yBot - GAP, TOP, { ...SD, dir: 1, from: PL, to: PL + n, color: C.mint });
+      // 上股下方:新股從右往左長(接在反引子前面)
+      if (n > 0) g.strand(X0, yTop + GAP, BOT, { ...SD, dir: -1, from: N - PL - n, to: N - PL, color: C.mint });
+      const hb = (i, y1, y2) => g.line(X0 + i * STEP, y1, X0 + i * STEP, y2, 'rgba(240,243,238,.5)', 2, [2, 3]);
+      for (let i = 0; i < Math.min(N, PL + n); i++) hb(i, yBot - GAP + BH + 4, yBot - BH - 4);
+      for (let i = Math.max(0, N - PL - n); i < N; i++) hb(i, yTop + BH + 4, yTop + GAP - BH - 4);
+      const pa = ease(seg(t, 1.5, 3));
+      if (pa > 0) {
+        const xb = X0 + (PL + n) * STEP - STEP * 0.2, xt = X0 + (N - PL - n - 1) * STEP + STEP * 0.2;
+        if (grow < 1) {
+          g.blob(Math.min(xb, X0 + N * STEP), yBot - GAP - 6, 30, 22, C.lav, 'Taq', { alpha: pa, wobble: 1, t });
+          g.blob(Math.max(xt, X0 - STEP), yTop + GAP + 6, 30, 22, C.lav, 'Taq', { alpha: pa, wobble: 1, t: t + 1 });
+          g.arrow(xb + 36, yBot - GAP - 40, xb + 92, yBot - GAP - 40, { color: C.lav, alpha: pa });
+          g.text(xb + 64, yBot - GAP - 58, '5′→3′', { size: 13, color: C.lav, align: 'center', mono: true, alpha: pa });
+          g.arrow(xt - 36, yTop + GAP + 40, xt - 92, yTop + GAP + 40, { color: C.lav, alpha: pa });
+          g.text(xt - 64, yTop + GAP + 58, '5′→3′', { size: 13, color: C.lav, align: 'center', mono: true, alpha: pa });
+        }
+      }
+      // 游來游去的核苷酸
+      const R = rng(11);
+      for (let i = 0; i < 26; i++) {
+        const x = 200 + R() * 620 + Math.sin(t * 0.9 + i) * 12, y = 272 + R() * 36 + Math.cos(t * 1.1 + i * 2) * 10;
+        g.circle(x, y, 4.5, [C.A, C.T, C.G, C.C][i % 4], null);
+      }
+      if (t >= 9.8) g.tag(480, 500, '2 個雙股:各有一條舊股(灰)與一條新股(綠)', { size: 15, color: C.mint, alpha: ease(seg(t, 9.8, 10.5)) });
+    },
+  },
+  {
+    key: 'cycles', name: '重複循環:數量倍增', dur: 15,
+    cues: [[0, '變性、黏合、延伸三步是一個循環;機器(熱循環儀)會自動重複 25 到 35 次。'],
+      [5, '每一輪數量加倍:n 輪後理論上是起始量 × 2ⁿ。下面一排小方塊是前五輪的雙股數。'],
+      [10, '實際上幾十輪後引子與核苷酸用完、酵素也累了,曲線轉平(平原期)。右邊可以改循環數與起始量。']],
+    draw(g, t, S) {
+      // 左:溫度程式
+      const A = g.axes(70, 70, 360, 190, { xmin: 0, xmax: 3, ymin: 40, ymax: 100, yticks: [50, 72, 95], xlab: '時間(3 個循環)', ylab: '溫度(°C)', fmtY: (v) => String(v) });
+      const prof = (x) => { const f = x % 1; return f < 0.28 ? 95 : f < 0.36 ? lerp(95, S.anneal, (f - 0.28) / 0.08) : f < 0.58 ? S.anneal : f < 0.64 ? lerp(S.anneal, 72, (f - 0.58) / 0.06) : f < 0.94 ? 72 : lerp(72, 95, (f - 0.94) / 0.06); };
+      const pts = []; for (let x = 0; x <= 3; x += 0.01) pts.push([A.X(x), A.Y(prof(x))]);
+      g.curve(pts, C.hot, 2.5);
+      const xm = (t * 0.6) % 3;
+      g.circle(A.X(xm), A.Y(prof(xm)), 7, C.ink, C.hot, 2);
+      g.text(A.X(0.14), A.Y(95) - 14, '變性', { size: 12.5, color: C.ink2, align: 'center' });
+      g.text(A.X(0.47), A.Y(S.anneal) + 16, '黏合', { size: 12.5, color: C.ink2, align: 'center' });
+      g.text(A.X(0.79), A.Y(72) - 14, '延伸', { size: 12.5, color: C.ink2, align: 'center' });
+      // 左下:前五輪的雙股數
+      const k = Math.min(5, Math.floor(seg(t, 4.5, 9.5) * 6));
+      g.text(70, 340, `第 ${k} 輪:${2 ** k} 個`, { size: 15, weight: 700, color: C.mint });
+      for (let i = 0; i < 2 ** k; i++) {
+        const x = 72 + (i % 16) * 23, y = 362 + Math.floor(i / 16) * 22;
+        g.rrect(x, y, 18, 6, 2, i < 2 ** k / 2 ? C.backbone : C.mint); g.rrect(x, y + 9, 18, 6, 2, C.mint);
+      }
+      // 右:份數對循環數(對數軸)
+      const B = g.axes(560, 70, 360, 330, { xmin: 0, xmax: 40, ymin: 1, ymax: 1e13, ylog: true, xticks: [0, 10, 20, 30, 40], yticks: [1, 1e3, 1e6, 1e9, 1e12], xlab: '循環數', ylab: '份數(對數)', fmtY: (v) => `10${sup(Math.round(Math.log10(v)))}` });
+      const nn = Math.min(S.cycles, seg(t, 1, 12) * S.cycles);
+      const curve = []; for (let n = 0; n <= nn + 1e-9; n += 0.25) curve.push([B.X(n), B.Y(copies(n, S.start))]);
+      const ideal = []; for (let n = 0; n <= nn + 1e-9; n += 0.25) { const v = S.start * 2 ** n; if (v <= 1e13) ideal.push([B.X(n), B.Y(v)]); }
+      g.curve(ideal, C.muted, 1.6, { dash: [5, 5] });
+      g.curve(curve, C.mint, 3);
+      const v = copies(nn, S.start);
+      g.circle(B.X(nn), B.Y(v), 6, C.mint);
+      g.text(580, 98, `第 ${Math.round(nn)} 輪:約 ${fmtCopies(v)}`, { size: 16, weight: 700, color: C.mint });
+      g.text(580, 124, '虛線:每輪都剛好加倍的理想值', { size: 12.5, color: C.muted });
+      if (v > NMAX * 0.3) g.tag(B.X(Math.min(nn, 36)), B.Y(NMAX) - 24, '平原期(示意)', { size: 13, color: C.amber });
+    },
+  },
+  {
+    key: 'gel', name: '洋菜膠電泳:看產物多長', dur: 16,
+    cues: [[0, '做完 PCR 用洋菜膠電泳檢查產物:把樣品加進膠上的小洞,膠的兩端通上電。'],
+      [4.5, 'DNA 的骨架帶負電,所以往正極(紅色那端)移動;膠裡是密密的網孔,短的片段鑽得快、跑得遠,長的跑得慢。'],
+      [9.5, '旁邊放一管已知長度的「分子量標準」,比對位置就知道產物大約幾個鹼基對(bp)。'],
+      [13, '染色後在藍光或紫外光下看到條帶:只有一條表示產物很單純;黏合溫度太低時會多出梯子狀的雜帶。']],
+    draw(g, t, S) {
+      const gx = 330, gy = 76, gw = 420, gh = 392;
+      // 電泳槽與電極
+      g.rrect(gx - 30, gy - 34, gw + 60, gh + 70, 14, '#0d1a1d', C.line);
+      g.rrect(gx, gy, gw, gh, 6, 'rgba(150,190,200,.13)', 'rgba(170,210,220,.35)');
+      g.text(gx + gw / 2, gy - 18, '負極(−)', { size: 14, weight: 700, color: C.ink2, align: 'center' });
+      g.text(gx + gw / 2, gy + gh + 22, '正極(+)', { size: 14, weight: 700, color: C.red, align: 'center' });
+      const lanes = [{ x: gx + 80, name: '標準' }, { x: gx + 210, name: 'PCR 產物' }, { x: gx + 340, name: '不加模板' }];
+      for (const l of lanes) { g.rrect(l.x - 34, gy + 16, 68, 9, 2, '#05090a'); g.text(l.x, gy - 46, l.name, { size: 13, color: C.ink2, align: 'center' }); }
+      // 跑膠:跑的距離和長度的對數成反比,膠越濃、長的片段越被擠在上面(示意)
+      const run = ease(seg(t, 3, 12)), stain = ease(seg(t, 12, 14));
+      const gamma = S.agarose >= 2 ? 0.75 : S.agarose >= 1.5 ? 1 : 1.45;
+      const f = (bp) => clamp((Math.log10(3000) - Math.log10(bp)) / (Math.log10(3000) - Math.log10(40))) ** gamma;
+      const yAt = (bp) => gy + 26 + run * f(bp) * (gh - 60);
+      const band = (x, bp, w, inten, label) => {
+        if (inten <= 0.02) return;
+        const y = yAt(bp);
+        const col = stain > 0 ? `rgba(255,${Math.round(lerp(150, 236, stain))},${Math.round(lerp(60, 160, stain))},${(0.25 + 0.75 * inten) * (0.35 + 0.65 * stain)})` : `rgba(120,150,255,${0.35 * inten})`;
+        g.ctx.save(); if (stain > 0) { g.ctx.shadowColor = 'rgba(255,200,120,.8)'; g.ctx.shadowBlur = 10 * stain * inten; }
+        g.rrect(x - w / 2, y - 4, w, 8, 3, col); g.ctx.restore();
+        if (label && stain > 0.5) g.text(x - w / 2 - 10, y, label, { size: 12, color: C.ink2, align: 'right', mono: true, alpha: stain });
+      };
+      // 載入染劑(藍色的跑在最前面)
+      const load = ease(seg(t, 0.5, 3));
+      for (const l of lanes) { g.ctx.save(); g.ctx.globalAlpha = load * (1 - stain * 0.8); g.rrect(l.x - 30, gy + 26 + run * (gh - 70), 60, 7, 3, 'rgba(90,120,255,.55)'); g.ctx.restore(); }
+      for (const bp of [2000, 1500, 1000, 700, 500, 400, 300, 200, 100]) band(lanes[0].x, bp, 60, 0.8, `${bp}`);
+      const yl = yieldOf(S.anneal), ns = nonspec(S.anneal);
+      band(lanes[1].x, 450, 60, yl, '');
+      for (const [bp, k] of [[1200, 0.5], [800, 0.8], [620, 0.6], [330, 0.7], [250, 0.9]]) band(lanes[1].x, bp, 60, ns * k, '');
+      band(lanes[1].x, 60, 50, 0.15 + 0.5 * ns, '');
+      band(lanes[2].x, 60, 50, 0.15 + 0.3 * ns, '');
+      if (stain > 0.6 && yl > 0.2) g.tag(lanes[1].x + 70, yAt(450), '約 450 bp', { size: 13, color: C.mint, align: 'left', alpha: stain });
+      if (stain > 0.6) g.tag(lanes[2].x + 40, yAt(60) + 18, '引子二聚體', { size: 12, color: C.muted, align: 'left', alpha: stain });
+      // 左邊:帶負電的骨架往正極
+      if (t > 4.5) {
+        const a = seg(t, 4.5, 5.2);
+        g.ctx.save(); g.ctx.globalAlpha = a;
+        g.panel(40, 150, 220, 200, 'DNA 帶負電');
+        g.line(70, 210, 230, 210, C.backbone, 4); g.line(70, 250, 230, 250, C.backbone, 4);
+        for (let i = 0; i < 6; i++) { g.text(78 + i * 28, 196, '−', { size: 16, weight: 700, color: C.blue, align: 'center' }); g.text(78 + i * 28, 266, '−', { size: 16, weight: 700, color: C.blue, align: 'center' }); }
+        g.arrow(150, 284, 150, 334, { color: C.red });
+        g.text(150, 340 + 4, '往正極', { size: 13, color: C.red, align: 'center', base: 'top' });
+        g.ctx.restore();
+      }
+      g.text(810, 120, `膠濃度 ${S.agarose}%`, { size: 15, weight: 700, color: C.ink2 });
+      g.text(810, 146, S.agarose >= 2 ? '適合一兩百 bp 的小片段' : S.agarose >= 1.5 ? '適合幾百到兩千 bp' : '適合幾千 bp 的大片段', { size: 13, color: C.muted });
+      g.text(810, 186, `黏合溫度 ${S.anneal} °C`, { size: 15, weight: 700, color: C.ink2 });
+      g.text(810, 212, verdict(S.anneal)[0].split(':')[0], { size: 13, color: verdict(S.anneal)[1] });
+    },
+  },
+  {
+    key: 'qpcr', name: 'qPCR:邊做邊量', dur: 17,
+    cues: [[0, '即時定量 PCR(qPCR)每一輪都量一次螢光:加入的染劑(例如 SYBR Green I)夾在雙股 DNA 上時螢光會大增。'],
+      [5, '起始量越多,螢光越早超過設定的門檻;剛超過門檻的那一輪叫 Ct(或 Cq)值。'],
+      [9.5, '效率 100% 時每輪剛好加倍,起始量每多 10 倍,Ct 提早 log₂10 ≈ 3.32 輪。'],
+      [13, '用已知量的標準品畫出 Ct 對起始量對數的直線,就能從未知樣品的 Ct 推回它原本有多少。右邊可以改未知樣品的量。']],
+    draw(g, t, S) {
+      const A = g.axes(80, 60, 430, 330, { xmin: 0, xmax: 40, ymin: 0, ymax: 1.1, xticks: [0, 10, 20, 30, 40], yticks: [0, 0.5, 1], xlab: '循環數', ylab: '螢光(相對)', fmtY: (v) => v.toFixed(1) });
+      const c0 = 18 + Math.log2(1e6), s = 1.5, th = 0.2;
+      const F = (c, n0) => 1 / (1 + Math.exp(-(c - (c0 - Math.log2(n0))) / s));
+      const Ct = (n0) => (c0 - Math.log2(n0)) - s * Math.log(1 / th - 1);
+      const upto = seg(t, 0.5, 9) * 40;
+      const stds = [6, 5, 4, 3, 2];
+      stds.forEach((e, i) => {
+        const pts = []; for (let c = 0; c <= upto; c += 0.2) pts.push([A.X(c), A.Y(F(c, 10 ** e))]);
+        g.curve(pts, ['#a5f3cd', '#8fe0d0', '#7fc8e8', '#7fb0ff', '#9a9cff'][i], 2.2);
+        if (upto > Ct(10 ** e)) { g.circle(A.X(Ct(10 ** e)), A.Y(th), 4.5, C.ink); if (t > 5) g.text(A.X(Ct(10 ** e)) - 10, A.Y(th) - 16 - (i % 2) * 15, `10${sup(e)}`, { size: 11.5, color: C.muted, align: 'center', mono: true }); }
+      });
+      const nu = 10 ** S.unknown;
+      const pu = []; for (let c = 0; c <= upto; c += 0.2) pu.push([A.X(c), A.Y(F(c, nu))]);
+      g.curve(pu, C.lav, 3.4);
+      g.line(A.X(0), A.Y(th), A.X(40), A.Y(th), C.amber, 1.6, [7, 6]);
+      g.text(A.X(40) - 4, A.Y(th) - 12, '門檻', { size: 12.5, color: C.amber, align: 'right' });
+      const ctu = Ct(nu);
+      if (upto > ctu) { g.line(A.X(ctu), A.Y(th), A.X(ctu), A.Y(0), C.lav, 1.6, [4, 4]); g.tag(A.X(ctu), A.Y(0) - 18, `Ct ${ctu.toFixed(1)}`, { size: 13, color: C.lav }); }
+      // 右上:染劑小圖
+      const da = ease(seg(t, 0, 1));
+      g.ctx.save(); g.ctx.globalAlpha = da;
+      g.panel(585, 40, 345, 120, 'SYBR Green I');
+      g.line(605, 92, 760, 92, C.backbone, 3.5); g.line(605, 116, 760, 116, C.backbone, 3.5);
+      for (let i = 0; i < 4; i++) { g.ctx.save(); g.ctx.shadowColor = '#7dff9e'; g.ctx.shadowBlur = 12; g.circle(625 + i * 40, 104, 6, '#7dff9e'); g.ctx.restore(); }
+      g.text(682, 140, '雙股:發亮', { size: 12.5, color: '#7dff9e', align: 'center' });
+      g.line(800, 104, 910, 104, C.backbone, 3.5);
+      for (let i = 0; i < 3; i++) g.circle(815 + i * 38, 86, 5, '#2f5a3c');
+      g.text(855, 140, '單股:幾乎不亮', { size: 12.5, color: C.muted, align: 'center' });
+      g.ctx.restore();
+      // 右下:標準曲線
+      const sa = ease(seg(t, 10, 11.5));
+      if (sa > 0) {
+        g.ctx.save(); g.ctx.globalAlpha = sa;
+        const B = g.axes(640, 220, 270, 170, { xmin: 1, xmax: 7, ymin: 10, ymax: 34, xticks: [2, 4, 6], yticks: [15, 20, 25, 30], xlab: '起始量(10 的幾次方)', ylab: 'Ct', fmtX: (v) => `10${sup(v)}` });
+        g.curve([[B.X(1.6), B.Y(Ct(10 ** 1.6))], [B.X(6.6), B.Y(Ct(10 ** 6.6))]], C.ink2, 1.8);
+        stds.forEach((e) => g.circle(B.X(e), B.Y(Ct(10 ** e)), 4.5, C.mint));
+        const back = ease(seg(t, 13.5, 15));
+        if (back > 0) {
+          g.line(B.X(1), B.Y(ctu), lerp(B.X(1), B.X(S.unknown), back), B.Y(ctu), C.lav, 1.6, [4, 4]);
+          if (back >= 1) { g.line(B.X(S.unknown), B.Y(ctu), B.X(S.unknown), B.Y(10), C.lav, 1.6, [4, 4]); g.circle(B.X(S.unknown), B.Y(ctu), 6, C.lav); }
+        }
+        g.text(660, 206, '斜率 −3.32(效率 100%)', { size: 12.5, color: C.muted });
+        if (back >= 1) g.tag(B.X(S.unknown), B.Y(ctu) - 24, `推回:約 ${fmtCopies(10 ** S.unknown)}`, { size: 13, color: C.lav });
+        g.ctx.restore();
+      }
+    },
+  },
+];
+
+function sup(n) { return String(n).replace(/[-0-9]/g, (d) => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'[d === '-' ? 0 : Number(d) + 1]); }
+
+createLesson({
+  chapters,
+  state: { anneal: 53, cycles: 40, start: 1000, agarose: 1.5, unknown: 4 },
+  controls: [
+    { id: 'anneal', label: '黏合溫度', type: 'range', min: 40, max: 68, step: 1, unit: ' °C', chapters: ['anneal', 'extend', 'cycles', 'gel'], restart: false },
+    { id: 'cycles', label: '循環數', type: 'range', min: 1, max: 40, step: 1, unit: ' 輪', chapters: ['cycles'], restart: true },
+    { id: 'start', label: '起始份數', type: 'seg', options: [{ v: 1, label: '1' }, { v: 10, label: '10' }, { v: 1000, label: '1000' }, { v: 100000, label: '10 萬' }], chapters: ['cycles'], restart: true },
+    { id: 'agarose', label: '洋菜膠濃度', type: 'seg', options: [{ v: 0.8, label: '0.8%' }, { v: 1.5, label: '1.5%' }, { v: 2, label: '2%' }], chapters: ['gel'], restart: true },
+    { id: 'unknown', label: '未知樣品的起始量', type: 'range', min: 2, max: 6.5, step: 0.5, format: (v) => `10${sup(v)} 份`, chapters: ['qpcr'], restart: false },
+  ],
+});
+createRotateHint({ top: '.cap', suspended: () => false, text: '建議轉成橫式觀看,動畫比較大' });
+</script>
+</body>
+</html>

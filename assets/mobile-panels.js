@@ -50,9 +50,10 @@ const SHORT = { adjust: '調整', chart: '圖譜', text: '說明' };
 // 全螢幕:按鈕觸發才能進入(瀏覽器的規定);Safari 舊版用 webkit 前綴,iPhone 不支援網頁全螢幕
 const FS_IN = '<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>';
 const FS_OUT = '<path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/>';
-const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement || null;
-const fsSupported = () => typeof document !== 'undefined' && !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
-function toggleFullscreen() {
+// 匯出給生化原理的播放器(bio-lesson.js)用,播放列上另有自己樣式的全螢幕鈕
+export const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement || null;
+export const fsSupported = () => typeof document !== 'undefined' && !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+export function toggleFullscreen() {
   if (fsElement()) {
     const exit = document.exitFullscreen || document.webkitExitFullscreen;
     if (exit) { const r = exit.call(document); if (r && r.catch) r.catch(() => {}); }
@@ -99,8 +100,9 @@ if (typeof document !== 'undefined') {
 // 「建議轉成橫式觀看」提示:手機尺寸(query)的觸控手機直拿時,開頁 1.5 秒後出現在 top 元素下方(沒有就離頂端 120 px),
 // 8 秒後或按 × 收起;同一次瀏覽(sessionStorage 的 mp-rotate-hint)只出現一次。suspended() 為 true 時
 // (導覽、錄影、還在載入)先不出現,出現後變成 true 或轉成橫的就收起。樣式是 mobile-panels.css 的 .mp-rotate。
-// createMobilePanels({ rotateHint: true }) 會呼叫它;沒有收合面板的頁面(離子阱質譜的兩頁)直接呼叫。
-export function createRotateHint({ top = null, suspended = () => false, query = MOBILE_QUERY } = {}) {
+// createMobilePanels({ rotateHint: true }) 會呼叫它;沒有收合面板的頁面(離子阱質譜的兩頁、生化原理)直接呼叫。
+// text 是提示的文字(生化原理是 2D 動畫,傳自己的說法)。
+export function createRotateHint({ top = null, suspended = () => false, query = MOBILE_QUERY, text = '建議轉成橫式觀看,3D 畫面比較大' } = {}) {
   const mq = matchMedia(query), portrait = matchMedia(PORTRAIT_PHONE);
   const pick = (x) => (typeof x === 'string' ? document.querySelector(x) : x);
   const born = performance.now();
@@ -117,7 +119,10 @@ export function createRotateHint({ top = null, suspended = () => false, query = 
     hint = document.createElement('div');
     hint.className = 'mp-rotate';
     hint.setAttribute('role', 'status');
-    hint.innerHTML = `${svg('<rect x="4.5" y="1.5" width="7" height="13" rx="1.5"/><path d="M14.5 9.5a6 6 0 0 1-4 4.8M13 15l-2.5-.7.8-2.4"/>', 'mp-ico')}<span>建議轉成橫式觀看,3D 畫面比較大</span>`;
+    hint.innerHTML = svg('<rect x="4.5" y="1.5" width="7" height="13" rx="1.5"/><path d="M14.5 9.5a6 6 0 0 1-4 4.8M13 15l-2.5-.7.8-2.4"/>', 'mp-ico');
+    const msg = document.createElement('span');
+    msg.textContent = text;
+    hint.append(msg);
     const x = document.createElement('button');
     x.type = 'button';
     x.className = 'mp-rotate-x';
