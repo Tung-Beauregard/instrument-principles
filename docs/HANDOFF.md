@@ -58,6 +58,13 @@
 
 ## 更新紀錄
 
+### 2026-10-31：推送與部署確認（官能基編號兩份、手機講解全螢幕）
+
+- 提交 `7ac46f8`，以 fast-forward 推送到 `main`（推送前 `git fetch` 確認遠端仍是 `9ea6037`）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上的 `nomenclature/` 與 `carbohydrates/` 的 `index.html`、`MAINTENANCE.md`，`assets/bio-lesson.js`、`assets/bio-lesson.css`、`content/instruments.json`、`index.html`、兩張卡片圖與兩張分享預覽圖，`README.md`、`AGENTS.md`、`INSTRUMENTS.md`、`docs/HANDOFF.md`、`docs/VALIDATION.md`、`scripts/check-bio.mjs`、`scripts/make-og-images.mjs`，共 19 個檔都和提交的版本完全相同（比對 SHA-256）。
+- 通過：無頭 Edge 開正式網址（先標記已計數，不增加到站人數）。入口的「官能基編號」區有兩張卡片，圖都載入；`nomenclature/` 15 章、`carbohydrates/` 12 章、`pcr/` 10 章，分頁列正確，桌機照常自動播放，沒有錯誤，390 寬沒有橫向捲動。觸控模擬 390×844：`nomenclature/`（支援網頁全螢幕）與 `carbohydrates/`（關掉網頁全螢幕，模擬 iPhone 的 Safari）開頁都不自動播放、有「開始講解」；按下去進全螢幕並播放，轉橫照常，離開就暫停，點章節又進全螢幕；沒有 console 訊息。
+- 未執行：實機手機、Safari、Firefox。
+
 ### 2026-10-31：醣類加上環狀糖的命名、手機上講解一律全螢幕、新增「有機化學命名法則」
 
 - 執行者：Claude，在作者電腦的分支 `nmr-lesson`（基準 `9ea6037`）。使用者 2026-10-31 同意推送，和 2026-10-30 那一段一起提交；推送與部署的結果另記一段。
