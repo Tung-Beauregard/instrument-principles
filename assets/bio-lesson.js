@@ -24,12 +24,15 @@
 //   手指在畫布上才不會捲動頁面。畫面上的操作要改控制項的值時,用傳回的 api.set(id, v)(右邊的顯示會跟著更新)。
 // 頁面有 #btnFs 時,瀏覽器支援全螢幕就顯示全螢幕鈕(和其他教材共用 mobile-panels.js 的判斷)。全螢幕是劇場模式
 //   (html.bio-fs,版面在 bio-lesson.css),手機上順便鎖成橫向。觸控手機直拿時的轉向提示也由這裡顯示,頁面不用自己呼叫 createRotateHint。
+// 手機(觸控的小螢幕)上講解一律全螢幕(2026-10-31):開頁不自動播放,畫面中間有「開始講解」;從播放鈕、「開始講解」、章節清單、
+//   進度列或「自己調整」開始播放時先進全螢幕,離開全螢幕就暫停。iPhone 的 Safari 不支援網頁全螢幕,改用同一套劇場版面蓋滿畫面,
+//   所以手機上一定有全螢幕鈕。
 // 傳回的 api(也掛在 globalThis.__lesson,給測試與 scripts/make-og-images.mjs 用):go(第幾章或章節代號)、play()、pause()、
 //   chapter(目前章節代號)、duration(這一章幾秒)、time(可讀可設)、state、redraw()、set(id, v, { restart })。
 // 畫面縮得很小時(手機),畫圖的字會自動放大(g.boost,最多 1.3 倍),版面要留空間。
 import { makeG, C } from './bio-draw.js';
 // 分頁列排不下時捲到目前這一頁(模組載入就會做);全螢幕共用同一套判斷
-import { fsSupported, fsElement, toggleFullscreen, createRotateHint } from './mobile-panels.js';
+import { fsSupported, fsElement, createRotateHint } from './mobile-panels.js';
 
 export function createLesson({ chapters, state = {}, controls = [], W = 960, H = 540, autoplay = true }) {
   const need = (s) => { const e = document.querySelector(s); if (!e) throw new Error(`bio-lesson: 頁面缺少 ${s}`); return e; };
@@ -40,8 +43,15 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
   const S = state;
   const g = makeG(ctx, W, H);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 手機:觸控而且畫面小(直拿寬 760 px 以下,或橫拿高 500 px 以下)
+  const phone = matchMedia('(pointer: coarse) and (max-width: 760px), (pointer: coarse) and (max-height: 500px)');
   let ci = 0, t = 0, playing = false, last = performance.now(), touched = false, lastCue = -2;
   const view = { s: 1, ox: 0, oy: 0 };
+  // 手機上畫面中間的「開始講解」:沒在播、也不在全螢幕時出現,按了等於按播放(會先進全螢幕)
+  const startBtn = document.createElement('button');
+  startBtn.type = 'button'; startBtn.className = 'bio-start'; startBtn.hidden = true;
+  startBtn.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.6v10.8L13.2 8z" fill="currentColor"/></svg><span>開始講解</span><small>全螢幕</small>';
+  canvas.parentElement.append(startBtn);
 
   // 章節清單與進度列
   const items = chapters.map((c, i) => {
@@ -51,7 +61,7 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     b.innerHTML = '<span class="no"></span><span class="nm"></span>';
     b.querySelector('.no').textContent = String(i + 1).padStart(2, '0');
     b.querySelector('.nm').textContent = c.name;
-    b.addEventListener('click', () => { go(i); setPlaying(true); });
+    b.addEventListener('click', () => { go(i); userPlay(); });
     li.append(b); list.append(li);
     const sgm = document.createElement('button');
     sgm.type = 'button'; sgm.className = 'sg'; sgm.style.flexGrow = String(c.dur);
@@ -60,7 +70,7 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     sgm.addEventListener('click', (e) => {
       const r = sgm.getBoundingClientRect();
       const k = Math.min(0.98, Math.max(0, (e.clientX - r.left) / r.width));
-      go(i, k * c.dur); setPlaying(true);
+      go(i, k * c.dur); userPlay();
     });
     prog.append(sgm);
     return { b, sgm, fill: sgm.querySelector('i') };
@@ -116,7 +126,7 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     if (c.onChange && c.type !== 'button') c.onChange(S[c.id], S);
     // 一個控制項改了,其他看得到的控制項也重新顯示(它們的 format 可能用到這個值)
     for (const x of ctl) if (x.c !== c && !x.box.hidden) x.sync();
-    if (c.restart) { t = 0; lastCue = -2; setPlaying(true); }
+    if (c.restart) { t = 0; lastCue = -2; userPlay(); }
   }
   const refreshControls = () => {
     const key = chapters[ci].key;
@@ -146,34 +156,66 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     btnPlay.setAttribute('aria-label', playing ? '暫停' : '播放');
     btnPlay.querySelector('.lbl').textContent = playing ? '暫停' : '播放';
     btnPlay.classList.toggle('playing', playing);
+    syncStart();
+  }
+  // 使用者按了要播放(播放鈕、「開始講解」、章節清單、進度列、「自己調整」):手機上先進全螢幕,講解不在頁面裡的小框播
+  function userPlay() {
+    if (phone.matches) enterTheater();
+    setPlaying(true);
   }
   btnPlay.addEventListener('click', () => {
-    if (!playing && ci === chapters.length - 1 && t >= chapters[ci].dur - 0.01) go(0);
-    else if (!playing && t >= chapters[ci].dur - 0.01) t = 0;
-    setPlaying(!playing);
+    if (playing) { setPlaying(false); return; }
+    if (ci === chapters.length - 1 && t >= chapters[ci].dur - 0.01) go(0);
+    else if (t >= chapters[ci].dur - 0.01) t = 0;
+    userPlay();
   });
+  startBtn.addEventListener('click', () => btnPlay.click());
   btnPrev.addEventListener('click', () => { go(t > 1.5 ? ci : ci - 1); });
-  // 全螢幕鈕(頁面有 #btnFs 而且瀏覽器支援時才出現;iPhone 的 Safari 不支援網頁全螢幕)。
-  // 全螢幕時 html 加上 .bio-fs(劇場模式,版面在 bio-lesson.css):只留動畫、字幕、播放列與自己調整,動畫盡量大。
-  // 手機直拿時動畫只有螢幕寬,圖上的小字只剩 6 px 左右,所以手機進入全螢幕時順便鎖成橫向(Android 的 Chrome 只有全螢幕時能鎖),離開時解除。
+  // 全螢幕(劇場模式):html 加上 .bio-fs(版面在 bio-lesson.css),只留動畫、字幕、播放列與自己調整,動畫盡量大。
+  // 瀏覽器支援網頁全螢幕時用真的全螢幕;手機直拿時動畫只有螢幕寬,圖上的小字只剩 6 px 左右,所以手機進入全螢幕時順便鎖成橫向
+  // (Android 的 Chrome 只有全螢幕時能鎖),離開時解除。不支援的(iPhone 的 Safari)用同一套版面蓋滿瀏覽器的畫面(pseudo),
+  // 網址列還在,也不能替使用者轉向。要求真的全螢幕被拒絕時也退回這一種。
+  const root = document.documentElement;
   const btnFs = document.querySelector('#btnFs');
-  if (btnFs) {
-    btnFs.hidden = !fsSupported();
-    const phone = matchMedia('(pointer: coarse) and (max-width: 760px), (pointer: coarse) and (max-height: 500px)');
-    const orient = typeof screen !== 'undefined' ? screen.orientation : null;
-    let locked = false;
-    const syncFs = () => {
-      const on = !!fsElement();
-      btnFs.setAttribute('aria-pressed', String(on)); btnFs.setAttribute('aria-label', on ? '結束全螢幕' : '全螢幕'); btnFs.classList.toggle('on', on);
-      document.documentElement.classList.toggle('bio-fs', on);
-      if (on && phone.matches && orient && orient.lock) orient.lock('landscape').then(() => { locked = true; }, () => {});
-      if (!on && locked) { locked = false; try { orient.unlock(); } catch (e) { /* already unlocked */ } }
-    };
-    btnFs.addEventListener('click', toggleFullscreen);
-    document.addEventListener('fullscreenchange', syncFs);
-    document.addEventListener('webkitfullscreenchange', syncFs);
-    syncFs();
+  const orient = typeof screen !== 'undefined' ? screen.orientation : null;
+  let pseudo = false, locked = false, wasOn = false;
+  const theaterOn = () => !!fsElement() || pseudo;
+  function syncTheater() {
+    const on = theaterOn();
+    root.classList.toggle('bio-fs', on);
+    if (btnFs) { btnFs.setAttribute('aria-pressed', String(on)); btnFs.setAttribute('aria-label', on ? '結束全螢幕' : '全螢幕'); btnFs.classList.toggle('on', on); }
+    if (fsElement() && phone.matches && orient && orient.lock) orient.lock('landscape').then(() => { locked = true; }, () => {});
+    if (!fsElement() && locked) { locked = false; try { orient.unlock(); } catch (e) { /* already unlocked */ } }
+    // 手機上離開全螢幕(按鈕、返回鍵)就暫停
+    if (wasOn && !on && phone.matches) setPlaying(false);
+    wasOn = on;
+    syncStart();
   }
+  function enterTheater() {
+    if (theaterOn()) return;
+    const usePseudo = () => { if (!fsElement() && !pseudo) { pseudo = true; syncTheater(); } };
+    const req = fsSupported() && (root.requestFullscreen || root.webkitRequestFullscreen);
+    if (!req) { usePseudo(); return; }
+    try { const r = req.call(root, { navigationUI: 'hide' }); if (r && r.catch) r.catch(usePseudo); } catch (e) { usePseudo(); }
+  }
+  function exitTheater() {
+    if (pseudo) { pseudo = false; syncTheater(); }
+    const exit = fsElement() && (document.exitFullscreen || document.webkitExitFullscreen);
+    if (exit) { try { const r = exit.call(document); if (r && r.catch) r.catch(() => {}); } catch (e) { /* already out */ } }
+  }
+  function syncStart() { startBtn.hidden = !(phone.matches && !playing && !theaterOn()); }
+  if (btnFs) {
+    // 支援網頁全螢幕的瀏覽器都有這顆;不支援的只在手機上出現(用蓋滿畫面的版面)
+    const showFs = () => { btnFs.hidden = !(fsSupported() || phone.matches); };
+    showFs();
+    phone.addEventListener('change', showFs);
+    btnFs.addEventListener('click', () => { if (theaterOn()) exitTheater(); else enterTheater(); });
+  }
+  phone.addEventListener('change', syncStart);
+  document.addEventListener('fullscreenchange', syncTheater);
+  document.addEventListener('webkitfullscreenchange', syncTheater);
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && pseudo) exitTheater(); });
+  syncTheater();
   btnNext.addEventListener('click', () => { if (ci < chapters.length - 1) go(ci + 1); });
   addEventListener('keydown', (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -245,7 +287,8 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
   }
   const start = chapters.findIndex((c) => c.key === decodeURIComponent(location.hash.slice(1)));
   go(start >= 0 ? start : 0);
-  setPlaying(autoplay && !reduce);
+  // 手機上不自動播放:進全螢幕一定要使用者按一下(瀏覽器的規定),講解又只在全螢幕播,所以等使用者按「開始講解」或播放鈕
+  setPlaying(autoplay && !reduce && !phone.matches);
   requestAnimationFrame(frame);
   // set(id, v):從畫面上的操作改控制項的值(例如在圖上拖門檻),右邊的顯示跟著更新;restart 預設不從頭播
   const setValue = (id, v, { restart = false } = {}) => {
@@ -258,8 +301,8 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     get chapter() { return chapters[ci].key; }, get duration() { return chapters[ci].dur; }, get time() { return t; }, set time(v) { t = v; lastCue = -2; }, state: S, redraw: draw, set: setValue };
   globalThis.__lesson = api; // 除錯與測試用
   // 觸控手機直拿時提示一次(mobile-panels.js 的 createRotateHint),排在播放列下面,不擋播放鈕。
-  // 能全螢幕的瀏覽器建議按全螢幕鈕:直拿與一般橫拿時動畫都被約 200 px 的高度限住,只有全螢幕(會轉成橫的)才真的變大;
-  // 不能全螢幕的(iPhone 的 Safari)建議轉成橫式。
-  createRotateHint({ top: '.bar', suspended: () => false, text: btnFs && !btnFs.hidden ? '按全螢幕鈕,動畫會轉成橫的、放到最大' : '建議轉成橫式觀看,動畫比較大' });
+  // 直拿與一般橫拿時動畫都被約 200 px 的高度限住,只有全螢幕而且橫拿才真的變大:能全螢幕的瀏覽器(Android 的 Chrome 等)
+  // 進全螢幕時會自動轉成橫的;不能的(iPhone 的 Safari)只能請使用者自己把手機轉成橫的。
+  createRotateHint({ top: '.bar', suspended: theaterOn, text: fsSupported() ? '按播放會全螢幕,動畫轉成橫的、放到最大' : '按播放會全螢幕;手機轉成橫的,動畫更大' });
   return api;
 }

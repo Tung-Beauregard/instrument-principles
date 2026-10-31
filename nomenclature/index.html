@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>有機化學命名法則:主鏈、編號、取代基與立體組態</title>
+<meta name="description" content="用動畫學有機化合物的命名:名字的五個部分、官能基決定字尾、烷烯炔、找主鏈、取代基、編號,以及順反、立體中心、CIP 優先順序、R 與 S、E 與 Z、鏡像與非鏡像異構物、內消旋與費雪投影式。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="有機化學命名法則:主鏈、編號、取代基與立體組態">
+<meta property="og:description" content="用動畫學有機化合物的命名:找主鏈、編號、取代基與官能基字尾,再到 R 與 S、E 與 Z、鏡像異構物與內消旋。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/nomenclature/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/nomenclature.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="2-丁醇的立體中心,四個原子團標上優先順序 1 到 4,箭頭順時針繞一圈是 R">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/nomenclature/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="官能基編號"><a href="../">← 儀器入口</a><a href="./" aria-current="page">命名法則</a><a href="../carbohydrates/">醣類</a></nav></div>
+<header class="top wrap">
+  <h1>有機化學命名法則 <span class="k">主鏈、編號到立體組態</span></h1>
+  <p class="lede">一個有機化合物的名字可以拆成五塊:立體、取代基、主鏈、不飽和、官能基。先學會看鍵線式、找主鏈、替碳編號,再看雙鍵與立體中心的方向怎麼寫成順反、E 與 Z、R 與 S。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="有機化學命名法則的動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <ul>
+      <li>名字由左到右分五塊:立體、取代基、主鏈、不飽和、官能基,例如 (E)-6-甲基-3-庚烯-2-酮;讀的時候從右邊往左。</li>
+      <li>官能基決定字尾。常見的優先順序:羧酸、酯、醛、酮、醇、胺;只有排第一的當字尾,其他的改成字首(例如 –OH 叫羥基)。鹵素、硝基、烷氧基只能當字首。</li>
+      <li>主鏈要包含當字尾的官能基,再取最長的碳鏈;一樣長時取接了比較多取代基的那條(IUPAC 2013 年的規則;舊規則與不少課本是先選雙鍵、參鍵最多的鏈,有雙鍵的分子兩種選法偶爾會不同)。碳數用甲、乙、丙、丁、戊、己、庚、辛、壬、癸;全部單鍵叫烷,有雙鍵叫烯,有參鍵叫炔。</li>
+      <li>編號:先讓字尾的官能基拿到最小的號碼,再來是雙鍵與參鍵,最後所有取代基一起比,看第一個不一樣的號碼。同一種取代基有好幾個時寫成二、三、四,每一個都要寫號碼。不同的取代基,中文把碳數少的寫在前面(2-甲基-3-乙基己烷),英文照字母順序(3-ethyl-2-methylhexane)。</li>
+      <li>雙鍵與環不能轉動,兩個取代基同一邊是順式、兩邊是反式;同一個碳上接著兩個一樣的原子團就沒有順反。</li>
+      <li>接著四個不一樣原子團的碳是立體中心,它和自己的鏡像疊不起來。CIP 規則:原子序大的優先;平手時往外一層,比第一個不一樣的地方;雙鍵算接了兩次。</li>
+      <li>R 與 S:把第 4 名轉到後面,1→2→3 順時針是 R、逆時針是 S。E 與 Z:雙鍵兩端各自比較優先的原子團在同一邊是 Z、兩邊是 E。E、Z 不一定等於反、順。</li>
+      <li>n 個立體中心最多 2ⁿ 種立體異構物。互為鏡像的叫鏡像異構物,其他的叫非鏡像異構物;分子裡有對稱面的叫內消旋化合物,不是掌性分子,沒有光學活性。</li>
+      <li>費雪投影式:橫線朝向你、直線往後;第 4 名在橫線上時,看到的方向要反過來。醣類的 D、L 和 R、S 是兩套規則,不一定對得上。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>章節的安排參考:Klein DR 著,師明睿譯,《有機化學天堂祕笈 I》,天下文化,2007(原書 Organic Chemistry as a Second Language)第 5 章命名法、第 7 章組態。頁面的說明、例子與動畫都是另外寫的。</li>
+      <li>中文的寫法:國家教育研究院<a href="https://terms.naer.edu.tw/">樂詞網</a>(組態 configuration、構形 conformation、掌性、掌性中心、鏡像異構物、非鏡像異構物、內消旋化合物、光學活性、費雪投影式、順反異構物、序列法則;構型是中國大陸的用語)與化學名詞開放資料(<a href="https://opendata.naer.edu.tw/學術名詞/國家教育研究院-化學名詞-兩岸化學名詞.csv">兩岸化學名詞</a>、<a href="https://opendata.naer.edu.tw/學術名詞/國家教育研究院-化學名詞-有機化合物之基學術名詞.csv">有機化合物之基</a>,例如側氧基、甲醯基、胺基)。號碼寫在主鏈前面(2-丁醇),不同的取代基碳數少的寫在前面:高瞻自然科學教學資源平台〈<a href="https://case.ntu.edu.tw/highscope/localhost/%e9%95%b7%e9%8f%88%e7%83%b7%e7%83%b4%e7%9a%84%e5%91%bd%e5%90%8d%e6%b3%95%ef%bc%88the-nomenclature-of-aliphatic-alkanes%ef%bc%89/index.html">長鏈烷烴的命名法</a>〉。中國大陸 2017 年的新規則改成照英文字母順序、號碼放在主鏈後面(丁-2-醇),和台灣的寫法不同。</li>
+      <li>規則:IUPAC 2013 Recommendations(Blue Book 網路版)<a href="https://iupac.qmul.ac.uk/BlueBook/P1.html#1404">P-14.4</a>(最小號碼的先後)、<a href="https://iupac.qmul.ac.uk/BlueBook/P1.html#140305">P-14.3.5</a>(比第一個不同處)、<a href="https://iupac.qmul.ac.uk/BlueBook/P1.html#1405">P-14.5</a>(英文的字母順序)、<a href="https://iupac.qmul.ac.uk/BlueBook/P4.html#41">P-41</a>(官能基的優先順序)、<a href="https://iupac.qmul.ac.uk/BlueBook/P4.html#4403">P-44.3</a>(主鏈:長度優先於雙鍵、參鍵的數目,和舊規則相反)、<a href="https://iupac.qmul.ac.uk/BlueBook/P6.html#6100">P-61</a>(鹵素、硝基只當字首)、<a href="https://iupac.qmul.ac.uk/BlueBook/P9.html#920103">P-92.1</a>(CIP 規則、雙鍵算兩次、R 與 S)、<a href="https://iupac.qmul.ac.uk/BlueBook/P9.html#920401">P-92.4</a>(E 與 Z)、<a href="https://iupac.qmul.ac.uk/BlueBook/P9.html#9103">P-91.3</a>(立體標記寫在名字最前面)。英文名稱照 IUPAC 現行寫法把號碼放在字尾前(butan-2-ol)。</li>
+      <li>教科書:OpenStax Organic Chemistry <a href="https://openstax.org/books/organic-chemistry/pages/3-4-naming-alkanes">3.4</a>(取代基的名字與字母順序)、<a href="https://openstax.org/books/organic-chemistry/pages/5-5-sequence-rules-for-specifying-configuration">5.5</a>(R 與 S)、<a href="https://openstax.org/books/organic-chemistry/pages/5-6-diastereomers">5.6</a>(非鏡像異構物、最多 2ⁿ 種)、<a href="https://openstax.org/books/organic-chemistry/pages/5-7-meso-compounds">5.7</a>(內消旋)、<a href="https://openstax.org/books/organic-chemistry/pages/7-4-cis-trans-isomerism-in-alkenes">7.4</a>(順反)、<a href="https://openstax.org/books/organic-chemistry/pages/25-2-representing-carbohydrate-stereochemistry-fischer-projections">25.2</a>(費雪投影式)、<a href="https://openstax.org/books/organic-chemistry/pages/25-3-d-l-sugars">25.3</a>(D-甘油醛是 R)。2-溴-2-丁烯兩個甲基同一邊的是 E:<a href="https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_(Organic_Chemistry)/Fundamentals/Structure_of_Organic_Molecules/The_E-Z_system_for_naming_alkenes">LibreTexts</a>;費雪投影式判斷 R、S 的捷徑:<a href="https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_I_(Liu)/05:_Stereochemistry/5.05:_Fisher_Projection">LibreTexts</a>。</li>
+      <li>L-半胱胺酸是 R(其他常見的 L-胺基酸幾乎都是 S):IUPAC-IUBMB <a href="https://iupac.qmul.ac.uk/AminoAcid/AA3t5.html#AA35">3AA-3.5</a>。異辛烷(2,2,4-三甲基戊烷)是辛烷值 100 的標準、正庚烷是 0:<a href="https://en.wikipedia.org/wiki/2,2,4-Trimethylpentane">Wikipedia</a>。</li>
+      <li>立體圖的鍵長、角度與轉動都是示意。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">官能基編號・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, seg, ease, clamp, lerp } from '../assets/bio-draw.js';
+
+// ================= 顏色與小工具 =================
+// 名字的五塊各一個顏色:立體 淡紫、取代基 淺藍、主鏈 薄荷綠、不飽和 橘、官能基 琥珀。
+// 元素:O 淡紅、N 藍、Cl 綠、Br 棕。CIP 的第 1 到 4 名:紅、琥珀、藍、灰
+const K = { bond: '#c3cdc8', dot: '#a9bab3', st: '#c3a8ff', sub: '#8ec5ff', main: '#a5f3cd', uns: '#ff9a5c', fg: '#ffd166',
+  O: '#ff8f8f', N: '#7fb8ff', Cl: '#8fe39a', Br: '#e8a26f', H: '#9caca5', c: '#d5ddd9', bad: '#ff7b7b', bg: '#0f1716' };
+const PRI = ['#ff8f8f', '#ffd166', '#8ec5ff', '#9caca5'];
+const fin = (t, a, d = 0.6) => ease(seg(t, a, a + d));
+const win = (t, a, b, d = 0.5) => Math.min(fin(t, a, d), 1 - ease(seg(t, b - d, b)));
+const P = (x, y) => ({ x, y });
+const add = (p, dx, dy) => P(p.x + dx, p.y + dy);
+const mixP = (p, q, k) => P(lerp(p.x, q.x, k), lerp(p.y, q.y, k));
+function alpha(g, a, fn) { if (a <= 0.01) return; g.ctx.save(); g.ctx.globalAlpha *= Math.min(1, a); fn(); g.ctx.restore(); }
+const elCol = (s) => (/^(O|HO|OH|HOOC|COOH)/.test(s) ? K.O : /^(N|NH|H₂N)/.test(s) ? K.N : s.includes('Cl') ? K.Cl : s.includes('Br') ? K.Br : s === 'H' ? K.H : K.c);
+
+// 原子或原子團的字,底下墊一塊底色(鍵畫到中心也不會穿過字);hl 是外框的顏色
+function label(g, p, s, { color, size = 16, a = 1, weight = 700, hl } = {}) {
+  alpha(g, a, () => {
+    const ctx = g.ctx; g.font(size, weight);
+    const w = ctx.measureText(s).width, h = size * g.boost;
+    if (hl) g.rrect(p.x - w / 2 - 6, p.y - h / 2 - 4, w + 12, h + 8, 7, 'rgba(15,23,22,.95)', hl, 2);
+    else { ctx.fillStyle = K.bg; ctx.fillRect(p.x - w / 2 - 3, p.y - h / 2, w + 6, h); }
+    g.text(p.x, p.y + 0.5, s, { size, weight, color: color || elCol(s), align: 'center' });
+  });
+}
+// 號碼的小圓
+function badge(g, p, n, { a = 1, color = K.main } = {}) {
+  alpha(g, a, () => {
+    g.circle(p.x, p.y, 9.5 * Math.max(1, g.boost * 0.92), color);
+    g.text(p.x, p.y + 0.5, String(n), { size: 12, weight: 800, color: '#0b1111', align: 'center', mono: true });
+  });
+}
+function lines(g, x, y, arr, { size = 15, color = C.ink2, gap = 1.6, a = 1, weight = 500, align = 'left' } = {}) {
+  alpha(g, a, () => arr.forEach((s, i) => g.text(x, y + i * size * gap * g.boost, s, { size, color, weight, align })));
+}
+// 說明卡片:標題加幾行字
+function card(g, x, y, w, h, title, color, body, a = 1, { size = 14 } = {}) {
+  alpha(g, a, () => {
+    g.rrect(x, y, w, h, 12, 'rgba(21,32,30,.92)', color, 1.6);
+    g.text(x + 16, y + 24, title, { size: 16, weight: 800, color });
+    lines(g, x + 16, y + 52, body, { size, gap: 1.55 });
+  });
+}
+// 一排有顏色的字(名字拆成幾塊,parts 是 [字, 顏色, 代號]);act 是目前講到的那一塊:其他塊變暗,這一塊底下畫線
+function nameRow(g, parts, x, y, size, act = null, { dim = 0.35, align = 'center' } = {}) {
+  const ctx = g.ctx; g.font(size, 800);
+  const ws = parts.map(([s]) => ctx.measureText(s).width), tot = ws.reduce((p, q) => p + q, 0);
+  let x0 = align === 'left' ? x : x - tot / 2;
+  parts.forEach(([s, col, k], i) => {
+    const on = !act || k === act;
+    alpha(g, on ? 1 : dim, () => g.text(x0 + ws[i] / 2, y, s, { size, weight: 800, color: col, align: 'center' }));
+    if (act && k === act) { const yy = y + size * 0.72 * g.boost; g.line(x0 + 1, yy, x0 + ws[i] - 1, yy, col, 3); }
+    x0 += ws[i];
+  });
+  return tot;
+}
+// 打叉的名字(錯誤的叫法)
+function wrongName(g, x, y, s, size = 22) {
+  const w = nameRow(g, [[s, K.bad]], x, y, size);
+  g.line(x - w / 2 - 4, y + 1, x + w / 2 + 4, y + 1, K.bad, 2.6);
+}
+// 小色塊(圖例)
+function chip(g, x, y, s, col) {
+  g.font(14, 700); const w = g.ctx.measureText(s).width + 22;
+  g.rrect(x - w / 2, y - 14, w, 28, 14, 'rgba(15,23,22,.9)', col, 1.6);
+  g.text(x, y + 0.5, s, { size: 14, weight: 700, color: col, align: 'center' });
+  return w;
+}
+// 彎的箭頭(二次曲線),bend 是往左彎的程度(負的往右)
+function carrow(g, p, q, bend, { color = C.mint, lw = 2.4, a = 1, dash } = {}) {
+  const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1;
+  const c = P((p.x + q.x) / 2 - (dy / L) * bend, (p.y + q.y) / 2 + (dx / L) * bend);
+  const at = (k) => [(1 - k) * (1 - k) * p.x + 2 * (1 - k) * k * c.x + k * k * q.x, (1 - k) * (1 - k) * p.y + 2 * (1 - k) * k * c.y + k * k * q.y];
+  const pts = Array.from({ length: 21 }, (_, i) => at(i / 20));
+  alpha(g, a, () => {
+    g.curve(pts.slice(0, 19), color, lw, { dash });
+    const [x1, y1] = pts[17], [x2, y2] = pts[20];
+    g.arrow(x1, y1, x2, y2, { color, lw, head: 10 });
+  });
+}
+// 兩頭的箭頭
+function arrow2(g, p, q, { color = C.mint, lw = 2.2, a = 1 } = {}) {
+  alpha(g, a, () => { const m = mixP(p, q, 0.5); g.arrow(m.x, m.y, q.x, q.y, { color, lw, head: 10 }); g.arrow(m.x, m.y, p.x, p.y, { color, lw, head: 10 }); });
+}
+
+// ================= 分子:鍵線式 =================
+// 原子 [x, y, 字]:鍵長 1 的座標,y 朝下;字是空的就是碳(畫成小點)。
+// 鍵 [a, b, 幾鍵, 立體]:立體 'w' 楔形(b 朝向你)、'h' 虛線(b 往後),立體中心一律放在 a
+function mol(atoms, bonds) { return { atoms: atoms.map(([x, y, t = '']) => ({ x, y, t })), bonds: bonds.map(([a, b, n = 1, st = '']) => ({ a, b, n, st })) }; }
+const ZX = Math.sqrt(3) / 2; // 鋸齒鏈相鄰兩個碳的水平距離(鍵角 120°)
+// 鋸齒鏈:n 個碳往右排,第一個在下(down)或在上
+const zig = (n, down = true, x0 = 0, y0 = 0) => Array.from({ length: n }, (_, i) => [x0 + i * ZX, y0 + ((i % 2 === 0) === down ? 0.25 : -0.25)]);
+const links = (ids) => ids.slice(1).map((id, i) => [ids[i], id]);
+// 一根鍵:單、雙、參鍵,或楔形、虛線
+function drawBond(g, p, q, n = 1, st = '', col = K.bond, lw = 2.4) {
+  const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, ctx = g.ctx;
+  if (st === 'w') { const w = 5.5; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x + nx * w, q.y + ny * w); ctx.lineTo(q.x - nx * w, q.y - ny * w); ctx.closePath(); ctx.fillStyle = col; ctx.fill(); return; }
+  if (st === 'h') { for (let i = 1; i <= 7; i++) { const k = i / 7, w = 5.5 * k, x = p.x + dx * k, y = p.y + dy * k; g.line(x - nx * w, y - ny * w, x + nx * w, y + ny * w, col, 1.8); } return; }
+  if (n === 1) { g.line(p.x, p.y, q.x, q.y, col, lw); return; }
+  const offs = n === 2 ? [-3.4, 3.4] : [-5.2, 0, 5.2];
+  for (const o of offs) g.line(p.x + nx * o, p.y + ny * o, q.x + nx * o, q.y + ny * o, col, n === 2 ? lw * 0.92 : lw * 0.8);
+}
+// 沿著一串點畫半透明的粗線(標出主鏈);k 是畫到全長的幾成
+function glowPath(g, pts, color, { a = 1, w = 16, k = 1 } = {}) {
+  if (k <= 0.001 || pts.length < 2) return;
+  const segL = pts.slice(1).map((p, i) => Math.hypot(p.x - pts[i].x, p.y - pts[i].y)), tot = segL.reduce((p, q) => p + q, 0);
+  let left = tot * k;
+  alpha(g, a, () => {
+    const ctx = g.ctx; ctx.save(); ctx.globalAlpha *= 0.32; ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length && left > 0; i++) { const f = Math.min(1, left / segL[i - 1]); const q = mixP(pts[i - 1], pts[i], f); ctx.lineTo(q.x, q.y); left -= segL[i - 1]; }
+    ctx.stroke(); ctx.restore();
+  });
+}
+// 號碼放在原子的外側:往「鍵的反方向」;三面都有鍵時,上角放下面、下角放上面
+function numPos(m, i, S, off) {
+  if (off && off[i]) return add(S(i), off[i][0], off[i][1]);
+  const p = S(i); let sx = 0, sy = 0;
+  for (const b of m.bonds) { const j = b.a === i ? b.b : b.b === i ? b.a : -1; if (j < 0) continue; const q = S(j), d = Math.hypot(q.x - p.x, q.y - p.y) || 1; sx += (q.x - p.x) / d; sy += (q.y - p.y) / d; }
+  let L = Math.hypot(sx, sy);
+  if (L < 0.35) { sx = 0; sy = m.atoms[i].y < 0 ? -1 : 1; L = 1; }
+  return P(p.x - (sx / L) * 20, p.y - (sy / L) * 20);
+}
+// 畫分子。v = { cx, cy, s }(s 是一個鍵長幾 px)。o:
+//   bcol { 鍵: 顏色 }、ba { 鍵: 濃淡 }、tcol { 原子: 字的顏色 }、dcol { 原子: 小點的顏色 }、aa { 原子: 濃淡 }、
+//   hl { 原子: 外框顏色 }、glow [{ path: [原子…], color, k }]、nums { 原子: 號碼 }、numA 號碼的濃淡、numCol、numOff { 原子: [dx, dy] }、size 字的大小
+function drawMol(g, m, v, o = {}) {
+  const S = (i) => P(v.cx + v.s * m.atoms[i].x, v.cy + v.s * m.atoms[i].y);
+  alpha(g, o.a ?? 1, () => {
+    for (const gl of o.glow || []) glowPath(g, gl.path.map(S), gl.color, { k: gl.k ?? 1, a: gl.a ?? 1 });
+    m.bonds.forEach((b, k) => {
+      const a = o.ba && o.ba[k] != null ? o.ba[k] : 1;
+      alpha(g, a, () => drawBond(g, S(b.a), S(b.b), b.n, b.st, (o.bcol && o.bcol[k]) || K.bond, o.lw || 2.4));
+    });
+    m.atoms.forEach((A, i) => {
+      const a = o.aa && o.aa[i] != null ? o.aa[i] : 1, p = S(i), hl = o.hl && o.hl[i];
+      alpha(g, a, () => {
+        if (A.t) { label(g, p, A.t, { color: o.tcol && o.tcol[i], size: o.size || 16, hl }); return; }
+        if (hl) { g.ctx.save(); g.ctx.shadowColor = hl; g.ctx.shadowBlur = 12; g.circle(p.x, p.y, 8, null, hl, 2.2); g.ctx.restore(); }
+        g.circle(p.x, p.y, 3.4, (o.dcol && o.dcol[i]) || K.dot);
+      });
+    });
+    for (const [i, n] of Object.entries(o.nums || {})) badge(g, numPos(m, +i, S, o.numOff), n, { a: o.numA ?? 1, color: o.numCol || K.main });
+  });
+  return S;
+}
+
+// ================= 立體:四面體、R 與 S =================
+// 分子座標:x 右、y 上、z 朝向看的人。yaw 繞直的軸轉、pitch 往前後倒
+function rot3([x, y, z], { yaw = 0, pitch = 0 } = {}) {
+  let c = Math.cos(yaw), s = Math.sin(yaw); [x, z] = [x * c + z * s, -x * s + z * c];
+  c = Math.cos(pitch); s = Math.sin(pitch); [y, z] = [y * c - z * s, y * s + z * c];
+  return [x, y, z];
+}
+// 四面體的四個方向:第 4 個朝正後方,其他三個從前面看是上、右下、左下
+const TET = { top: [0, 0.943, 0.333], lr: [0.816, -0.471, 0.333], ll: [-0.816, -0.471, 0.333], back: [0, 0, -1] };
+// 四個方向依優先順序(pri 1 到 4)排好之後的手性:行列式小於 0 是 R
+function chir(subs) {
+  const v = [1, 2, 3, 4].map((n) => subs.find((s) => s.pri === n).d);
+  const s = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const a = s(v[0], v[3]), b = s(v[1], v[3]), c = s(v[2], v[3]);
+  const det = a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0]);
+  return det < 0 ? 'R' : 'S';
+}
+// 鍵線式上的立體中心:楔形的原子當作朝你、虛線的往後,沒畫出來的 H 在其他三個的反方向。pri 是第 1 到 3 名的原子
+function chirMol(m, ctr, pri) {
+  const A = m.atoms[ctr], vec = {};
+  for (const b of m.bonds) {
+    if (b.a !== ctr && b.b !== ctr) continue;
+    const j = b.a === ctr ? b.b : b.a, B = m.atoms[j], dx = B.x - A.x, dy = -(B.y - A.y), L = Math.hypot(dx, dy) || 1;
+    const z = b.a === ctr && b.st === 'w' ? 0.8 : b.a === ctr && b.st === 'h' ? -0.8 : 0, r = z ? 0.6 : 1;
+    vec[j] = [(dx / L) * r, (dy / L) * r, z];
+  }
+  const v = pri.map((j) => vec[j]);
+  const h = [0, 1, 2].map((k) => -(v[0][k] + v[1][k] + v[2][k]));
+  return chir([{ d: v[0], pri: 1 }, { d: v[1], pri: 2 }, { d: v[2], pri: 3 }, { d: h, pri: 4 }]);
+}
+// 畫立體中心。subs [{ d, lab, col, pri, hl }];r = { yaw, pitch };朝你(z > 0.3)畫楔形、往後(z < −0.3)畫虛線。
+// o.pri 顯示優先順序的號碼(濃淡);傳回每個原子團在畫面上的位置
+function tetra(g, c, subs, r = {}, o = {}) {
+  const len = o.len || 100, size = o.size || 17;
+  const E = subs.map((s) => { const d = rot3(s.d, r); return { ...s, w: d, p: P(c.x + d[0] * len, c.y - d[1] * len), z: d[2] }; });
+  alpha(g, o.a ?? 1, () => {
+    [...E].sort((a, b) => a.z - b.z).forEach((e) => drawBond(g, c, e.p, 1, e.z > 0.3 ? 'w' : e.z < -0.3 ? 'h' : '', K.bond, 2.6));
+    g.circle(c.x, c.y, 13, K.bg, '#8fa39b', 1.5);
+    g.text(c.x, c.y + 0.5, 'C', { size: 14, weight: 700, color: K.c, align: 'center' });
+    E.forEach((e) => label(g, e.p, e.lab, { color: e.col, size, hl: e.hl }));
+    if (o.pri) E.forEach((e) => {
+      g.font(size, 700);
+      const w = g.ctx.measureText(e.lab).width, dx = e.p.x - c.x, dy = e.p.y - c.y, L = Math.hypot(dx, dy) || 1;
+      const ux = L > 8 ? dx / L : 0, uy = L > 8 ? dy / L : -1, k = Math.abs(ux) * (w / 2 + 14) + Math.abs(uy) * 22;
+      badge(g, P(e.p.x + ux * k, e.p.y + uy * k), e.pri, { a: o.pri, color: PRI[e.pri - 1] });
+    });
+  });
+  return E;
+}
+// 從第 1 名經過第 2 名到第 3 名的圓弧箭頭;k 是畫到幾成。傳回 true 表示畫面上是順時針
+function rsArc(g, c, pts, { r = 60, color = C.mint, k = 1, a = 1 } = {}) {
+  const ang = (p) => Math.atan2(p.y - c.y, p.x - c.x), T = Math.PI * 2, d = (x) => ((x % T) + T) % T;
+  const a1 = ang(pts[0]), a2 = ang(pts[1]), a3 = ang(pts[2]);
+  const cw = d(a2 - a1) < d(a3 - a1), span = cw ? d(a3 - a1) : -d(a1 - a3);
+  if (k > 0.01) alpha(g, a, () => {
+    const end = a1 + span * k, ctx = g.ctx;
+    ctx.save(); ctx.beginPath(); ctx.arc(c.x, c.y, r, a1, end, span < 0); ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore();
+    const ex = c.x + r * Math.cos(end), ey = c.y + r * Math.sin(end), tx = -Math.sin(end) * Math.sign(span), ty = Math.cos(end) * Math.sign(span);
+    g.arrow(ex - tx * 12, ey - ty * 12, ex + tx * 2, ey + ty * 2, { color, lw: 3, head: 12 });
+  });
+  return cw;
+}
+// 方向盤:往右轉(順時針)是 R
+function wheel(g, x, y, r, cw, a = 1) {
+  alpha(g, a, () => {
+    g.circle(x, y, r, null, C.ink2, 5);
+    g.circle(x, y, r * 0.22, C.ink2);
+    for (const ang of [Math.PI / 2, Math.PI / 2 + 2.1, Math.PI / 2 - 2.1]) g.line(x, y, x + Math.cos(ang) * r, y + Math.sin(ang) * r, C.ink2, 4);
+    const ctx = g.ctx, R = r + 12, a0 = -Math.PI * 0.75, a1 = -Math.PI * 0.25;
+    ctx.save(); ctx.beginPath(); ctx.arc(x, y, R, cw ? a0 : a1, cw ? a1 : a0, !cw); ctx.strokeStyle = C.mint; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+    const e = cw ? a1 : a0, s = cw ? 1 : -1, ex = x + R * Math.cos(e), ey = y + R * Math.sin(e);
+    g.arrow(ex - -Math.sin(e) * s * 10, ey - Math.cos(e) * s * 10, ex + -Math.sin(e) * s * 2, ey + Math.cos(e) * s * 2, { color: C.mint, lw: 3, head: 11 });
+  });
+}
+// 鏡子:直的虛線
+function mirror(g, x, y0, y1, a = 1) {
+  alpha(g, a, () => { g.line(x, y0, x, y1, C.muted, 1.6, [6, 6]); g.text(x, y1 + 16, '鏡子', { size: 13, color: C.muted, align: 'center' }); });
+}
+
+// ================= 每一章用到的分子 =================
+const BUT = mol(zig(4), links([0, 1, 2, 3]));
+const ETOH = mol([...zig(2), [2 * ZX, 0.25, 'OH']], links([0, 1, 2]));
+// 全部寫出來時,每個碳上的 H 的位置
+function hPos(m, i) {
+  const A = m.atoms[i], us = [];
+  for (const b of m.bonds) { const j = b.a === i ? b.b : b.b === i ? b.a : -1; if (j < 0) continue; const B = m.atoms[j], L = Math.hypot(B.x - A.x, B.y - A.y); us.push([(B.x - A.x) / L, (B.y - A.y) / L]); }
+  const at = (ang) => [A.x + Math.cos(ang) * 0.62, A.y + Math.sin(ang) * 0.62];
+  if (us.length === 1) { const b = Math.atan2(us[0][1], us[0][0]); return [at(b + Math.PI), at(b + Math.PI * 0.58), at(b - Math.PI * 0.58)]; }
+  const o = Math.atan2(-(us[0][1] + us[1][1]), -(us[0][0] + us[1][0]));
+  return [at(o - 0.62), at(o + 0.62)];
+}
+// (E)-6-甲基-3-庚烯-2-酮:鍵 2 是雙鍵、鍵 6 是 C=O、鍵 7 接甲基
+const PARTS = mol([...zig(7), [ZX, -1.25, 'O'], [5 * ZX, -1.25]], [[0, 1], [1, 2], [2, 3, 2], [3, 4], [4, 5], [5, 6], [1, 7, 2], [5, 8]]);
+// 4-羥基-2-丁酮
+const HB = mol([...zig(4), [ZX, -1.25, 'O'], [4 * ZX, 0.25, 'OH']], [[0, 1], [1, 2], [2, 3], [1, 4, 2], [3, 5]]);
+// 丁烷、1-丁烯、2-丁烯、1-丁炔
+const UNS = [
+  ['ane', mol(zig(4), links([0, 1, 2, 3])), '丁烷', 'butane', '全部單鍵:烷'],
+  ['ene1', mol(zig(4), [[0, 1, 2], [1, 2], [2, 3]]), '1-丁烯', 'but-1-ene', '雙鍵在 1、2 號碳之間'],
+  ['ene2', mol(zig(4), [[0, 1], [1, 2, 2], [2, 3]]), '2-丁烯', 'but-2-ene', '雙鍵在 2、3 號碳之間'],
+  ['yne', mol([[0, 0], [1, 0], [2, 0], [2 + ZX, -0.5]], [[0, 1, 3], [1, 2], [2, 3]]), '1-丁炔', 'but-1-yne', '參鍵:三根鍵,排成一直線'],
+];
+// 3-甲基己烷:橫的 5 個碳(0 到 4),1 號原子往上接兩個碳(5、6)
+const PAR = mol([...zig(5), [ZX, -1.25], [2 * ZX, -1.75]], [[0, 1], [1, 2], [2, 3], [3, 4], [1, 5], [5, 6]]);
+// 取代基的樣子:第 0 個原子是接點(畫成波浪線)
+const ALK = [
+  ['甲基', 'methyl', mol([[0, 0], [1, 0]], [[0, 1]])],
+  ['乙基', 'ethyl', mol([[0, 0], [ZX, 0.5], [2 * ZX, 0]], links([0, 1, 2]))],
+  ['丙基', 'propyl', mol([[0, 0], [ZX, 0.5], [2 * ZX, 0], [3 * ZX, 0.5]], links([0, 1, 2, 3]))],
+  ['異丙基', 'isopropyl', mol([[0, 0], [ZX, 0.5], [2 * ZX, 0], [ZX, 1.5]], [[0, 1], [1, 2], [1, 3]])],
+  ['第三丁基', 'tert-butyl', mol([[0, 0], [1, 0], [1.5, -ZX], [1.5, ZX], [2, 0]], [[0, 1], [1, 2], [1, 3], [1, 4]])],
+];
+const DMB = mol([...zig(4), [ZX - 0.5, -0.25 - ZX], [ZX + 0.5, -0.25 - ZX]], [[0, 1], [1, 2], [2, 3], [1, 4], [1, 5]]);
+// 2-甲基-3-乙基己烷(英文 3-ethyl-2-methylhexane):鏈 0 到 5,1 號原子往上接甲基(6),2 號原子往下接乙基(7、8)
+const EMH = mol([...zig(6), [ZX, -1.25], [2 * ZX, 1.25], [3 * ZX, 1.75]], [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [1, 6], [2, 7], [7, 8]]);
+// 編號:2,2,4-三甲基戊烷、4-甲基-2-戊醇
+const NUMX = {
+  iso: { m: mol([...zig(5), [ZX - 0.5, -0.25 - ZX], [ZX + 0.5, -0.25 - ZX], [3 * ZX, -1.25]], [[0, 1], [1, 2], [2, 3], [3, 4], [1, 5], [1, 6], [3, 7]]),
+    L: '2, 2, 4', R: '2, 4, 4', diff: '第二個:2 比 4 小', name: [['2,2,4-三甲基', K.sub], ['戊烷', K.main]], en: '2,2,4-trimethylpentane', note: '又叫異辛烷:汽油辛烷值 100 的標準', hlSub: [1, 3] },
+  ol: { m: mol([...zig(5), [ZX, -1.25, 'OH'], [3 * ZX, -1.25]], [[0, 1], [1, 2], [2, 3], [3, 4], [1, 5], [3, 6]]),
+    L: 'OH 2、甲基 4', R: 'OH 4、甲基 2', diff: 'OH 是字尾,先讓它最小', name: [['4-甲基-', K.sub], ['2-', K.fg], ['戊', K.main], ['醇', K.fg]], en: '4-methylpentan-2-ol', note: '甲基從另一端數比較小,但字尾的官能基先選', hlSub: [1, 3] },
+};
+// 順反:2-丁烯(雙鍵橫放,0 與 1 是雙鍵的碳)
+const B2 = (trans) => mol([[0, 0], [1, 0], [-0.5, -ZX], [1.5, trans ? ZX : -ZX], [-0.5, ZX, 'H'], [1.5, trans ? -ZX : ZX, 'H']], [[0, 1, 2], [0, 2], [1, 3], [0, 4], [1, 5]]);
+// 1,2-二甲基環己烷:平的六邊形,右上(5)是 1 號碳、左上(4)是 2 號碳
+const HEX = Array.from({ length: 6 }, (_, k) => [Math.cos((k * Math.PI) / 3), Math.sin((k * Math.PI) / 3)]);
+const DMCH = (st1, st2) => mol([...HEX, [0.95, -1.645], [-0.95, -1.645]], [...links([0, 1, 2, 3, 4, 5]), [5, 0], [5, 6, 1, st1], [4, 7, 1, st2]]);
+// E 與 Z:0 與 1 是雙鍵的碳;左邊兩個(上、下)接在 0,右邊兩個接在 1
+const EZM = (ul, dl, ur, dr) => mol([[0, 0], [1, 0], [-0.5, -ZX, ul], [-0.5, ZX, dl], [1.5, -ZX, ur], [1.5, ZX, dr]], [[0, 1, 2], [0, 2], [0, 3], [1, 4], [1, 5]]);
+// 3-溴-2-丁醇:1 號原子(2 號碳)往上接 OH,2 號原子(3 號碳)往下接 Br。2 號碳:OH > 3 號碳 > 1 號碳;3 號碳:Br > 2 號碳 > 4 號碳
+const BC = (s1, s2) => mol([...zig(4), [ZX, -1.2, 'OH'], [2 * ZX, 1.2, 'Br']], [[0, 1], [1, 2], [2, 3], [1, 4, 1, s1], [2, 5, 1, s2]]);
+// 2-丁醇的立體中心(rs:R 或 S):OH 在上、H 在後,乙基與甲基在左下、右下
+const BUTOL = (rs, col = true) => [
+  { d: TET.top, lab: 'OH', pri: 1, col: col ? K.O : undefined },
+  { d: rs === 'R' ? TET.lr : TET.ll, lab: 'CH₂CH₃', pri: 2, col: col ? K.sub : undefined },
+  { d: rs === 'R' ? TET.ll : TET.lr, lab: 'CH₃', pri: 3, col: col ? K.main : undefined },
+  { d: TET.back, lab: 'H', pri: 4 },
+];
+const flipX = (subs) => subs.map((s) => ({ ...s, d: [-s.d[0], s.d[1], s.d[2]] }));
+// 甘油醛(費雪投影式):直的往後、橫的朝你;D 型的 OH 在右
+const GLY = (dl) => [
+  { d: [0, 0.8, -0.6], lab: 'CHO', pri: 2 },
+  { d: [0, -0.8, -0.6], lab: 'CH₂OH', pri: 3 },
+  { d: [dl === 'D' ? 0.8 : -0.8, 0, 0.6], lab: 'OH', pri: 1 },
+  { d: [dl === 'D' ? -0.8 : 0.8, 0, 0.6], lab: 'H', pri: 4 },
+];
+
+// ================= 章節 =================
+const chapters = [
+  {
+    key: 'skeleton', name: '鍵線式:轉角就是碳', dur: 16,
+    cues: [[0, '有機分子的骨架是碳。先把每個原子都寫出來:丁烷有 4 個碳、10 個氫,碳和碳之間一根鍵,其他的鍵接氫。'],
+      [5, '碳一定有 4 根鍵,鍵不夠的地方就是接著 H,所以碳上的 H 可以省略不寫。'],
+      [9, '再把 C 也省掉:每一個轉角和端點都是一個碳。這種畫法叫鍵線式,課本與論文幾乎都用它。'],
+      [13, 'O、N、Cl 這些不是碳的原子照樣寫出來,接在它們上面的 H 也要寫,例如乙醇的 OH。']],
+    draw(g, t) {
+      const v = { cx: 480 - 1.5 * ZX * 118, cy: 232, s: 118 };
+      const hA = 1 - fin(t, 5, 1.4), cA = 1 - fin(t, 9, 1.2);
+      const S = (i) => P(v.cx + v.s * BUT.atoms[i].x, v.cy + v.s * BUT.atoms[i].y);
+      for (let i = 0; i < 4; i++) for (const h of hPos(BUT, i)) {
+        const p = S(i), q = P(v.cx + v.s * h[0], v.cy + v.s * h[1]), e = mixP(p, q, 0.74);
+        alpha(g, hA, () => { g.line(p.x, p.y, e.x, e.y, '#7d8f88', 1.8); g.text(q.x, q.y, 'H', { size: 15, weight: 700, color: K.H, align: 'center' }); });
+      }
+      BUT.bonds.forEach((b) => drawBond(g, S(b.a), S(b.b)));
+      for (let i = 0; i < 4; i++) {
+        const p = S(i);
+        alpha(g, 1 - cA, () => g.circle(p.x, p.y, 4, K.dot));
+        alpha(g, cA, () => { g.circle(p.x, p.y, 14, K.bg, '#8fa39b', 1.5); g.text(p.x, p.y + 0.5, 'C', { size: 15, weight: 700, color: K.c, align: 'center' }); });
+      }
+      alpha(g, win(t, 0.4, 5.2), () => g.text(480, 56, '丁烷 C₄H₁₀', { size: 24, weight: 800, color: C.ink, align: 'center' }));
+      alpha(g, win(t, 5.2, 9.2), () => g.tag(480, 56, '碳上的 H 省略不寫', { size: 16, color: K.H }));
+      alpha(g, fin(t, 9.4), () => {
+        g.tag(480, 56, '轉角和端點都是碳', { size: 16, color: C.mint });
+        for (let i = 0; i < 4; i++) { const p = S(i), up = BUT.atoms[i].y < 0; g.arrow(p.x, p.y + (up ? -58 : 58), p.x, p.y + (up ? -16 : 16), { color: C.mint, lw: 2, head: 8 }); }
+      });
+      alpha(g, fin(t, 13), () => {
+        g.panel(250, 352, 460, 168, '');
+        const S2 = drawMol(g, ETOH, { cx: 330, cy: 440, s: 80 });
+        g.text(560, 420, '乙醇', { size: 20, weight: 800, color: C.ink, align: 'center' });
+        g.text(560, 452, 'O 與它上面的 H 照樣寫', { size: 14, color: K.O, align: 'center' });
+        g.text(560, 478, '2 個碳:兩個端點', { size: 14, color: C.ink2, align: 'center' });
+        void S2;
+      });
+    },
+  },
+  {
+    key: 'parts', name: '名字的五個部分', dur: 26,
+    cues: [[0, '一個有機化合物的名字可以拆成五塊,由左到右是:立體、取代基、主鏈、不飽和、官能基。例子:(E)-6-甲基-3-庚烯-2-酮。'],
+      [4, '從最右邊讀起。官能基決定字尾:這裡是酮(C=O 在碳鏈的中間),在 2 號碳,寫成「2-…酮」。'],
+      [8, '不飽和:碳和碳之間有雙鍵用「烯」,有參鍵用「炔」,全部單鍵用「烷」;雙鍵在 3、4 號碳之間,寫比較小的 3。'],
+      [12, '主鏈:最長、而且包含官能基的那條碳鏈。7 個碳叫「庚」;編號從靠近官能基的那一端開始。'],
+      [16, '取代基:接在主鏈上的其他原子團,前面寫它接在幾號碳,這裡是 6 號碳上的甲基。'],
+      [20, '立體:雙鍵兩邊的主鏈在同一側或兩側,這裡寫 E;有立體中心時寫 R 或 S。後面每一章一塊一塊講。']],
+    draw(g, t) {
+      const v = { cx: 480 - 3 * ZX * 94, cy: 336, s: 94 };
+      const STEP = [['fg', 4], ['uns', 8], ['main', 12], ['sub', 16], ['st', 20]];
+      let act = null;
+      for (const [k, t0] of STEP) if (t >= t0 && t < 24) act = k;
+      const seen = (k) => t >= STEP.find((s) => s[0] === k)[1];
+      const bcol = {}, tcol = {}, dcol = {}, hl = {}, glow = [];
+      if (seen('fg')) { bcol[6] = K.fg; tcol[7] = K.fg; if (act === 'fg') hl[7] = K.fg; }
+      if (seen('uns')) bcol[2] = K.uns;
+      if (seen('main')) glow.push({ path: [0, 1, 2, 3, 4, 5, 6], color: K.main, k: seg(t, 12, 13.8) });
+      if (seen('sub')) { bcol[7] = K.sub; dcol[8] = K.sub; if (act === 'sub') hl[8] = K.sub; }
+      if (act === 'st') { bcol[1] = K.st; bcol[3] = K.st; }
+      const nums = t >= 12 ? Object.fromEntries([0, 1, 2, 3, 4, 5, 6].map((i) => [i, i + 1])) : {};
+      const S = drawMol(g, PARTS, v, { bcol, tcol, dcol, hl, glow, nums, numA: fin(t, 12.4) });
+      const CN = [['(E)-', K.st, 'st'], ['6-甲基-', K.sub, 'sub'], ['3-', K.uns, 'uns'], ['庚', K.main, 'main'], ['烯', K.uns, 'uns'], ['-2-', K.fg, 'fg'], ['酮', K.fg, 'fg']];
+      const EN = [['(E)-', K.st, 'st'], ['6-methyl', K.sub, 'sub'], ['hept', K.main, 'main'], ['-3-en', K.uns, 'uns'], ['-2-one', K.fg, 'fg']];
+      nameRow(g, CN, 480, 56, 36, act);
+      nameRow(g, EN, 480, 104, 21, act);
+      alpha(g, win(t, 0.6, 4), () => { g.arrow(660, 138, 300, 138, { color: C.mint, lw: 2.4, head: 10 }); g.text(480, 156, '從右邊往左讀', { size: 13, color: C.mint, align: 'center' }); });
+      const mid = mixP(S(2), S(3), 0.5);
+      alpha(g, win(t, 4.3, 8), () => g.tag(S(7).x + 112, S(7).y, '酮:C=O 在碳鏈中間', { size: 15, color: K.fg }));
+      alpha(g, win(t, 8.3, 12), () => g.tag(mid.x, mid.y + 72, '雙鍵 → 烯', { size: 15, color: K.uns }));
+      alpha(g, win(t, 13.6, 16), () => g.tag(480, 436, '主鏈 7 個碳 → 庚', { size: 15, color: K.main }));
+      alpha(g, win(t, 16.3, 20), () => g.tag(S(8).x + 104, S(8).y, '6 號碳上的甲基', { size: 15, color: K.sub }));
+      alpha(g, win(t, 20.3, 24), () => {
+        const a = S(2), b = S(3), dx = b.x - a.x, dy = b.y - a.y;
+        g.line(a.x - dx * 1.4, a.y - dy * 1.4, b.x + dx * 1.4, b.y + dy * 1.4, K.st, 1.4, [5, 5]);
+        g.tag(mid.x, mid.y + 78, 'E:主鏈的兩段在雙鍵的兩邊', { size: 15, color: K.st });
+      });
+      alpha(g, fin(t, 24), () => {
+        const L = [['立體', K.st], ['取代基', K.sub], ['主鏈', K.main], ['不飽和', K.uns], ['官能基', K.fg]];
+        L.forEach(([s, col], i) => chip(g, 480 + (i - 2) * 112, 488, s, col));
+      });
+    },
+  },
+  {
+    key: 'suffix', name: '官能基決定字尾', dur: 22,
+    cues: [[0, '一個分子常常有好幾個官能基,但字尾只能放一個。這個分子同時有酮(C=O)和醇(–OH)。'],
+      [4.5, '照優先順序比:羧酸、酯、醛、酮、醇、胺,越上面越優先。酮排在醇的前面,所以酮當字尾。'],
+      [9.5, '主鏈 4 個碳(丁),酮在 2 號碳,先寫成「2-丁酮」;編號要讓當字尾的官能基拿到最小的號碼。'],
+      [14, '沒當上字尾的官能基改成字首:–OH 叫羥基,在 4 號碳,整個名字是 4-羥基-2-丁酮。鹵素、硝基這些只能當字首。']],
+    draw(g, t) {
+      const v = { cx: 92, cy: 286, s: 96 };
+      const both = t >= 1.2 && t < 14;
+      const S = drawMol(g, HB, v, { hl: both ? { 4: K.fg, 5: K.sub } : {}, tcol: { 4: K.fg, 5: t >= 14 ? K.sub : undefined }, bcol: { 3: K.fg },
+        glow: t >= 9.5 ? [{ path: [0, 1, 2, 3], color: K.main, k: seg(t, 9.5, 10.8) }] : [], nums: t >= 9.5 ? { 0: 1, 1: 2, 2: 3, 3: 4 } : {}, numA: fin(t, 9.8) });
+      // 優先順序表
+      const rows = [['羧酸', '–COOH', '…酸', '羧基'], ['酯', '–COO–', '…酸…酯', ''], ['醛', '–CHO', '…醛', '甲醯基'], ['酮', 'C=O', '…酮', '側氧基'], ['醇', '–OH', '…醇', '羥基'], ['胺', '–NH₂', '…胺', '胺基']];
+      const x0 = 500, y0 = 70, rh = 42;
+      alpha(g, fin(t, 0.4), () => {
+        g.rrect(x0 - 16, y0 - 26, 452, 26 + rows.length * rh + 112, 14, 'rgba(21,32,30,.88)', C.line, 1.4);
+        [['官能基', 0], ['當字尾', 196], ['當字首', 300]].forEach(([s, dx]) => g.text(x0 + dx, y0 - 6, s, { size: 13, color: C.muted }));
+        rows.forEach(([nm, st, suf, pre], i) => {
+          const y = y0 + 22 + i * rh, on = (i === 3 && t >= 4.5) ? K.fg : (i === 4 && t >= 4.5) ? K.sub : null;
+          if (on) g.rrect(x0 - 8, y - 18, 436, 36, 8, 'rgba(255,255,255,.05)', on, 1.6);
+          g.text(x0 - 2, y, String(i + 1), { size: 13, color: C.muted, mono: true });
+          g.text(x0 + 18, y, nm, { size: 17, weight: 800, color: on || C.ink });
+          g.text(x0 + 84, y, st, { size: 15, color: C.ink2 });
+          g.text(x0 + 196, y, suf, { size: 16, weight: 700, color: K.fg });
+          g.text(x0 + 300, y, pre, { size: 16, weight: 700, color: K.sub });
+        });
+        const yb = y0 + 22 + rows.length * rh + 6;
+        g.text(x0, yb, '只能當字首:', { size: 13, color: C.muted });
+        g.text(x0, yb + 28, '–F –Cl –Br –I', { size: 15, color: C.ink2 });
+        g.text(x0 + 196, yb + 28, '氟 氯 溴 碘', { size: 16, weight: 700, color: K.sub });
+        g.text(x0, yb + 58, '–NO₂、–OR', { size: 15, color: C.ink2 });
+        g.text(x0 + 196, yb + 58, '硝基、烷氧基', { size: 16, weight: 700, color: K.sub });
+      });
+      alpha(g, win(t, 4.8, 9.6), () => {
+        g.arrow(x0 - 30, y0 + 22 + 4 * rh, x0 - 30, y0 + 22 + 3 * rh + 4, { color: K.fg, lw: 3, head: 11 });
+        g.tag(S(4).x + 120, S(4).y - 6, '酮排在醇前面 → 當字尾', { size: 14, color: K.fg });
+      });
+      // 名字
+      alpha(g, fin(t, 9.8), () => {
+        const parts = t < 14 ? [['2-', K.fg], ['丁', K.main], ['酮', K.fg]] : [['4-羥基-', K.sub], ['2-', K.fg], ['丁', K.main], ['酮', K.fg]];
+        nameRow(g, parts, 230, 466, 32);
+        alpha(g, fin(t, 14.4), () => nameRow(g, [['4-hydroxy', K.sub], ['butan', K.main], ['-2-one', K.fg]], 230, 506, 18));
+      });
+      alpha(g, fin(t, 14), () => g.tag(S(5).x - 76, S(5).y + 46, '–OH → 羥基(字首)', { size: 14, color: K.sub }));
+    },
+  },
+  {
+    key: 'unsat', name: '烷、烯、炔', dur: 18,
+    cues: [[0, '碳和碳之間全是單鍵叫「烷」;有雙鍵(兩根鍵)叫「烯」,有參鍵(三根鍵)叫「炔」。'],
+      [6, '雙鍵、參鍵的位置用號碼標出來:從比較靠近它的那一端編號,寫兩個碳裡比較小的號碼,例如 1-丁烯、2-丁烯。'],
+      [12.5, '有兩個雙鍵時寫成「二烯」,例如 1,3-丁二烯。英文的 ane、ene、yne 意思一樣。']],
+    draw(g, t) {
+      UNS.forEach(([k, m, cn, en, note], i) => {
+        const y = 92 + i * 112, a = fin(t, 0.3 + i * 0.7);
+        alpha(g, a, () => {
+          const bcol = Object.fromEntries(m.bonds.map((b, j) => [j, b.n > 1 ? K.uns : K.bond]));
+          drawMol(g, m, { cx: 150, cy: y, s: 76 }, { bcol, nums: t >= 6 ? Object.fromEntries([0, 1, 2, 3].map((j) => [j, j + 1])) : {}, numA: fin(t, 6.4) });
+          const sfx = cn.slice(-1);
+          nameRow(g, [[cn.slice(0, -1), C.ink], [sfx, K.uns]], 560, y - 12, 28);
+          g.text(560, y + 22, `${en}・${note}`, { size: 14, color: C.ink2, align: 'center' });
+        });
+      });
+      alpha(g, fin(t, 12.5), () => g.tag(560, 512, '兩個雙鍵:1,3-丁二烯(buta-1,3-diene)', { size: 15, color: K.uns }));
+    },
+  },
+  {
+    key: 'parent', name: '主鏈:找最長的碳鏈', dur: 22,
+    cues: [[0, '主鏈是名字的骨幹,碳數用天干表示:1 到 10 個碳是甲、乙、丙、丁、戊、己、庚、辛、壬、癸。'],
+      [4, '找主鏈要找最長的碳鏈。橫著畫的這條有 5 個碳,但最長的鏈不一定畫成一直線。'],
+      [8, '從左上角的碳轉進來,一路走到右邊,有 6 個碳;這才是最長的鏈,主鏈是「己」。'],
+      [12, '所以名字是 3-甲基己烷;叫成 2-乙基戊烷是常見的錯誤。'],
+      [16, '找主鏈的順序:先要包含當字尾的官能基,再取最長;一樣長時,取接了比較多取代基的那條。']],
+    draw(g, t) {
+      const ROOTS = [['甲', 'meth'], ['乙', 'eth'], ['丙', 'prop'], ['丁', 'but'], ['戊', 'pent'], ['己', 'hex'], ['庚', 'hept'], ['辛', 'oct'], ['壬', 'non'], ['癸', 'dec']];
+      ROOTS.forEach(([ch, en], i) => {
+        const x = 84 + i * 88, on = (i === 5 && t >= 8.6) || (i === 4 && t >= 4.4 && t < 8.6);
+        alpha(g, fin(t, 0.2 + i * 0.12), () => {
+          g.rrect(x - 38, 22, 76, 74, 10, on ? 'rgba(165,243,205,.14)' : 'rgba(21,32,30,.85)', on ? K.main : C.line, on ? 2 : 1.2);
+          g.text(x, 48, ch, { size: 26, weight: 800, color: on ? K.main : C.ink, align: 'center' });
+          g.text(x, 78, `${i + 1}・${en}`, { size: 12, color: C.muted, align: 'center' });
+        });
+      });
+      const v = { cx: 480 - 2 * ZX * 100, cy: 330, s: 100 };
+      const five = [0, 1, 2, 3, 4], six = [6, 5, 1, 2, 3, 4];
+      const glow = [];
+      if (t >= 4 && t < 8.4) glow.push({ path: five, color: K.uns, k: seg(t, 4.2, 6), a: 1 - fin(t, 7.8) });
+      if (t >= 8) glow.push({ path: six, color: K.main, k: seg(t, 8.2, 10.2) });
+      const nums = t >= 12 ? Object.fromEntries(six.map((a, i) => [a, i + 1])) : {};
+      const S = drawMol(g, PAR, v, { glow, nums, numA: fin(t, 12.2), bcol: t >= 12 ? { 0: K.sub } : {}, dcol: t >= 12 ? { 0: K.sub } : {} });
+      alpha(g, win(t, 5.6, 8.4), () => g.tag(S(4).x + 70, S(4).y, '5 個碳?', { size: 16, color: K.uns }));
+      alpha(g, fin(t, 9.8) * (1 - fin(t, 16)), () => g.tag(S(4).x + 82, S(4).y, '6 個碳:最長', { size: 16, color: K.main }));
+      alpha(g, fin(t, 12) * (1 - fin(t, 16)), () => {
+        nameRow(g, [['3-甲基', K.sub], ['己烷', K.main]], 760, 210, 30);
+        wrongName(g, 760, 262, '2-乙基戊烷', 22);
+        g.text(760, 292, '主鏈沒選到最長的', { size: 13, color: K.bad, align: 'center' });
+      });
+      alpha(g, fin(t, 16), () => card(g, 646, 168, 290, 156, '找主鏈的順序', K.main, ['① 包含當字尾的官能基', '② 最長', '③ 一樣長時,取代基比較多的'], 1, { size: 15 }));
+    },
+  },
+  {
+    key: 'subs', name: '取代基:烷變成基', dur: 22,
+    cues: [[0, '接在主鏈上的原子團叫取代基。甲烷拿掉一個 H,空出來的那根鍵可以接到別的碳上,就成了甲基;名字裡的「烷」換成「基」。'],
+      [5, '常見的取代基:甲基、乙基、丙基,以及分叉的異丙基、第三丁基。波浪線是接到主鏈的那一頭。'],
+      [11, '同一種取代基有兩個以上時,寫成二、三、四,而且每一個都要寫號碼:2,2-二甲基丁烷的兩個甲基都在 2 號碳。'],
+      [16, '不同的取代基要排先後:中文名字把碳數少的寫在前面,所以是 2-甲基-3-乙基己烷;英文照字母順序,乙基 ethyl 排在甲基 methyl 前面,寫成 3-ethyl-2-methylhexane。']],
+    draw(g, t) {
+      const A = 1 - fin(t, 10.6), B = fin(t, 11);
+      alpha(g, A, () => {
+        // 甲烷 → 甲基
+        const c = P(150, 196), k = fin(t, 2.4, 1.2);
+        const Hs = [[0, -66], [0, 66], [-66, 0], [66, 0]];
+        Hs.forEach(([dx, dy], i) => {
+          const q = add(c, dx, dy), off = i === 3 ? 1 - k : 1;
+          alpha(g, off, () => { g.line(c.x, c.y, c.x + dx * 0.72, c.y + dy * 0.72, '#7d8f88', 1.8); g.text(q.x, q.y, 'H', { size: 16, weight: 700, color: K.H, align: 'center' }); });
+        });
+        alpha(g, k, () => { g.line(c.x, c.y, c.x + 52, c.y, K.sub, 2.6); squiggle(g, P(c.x + 56, c.y), 0); });
+        g.circle(c.x, c.y, 14, K.bg, '#8fa39b', 1.5); g.text(c.x, c.y + 0.5, 'C', { size: 15, weight: 700, color: K.c, align: 'center' });
+        g.text(150, 318, k < 0.5 ? '甲烷 CH₄' : '甲基 –CH₃', { size: 20, weight: 800, color: k < 0.5 ? C.ink : K.sub, align: 'center' });
+        g.text(150, 348, k < 0.5 ? 'methane' : 'methyl:烷 → 基', { size: 14, color: C.ink2, align: 'center' });
+        // 常見的取代基
+        ALK.forEach(([cn, en, m], i) => {
+          const x = 372 + i * 118, y = 196;
+          alpha(g, fin(t, 5 + i * 0.5), () => {
+            g.rrect(x - 52, 104, 104, 268, 12, 'rgba(21,32,30,.85)', C.line, 1.2);
+            const sc = 40, w = Math.max(...m.atoms.map((a) => a.x)) * sc;
+            const S = drawMol(g, m, { cx: x - w / 2, cy: y, s: sc }, { ba: {}, nums: {} });
+            squiggle(g, S(0), Math.atan2(S(1).y - S(0).y, S(1).x - S(0).x));
+            g.text(x, 318, cn, { size: 17, weight: 800, color: K.sub, align: 'center' });
+            g.text(x, 344, en, { size: 13, color: C.ink2, align: 'center' });
+          });
+        });
+      });
+      alpha(g, B, () => {
+        // 2,2-二甲基丁烷
+        const S1 = drawMol(g, DMB, { cx: 110, cy: 300, s: 82 }, { bcol: { 3: K.sub, 4: K.sub }, dcol: { 4: K.sub, 5: K.sub }, nums: { 0: 1, 1: 2, 2: 3, 3: 4 }, numA: fin(t, 12) });
+        void S1;
+        nameRow(g, [['2,2-二甲基', K.sub], ['丁烷', K.main]], 230, 418, 26);
+        g.text(230, 452, '兩個甲基都寫號碼:2,2', { size: 14, color: C.ink2, align: 'center' });
+        // 3-乙基-2-甲基己烷
+        alpha(g, fin(t, 16), () => {
+          drawMol(g, EMH, { cx: 520, cy: 270, s: 74 }, { bcol: { 5: K.sub, 6: K.sub, 7: K.sub }, dcol: { 6: K.sub, 7: K.sub, 8: K.sub }, glow: [{ path: [0, 1, 2, 3, 4, 5], color: K.main }], nums: { 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6 }, numOff: { 2: [-20, -14] } });
+          nameRow(g, [['2-甲基-', K.sub], ['3-乙基', K.sub], ['己烷', K.main]], 712, 418, 26);
+          g.text(712, 450, '中文:碳數少的先寫(甲基 1 個碳、乙基 2 個)', { size: 14, color: C.ink2, align: 'center' });
+          nameRow(g, [['3-ethyl-', K.sub], ['2-methyl', K.sub], ['hexane', K.main]], 712, 484, 18);
+          g.text(712, 512, '英文:照字母順序(e 在 m 前面)', { size: 14, color: C.ink2, align: 'center' });
+        });
+      });
+    },
+  },
+  {
+    key: 'numbering', name: '編號:第一個不同的號碼要小', dur: 22,
+    cues: [[0, '主鏈要從其中一端開始編號。兩種數法都試試看,把每個取代基拿到的號碼寫出來。'],
+      [6, '比的時候一個一個比,看第一個不一樣的號碼,小的那一邊贏;不是比加起來的總和。'],
+      [12, '規則的先後:先讓當字尾的官能基號碼最小,再來是雙鍵與參鍵,最後才是所有取代基一起比。'],
+      [17, '寫法:號碼之間用逗號,號碼和字之間用短橫線,同一個碳上有兩個取代基就寫兩次號碼。「自己調整」可以換成有 OH 的例子。']],
+    draw(g, t, S) {
+      const X = NUMX[S.nx], v = { cx: 480 - 2 * ZX * 104, cy: 300, s: 104 };
+      const left = (i) => i + 1, right = (i) => 5 - i;
+      const useR = t >= 4.6 && t < 9.4;
+      const nums = Object.fromEntries([0, 1, 2, 3, 4].map((i) => [i, useR ? right(i) : left(i)]));
+      const bcol = {}, dcol = {}, tcol = {};
+      X.m.bonds.forEach((b, k) => { if (k >= 4) bcol[k] = X.m.atoms[b.b].t ? K.fg : K.sub; });
+      X.m.atoms.forEach((a, i) => { if (i >= 5) { if (a.t) tcol[i] = K.fg; else dcol[i] = K.sub; } });
+      drawMol(g, X.m, v, { bcol, dcol, tcol, nums: t >= 0.8 ? nums : {}, numA: fin(t, 0.8) * (t >= 4.2 && t < 4.6 ? 0 : 1) * (t >= 9 && t < 9.4 ? 0 : 1), numCol: useR ? K.fg : K.main });
+      alpha(g, fin(t, 0.6), () => {
+        g.text(480, 50, useR ? '從右邊數' : '從左邊數', { size: 18, weight: 800, color: useR ? K.fg : K.main, align: 'center' });
+      });
+      // 兩種數法的比較表
+      alpha(g, fin(t, 2.6), () => {
+        g.rrect(250, 392, 460, 118, 12, 'rgba(21,32,30,.88)', C.line, 1.2);
+        const win2 = t >= 9.4;
+        g.text(276, 424, '從左邊數', { size: 15, weight: 700, color: K.main });
+        g.text(400, 424, X.L, { size: 18, weight: 800, color: win2 ? K.main : C.ink, mono: true });
+        alpha(g, fin(t, 6.4), () => { g.text(276, 462, '從右邊數', { size: 15, weight: 700, color: K.fg }); g.text(400, 462, X.R, { size: 18, weight: 800, color: win2 ? C.muted : C.ink, mono: true }); });
+        alpha(g, fin(t, 9.4), () => { g.text(480, 494, `${X.diff} → 從左邊數`, { size: 14, color: K.main, align: 'center' }); });
+      });
+      alpha(g, fin(t, 10), () => {
+        nameRow(g, X.name, 480, 96, 28);
+        g.text(480, 128, `${X.en}・${X.note}`, { size: 13, color: C.ink2, align: 'center' });
+      });
+      alpha(g, fin(t, 12.4), () => card(g, 724, 170, 222, 162, '誰先拿小號', K.main, ['① 字尾的官能基', '② 雙鍵、參鍵', '③ 所有取代基一起比'], 1, { size: 14 }));
+    },
+  },
+  {
+    key: 'cistrans', name: '順式與反式', dur: 20,
+    cues: [[0, '雙鍵不能像單鍵那樣轉動,所以 2-丁烯有兩種:兩個甲基在同一邊叫順式(cis),在兩邊叫反式(trans)。'],
+      [6, '環也不能翻面,環上的兩個取代基同樣分順反:兩個都朝你(楔形)是順式,一個朝你、一個往後(虛線)是反式。'],
+      [12.5, '同一個碳上接著兩個一樣的原子團(例如 1-丁烯的 1 號碳接兩個 H),就沒有順反之分。雙鍵上的原子團都不一樣時,要用後面的 E 與 Z 才說得清楚。']],
+    draw(g, t) {
+      const A = 1 - fin(t, 12.2);
+      alpha(g, A, () => {
+        [[false, 250, '順-2-丁烯', 'cis'], [true, 690, '反-2-丁烯', 'trans']].forEach(([tr, x, cn, en]) => {
+          const m = B2(tr);
+          drawMol(g, m, { cx: x - 0.5 * 78, cy: 150, s: 78 }, { bcol: { 1: K.st, 2: K.st }, dcol: { 2: K.st, 3: K.st }, size: 15 });
+          g.text(x, 250, cn, { size: 20, weight: 800, color: C.ink, align: 'center' });
+          g.text(x, 276, en + '-2-butene', { size: 13, color: C.ink2, align: 'center' });
+        });
+        alpha(g, win(t, 1.6, 6.2), () => g.tag(480, 150, '雙鍵不能轉', { size: 15, color: K.uns }));
+        alpha(g, fin(t, 6), () => {
+          [['w', 250, '順-1,2-二甲基環己烷', '兩個都朝你'], ['h', 690, '反-1,2-二甲基環己烷', '一個朝你、一個往後']].forEach(([st2, x, cn, note]) => {
+            drawMol(g, DMCH('w', st2), { cx: x, cy: 392, s: 54 }, { bcol: { 6: K.st, 7: K.st }, dcol: { 6: K.st, 7: K.st } });
+            g.text(x, 476, cn, { size: 17, weight: 800, color: C.ink, align: 'center' });
+            g.text(x, 502, note, { size: 13, color: C.ink2, align: 'center' });
+          });
+        });
+      });
+      alpha(g, fin(t, 12.6), () => {
+        const m = mol([[0, 0], [1, 0], [-0.5, -ZX, 'H'], [-0.5, ZX, 'H'], [1.5, -ZX, 'H'], [1.5 + ZX * 0 + 0.5, ZX - 0.0, '']], []);
+        void m;
+        const one = mol([[0, 0], [1, 0], [-0.5, -ZX, 'H'], [-0.5, ZX, 'H'], [1.5, -ZX, 'H'], [1.5, ZX], [2.5, ZX]], [[0, 1, 2], [0, 2], [0, 3], [1, 4], [1, 5], [5, 6]]);
+        drawMol(g, one, { cx: 220, cy: 250, s: 92 }, { hl: { 2: K.bad, 3: K.bad }, nums: { 0: 1, 1: 2, 5: 3, 6: 4 }, size: 16 });
+        g.text(300, 400, '1-丁烯', { size: 22, weight: 800, color: C.ink, align: 'center' });
+        g.text(300, 430, '1 號碳接著兩個 H:沒有順反', { size: 15, color: K.bad, align: 'center' });
+        card(g, 560, 180, 360, 150, '順反說不清楚的時候', K.st, ['雙鍵上接著三、四個不一樣的原子團,', '「誰跟誰同一邊」會有歧義,', '改用 E 與 Z(第 12 章)'], 1, { size: 14 });
+      });
+    },
+  },
+  {
+    key: 'stereocenter', name: '立體中心:照鏡子疊不起來', dur: 20,
+    cues: [[0, '一個碳接著四個不一樣的原子團,這個碳就是立體中心(也叫掌性中心)。2-丁醇的 2 號碳接著 OH、H、甲基和乙基。'],
+      [5.5, '照鏡子:鏡子裡的分子不管怎麼轉,都和原本的疊不起來,就像左手和右手。這種分子叫掌性分子。'],
+      [12.5, '2-丙醇的 2 號碳接了兩個一樣的甲基,不是立體中心;它的鏡像轉一轉就和原本一模一樣。']],
+    draw(g, t) {
+      const A = 1 - fin(t, 12.2), B = fin(t, 12.6);
+      const r0 = { yaw: 0.25 * Math.sin(t * 0.6), pitch: 0.3 };
+      alpha(g, A, () => {
+        const orig = BUTOL('R');
+        tetra(g, P(240, 270), orig, r0, { len: 104 });
+        alpha(g, fin(t, 1.2), () => g.tag(240, 470, '4 個不一樣的原子團', { size: 15, color: C.mint }));
+        mirror(g, 480, 120, 440, fin(t, 5.5));
+        alpha(g, fin(t, 5.8), () => {
+          const spin = Math.PI * ease(seg(t, 8, 10.4));
+          tetra(g, P(720, 270), flipX(orig), { yaw: r0.yaw * -1 + spin, pitch: 0.3 }, { len: 104 });
+          g.text(720, 104, spin < 0.1 ? '鏡像' : '鏡像轉 180°', { size: 16, weight: 700, color: C.ink2, align: 'center' });
+          alpha(g, fin(t, 10.6), () => g.tag(720, 470, '還是疊不起來:H 跑到前面', { size: 15, color: K.bad }));
+        });
+      });
+      alpha(g, B, () => {
+        const pr = [{ d: TET.top, lab: 'OH', col: K.O }, { d: TET.lr, lab: 'CH₃', col: K.main }, { d: TET.ll, lab: 'CH₃', col: K.main }, { d: TET.back, lab: 'H' }];
+        tetra(g, P(240, 270), pr, r0, { len: 104 });
+        mirror(g, 480, 120, 440);
+        tetra(g, P(720, 270), flipX(pr), { yaw: -r0.yaw, pitch: 0.3 }, { len: 104 });
+        g.text(240, 104, '2-丙醇', { size: 18, weight: 800, color: C.ink, align: 'center' });
+        g.text(720, 104, '鏡像', { size: 16, weight: 700, color: C.ink2, align: 'center' });
+        g.tag(480, 470, '兩個甲基一樣:鏡像就是自己,不是立體中心', { size: 15, color: C.mint });
+      });
+    },
+  },
+  {
+    key: 'cip', name: '優先順序:CIP 規則', dur: 24,
+    cues: [[0, '要說立體中心是 R 還是 S,先替四個原子團排名次,用的是 CIP 規則(序列法則)。第一步:比直接接在立體中心上的原子,原子序大的優先。'],
+      [7, '平手時往外走一層:把兩邊接的原子各列成一組,由大到小排好,一個一個比,第一個不一樣的地方決定。乙基 (C,H,H) 贏甲基 (H,H,H)。'],
+      [14.5, '雙鍵當成接了兩次:醛基 –CHO 的碳算接了 (O,O,H),所以排在 –CH₂OH (O,H,H) 前面。注意是比第一個不一樣的地方,不是把原子序加起來。']],
+    draw(g, t) {
+      const c = P(250, 286), G = [
+        { p: P(250, 152), lab: 'OH', z: 'O', Z: 8, pri: 1, set: '' },
+        { p: P(420, 286), lab: 'CH₂CH₃', z: 'C', Z: 6, pri: 2, set: '(C, H, H)' },
+        { p: P(84, 286), lab: 'CH₃', z: 'C', Z: 6, pri: 3, set: '(H, H, H)' },
+        { p: P(250, 420), lab: 'H', z: 'H', Z: 1, pri: 4, set: '' },
+      ];
+      const known = (gr) => (gr.pri === 1 || gr.pri === 4 ? t >= 3.4 : t >= 10.4);
+      G.forEach((gr) => drawBond(g, c, gr.p, 1, '', K.bond, 2.6));
+      g.circle(c.x, c.y, 14, K.bg, '#8fa39b', 1.5); g.text(c.x, c.y + 0.5, 'C', { size: 15, weight: 700, color: K.c, align: 'center' });
+      G.forEach((gr) => {
+        label(g, gr.p, gr.lab, { size: 19, color: known(gr) ? PRI[gr.pri - 1] : undefined });
+        const side = gr.p.x < c.x - 10 ? -1 : gr.p.x > c.x + 10 ? 1 : 0;
+        g.font(19, 700); const w = g.ctx.measureText(gr.lab).width;
+        const zp = side ? add(gr.p, side * (w / 2 + 26), side > 0 ? 34 : 34) : add(gr.p, 52, 0);
+        alpha(g, fin(t, 1), () => g.tag(zp.x, zp.y, `${gr.z} ${gr.Z}`, { size: 13, color: C.ink2 }));
+        if (known(gr)) badge(g, side ? add(gr.p, 0, -30) : add(gr.p, -40, 0), gr.pri, { color: PRI[gr.pri - 1] });
+        else if (t >= 3.4 && gr.Z === 6) alpha(g, 1 - fin(t, 10), () => g.text(gr.p.x, gr.p.y - 30, '?', { size: 18, weight: 800, color: K.fg, align: 'center' }));
+        if (gr.set) alpha(g, fin(t, 7.4), () => g.tag(gr.p.x, gr.p.y + 66, gr.set, { size: 15, color: gr.pri === 2 && t >= 10 ? PRI[1] : C.ink }));
+      });
+      alpha(g, win(t, 3.4, 7.2), () => g.tag(250, 506, 'O(8)最大、H(1)最小;兩個 C(6)平手', { size: 14, color: C.ink }));
+      alpha(g, fin(t, 10), () => g.tag(250, 506, '第一個不同處:C 比 H 大 → 乙基排第 2', { size: 14, color: PRI[1] }));
+      // 雙鍵算兩次
+      alpha(g, fin(t, 14.5), () => {
+        g.panel(560, 96, 380, 330, '');
+        g.text(750, 124, '雙鍵算接了兩次', { size: 17, weight: 800, color: K.fg, align: 'center' });
+        const a = P(660, 230);
+        drawBond(g, a, P(660, 168), 2, '', K.bond); label(g, P(660, 166), 'O', { size: 17 });
+        drawBond(g, a, P(608, 262)); label(g, P(604, 266), 'H', { size: 15 });
+        drawBond(g, a, P(712, 262), 1, '', '#6f7f78'); g.text(722, 272, '立體中心', { size: 11, color: C.muted });
+        g.circle(a.x, a.y, 4, K.dot);
+        g.text(660, 312, '–CHO', { size: 18, weight: 800, color: C.ink, align: 'center' });
+        g.text(660, 340, '(O, O, H)', { size: 16, weight: 700, color: K.fg, align: 'center', mono: true });
+        g.text(840, 312, '–CH₂OH', { size: 18, weight: 800, color: C.ink, align: 'center' });
+        g.text(840, 340, '(O, H, H)', { size: 16, weight: 700, color: C.ink2, align: 'center', mono: true });
+        alpha(g, fin(t, 17), () => { g.text(750, 384, '第二個:O 比 H 大 → –CHO 優先', { size: 14, color: K.fg, align: 'center' }); g.text(750, 408, '不是把原子序加起來', { size: 13, color: C.muted, align: 'center' }); });
+        alpha(g, fin(t, 15.4), () => { const b = P(840, 230); drawBond(g, b, P(840, 172)); label(g, P(840, 168), 'OH', { size: 16 }); label(g, P(792, 262), 'H', { size: 15 }); label(g, P(888, 262), 'H', { size: 15 }); drawBond(g, b, P(798, 256)); drawBond(g, b, P(882, 256)); g.circle(b.x, b.y, 4, K.dot); });
+      });
+    },
+  },
+  {
+    key: 'rs', name: 'R 與 S', dur: 24,
+    cues: [[0, '排好名次以後,把分子轉一轉,讓第 4 名(這裡是 H)朝後面,離你最遠。'],
+      [8, '從第 1 名經過第 2 名到第 3 名:順時針是 R,逆時針是 S。像開車時方向盤往右轉就是 R。'],
+      [14, '所以這是 (R)-2-丁醇。R、S 說的是立體中心的組態,加括號寫在名字最前面。「自己調整」可以換成它的鏡像 (S)-2-丁醇。'],
+      [19, '第 4 名朝向你(楔形)時不必轉:照樣看 1→2→3 的方向,再把答案反過來就好。']],
+    draw(g, t, S) {
+      const k = ease(seg(t, 2.4, 7.4)), c = P(270, 282);
+      const r = { yaw: lerp(2.25, 0, k), pitch: lerp(-0.15, -0.3, k) };
+      const subs = BUTOL(S.rs, false).map((s) => ({ ...s, col: PRI[s.pri - 1] }));
+      const E = tetra(g, c, subs, r, { len: 120, size: 19, pri: fin(t, 0.6) });
+      alpha(g, win(t, 0.6, 7.6), () => g.tag(270, 506, k < 0.5 ? '第 4 名(H)現在朝向你' : '轉到後面', { size: 15, color: C.ink }));
+      const by = (n) => E.find((e) => e.pri === n).p;
+      let cw = null;
+      if (t >= 8) cw = rsArc(g, c, [by(1), by(2), by(3)], { r: 66, k: seg(t, 8.2, 10.2) });
+      const rs = chir(subs);
+      alpha(g, fin(t, 10.2), () => {
+        wheel(g, 700, 170, 44, rs === 'R');
+        g.text(700, 252, rs === 'R' ? '順時針 → R' : '逆時針 → S', { size: 22, weight: 800, color: C.mint, align: 'center' });
+        g.text(700, 282, rs === 'R' ? 'R:拉丁文 rectus(右)' : 'S:拉丁文 sinister(左)', { size: 14, color: C.ink2, align: 'center' });
+      });
+      alpha(g, fin(t, 14), () => {
+        nameRow(g, [[`(${rs})-`, K.st], ['2-', K.fg], ['丁', K.main], ['醇', K.fg]], 700, 352, 32);
+        g.text(700, 388, `(${rs})-butan-2-ol`, { size: 15, color: C.ink2, align: 'center' });
+      });
+      alpha(g, fin(t, 19), () => g.tag(700, 448, '第 4 名朝你時:看到的方向反過來', { size: 15, color: K.fg }));
+      void cw;
+    },
+  },
+  {
+    key: 'ez', name: 'E 與 Z', dur: 22,
+    cues: [[0, '雙鍵兩端的碳,各自比一比它接的兩個原子團(用 CIP 規則),找出比較優先的那一個。'],
+      [6, '兩個優先的在同一邊叫 Z(德文 zusammen,一起),在兩邊叫 E(entgegen,相對)。2-丁烯的 Z 就是順式,E 就是反式。'],
+      [12, '但 E、Z 不一定等於順、反。2-溴-2-丁烯:兩個甲基在同一邊的那一個,Br 比甲基優先,反而是 E。'],
+      [17, '雙鍵上的原子團都不一樣時,用 E、Z 才說得清楚;寫法和 R、S 一樣,加括號放在名字最前面。']],
+    draw(g, t) {
+      const br = t >= 12, a = br ? fin(t, 12.2) : 1 - fin(t, 11.6);
+      const SETS = br
+        ? [[EZM('CH₃', 'Br', 'CH₃', 'H'), 'E', '(E)-2-溴-2-丁烯', '兩個甲基同一邊,但 Br 優先'], [EZM('CH₃', 'Br', 'H', 'CH₃'), 'Z', '(Z)-2-溴-2-丁烯', 'Br 和右邊的甲基同一邊']]
+        : [[EZM('CH₃', 'H', 'CH₃', 'H'), 'Z', '(Z)-2-丁烯', '= 順-2-丁烯'], [EZM('CH₃', 'H', 'H', 'CH₃'), 'E', '(E)-2-丁烯', '= 反-2-丁烯']];
+      alpha(g, a, () => SETS.forEach(([m, ez, cn, note], i) => {
+        const x = 250 + i * 460, v = { cx: x - 0.5 * 96, cy: 250, s: 96 };
+        const hiL = m.atoms[3].t === 'Br' ? 3 : 2, hiR = m.atoms[4].t === 'CH₃' ? 4 : 5;
+        const t0 = br ? t - 12 : t, pr = fin(t0, br ? 0.6 : 1.6);
+        const S = drawMol(g, m, v, { size: 16, hl: pr > 0.5 ? { [hiL]: K.fg, [hiR]: K.fg } : {} });
+        alpha(g, pr, () => {
+          for (const j of [2, 3, 4, 5]) { const p = S(j), hi = j === hiL || j === hiR, dx = p.x < S(0).x ? -1 : 1; g.text(p.x + dx * 40, p.y, hi ? '優先' : '', { size: 12, weight: 700, color: K.fg, align: 'center' }); }
+        });
+        alpha(g, fin(t0, br ? 1.6 : 6), () => {
+          const p = S(hiL), q = S(hiR);
+          g.line(p.x, p.y, q.x, q.y, K.st, 2, [6, 5]);
+          g.text(x, 62, ez, { size: 40, weight: 800, color: K.st, align: 'center' });
+          g.text(x, 100, ez === 'Z' ? '同一邊(zusammen)' : '兩邊(entgegen)', { size: 14, color: C.ink2, align: 'center' });
+        });
+        alpha(g, fin(t0, br ? 2.2 : 7), () => {
+          g.text(x, 392, cn, { size: 20, weight: 800, color: C.ink, align: 'center' });
+          g.text(x, 420, note, { size: 14, color: br && ez === 'E' ? K.fg : C.ink2, align: 'center' });
+        });
+      }));
+      alpha(g, fin(t, 17), () => g.tag(480, 490, '寫法:(E)-、(Z)- 放在名字最前面,和 (R)-、(S)- 一樣', { size: 15, color: K.st }));
+    },
+  },
+  {
+    key: 'isomers', name: '鏡像與非鏡像異構物', dur: 22,
+    cues: [[0, '有兩個立體中心時,每個都可以是 R 或 S,最多 2² = 4 種;n 個立體中心最多 2ⁿ 種。這是 3-溴-2-丁醇的四種。'],
+      [6, '(2R,3R) 和 (2S,3S) 互為鏡像(兩個中心全部相反),是一對鏡像異構物;(2R,3S) 和 (2S,3R) 是另一對。'],
+      [12, '不互為鏡像的立體異構物叫非鏡像異構物,例如 (2R,3R) 和 (2R,3S):只有一個中心不一樣。順反異構物也是非鏡像異構物。'],
+      [17, '一對鏡像異構物的熔點、沸點都一樣,只是讓偏振光轉的方向相反;往哪邊轉(+ 或 −)要實際量,不能由 R、S 推出來。非鏡像異構物的性質都不一樣。']],
+    draw(g, t) {
+      const CELLS = [['w', 'w', 240, 150], ['h', 'h', 720, 150], ['w', 'h', 240, 384], ['h', 'w', 720, 384]];
+      const pos = CELLS.map(([s1, s2, x, y], i) => {
+        const m = BC(s1, s2), r2 = chirMol(m, 1, [4, 2, 0]), r3 = chirMol(m, 2, [5, 1, 3]);
+        alpha(g, fin(t, 0.4 + i * 0.6), () => {
+          drawMol(g, m, { cx: x - 1.5 * ZX * 70, cy: y, s: 70 }, { size: 15, bcol: { 3: K.st, 4: K.st } });
+          g.text(x, y + 112, `(2${r2},3${r3})`, { size: 20, weight: 800, color: K.st, align: 'center', mono: true });
+        });
+        return P(x, y);
+      });
+      mirror(g, 480, 60, 470, fin(t, 6) * (1 - fin(t, 11.6)));
+      alpha(g, fin(t, 6.4), () => {
+        arrow2(g, add(pos[0], 150, 8), add(pos[1], -150, 8), { color: C.mint });
+        arrow2(g, add(pos[2], 150, 8), add(pos[3], -150, 8), { color: C.mint });
+        g.tag(480, pos[0].y - 22, '鏡像異構物', { size: 14, color: C.mint });
+        g.tag(480, pos[2].y - 22, '鏡像異構物', { size: 14, color: C.mint });
+      });
+      alpha(g, fin(t, 12), () => {
+        arrow2(g, add(pos[0], 0, 136), add(pos[2], 0, -64), { color: K.fg });
+        arrow2(g, add(pos[1], 0, 136), add(pos[3], 0, -64), { color: K.fg });
+        g.tag(pos[0].x + 104, 303, '非鏡像異構物', { size: 14, color: K.fg });
+        g.tag(pos[1].x - 104, 303, '非鏡像異構物', { size: 14, color: K.fg });
+      });
+      alpha(g, fin(t, 0.6) * (1 - fin(t, 6)), () => g.tag(480, 40, '2 個立體中心:最多 2² = 4 種', { size: 16, color: C.ink }));
+    },
+  },
+  {
+    key: 'meso', name: '內消旋:分子裡有一面鏡子', dur: 20,
+    cues: [[0, '順-1,2-二甲基環己烷有兩個立體中心,一個是 R、一個是 S。照 2ⁿ 應該有 4 種立體異構物,實際上只有 3 種。'],
+      [6, '因為它的分子裡就有一面鏡子(對稱面):左半邊正好是右半邊的鏡像,所以它的鏡像就是它自己,不是掌性分子。這種化合物叫內消旋化合物。'],
+      [13, '內消旋化合物沒有光學活性。反式的沒有對稱面,(1R,2R) 和 (1S,2S) 是一對鏡像異構物;「自己調整」可以切換順式與反式。']],
+    draw(g, t, S) {
+      const cis = S.mz === 'cis', m = DMCH('w', cis ? 'w' : 'h');
+      const rA = chirMol(m, 5, [4, 0, 6]), rB = chirMol(m, 4, [5, 3, 7]);
+      // 1 號碳給 R(兩個不一樣時);順式是 (1R,2S)
+      const oneIsA = !(rA === 'S' && rB === 'R'), d1 = oneIsA ? rA : rB, d2 = oneIsA ? rB : rA;
+      const v = { cx: 270, cy: 300, s: 96 };
+      const Sx = drawMol(g, m, v, { bcol: { 6: K.st, 7: K.st }, dcol: { 6: K.st, 7: K.st }, nums: { [oneIsA ? 5 : 4]: 1, [oneIsA ? 4 : 5]: 2 }, numA: fin(t, 0.8) });
+      const p1 = Sx(oneIsA ? 5 : 4), p2 = Sx(oneIsA ? 4 : 5);
+      alpha(g, fin(t, 1.4), () => { g.tag(p1.x + (p1.x > v.cx ? 30 : -30), p1.y + 40, d1, { size: 16, color: K.st }); g.tag(p2.x + (p2.x > v.cx ? 30 : -30), p2.y + 40, d2, { size: 16, color: K.st }); });
+      g.text(270, 70, cis ? '順-1,2-二甲基環己烷' : '反-1,2-二甲基環己烷', { size: 22, weight: 800, color: C.ink, align: 'center' });
+      g.text(270, 100, `(1${d1},2${d2})`, { size: 18, weight: 800, color: K.st, align: 'center', mono: true });
+      if (cis) alpha(g, fin(t, 6), () => { g.line(270, 120, 270, 470, C.mint, 2, [7, 6]); g.tag(270, 490, '對稱面:左右互為鏡像', { size: 15, color: C.mint }); });
+      else alpha(g, fin(t, 6), () => {
+        mirror(g, 520, 150, 450);
+        const mm = DMCH('h', 'w');
+        drawMol(g, mm, { cx: 770, cy: 300, s: 96 }, { bcol: { 6: K.st, 7: K.st }, dcol: { 6: K.st, 7: K.st } });
+        g.text(770, 100, `(1${d1 === 'R' ? 'S' : 'R'},2${d2 === 'R' ? 'S' : 'R'})`, { size: 18, weight: 800, color: K.st, align: 'center', mono: true });
+        g.tag(520, 500, '沒有對稱面:一對鏡像異構物', { size: 15, color: C.mint });
+      });
+      if (cis) alpha(g, fin(t, 3), () => {
+        card(g, 560, 150, 370, 214, cis ? '只有 3 種,不是 4 種' : '', K.st, ['順式:(1R,2S),內消旋,1 種', '反式:(1R,2R) 與 (1S,2S),2 種', '', '內消旋:有立體中心,', '但不是掌性分子,沒有光學活性'], 1, { size: 15 });
+      });
+    },
+  },
+  {
+    key: 'fischer', name: '費雪投影式', dur: 25,
+    cues: [[0, '費雪投影式是立體中心的簡寫:橫線上的原子團朝向你,直線上的往後。這是甘油醛,最簡單的醣。'],
+      [6, '把立體的樣子壓平,就是一個十字;十字的交點是立體中心的碳,通常不寫出來。'],
+      [10, '判斷 R、S:第 4 名在直線上就直接看 1→2→3;在橫線上(像這裡的 H),看完以後答案要反過來。這是 (R)-甘油醛。'],
+      [17, '醣類的 D、L 只看最下面那個立體中心的 OH 在右或左,和 R、S 是兩套不同的規則;D-甘油醛剛好是 R,換了分子就不一定對得上。'],
+      [21.5, '費雪投影式只能在紙面上轉 180°;轉 90° 會變成它的鏡像。']],
+    draw(g, t, S) {
+      const subs = GLY(S.gl).map((s) => ({ ...s, col: t >= 10 ? PRI[s.pri - 1] : undefined }));
+      const c = P(270, 290), flat = ease(seg(t, 6, 8));
+      // 立體的樣子(蝴蝶結)
+      alpha(g, 1 - flat, () => tetra(g, c, subs, { yaw: 0.35 * Math.sin(t * 0.7) * (1 - fin(t, 5)), pitch: 0 }, { len: 120, size: 19 }));
+      alpha(g, win(t, 1, 6.4), () => { g.tag(470, 290, '橫的:朝向你', { size: 14, color: C.ink }); g.tag(270, 128, '直的:往後', { size: 14, color: C.ink }); });
+      // 十字
+      const ends = { CHO: P(270, 170), 'CH₂OH': P(270, 410), OH: P(S.gl === 'D' ? 390 : 150, 290), H: P(S.gl === 'D' ? 150 : 390, 290) };
+      alpha(g, flat, () => {
+        g.line(270, 190, 270, 390, K.bond, 2.6); g.line(170, 290, 370, 290, K.bond, 2.6);
+        subs.forEach((s) => label(g, ends[s.lab], s.lab, { size: 19, color: s.col }));
+        if (t >= 10) subs.forEach((s) => {
+          g.font(19, 700); const w = g.ctx.measureText(s.lab).width, vert = s.lab === 'CHO' || s.lab === 'CH₂OH';
+          badge(g, add(ends[s.lab], vert ? w / 2 + 16 : 0, vert ? 0 : -30), s.pri, { color: PRI[s.pri - 1] });
+        });
+      });
+      const rs = chir(subs);
+      if (t >= 10.6) {
+        const seen = rsArc(g, c, [ends.OH, ends.CHO, ends['CH₂OH']], { r: 54, k: seg(t, 10.6, 12.4), color: K.fg });
+        alpha(g, fin(t, 12.6), () => {
+          g.text(700, 150, seen ? '看到順時針' : '看到逆時針', { size: 18, weight: 700, color: K.fg, align: 'center' });
+          g.text(700, 182, 'H 在橫線上 → 反過來', { size: 15, color: C.ink2, align: 'center' });
+          g.text(700, 226, `→ ${rs}`, { size: 34, weight: 800, color: C.mint, align: 'center' });
+        });
+      }
+      alpha(g, fin(t, 14), () => {
+        nameRow(g, [[`(${rs})-`, K.st], ['甘油醛', C.ink]], 700, 282, 28);
+        g.text(700, 314, `= ${S.gl}-甘油醛(OH 在${S.gl === 'D' ? '右' : '左'})`, { size: 15, color: C.ink2, align: 'center' });
+      });
+      alpha(g, fin(t, 17), () => card(g, 520, 350, 410, 112, 'D、L 和 R、S 是兩套規則', K.st, ['D、L:最下面那個立體中心的 OH 在右或左', 'R、S:CIP 名次繞的方向;L-半胱胺酸是 R'], 1, { size: 13 }));
+      alpha(g, fin(t, 21.5), () => g.tag(270, 494, '只能轉 180°;轉 90° 會變成鏡像', { size: 15, color: K.bad }));
+    },
+  },
+];
+
+// 波浪線(取代基接到主鏈的那一頭);ang 是鍵的方向
+function squiggle(g, p, ang) {
+  const nx = -Math.sin(ang), ny = Math.cos(ang), pts = [];
+  for (let i = 0; i <= 16; i++) { const k = i / 16 - 0.5, w = Math.sin(k * Math.PI * 4) * 3.5; pts.push([p.x + nx * k * 30 + Math.cos(ang) * w, p.y + ny * k * 30 + Math.sin(ang) * w]); }
+  g.curve(pts, K.sub, 2);
+}
+
+createLesson({
+  chapters,
+  state: { nx: 'iso', rs: 'R', mz: 'cis', gl: 'D' },
+  controls: [
+    { id: 'nx', label: '例子', type: 'seg', options: [{ v: 'iso', label: '2,2,4-三甲基戊烷' }, { v: 'ol', label: '4-甲基-2-戊醇' }], chapters: ['numbering'], restart: true },
+    { id: 'rs', label: '哪一個', type: 'seg', options: [{ v: 'R', label: '(R)-2-丁醇' }, { v: 'S', label: '(S)-2-丁醇' }], chapters: ['rs'], restart: true },
+    { id: 'mz', label: '1,2-二甲基環己烷', type: 'seg', options: [{ v: 'cis', label: '順式' }, { v: 'trans', label: '反式' }], chapters: ['meso'] },
+    { id: 'gl', label: '甘油醛', type: 'seg', options: [{ v: 'D', label: 'D(OH 在右)' }, { v: 'L', label: 'L(OH 在左)' }], chapters: ['fischer'] },
+  ],
+});
+</script>
+</body>
+</html>

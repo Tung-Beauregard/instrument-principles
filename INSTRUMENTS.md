@@ -1766,6 +1766,111 @@ VIGS:
 
 未確認:沒有找到同時報告 qPCR 轉錄量下降百分比與 GC-MS 產物下降百分比的 VIGS 萜類合成酶論文(找到的 VIGS 案例不是萜類合成酶,找到的萜類合成酶案例不是 VIGS),所以第 6 章的「轉錄本降多少產物就降多少」明確標成示意。也沒有找到同一篇裡用純單萜合成酶做「全長 GFP 進質體、去掉轉運胜肽後進細胞質」的實驗,第 5 章用的 Nagegowda 等 2008 是雙功能的 nerolidol/linalool 合成酶。Reed 與 Osbourn 2018(Plant Cell Rep 37:1431–1441,PMC6153650)是綜論,沒有當原始依據引用,但可以當第 4、5 章的補充閱讀。
 
+## 官能基編號
+
+入口的「官能基編號」一區(2026-10-30 起)用生化原理那套 2D 播放器講有機分子的碳怎麼編號、官能基在哪裡,程度和生化原理相同(台灣高中畢業看得懂)。目前有兩份:有機化學命名法則(2026-10-31,通則,排在前面)與醣類;之後一類化合物一份。
+
+### 有機化學命名法則:從主鏈編號到 R/S 與 E/Z(`nomenclature/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/nomenclature/
+
+使用者 2026-10-31 要求「醣類旁邊另外做一個有機化學命名法則,包含立體構型;講解可以參考有機化學天堂秘笈的篇章介紹」。《有機化學天堂祕笈 I》(Klein 著,師明睿譯,天下文化 2007;原書 Organic Chemistry as a Second Language)第 5 章命名法(官能基、不飽和、主鏈、取代基、立體異構、編號)與第 7 章組態(找立體中心、決定組態、命名、鏡像異構物、非鏡像異構物、內消旋、費雪投影式、光學活性)的順序是章節安排的參考;說明、例子與動畫另外寫,不引用書上的文字。在分區裡排在醣類前面。共 15 章:
+
+- 第 1 章:鍵線式(碳上的 H 省略,轉角與端點都是碳)
+- 第 2 章:名字的五個部分(立體、取代基、主鏈、不飽和、官能基),例子 (E)-6-甲基-3-庚烯-2-酮,從右邊讀起
+- 第 3 章:官能基決定字尾,優先順序(羧酸、酯、醛、酮、醇、胺)與當字首的寫法;例子 4-羥基-2-丁酮
+- 第 4 章:烷、烯、炔與雙鍵的號碼(1-丁烯、2-丁烯、1-丁炔、1,3-丁二烯)
+- 第 5 章:碳數的字根(甲到癸)與找主鏈;例子 3-甲基己烷(常見的錯誤叫法 2-乙基戊烷)
+- 第 6 章:取代基(烷變成基;甲基、乙基、丙基、異丙基、第三丁基)、二三四與每一個都寫號碼、不同取代基的先後(中文碳數少的在前,英文照字母)
+- 第 7 章:編號(兩端都數,比第一個不同的號碼);例子 2,2,4-三甲基戊烷、4-甲基-2-戊醇(可切換)
+- 第 8 章:順式與反式(2-丁烯、1,2-二甲基環己烷);同一個碳上接兩個一樣的原子團就沒有順反
+- 第 9 章:立體中心與鏡像(2-丁醇對 2-丙醇)
+- 第 10 章:CIP 規則(原子序;平手往外一層,比第一個不同處;雙鍵算兩次)
+- 第 11 章:R 與 S(第 4 名轉到後面,1→2→3 順時針是 R;第 4 名朝你時反過來),可切換 (R)、(S)-2-丁醇
+- 第 12 章:E 與 Z(2-丁烯的 Z 就是順式;2-溴-2-丁烯兩個甲基同一邊的是 E)
+- 第 13 章:鏡像與非鏡像異構物、最多 2ⁿ 種(3-溴-2-丁醇的四種),光學活性
+- 第 14 章:內消旋(順-1,2-二甲基環己烷有對稱面,只有 3 種立體異構物),可切換順式、反式
+- 第 15 章:費雪投影式(甘油醛;橫的朝你、直的往後;判斷 R、S 的捷徑;D、L 和 R、S 是兩套規則;只能轉 180°),可切換 D、L
+
+#### 寫法與查證
+
+- 中文名稱:號碼寫在主鏈前面(2-丁醇、3-庚烯-2-酮);不同的取代基碳數少的寫在前面(2-甲基-3-乙基己烷),英文照 IUPAC 的字母順序(3-ethyl-2-methylhexane)。依據:國家教育研究院化學名詞開放資料(兩岸化學名詞把 3-ethyl-2-methylpentane 寫成 2-甲-3-乙基戊烷;兩岸中小學教科書學術名詞有 N-甲基-N-乙基苯胺、3-甲基-2-丁醇)與高瞻自然科學教學資源平台〈長鏈烷烴的命名法〉(取代基碳數少的排在前面,不照英文字母)。中國大陸 1980 年的規則與台灣相近,2017 年的新規則改成照英文字母順序、號碼放在主鏈後面(丁-2-醇)。兩個不同鹵素在中文裡的先後沒有查到可靠的資料,頁面的例子避開;編號平手時「字母順序在前的拿小號」在中文名字裡怎麼對應也沒有查到,頁面不講。目前的 108 課綱高中課本沒有在網路上核對。
+- 名詞(樂詞網與化學名詞開放資料):configuration 組態(構型是中國大陸的用語)、conformation 構形、chirality 掌性(樂詞網台灣欄列手性、掌性,台灣教學多用掌性)、chiral center 掌性中心、enantiomer 鏡像異構物、diastereomer 非鏡像異構物、meso compound 內消旋化合物、optical activity 光學活性、Fischer projection 費雪投影式、cis/trans 順-/反-、sequence rule 序列法則、oxo 側氧基、formyl 甲醯基、amino 胺基。tert-butyl 頁面寫第三丁基(樂詞網是三級-丁基,教材與法規文件常用第三丁基)。
+- 規則(IUPAC 2013 Recommendations,Blue Book 網路版):P-14.4 最小號碼的先後(字尾、重鍵、所有字首一起,最後才是字母順序)、P-14.3.5 比第一個不同處、P-14.5 英文的字母順序(倍數字不算)、P-41 官能基的優先順序(酸 > 酸酐 > 酯 > 醯鹵 > 醯胺 > 腈 > 醛 > 酮 > 醇 > 胺)、P-44.3 主鏈(2013 起長度優先於重鍵的數目,和 1979 年的規則相反;OpenStax 7.3 仍用舊規則;頁面的例子兩種規則答案一樣,重點整理有註明)、P-61 鹵素與硝基只當字首、P-92.1 CIP 規則(雙鍵兩端各加一個重複的原子)與 R、S、P-92.4 E 與 Z、P-91.3 立體標記寫在名字最前面。英文名稱照現行寫法把號碼放在字尾前(butan-2-ol)。
+- 例子的核對:2-溴-2-丁烯兩個甲基同一邊的是 E(Br 比甲基優先;LibreTexts 的 E/Z 頁用同一個例子);D-甘油醛是 R(OpenStax 25.3);L-半胱胺酸是 R,其他常見的 L-胺基酸幾乎都是 S(IUPAC-IUBMB 3AA-3.5);順-1,2-二甲基環己烷是 (1R,2S) 的內消旋化合物;2,2,4-三甲基戊烷(異辛烷)是辛烷值 100 的標準。第 11、13、14、15 章畫面上的 R、S 由頁面依楔形、虛線與名次算出(行列式的正負),和手算的結果一致。
+- 示意:鍵線式的角度、立體圖的鍵長、角度與轉動都是示意。
+
+#### 技術
+
+單一 HTML 檔(nomenclature/index.html),2D canvas 動畫,用共用的 assets/bio-lesson.js、assets/bio-draw.js 與 assets/bio-lesson.css;鍵線式、立體中心與 R、S 的計算都由頁面裡的函式處理,不需要建置,不使用到站人數計數。入口卡片概念圖 assets/nomenclature.svg。分頁列是「← 儀器入口」、本頁與醣類(`aria-label="官能基編號"`)。程式分區、每章的時間點與修改方式見 nomenclature/MAINTENANCE.md。
+
+#### 來源連結
+
+- 《有機化學天堂祕笈 I》目錄(天下文化,ISBN 978-986-216-008-4):https://reading.udn.com/udnlib/hlslib/B/177712
+- IUPAC, Nomenclature of Organic Chemistry: IUPAC Recommendations and Preferred Names 2013(Blue Book 網路版):https://iupac.qmul.ac.uk/BlueBook/ (P-1:https://iupac.qmul.ac.uk/BlueBook/P1.html ;P-4:https://iupac.qmul.ac.uk/BlueBook/P4.html ;P-6:https://iupac.qmul.ac.uk/BlueBook/P6.html ;P-9:https://iupac.qmul.ac.uk/BlueBook/P9.html )
+- IUPAC-IUBMB, Nomenclature and Symbolism for Amino Acids and Peptides, 3AA-3.5:https://iupac.qmul.ac.uk/AminoAcid/AA3t5.html#AA35
+- 國家教育研究院樂詞網:https://terms.naer.edu.tw/ ;化學名詞開放資料(兩岸化學名詞、兩岸中小學教科書學術名詞、有機化合物之基):https://opendata.naer.edu.tw/
+- 高瞻自然科學教學資源平台〈長鏈烷烴的命名法〉:https://case.ntu.edu.tw/highscope/localhost/%e9%95%b7%e9%8f%88%e7%83%b7%e7%83%b4%e7%9a%84%e5%91%bd%e5%90%8d%e6%b3%95%ef%bc%88the-nomenclature-of-aliphatic-alkanes%ef%bc%89/index.html
+- 中國大陸 2017 年《有機化合物命名原則》的說明(大學化學,2022):https://www.dxhx.pku.edu.cn/article/2022/1000-8438/20220738.shtml
+- OpenStax, Organic Chemistry:3.4 https://openstax.org/books/organic-chemistry/pages/3-4-naming-alkanes ;5.5 https://openstax.org/books/organic-chemistry/pages/5-5-sequence-rules-for-specifying-configuration ;5.6 https://openstax.org/books/organic-chemistry/pages/5-6-diastereomers ;5.7 https://openstax.org/books/organic-chemistry/pages/5-7-meso-compounds ;7.4 https://openstax.org/books/organic-chemistry/pages/7-4-cis-trans-isomerism-in-alkenes ;25.2 https://openstax.org/books/organic-chemistry/pages/25-2-representing-carbohydrate-stereochemistry-fischer-projections ;25.3 https://openstax.org/books/organic-chemistry/pages/25-3-d-l-sugars
+- LibreTexts:E/Z 的命名 https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_(Organic_Chemistry)/Fundamentals/Structure_of_Organic_Molecules/The_E-Z_system_for_naming_alkenes ;費雪投影式 https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_I_(Liu)/05:_Stereochemistry/5.05:_Fisher_Projection
+- 2,2,4-三甲基戊烷(辛烷值的標準):https://en.wikipedia.org/wiki/2,2,4-Trimethylpentane
+
+### 醣類:從葡萄糖到纖維素與澱粉(`carbohydrates/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/carbohydrates/
+
+使用者要求「介紹官能基編號的頁面,先做醣類的:酮糖/醛糖、鏈狀到環狀的動畫,然後介紹糖苷鍵,再介紹到纖維素/澱粉」,並要「α、β 都要有,而且要能解釋」;2026-10-31 再要求「多一個環狀的糖的命名」。共 12 章:
+
+- 第 1 章:醣的骨架與官能基(羥基、羥甲基、醛基),費雪投影的讀法
+- 第 2 章:醛糖與酮糖,編號從離羰基最近的那一端數起(醛基是 1 號、常見酮糖的酮基是 2 號);可切換葡萄糖與果糖、核糖與核酮糖
+- 第 3 章:不對稱碳,D 與 L 看編號最大的不對稱碳(己糖是 5 號碳)
+- 第 4 章:葡萄糖從鏈狀接成六員環(費雪投影躺下來、彎成一圈、5 號碳轉一下、5 號碳的 O 接上 1 號碳),可切換 α、β
+- 第 5 章:α 與 β 怎麼分(和 6 號碳的 CH₂OH 同一邊是 β)、為什麼有兩種(醛基是平的,兩面都能被接上)、名字「β-D-葡萄哌喃糖」
+- 第 6 章:變旋現象(環打開再接回去),從純 α 或純 β 開始都到 36:64;椅式裡 β 的 OH 全部往外伸、α 的 1 號 OH 直立
+- 第 7 章:果糖的 5 號碳接 2 號碳成五員環(呋喃糖),右下是水裡最多的六員環(果哌喃糖)
+- 第 8 章:環狀糖的命名(α 或 β、D 或 L、哪一種糖、夾在糖名中間的環的大小;英文 α-D-glucopyranose 與縮寫 α-D-Glcp),可切換葡萄糖六員環、果糖五員環、果糖六員環與 α、β
+- 第 9 章:糖苷鍵(兩個 OH 之間少一分子水)與 α(1→4) 的讀法、還原端;例子:麥芽糖、纖維二糖、異麥芽糖、蔗糖
+- 第 10 章:纖維素 β(1→4),每個葡萄糖和隔壁翻面、鏈內與鏈間的氫鍵、微纖維,以及每個葡萄糖剩下的 2、3、6 號 OH
+- 第 11 章:澱粉 α(1→4) 的螺旋(可加碘)與支鏈澱粉的 α(1→6) 分支
+- 第 12 章:纖維素、直鏈澱粉、支鏈澱粉比一比(接法、形狀、人能不能消化)
+
+#### 數值與示意
+
+- 編號、D 與 L、α 與 β、哈沃斯投影:IUPAC-IUBMB 2-Carb(1996)。2-Carb-2.2.1:醛基是 1 號,酮糖的羰基取最小的號碼;2-Carb-4.2:D、L 看編號最大的不對稱碳,費雪投影裡它的 OH 在右是 D;2-Carb-5.4:哈沃斯投影的環上的氧在後面、1 號碳在右端,順時針編號,費雪投影在右的朝下,D 型己醛糖的 6 號碳在環上方;2-Carb-6.1、6.2:在費雪投影裡,異頭碳的 O 和參考原子(己糖的 5 號碳)的 O 在同一邊是 α、在兩邊是 β。頁面用「1 號碳的 OH 和 6 號碳的 CH₂OH 同一邊是 β」說明,這只適用於 D-葡萄糖這類 6 號碳在環外的環(果哌喃糖不適用,頁面沒有用它說明)。2-Carb-5.3 寫了 α-D-葡萄哌喃糖的 CH₂OH 與 1 號 OH 互為反式。第 8 章改用「D 型照標準方向畫,異頭碳的 OH 朝下是 α、朝上是 β」說明三種環(葡萄哌喃糖、果呋喃糖、果哌喃糖),逐一對過 PubChem 依結構算出的 IUPAC 名稱:β 的異頭碳都是 R、α 都是 S(CID 64689、79025、439709、11105942、24310、440545),頁面畫的方向和它們一致。2-Carb-5.1:五員環叫 furanose、六員環叫 pyranose。
+- 名詞:國家教育研究院樂詞網(2026-10-30 查):pyranose 哌喃醣(中國大陸寫作吡喃糖)、furanose 呋喃糖、anomer 變旋異構物、mutarotation 變旋[作用]、Fischer projection 費雪投影式、Haworth projection 哈沃斯[氏]投影式(生命科學)、aldose 醛醣、ketose 酮醣(化學;生命科學有酮糖)。頁面照使用者的寫法用醛糖、酮糖,環用「哌喃」「呋喃」。環狀糖的名字樂詞網把糖名寫在前面(glucopyranose 葡萄哌喃糖、fructofuranose 果呋喃糖;同一型的還有半乳哌喃糖、核呋喃糖),頁面照這個詞序(果哌喃糖依同一型推得);2026-10-31 由原本的「哌喃葡萄糖」改過來(中國大陸寫作吡喃葡萄糖)。glycoside 是醣苷、glycosyl 是[醣]苷基,頁面沒有用到中文的糖苷基名稱,雙醣只寫縮寫。anomeric carbon 樂詞網沒有收錄,頁面用「異頭碳」。
+- 葡萄糖在水裡的平衡:α 約 36%、β 約 64%(LibreTexts 20.3;OpenStax 有機化學 25.5 寫 37:63);打開的鏈狀(醛基)約 0.001% 到 0.004%(Dworkin 與 Miller 2000 的 25 °C 最佳估計 0.0012%;圓二色光譜 20 °C 0.0022%),連同水合物也不到 0.01%。頁面寫「十萬個裡只有一到四個」。
+- 果糖在水裡(D₂O,20 °C):β-果哌喃糖 68.23%、β-果呋喃糖 22.35%、α-果呋喃糖 6.24%、α-果哌喃糖 2.67%、鏈狀 0.50%(Barclay 等 2012);0.089 到 0.36 M、pH 3 都差不多。六員環合計約 71%,頁面寫「多半是六員環」。蔗糖裡的果糖是 β-果呋喃糖。
+- 糖苷鍵:2-Carb-1.13 與 33.1(糖苷是混合縮醛,兩個糖之間的鍵叫糖苷鍵)。2-Carb-36:麥芽糖 α-D-Glcp-(1→4)-D-Glc、纖維二糖 β-D-Glcp-(1→4)-D-Glc、異麥芽糖 α-D-Glcp-(1→6)-D-Glc;蔗糖在 2-Carb-36 寫成 α-D-glucopyranosyl β-D-fructofuranoside(縮寫 α-D-Glcp-(1↔2)-β-D-Fruf),頁面寫成 α1↔β2(葡萄糖的 1 號碳是 α、果糖的 2 號碳是 β),兩個異頭碳都用掉,沒有還原端。「少一分子水」是淨結果,細胞裡由酵素把活化過的糖接上去。縮寫的寫法(Glc、Fru 前面寫 α 或 β 與 D,環的大小寫成 p 或 f,兩個異頭碳相接用 ↔)見 2-Carb-38;第 9 章畫面下方寫這種縮寫,還原端照 2-Carb-36 寫成 D-Glc。
+- 纖維素:每個葡萄糖和隔壁轉 180°,重複單位是纖維二糖(長約 1.04 nm,纖維素 Iβ 的 c 軸 1.038 nm);鏈內最主要的氫鍵是 O3–H⋯O5(另有 O2–H⋯O6),鏈與鏈之間主要是 O6–H⋯O3(Nishiyama 等 2002;Moon 等 2011;Chen 等 2014)。木材的纖維素約占乾重 40% 到 50%(Rowell 等 2013:針葉樹 40% 到 45%、闊葉樹 38% 到 49%)。天然木材纖維素的聚合度約 1 萬以上,頁面沒有寫。2、3 號碳的 OH 是二級醇、6 號碳的是一級醇;醋酸纖維素、羧甲基纖維素是在這些 OH 上接上去的(一般有機化學與纖維素化學的常識,頁面沒有寫取代的位置比例)。
+- 澱粉:直鏈澱粉和碘結合時是每圈 6 個葡萄糖、螺距約 0.8 nm 的左手單螺旋,藍色(約 600 nm 吸收)來自螺旋中間的多碘離子鏈(Pesek 與 Silaghi-Dumitrescu 2024);澱粉粒裡天然的鏈則是雙螺旋,頁面沒有講。支鏈澱粉約每 25 到 30 個葡萄糖一個 α(1→6) 分支(LibreTexts 20.7),α(1→6) 約占支鏈澱粉的鍵的 5%、肝醣約 9%(Tetlow 與 Bertoft 2020);肝醣每 8 到 12 個一個分支。直鏈澱粉的比例:一般澱粉約 20% 到 30%(Pesek 2024),JECFA 1973 寫 15% 到 30%、Tetlow 與 Bertoft 寫約 15% 到 35%;頁面寫「通常約兩到三成」。
+- 消化:α-澱粉酶切 α(1→4)(IUBMB EC 3.2.1.1),纖維素酶切 β(1→4)(EC 3.2.1.4);人的消化酵素切不開 β(1→4),反芻動物靠瘤胃裡的微生物(OpenStax Biology 2e 3.2;Weimer 2022)。白蟻腸道有共生微生物,也有自己的纖維素酶,頁面不拿白蟻當例子。
+- 示意:費雪投影、哈沃斯投影、椅式是教科書的畫法;成環動畫是把畫法之間內插,中間的樣子不代表分子真正經過的形狀;第 6 章的比例曲線沒有時間刻度;螺旋、並排的鏈、微纖維截面與支鏈澱粉的分支都是示意(分支畫得比實際密)。
+
+#### 技術
+
+單一 HTML 檔(carbohydrates/index.html),2D canvas 動畫,用共用的 assets/bio-lesson.js(播放器)、assets/bio-draw.js(畫圖工具)與 assets/bio-lesson.css(版面);分子的畫法(費雪投影、成環動畫、哈沃斯投影、椅式、螺旋)由頁面裡的函式畫,不需要建置,不使用到站人數計數。入口卡片概念圖 assets/carbohydrates.svg。分頁列是「← 儀器入口」「命名法則」與本頁(`aria-label="官能基編號"`)。程式分區、每章的時間點與修改方式見 carbohydrates/MAINTENANCE.md。
+
+#### 來源連結
+
+- IUPAC-IUBMB, Nomenclature of Carbohydrates(1996):https://iupac.qmul.ac.uk/2carb/ (2-Carb-2:https://iupac.qmul.ac.uk/2carb/02.html ;4:https://iupac.qmul.ac.uk/2carb/03n04.html#04 ;5:https://iupac.qmul.ac.uk/2carb/05.html ;6:https://iupac.qmul.ac.uk/2carb/06n07.html ;36:https://iupac.qmul.ac.uk/2carb/36.html ;38:https://iupac.qmul.ac.uk/2carb/38.html )
+- PubChem(異頭碳的 R、S):β-D-葡萄哌喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/64689 ;α-D-葡萄哌喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/79025 ;β-D-果呋喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/439709 ;α-D-果呋喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/11105942 ;β-D-果哌喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/24310 ;α-D-果哌喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/440545
+- 國家教育研究院樂詞網:https://terms.naer.edu.tw/
+- LibreTexts, Fundamentals of General, Organic, and Biological Chemistry, 20.3:https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Fundamentals_of_General_Organic_and_Biological_Chemistry_(LibreTexts)/20%3A_Carbohydrates/20.03%3A_Structure_of_Glucose_and_Other_Monosaccharides ;20.7:https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Fundamentals_of_General_Organic_and_Biological_Chemistry_(LibreTexts)/20%3A_Carbohydrates/20.07%3A_Some_Important_Polysaccharides_Based_on_Glucose
+- OpenStax, Organic Chemistry, 25.5:https://openstax.org/books/organic-chemistry/pages/25-5-cyclic-structures-of-monosaccharides-anomers
+- Dworkin JP, Miller SL. A kinetic estimate of the free aldehyde content of aldoses. Carbohydr Res. 2000;329:359–365(doi:10.1016/S0008-6215(00)00204-4):https://www.astrochem.org/docs/DworkinMiller.pdf
+- Barclay T, et al. Observation of the keto tautomer of D-fructose in D2O using 1H NMR spectroscopy. Carbohydr Res. 2012;347(1):136–141(doi:10.1016/j.carres.2011.11.003):https://pmc.ncbi.nlm.nih.gov/articles/PMC3254704/
+- Nishiyama Y, Langan P, Chanzy H. Crystal structure and hydrogen-bonding system in cellulose Iβ. J Am Chem Soc. 2002;124:9074–9082:https://pubmed.ncbi.nlm.nih.gov/12149011/
+- Moon RJ, et al. Cellulose nanomaterials review. Chem Soc Rev. 2011;40:3941(美國林務署的版本):https://research.fs.usda.gov/download/treesearch/38661.pdf
+- Chen P, Nishiyama Y, Putaux JL, Mazeau K. Cellulose. 2014;21:897(鏈間氫鍵的主要型式;只核對到摘要)
+- Rowell RM, Pettersen R, Tshabalala MA. Cell wall chemistry. Handbook of Wood Chemistry and Wood Composites, 2nd ed., CRC Press, 2013, 第 3 章(美國林務署的版本):https://research.fs.usda.gov/download/treesearch/42245.pdf
+- Pesek S, Silaghi-Dumitrescu R. The iodine/iodide/starch supramolecular complex. Molecules. 2024;29:641:https://pmc.ncbi.nlm.nih.gov/articles/PMC10856212/
+- Tetlow IJ, Bertoft E. A review of starch biosynthesis in relation to the building block-backbone model. Int J Mol Sci. 2020;21:7011:https://pmc.ncbi.nlm.nih.gov/articles/PMC7582286/
+- JECFA(FAO/WHO), WHO Food Additives Series 5(1973):https://inchem.org/documents/jecfa/jecmono/v05je65.htm
+- IUBMB 酵素命名:EC 3.2.1.1 https://iubmb.qmul.ac.uk/enzyme/EC3/2/1/1.html ;EC 3.2.1.4 https://iubmb.qmul.ac.uk/enzyme/EC3/2/1/4.html
+- OpenStax, Biology 2e, 3.2 Carbohydrates:https://openstax.org/books/biology-2e/pages/3-2-carbohydrates
+- Weimer PJ. Microorganisms. 2022;10:2345(反芻動物瘤胃裡分解纖維素的微生物):https://pmc.ncbi.nlm.nih.gov/articles/PMC9785684/
+
 ## 數據畫圖(plot/)
 
 網頁:https://tung-beauregard.github.io/instrument-principles/plot/

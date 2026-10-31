@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="葡萄糖的六員環,六個碳標上 1 到 6 號;右邊是拉直的纖維素鏈與捲成螺旋的澱粉">
+  <ellipse cx="220" cy="238" rx="190" ry="11" fill="#050e0c" opacity=".45"/>
+  <!-- 左:β-D-葡萄哌喃糖(哈沃斯投影),前面的邊畫粗 -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M90 96H159M181 101L210 125" stroke="#c9d3ce" stroke-width="2.4"/>
+    <path d="M90 96L50 125" stroke="#c9d3ce" stroke-width="2.6"/>
+    <path d="M50 125L90 154L170 154L210 125" stroke="#e6ece9" stroke-width="5.4"/>
+    <g stroke="#c3cdc8" stroke-width="2.2">
+      <path d="M210 125V93"/><path d="M170 154V184"/><path d="M90 154V124"/><path d="M50 125V156"/><path d="M90 96V66"/>
+    </g>
+  </g>
+  <g font-family="Segoe UI,Noto Sans TC,sans-serif" font-weight="700" text-anchor="middle">
+    <text x="170" y="101" fill="#ff8f8f" font-size="15">O</text>
+    <text x="211" y="89" fill="#c3a8ff" font-size="14">OH</text>
+    <text x="171" y="199" fill="#8ec5ff" font-size="14">OH</text>
+    <text x="90" y="120" fill="#8ec5ff" font-size="14">OH</text>
+    <text x="48" y="171" fill="#8ec5ff" font-size="14">HO</text>
+    <text x="90" y="61" fill="#8ec5ff" font-size="14">CH₂OH</text>
+  </g>
+  <g font-family="Consolas,monospace" font-weight="800" font-size="11" text-anchor="middle" fill="#0b1111">
+    <circle cx="194" cy="125" r="8" fill="#a5f3cd"/><text x="194" y="129">1</text>
+    <circle cx="158" cy="144" r="8" fill="#a5f3cd"/><text x="158" y="148">2</text>
+    <circle cx="104" cy="144" r="8" fill="#a5f3cd"/><text x="104" y="148">3</text>
+    <circle cx="31" cy="124" r="8" fill="#a5f3cd"/><text x="31" y="128">4</text>
+    <circle cx="105" cy="106" r="8" fill="#a5f3cd"/><text x="105" y="110">5</text>
+    <circle cx="57" cy="80" r="8" fill="#a5f3cd"/><text x="57" y="84">6</text>
+  </g>
+  <!-- 右上:纖維素,β(1→4) 一個翻一個,拉成直線 -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M270 82H414" stroke="#6f9f86" stroke-width="2.4"/>
+    <g fill="#173328" stroke="#a5f3cd" stroke-width="1.8">
+      <path d="M262 82l8-11h16l8 11-8 11h-16z"/><path d="M310 82l8-11h16l8 11-8 11h-16z"/><path d="M358 82l8-11h16l8 11-8 11h-16z"/><path d="M406 82l4-6"/>
+    </g>
+    <path d="M274 71l-4-12M322 93l-4 12M370 71l-4-12" stroke="#8ec5ff" stroke-width="2"/>
+    <g opacity=".55"><path d="M270 126H414" stroke="#6f9f86" stroke-width="2.2"/>
+      <g fill="#173328" stroke="#7fd8ad" stroke-width="1.6"><path d="M262 126l8-11h16l8 11-8 11h-16z"/><path d="M310 126l8-11h16l8 11-8 11h-16z"/><path d="M358 126l8-11h16l8 11-8 11h-16z"/></g></g>
+    <path d="M278 95V113M326 95V113M374 95V113" stroke="#ffd166" stroke-width="1.6" stroke-dasharray="3 4"/>
+  </g>
+  <!-- 右下:澱粉,α(1→4) 捲成螺旋 -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M266 182C282 150 298 150 312 176C326 202 342 204 356 178C370 152 386 150 400 174" stroke="#4f8f74" stroke-width="2.6"/>
+    <g fill="#16302a" stroke="#4f8f74" stroke-width="1.6" opacity=".8"><path d="M300 200l6-8h12l6 8-6 8h-12z"/><path d="M344 200l6-8h12l6 8-6 8h-12z"/></g>
+    <g fill="#2c6a52" stroke="#a5f3cd" stroke-width="1.8"><path d="M258 182l6-8h12l6 8-6 8h-12z"/><path d="M280 156l6-8h12l6 8-6 8h-12z"/><path d="M324 176l6-8h12l6 8-6 8h-12z"/><path d="M366 158l6-8h12l6 8-6 8h-12z"/><path d="M392 174l6-8h12l6 8-6 8h-12z"/></g>
+  </g>
+</svg>

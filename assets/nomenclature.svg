@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="左邊是編好號的碳鏈,有一個雙鍵、一個 C=O 和一個甲基;右邊是立體中心,四個原子團標上名次 1 到 4,箭頭順時針繞一圈是 R">
+  <ellipse cx="220" cy="238" rx="190" ry="11" fill="#050e0c" opacity=".45"/>
+  <!-- 左:鍵線式的碳鏈(主鏈薄荷綠、雙鍵橘、C=O 琥珀、甲基淺藍) -->
+  <path d="M26 160L59 141L92 160L125 141L158 160L191 141L224 160" stroke="#a5f3cd" stroke-opacity=".28" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <g stroke-linecap="round" stroke-width="2.6">
+    <path d="M26 160L59 141L92 160" stroke="#c3cdc8"/>
+    <path d="M125 141L158 160L191 141L224 160" stroke="#c3cdc8"/>
+    <path d="M90.6 157.3L123.6 138.3M93.4 162.7L126.4 143.7" stroke="#ff9a5c" stroke-width="2.3"/>
+    <path d="M56 141V106M62 141V106" stroke="#ffd166" stroke-width="2.3"/>
+    <path d="M191 141V104" stroke="#8ec5ff"/>
+  </g>
+  <g fill="#a9bab3"><circle cx="26" cy="160" r="3.4"/><circle cx="92" cy="160" r="3.4"/><circle cx="125" cy="141" r="3.4"/><circle cx="158" cy="160" r="3.4"/><circle cx="224" cy="160" r="3.4"/></g>
+  <circle cx="191" cy="104" r="3.4" fill="#8ec5ff"/>
+  <text x="59" y="99" fill="#ffd166" font-family="Segoe UI,Noto Sans TC,sans-serif" font-weight="700" font-size="16" text-anchor="middle">O</text>
+  <g font-family="Consolas,monospace" font-weight="800" font-size="11" text-anchor="middle" fill="#0b1111">
+    <circle cx="26" cy="181" r="8" fill="#a5f3cd"/><text x="26" y="185">1</text>
+    <circle cx="59" cy="162" r="8" fill="#a5f3cd"/><text x="59" y="166">2</text>
+    <circle cx="92" cy="181" r="8" fill="#a5f3cd"/><text x="92" y="185">3</text>
+    <circle cx="125" cy="120" r="8" fill="#a5f3cd"/><text x="125" y="124">4</text>
+    <circle cx="158" cy="181" r="8" fill="#a5f3cd"/><text x="158" y="185">5</text>
+    <circle cx="191" cy="162" r="8" fill="#a5f3cd"/><text x="191" y="166">6</text>
+    <circle cx="224" cy="181" r="8" fill="#a5f3cd"/><text x="224" y="185">7</text>
+  </g>
+  <!-- 右:立體中心,H 朝後;1→2→3 順時針是 R -->
+  <path d="M332 70A56 56 0 1 1 286 158" stroke="#a5f3cd" stroke-width="3" stroke-linecap="round"/>
+  <path d="M283 147L284 163L298 156Z" fill="#a5f3cd"/>
+  <g stroke-linecap="round">
+    <path d="M330 126V84" stroke="#c3cdc8" stroke-width="2.6"/>
+    <path d="M330 126L380 150L376 158Z" fill="#c3cdc8"/>
+    <path d="M330 126L280 150L284 158Z" fill="#c3cdc8"/>
+    <path d="M327 134h6M326 140h8M325 146h10" stroke="#c3cdc8" stroke-width="1.8"/>
+  </g>
+  <circle cx="330" cy="126" r="11" fill="#0f1716" stroke="#8fa39b" stroke-width="1.5"/>
+  <g font-family="Segoe UI,Noto Sans TC,sans-serif" font-weight="700" text-anchor="middle">
+    <text x="330" y="131" fill="#d5ddd9" font-size="12">C</text>
+    <text x="330" y="78" fill="#ff8f8f" font-size="16">OH</text>
+    <text x="404" y="180" fill="#ffd166" font-size="15">CH₂CH₃</text>
+    <text x="258" y="180" fill="#8ec5ff" font-size="15">CH₃</text>
+    <text x="330" y="164" fill="#9caca5" font-size="14">H</text>
+    <text x="404" y="84" fill="#c3a8ff" font-size="30" font-weight="800">R</text>
+  </g>
+  <g font-family="Consolas,monospace" font-weight="800" font-size="11" text-anchor="middle" fill="#0b1111">
+    <circle cx="354" cy="72" r="8" fill="#ff8f8f"/><text x="354" y="76">1</text>
+    <circle cx="428" cy="156" r="8" fill="#ffd166"/><text x="428" y="160">2</text>
+    <circle cx="236" cy="158" r="8" fill="#8ec5ff"/><text x="236" y="162">3</text>
+    <circle cx="348" cy="160" r="8" fill="#9caca5"/><text x="348" y="164">4</text>
+  </g>
+</svg>

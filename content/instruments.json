@@ -25,6 +25,10 @@
       "name": "生化進階"
     },
     {
+      "id": "fg",
+      "name": "官能基編號"
+    },
+    {
       "id": "tools",
       "name": "工具"
     }
@@ -306,6 +310,30 @@
       "image": "./assets/gene-function.svg",
       "imageAlt": "針筒把農桿菌的菌液推進一片葉子,葉子下方是左右邊界之間分段上色的 T-DNA,右邊是葉綠體裡亮起的綠色訊號與層析圖上新出現的一支峰",
       "href": "./gene-function/"
+    },
+    {
+      "id": "nomenclature",
+      "name": "有機化學命名法則:從主鏈編號到 R/S 與 E/Z",
+      "categories": [
+        "fg"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/nomenclature.svg",
+      "imageAlt": "左邊是編好號的碳鏈,有一個雙鍵、一個 C=O 和一個甲基;右邊是立體中心,四個原子團標上名次 1 到 4,箭頭順時針繞一圈是 R",
+      "href": "./nomenclature/"
+    },
+    {
+      "id": "carbohydrates",
+      "name": "醣類:從葡萄糖到纖維素與澱粉",
+      "categories": [
+        "fg"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/carbohydrates.svg",
+      "imageAlt": "葡萄糖的六員環,六個碳標上 1 到 6 號;右邊是拉直的纖維素鏈與捲成螺旋的澱粉",
+      "href": "./carbohydrates/"
     },
     {
       "id": "plot",

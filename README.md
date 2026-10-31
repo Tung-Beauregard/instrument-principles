@@ -12,10 +12,11 @@
 - [光譜-光與分子](https://tung-beauregard.github.io/instrument-principles/spectroscopy/)
 - 生化原理：[中心法則](https://tung-beauregard.github.io/instrument-principles/central-dogma/)、[PCR 與電泳](https://tung-beauregard.github.io/instrument-principles/pcr/)、[DNA 定序](https://tung-beauregard.github.io/instrument-principles/sequencing/)、[DNA 鑑定與分子標記](https://tung-beauregard.github.io/instrument-principles/dna-markers/)、[基因選殖與蛋白表現](https://tung-beauregard.github.io/instrument-principles/cloning/)、[萜類合成酶](https://tung-beauregard.github.io/instrument-principles/terpene-synthase/)、[CRISPR 基因編輯](https://tung-beauregard.github.io/instrument-principles/crispr/)、[抗體檢測](https://tung-beauregard.github.io/instrument-principles/immunoassay/)、[流式細胞儀](https://tung-beauregard.github.io/instrument-principles/flow-cytometry/)、[蛋白質質譜定序](https://tung-beauregard.github.io/instrument-principles/proteomics/)
 - 生化進階：[轉錄體分析](https://tung-beauregard.github.io/instrument-principles/transcriptomics/)、[萜類前驅物：MEP 與 MVA](https://tung-beauregard.github.io/instrument-principles/terpenoid-precursors/)、[酵素動力學](https://tung-beauregard.github.io/instrument-principles/enzyme-kinetics/)、[族群遺傳與產地鑑定](https://tung-beauregard.github.io/instrument-principles/population-genetics/)、[演化樹](https://tung-beauregard.github.io/instrument-principles/phylogenetics/)、[在植物裡驗證基因功能](https://tung-beauregard.github.io/instrument-principles/gene-function/)
+- 官能基編號：[有機化學命名法則](https://tung-beauregard.github.io/instrument-principles/nomenclature/)（名字的五個部分、主鏈與編號、取代基，到順反、R 與 S、E 與 Z）、[醣類](https://tung-beauregard.github.io/instrument-principles/carbohydrates/)（碳的編號、成環、α 與 β、環狀糖的名字、糖苷鍵到纖維素與澱粉）
 - [數據畫圖](https://tung-beauregard.github.io/instrument-principles/plot/)（工具：把儀器匯出的檔案畫成報告用的圖）
 - [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-目前共有七份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。「生化原理」區（2026-10-26 起）有十份 2D 動畫教材，用分章動畫與可調的參數講分子生物學與生物化學的實驗原理：中心法則、PCR 與電泳、DNA 定序、DNA 鑑定與分子標記、基因選殖與蛋白表現、萜類合成酶、CRISPR 基因編輯、抗體檢測（西方墨點法與 ELISA）、流式細胞儀、蛋白質質譜定序；這一區不用 WebGL。「生化進階」區（2026-10-27 起）有六份給大學部高年級與研究生的教材，帶公式、統計與接近真實的數據：轉錄體分析、萜類前驅物（MEP 與 MVA 路徑）、酵素動力學、族群遺傳與產地鑑定、演化樹、在植物裡驗證基因功能；生化原理裡有七份也在最後加了「進階」章節。另有「工具」區（2026-10-22 起）放數據畫圖：把 FTIR、DSC、TGA、LCQ 質譜的檔案放進瀏覽器就畫成黑白的報告用圖，可下載 SVG 或 PNG；它不是教材，檔案只在瀏覽器裡處理。
+目前共有七份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。「生化原理」區（2026-10-26 起）有十份 2D 動畫教材，用分章動畫與可調的參數講分子生物學與生物化學的實驗原理：中心法則、PCR 與電泳、DNA 定序、DNA 鑑定與分子標記、基因選殖與蛋白表現、萜類合成酶、CRISPR 基因編輯、抗體檢測（西方墨點法與 ELISA）、流式細胞儀、蛋白質質譜定序；這一區不用 WebGL。「生化進階」區（2026-10-27 起）有六份給大學部高年級與研究生的教材，帶公式、統計與接近真實的數據：轉錄體分析、萜類前驅物（MEP 與 MVA 路徑）、酵素動力學、族群遺傳與產地鑑定、演化樹、在植物裡驗證基因功能；生化原理裡有七份也在最後加了「進階」章節。「官能基編號」區（2026-10-30 起）用同一套 2D 播放器講有機分子的碳怎麼編號、官能基在哪裡，有兩份：有機化學命名法則（名字的五個部分、主鏈、編號、取代基，以及順反、立體中心、R 與 S、E 與 Z、鏡像異構物、內消旋與費雪投影式，2026-10-31 起）、醣類（醛糖與酮糖、鏈狀接成環狀、α 與 β、環狀糖的名字、糖苷鍵，到纖維素與澱粉）。另有「工具」區（2026-10-22 起）放數據畫圖：把 FTIR、DSC、TGA、LCQ 質譜的檔案放進瀏覽器就畫成黑白的報告用圖，可下載 SVG 或 PNG；它不是教材，檔案只在瀏覽器裡處理。
 
 離子阱質譜有兩個畫面：「動畫講解」（`lcq/`）與「拆開探索」（`lcq-3d/`）。拆開探索原本是另一份教材「LCQ 離子之旅」，2026-10-13 併入；入口只列一張卡片，兩個畫面由分頁列的「離子阱質譜」一組互相切換，網址都沒有變。
 
@@ -32,9 +33,9 @@ assets/
   mobile-panels.js         手機版的面板收合：控制面板、譜與說明收成畫面右緣的「‹」把手，點了才彈出；全螢幕鈕；直拿時建議轉成橫式；分頁列排不下時捲到目前這一頁
   mobile-panels.css        右緣把手、停靠區與轉向提示的樣式（只在手機尺寸作用）
   analyzer-fields.js       四種質量分析器的電場示意：四極柱與離子阱是翻轉的馬鞍、飛行時間是坡道地形、Orbitrap 是紡錘與碗（GC-MS 與質譜儀-不同分析器比較）
-  bio-lesson.js            生化原理與生化進階的共用播放器：章節、字幕、播放列、章節清單、「自己調整」的選項、全螢幕、網址 # 跳章
-  bio-draw.js              生化原理與生化進階的 2D 畫圖工具：鹼基與雙股、試管、溫度計、座標軸、曲線、標籤、配色
-  bio-lesson.css           生化原理與生化進階的頁面版面：桌機左畫面右側欄，手機直拿單欄，手機橫拿畫面在左、字幕與章節在右
+  bio-lesson.js            生化原理、生化進階與官能基編號的共用播放器：章節、字幕、播放列、章節清單、「自己調整」的選項、全螢幕（手機上講解一律全螢幕）、網址 # 跳章
+  bio-draw.js              生化原理、生化進階與官能基編號的 2D 畫圖工具：鹼基與雙股、試管、溫度計、座標軸、曲線、標籤、配色
+  bio-lesson.css           生化原理、生化進階與官能基編號的頁面版面：桌機左畫面右側欄，手機直拿單欄，手機橫拿畫面在左、字幕與章節在右
   og/*.jpg                 各頁的分享預覽圖（1200 × 630），由 scripts/make-og-images.mjs 產生
   *.svg                    品牌與儀器概念示意
 content/
@@ -74,6 +75,8 @@ enzyme-kinetics/           生化進階：酵素動力學（初速度、Michaeli
 population-genetics/       生化進階：族群遺傳與產地鑑定（Hardy–Weinberg、F 統計、分群、指派檢定）
 phylogenetics/             生化進階：演化樹（比對、距離校正、UPGMA 與鄰接法、bootstrap、TPS 家族）
 gene-function/             生化進階：在植物裡驗證基因功能（農桿菌暫時表現、GFP 定位、VIGS）
+nomenclature/              官能基編號：有機化學命名法則（鍵線式、主鏈與編號、取代基、順反、R 與 S、E 與 Z、鏡像異構物、費雪投影式）
+carbohydrates/             官能基編號：醣類（碳的編號、成環、α 與 β、環狀糖的名字、糖苷鍵、纖維素與澱粉）
                            以上每個資料夾都有 index.html 與 MAINTENANCE.md
 scripts/check-site.mjs     資料、相對連結與靜態備援檢查
 scripts/check-render-quality.mjs  各教材的 module 語法與畫質、幀率邏輯檢查
@@ -82,7 +85,7 @@ scripts/check-mobile-panels.mjs  手機版面板收合的樣式範圍（只在�
 scripts/check-fields.mjs   四種電場示意的物理（穩定條件、射出順序、飛行時間的聚焦、Orbitrap 的頻率）與兩份教材的接線檢查
 scripts/make-og-images.mjs 重產 assets/og/ 的分享預覽圖（用本機的 Chrome 或 Edge 無頭截圖）
 scripts/check-plot.mjs     數據畫圖的讀檔與畫圖檢查（在程式裡合成各種格式的小檔案，不需要真實數據）
-scripts/check-bio.mjs      生化原理與生化進階每一頁的接線檢查：共用播放器、必要元素、分頁列順序、章節代號、module 語法、維護說明
+scripts/check-bio.mjs      生化原理、生化進階與官能基編號每一頁的接線檢查：共用播放器、必要元素、分頁列順序、章節代號、module 語法、維護說明
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
 INSTRUMENTS.md             各儀器功能、數據與示意說明
@@ -161,13 +164,13 @@ node scripts/make-og-images.mjs http://127.0.0.1:8000/
 
 手機上（寬度 760 px 以下，或高度 500 px 以下的橫拿畫面），UV-Vis、NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC、GC-MS 六份教材用 `assets/mobile-panels.js` 把控制面板、譜與說明收起來（2026-10-22）。2026-10-24 起收起的面板只剩畫面右緣的「‹」小把手，上面直排「調整」「圖譜」「說明」，點了面板才從右邊彈出、排在把手左邊，再點一次收回；按「掃描」「收訊」這類按鈕時譜會自動彈出。瀏覽器支援全螢幕時（Android 的 Chrome 等；iPhone 的 Safari 不支援網頁全螢幕），把手最下面有全螢幕鈕。面板展開時，3D 的主角會移到沒被擋住的地方；橫拿時標題縮成一行，其餘整片留給 3D；直拿的觸控手機會提示一次建議轉成橫式。導覽中把手藏起來，結束後回到原本的收合狀態。桌機與平板的版面不變。離子阱質譜的兩個畫面直拿時只多了轉向提示，版面照舊；手機橫拿時，拆開探索的控制面板也收成右緣的「調整」把手，動畫講解在播放中幾秒沒操作就讓出上下兩條（點一下就回來），全螢幕用它自己播放列上的按鈕。手機橫拿時寬度常常不到 760 px（作者的 Galaxy S23 Ultra 橫拿是 742×298），所以橫拿的版面一律看方向與高度，不看寬度。分頁列排不下時會捲到目前這一頁。
 
-維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)；生化原理：[中心法則](./central-dogma/MAINTENANCE.md)、[PCR 與電泳](./pcr/MAINTENANCE.md)、[DNA 定序](./sequencing/MAINTENANCE.md)、[DNA 鑑定](./dna-markers/MAINTENANCE.md)、[基因選殖](./cloning/MAINTENANCE.md)、[萜類合成酶](./terpene-synthase/MAINTENANCE.md)、[CRISPR](./crispr/MAINTENANCE.md)、[抗體檢測](./immunoassay/MAINTENANCE.md)、[流式細胞儀](./flow-cytometry/MAINTENANCE.md)、[蛋白質定序](./proteomics/MAINTENANCE.md)；生化進階：[轉錄體分析](./transcriptomics/MAINTENANCE.md)、[萜類前驅物](./terpenoid-precursors/MAINTENANCE.md)、[酵素動力學](./enzyme-kinetics/MAINTENANCE.md)、[族群遺傳與產地鑑定](./population-genetics/MAINTENANCE.md)、[演化樹](./phylogenetics/MAINTENANCE.md)、[在植物裡驗證基因功能](./gene-function/MAINTENANCE.md)。
+維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)；生化原理：[中心法則](./central-dogma/MAINTENANCE.md)、[PCR 與電泳](./pcr/MAINTENANCE.md)、[DNA 定序](./sequencing/MAINTENANCE.md)、[DNA 鑑定](./dna-markers/MAINTENANCE.md)、[基因選殖](./cloning/MAINTENANCE.md)、[萜類合成酶](./terpene-synthase/MAINTENANCE.md)、[CRISPR](./crispr/MAINTENANCE.md)、[抗體檢測](./immunoassay/MAINTENANCE.md)、[流式細胞儀](./flow-cytometry/MAINTENANCE.md)、[蛋白質定序](./proteomics/MAINTENANCE.md)；生化進階：[轉錄體分析](./transcriptomics/MAINTENANCE.md)、[萜類前驅物](./terpenoid-precursors/MAINTENANCE.md)、[酵素動力學](./enzyme-kinetics/MAINTENANCE.md)、[族群遺傳與產地鑑定](./population-genetics/MAINTENANCE.md)、[演化樹](./phylogenetics/MAINTENANCE.md)、[在植物裡驗證基因功能](./gene-function/MAINTENANCE.md)；官能基編號：[有機化學命名法則](./nomenclature/MAINTENANCE.md)、[醣類](./carbohydrates/MAINTENANCE.md)。
 
 ## 生化原理的播放器
 
-生化原理的十頁與生化進階的六頁共用 `assets/bio-lesson.js`：每頁只寫章節（名稱、長度、字幕時間點、畫面）與「自己調整」的選項，播放、暫停、上一章與下一章、進度條、章節清單、字幕、全螢幕與網址 `#章節代號` 都由播放器處理。畫布用 960 × 540 的邏輯座標，依畫面大小等比例縮放；手機上畫面很小時字會放大一些（最多 1.3 倍）。使用者動過選項或點過畫面，這一章播完就停住，不自動跳下一章。鍵盤：空白鍵播放或暫停、左右鍵換章。偏好減少動態效果時不自動播放。
+生化原理的十頁、生化進階的六頁與官能基編號的兩頁共用 `assets/bio-lesson.js`：每頁只寫章節（名稱、長度、字幕時間點、畫面）與「自己調整」的選項，播放、暫停、上一章與下一章、進度條、章節清單、字幕、全螢幕與網址 `#章節代號` 都由播放器處理。畫布用 960 × 540 的邏輯座標，依畫面大小等比例縮放；手機上畫面很小時字會放大一些（最多 1.3 倍）。使用者動過選項或點過畫面，這一章播完就停住，不自動跳下一章。鍵盤：空白鍵播放或暫停、左右鍵換章。偏好減少動態效果時不自動播放；手機上開頁也不自動播放（見下一段）。
 
-版面：桌機畫面在左、選項與章節在右；手機直拿是單欄，選項排在畫面下方；手機橫拿（高度 500 px 以下）畫面在左，字幕、選項與章節在右邊一欄，頁首收起。播放列最右邊是全螢幕鈕：全螢幕時是劇場模式，只留動畫、字幕、播放列與「自己調整」，動畫盡量大，手機上會自動轉成橫的；iPhone 的 Safari 不支援網頁全螢幕，不顯示這顆鈕。手機直拿與一般橫拿時，動畫都被約 200 px 的高度限住（Galaxy S23 Ultra 實測，圖上 13 單位的字約 6.3 px），全螢幕時放大到約 7.9 px，所以觸控手機直拿時提示一次「按全螢幕鈕」（不能全螢幕的瀏覽器改成建議轉成橫式），提示排在播放列下面，不擋播放鈕。
+版面：桌機畫面在左、選項與章節在右；手機直拿是單欄，選項排在畫面下方；手機橫拿（高度 500 px 以下）畫面在左，字幕、選項與章節在右邊一欄，頁首收起。播放列最右邊是全螢幕鈕：全螢幕時是劇場模式，只留動畫、字幕、播放列與「自己調整」，動畫盡量大，手機上會自動轉成橫的。手機上講解一律全螢幕（使用者 2026-10-31 要求）：開頁不自動播放，動畫中間有「開始講解」；按它、播放鈕、章節清單、進度列或「自己調整」開始播放時先進全螢幕，離開全螢幕（全螢幕鈕或返回鍵）就暫停，講解不在頁面裡的小框播。iPhone 的 Safari 不支援網頁全螢幕，改用同一套劇場版面蓋滿瀏覽器的畫面（網址列還在，也不能替使用者轉向），所以手機上一定有全螢幕鈕。手機直拿與一般橫拿時，動畫都被約 200 px 的高度限住（Galaxy S23 Ultra 實測，圖上 13 單位的字約 6.3 px），全螢幕時放大到約 7.9 px；觸控手機直拿時提示一次「按播放會全螢幕」（不能網頁全螢幕的瀏覽器另外建議把手機轉成橫的），提示排在播放列下面，不擋播放鈕。
 
 ## 品牌與資料來源
 

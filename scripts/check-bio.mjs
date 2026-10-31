@@ -1,4 +1,4 @@
-// 生化原理(bio,2026-10-26)與生化進階(bio-adv,2026-10-27)兩區的檢查:清單裡這兩個分類的每一頁都接上共用播放器、
+// 生化原理(bio,2026-10-26)、生化進階(bio-adv,2026-10-27)與官能基編號(fg,2026-10-30)三區的檢查:清單裡這些分類的每一頁都接上共用播放器、
 // 元素齊全、分頁列和自己那一區一致、章節代號不重複、module 語法正確、有維護說明;頁面文字不放特定老師的名字、不用破折號。
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -13,14 +13,14 @@ const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
 const { categories, instruments } = JSON.parse(read('content/instruments.json'));
 assert.ok(categories.some((c) => c.id === 'bio' && c.name === '生化原理'), '清單裡要有「生化原理」分類(id: bio)');
 // 每一區一組分頁列(nav 的 aria-label 是分區名稱);生化進階分類存在時也要有教材
-const groups = [{ id: 'bio', name: '生化原理' }, { id: 'bio-adv', name: '生化進階' }]
+const groups = [{ id: 'bio', name: '生化原理' }, { id: 'bio-adv', name: '生化進階' }, { id: 'fg', name: '官能基編號' }]
   .filter((g) => categories.some((c) => c.id === g.id))
   .map((g) => ({ ...g, items: instruments.filter((i) => i.categories.includes(g.id) && i.status === 'ready') }));
 for (const g of groups) {
   assert.ok(categories.some((c) => c.id === g.id && c.name === g.name), `分類 ${g.id} 的名稱要是「${g.name}」`);
   assert.ok(g.items.length > 0, `${g.name}分類裡沒有已完成的教材`);
 }
-const both = groups.length > 1 ? groups[0].items.filter((i) => groups[1].items.includes(i)) : [];
+const both = groups.flatMap((ga, a) => groups.slice(a + 1).flatMap((gb) => ga.items.filter((i) => gb.items.includes(i))));
 assert.equal(both.length, 0, `教材不能同時放在兩區:${both.map((i) => i.id).join(', ')}`);
 
 // 共用檔
@@ -34,11 +34,18 @@ const nodeCheck = (code, name) => {
 };
 nodeCheck(read('assets/bio-lesson.js'), 'bio-lesson.js');
 nodeCheck(read('assets/bio-draw.js'), 'bio-draw.js');
-// 轉向提示由播放器顯示一次(全螢幕可用時提示按全螢幕鈕),頁面不自己呼叫;全螢幕時切換劇場模式 .bio-fs,手機鎖成橫向
+// 轉向提示由播放器顯示一次,頁面不自己呼叫;全螢幕時切換劇場模式 .bio-fs,手機鎖成橫向
 const player = read('assets/bio-lesson.js'), css = read('assets/bio-lesson.css');
 assert.equal((player.match(/createRotateHint\(\{/g) || []).length, 1, 'bio-lesson.js 要呼叫一次 createRotateHint');
 assert.ok(player.includes("classList.toggle('bio-fs', on)") && player.includes("orient.lock('landscape')"), 'bio-lesson.js:全螢幕要切換 .bio-fs,手機要鎖成橫向');
 assert.ok(css.includes('html.bio-fs main.lesson{position:fixed;inset:0'), 'bio-lesson.css 缺少全螢幕的劇場模式版面');
+// 手機上講解一律全螢幕(2026-10-31):開頁不自動播放、有「開始講解」,使用者開始播放時先進全螢幕,離開全螢幕就暫停;
+// 不支援網頁全螢幕的(iPhone 的 Safari)用蓋滿畫面的劇場版面
+assert.ok(player.includes('setPlaying(autoplay && !reduce && !phone.matches)'), 'bio-lesson.js:手機上不要自動播放');
+assert.ok(/function userPlay\(\) \{\s*if \(phone\.matches\) enterTheater\(\);/.test(player), 'bio-lesson.js:手機上開始播放要先進全螢幕');
+assert.ok(player.includes('if (wasOn && !on && phone.matches) setPlaying(false)'), 'bio-lesson.js:手機上離開全螢幕要暫停');
+assert.ok(player.includes("startBtn.className = 'bio-start'") && css.includes('.bio-start{position:absolute'), '缺少手機的「開始講解」鈕');
+assert.ok(player.includes('pseudo = true'), 'bio-lesson.js:不支援網頁全螢幕時要退回蓋滿畫面的版面');
 
 // 分頁列:← 儀器入口,然後是清單裡同一區的每一頁(順序相同),本頁 aria-current
 const navOf = (html, label) => {

@@ -48,11 +48,16 @@ main.lesson{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;alig
 #prog .sg.done i{width:100%!important;opacity:.55}
 #prog .sg.on{height:10px;background:rgba(165,243,205,.22)}
 #chName{flex:none;max-width:40%;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* 全螢幕鈕(瀏覽器支援時才出現):全螢幕時換成縮小的圖示 */
+/* 全螢幕鈕(瀏覽器支援時,以及所有手機上才出現):全螢幕時換成縮小的圖示 */
 #btnFs[hidden]{display:none}
 #btnFs .i-out{display:none}
 #btnFs.on .i-in{display:none}
 #btnFs.on .i-out{display:block}
+/* 手機上開頁不自動播放,動畫中間一顆「開始講解」,按了進全螢幕並播放(bio-lesson.js);沒在播、也不在全螢幕時才出現 */
+.bio-start{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:inline-flex;align-items:center;gap:8px;padding:12px 18px 12px 15px;border-radius:999px;border:1px solid rgba(165,243,205,.55);background:rgba(11,17,17,.86);color:#f0f3ee;font:inherit;font-size:15px;font-weight:600;line-height:1;white-space:nowrap;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.bio-start svg{width:15px;height:15px;flex:none;color:var(--mint)}
+.bio-start small{font-size:12px;font-weight:500;color:var(--muted)}
+.bio-start[hidden]{display:none}
 /* 右側:自己調整、章節 */
 .side{display:flex;flex-direction:column;gap:12px;min-width:0}
 .box{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 14px}

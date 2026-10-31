@@ -1,0 +1,1021 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>醣類:碳的編號、成環、糖苷鍵到纖維素與澱粉</title>
+<meta name="description" content="用動畫看醣類的碳怎麼編號:醛糖與酮糖、鏈狀接成環狀、α 與 β 怎麼分又為什麼有兩種、環狀糖的名字怎麼讀、糖苷鍵 α(1→4) 與 β(1→4) 怎麼讀,以及纖維素為什麼是直的、澱粉為什麼捲成螺旋。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="醣類:碳的編號、成環、糖苷鍵到纖維素與澱粉">
+<meta property="og:description" content="用動畫看醣類的碳怎麼編號:醛糖與酮糖、鏈狀接成環狀、α 與 β、糖苷鍵 α(1→4) 與 β(1→4),以及纖維素與澱粉的差別。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/carbohydrates/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/carbohydrates.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="葡萄糖接成六員環,六個碳標上 1 到 6 號">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/carbohydrates/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="官能基編號"><a href="../">← 儀器入口</a><a href="../nomenclature/">命名法則</a><a href="./" aria-current="page">醣類</a></nav></div>
+<header class="top wrap">
+  <h1>醣類 <span class="k">碳的編號、成環與糖苷鍵</span></h1>
+  <p class="lede">醣類是一條帶著很多 OH 的碳鏈。先學會替碳編號,就讀得懂醛糖與酮糖、鏈狀怎麼接成環、1 號碳上的 α 與 β、「α-D-葡萄哌喃糖」這種名字怎麼讀,以及「β(1→4)」這種糖苷鍵的寫法;最後看同樣是葡萄糖,為什麼接成纖維素是直的、接成澱粉會捲成螺旋。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="醣類的動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <ul>
+      <li>醣類是帶著很多羥基(–OH)的碳鏈,再加一個羰基(C=O)。羰基在鏈的末端是醛基,這種醣叫醛糖(例如葡萄糖);羰基在鏈的中間是酮基,叫酮糖(例如果糖)。</li>
+      <li>編號從離羰基最近的那一端開始:醛糖的醛基是 1 號碳,常見酮糖的酮基是 2 號碳。D 或 L 看編號最大的那個不對稱碳(葡萄糖、果糖都是 5 號碳):費雪投影裡它的 OH 在右邊就是 D 型。</li>
+      <li>在水裡,5 號碳的 OH 接上羰基的碳就成環,環上的氧來自 5 號碳。葡萄糖接成 5 個碳加 1 個氧的六員環(哌喃糖);果糖的 5 號碳接 2 號碳,成 4 個碳加 1 個氧的五員環(呋喃糖)。原本羰基的碳叫異頭碳,它多出一個新的 OH。</li>
+      <li>α 與 β:以 D-葡萄糖的環來說,1 號碳的 OH 和 6 號碳的 CH₂OH 在環的同一邊是 β,在反邊是 α(正式的定義:在費雪投影裡,異頭碳的 OH 和 5 號碳的 O 在同一邊是 α,在兩邊是 β)。羰基是平的,5 號碳的 O 可以從任一面接上,所以兩種都會出現;環在水裡會打開再接回去,α 和 β 互相轉換(變旋現象)。</li>
+      <li>環狀糖的名字由四塊組成:α 或 β(異頭碳的 OH)、D 或 L(5 號碳)、哪一種糖,以及夾在糖名中間的環的大小,例如 α-D-葡萄哌喃糖。5 個碳加 1 個氧的六員環叫哌喃,4 個碳加 1 個氧的五員環叫呋喃。英文的順序一樣(α-D-glucopyranose:gluco 葡萄、pyran 哌喃、ose 糖),縮寫成 α-D-Glcp(p 是哌喃、f 是呋喃);雙醣寫成 α-D-Glcp-(1→4)-D-Glc 這樣。</li>
+      <li>糖苷鍵:一個糖的異頭碳上的 OH 和另一個糖的 OH 之間少掉一分子水,留下的 O 把兩個碳連起來。寫成 α(1→4) 表示 1 號碳(α 方向)接到下一個糖的 4 號碳。還留著自由異頭碳的那一端叫還原端。</li>
+      <li>纖維素是 β(1→4) 接起來的葡萄糖,每一個都和隔壁上下翻面,鏈又直又平,鏈之間靠氫鍵排成結晶;澱粉是 α(1→4),鏈會捲成螺旋,支鏈澱粉另外用 α(1→6) 接出分支。人有切 α(1→4) 的澱粉酶,沒有切 β(1→4) 的酵素。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>編號、D 與 L、α 與 β、環的畫法、糖苷鍵:IUPAC-IUBMB. Nomenclature of Carbohydrates(1996;Pure Appl Chem 68:1919)。<a href="https://iupac.qmul.ac.uk/2carb/02.html">2-Carb-2.2.1</a>(醛基是 1 號,酮糖的羰基取最小的號碼)、<a href="https://iupac.qmul.ac.uk/2carb/03n04.html#04">2-Carb-4.2</a>(D、L 看編號最大的不對稱碳)、<a href="https://iupac.qmul.ac.uk/2carb/05.html">2-Carb-5.1</a>(五員環叫 furanose、六員環叫 pyranose)、<a href="https://iupac.qmul.ac.uk/2carb/05.html">2-Carb-5.4</a>(哈沃斯投影:環上的氧在後面、1 號碳在右端,費雪投影在右的朝下,D 型己醛糖的 6 號碳在環上方)、<a href="https://iupac.qmul.ac.uk/2carb/06n07.html">2-Carb-6</a>(α 與 β)、<a href="https://iupac.qmul.ac.uk/2carb/36.html">2-Carb-36</a>(蔗糖、麥芽糖、纖維二糖、異麥芽糖)、<a href="https://iupac.qmul.ac.uk/2carb/38.html">2-Carb-38</a>(縮寫:Glc、Fru 前面寫 α 或 β 與 D,環的大小寫成 p 或 f,兩個異頭碳相接用 ↔)。</li>
+      <li>第 8 章「朝下是 α、朝上是 β」:頁面上照標準方向畫的三種 D 型環,α 與 β 都對過 PubChem 依結構算出的立體標記,β 的異頭碳都是 R、α 都是 S(<a href="https://pubchem.ncbi.nlm.nih.gov/compound/64689">β-D-葡萄哌喃糖</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/79025">α-D-葡萄哌喃糖</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/439709">β-D-果呋喃糖</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/11105942">α-D-果呋喃糖</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/24310">β-D-果哌喃糖</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/440545">α-D-果哌喃糖</a>)。</li>
+      <li>名詞:國家教育研究院<a href="https://terms.naer.edu.tw/">樂詞網</a>。哌喃醣(中國大陸寫作吡喃糖)、呋喃糖;環狀糖的名字照樂詞網把糖名寫在前面,例如葡萄哌喃糖、果呋喃糖(中國大陸寫作吡喃葡萄糖、呋喃果糖)。變旋異構物(anomer)、變旋作用、費雪投影式、哈沃斯投影式;化學名詞把醛糖、酮糖寫成醛醣、酮醣,頁面沿用常見的寫法。「異頭碳」(anomeric carbon)樂詞網沒有收錄。</li>
+      <li>葡萄糖在水裡的平衡:α 約 36%、β 約 64%(LibreTexts, Fundamentals of General, Organic, and Biological Chemistry, <a href="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Fundamentals_of_General_Organic_and_Biological_Chemistry_(LibreTexts)/20%3A_Carbohydrates/20.03%3A_Structure_of_Glucose_and_Other_Monosaccharides">20.3</a>;OpenStax Organic Chemistry <a href="https://openstax.org/books/organic-chemistry/pages/25-5-cyclic-structures-of-monosaccharides-anomers">25.5</a> 寫 37:63)。打開的鏈狀(醛基)約 0.001% 到 0.004%:Dworkin JP, Miller SL. A kinetic estimate of the free aldehyde content of aldoses. Carbohydr Res. 2000;329:359–365. <a href="https://www.astrochem.org/docs/DworkinMiller.pdf">全文</a>(25 °C 最佳估計 0.0012%,依文獻在 20 到 30 °C 之間約 0.001% 到 0.004%)。</li>
+      <li>果糖在水裡(D₂O,20 °C)約 68% 是 β-果哌喃糖、22% 是 β-果呋喃糖、6% 是 α-果呋喃糖、3% 是 α-果哌喃糖、0.5% 是鏈狀。Barclay T, et al. Observation of the keto tautomer of D-fructose in D₂O using ¹H NMR spectroscopy. Carbohydr Res. 2012;347(1):136–141. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3254704/">PMC3254704</a></li>
+      <li>纖維素:每個葡萄糖和隔壁轉 180°,鏈內最主要的氫鍵是 3 號碳的 OH 到隔壁環上的氧(O3–H⋯O5),鏈與鏈之間主要是 O6–H⋯O3。Nishiyama Y, Langan P, Chanzy H. J Am Chem Soc. 2002;124:9074–9082(<a href="https://pubmed.ncbi.nlm.nih.gov/12149011/">PubMed 12149011</a>);Moon RJ, et al. Cellulose nanomaterials review. Chem Soc Rev. 2011;40:3941(<a href="https://research.fs.usda.gov/download/treesearch/38661.pdf">美國林務署的版本</a>,1.1 與 1.2 節)。</li>
+      <li>木材乾重約 4 到 5 成是纖維素(針葉樹 40% 到 45%、闊葉樹 38% 到 49%):Rowell RM, Pettersen R, Tshabalala MA. Cell wall chemistry. In: Handbook of Wood Chemistry and Wood Composites, 2nd ed. CRC Press; 2013. 第 3 章(<a href="https://research.fs.usda.gov/download/treesearch/42245.pdf">美國林務署的版本</a>)。</li>
+      <li>澱粉:直鏈澱粉和碘結合時是每圈 6 個葡萄糖的左手螺旋,藍色來自螺旋中間的一串碘(多碘離子)(Pesek S, Silaghi-Dumitrescu R. Molecules. 2024;29:641,<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10856212/">PMC10856212</a>);支鏈澱粉約每 25 到 30 個葡萄糖一個 α(1→6) 分支,肝醣每 8 到 12 個(LibreTexts <a href="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Fundamentals_of_General_Organic_and_Biological_Chemistry_(LibreTexts)/20%3A_Carbohydrates/20.07%3A_Some_Important_Polysaccharides_Based_on_Glucose">20.7</a>;Tetlow IJ, Bertoft E. Int J Mol Sci. 2020;21:7011,<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7582286/">PMC7582286</a>:α(1→6) 約占支鏈澱粉的鍵的 5%)。直鏈澱粉的比例各書略有不同(一成五到三成五),頁面寫「通常約兩到三成」(Pesek 2024;<a href="https://inchem.org/documents/jecfa/jecmono/v05je65.htm">JECFA 1973</a> 寫 15% 到 30%)。</li>
+      <li>消化:澱粉酶切的是 α(1→4)(<a href="https://iubmb.qmul.ac.uk/enzyme/EC3/2/1/1.html">EC 3.2.1.1</a>),切 β(1→4) 的是纖維素酶(<a href="https://iubmb.qmul.ac.uk/enzyme/EC3/2/1/4.html">EC 3.2.1.4</a>),人的消化酵素切不開 β(1→4),反芻動物靠胃裡的微生物(OpenStax Biology 2e <a href="https://openstax.org/books/biology-2e/pages/3-2-carbohydrates">3.2</a>)。</li>
+      <li>分子的形狀、鍵長、成環動畫中間的樣子、螺旋與分支的畫法、第 6 章曲線的形狀都是示意,不是實際比例。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">官能基編號・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, seg, ease, clamp, lerp, mix } from '../assets/bio-draw.js';
+
+// ================= 顏色與小工具 =================
+// OH 淺藍、羰基(C=O)琥珀、環上的氧淡紅、α 橘、β 淡紫、編號薄荷綠、氫鍵琥珀虛線
+const K = { bond: '#c3cdc8', c: '#d5ddd9', h: '#8a9a94', oh: '#8ec5ff', co: '#ffd166', ringO: '#ff8f8f', a: '#ff9a5c', b: '#c3a8ff', num: '#a5f3cd', hb: '#ffd166', bg: '#0f1716' };
+const RAD = Math.PI / 180;
+const fin = (t, a, d = 0.6) => ease(seg(t, a, a + d));
+const win = (t, a, b, d = 0.5) => Math.min(fin(t, a, d), 1 - ease(seg(t, b - d, b)));
+const P = (x, y) => ({ x, y });
+const add = (p, dx, dy) => P(p.x + dx, p.y + dy);
+const mixP = (p, q, k) => P(lerp(p.x, q.x, k), lerp(p.y, q.y, k));
+const xy = (p) => [p.x, p.y];
+const ANO = { a: 'α', b: 'β' };
+const anoCol = (ab) => (ab === 'a' ? K.a : ab === 'b' ? K.b : K.oh);
+// 名詞:哌喃、呋喃用國家教育研究院樂詞網的譯名(中國大陸寫作吡喃);要換寫法只改這裡
+const PYR = '哌喃', FUR = '呋喃';
+function alpha(g, a, fn) { if (a <= 0.01) return; g.ctx.save(); g.ctx.globalAlpha *= Math.min(1, a); fn(); g.ctx.restore(); }
+
+// 鍵;k2 > 0 時畫成雙鍵(k2 是第二條線的濃淡,雙鍵打開成單鍵時從 1 變成 0)
+function bond(g, p, q, { color = K.bond, lw = 2.4, a = 1, k2 = 0, dash, off = 4 } = {}) {
+  alpha(g, a, () => {
+    if (k2 <= 0.01) { g.line(p.x, p.y, q.x, q.y, color, lw, dash); return; }
+    const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1, nx = (-dy / L) * off * k2, ny = (dx / L) * off * k2;
+    g.line(p.x + nx, p.y + ny, q.x + nx, q.y + ny, color, lw, dash);
+    alpha(g, k2, () => g.line(p.x - nx, p.y - ny, q.x - nx, q.y - ny, color, lw, dash));
+  });
+}
+// 波浪線:還原端的異頭碳,OH 可能是 α 也可能是 β
+function wavy(g, p, q, { color = K.bond, lw = 2.2, a = 1 } = {}) {
+  alpha(g, a, () => {
+    const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, pts = [];
+    for (let i = 0; i <= 24; i++) { const k = i / 24, w = Math.sin(k * Math.PI * 4) * 4 * Math.min(1, k * 4, (1 - k) * 4); pts.push([p.x + dx * k + nx * w, p.y + dy * k + ny * w]); }
+    g.curve(pts, color, lw);
+  });
+}
+// 原子或原子團的字(OH、H、O、CH₂OH),底下墊一塊底色,鍵畫到中心也不會穿過字;hl 是外框的顏色
+function label(g, p, s, { color = K.oh, size = 15, a = 1, weight = 700, hl, nobg = false } = {}) {
+  alpha(g, a, () => {
+    const ctx = g.ctx; g.font(size, weight);
+    const w = ctx.measureText(s).width, h = size * g.boost;
+    if (hl) g.rrect(p.x - w / 2 - 6, p.y - h / 2 - 4, w + 12, h + 8, 7, 'rgba(15,23,22,.95)', hl, 2);
+    else if (!nobg) { ctx.fillStyle = K.bg; ctx.fillRect(p.x - w / 2 - 2, p.y - h / 2, w + 4, h); }
+    g.text(p.x, p.y + 0.5, s, { size, weight, color, align: 'center' });
+  });
+}
+// 碳原子:小圓圈裡寫 C;hl 是發光的顏色
+function carbon(g, p, { a = 1, r = 11, hl } = {}) {
+  alpha(g, a, () => {
+    if (hl) { g.ctx.save(); g.ctx.shadowColor = hl; g.ctx.shadowBlur = 16; g.circle(p.x, p.y, r + 1, K.bg, hl, 2.4); g.ctx.restore(); }
+    else g.circle(p.x, p.y, r, K.bg, '#8fa39b', 1.5);
+    g.text(p.x, p.y + 0.5, 'C', { size: 13, weight: 700, color: K.c, align: 'center' });
+  });
+}
+// 編號的小圓
+function badge(g, p, n, { a = 1, color = K.num } = {}) {
+  alpha(g, a, () => {
+    g.circle(p.x, p.y, 9 * Math.max(1, g.boost * 0.92), color);
+    g.text(p.x, p.y + 0.5, String(n), { size: 12, weight: 800, color: '#0b1111', align: 'center', mono: true });
+  });
+}
+// 多行字(arr 是字串陣列)
+function lines(g, x, y, arr, { size = 15, color = C.ink2, gap = 1.6, a = 1, weight = 500, align = 'left' } = {}) {
+  alpha(g, a, () => arr.forEach((s, i) => g.text(x, y + i * size * gap * g.boost, s, { size, color, weight, align })));
+}
+// 說明卡片:標題加幾行字
+function card(g, x, y, w, h, title, color, body, a = 1) {
+  alpha(g, a, () => {
+    g.rrect(x, y, w, h, 12, 'rgba(21,32,30,.88)', color, 1.6);
+    g.text(x + 16, y + 24, title, { size: 17, weight: 800, color });
+    lines(g, x + 16, y + 54, body, { size: 14 });
+  });
+}
+// 一排有顏色的字(名字拆成幾塊,parts 是 [字, 顏色, 代號]);act 是目前講到的那一塊:其他塊變暗,這一塊底下畫線。
+// align 'left' 時從 x 開始排,否則以 x 置中
+function nameRow(g, parts, x, y, size, act = null, { dim = 0.4, align = 'center' } = {}) {
+  const ctx = g.ctx; g.font(size, 800);
+  const ws = parts.map(([s]) => ctx.measureText(s).width), tot = ws.reduce((p, q) => p + q, 0);
+  let x0 = align === 'left' ? x : x - tot / 2;
+  parts.forEach(([s, col, k], i) => {
+    const on = !act || k === act;
+    alpha(g, on ? 1 : dim, () => g.text(x0 + ws[i] / 2, y, s, { size, weight: 800, color: col, align: 'center' }));
+    if (act && k === act) { const yy = y + size * 0.72 * g.boost; g.line(x0 + 2, yy, x0 + ws[i] - 2, yy, col, 3); }
+    x0 += ws[i];
+  });
+}
+// 小的 n 邊形環,最上面的頂點是 O(哌喃是六員環、呋喃是五員環)
+function ringIcon(g, x, y, r, n, { color = K.ringO, a = 1 } = {}) {
+  alpha(g, a, () => {
+    const pts = Array.from({ length: n }, (_, i) => { const ang = -Math.PI / 2 + (i * 2 * Math.PI) / n; return P(x + r * Math.cos(ang), y + r * Math.sin(ang)); });
+    pts.forEach((p, i) => { const q = pts[(i + 1) % n]; g.line(p.x, p.y, q.x, q.y, color, 1.6); });
+    label(g, pts[0], 'O', { color, size: 11 });
+  });
+}
+// 彎的箭頭(二次曲線),bend 是往左彎的程度(負的往右)
+function carrow(g, p, q, bend, { color = C.mint, lw = 2.4, a = 1, dash } = {}) {
+  const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1;
+  const c = P((p.x + q.x) / 2 - (dy / L) * bend, (p.y + q.y) / 2 + (dx / L) * bend);
+  const at = (k) => [(1 - k) * (1 - k) * p.x + 2 * (1 - k) * k * c.x + k * k * q.x, (1 - k) * (1 - k) * p.y + 2 * (1 - k) * k * c.y + k * k * q.y];
+  const pts = Array.from({ length: 21 }, (_, i) => at(i / 20));
+  alpha(g, a, () => {
+    g.curve(pts.slice(0, 19), color, lw, { dash });
+    const [x1, y1] = pts[17], [x2, y2] = pts[20];
+    g.arrow(x1, y1, x2, y2, { color, lw, head: 10 });
+  });
+}
+// 小六邊形(示意一個葡萄糖);flat 是上下壓扁的比例
+function hexagon(g, x, y, r, { fill = 'rgba(165,243,205,.16)', stroke = K.num, lw = 1.6, a = 1, flat = 0.62 } = {}) {
+  alpha(g, a, () => {
+    const ctx = g.ctx; ctx.beginPath();
+    for (let i = 0; i < 6; i++) { const ang = i * 60 * RAD, px = x + r * Math.cos(ang), py = y + r * flat * Math.sin(ang); if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
+    ctx.closePath();
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    ctx.lineWidth = lw; ctx.strokeStyle = stroke; ctx.stroke();
+  });
+}
+
+// ================= 費雪投影 =================
+// 直的一條是碳鏈(1 號碳在上),左右是接在碳上的 H 與 OH。oh[i] 是 i 號碳的 OH 在右(R)或左(L)
+const SUG = {
+  glc: { name: 'D-葡萄糖', n: 6, co: 1, oh: { 2: 'R', 3: 'L', 4: 'R', 5: 'R' } },
+  lglc: { name: 'L-葡萄糖', n: 6, co: 1, oh: { 2: 'L', 3: 'R', 4: 'L', 5: 'L' } },
+  fru: { name: 'D-果糖', n: 6, co: 2, oh: { 3: 'L', 4: 'R', 5: 'R' } },
+  rib: { name: 'D-核糖', n: 5, co: 1, oh: { 2: 'R', 3: 'R', 4: 'R' } },
+  rbu: { name: 'D-核酮糖', n: 5, co: 2, oh: { 3: 'R', 4: 'R' } },
+};
+// o:cx、cy(碳鏈中點)、step(碳與碳的距離)、arm(左右原子團的距離)、num(編號的濃淡,可以是 i => 0 到 1)、
+//   hlOH(i => 顏色)圈起 OH、hlCO 圈起羰基、hlCH2 圈起 CH₂OH、hlC(i => 顏色)讓碳發光
+function fischer(g, S, o) {
+  const { cx, cy, step = 58, arm = 66, a = 1 } = o;
+  const y0 = cy - ((S.n - 1) * step) / 2, pos = (i) => P(cx, y0 + (i - 1) * step);
+  const term = (i) => (i === 1 && S.co !== 1) || i === S.n;
+  const numA = (i) => (typeof o.num === 'function' ? o.num(i) : o.num || 0);
+  alpha(g, a, () => {
+    const labs = [];
+    for (let i = 1; i < S.n; i++) bond(g, pos(i), pos(i + 1));
+    for (let i = 1; i <= S.n; i++) {
+      const p = pos(i);
+      if (i === S.co) {
+        const pO = S.co === 1 ? add(p, 40, -34) : add(p, arm, 0);
+        bond(g, p, pO, { k2: 1, color: o.hlCO ? K.co : K.bond });
+        labs.push(() => label(g, pO, 'O', { color: K.co, hl: o.hlCO ? K.co : null }));
+        if (S.co === 1) { const pH = add(p, -40, -34); bond(g, p, pH); labs.push(() => label(g, pH, 'H', { color: K.h, size: 14 })); }
+      } else if (!term(i)) {
+        const s = S.oh[i] === 'R' ? 1 : -1, pO = add(p, s * arm, 0), pH = add(p, -s * arm, 0);
+        bond(g, p, pO); bond(g, p, pH);
+        labs.push(() => label(g, pO, s > 0 ? 'OH' : 'HO', { color: K.oh, hl: o.hlOH ? o.hlOH(i) : null }));
+        labs.push(() => label(g, pH, 'H', { color: K.h, size: 14 }));
+      }
+    }
+    labs.forEach((f) => f());
+    for (let i = 1; i <= S.n; i++) {
+      const p = pos(i);
+      if (term(i)) label(g, p, 'CH₂OH', { color: K.oh, hl: o.hlCH2 ? K.oh : null });
+      else carbon(g, p, { hl: o.hlC ? o.hlC(i) : null });
+      const na = numA(i);
+      if (na > 0) badge(g, term(i) ? add(p, 46, -16) : i === 1 ? add(p, 26, 6) : add(p, 21, -21), i, { a: na });
+    }
+  });
+  return { pos, y0 };
+}
+
+// ================= 鏈狀變環狀(第 4 章葡萄糖、第 7 章果糖) =================
+// 五個姿勢:F 費雪投影 → 躺下來(F 順時針轉 90°)→ R0 碳鏈彎成一圈 → R1 5 號碳轉一下,OH 轉到環上 → R2 接上成環。
+// 每個原子(或原子團)有一個代號,姿勢之間內插位置;編號的小圓也當成一個點(N1 到 N6)。
+// 代號:C1 到 C6 碳(環外的 CH₂OH 也算碳);Oc 羰基的 O(成環後變成新的 OH);X 醛糖羰基碳上的 H;
+//   O2、H2…中間碳上的 OH 與 H;Or 成環那個 OH 的 O(變成環上的氧)、Hr 它的 H(移到 Oc 上);H5 5 號碳上的 H。
+const RG = { cx: 470, cy: 300, R: 160, k: 0.42, L: 52 };
+const VR = (deg, rr = 1) => P(RG.cx + RG.R * rr * Math.cos(deg * RAD), RG.cy + RG.R * rr * RG.k * Math.sin(deg * RAD));
+const FX = { cx: 480, cy: 272, step: 58, arm: 66 };
+const CYC = {
+  glc: { S: 'glc', ca: 1, co: 5, ang: { 1: 0, 2: 60, 3: 120, 4: 180, 5: 240, O: 300 } },
+  fru: { S: 'fru', ca: 2, co: 5, ang: { 2: 342, 3: 54, 4: 126, 5: 198, O: 270 } },
+};
+function cycPoses(cfg, ab) {
+  const S = SUG[cfg.S], n = S.n, { ca, co, ang } = cfg;
+  const F = {}, R0 = {};
+  const y0 = FX.cy - ((n - 1) * FX.step) / 2, Cf = (i) => P(FX.cx, y0 + (i - 1) * FX.step);
+  const isLab = (i) => i < ca || i > co; // 環外的 CH₂OH
+  // F:費雪投影
+  for (let i = 1; i <= n; i++) F['C' + i] = Cf(i);
+  if (ca === 1) { F.Oc = add(Cf(1), 40, -34); F.X = add(Cf(1), -40, -34); } else F.Oc = add(Cf(ca), FX.arm, 0);
+  for (let i = ca + 1; i < co; i++) { const s = S.oh[i] === 'R' ? 1 : -1; F['O' + i] = add(Cf(i), s * FX.arm, 0); F['H' + i] = add(Cf(i), -s * FX.arm, 0); }
+  F.Or = add(Cf(co), FX.arm - 5, 0); F.Hr = add(Cf(co), FX.arm + 6, 0); F['H' + co] = add(Cf(co), -FX.arm, 0);
+  // R0:碳鏈彎成一圈(異頭碳先停在外面一點)。費雪投影在右邊的,躺下來以後朝下(畫面 y 往下為正)
+  for (let i = ca; i <= co; i++) R0['C' + i] = i === ca ? VR(ang[i] - 12, 1.14) : VR(ang[i]);
+  const ud = (i) => (S.oh[i] === 'R' ? 1 : -1);
+  for (let i = ca + 1; i < co; i++) { R0['O' + i] = add(R0['C' + i], 0, ud(i) * RG.L); R0['H' + i] = add(R0['C' + i], 0, -ud(i) * RG.L * 0.8); }
+  const Ca0 = R0['C' + ca], Co0 = R0['C' + co];
+  if (ca === 1) { R0.Oc = add(Ca0, 36, 38); R0.X = add(Ca0, 36, -38); } else { R0.Oc = add(Ca0, 30, 44); R0.C1 = add(Ca0, 70, -20); }
+  R0.Or = add(Co0, 0, RG.L); R0.Hr = add(Co0, 0, RG.L + 17); R0['H' + co] = add(Co0, 0, -RG.L * 0.8);
+  R0['C' + (co + 1)] = VR(ang.O);
+  // R1:5 號碳轉一下:OH 轉到環上、CH₂OH 朝上、H 朝下
+  const R1 = { ...R0 }, Opos = VR(ang.O);
+  R1.Or = Opos; R1.Hr = add(Opos, 11, 0); R1['C' + (co + 1)] = add(Co0, -10, -RG.L - 6); R1['H' + co] = add(Co0, 0, RG.L * 0.62);
+  // R2:接上成環;β 的新 OH 朝上(和 CH₂OH 同一邊),α 朝下
+  const R2 = { ...R1 }, Ca = VR(ang[ca]), up = ab === 'b' ? -1 : 1;
+  R2['C' + ca] = Ca; R2.Oc = add(Ca, 0, up * 54); R2.Hr = add(R2.Oc, 11, 0);
+  if (ca === 1) R2.X = add(Ca, 0, -up * 44); else R2.C1 = add(Ca, 0, -up * 56);
+  // 編號的小圓:費雪投影在碳的右上;環上的往環中心靠;環外的 CH₂OH 放在字的旁邊
+  const ctr = P(RG.cx, RG.cy);
+  for (let i = 1; i <= n; i++) {
+    F['N' + i] = isLab(i) ? add(Cf(i), 46, -16) : i === 1 ? add(Cf(i), 26, 6) : add(Cf(i), 21, -21);
+    for (const Q of [R0, R1, R2]) {
+      const c = Q['C' + i];
+      // 環外的 CH₂OH:6 號碳的編號放在字的上方,果糖 1 號碳的放在右邊(移動時才不會穿過字)
+      Q['N' + i] = isLab(i) ? (i === 1 ? add(c, 46, 0) : add(c, 0, -24)) : mixP(c, ctr, 0.3);
+    }
+  }
+  return { F, R0, R1, R2, isLab, S, ca, co, c6: 'C' + (co + 1) };
+}
+// u:rot(躺下來)、curl(彎成一圈)、c5(5 號碳轉一下)、close(接上成環),各 0 到 1
+function cycAt(Ps, id, u) {
+  const f = Ps.F[id];
+  if (!f) return null;
+  const th = 90 * u.rot * RAD, c = Math.cos(th), s = Math.sin(th), dx = f.x - FX.cx, dy = f.y - FX.cy;
+  let p = P(FX.cx + dx * c - dy * s, FX.cy + dx * s + dy * c); // 畫面座標的順時針
+  if (u.curl > 0 && Ps.R0[id]) {
+    // 6 號碳從左邊繞到環的後面:走上方的弧線,不穿過 5 號碳
+    if (id === Ps.c6) { const q = Ps.R0[id], c = P((p.x + q.x) / 2, Math.min(p.y, q.y) - 95), k = u.curl; p = P((1 - k) * (1 - k) * p.x + 2 * (1 - k) * k * c.x + k * k * q.x, (1 - k) * (1 - k) * p.y + 2 * (1 - k) * k * c.y + k * k * q.y); }
+    else p = mixP(p, Ps.R0[id], u.curl);
+  }
+  if (u.c5 > 0 && Ps.R1[id]) p = mixP(p, Ps.R1[id], u.c5);
+  if (u.close > 0 && Ps.R2[id]) p = mixP(p, Ps.R2[id], u.close);
+  return p;
+}
+// 接上成環時,異頭碳上的兩個原子團繞著它轉到新位置(走環的外側,不穿過環)
+function swing(Ps, id, u) {
+  const c1 = Ps.R1['C' + Ps.ca], c2 = Ps.R2['C' + Ps.ca], cn = mixP(c1, c2, u);
+  const v1 = P(Ps.R1[id].x - c1.x, Ps.R1[id].y - c1.y), v2 = P(Ps.R2[id].x - c2.x, Ps.R2[id].y - c2.y);
+  const a = lerp(Math.atan2(v1.y, v1.x), Math.atan2(v2.y, v2.x), u), r = lerp(Math.hypot(v1.x, v1.y), Math.hypot(v2.x, v2.y), u);
+  return P(cn.x + r * Math.cos(a), cn.y + r * Math.sin(a));
+}
+function drawCyc(g, cfg, ab, u) {
+  const Ps = cycPoses(cfg, ab), { S, ca, co } = Ps, n = S.n, Xid = ca === 1 ? 'X' : 'C1';
+  const at = (id) => ((id === 'Oc' || id === Xid) && u.close > 0 ? swing(Ps, id, u.close) : cycAt(Ps, id, u));
+  // β 時兩個原子團會交錯而過:在後面的那個(X)淡一點
+  const cross = ab === 'b' ? Math.sin(Math.PI * clamp(u.close)) : 0;
+  const ringO = u.c5 > 0.5;
+  // 鍵
+  const front = (p, q) => 2.4 + 3 * clamp(u.curl) * clamp(((p.y + q.y) / 2 - RG.cy) / (RG.R * RG.k * 0.8));
+  for (let i = 1; i < n; i++) { const p = at('C' + i), q = at('C' + (i + 1)), ring = i >= ca && i + 1 <= co; bond(g, p, q, { a: i + 1 === ca || i === ca - 1 ? 1 - 0.45 * cross : 1, lw: ring ? front(p, q) : 2.4 }); }
+  bond(g, at('C' + ca), at('Oc'), { k2: 1 - u.close, color: u.close < 0.5 ? K.co : K.bond });
+  if (ca === 1) bond(g, at('C1'), at('X'), { a: 1 - 0.5 * cross });
+  for (let i = ca + 1; i < co; i++) { bond(g, at('C' + i), at('O' + i)); bond(g, at('C' + i), at('H' + i)); }
+  bond(g, at('C' + co), at('Or')); bond(g, at('C' + co), at('H' + co));
+  if (u.close > 0) bond(g, at('Or'), at('C' + ca), { a: clamp(u.close * 1.6) });
+  // 字:H、OH、環外的 CH₂OH
+  const side = (id, cid) => at(id).x - at(cid).x;
+  for (let i = ca + 1; i < co; i++) {
+    label(g, at('H' + i), 'H', { color: K.h, size: 14 });
+    label(g, at('O' + i), side('O' + i, 'C' + i) < -10 ? 'HO' : 'OH', { color: K.oh });
+  }
+  label(g, at('H' + co), 'H', { color: K.h, size: 14 });
+  if (ca === 1) label(g, at('X'), 'H', { color: K.h, size: 14, a: 1 - 0.5 * cross });
+  for (let i = 1; i <= n; i++) if (Ps.isLab(i)) {
+    const nb = i < ca ? 'C' + ca : 'C' + co, left = side('C' + i, nb) < -20;
+    label(g, at('C' + i), left ? 'HOCH₂' : 'CH₂OH', { color: K.oh, a: i === 1 && ca === 2 ? 1 - 0.5 * cross : 1 });
+  }
+  // 碳
+  for (let i = ca; i <= co; i++) carbon(g, at('C' + i), { hl: i === ca && u.close > 0.05 && u.close < 1 ? C.mint : null });
+  // 成環的 O 與它的 H、羰基的 O(成環後是新的 OH)
+  const oc = at('Oc'), hr = at('Hr');
+  label(g, at('Or'), 'O', { color: ringO ? K.ringO : K.oh });
+  label(g, oc, 'O', { color: u.close > 0.5 ? anoCol(ab) : K.co });
+  label(g, hr, 'H', { color: u.close > 0.5 ? anoCol(ab) : K.oh, size: 15, nobg: true });
+  // 編號
+  for (let i = 1; i <= n; i++) badge(g, at('N' + i), i);
+  return { at, Ps };
+}
+
+// ================= 哈沃斯投影(環躺在水平面上,前面的邊畫粗) =================
+// 每個糖用局部座標:環的半徑 1,y 朝上、z 朝前;畫面座標 X = cx + s·x、Y = cy − s·y + s·k·z。
+// 翻面:fx 繞 x 軸轉 180°(上下、前後對調,纖維素每隔一個就是這樣),fy 繞 y 軸轉 180°(左右、前後對調,蔗糖裡的果糖)
+const HW = { k: 0.42, L: 0.38 };
+const ANG = {
+  glcp: { C1: 0, C2: 60, C3: 120, C4: 180, C5: 240, O5: 300 }, // 葡萄哌喃糖:環上的氧在右後方
+  fruf: { C2: 342, C3: 54, C4: 126, C5: 198, O5: 270 },        // 果呋喃糖:環上的氧在正後方
+  frup: { C2: 0, C3: 60, C4: 120, C5: 180, C6: 240, O6: 300 }, // 果哌喃糖:6 號碳的 O 接上 2 號碳
+};
+const RINGS = { glcp: ['C1', 'C2', 'C3', 'C4', 'C5', 'O5'], fruf: ['C2', 'C3', 'C4', 'C5', 'O5'], frup: ['C2', 'C3', 'C4', 'C5', 'C6', 'O6'] };
+// 環外的原子團:[代號, 接在哪個環原子, 朝上 1 或朝下 −1, 字, 角色];費雪投影在右邊的朝下、左邊的朝上
+function subsOf(kind, ab) {
+  const up = ab === 'b' ? 1 : -1; // 異頭碳的 OH:β 朝上(和 CH₂OH 同一邊)、α 朝下
+  if (kind === 'glcp') return [['O1', 'C1', up, 'OH', 'ano'], ['O2', 'C2', -1, 'OH'], ['O3', 'C3', 1, 'OH'], ['O4', 'C4', -1, 'OH'], ['C6', 'C5', 1, 'CH₂OH', 'c6']];
+  if (kind === 'fruf') return [['O2', 'C2', up, 'OH', 'ano'], ['C1', 'C2', -up, 'CH₂OH', 'c1'], ['O3', 'C3', 1, 'OH'], ['O4', 'C4', -1, 'OH'], ['C6', 'C5', 1, 'CH₂OH', 'c6']];
+  return [['O2', 'C2', up, 'OH', 'ano'], ['C1', 'C2', -up, 'CH₂OH', 'c1'], ['O3', 'C3', 1, 'OH'], ['O4', 'C4', -1, 'OH'], ['O5', 'C5', -1, 'OH']];
+}
+// ab:'a'、'b',或 '~'(還原端:兩種都有,畫成往外的波浪線)。link6:6 號碳要接糖苷鍵(CH₂ 加上左上方的 O6)
+function sugar(kind, ab, { fx = false, fy = false, T = [0, 0, 0], link6 = false } = {}) {
+  const tf = ([x, y, z]) => { if (fx) { y = -y; z = -z; } if (fy) { x = -x; z = -z; } return [x + T[0], y + T[1], z + T[2]]; };
+  const A = {};
+  for (const nm of RINGS[kind]) { const d = ANG[kind][nm] * RAD; A[nm] = { w: tf([Math.cos(d), 0, Math.sin(d)]), ring: true }; }
+  for (const [nm, on, dir, lab, role] of subsOf(kind, ab)) {
+    const d = ANG[kind][on] * RAD, bx = Math.cos(d), bz = Math.sin(d), wv = role === 'ano' && ab === '~';
+    A[nm] = { w: tf(wv ? [bx + HW.L * 1.25, 0, bz] : [bx, dir * HW.L, bz]), on, lab: role === 'c6' && link6 ? 'CH₂' : lab, role, wavy: wv };
+  }
+  if (link6) { const d = ANG[kind].C5 * RAD; A.O6 = { w: tf([Math.cos(d) - 0.35, HW.L + 0.35, Math.sin(d)]), on: 'C6', lab: 'OH', role: 'o6' }; }
+  return { kind, ab, A, c: tf([0, 0, 0]) };
+}
+// 畫一組糖。v = { cx, cy, s }。o:
+//   hide:{ '第幾個:代號': true } 不畫(接成糖苷鍵的 OH)。hl:{ '第幾個:代號': 顏色 } 圈起來。
+//   num:編號的濃淡;nums:{ '第幾個:代號': 濃淡 } 個別指定。only:只畫這些環外的原子團。size:字的大小。labA:環外字的濃淡
+function drawSugars(g, list, v, o = {}) {
+  const S = (w) => P(v.cx + v.s * w[0], v.cy - v.s * w[1] + v.s * HW.k * w[2]);
+  const hide = o.hide || {}, hl = o.hl || {}, nb = o.nums || {}, size = o.size || 15, la = o.labA ?? 1;
+  const skip = (i, nm, A) => !A.ring && (hide[`${i}:${nm}`] || (o.only && !o.only.includes(nm)));
+  alpha(g, o.a ?? 1, () => {
+    list.forEach((R) => {
+      const ring = RINGS[R.kind];
+      ring.forEach((nm, j) => {
+        const a = R.A[nm], b = R.A[ring[(j + 1) % ring.length]];
+        const zm = (a.w[2] + b.w[2]) / 2 - R.c[2];
+        bond(g, S(a.w), S(b.w), { lw: 2 + 3.6 * clamp((zm + 0.15) / 0.85), color: o.ringCol || '#c9d3ce' });
+      });
+    });
+    list.forEach((R, i) => {
+      for (const [nm, A] of Object.entries(R.A)) {
+        if (A.ring || skip(i, nm, A)) continue;
+        const p = S(R.A[A.on].w), q = S(A.w);
+        if (A.wavy) wavy(g, p, q); else bond(g, p, q);
+      }
+    });
+    list.forEach((R, i) => {
+      for (const [nm, A] of Object.entries(R.A)) {
+        const id = `${i}:${nm}`;
+        if (A.ring) { if (nm[0] === 'O') label(g, S(A.w), 'O', { color: K.ringO, size, hl: hl[id] }); continue; }
+        if (skip(i, nm, A)) continue;
+        let s = A.lab;
+        if (A.w[0] < R.c[0] - 0.25 && !A.wavy) s = s === 'OH' ? 'HO' : s === 'CH₂OH' ? 'HOCH₂' : s;
+        label(g, S(A.w), s, { color: A.role === 'ano' ? anoCol(R.ab) : K.oh, size, a: la, hl: hl[id] });
+      }
+    });
+    list.forEach((R, i) => {
+      const cc = S(R.c);
+      for (const [nm, A] of Object.entries(R.A)) {
+        if (nm[0] !== 'C') continue;
+        const a = nb[`${i}:${nm}`] ?? o.num ?? 0;
+        if (a <= 0.01 || skip(i, nm, A)) continue;
+        let p;
+        // 環上的碳:左端的往外,其他往環中間;果糖在右端的 2 號碳往外(往裡會壓到 3 號碳朝上的 OH),避開 1 號碳那一邊
+        if (A.ring && A.w[0] < R.c[0] - 0.9) p = add(S(A.w), -20, -2);
+        else if (A.ring && nm === 'C2' && R.kind !== 'glcp' && A.w[0] > R.c[0] + 0.9) p = add(S(A.w), 22, R.A.C1.w[1] > A.w[1] ? 7 : -7);
+        else if (A.ring) p = mixP(S(A.w), cc, 0.34);
+        else { const q = S(R.A[A.on].w), r = S(A.w); p = add(mixP(q, r, 0.5), r.x < cc.x ? -15 : 15, 0); }
+        badge(g, p, nm.slice(1), { a });
+      }
+    });
+  });
+  return S;
+}
+
+// ================= 椅式(真實的環不是平的) =================
+// 葡萄哌喃糖常見的椅式(⁴C₁):1、3、5 號碳在下,2、4 號碳與環上的氧在上。
+// 哈沃斯投影的「上、下」換到椅式:原子在上的,朝上的是直立、朝下的往外伸;原子在下的相反。
+function view3([x, y, z], v) {
+  const cs = Math.cos(v.yaw), sn = Math.sin(v.yaw), x1 = x * cs + z * sn, z1 = -x * sn + z * cs;
+  const ct = Math.cos(v.tilt), st = Math.sin(v.tilt), y2 = y * ct - z1 * st, z2 = y * st + z1 * ct;
+  return { x: v.cx + v.s * x1, y: v.cy - v.s * y2, z: z2 };
+}
+function chair(g, ab, v, o = {}) {
+  const ord = ['C1', 'C2', 'C3', 'C4', 'C5', 'O5'], ud = [-1, 1, -1, 1, -1, 1], h = 0.26;
+  const W = {};
+  ord.forEach((nm, i) => { const d = i * 60 * RAD; W[nm] = [Math.cos(d), ud[i] * h, Math.sin(d)]; });
+  const dirOf = (i, up) => {
+    const d = i * 60 * RAD;
+    if ((ud[i] > 0) === (up > 0)) return [[0, up, 0], 'ax'];
+    const e = [Math.cos(d), up * 0.33, Math.sin(d)], L = Math.hypot(...e);
+    return [e.map((x) => x / L), 'eq'];
+  };
+  const spec = [[0, ab === 'b' ? 1 : -1, 'OH', 'ano'], [1, -1, 'OH'], [2, 1, 'OH'], [3, -1, 'OH'], [4, 1, 'CH₂OH']];
+  const subs = [];
+  for (const [i, up, lab, role] of spec) {
+    const b = W[ord[i]];
+    for (const [dirUp, s, len, r] of [[up, lab, 0.62, role], [-up, 'H', 0.4, 'h']]) {
+      const [d, kind] = dirOf(i, dirUp);
+      subs.push({ on: ord[i], w: [b[0] + d[0] * len, b[1] + d[1] * len, b[2] + d[2] * len], lab: s, role: r, kind, i });
+    }
+  }
+  const V = (w) => view3(w, v);
+  alpha(g, o.a ?? 1, () => {
+    const items = [];
+    ord.forEach((nm, j) => {
+      const p = V(W[nm]), q = V(W[ord[(j + 1) % 6]]), z = (p.z + q.z) / 2;
+      items.push({ z, f: () => bond(g, p, q, { lw: 2.2 + 2.6 * clamp((z + 1) / 2), color: mix('#6d7f78', '#e2e9e5', clamp((z + 1) / 2)) }) });
+    });
+    for (const sb of subs) {
+      if (sb.lab === 'H' && sb.kind !== 'ax') continue; // 往外伸的 H 不畫,直立的 H 才看得出擠不擠
+      const p = V(W[sb.on]), q = V(sb.w), z = q.z;
+      const isAno = sb.role === 'ano', col = isAno ? anoCol(ab) : sb.lab === 'H' ? K.h : K.oh;
+      items.push({ z: z + 0.01, f: () => {
+        bond(g, p, q, { lw: 2, color: sb.lab === 'H' ? '#56665f' : K.bond });
+        label(g, q, sb.lab === 'CH₂OH' && q.x < v.cx ? 'HOCH₂' : sb.lab === 'OH' && q.x < v.cx - v.s * 0.3 ? 'HO' : sb.lab, { color: col, size: sb.lab === 'H' ? 12 : 14, hl: isAno && o.hlAno ? anoCol(ab) : null });
+      } });
+    }
+    items.push({ z: V(W.O5).z + 0.02, f: () => label(g, V(W.O5), 'O', { color: K.ringO, size: 14 }) });
+    items.sort((p, q) => p.z - q.z).forEach((it) => it.f());
+    // α:1 號碳直立的 OH 和同一邊(3、5 號碳)直立的 H 很近
+    if (o.crowd > 0 && ab === 'a') {
+      const o1 = V(subs.find((sb) => sb.role === 'ano').w);
+      for (const i of [2, 4]) { const hh = V(subs.find((sb) => sb.i === i && sb.lab === 'H').w); bond(g, o1, hh, { color: K.a, lw: 1.6, dash: [4, 4], a: o.crowd }); }
+    }
+  });
+  return V;
+}
+
+// ================= 螺旋(直鏈澱粉)與分支(支鏈澱粉) =================
+function helix(g, x0, x1, cy, t, { per = 6, turns = 3, r = 56, iodine = 0, a = 1, grow = 1 } = {}) {
+  const n = per * turns, dx = (x1 - x0) / (n - 1), ph = t * 0.6, shown = Math.round(n * grow);
+  const pts = Array.from({ length: n }, (_, i) => { const an = (i / per) * Math.PI * 2 + ph; return { x: x0 + i * dx + 0.5 * r * Math.sin(an), y: cy - r * Math.cos(an), z: Math.sin(an) }; });
+  const items = [];
+  for (let i = 0; i < shown - 1; i++) {
+    const z = (pts[i].z + pts[i + 1].z) / 2;
+    items.push({ z: z - 0.02, f: () => bond(g, pts[i], pts[i + 1], { lw: 2 + 1.6 * (z + 1), color: mix('#36574b', '#cfe9dc', (z + 1) / 2) }) });
+  }
+  for (let i = 0; i < shown; i++) { const p = pts[i]; items.push({ z: p.z, f: () => hexagon(g, p.x, p.y, 12 + 3 * p.z, { fill: mix('#16302a', '#2c6a52', (p.z + 1) / 2), stroke: mix('#3f6f5c', '#a5f3cd', (p.z + 1) / 2), flat: 0.75 }) }); }
+  if (iodine > 0.01) items.push({ z: 0, f: () => { for (let x = x0 + 8; x <= x1 - 8; x += 13) g.circle(x, cy, 4.2, `rgba(160,120,255,${0.95 * iodine})`); } });
+  alpha(g, a, () => items.sort((p, q) => p.z - q.z).forEach((it) => it.f()));
+}
+// 支鏈澱粉的示意:主鏈加幾條 α(1→6) 分支,分支上再分;每個點是一個葡萄糖
+const TREE = (() => {
+  const nodes = [], links = [], branchAt = [];
+  const chain = (x, y, ang, len, from = null) => {
+    let px = x, py = y, prev = from;
+    const ids = [];
+    for (let i = 0; i < len; i++) {
+      const id = nodes.length;
+      nodes.push({ x: px, y: py });
+      if (prev !== null) links.push([prev, id, i === 0 && from !== null]);
+      ids.push(id); prev = id;
+      px += Math.cos(ang) * 15; py += Math.sin(ang) * 15; ang += Math.sin(i * 1.7) * 0.05;
+    }
+    return ids;
+  };
+  const main = chain(560, 478, -0.22, 24);
+  for (const [k, ang, len, sub] of [[4, -1.3, 10, [4, -0.55, 6]], [11, -1.1, 11, [5, -1.75, 6]], [18, -1.0, 9, [3, -1.65, 5]]]) {
+    const b = nodes[main[k]], ids = chain(b.x + Math.cos(ang) * 15, b.y + Math.sin(ang) * 15, ang, len, main[k]);
+    branchAt.push(main[k]);
+    const s = nodes[ids[sub[0]]], sid = chain(s.x + Math.cos(sub[1]) * 15, s.y + Math.sin(sub[1]) * 15, sub[1], sub[2], ids[sub[0]]);
+    branchAt.push(ids[sub[0]]);
+    void sid;
+  }
+  return { nodes, links, branchAt };
+})();
+// 比較卡片用的小樹:主鏈加三條分支,分支點是琥珀色
+function miniTree(g, x, y) {
+  const dot = (px, py, br) => g.circle(px, py, br ? 4.5 : 3.6, br ? K.co : '#7fd8ad');
+  const pts = Array.from({ length: 15 }, (_, i) => P(x + i * 15, y + 26 - i * 1.6));
+  pts.forEach((p, i) => { if (i) bond(g, pts[i - 1], p, { color: '#5f9a80', lw: 2 }); });
+  for (const [k, n, ang] of [[3, 5, -1.2], [8, 6, -1.0], [12, 4, -1.3]]) {
+    let p = pts[k];
+    for (let j = 0; j < n; j++) { const q = add(p, Math.cos(ang) * 13, Math.sin(ang) * 13); bond(g, p, q, { color: j ? '#5f9a80' : K.co, lw: 2 }); dot(q.x, q.y, false); p = q; }
+  }
+  pts.forEach((p, i) => dot(p.x, p.y, [3, 8, 12].includes(i)));
+}
+function tree(g, grow, { a = 1 } = {}) {
+  const n = Math.round(TREE.nodes.length * grow);
+  alpha(g, a, () => {
+    for (const [p, q, br] of TREE.links) if (q < n) { const A = TREE.nodes[p], B = TREE.nodes[q]; bond(g, A, B, { color: br ? K.co : '#5f9a80', lw: br ? 2.6 : 2.2 }); }
+    TREE.nodes.forEach((p, i) => { if (i < n) g.circle(p.x, p.y, 5, TREE.branchAt.includes(i) ? K.co : '#7fd8ad'); });
+  });
+}
+
+// ================= 糖苷鍵的例子(第 8 章) =================
+// 每個例子:左邊的糖(用異頭碳接出去)、右邊的糖(放的位置、翻不翻面)、右邊用哪個 OH、中間那個 O 的位置 B
+const D14 = 2.7;
+// 四個糖接成一條鏈時,每個接點標 1 號與 4 號碳
+const LINKNUMS = { '0:C1': 1, '1:C4': 1, '1:C1': 1, '2:C4': 1, '2:C1': 1, '3:C4': 1 };
+const EXS = {
+  maltose: { name: '麥芽糖', link: 'α(1→4)', sym: 'α-D-Glcp-(1→4)-D-Glc', note: '澱粉被澱粉酶切開的產物', da: 'a', acc: () => sugar('glcp', '~', { T: [D14, 0, 0] }), accC: 'C4', accO: 'O4', B: [D14 / 2, -HW.L, 0], v: { cx: 290, cy: 236, s: 108 }, nums: ['C1', 'C4'] },
+  cellobiose: { name: '纖維二糖', link: 'β(1→4)', sym: 'β-D-Glcp-(1→4)-D-Glc', note:'纖維素的重複單位:右邊那個翻了面', da: 'b', acc: () => sugar('glcp', '~', { T: [D14, 0, 0], fx: true }), accC: 'C4', accO: 'O4', B: [D14 / 2, HW.L, 0], v: { cx: 290, cy: 250, s: 108 }, nums: ['C1', 'C4'] },
+  isomaltose: { name: '異麥芽糖', link: 'α(1→6)', sym: 'α-D-Glcp-(1→6)-D-Glc', note:'支鏈澱粉的分支就是這樣接的', da: 'a', acc: () => sugar('glcp', '~', { T: [1.85, -1.11, 0.866], link6: true }), accC: 'C6', accO: 'O6', B: [1, -HW.L, 0], v: { cx: 330, cy: 160, s: 100 }, nums: ['C1', 'C6'] },
+  sucrose: { name: '蔗糖', link: 'α1↔β2', sym: 'α-D-Glcp-(1↔2)-β-D-Fruf', note:'兩個異頭碳都用掉了,沒有還原端', da: 'a', acc: () => sugar('fruf', 'b', { T: [2.451, -0.8, -0.309], fy: true }), accC: 'C2', accO: 'O2', B: [1, -HW.L, 0], v: { cx: 300, cy: 190, s: 104 }, nums: ['C1', 'C2'] },
+};
+// k:0 是分開、1 是接好;回傳要畫的東西
+function exScene(ex, k) {
+  const donor = sugar('glcp', ex.da);
+  const acc0 = ex.acc(), shift = (1 - k) * 1.3;
+  const acc = { ...acc0, A: Object.fromEntries(Object.entries(acc0.A).map(([nm, A]) => [nm, { ...A, w: [A.w[0] + shift, A.w[1], A.w[2]] }])), c: [acc0.c[0] + shift, acc0.c[1], acc0.c[2]] };
+  return { donor, acc };
+}
+
+// ================= 環狀糖的命名(naming 那一章) =================
+// 名字照樂詞網的詞序:α 或 β、D 或 L、糖名的前半(stem)、環的大小(ring)、糖;講的順序是糖名、環、D、α 與 β。每一塊對到結構上要圈起來的原子:
+//   idOH 決定是哪一種糖的 OH、ringO 環上的氧、dAt 講 D 時圈起來的原子團、anoO 異頭碳的 OH。
+// 「朝下是 α、朝上是 β」只對這幾個照標準方向畫的 D 型環檢查過(和 PubChem 的 R、S 對得起來)
+const NAMING = {
+  glcp: { kind: 'glcp', sugar: '葡萄糖', stem: '葡萄', ring: PYR, en: ['gluco', 'pyran'], sym: 'Glc', p: 'p', ano: 1, anoO: 'O1', ringO: 'O5', idOH: ['O2', 'O3', 'O4'], dAt: 'C6',
+    idTxt: ['醛糖,6 個碳(1 號碳原本是醛基)', '2、3、4 號碳的 OH:下、上、下'], ringTxt: ['六員環:5 個 C 加 1 個 O', '名字借自同樣大小的哌喃(pyran)'], dTxt: ['費雪投影裡 5 號碳的 OH 在右 → D', '畫成環:5 號碳的 CH₂OH 朝上'] },
+  fruf: { kind: 'fruf', sugar: '果糖', stem: '果', ring: FUR, en: ['fructo', 'furan'], sym: 'Fru', p: 'f', ano: 2, anoO: 'O2', ringO: 'O5', idOH: ['O3', 'O4'], dAt: 'C6',
+    idTxt: ['酮糖,6 個碳(2 號碳原本是酮基)', '3、4 號碳的 OH:上、下'], ringTxt: ['五員環:4 個 C 加 1 個 O', '名字借自同樣大小的呋喃(furan)'], dTxt: ['費雪投影裡 5 號碳的 OH 在右 → D', '畫成環:5 號碳的 CH₂OH 朝上'] },
+  frup: { kind: 'frup', sugar: '果糖', stem: '果', ring: PYR, en: ['fructo', 'pyran'], sym: 'Fru', p: 'p', ano: 2, anoO: 'O2', ringO: 'O6', idOH: ['O3', 'O4'], dAt: 'O5',
+    idTxt: ['酮糖,6 個碳(2 號碳原本是酮基)', '3、4 號碳的 OH:上、下'], ringTxt: ['六員環:5 個 C 加 1 個 O', '這次是 6 號碳的 O 接上 2 號碳'], dTxt: ['費雪投影裡 5 號碳的 OH 在右 → D', '畫成環:5 號碳的 OH 朝下'] },
+};
+
+// ================= 章節 =================
+const chapters = [
+  {
+    key: 'groups', name: '醣的骨架與官能基', dur: 16,
+    cues: [[0, '醣類的分子是一條碳鏈,幾乎每個碳都接著一個羥基(–OH);鏈上另外有一個羰基(C=O,碳和氧之間是雙鍵)。'],
+      [5.5, '這是葡萄糖:6 個碳,分子式 C₆H₁₂O₆。它的羰基在鏈的最末端,這種羰基叫醛基(–CHO)。'],
+      [11, '這種畫法叫費雪投影:直的一條是碳鏈,左右是接在每個碳上的 H 和 OH。要說清楚是哪一個碳,就得先替碳編號。']],
+    draw(g, t) {
+      const on = t < 11;
+      fischer(g, SUG.glc, { cx: 290, cy: 284, step: 60, arm: 70, a: fin(t, 0, 0.8), hlOH: () => (t >= 1.8 && on ? K.oh : null), hlCO: t >= 6 && on, hlCH2: t >= 3.6 && on });
+      card(g, 560, 58, 370, 100, '羥基 –OH', K.oh, ['一個 O 接一個 H,接在碳上', '開鏈的葡萄糖有 5 個'], fin(t, 1.8));
+      card(g, 560, 172, 370, 100, '羥甲基 –CH₂OH', K.oh, ['鏈的最後一個碳:CH₂ 再接一個 OH'], fin(t, 3.6));
+      card(g, 560, 286, 370, 100, '醛基 –CHO', K.co, ['羰基(C=O)在鏈的末端', '那個碳另外接一個 H'], fin(t, 6));
+      alpha(g, fin(t, 7.4), () => g.text(290, 50, 'C₆H₁₂O₆', { size: 22, weight: 800, color: C.ink, align: 'center', mono: true }));
+      alpha(g, fin(t, 11), () => {
+        g.line(170, 120, 170, 452, C.mint, 2, [5, 5]);
+        g.text(160, 286, '碳鏈', { size: 15, weight: 700, color: C.mint, align: 'right' });
+        g.tag(745, 432, '左右兩邊:接在碳上的 H 與 OH', { size: 14, color: C.ink2 });
+      });
+      alpha(g, fin(t, 13.2), () => { for (let i = 1; i <= 6; i++) g.text(290 + (i === 1 ? 26 : i === 6 ? 46 : 21), 134 + (i - 1) * 60 + (i === 1 ? 6 : i === 6 ? -16 : -21), '?', { size: 15, weight: 800, color: K.co, align: 'center' }); });
+    },
+  },
+  {
+    key: 'aldose-ketose', name: '醛糖與酮糖:從哪一端開始數', dur: 18,
+    cues: [[0, '葡萄糖和果糖都是 C₆H₁₂O₆,差在羰基的位置:葡萄糖的在鏈的末端(醛基),果糖的在第二個碳上(酮基)。'],
+      [6, '編號的規則:從離羰基最近的那一端開始數。所以醛糖的醛基一定是 1 號碳,常見的酮糖,酮基是 2 號碳。'],
+      [12, '羰基是醛基的叫醛糖,是酮基的叫酮糖;再依碳數叫己醛糖、己酮糖(6 個碳)或戊醛糖、戊酮糖(5 個碳)。']],
+    draw(g, t, S) {
+      const pent = S.pair === 'pent', L = SUG[pent ? 'rib' : 'glc'], R = SUG[pent ? 'rbu' : 'fru'];
+      const cnt = (i) => fin(t, 6.3 + (i - 1) * 0.5, 0.35);
+      const fa = fischer(g, L, { cx: 280, cy: 290, step: 56, arm: 64, hlCO: t >= 1, num: cnt });
+      const fb = fischer(g, R, { cx: 690, cy: 290, step: 56, arm: 64, hlCO: t >= 1, num: cnt });
+      g.text(280, 44, L.name, { size: 20, weight: 800, color: C.ink, align: 'center' });
+      g.text(690, 44, R.name, { size: 20, weight: 800, color: C.ink, align: 'center' });
+      alpha(g, fin(t, 12), () => {
+        g.text(280, 74, pent ? '戊醛糖(5 個碳 + 醛基)' : '己醛糖(6 個碳 + 醛基)', { size: 15, color: K.co, align: 'center' });
+        g.text(690, 74, pent ? '戊酮糖(5 個碳 + 酮基)' : '己酮糖(6 個碳 + 酮基)', { size: 15, color: K.co, align: 'center' });
+      });
+      alpha(g, fin(t, 1.4), () => {
+        g.tag(432, fa.y0 - 34, '醛基:在鏈的末端', { size: 14, color: K.co });
+        g.tag(856, fb.y0 + 56, '酮基:在鏈的中間', { size: 14, color: K.co });
+      });
+      // 從羰基那一端往下數
+      for (const [cx, f, Sg] of [[280, fa, L], [690, fb, R]]) {
+        const k = seg(t, 6.3, 6.3 + 0.5 * (Sg.n - 1) + 0.3);
+        if (k > 0 && k < 1) { const y = f.y0 + k * (Sg.n - 1) * 56; g.arrow(cx - 112, y - 26, cx - 112, y + 4, { color: C.mint, lw: 3, head: 10 }); }
+      }
+      alpha(g, fin(t, 8.6), () => {
+        g.rrect(170, 470, 620, 58, 12, 'rgba(21,32,30,.92)', C.mint, 1.6);
+        g.text(480, 489, '編號:從離羰基(C=O)最近的那一端數起', { size: 16, weight: 700, color: C.mint, align: 'center' });
+        g.text(480, 513, '醛糖的醛基是 1 號碳;酮糖的酮基是 2 號碳', { size: 14, color: C.ink2, align: 'center' });
+      });
+    },
+  },
+  {
+    key: 'dl', name: 'D 與 L:看編號最大的不對稱碳', dur: 14,
+    cues: [[0, '一個碳接著四個不一樣的原子團,叫不對稱碳;葡萄糖的 2 到 5 號碳都是。每個 OH 朝左或朝右,決定這是哪一種糖。'],
+      [5, '看編號最大的那個不對稱碳(葡萄糖是 5 號碳):它的 OH 在右邊叫 D 型,在左邊叫 L 型。兩者互為鏡像,像左手和右手。'],
+      [10, '自然界的醣大多是 D 型(植物細胞壁裡的 L-阿拉伯糖、L-鼠李糖是例外)。D-葡萄糖的 2、4、5 號碳 OH 在右,3 號碳在左。']],
+    draw(g, t) {
+      const hlC = (i) => (i === 5 && t >= 5 ? K.num : i >= 2 && i <= 5 && t >= 1 ? K.co : null);
+      const hlOH = (i) => (i === 5 && t >= 5 ? K.num : null);
+      fischer(g, SUG.glc, { cx: 270, cy: 286, step: 56, arm: 64, num: 1, hlC, hlOH });
+      fischer(g, SUG.lglc, { cx: 690, cy: 286, step: 56, arm: 64, num: 1, hlC, hlOH });
+      g.text(270, 44, 'D-葡萄糖', { size: 20, weight: 800, color: C.ink, align: 'center' });
+      g.text(690, 44, 'L-葡萄糖', { size: 20, weight: 800, color: C.ink, align: 'center' });
+      alpha(g, fin(t, 0.4), () => { g.line(480, 104, 480, 452, C.muted, 1.6, [6, 6]); g.text(480, 470, '鏡子', { size: 13, color: C.muted, align: 'center' }); });
+      alpha(g, win(t, 1.2, 9.8), () => g.tag(480, 80, '圈起來的是不對稱碳:接著 4 個不一樣的原子團', { size: 14, color: K.co }));
+      alpha(g, fin(t, 5.2), () => {
+        g.tag(270, 506, '5 號碳的 OH 在右 → D 型', { size: 15, color: K.num });
+        g.tag(690, 506, '5 號碳的 OH 在左 → L 型', { size: 15, color: K.num });
+      });
+      alpha(g, fin(t, 10), () => g.tag(480, 80, '自然界的醣大多是 D 型', { size: 15, color: C.ink }));
+    },
+  },
+  {
+    key: 'ring', name: '鏈狀變環狀:葡萄糖', dur: 24,
+    cues: [[0, '在水裡,葡萄糖的鏈會自己接成一個環。先把費雪投影躺下來:原本在右邊的原子團變成朝下,在左邊的朝上。'],
+      [6, '碳鏈彎成一圈;5 號碳轉一下,讓它的 OH 正對著 1 號碳的醛基。'],
+      [12.2, '5 號碳的 O 接上 1 號碳,醛基的 C=O 打開;原本 5 號碳 OH 上的 H 移到醛基的 O 上,變成新的 OH。'],
+      [17, '接出來的環有 5 個碳和 1 個氧,編號照舊:環上的 O 來自 5 號碳,1 號碳多了一個新的 OH。'],
+      [21, '新的 OH 可以朝下或朝上,就是 α 和 β(下一章);「自己調整」可以切換。']],
+    draw(g, t, S) {
+      const u = { rot: fin(t, 3, 2.8), curl: fin(t, 6.2, 3.4), c5: fin(t, 9.8, 2.2), close: fin(t, 13.4, 2.4) };
+      const { at } = drawCyc(g, CYC.glc, S.ab, u);
+      alpha(g, win(t, 3, 9.4), () => g.tag(480, 36, '躺下來:費雪投影右邊的朝下、左邊的朝上', { size: 15, color: C.ink }));
+      alpha(g, win(t, 9.8, 13), () => g.tag(330, 150, '5 號碳轉一下,OH 對準 1 號碳', { size: 14, color: K.oh }));
+      alpha(g, win(t, 12.2, 14.4, 0.3), () => carrow(g, add(at('Or'), 14, 4), add(at('C1'), -6, -10), -26, { color: C.mint }));
+      alpha(g, fin(t, 16.2), () => {
+        const O = at('Or'), C1 = at('C1');
+        g.tag(O.x + 10, O.y - 70, '環上的 O:來自 5 號碳', { size: 14, color: K.ringO });
+        g.line(O.x, O.y - 12, O.x + 6, O.y - 58, K.ringO, 1.4);
+        g.tag(C1.x + 150, C1.y, '1 號碳:異頭碳,多一個新的 OH', { size: 14, color: anoCol(S.ab) });
+        g.text(RG.cx, RG.cy + 4, '5 個 C + 1 個 O', { size: 13, color: C.muted, align: 'center' });
+        g.tag(480, 500, `${ANO[S.ab]}-D-葡萄${PYR}糖(六員環的葡萄糖)`, { size: 16, color: anoCol(S.ab) });
+      });
+    },
+  },
+  {
+    key: 'anomer', name: 'α 與 β:怎麼分、為什麼有兩種', dur: 21,
+    cues: [[0, '1 號碳上新的 OH 有兩種方向。拿它和 6 號碳(CH₂OH)比:在環的同一邊叫 β,在反邊叫 α。'],
+      [7, '為什麼會有兩種?醛基的 C=O 是平的,5 號碳的 O 可以從這個平面的任一面接上;從哪一面接,決定新的 OH 最後朝上還是朝下。'],
+      [14, '名字把這些都寫出來:β-D-葡萄哌喃糖。β 說 1 號碳的 OH,D 說 5 號碳的 OH,夾在糖名中間的哌喃說環是 5 個碳加 1 個氧。']],
+    draw(g, t) {
+      const vA = { cx: 250, cy: 196, s: 104 }, vB = { cx: 712, cy: 196, s: 104 };
+      // 環的平面(上與下的分界)
+      alpha(g, fin(t, 2.6) * (1 - fin(t, 13.4)), () => {
+        for (const v of [vA, vB]) {
+          const ctx = g.ctx; ctx.beginPath(); ctx.ellipse(v.cx, v.cy, v.s * 1.45, v.s * 0.62, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(165,243,205,.07)'; ctx.fill();
+          g.text(v.cx - v.s * 1.55, v.cy - 34, '上', { size: 13, color: C.muted, align: 'center' }); g.text(v.cx - v.s * 1.55, v.cy + 36, '下', { size: 13, color: C.muted, align: 'center' });
+        }
+      });
+      const hl = t >= 1.4;
+      drawSugars(g, [sugar('glcp', 'a')], vA, { num: 0.85, hl: hl ? { '0:C6': K.num, '0:O1': K.a } : {} });
+      drawSugars(g, [sugar('glcp', 'b')], vB, { num: 0.85, hl: hl ? { '0:C6': K.num, '0:O1': K.b } : {} });
+      g.text(vA.cx, 40, `α-D-葡萄${PYR}糖`, { size: 19, weight: 800, color: K.a, align: 'center' });
+      g.text(vB.cx, 40, `β-D-葡萄${PYR}糖`, { size: 19, weight: 800, color: K.b, align: 'center' });
+      alpha(g, fin(t, 3.2) * (1 - fin(t, 13.4)), () => {
+        g.tag(vA.cx + 104, vA.cy + 92, '1 號的 OH 朝下:和 CH₂OH 反邊 → α', { size: 14, color: K.a });
+        g.tag(vB.cx + 40, vB.cy - 110, '1 號的 OH 朝上:和 CH₂OH 同一邊 → β', { size: 14, color: K.b });
+      });
+      // 為什麼有兩種:平的 C=O,兩面都能被接上
+      alpha(g, win(t, 7, 13.8), () => {
+        const cx = 480, cy = 420;
+        g.panel(250, 332, 460, 186, '');
+        const ctx = g.ctx; ctx.beginPath(); ctx.moveTo(cx - 120, cy + 16); ctx.lineTo(cx + 40, cy + 34); ctx.lineTo(cx + 120, cy - 16); ctx.lineTo(cx - 40, cy - 34); ctx.closePath();
+        ctx.fillStyle = 'rgba(255,209,102,.12)'; ctx.fill(); ctx.lineWidth = 1.4; ctx.strokeStyle = 'rgba(255,209,102,.6)'; ctx.stroke();
+        bond(g, P(cx, cy), P(cx + 58, cy - 8), { k2: 1, color: K.co }); bond(g, P(cx, cy), P(cx - 50, cy - 14)); bond(g, P(cx, cy), P(cx - 26, cy + 20));
+        label(g, P(cx + 64, cy - 9), 'O', { color: K.co }); label(g, P(cx - 56, cy - 15), 'H', { color: K.h, size: 13 }); g.text(cx - 34, cy + 28, '2 號碳', { size: 12, color: C.muted, align: 'center' });
+        carbon(g, P(cx, cy), { r: 10 });
+        const bob = Math.sin(t * 3) * 4;
+        g.arrow(cx - 4, cy - 82 + bob, cx - 2, cy - 18, { color: K.ringO, lw: 2.4 }); label(g, P(cx - 4, cy - 92 + bob), 'O', { color: K.ringO, size: 14 });
+        g.arrow(cx + 4, cy + 84 - bob, cx + 2, cy + 18, { color: K.ringO, lw: 2.4 }); label(g, P(cx + 4, cy + 94 - bob), 'O', { color: K.ringO, size: 14 });
+        g.text(cx + 140, cy - 54, '從這一面接上 → 一種', { size: 14, color: C.ink2 });
+        g.text(cx + 140, cy + 58, '從另一面接上 → 另一種', { size: 14, color: C.ink2 });
+        g.text(270, 352, '1 號碳的醛基是平的', { size: 14, weight: 700, color: K.co });
+      });
+      // 名字的拆解:整個名字照顏色寫一行,底下三行說明(第 8 章再一塊一塊講)
+      alpha(g, fin(t, 14), () => {
+        nameRow(g, [['β', K.b], ['-D-', K.num], ['葡萄', C.ink], [PYR, K.ringO], ['糖', C.ink]], 480, 384, 34);
+        [['β', K.b, '1 號碳的 OH 和 CH₂OH 同一邊'], ['D', K.num, '5 號碳的 OH 在費雪投影的右邊'], [PYR, K.ringO, '環是 5 個 C 加 1 個 O(夾在糖名中間)']].forEach(([k, col, txt], i) => {
+          g.text(360, 434 + i * 26, k, { size: 15, weight: 800, color: col, align: 'right' });
+          g.text(376, 434 + i * 26, txt, { size: 14, color: C.ink2 });
+        });
+      });
+    },
+  },
+  {
+    key: 'mutarotation', name: '在水裡 α 與 β 會互換', dur: 20,
+    cues: [[0, '在水裡,環偶爾會打開回到鏈狀,再重新接起來;每次接回去都可能換成另一種。所以 α 和 β 會互相轉換,這叫變旋現象。'],
+      [6, '不管一開始是純的 α 還是純的 β,最後都停在大約 36% 的 α、64% 的 β;打開的鏈狀極少,十萬個裡只有一到四個。'],
+      [12, 'β 比較多,因為真實的環像一張椅子,不是平的:β 的 OH 和 CH₂OH 全部往環的外圍伸;α 在 1 號碳的 OH 卻是直立的,和同一邊的 H 擠在一起。']],
+    draw(g, t, S) {
+      // 左上:α ⇌ 鏈狀 ⇌ β
+      const vA = { cx: 92, cy: 150, s: 46 }, vB = { cx: 400, cy: 150, s: 46 };
+      drawSugars(g, [sugar('glcp', 'a')], vA, { only: ['O1', 'C6'], size: 13 });
+      drawSugars(g, [sugar('glcp', 'b')], vB, { only: ['O1', 'C6'], size: 13 });
+      g.text(vA.cx, 70, 'α', { size: 20, weight: 800, color: K.a, align: 'center' });
+      g.text(vB.cx, 70, 'β', { size: 20, weight: 800, color: K.b, align: 'center' });
+      // 鏈狀(打開的)
+      const ch = P(246, 96), pts = [];
+      for (let i = 0; i < 6; i++) pts.push(P(ch.x - 62 + i * 25, ch.y + (i % 2 ? 9 : -9)));
+      pts.forEach((p, i) => { if (i) bond(g, pts[i - 1], p); });
+      bond(g, pts[5], add(pts[5], 18, -16), { k2: 1, color: K.co }); label(g, add(pts[5], 22, -20), 'O', { color: K.co, size: 13 });
+      g.text(ch.x, ch.y + 30, '鏈狀(打開)', { size: 12, color: C.muted, align: 'center' });
+      const ph = (t * 0.5) % 1;
+      carrow(g, P(130, 118), P(196, 92), -18, { color: ph < 0.5 ? K.a : C.line, lw: 2 });
+      carrow(g, P(296, 92), P(362, 118), -18, { color: ph < 0.5 ? K.b : C.line, lw: 2 });
+      carrow(g, P(362, 136), P(296, 110), -18, { color: ph >= 0.5 ? K.b : C.line, lw: 2 });
+      carrow(g, P(196, 110), P(130, 136), -18, { color: ph >= 0.5 ? K.a : C.line, lw: 2 });
+      // 左下:從純 α(或純 β)開始,比例隨時間變化
+      alpha(g, fin(t, 6), () => {
+        const ax = g.axes(70, 262, 380, 200, { xmin: 0, xmax: 1, ymin: 0, ymax: 100, xlab: '時間', ylab: '比例(%)', yticks: [0, 36, 64, 100], fmtY: (y) => String(y) });
+        const b0 = S.start === 'b' ? 100 : 0, k = seg(t, 6.2, 11.6), N = 60, pa = [], pb = [];
+        for (let i = 0; i <= N * k; i++) { const x = i / N, b = 64 + (b0 - 64) * Math.exp(-x * 5); pa.push([ax.X(x), ax.Y(100 - b)]); pb.push([ax.X(x), ax.Y(b)]); }
+        g.curve(pa, K.a, 2.6); g.curve(pb, K.b, 2.6);
+        if (k > 0.9) { g.text(ax.X(1) + 8, ax.Y(36), 'α', { size: 15, weight: 800, color: K.a }); g.text(ax.X(1) + 8, ax.Y(64), 'β', { size: 15, weight: 800, color: K.b }); }
+        g.text(70, 248, S.start === 'b' ? '一開始全部是 β' : '一開始全部是 α', { size: 13, color: C.ink2 });
+      });
+      // 右邊:椅式
+      const yaw = 7 * Math.sin(t * 0.5) * RAD;
+      alpha(g, fin(t, 12), () => {
+        chair(g, 'a', { cx: 772, cy: 184, s: 80, yaw, tilt: 16 * RAD }, { hlAno: true, crowd: fin(t, 14) });
+        chair(g, 'b', { cx: 772, cy: 414, s: 80, yaw, tilt: 16 * RAD }, { hlAno: true });
+        g.text(772, 50, 'α:1 號碳的 OH 直立', { size: 15, weight: 700, color: K.a, align: 'center' });
+        g.text(772, 300, 'β:OH 和 CH₂OH 全部往外伸', { size: 15, weight: 700, color: K.b, align: 'center' });
+        alpha(g, fin(t, 14), () => g.text(772, 72, '虛線:和同一邊直立的 H 擠在一起', { size: 13, color: C.ink2, align: 'center' }));
+      });
+    },
+  },
+  {
+    key: 'fructose', name: '果糖的環:5 號碳接 2 號碳', dur: 20,
+    cues: [[0, '酮糖也會成環。果糖的羰基在 2 號碳,所以由 5 號碳的 OH 去接 2 號碳。'],
+      [9.4, '這次是 4 個碳加 1 個氧的五員環,叫呋喃糖;1 號碳與 6 號碳的 CH₂OH 都在環外。異頭碳是 2 號碳,一樣分 α 和 β。'],
+      [15, '在水裡,果糖其實多半由 6 號碳的 OH 接上 2 號碳,成六員環;蔗糖裡的果糖則是這個五員環。']],
+    draw(g, t, S) {
+      const u = { rot: fin(t, 1.6, 2.4), curl: fin(t, 4.2, 3), c5: fin(t, 7.4, 1.8), close: fin(t, 10.2, 2.2) };
+      const { at } = drawCyc(g, CYC.fru, S.ab, u);
+      alpha(g, win(t, 7.2, 10.6, 0.3), () => carrow(g, add(at('Or'), 6, 10), add(at('C2'), -12, -6), -20, { color: C.mint }));
+      alpha(g, fin(t, 12.6), () => {
+        const C2 = at('C2');
+        g.tag(C2.x + 30, C2.y - 98, '2 號碳:異頭碳', { size: 14, color: anoCol(S.ab) });
+        g.text(RG.cx, RG.cy + 6, '4 個 C + 1 個 O', { size: 13, color: C.muted, align: 'center' });
+        g.tag(400, 500, `${ANO[S.ab]}-D-果${FUR}糖(五員環的果糖)`, { size: 16, color: anoCol(S.ab) });
+      });
+      alpha(g, fin(t, 15), () => {
+        g.panel(712, 262, 236, 264, '');
+        g.text(726, 284, '在水裡最多的:六員環', { size: 14, weight: 700, color: C.ink2 });
+        g.text(726, 306, '6 號碳的 OH 接上 2 號碳', { size: 13, color: C.muted });
+        drawSugars(g, [sugar('frup', 'b')], { cx: 830, cy: 420, s: 74 }, { size: 13, num: 1 });
+      });
+    },
+  },
+  {
+    key: 'naming', name: '環狀糖的命名:名字拆成四塊', dur: 28,
+    cues: [[0, '環狀糖的名字由四塊拼成,例如 α-D-葡萄哌喃糖:α 或 β、D 或 L、哪一種糖,以及夾在糖名中間的環的大小。每一塊都對得到結構上的一個地方。'],
+      [4.5, '先看糖名(葡萄…糖、果…糖)說是哪一種糖:碳的數目、羰基原本在哪一個碳、每個 OH 朝哪一邊,都包含在這個名字裡。'],
+      [9.5, '夾在中間的「哌喃」「呋喃」說環的大小:5 個碳加 1 個氧的六員環叫哌喃,4 個碳加 1 個氧的五員環叫呋喃,名字借自同樣大小、環上有一個氧的分子哌喃與呋喃。'],
+      [15, '「D」看 5 號碳,也就是編號最大的不對稱碳:費雪投影裡它的 OH 在右邊是 D,在左邊是 L。'],
+      [19.5, '「α」「β」看異頭碳的 OH(葡萄糖是 1 號碳,果糖是 2 號碳)。D 型的糖照標準方向畫環時,這個 OH 朝下是 α,朝上是 β。'],
+      [24, '英文的順序一樣:α-D-glucopyranose 是 gluco(葡萄)、pyran(哌喃)、ose(糖);縮寫成 α-D-Glcp,p 是哌喃,f 是呋喃。「自己調整」可以換成果糖或改成 β。']],
+    draw(g, t, S) {
+      const N = NAMING[S.nm], ab = S.nab, R = sugar(N.kind, ab), v = { cx: 236, cy: 296, s: 112 };
+      const STEP = [['sugar', 4.5], ['ring', 9.5], ['d', 15], ['ab', 19.5]];
+      let act = null;
+      for (const [k, t0] of STEP) if (t >= t0 && t < 24) act = k;
+      // 講 D 與 α、β 時標出環的上與下
+      alpha(g, win(t, 15, 24), () => {
+        const ctx = g.ctx; ctx.beginPath(); ctx.ellipse(v.cx, v.cy, v.s * 1.45, v.s * 0.62, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(165,243,205,.07)'; ctx.fill();
+        g.text(v.cx - v.s * 1.6, v.cy - 34, '上', { size: 13, color: C.muted, align: 'center' });
+        g.text(v.cx - v.s * 1.6, v.cy + 36, '下', { size: 13, color: C.muted, align: 'center' });
+      });
+      // 結構:講到哪一塊就圈起那裡
+      const hl = {}, nums = {};
+      if (act === 'sugar') for (const nm of N.idOH) { hl[`0:${nm}`] = C.ink; nums[`0:C${nm.slice(1)}`] = 1; }
+      if (act === 'ring') hl[`0:${N.ringO}`] = K.ringO;
+      if (act === 'd') { hl[`0:${N.dAt}`] = K.num; nums['0:C5'] = 1; }
+      if (act === 'ab') { hl[`0:${N.anoO}`] = anoCol(ab); nums[`0:C${N.ano}`] = 1; }
+      alpha(g, fin(t, 0.4, 0.8), () => drawSugars(g, [R], v, { num: !act || act === 'ring' ? 0.85 : 0, nums, hl, ringCol: act === 'ring' ? K.ringO : null }));
+      // 名字(講到的那一塊底下畫線)
+      const parts = [[ANO[ab], anoCol(ab), 'ab'], ['-D-', K.num, 'd'], [N.stem, C.ink, 'sugar'], [N.ring, K.ringO, 'ring'], ['糖', C.ink, 'sugar']];
+      alpha(g, fin(t, 0.2), () => nameRow(g, parts, 480, 56, 40, act));
+      // 右邊:每一塊的說明卡
+      const CARDS = [
+        ['sugar', `${N.stem}…糖:哪一種糖`, C.ink, N.idTxt],
+        ['ring', `${N.ring}:環的大小`, K.ringO, N.ringTxt],
+        ['d', 'D:5 號碳', K.num, N.dTxt],
+        ['ab', `${ANO[ab]}:異頭碳的 OH`, anoCol(ab), [`${N.ano} 號碳(異頭碳)的 OH 朝${ab === 'a' ? '下' : '上'}`, 'D 型照標準方向畫:朝下 α、朝上 β']],
+      ];
+      CARDS.forEach(([k, title, col, body], i) => {
+        const a = fin(t, STEP[i][1] + 0.2), y = 142 + i * 90, on = act === k;
+        alpha(g, a * (act && !on ? 0.45 : 1), () => {
+          g.rrect(520, y, 416, 80, 10, 'rgba(21,32,30,.92)', on ? col : C.line, on ? 2 : 1.2);
+          g.text(538, y + 22, title, { size: 16, weight: 800, color: col });
+          lines(g, 538, y + 47, body, { size: 13.5, gap: 1.45 });
+          if (k === 'ring') { ringIcon(g, 866, y + 25, 13, 6, { a: N.ring === PYR ? 1 : 0.3 }); ringIcon(g, 908, y + 26, 13, 5, { a: N.ring === FUR ? 1 : 0.3 }); }
+        });
+      });
+      alpha(g, win(t, 19.5, 24), () => g.text(728, 518, '標準方向:環上的 O 在後面,碳的編號順時針', { size: 13, color: C.muted, align: 'center' }));
+      // 最後:英文名稱與縮寫
+      alpha(g, fin(t, 24), () => {
+        g.text(56, 470, '英文', { size: 13, color: C.muted });
+        nameRow(g, [[ANO[ab], anoCol(ab)], ['-D-', K.num], [N.en[0], C.ink], [N.en[1], K.ringO], ['ose', C.ink]], 100, 470, 22, null, { align: 'left' });
+        g.text(56, 506, '縮寫', { size: 13, color: C.muted });
+        nameRow(g, [[ANO[ab], anoCol(ab)], ['-D-', K.num], [N.sym, C.ink], [N.p, K.ringO]], 100, 506, 20, null, { align: 'left' });
+      });
+    },
+  },
+  {
+    key: 'glycosidic', name: '糖苷鍵:兩個糖接起來', dur: 22,
+    cues: [[0, '兩個糖可以用糖苷鍵接起來。其中一個一定用異頭碳上的 OH(葡萄糖是 1 號碳),另一個用它自己的某一個 OH。'],
+      [5.5, '兩個 OH 之間少掉一分子水(H₂O),剩下一個 O 把兩個碳連起來。細胞裡是酵素把活化過的糖接上去,淨結果一樣是少一分子水。'],
+      [11, '名字寫成「α(1→4)」這樣:α 或 β 是接出去那個異頭碳的方向,箭頭從 1 號碳指到另一個糖的 4 號碳。'],
+      [16.5, '接上以後,這個異頭碳就固定了,不會再在 α 和 β 之間變;另一頭還留著自由異頭碳的,叫還原端。「自己調整」可以換例子。']],
+    draw(g, t, S) {
+      const ex = EXS[S.ex], v = ex.v;
+      const kSlide = fin(t, 3.6, 2.4), kJoin = fin(t, 6.2, 1.6);
+      const { donor, acc } = exScene(ex, kSlide);
+      const Sx = (w) => P(v.cx + v.s * w[0], v.cy - v.s * w[1] + v.s * HW.k * w[2]);
+      const B = Sx(ex.B), accO0 = Sx(acc.A[ex.accO].w), oPos = mixP(accO0, B, kJoin);
+      const hide = { '0:O1': kJoin > 0.5, [`1:${ex.accO}`]: true };
+      const hl = t < 6 ? { '0:O1': anoCol(ex.da), [`1:${ex.accO}`]: K.oh } : {};
+      const nums = { [`0:${ex.nums[0]}`]: 1, [`1:${ex.nums[1]}`]: 1 };
+      drawSugars(g, [donor, acc], v, { num: 0, nums, hide, hl: kJoin < 0.5 ? hl : {} });
+      // 中間那個 O:右邊糖的 O 移到中間,接上左邊的異頭碳
+      bond(g, Sx(acc.A[ex.accC].w), oPos);
+      bond(g, Sx(donor.A.C1.w), B, { a: kJoin });
+      label(g, oPos, kJoin > 0.5 ? 'O' : 'OH', { color: kJoin > 0.5 ? K.num : K.oh, hl: kJoin < 0.5 && t < 6 ? K.oh : null });
+      // 離開的水
+      if (kJoin > 0) {
+        const w0 = mixP(Sx(donor.A.O1.w), oPos, 0.5), k = fin(t, 6.8, 2.4);
+        alpha(g, 1 - fin(t, 9, 0.8), () => g.tag(w0.x - 30 * k, w0.y + 70 * k + 20, 'H₂O', { size: 15, color: K.oh }));
+      }
+      // 名字
+      alpha(g, fin(t, 10.6), () => {
+        const c1 = Sx(donor.A.C1.w);
+        g.tag(c1.x + 4, Math.min(c1.y, B.y) - 70, `${ex.name}:${ex.link}`, { size: 18, color: anoCol(ex.da) });
+        g.text(480, 470, ex.sym, { size: 16, weight: 700, color: C.ink, align: 'center' });
+        g.text(480, 500, ex.note, { size: 15, color: C.ink2, align: 'center' });
+      });
+      alpha(g, fin(t, 16.5), () => {
+        if (S.ex === 'sucrose') return;
+        const r = Sx(acc.A.O1.w);
+        g.tag(r.x + 34, r.y + 34, '還原端', { size: 14, color: C.ink });
+      });
+    },
+  },
+  {
+    key: 'cellulose', name: '纖維素:β(1→4) 拉成直線', dur: 24,
+    cues: [[0, '纖維素是很多葡萄糖用 β(1→4) 一個接一個連起來。β 的接法讓每個葡萄糖都和隔壁的上下翻面。'],
+      [6.5, '翻面讓整條鏈拉得又直又平;相鄰的兩個葡萄糖之間還有氫鍵(3 號碳的 OH 拉住隔壁環上的 O),鏈不容易彎。'],
+      [12, '很多條直鏈並排,鏈與鏈之間又有大量氫鍵,排成整齊的結晶,聚成微纖維。所以纖維素很強、不溶於水,是木材的骨架。'],
+      [18, '每個葡萄糖還留著三個 OH:2、3 號碳的接在 CH 上,叫二級醇;6 號碳的接在 CH₂ 上,叫一級醇。醋酸纖維素、羧甲基纖維素就是在這些 OH 上接東西。']],
+    draw(g, t, S) {
+      const v = { cx: 120, cy: 150, s: 76 };
+      const list = [0, 1, 2, 3].map((i) => sugar('glcp', i === 3 ? '~' : 'b', { T: [i * D14, 0, 0], fx: i % 2 === 1 }));
+      const hide = {};
+      for (let i = 0; i < 4; i++) { if (i < 3) hide[`${i}:O1`] = true; if (i > 0) hide[`${i}:O4`] = true; }
+      const Sx = drawSugars(g, list, v, { hide, size: 13, nums: LINKNUMS, num: 0, a: 1 - 0.55 * fin(t, 17.6) });
+      alpha(g, 1 - 0.55 * fin(t, 17.6), () => {
+        for (let i = 0; i < 3; i++) {
+          const B = Sx([i * D14 + D14 / 2, i % 2 ? -HW.L : HW.L, 0]);
+          bond(g, Sx(list[i].A.C1.w), B); bond(g, B, Sx(list[i + 1].A.C4.w)); label(g, B, 'O', { color: K.num, size: 13 });
+        }
+      });
+      alpha(g, fin(t, 0.6) * (1 - fin(t, 6)), () => g.tag(480, 36, '每個都和隔壁上下翻面(CH₂OH 一上一下)', { size: 14, color: C.ink }));
+      // 鏈內的氫鍵:下一個糖 3 號碳的 OH … 這一個環上的 O
+      if (S.hb) alpha(g, fin(t, 6.5) * (1 - 0.55 * fin(t, 17.6)), () => {
+        for (let i = 0; i < 3; i++) g.line(...xy(Sx(list[i + 1].A.O3.w)), ...xy(Sx(list[i].A.O5.w)), K.hb, 2, [4, 4]);
+        g.tag(480, 36, '虛線:氫鍵(3 號碳的 OH 拉住隔壁環上的 O)', { size: 14, color: K.hb });
+      });
+      // 很多條並排
+      alpha(g, fin(t, 12), () => {
+        g.panel(24, 268, 560, 254, '鏈與鏈並排(示意)');
+        for (let r = 0; r < 3; r++) {
+          const y = 330 + r * 66;
+          for (let i = 0; i < 9; i++) {
+            const x = 70 + i * 58, up = (i + r) % 2 ? -1 : 1;
+            if (i < 8) g.line(x + 16, y, x + 42, y, '#6f9f86', 2.2);
+            hexagon(g, x, y, 16);
+            g.line(x - 6, y - up * 9, x - 10, y - up * 20, '#6f9f86', 1.8);
+            if (S.hb && r < 2) g.line(x + 4, y + 12, x + 4, y + 54, K.hb, 1.6, [3, 4]);
+          }
+        }
+        if (S.hb) g.text(300, 515, '虛線:鏈與鏈之間的氫鍵', { size: 13, color: K.hb, align: 'center' });
+      });
+      alpha(g, win(t, 13.5, 18.2), () => {
+        g.panel(604, 268, 332, 254, '');
+        for (let r = -2; r <= 2; r++) for (let c = -2; c <= 2; c++) if (Math.abs(r) + Math.abs(c) < 4) g.circle(770 + c * 22 + (r % 2) * 11, 380 + r * 19, 9, 'rgba(165,243,205,.25)', C.mint, 1.2);
+        g.text(770, 470, '微纖維的截面(示意):很多條鏈捆在一起', { size: 13, color: C.ink2, align: 'center' });
+        g.text(770, 296, '木材乾重約 4 到 5 成是纖維素', { size: 14, weight: 700, color: C.mint, align: 'center' });
+      });
+      // 每個葡萄糖剩下的三個 OH
+      alpha(g, fin(t, 18), () => {
+        g.panel(604, 268, 332, 254, '');
+        const R = sugar('glcp', 'b'), vv = { cx: 770, cy: 384, s: 64 };
+        const Sy = drawSugars(g, [R], vv, { only: ['O2', 'O3', 'C6'], size: 13, hl: { '0:O2': K.oh, '0:O3': K.oh, '0:C6': K.num }, nums: { '0:C2': 1, '0:C3': 1, '0:C6': 1 } });
+        for (const [nm, dx] of [['C1', 30], ['C4', -30]]) { const p = Sy(R.A[nm].w), q = add(p, dx, nm === 'C1' ? -22 : 22); bond(g, p, q); label(g, q, 'O', { color: K.num, size: 13 }); g.line(q.x, q.y, q.x + dx * 0.8, q.y, C.muted, 1.6, [3, 3]); }
+        g.text(770, 296, '還能反應的 OH:2、3、6 號碳', { size: 14, weight: 700, color: C.mint, align: 'center' });
+        g.text(770, 488, '6 號:一級醇;2、3 號:二級醇', { size: 13, color: C.ink2, align: 'center' });
+      });
+    },
+  },
+  {
+    key: 'starch', name: '澱粉:α(1→4) 捲成螺旋', dur: 22,
+    cues: [[0, '澱粉也是葡萄糖接成的,但用的是 α(1→4)。α 的接法不會翻面,每接一個就偏一點角度,整條鏈慢慢捲成螺旋。'],
+      [6.5, '直鏈澱粉的螺旋大約每一圈 6 個葡萄糖;碘可以鑽進螺旋裡,所以澱粉遇到碘會變成藍黑色。'],
+      [13, '支鏈澱粉在主鏈上每隔二、三十個葡萄糖,就用某個葡萄糖 6 號碳的 OH 接出一條分支,這是 α(1→6)。'],
+      [18, '一般的澱粉以支鏈澱粉為主,直鏈澱粉通常約兩到三成(依植物而不同);動物存的肝醣,分支更密。']],
+    draw(g, t, S) {
+      const v = { cx: 120, cy: 128, s: 76 };
+      const list = [0, 1, 2, 3].map((i) => sugar('glcp', i === 3 ? '~' : 'a', { T: [i * D14, 0, 0] }));
+      const hide = {};
+      for (let i = 0; i < 4; i++) { if (i < 3) hide[`${i}:O1`] = true; if (i > 0) hide[`${i}:O4`] = true; }
+      const Sx = drawSugars(g, list, v, { hide, size: 13, nums: LINKNUMS, num: 0 });
+      for (let i = 0; i < 3; i++) {
+        const B = Sx([i * D14 + D14 / 2, -HW.L, 0]);
+        bond(g, Sx(list[i].A.C1.w), B); bond(g, B, Sx(list[i + 1].A.C4.w)); label(g, B, 'O', { color: K.num, size: 13 });
+      }
+      alpha(g, fin(t, 0.6) * (1 - fin(t, 6)), () => g.tag(480, 248, '都朝同一個方向,O 都在下面', { size: 14, color: C.ink }));
+      // 直鏈澱粉的螺旋
+      alpha(g, fin(t, 6.2), () => {
+        g.panel(24, 262, 520, 262, '直鏈澱粉:捲成螺旋(示意)');
+        helix(g, 70, 500, 396, t, { iodine: S.iodine ? 1 : 0, grow: seg(t, 6.2, 9) });
+        g.text(150, 506, '每一圈約 6 個葡萄糖', { size: 13, color: C.ink2, align: 'center' });
+        if (S.iodine) { g.circle(440, 500, 10, '#1f1b4d', '#6f63c8', 1.5); g.text(426, 500, '碘:藍黑色', { size: 13, color: '#b9a8ff', align: 'right' }); }
+      });
+      // 支鏈澱粉
+      alpha(g, fin(t, 13), () => {
+        g.panel(560, 262, 376, 262, '支鏈澱粉:有分支(示意)');
+        tree(g, seg(t, 13, 16.5));
+        alpha(g, fin(t, 15), () => { const b = TREE.nodes[TREE.branchAt[0]]; g.tag(b.x - 2, b.y + 26, 'α(1→6) 分支點', { size: 13, color: K.co }); });
+      });
+    },
+  },
+  {
+    key: 'compare', name: '比一比:同樣是葡萄糖', dur: 16,
+    cues: [[0, '纖維素和澱粉都是葡萄糖接成的,差別只在異頭碳(1 號碳)的 OH 是 α 還是 β,以及接到哪一個碳。'],
+      [6, '人的唾液和胰臟有澱粉酶,能切開 α(1→4);人沒有能切 β(1→4) 的酵素,所以纖維素是膳食纖維。牛、羊要靠胃裡的微生物分解纖維素。'],
+      [11.5, '以後看到「β-D-Glcp-(1→4)」這種名字,就知道說的是哪一個碳、朝哪一面、接到哪裡。']],
+    draw(g, t) {
+      const cols = [
+        ['纖維素', K.b, 'β(1→4)', ['每個都翻面', '直、平,排成結晶'], '不能(沒有切 β 鍵的酵素)', '細胞壁、木材、棉花'],
+        ['直鏈澱粉', K.a, 'α(1→4)', ['捲成螺旋'], '能(澱粉酶切 α(1→4))', '種子、塊莖的澱粉粒'],
+        ['支鏈澱粉', K.co, 'α(1→4) + α(1→6)', ['主鏈加上分支'], '能', '和直鏈澱粉一起'],
+      ];
+      cols.forEach(([nm, col, link, shape, eat, where], i) => {
+        const x = 30 + i * 306, a = fin(t, 0.4 + i * 0.5);
+        alpha(g, a, () => {
+          g.rrect(x, 30, 286, 486, 14, 'rgba(21,32,30,.88)', col, 1.6);
+          g.text(x + 143, 62, nm, { size: 20, weight: 800, color: col, align: 'center' });
+          // 小圖示
+          if (i === 0) for (let k = 0; k < 5; k++) { hexagon(g, x + 47 + k * 48, 128, 15); g.line(x + 47 + k * 48 - 4, 128 + (k % 2 ? 9 : -9), x + 47 + k * 48 - 7, 128 + (k % 2 ? 19 : -19), '#6f9f86', 1.6); if (k < 4) g.line(x + 62 + k * 48, 128, x + 80 + k * 48, 128, '#6f9f86', 2); }
+          if (i === 1) helix(g, x + 36, x + 250, 128, t, { turns: 2, r: 30, grow: 1 });
+          if (i === 2) miniTree(g, x + 34, 128);
+          g.text(x + 20, 204, '接法', { size: 13, color: C.muted });
+          g.text(x + 20, 228, link, { size: 17, weight: 700, color: col });
+          g.text(x + 20, 268, '形狀', { size: 13, color: C.muted });
+          lines(g, x + 20, 292, shape, { size: 15, color: C.ink });
+          g.text(x + 20, 356, '人能消化嗎', { size: 13, color: C.muted });
+          g.text(x + 20, 380, eat, { size: 15, color: C.ink, max: 250 });
+          g.text(x + 20, 420, '在哪裡', { size: 13, color: C.muted });
+          g.text(x + 20, 444, where, { size: 15, color: C.ink, max: 250 });
+        });
+      });
+    },
+  },
+];
+createLesson({
+  chapters,
+  state: { pair: 'hex', ab: 'b', start: 'a', nm: 'glcp', nab: 'a', ex: 'maltose', hb: true, iodine: false },
+  controls: [
+    { id: 'pair', label: '比較哪兩個', type: 'seg', options: [{ v: 'hex', label: '葡萄糖與果糖' }, { v: 'pent', label: '核糖與核酮糖' }], chapters: ['aldose-ketose'] },
+    { id: 'ab', label: '新的 OH', type: 'seg', options: [{ v: 'a', label: 'α(朝下)' }, { v: 'b', label: 'β(朝上)' }], chapters: ['ring', 'fructose'], restart: true },
+    { id: 'start', label: '一開始溶進水的', type: 'seg', options: [{ v: 'a', label: '純 α' }, { v: 'b', label: '純 β' }], chapters: ['mutarotation'] },
+    { id: 'nm', label: '哪一個環', type: 'seg', options: [{ v: 'glcp', label: '葡萄糖六員環' }, { v: 'fruf', label: '果糖五員環' }, { v: 'frup', label: '果糖六員環' }], chapters: ['naming'] },
+    { id: 'nab', label: '異頭碳的 OH', type: 'seg', options: [{ v: 'a', label: 'α(朝下)' }, { v: 'b', label: 'β(朝上)' }], chapters: ['naming'] },
+    { id: 'ex', label: '例子', type: 'seg', options: [{ v: 'maltose', label: '麥芽糖' }, { v: 'cellobiose', label: '纖維二糖' }, { v: 'isomaltose', label: '異麥芽糖' }, { v: 'sucrose', label: '蔗糖' }], chapters: ['glycosidic'], restart: true },
+    { id: 'hb', label: '顯示氫鍵', type: 'toggle', chapters: ['cellulose'] },
+    { id: 'iodine', label: '加碘', type: 'toggle', chapters: ['starch'] },
+  ],
+});
+</script>
+</body>
+</html>
