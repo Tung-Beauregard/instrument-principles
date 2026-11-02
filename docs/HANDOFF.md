@@ -58,6 +58,13 @@
 
 ## 更新紀錄
 
+### 2026-11-02：推送與部署確認（木材三大成分、醣類的醛糖與酮糖）
+
+- 提交 `4cd51ca`，以 fast-forward 推送到 `main`（推送前 `git fetch` 確認遠端仍是 `c7b99fd`）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上這次改到的 16 個檔（`wood-components/` 與 `carbohydrates/` 的 `index.html`、`MAINTENANCE.md`，`nomenclature/index.html`、入口 `index.html`、`content/instruments.json`、卡片圖 `assets/wood-components.svg`、兩張分享預覽圖、`scripts/make-og-images.mjs`，`README.md`、`AGENTS.md`、`INSTRUMENTS.md`、`docs/HANDOFF.md`、`docs/VALIDATION.md`）都和提交的版本完全相同（比對 SHA-256）。
+- 通過：無頭 Edge 開正式網址（先標記已計數，不增加到站人數）。入口的「官能基編號」區有三張卡片，圖都載入；`nomenclature/` 15 章、`carbohydrates/` 12 章、`wood-components/` 13 章，三頁的分頁列都是「← 儀器入口、命名法則、醣類、木材三大成分」並標出本頁，桌機照常自動播放，沒有錯誤，390 寬沒有橫向捲動。觸控模擬 390×844：`wood-components/`（支援網頁全螢幕）與 `carbohydrates/`（關掉網頁全螢幕，模擬 iPhone 的 Safari）開頁都不自動播放、有「開始講解」；按下去進全螢幕並播放，轉橫照常，離開就暫停，點章節又進全螢幕；沒有 console 訊息。
+- 未執行：實機手機、Safari、Firefox。
+
 ### 2026-10-31：醣類的成環兩章強調醛糖與酮糖的差別
 
 - 執行者：Claude，在作者電腦的分支 `nmr-lesson`（基準 `c7b99fd`）。使用者 2026-11-02 同意推送，和下面「木材三大成分」那一段一起提交；推送與部署的結果另記一段。
