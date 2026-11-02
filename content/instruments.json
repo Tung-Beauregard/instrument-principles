@@ -336,6 +336,18 @@
       "href": "./carbohydrates/"
     },
     {
+      "id": "wood-components",
+      "name": "木材三大成分:纖維素、半纖維素與木質素",
+      "categories": [
+        "fg"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/wood-components.svg",
+      "imageAlt": "左邊是細胞壁的橫切面,一層一層;右邊由上到下是纖維素鏈、帶支鏈的半纖維素與木質素的單元",
+      "href": "./wood-components/"
+    },
+    {
       "id": "plot",
       "name": "數據畫圖",
       "categories": [

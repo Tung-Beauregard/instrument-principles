@@ -1768,7 +1768,7 @@ VIGS:
 
 ## 官能基編號
 
-入口的「官能基編號」一區(2026-10-30 起)用生化原理那套 2D 播放器講有機分子的碳怎麼編號、官能基在哪裡,程度和生化原理相同(台灣高中畢業看得懂)。目前有兩份:有機化學命名法則(2026-10-31,通則,排在前面)與醣類;之後一類化合物一份。
+入口的「官能基編號」一區(2026-10-30 起)用生化原理那套 2D 播放器講有機分子的碳怎麼編號、官能基在哪裡,程度和生化原理相同(台灣高中畢業看得懂)。目前有三份:有機化學命名法則(2026-10-31,通則,排在前面)、醣類,以及木材三大成分(2026-10-31,排在醣類後面);之後一類化合物一份。
 
 ### 有機化學命名法則:從主鏈編號到 R/S 與 E/Z(`nomenclature/`)
 
@@ -1802,7 +1802,7 @@ VIGS:
 
 #### 技術
 
-單一 HTML 檔(nomenclature/index.html),2D canvas 動畫,用共用的 assets/bio-lesson.js、assets/bio-draw.js 與 assets/bio-lesson.css;鍵線式、立體中心與 R、S 的計算都由頁面裡的函式處理,不需要建置,不使用到站人數計數。入口卡片概念圖 assets/nomenclature.svg。分頁列是「← 儀器入口」、本頁與醣類(`aria-label="官能基編號"`)。程式分區、每章的時間點與修改方式見 nomenclature/MAINTENANCE.md。
+單一 HTML 檔(nomenclature/index.html),2D canvas 動畫,用共用的 assets/bio-lesson.js、assets/bio-draw.js 與 assets/bio-lesson.css;鍵線式、立體中心與 R、S 的計算都由頁面裡的函式處理,不需要建置,不使用到站人數計數。入口卡片概念圖 assets/nomenclature.svg。分頁列是「← 儀器入口」、本頁、醣類與木材三大成分(`aria-label="官能基編號"`)。程式分區、每章的時間點與修改方式見 nomenclature/MAINTENANCE.md。
 
 #### 來源連結
 
@@ -1825,31 +1825,31 @@ VIGS:
 - 第 1 章:醣的骨架與官能基(羥基、羥甲基、醛基),費雪投影的讀法
 - 第 2 章:醛糖與酮糖,編號從離羰基最近的那一端數起(醛基是 1 號、常見酮糖的酮基是 2 號);可切換葡萄糖與果糖、核糖與核酮糖
 - 第 3 章:不對稱碳,D 與 L 看編號最大的不對稱碳(己糖是 5 號碳)
-- 第 4 章:葡萄糖從鏈狀接成六員環(費雪投影躺下來、彎成一圈、5 號碳轉一下、5 號碳的 O 接上 1 號碳),可切換 α、β
+- 第 4 章:醛糖(葡萄糖)從鏈狀接成六員環(費雪投影躺下來、彎成一圈、5 號碳轉一下、5 號碳的 O 接上 1 號碳的醛基,成為半縮醛),可切換 α、β;最後和酮糖並排比較:被接上的碳(1 號或 2 號)、環的大小、異頭碳與它另一邊的原子團(H 或 CH₂OH)、半縮醛與半縮酮
 - 第 5 章:α 與 β 怎麼分(和 6 號碳的 CH₂OH 同一邊是 β)、為什麼有兩種(醛基是平的,兩面都能被接上)、名字「β-D-葡萄哌喃糖」
 - 第 6 章:變旋現象(環打開再接回去),從純 α 或純 β 開始都到 36:64;椅式裡 β 的 OH 全部往外伸、α 的 1 號 OH 直立
-- 第 7 章:果糖的 5 號碳接 2 號碳成五員環(呋喃糖),右下是水裡最多的六員環(果哌喃糖)
+- 第 7 章:酮糖(果糖)的 5 號碳接 2 號碳的酮基成五員環(呋喃糖,半縮酮),異頭碳是 2 號碳、另一邊是 1 號碳的 CH₂OH;右下是水裡最多的六員環(果哌喃糖);最後和葡萄糖對照三點(第 4、7 章的名稱與對照是使用者 2026-10-31 要求「鏈狀變環狀要強調醛糖跟酮糖的差別」加的)
 - 第 8 章:環狀糖的命名(α 或 β、D 或 L、哪一種糖、夾在糖名中間的環的大小;英文 α-D-glucopyranose 與縮寫 α-D-Glcp),可切換葡萄糖六員環、果糖五員環、果糖六員環與 α、β
 - 第 9 章:糖苷鍵(兩個 OH 之間少一分子水)與 α(1→4) 的讀法、還原端;例子:麥芽糖、纖維二糖、異麥芽糖、蔗糖
-- 第 10 章:纖維素 β(1→4),每個葡萄糖和隔壁翻面、鏈內與鏈間的氫鍵、微纖維,以及每個葡萄糖剩下的 2、3、6 號 OH
+- 第 10 章:纖維素 β(1→4),每個葡萄糖和隔壁翻面、鏈內與鏈間的氫鍵、微纖絲,以及每個葡萄糖剩下的 2、3、6 號 OH
 - 第 11 章:澱粉 α(1→4) 的螺旋(可加碘)與支鏈澱粉的 α(1→6) 分支
 - 第 12 章:纖維素、直鏈澱粉、支鏈澱粉比一比(接法、形狀、人能不能消化)
 
 #### 數值與示意
 
 - 編號、D 與 L、α 與 β、哈沃斯投影:IUPAC-IUBMB 2-Carb(1996)。2-Carb-2.2.1:醛基是 1 號,酮糖的羰基取最小的號碼;2-Carb-4.2:D、L 看編號最大的不對稱碳,費雪投影裡它的 OH 在右是 D;2-Carb-5.4:哈沃斯投影的環上的氧在後面、1 號碳在右端,順時針編號,費雪投影在右的朝下,D 型己醛糖的 6 號碳在環上方;2-Carb-6.1、6.2:在費雪投影裡,異頭碳的 O 和參考原子(己糖的 5 號碳)的 O 在同一邊是 α、在兩邊是 β。頁面用「1 號碳的 OH 和 6 號碳的 CH₂OH 同一邊是 β」說明,這只適用於 D-葡萄糖這類 6 號碳在環外的環(果哌喃糖不適用,頁面沒有用它說明)。2-Carb-5.3 寫了 α-D-葡萄哌喃糖的 CH₂OH 與 1 號 OH 互為反式。第 8 章改用「D 型照標準方向畫,異頭碳的 OH 朝下是 α、朝上是 β」說明三種環(葡萄哌喃糖、果呋喃糖、果哌喃糖),逐一對過 PubChem 依結構算出的 IUPAC 名稱:β 的異頭碳都是 R、α 都是 S(CID 64689、79025、439709、11105942、24310、440545),頁面畫的方向和它們一致。2-Carb-5.1:五員環叫 furanose、六員環叫 pyranose。
-- 名詞:國家教育研究院樂詞網(2026-10-30 查):pyranose 哌喃醣(中國大陸寫作吡喃糖)、furanose 呋喃糖、anomer 變旋異構物、mutarotation 變旋[作用]、Fischer projection 費雪投影式、Haworth projection 哈沃斯[氏]投影式(生命科學)、aldose 醛醣、ketose 酮醣(化學;生命科學有酮糖)。頁面照使用者的寫法用醛糖、酮糖,環用「哌喃」「呋喃」。環狀糖的名字樂詞網把糖名寫在前面(glucopyranose 葡萄哌喃糖、fructofuranose 果呋喃糖;同一型的還有半乳哌喃糖、核呋喃糖),頁面照這個詞序(果哌喃糖依同一型推得);2026-10-31 由原本的「哌喃葡萄糖」改過來(中國大陸寫作吡喃葡萄糖)。glycoside 是醣苷、glycosyl 是[醣]苷基,頁面沒有用到中文的糖苷基名稱,雙醣只寫縮寫。anomeric carbon 樂詞網沒有收錄,頁面用「異頭碳」。
+- 名詞:國家教育研究院樂詞網(2026-10-30 查):pyranose 哌喃醣(中國大陸寫作吡喃糖)、furanose 呋喃糖、anomer 變旋異構物、mutarotation 變旋[作用]、Fischer projection 費雪投影式、Haworth projection 哈沃斯[氏]投影式(生命科學)、aldose 醛醣、ketose 酮醣(化學;生命科學有酮糖)。頁面照使用者的寫法用醛糖、酮糖,環用「哌喃」「呋喃」。環狀糖的名字樂詞網把糖名寫在前面(glucopyranose 葡萄哌喃糖、fructofuranose 果呋喃糖;同一型的還有半乳哌喃糖、核呋喃糖),頁面照這個詞序(果哌喃糖依同一型推得);2026-10-31 由原本的「哌喃葡萄糖」改過來(中國大陸寫作吡喃葡萄糖)。glycoside 是醣苷、glycosyl 是[醣]苷基,頁面沒有用到中文的糖苷基名稱,雙醣只寫縮寫。hemiacetal 半縮醛、hemiketal 半縮酮(化學術語,2026-10-31 查)。anomeric carbon 樂詞網沒有收錄,頁面用「異頭碳」。
 - 葡萄糖在水裡的平衡:α 約 36%、β 約 64%(LibreTexts 20.3;OpenStax 有機化學 25.5 寫 37:63);打開的鏈狀(醛基)約 0.001% 到 0.004%(Dworkin 與 Miller 2000 的 25 °C 最佳估計 0.0012%;圓二色光譜 20 °C 0.0022%),連同水合物也不到 0.01%。頁面寫「十萬個裡只有一到四個」。
 - 果糖在水裡(D₂O,20 °C):β-果哌喃糖 68.23%、β-果呋喃糖 22.35%、α-果呋喃糖 6.24%、α-果哌喃糖 2.67%、鏈狀 0.50%(Barclay 等 2012);0.089 到 0.36 M、pH 3 都差不多。六員環合計約 71%,頁面寫「多半是六員環」。蔗糖裡的果糖是 β-果呋喃糖。
 - 糖苷鍵:2-Carb-1.13 與 33.1(糖苷是混合縮醛,兩個糖之間的鍵叫糖苷鍵)。2-Carb-36:麥芽糖 α-D-Glcp-(1→4)-D-Glc、纖維二糖 β-D-Glcp-(1→4)-D-Glc、異麥芽糖 α-D-Glcp-(1→6)-D-Glc;蔗糖在 2-Carb-36 寫成 α-D-glucopyranosyl β-D-fructofuranoside(縮寫 α-D-Glcp-(1↔2)-β-D-Fruf),頁面寫成 α1↔β2(葡萄糖的 1 號碳是 α、果糖的 2 號碳是 β),兩個異頭碳都用掉,沒有還原端。「少一分子水」是淨結果,細胞裡由酵素把活化過的糖接上去。縮寫的寫法(Glc、Fru 前面寫 α 或 β 與 D,環的大小寫成 p 或 f,兩個異頭碳相接用 ↔)見 2-Carb-38;第 9 章畫面下方寫這種縮寫,還原端照 2-Carb-36 寫成 D-Glc。
 - 纖維素:每個葡萄糖和隔壁轉 180°,重複單位是纖維二糖(長約 1.04 nm,纖維素 Iβ 的 c 軸 1.038 nm);鏈內最主要的氫鍵是 O3–H⋯O5(另有 O2–H⋯O6),鏈與鏈之間主要是 O6–H⋯O3(Nishiyama 等 2002;Moon 等 2011;Chen 等 2014)。木材的纖維素約占乾重 40% 到 50%(Rowell 等 2013:針葉樹 40% 到 45%、闊葉樹 38% 到 49%)。天然木材纖維素的聚合度約 1 萬以上,頁面沒有寫。2、3 號碳的 OH 是二級醇、6 號碳的是一級醇;醋酸纖維素、羧甲基纖維素是在這些 OH 上接上去的(一般有機化學與纖維素化學的常識,頁面沒有寫取代的位置比例)。
 - 澱粉:直鏈澱粉和碘結合時是每圈 6 個葡萄糖、螺距約 0.8 nm 的左手單螺旋,藍色(約 600 nm 吸收)來自螺旋中間的多碘離子鏈(Pesek 與 Silaghi-Dumitrescu 2024);澱粉粒裡天然的鏈則是雙螺旋,頁面沒有講。支鏈澱粉約每 25 到 30 個葡萄糖一個 α(1→6) 分支(LibreTexts 20.7),α(1→6) 約占支鏈澱粉的鍵的 5%、肝醣約 9%(Tetlow 與 Bertoft 2020);肝醣每 8 到 12 個一個分支。直鏈澱粉的比例:一般澱粉約 20% 到 30%(Pesek 2024),JECFA 1973 寫 15% 到 30%、Tetlow 與 Bertoft 寫約 15% 到 35%;頁面寫「通常約兩到三成」。
 - 消化:α-澱粉酶切 α(1→4)(IUBMB EC 3.2.1.1),纖維素酶切 β(1→4)(EC 3.2.1.4);人的消化酵素切不開 β(1→4),反芻動物靠瘤胃裡的微生物(OpenStax Biology 2e 3.2;Weimer 2022)。白蟻腸道有共生微生物,也有自己的纖維素酶,頁面不拿白蟻當例子。
-- 示意:費雪投影、哈沃斯投影、椅式是教科書的畫法;成環動畫是把畫法之間內插,中間的樣子不代表分子真正經過的形狀;第 6 章的比例曲線沒有時間刻度;螺旋、並排的鏈、微纖維截面與支鏈澱粉的分支都是示意(分支畫得比實際密)。
+- 示意:費雪投影、哈沃斯投影、椅式是教科書的畫法;成環動畫是把畫法之間內插,中間的樣子不代表分子真正經過的形狀;第 6 章的比例曲線沒有時間刻度;螺旋、並排的鏈、微纖絲截面與支鏈澱粉的分支都是示意(分支畫得比實際密)。
 
 #### 技術
 
-單一 HTML 檔(carbohydrates/index.html),2D canvas 動畫,用共用的 assets/bio-lesson.js(播放器)、assets/bio-draw.js(畫圖工具)與 assets/bio-lesson.css(版面);分子的畫法(費雪投影、成環動畫、哈沃斯投影、椅式、螺旋)由頁面裡的函式畫,不需要建置,不使用到站人數計數。入口卡片概念圖 assets/carbohydrates.svg。分頁列是「← 儀器入口」「命名法則」與本頁(`aria-label="官能基編號"`)。程式分區、每章的時間點與修改方式見 carbohydrates/MAINTENANCE.md。
+單一 HTML 檔(carbohydrates/index.html),2D canvas 動畫,用共用的 assets/bio-lesson.js(播放器)、assets/bio-draw.js(畫圖工具)與 assets/bio-lesson.css(版面);分子的畫法(費雪投影、成環動畫、哈沃斯投影、椅式、螺旋)由頁面裡的函式畫,不需要建置,不使用到站人數計數。入口卡片概念圖 assets/carbohydrates.svg。分頁列是「← 儀器入口」「命名法則」、本頁與「木材三大成分」(`aria-label="官能基編號"`)。程式分區、每章的時間點與修改方式見 carbohydrates/MAINTENANCE.md。
 
 #### 來源連結
 
@@ -1870,6 +1870,67 @@ VIGS:
 - IUBMB 酵素命名:EC 3.2.1.1 https://iubmb.qmul.ac.uk/enzyme/EC3/2/1/1.html ;EC 3.2.1.4 https://iubmb.qmul.ac.uk/enzyme/EC3/2/1/4.html
 - OpenStax, Biology 2e, 3.2 Carbohydrates:https://openstax.org/books/biology-2e/pages/3-2-carbohydrates
 - Weimer PJ. Microorganisms. 2022;10:2345(反芻動物瘤胃裡分解纖維素的微生物):https://pmc.ncbi.nlm.nih.gov/articles/PMC9785684/
+
+### 木材三大成分:纖維素、半纖維素與木質素(`wood-components/`)
+
+網頁:https://tung-beauregard.github.io/instrument-principles/wood-components/
+
+使用者 2026-10-31 要求「另外幫我補一個 木材三大主成分的介紹」。放在官能基編號區、醣類後面;這一區的主題是碳的編號,所以半纖維素的糖、木質素的單體與鍵、三種成分之間的鍵都用號碼講。共 13 章:
+
+- 第 1 章:木材裡有什麼(100 克乾木材畫成 100 格;可切換針葉樹、闊葉樹)
+- 第 2 章:細胞壁的層次(中膠層、初生壁、次生壁外層 S1、中層 S2、內層 S3、細胞腔)、各層微纖絲的方向與微纖絲角、木質素的濃度與總量
+- 第 3 章:三種成分怎麼搭在一起(微纖絲、半纖維素、木質素;鋼筋混凝土的比喻)
+- 第 4 章:纖維素的鏈(β(1→4)、聚合度約一萬、一條鏈約 5 μm、2、3、6 號的 OH)
+- 第 5 章:微纖絲(18 條鏈的截面、同一層的氫鍵與層間的凡得瓦力、結晶區與非結晶區、結晶度)
+- 第 6 章:半纖維素的六種糖差在哪一號碳(葡萄糖、甘露糖、半乳糖、木糖、阿拉伯糖、4-O-甲基葡萄糖醛酸)與 SNFG 符號
+- 第 7 章:半纖維素的兩大類(闊葉樹的葡萄糖醛酸木聚糖;針葉樹的半乳葡甘露聚糖與阿拉伯糖葡萄糖醛酸木聚糖)與纖維素的比較
+- 第 8 章:木質素的三種單體(對香豆醇、松柏醇、芥子醇)、木質素的編號(1 到 6 號、α、β、γ)和命名法則(苯酚)的編號、H、G、S 在三種植物的比例
+- 第 9 章:自由基偶合(過氧化酶或漆酶、沒配對的電子可以在的位置、兩個自由基接成 β-O-4、不規則的網)
+- 第 10 章:木質素的鍵用號碼命名(β-O-4 雙體、各種鍵的比例範圍、G 與 S 的 5 號碳)
+- 第 11 章:三種成分之間的鍵(半纖維素和纖維素的氫鍵;木質素和醣類之間的醚鍵、酯鍵、糖苷鍵)
+- 第 12 章:實驗室怎麼分開來量(萃取物、酸不溶與酸可溶木質素、全纖維素、α-纖維素、灰分)
+- 第 13 章:三大成分比一比
+
+#### 數值與示意
+
+- 組成:Wood Handbook 2021 第 3 章(纖維素 40% 到 50%、半纖維素 20% 到 30%、木質素針葉樹 26% 到 32%、闊葉樹 20% 到 28%、溫帶樹種的萃取物多半在 5% 到 10% 以下、灰分不到 1%)與 Rowell 等 2013 表 3.1(Pettersen 1984 的美國樹種平均,針葉樹/闊葉樹:α-纖維素 43.7 / 45.4、Klason 木質素 28.8 / 23.0、全纖維素 64.5 / 71.7、灰分 0.3 / 0.5)。第 1 章的 100 格取整數:針葉樹 44、24、28、4,闊葉樹 45、28、23、4(全纖維素減 α-纖維素約 21 / 26,會低估半纖維素,所以取範圍內的值)。各書的木質素範圍不太一樣,Rowell 2013 同一章就有兩組(26% 到 34% / 23% 到 30%,以及 25% 到 35% / 18% 到 25%)。
+- 細胞壁:微纖絲角初生壁雜亂、S1 50° 到 70°、S2 5° 到 30°、S3 70° 以上(Wood Handbook;Rowell 2013 寫正常材的 S2 是 14° 到 19°,壓縮材 44° 到 47°)。厚度:中膠層 0.2 到 1.0 μm、初生壁 0.1 到 0.2、S1 0.2 到 0.3、S2 1 到 5、S3 約 0.1(Agarwal 2006 引 Sjöström 1993),畫面的厚度是示意。木質素的濃度在中膠層與細胞隅角最高,約七成的木質素在次生壁(Rowell 2013);纖維素集中在 S2(Agarwal 2006)。
+- 纖維素:β(1→4) 接起來的 D-葡萄哌喃糖,重複單位是纖維二糖(1.038 nm,每個葡萄糖約 0.52 nm);聚合度至少 9,000 到 10,000(Rowell 2013 引 Goring 與 Timell 1962;同一頁寫的分子量 10,000 到 150,000 是錯的,聚合度一萬約 1.6 × 10⁶),所以一條鏈約 5 μm。微纖絲約 3 nm、約 18 條鏈(新的共識,實際平均可能多一些;舊的 36 條模型已不用),針葉樹的微纖絲再聚成 10 到 20 nm 的束(Jarvis 2018)。氫鍵:鏈內 O3–H⋯O5(另有 O2–H⋯O6)、鏈間 O6–H⋯O3(Kubicki 2018)。結晶度依測法不同:Rowell 2013 寫最高約 65%、Agarwal 2006 寫 50% 到 60%,Jarvis 2018 指出 NMR 看到的結晶型構形只有三到四成;頁面寫「大約一半到三分之二」。纖維素是最多的有機物(Wood Handbook)。
+- 半纖維素:Rowell 2013 表 3.2、3.3(引 Sjöström)。聚合度平均 100 到 200(木聚糖約 200、半乳葡甘露聚糖約 100)。闊葉樹的 O-乙醯-4-O-甲基葡萄糖醛酸木聚糖占木材 15% 到 30%,木糖:醛酸:乙醯基約 10:1:7,醛酸接在 2 號(α(1→2)),乙醯基在 2 或 3 號;葡甘露聚糖 2% 到 5%。針葉樹的 O-乙醯半乳葡甘露聚糖約 20%(半乳糖:葡萄糖:甘露糖,低半乳糖的約 0.1:1:4、高半乳糖的約 1:1:3,半乳糖接在 6 號,α(1→6)),每 3 到 4 個己糖約 1 個乙醯基;阿拉伯糖葡萄糖醛酸木聚糖 7% 到 10%(內文寫 5% 到 10%),木糖:醛酸:阿拉伯糖約 10:2:1.3,阿拉伯糖接在 3 號(α(1→3)),沒有乙醯基。Rowell 的內文寫「每 1.3 個木糖一個阿拉伯糖」是打錯的。
+- 糖的立體:第 6 章每一種都對過 PubChem 依結構算出的 IUPAC 名稱:β-D-木哌喃糖 (2R,3R,4S,5R)、β-D-甘露哌喃糖 (2R,3S,4S,5S,6R)、α-D-半乳哌喃糖 (2S,3R,4S,5R,6R)、α-L-阿拉伯呋喃糖 (2R,3R,4R,5S)、4-O-甲基-α-D-葡萄哌喃糖醛酸 (2S,3S,4R,5R,6S)。和 β-D-葡萄哌喃糖 (2R,3R,4S,5S,6R) 比:甘露糖只差 2 號碳、半乳糖只差 4 號碳;木糖的 4 號碳寫法不同是因為少了 6 號碳、名次跟著變,形狀沒有變。α-L-阿拉伯呋喃糖的哈沃斯畫法(1 號 OH 朝上、2 號朝下、3 號朝上、5 號碳朝下)用行列式算過,四個碳都和 PubChem 一致。
+- 糖的符號:SNFG(NCBI,2024 年版 2.0.4;Varki 等 2015、Neelamegham 等 2019),以 CC0 公開。葡萄糖藍圓、甘露糖綠圓、半乳糖黃圓、木糖橘星、阿拉伯糖綠星(預設是 L 型;呋喃環在符號裡寫斜體 f)、葡萄糖醛酸上藍下白的菱形;甲基醚與乙醯基寫成 4Me、2Ac、3Ac;符號不要旋轉。
+- 木質素:三種單體與 H、G、S(Vanholme 2010;Wood Handbook);單體的英文名稱與 (E) 雙鍵見 PubChem(對香豆醇 4-[(E)-3-hydroxyprop-1-enyl]phenol、松柏醇 4-[(E)-3-hydroxyprop-1-enyl]-2-methoxyphenol、芥子醇 4-[(E)-3-hydroxyprop-1-enyl]-2,6-dimethoxyphenol)。木質素的編號(接側鏈的碳是 1 號、OH 在 4 號、甲氧基在 3 或 3 與 5 號,側鏈 α、β、γ)見 Rowell 2013 與 University of Washington PSE 406 的講義;命名法則的編號從接 OH 的碳數起。比例:針葉樹 G 95% 以上、H 不到 5%(Grabber 2004、Eswaran 2022;Wood Handbook 寫對香豆醇 5% 到 10%,偏高);闊葉樹 G 25% 到 50%、S 45% 到 75%、H 0 到 8%(Eswaran 2022);稻草 H:G:S = 15:45:40、麥稈 5:49:46(Grabber 2004)。比例條的闊葉樹 2:38:60 是範圍內的代表值。含量:Klason 木質素平均針葉樹 28.8%、闊葉樹 23.0%,壓縮材 30.9% 到 40.9%(Rowell 2013)。自由基偶合由過氧化酶或漆酶起頭(Vanholme 2010);木質素沒有光學活性(Ralph 2004)。
+- 木質素的鍵(占所有鍵的百分比,針葉樹/闊葉樹):β-O-4 45 到 50 / 50 到 65、β-5 9 到 12 / 3 到 11、β-β 2 到 6 / 3 到 16、5-5(含 dibenzodioxocin)2.5 到 11 / 不到 1 到 4、4-O-5 約 2(較舊的資料 4 到 8)、spirodienone(β-1)每 100 個單元約 3 到 4 個(Eswaran 2022 表 1,整理自 Rinaldi 2016)。舊教科書的 5-5 寫到 19% 到 27%、β-1 7% 到 9%,Rinaldi 2016 認為偏高(5-5 針葉樹最多約 9%、β-1 最多 1% 到 2%),頁面不用。S 單元 5 號碳有甲氧基,不能用 5 號碳去接,所以闊葉樹 β-O-4 多、碳和碳的鍵少,比較容易脫木質素(製漿)。
+- 三種成分之間:半纖維素幫忙把木質素和纖維素連起來(Wood Handbook);雲杉的固態 NMR 看到木聚糖以二重螺旋貼在纖維素上、半乳葡甘露聚糖也貼在微纖絲表面,木質素和兩者都有接觸(Terrett 2019)。木質素和醣類之間最常見的鍵是苄基醚、苄基酯(接醛酸)、苯基糖苷(Tarasov 2018:針葉樹以醚為主、闊葉樹以糖苷為主);頁面不用「苄基」這個字,直接說 α 碳上的 O、4 號碳的 O。鋼筋混凝土是常用的比喻(FWF 計畫 P15410:纖維素是鋼筋、木質素是混凝土);Salmén 2004 把細胞壁看成纖維強化的複合材料。半纖維素的角色照 Wood Handbook 另外寫,沒有硬套成比喻。
+- 分析方法:TAPPI T 204(溶劑萃取物:乙醇苯、二氯甲烷或丙酮;Rowell 2013 用甲苯乙醇,頁面寫「例如乙醇加甲苯」)、T 222(酸不溶木質素:72% 硫酸;TAPPI 是 20 °C 2 小時、稀釋到 3% 煮 4 小時,美國林務署的作法是 30 °C 1 小時、稀釋到 4%、121 °C 1 小時,頁面寫「再稀釋、加熱」)、UM 250(酸可溶木質素,紫外光 205 nm)、T 211(灰分 525 °C;ASTM D1102 是 575 °C)、全纖維素(亞氯酸鈉加醋酸,70 °C 反覆加入)、α-纖維素(全纖維素泡 17.5% 氫氧化鈉,20 °C;TAPPI T 203 是給紙漿用的)。
+- 名詞:國家教育研究院樂詞網與開放資料(2026-10-31 查):cellulose 纖維素、hemicellulose 半纖維素、lignin 木質素、middle lamella 中膠層(中國大陸作胞間層;林學的舊譯中間層)、primary wall 初生壁、secondary wall 次生壁、tracheid 假導管(高中名詞作管胞;假導管)、microfibril 微纖絲(植物學、高中;也有微纖維)、holocellulose 全纖維素(中國大陸作綜纖維素)、extractive 萃取物(化工有木材萃取物;林產化學論文多寫抽出物、抽出成分)、softwood 針葉樹材、hardwood 闊葉樹材(「軟木」在台灣是軟木塞)、xylan 木聚糖、glucomannan 葡甘露聚糖、galactoglucomannan 半乳葡甘露聚糖、glucuronic acid 葡萄糖醛酸、acetyl 乙醯基、methoxyl 甲氧基、guaiacyl 癒創木基、peroxidase 過氧化酶、laccase 漆酶(「蟲漆酶」的蟲漆是蟲膠,容易誤會)、crystalline region 結晶區、amorphous region 非結晶區、van der Waals force 凡得瓦力。多醣的名字:樂詞網用「醣」寫類別(單醣、多醣),用「糖」寫有名字的糖與用單一種糖命名的多醣(木聚糖、葡聚糖)。Klason lignin 沒有收錄,用 CNS 試驗法名稱的寫法「酸不溶木質素」;樂詞網化學術語把 acid lignin 譯成「酸溶木質素」,和酸可溶木質素不同。細胞隅角、木質素單體、苯丙烷單元、木質素-碳水化合物複合體沒有收錄。2026-10-31 醣類那一頁的「微纖維」也改成微纖絲。
+- 示意:細胞、微纖絲、半纖維素鏈、木質素網的形狀與數目;第 2 章各層的厚度;第 3 章的排列;100 格與 H、G、S 比例條是代表值;第 9 章只畫「電子可以在的位置」,沒有畫出每一個共振式與接上以後的重新排列。
+
+#### 技術
+
+單一 HTML 檔(wood-components/index.html),2D canvas 動畫,用共用的 assets/bio-lesson.js、assets/bio-draw.js 與 assets/bio-lesson.css;糖的符號、哈沃斯投影、鍵線式都由頁面裡的函式畫,不需要建置,不使用到站人數計數。入口卡片概念圖 assets/wood-components.svg。分頁列是「← 儀器入口」「命名法則」「醣類」與本頁(`aria-label="官能基編號"`)。程式分區、每章的時間點與修改方式見 wood-components/MAINTENANCE.md。
+
+#### 來源連結
+
+- Wiedenhoeft AC, Eberhardt TL. Structure and function of wood. Wood Handbook(FPL-GTR-282), USDA Forest Service, 2021, 第 3 章:https://research.fs.usda.gov/download/treesearch/62242.pdf
+- Rowell RM, Pettersen R, Tshabalala MA. Cell wall chemistry. Handbook of Wood Chemistry and Wood Composites, 2nd ed., CRC Press, 2013, 第 3 章(美國林務署的版本):https://research.fs.usda.gov/download/treesearch/42245.pdf
+- Agarwal UP. Raman imaging to investigate ultrastructure and composition of plant cell walls. Planta. 2006;224:1141:https://research.fs.usda.gov/download/treesearch/25772.pdf
+- Jarvis MC. Structure of native cellulose microfibrils, the starting point for nanocellulose manufacture. Phil Trans R Soc A. 2018;376:20170045(作者版):https://eprints.gla.ac.uk/143718/7/143718.pdf
+- Kubicki JD, et al. The shape of native plant cellulose microfibrils. Sci Rep. 2018:https://pmc.ncbi.nlm.nih.gov/articles/PMC6143632/
+- Vanholme R, et al. Lignin biosynthesis and structure. Plant Physiol. 2010;153:895:https://pmc.ncbi.nlm.nih.gov/articles/PMC2899938/
+- Ralph J, et al. Lignins: natural polymers from oxidative coupling of 4-hydroxyphenyl-propanoids. Phytochem Rev. 2004;3:29:https://research.fs.usda.gov/download/treesearch/22070.pdf
+- Rinaldi R, et al. Paving the way for lignin valorisation. Angew Chem Int Ed. 2016:https://pmc.ncbi.nlm.nih.gov/articles/PMC6680216/
+- Eswaran SCD, et al. Molecular structural dataset of lignin macromolecule elucidating experimental structural compositions. Sci Data. 2022;9:647:https://doi.org/10.1038/s41597-022-01709-4
+- Grabber JH, et al. Genetic and molecular basis of grass cell-wall degradability. C R Biol. 2004:https://comptes-rendus.academie-sciences.fr/biologies/articles/en/10.1016/j.crvi.2004.02.009/
+- Terrett OM, et al. Molecular architecture of softwood revealed by solid-state NMR. Nat Commun. 2019(只核對到摘要):https://doi.org/10.1038/s41467-019-12979-9
+- Tarasov D, Leitch M, Fatehi P. Lignin–carbohydrate complexes: properties, applications, analyses, and methods of extraction. Biotechnol Biofuels. 2018:https://pmc.ncbi.nlm.nih.gov/articles/PMC6162904/
+- Salmén L. Micromechanical understanding of the cell-wall structure. C R Biol. 2004:https://comptes-rendus.academie-sciences.fr/biologies/articles/10.1016/j.crvi.2004.03.010/
+- 奧地利科學基金會(FWF)計畫 P15410:https://www.fwf.ac.at/en/research-radar/10.55776/P15410
+- TAPPI 試驗法清單(2025-06-10 版):https://www.tappi.org/globalassets/003_numeric_index_tm.pdf
+- University of Washington PSE 406 Lecture 10(木質素的編號圖):https://depts.washington.edu/pse406/Notes%20pdf/406-10%20Lignin%20Biosynthesis%20II.pdf
+- SNFG:https://www.ncbi.nlm.nih.gov/glycans/snfg.html ;Varki A, et al. Glycobiology. 2015;25:1323:https://pmc.ncbi.nlm.nih.gov/articles/PMC4643639/ ;Neelamegham S, et al. Glycobiology. 2019;29:620:https://pmc.ncbi.nlm.nih.gov/articles/PMC7335484/
+- PubChem:β-D-木哌喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/125409 ;β-D-甘露哌喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/439680 ;α-D-半乳哌喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/439357 ;α-L-阿拉伯呋喃糖 https://pubchem.ncbi.nlm.nih.gov/compound/445935 ;4-O-甲基-α-D-葡萄哌喃糖醛酸 https://pubchem.ncbi.nlm.nih.gov/compound/445994 ;對香豆醇 https://pubchem.ncbi.nlm.nih.gov/compound/5280535 ;松柏醇 https://pubchem.ncbi.nlm.nih.gov/compound/1549095 ;芥子醇 https://pubchem.ncbi.nlm.nih.gov/compound/5280507
+- 國家教育研究院樂詞網:https://terms.naer.edu.tw/ ;學術名詞開放資料:https://opendata.naer.edu.tw/
 
 ## 數據畫圖(plot/)
 

@@ -23,7 +23,7 @@
 </head>
 <body>
 <a class="skip-link" href="#main">跳到動畫</a>
-<div class="nav-wrap"><nav class="sitenav" aria-label="官能基編號"><a href="../">← 儀器入口</a><a href="../nomenclature/">命名法則</a><a href="./" aria-current="page">醣類</a></nav></div>
+<div class="nav-wrap"><nav class="sitenav" aria-label="官能基編號"><a href="../">← 儀器入口</a><a href="../nomenclature/">命名法則</a><a href="./" aria-current="page">醣類</a><a href="../wood-components/">木材三大成分</a></nav></div>
 <header class="top wrap">
   <h1>醣類 <span class="k">碳的編號、成環與糖苷鍵</span></h1>
   <p class="lede">醣類是一條帶著很多 OH 的碳鏈。先學會替碳編號,就讀得懂醛糖與酮糖、鏈狀怎麼接成環、1 號碳上的 α 與 β、「α-D-葡萄哌喃糖」這種名字怎麼讀,以及「β(1→4)」這種糖苷鍵的寫法;最後看同樣是葡萄糖,為什麼接成纖維素是直的、接成澱粉會捲成螺旋。</p>
@@ -171,6 +171,15 @@ function ringIcon(g, x, y, r, n, { color = K.ringO, a = 1 } = {}) {
     const pts = Array.from({ length: n }, (_, i) => { const ang = -Math.PI / 2 + (i * 2 * Math.PI) / n; return P(x + r * Math.cos(ang), y + r * Math.sin(ang)); });
     pts.forEach((p, i) => { const q = pts[(i + 1) % n]; g.line(p.x, p.y, q.x, q.y, color, 1.6); });
     label(g, pts[0], 'O', { color, size: 11 });
+  });
+}
+// 把羰基(碳與它的 O)圈起來:醛糖、酮糖成環的那兩章用
+function glowCO(g, c, o, a) {
+  alpha(g, a, () => {
+    const m = mixP(c, o, 0.5), ctx = g.ctx;
+    ctx.save(); ctx.shadowColor = K.co; ctx.shadowBlur = 14; ctx.beginPath();
+    ctx.ellipse(m.x, m.y, Math.hypot(o.x - c.x, o.y - c.y) / 2 + 24, 26, Math.atan2(o.y - c.y, o.x - c.x), 0, Math.PI * 2);
+    ctx.strokeStyle = K.co; ctx.lineWidth = 2.2; ctx.stroke(); ctx.restore();
   });
 }
 // 彎的箭頭(二次曲線),bend 是往左彎的程度(負的往右)
@@ -650,16 +659,22 @@ const chapters = [
     },
   },
   {
-    key: 'ring', name: '鏈狀變環狀:葡萄糖', dur: 24,
-    cues: [[0, '在水裡,葡萄糖的鏈會自己接成一個環。先把費雪投影躺下來:原本在右邊的原子團變成朝下,在左邊的朝上。'],
+    key: 'ring', name: '鏈狀變環狀:醛糖(葡萄糖)', dur: 34,
+    cues: [[0, '在水裡,葡萄糖的鏈會自己接成一個環。葡萄糖是醛糖:羰基是 1 號碳的醛基,等一下被接上的就是它。先把費雪投影躺下來:原本在右邊的原子團變成朝下,在左邊的朝上。'],
       [6, '碳鏈彎成一圈;5 號碳轉一下,讓它的 OH 正對著 1 號碳的醛基。'],
-      [12.2, '5 號碳的 O 接上 1 號碳,醛基的 C=O 打開;原本 5 號碳 OH 上的 H 移到醛基的 O 上,變成新的 OH。'],
+      [12.2, '5 號碳的 O 接上醛基的碳(1 號碳),C=O 打開;原本 5 號碳 OH 上的 H 移到醛基的 O 上,變成新的 OH。醛基接上一個 OH 的結構叫半縮醛。'],
       [17, '接出來的環有 5 個碳和 1 個氧,編號照舊:環上的 O 來自 5 號碳,1 號碳多了一個新的 OH。'],
-      [21, '新的 OH 可以朝下或朝上,就是 α 和 β(下一章);「自己調整」可以切換。']],
+      [21, '新的 OH 可以朝下或朝上,就是 α 和 β(下一章);「自己調整」可以切換。'],
+      [24, '醛糖和酮糖成環的方式一樣:鏈上的 OH 接上羰基的碳。差在羰基的位置:醛糖在 1 號碳,5 號碳的 OH 接上去圍成六員環;酮糖(例如果糖)在 2 號碳,5 號碳的 OH 接上去只圍得出五員環,1 號碳留在環外。'],
+      [29.5, '所以醛糖的異頭碳是 1 號碳,另一邊接的是 H;酮糖的異頭碳是 2 號碳,另一邊接的是 CH₂OH。醛基接上 OH 叫半縮醛,酮基接上 OH 叫半縮酮。果糖怎麼接成環,在第 7 章。']],
     draw(g, t, S) {
       const u = { rot: fin(t, 3, 2.8), curl: fin(t, 6.2, 3.4), c5: fin(t, 9.8, 2.2), close: fin(t, 13.4, 2.4) };
       const { at } = drawCyc(g, CYC.glc, S.ab, u);
+      // 醛基:一開始與被接上的時候圈起來
+      glowCO(g, at('C1'), at('Oc'), Math.max(win(t, 0.3, 3.4), win(t, 12.2, 14.6, 0.3)));
+      alpha(g, win(t, 0.3, 3.2), () => g.tag(480, 36, '葡萄糖是醛糖:羰基是 1 號碳的醛基', { size: 15, color: K.co }));
       alpha(g, win(t, 3, 9.4), () => g.tag(480, 36, '躺下來:費雪投影右邊的朝下、左邊的朝上', { size: 15, color: C.ink }));
+      alpha(g, win(t, 13.2, 16.6), () => g.tag(480, 36, '醛基接上 OH:變成半縮醛', { size: 15, color: K.co }));
       alpha(g, win(t, 9.8, 13), () => g.tag(330, 150, '5 號碳轉一下,OH 對準 1 號碳', { size: 14, color: K.oh }));
       alpha(g, win(t, 12.2, 14.4, 0.3), () => carrow(g, add(at('Or'), 14, 4), add(at('C1'), -6, -10), -26, { color: C.mint }));
       alpha(g, fin(t, 16.2), () => {
@@ -669,6 +684,25 @@ const chapters = [
         g.tag(C1.x + 150, C1.y, '1 號碳:異頭碳,多一個新的 OH', { size: 14, color: anoCol(S.ab) });
         g.text(RG.cx, RG.cy + 4, '5 個 C + 1 個 O', { size: 13, color: C.muted, align: 'center' });
         g.tag(480, 500, `${ANO[S.ab]}-D-葡萄${PYR}糖(六員環的葡萄糖)`, { size: 16, color: anoCol(S.ab) });
+      });
+      // 24 秒起:醛糖和酮糖成環比一比(蓋在上面的一整片)
+      alpha(g, fin(t, 24), () => {
+        g.rrect(24, 24, 912, 492, 14, K.bg, C.mint, 1.6);
+        g.text(480, 54, '醛糖和酮糖:成環時差在哪裡', { size: 18, weight: 800, color: C.mint, align: 'center' });
+        for (const c of [{ x: 260, kind: 'glcp', head: '醛糖(葡萄糖)', hl: { '0:O1': anoCol(S.ab) } },
+          { x: 700, kind: 'fruf', head: '酮糖(果糖)', hl: { '0:O2': anoCol(S.ab), '0:C1': K.co } }]) {
+          g.text(c.x, 92, c.head, { size: 17, weight: 800, color: K.co, align: 'center' });
+          drawSugars(g, [sugar(c.kind, S.ab)], { cx: c.x, cy: 192, s: 80 }, { num: 1, size: 14, hl: c.hl });
+        }
+        const rows = [['羰基在', '1 號碳(醛基)', '2 號碳(酮基)'], ['5 號碳的 OH 接上', '1 號碳', '2 號碳'], ['圍成', '5 個 C + 1 個 O:六員環', '4 個 C + 1 個 O:五員環'],
+          ['異頭碳', '1 號碳', '2 號碳'], ['異頭碳的另一邊', 'H(原本醛基上的)', 'CH₂OH(1 號碳,在環外)'], ['叫做', '半縮醛', '半縮酮']];
+        rows.forEach(([h, a, b], i) => alpha(g, fin(t, i < 3 ? 24.6 + i * 0.9 : 29.8 + (i - 3) * 0.9), () => {
+          const y = 300 + i * 34;
+          if (i) g.line(48, y - 17, 912, y - 17, 'rgba(255,255,255,.07)', 1);
+          g.text(56, y, h, { size: 13, color: C.muted });
+          g.text(260, y, a, { size: 15, weight: 700, color: C.ink, align: 'center' });
+          g.text(700, y, b, { size: 15, weight: 700, color: C.ink, align: 'center' });
+        }));
       });
     },
   },
@@ -765,17 +799,22 @@ const chapters = [
     },
   },
   {
-    key: 'fructose', name: '果糖的環:5 號碳接 2 號碳', dur: 20,
-    cues: [[0, '酮糖也會成環。果糖的羰基在 2 號碳,所以由 5 號碳的 OH 去接 2 號碳。'],
-      [9.4, '這次是 4 個碳加 1 個氧的五員環,叫呋喃糖;1 號碳與 6 號碳的 CH₂OH 都在環外。異頭碳是 2 號碳,一樣分 α 和 β。'],
-      [15, '在水裡,果糖其實多半由 6 號碳的 OH 接上 2 號碳,成六員環;蔗糖裡的果糖則是這個五員環。']],
+    key: 'fructose', name: '鏈狀變環狀:酮糖(果糖)', dur: 24,
+    cues: [[0, '酮糖也會成環,但被接上的碳不一樣:果糖是酮糖,羰基是 2 號碳的酮基,所以 5 號碳的 OH 接的是 2 號碳(葡萄糖接的是 1 號碳)。'],
+      [9.4, '這次是 4 個碳加 1 個氧的五員環,叫呋喃糖。異頭碳是 2 號碳,它的另一邊接的是 1 號碳的 CH₂OH(葡萄糖的異頭碳另一邊是 H);酮基接上 OH 的結構叫半縮酮。一樣分 α 和 β。'],
+      [15, '在水裡,果糖其實多半由 6 號碳的 OH 接上 2 號碳,成六員環;蔗糖裡的果糖則是這個五員環。'],
+      [19.6, '和葡萄糖比:接上的是 2 號碳不是 1 號碳、用 5 號碳的 OH 圍成五員環不是六員環、異頭碳的另一邊是 CH₂OH 不是 H。三點都來自羰基的位置。']],
     draw(g, t, S) {
       const u = { rot: fin(t, 1.6, 2.4), curl: fin(t, 4.2, 3), c5: fin(t, 7.4, 1.8), close: fin(t, 10.2, 2.2) };
       const { at } = drawCyc(g, CYC.fru, S.ab, u);
+      // 酮基:一開始與被接上的時候圈起來
+      glowCO(g, at('C2'), at('Oc'), Math.max(win(t, 0.3, 3.2), win(t, 9.8, 12.4, 0.3)));
+      alpha(g, win(t, 0.3, 3.2), () => g.tag(480, 36, '果糖是酮糖:羰基是 2 號碳的酮基', { size: 15, color: K.co }));
+      alpha(g, win(t, 11, 15), () => g.tag(480, 36, '酮基接上 OH:變成半縮酮', { size: 15, color: K.co }));
       alpha(g, win(t, 7.2, 10.6, 0.3), () => carrow(g, add(at('Or'), 6, 10), add(at('C2'), -12, -6), -20, { color: C.mint }));
       alpha(g, fin(t, 12.6), () => {
         const C2 = at('C2');
-        g.tag(C2.x + 30, C2.y - 98, '2 號碳:異頭碳', { size: 14, color: anoCol(S.ab) });
+        g.tag(C2.x + 30, C2.y - 98, '2 號碳:異頭碳(葡萄糖是 1 號碳)', { size: 14, color: anoCol(S.ab) });
         g.text(RG.cx, RG.cy + 6, '4 個 C + 1 個 O', { size: 13, color: C.muted, align: 'center' });
         g.tag(400, 500, `${ANO[S.ab]}-D-果${FUR}糖(五員環的果糖)`, { size: 16, color: anoCol(S.ab) });
       });
@@ -785,6 +824,7 @@ const chapters = [
         g.text(726, 306, '6 號碳的 OH 接上 2 號碳', { size: 13, color: C.muted });
         drawSugars(g, [sugar('frup', 'b')], { cx: 830, cy: 420, s: 74 }, { size: 13, num: 1 });
       });
+      alpha(g, fin(t, 19.6), () => card(g, 24, 48, 300, 124, '和葡萄糖(醛糖)比', K.co, ['接上的是 2 號碳,不是 1 號碳', '五員環,不是六員環', '異頭碳另一邊是 CH₂OH,不是 H']));
     },
   },
   {
@@ -885,7 +925,7 @@ const chapters = [
     key: 'cellulose', name: '纖維素:β(1→4) 拉成直線', dur: 24,
     cues: [[0, '纖維素是很多葡萄糖用 β(1→4) 一個接一個連起來。β 的接法讓每個葡萄糖都和隔壁的上下翻面。'],
       [6.5, '翻面讓整條鏈拉得又直又平;相鄰的兩個葡萄糖之間還有氫鍵(3 號碳的 OH 拉住隔壁環上的 O),鏈不容易彎。'],
-      [12, '很多條直鏈並排,鏈與鏈之間又有大量氫鍵,排成整齊的結晶,聚成微纖維。所以纖維素很強、不溶於水,是木材的骨架。'],
+      [12, '很多條直鏈並排,鏈與鏈之間又有大量氫鍵,排成整齊的結晶,聚成微纖絲。所以纖維素很強、不溶於水,是木材的骨架。'],
       [18, '每個葡萄糖還留著三個 OH:2、3 號碳的接在 CH 上,叫二級醇;6 號碳的接在 CH₂ 上,叫一級醇。醋酸纖維素、羧甲基纖維素就是在這些 OH 上接東西。']],
     draw(g, t, S) {
       const v = { cx: 120, cy: 150, s: 76 };
@@ -923,7 +963,7 @@ const chapters = [
       alpha(g, win(t, 13.5, 18.2), () => {
         g.panel(604, 268, 332, 254, '');
         for (let r = -2; r <= 2; r++) for (let c = -2; c <= 2; c++) if (Math.abs(r) + Math.abs(c) < 4) g.circle(770 + c * 22 + (r % 2) * 11, 380 + r * 19, 9, 'rgba(165,243,205,.25)', C.mint, 1.2);
-        g.text(770, 470, '微纖維的截面(示意):很多條鏈捆在一起', { size: 13, color: C.ink2, align: 'center' });
+        g.text(770, 470, '微纖絲的截面(示意):很多條鏈捆在一起', { size: 13, color: C.ink2, align: 'center' });
         g.text(770, 296, '木材乾重約 4 到 5 成是纖維素', { size: 14, weight: 700, color: C.mint, align: 'center' });
       });
       // 每個葡萄糖剩下的三個 OH

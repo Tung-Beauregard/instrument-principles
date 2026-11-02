@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" width="440" height="260" fill="none" role="img" aria-label="左邊是細胞壁的橫切面,一層一層;右邊由上到下是纖維素鏈、帶支鏈的半纖維素與木質素的單元">
+  <ellipse cx="220" cy="240" rx="190" ry="11" fill="#050e0c" opacity=".45"/>
+  <!-- 左:一個細胞的壁(橫切面):中膠層棕色、初生壁、S1、S2(最厚)、S3,中間是細胞腔;四個角是細胞隅角 -->
+  <rect x="22" y="40" width="176" height="176" rx="22" fill="#b08a5e"/>
+  <rect x="30" y="48" width="160" height="160" rx="19" fill="#7f9a8f"/>
+  <rect x="33" y="51" width="154" height="154" rx="18" fill="#6fae95"/>
+  <rect x="40" y="58" width="140" height="140" rx="16" fill="#4f9c7c"/>
+  <rect x="73" y="91" width="74" height="74" rx="11" fill="#86c9ad"/>
+  <rect x="77" y="95" width="66" height="66" rx="9" fill="#0f1716"/>
+  <g fill="#6b4a2c"><circle cx="27" cy="45" r="9"/><circle cx="193" cy="45" r="9"/><circle cx="193" cy="211" r="9"/><circle cx="27" cy="211" r="9"/></g>
+  <g font-family="Segoe UI,Noto Sans TC,sans-serif" font-weight="700" font-size="13">
+    <text x="232" y="44" fill="#a5f3cd">纖維素</text>
+    <text x="232" y="104" fill="#f2a0c8">半纖維素</text>
+    <text x="232" y="172" fill="#d29a62">木質素</text>
+  </g>
+  <!-- 右上:纖維素鏈,每個葡萄糖和隔壁翻面 -->
+  <g stroke="#a5f3cd" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M247 70H269M291 70H313M335 70H357M379 70H401" opacity=".8"/>
+    <path d="M236 62L258 62L266 70L258 78L236 78L228 70Z" fill="rgba(165,243,205,.18)"/>
+    <path d="M280 62L302 62L310 70L302 78L280 78L272 70Z" fill="rgba(165,243,205,.18)"/>
+    <path d="M324 62L346 62L354 70L346 78L324 78L316 70Z" fill="rgba(165,243,205,.18)"/>
+    <path d="M368 62L390 62L398 70L390 78L368 78L360 70Z" fill="rgba(165,243,205,.18)"/>
+    <path d="M236 62L232 52M280 78L276 88M324 62L320 52M368 78L364 88"/>
+  </g>
+  <!-- 右中:半纖維素(木糖的星號接成主鏈,一個葡萄糖醛酸的支鏈) -->
+  <path d="M236 128H404M352 128V154" stroke="#9fb0aa" stroke-width="2"/>
+  <g fill="#F47920" stroke="#dfe7e3" stroke-width="1.1" stroke-linejoin="round">
+    <path id="xs" d="M236 118L238.9 124.1L245.5 124.9L240.6 129.5L241.9 136.1L236 132.8L230.1 136.1L231.4 129.5L226.5 124.9L233.1 124.1Z"/>
+    <use href="#xs" x="42"/><use href="#xs" x="84"/><use href="#xs" x="126"/><use href="#xs" x="168"/>
+  </g>
+  <path d="M342 160L352 150L362 160Z" fill="#0072BC" stroke="#dfe7e3" stroke-width="1.1"/>
+  <path d="M342 160L352 170L362 160Z" fill="#ffffff" stroke="#dfe7e3" stroke-width="1.1"/>
+  <!-- 右下:木質素的單元(松柏醇,苯環接 3 個碳的側鏈,3 號碳有甲氧基) -->
+  <g stroke="#d29a62" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M262 190L280 200.5L280 221.5L262 232L244 221.5L244 200.5Z"/>
+    <path d="M266 196L276 202M276 219L266 225M249 219L249 203" opacity=".9"/>
+    <path d="M280 200.5L298 190L316 200.5L334 190L352 200.5"/>
+    <path d="M298 194L314 203" opacity=".9"/>
+    <path d="M280 221.5L294 229.5"/>
+  </g>
+  <g font-family="Segoe UI,Noto Sans TC,sans-serif" font-weight="700" font-size="12">
+    <text x="296" y="236" fill="#c3a8ff">OCH₃</text>
+    <text x="356" y="205" fill="#8ec5ff">OH</text>
+  </g>
+</svg>

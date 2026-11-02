@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1111">
+<title>木材三大成分:纖維素、半纖維素與木質素</title>
+<meta name="description" content="用動畫看木材的三大成分:細胞壁一層一層的構造、纖維素怎麼排成微纖絲、半纖維素用的六種糖差在哪一號碳、木質素的單體怎麼接成網狀與 β-O-4 這類用號碼命名的鍵,以及實驗室怎麼把它們分開來量。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="木材三大成分:纖維素、半纖維素與木質素">
+<meta property="og:description" content="用動畫看細胞壁的構造、纖維素的微纖絲、半纖維素的六種糖、木質素的單體與 β-O-4,以及實驗室怎麼分析這三種成分。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/wood-components/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/wood-components.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="細胞壁一層一層剝開來看:由外到內是初生壁、S1、S2、S3,斜線是各層纖維素微纖絲的方向">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://tung-beauregard.github.io/instrument-principles/wood-components/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/bio-lesson.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="官能基編號"><a href="../">← 儀器入口</a><a href="../nomenclature/">命名法則</a><a href="../carbohydrates/">醣類</a><a href="./" aria-current="page">木材三大成分</a></nav></div>
+<header class="top wrap">
+  <h1>木材三大成分 <span class="k">纖維素、半纖維素與木質素</span></h1>
+  <p class="lede">木材乾重九成以上是三種大分子:纖維素、半纖維素和木質素。從細胞壁一層一層的構造看起,接著看纖維素怎麼排成微纖絲、半纖維素用的糖差在哪一號碳、木質素的單體怎麼接成網狀,以及 β-O-4 這種用號碼命名的鍵;最後看三者怎麼連在一起、實驗室怎麼把它們分開來量。</p>
+</header>
+<main id="main" class="wrap lesson">
+  <section class="player">
+    <div class="screen">
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="木材三大成分的動畫"></canvas></div>
+      <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
+    </div>
+    <div class="bar">
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度"></div>
+      <span id="chName"></span>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+  </aside>
+</main>
+<section class="notes wrap" aria-label="重點整理與資料來源">
+  <div>
+    <h2>重點整理</h2>
+    <ul>
+      <li>木材乾重九成以上是三種大分子:纖維素(約 40% 到 50%)、半纖維素(約 20% 到 30%)、木質素(針葉樹約 26% 到 32%,闊葉樹約 20% 到 28%);其餘是萃取物(林產化學也叫抽出物,溫帶樹種多半在 10% 以下)和不到 1% 的灰分。</li>
+      <li>細胞壁由外到內是中膠層、初生壁、次生壁外層(S1)、中層(S2)、內層(S3)。S2 最厚,微纖絲和細胞長軸的夾角(微纖絲角)小,約 5° 到 30°,木材順紋的強度主要靠它。木質素在中膠層與細胞隅角濃度最高,但大約七成的木質素在次生壁。</li>
+      <li>纖維素是葡萄糖用 β(1→4) 接成的直鏈,聚合度約一萬,一條鏈長約 5 μm。很多條鏈靠氫鍵排成約 3 nm 寬的微纖絲,大部分結晶,所以纖維素不溶於水、很強;它也是地球上最多的有機物。</li>
+      <li>半纖維素用好幾種糖,用碳的編號就能認:甘露糖和葡萄糖只差 2 號碳、半乳糖只差 4 號碳、木糖沒有 6 號碳、阿拉伯糖是 5 個碳的五員環、4-O-甲基葡萄糖醛酸的 6 號碳是羧基。闊葉樹以木聚糖為主,針葉樹以半乳葡甘露聚糖為主;鏈短(約 100 到 200 個糖)、有支鏈和乙醯基、不結晶。</li>
+      <li>木質素由三種單體(對香豆醇、松柏醇、芥子醇)經自由基偶合長成不規則的立體網狀,單元分別叫 H、G、S,只差在 3、5 號碳有沒有甲氧基。木質素習慣從接側鏈的碳編 1 號,側鏈是 α、β、γ;命名法則的苯酚則從接 OH 的碳編 1 號。</li>
+      <li>木質素單元之間的鍵用位置命名:最多的是 β-O-4,A 單元的 β 碳經過一個氧接到 B 單元的 4 號碳。闊葉樹的 S 單元 5 號碳有甲氧基,碳和碳的鍵少、β-O-4 多,比較容易拆開。</li>
+      <li>半纖維素靠氫鍵貼在微纖絲上,又和木質素以醚鍵、酯鍵、糖苷鍵相連(木質素-碳水化合物複合體),三者連成一體,所以木材耐用、不容易分解。</li>
+      <li>含量是照方法定出來的:溶劑萃取得萃取物;72% 硫酸水解後剩下的固體是酸不溶木質素(Klason 木質素);亞氯酸鈉去掉木質素得全纖維素,再用 17.5% 氫氧化鈉溶液分出 α-纖維素。</li>
+    </ul>
+  </div>
+  <div class="src">
+    <h2>資料來源</h2>
+    <ul>
+      <li>組成的範圍、細胞壁各層與微纖絲角、萃取物對顏色與耐腐的影響、纖維素是最多的有機物:Wiedenhoeft AC, Eberhardt TL. Structure and function of wood. In: Wood Handbook (FPL-GTR-282). USDA Forest Service; 2021. 第 3 章(<a href="https://research.fs.usda.gov/download/treesearch/62242.pdf">美國林務署</a>,3-7 到 3-10 頁)。</li>
+      <li>平均組成、聚合度、纖維二糖的長度(1.038 nm)、半纖維素的種類與比例、木質素在細胞壁的分布、分析步驟:Rowell RM, Pettersen R, Tshabalala MA. Cell wall chemistry. In: Handbook of Wood Chemistry and Wood Composites, 2nd ed. CRC Press; 2013. 第 3 章(<a href="https://research.fs.usda.gov/download/treesearch/42245.pdf">美國林務署的版本</a>;表 3.1 是 Pettersen 1984 的美國樹種平均,表 3.2、3.3 是半纖維素)。第 1 章的 100 格是依這兩份的範圍與平均取的整數(針葉樹 44、24、28、4,闊葉樹 45、28、23、4),是代表值。</li>
+      <li>細胞壁各層的厚度,纖維素與木質素在各層的分布:Agarwal UP. Planta. 2006;224:1141(<a href="https://research.fs.usda.gov/download/treesearch/25772.pdf">美國林務署</a>)。</li>
+      <li>微纖絲約 3 nm 寬、約 18 條鏈、針葉樹的微纖絲再聚成 10 到 20 nm 的束、結晶度依測法不同:Jarvis MC. Phil Trans R Soc A. 2018;376:20170045(<a href="https://eprints.gla.ac.uk/143718/7/143718.pdf">作者版</a>)。纖維素的氫鍵:Kubicki JD, et al. Sci Rep. 2018(<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6143632/">PMC6143632</a>)。</li>
+      <li>木質素的單體、自由基偶合與 H、G、S:Vanholme R, et al. Plant Physiol. 2010;153:895(<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2899938/">PMC2899938</a>);Ralph J, et al. Phytochem Rev. 2004;3:29(<a href="https://research.fs.usda.gov/download/treesearch/22070.pdf">美國林務署</a>)。樹種的範圍:Eswaran SCD, et al. Sci Data. 2022;9:647(<a href="https://doi.org/10.1038/s41597-022-01709-4">doi</a>);稻草的 H、G、S:Grabber JH, et al. C R Biol. 2004(<a href="https://comptes-rendus.academie-sciences.fr/biologies/articles/en/10.1016/j.crvi.2004.02.009/">全文</a>)。</li>
+      <li>木質素各種鍵的比例:Eswaran 2022 的表 1(整理自 Rinaldi R, et al. Angew Chem Int Ed. 2016,<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6680216/">PMC6680216</a>)。較舊的教科書把 5-5 與 β-1 寫得比較多,Rinaldi 2016 認為偏高。</li>
+      <li>木質素和醣類之間的鍵:Tarasov D, et al. Biotechnol Biofuels. 2018(<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6162904/">PMC6162904</a>);三者在雲杉細胞壁裡的位置:Terrett OM, et al. Nat Commun. 2019(<a href="https://doi.org/10.1038/s41467-019-12979-9">doi</a>)。鋼筋混凝土的比喻:奧地利科學基金會計畫 P15410 的說明(<a href="https://www.fwf.ac.at/en/research-radar/10.55776/P15410">FWF</a>)。</li>
+      <li>分析方法:TAPPI T 204(溶劑萃取物)、T 222(酸不溶木質素)、UM 250(酸可溶木質素,紫外光 205 nm)、T 211(灰分,525 °C)、T 203(α-纖維素)(<a href="https://www.tappi.org/globalassets/003_numeric_index_tm.pdf">TAPPI 方法清單</a>);全纖維素、α-纖維素的步驟與灰分 575 °C(ASTM D1102)見 Rowell 2013 第 3.8 節。</li>
+      <li>糖的符號:SNFG(Symbol Nomenclature for Glycans,<a href="https://www.ncbi.nlm.nih.gov/glycans/snfg.html">NCBI</a>;Varki A, et al. Glycobiology. 2015;25:1323),以 CC0 公開。第 6 章的糖都對過 PubChem 依結構算出的立體標記:<a href="https://pubchem.ncbi.nlm.nih.gov/compound/125409">β-D-木糖</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/439680">β-D-甘露糖</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/439357">α-D-半乳糖</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/445935">α-L-阿拉伯呋喃糖</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/445994">4-O-甲基-α-D-葡萄糖醛酸</a>;木質素單體的英文名稱與反式雙鍵:<a href="https://pubchem.ncbi.nlm.nih.gov/compound/5280535">對香豆醇</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/1549095">松柏醇</a>、<a href="https://pubchem.ncbi.nlm.nih.gov/compound/5280507">芥子醇</a>。</li>
+      <li>名詞:國家教育研究院<a href="https://terms.naer.edu.tw/">樂詞網</a>(林學、植物學、化學):中膠層(中國大陸作胞間層)、初生壁、次生壁、假導管(管胞)、微纖絲、全纖維素、萃取物、針葉樹材、闊葉樹材、木聚糖、半乳葡甘露聚糖、葡甘露聚糖、葡萄糖醛酸、乙醯基、甲氧基、過氧化酶、漆酶、凡得瓦力。多醣類的名字照樂詞網,用單一種糖命名的寫「糖」(木聚糖),類別寫「醣」(多醣)。細胞隅角、木質素單體、苯丙烷單元、木質素-碳水化合物複合體沒有收錄,用台灣論文的寫法或依字面組成。</li>
+      <li>細胞、微纖絲、半纖維素鏈與木質素網的形狀、數目與比例都是示意;100 格與 H、G、S 的比例條是代表值。</li>
+    </ul>
+  </div>
+</section>
+<footer class="site wrap">官能基編號・<a href="../">回儀器入口</a></footer>
+<script type="module">
+import { createLesson } from '../assets/bio-lesson.js';
+import { C, FONT, seg, ease, clamp, lerp, mix, rng } from '../assets/bio-draw.js';
+
+// ================= 顏色與小工具 =================
+// 三大成分各一個顏色:纖維素 薄荷綠、半纖維素 粉紅、木質素 棕;萃取物 淡紫、灰分 灰。
+// 原子:OH 淺藍、環上的氧與醚鍵的氧 淡紅、甲氧基 淡紫、乙醯基 琥珀;編號 薄荷綠;氫鍵 琥珀虛線;自由基 紅
+const K = {
+  bond: '#c3cdc8', c: '#d5ddd9', dot: '#a9bab3', h: '#8a9a94', oh: '#8ec5ff', O: '#ff8f8f', ome: '#c3a8ff', ac: '#ffd166',
+  num: '#a5f3cd', hb: '#ffd166', rad: '#ff7b7b', bg: '#0f1716',
+  cel: '#a5f3cd', hem: '#f2a0c8', lig: '#d29a62', ext: '#b8a4f4', ash: '#9caca5',
+};
+const RAD = Math.PI / 180;
+const fin = (t, a, d = 0.6) => ease(seg(t, a, a + d));
+const win = (t, a, b, d = 0.5) => Math.min(fin(t, a, d), 1 - ease(seg(t, b - d, b)));
+const P = (x, y) => ({ x, y });
+const add = (p, dx, dy) => P(p.x + dx, p.y + dy);
+const mixP = (p, q, k) => P(lerp(p.x, q.x, k), lerp(p.y, q.y, k));
+const xy = (p) => [p.x, p.y];
+function alpha(g, a, fn) { if (a <= 0.01) return; g.ctx.save(); g.ctx.globalAlpha *= Math.min(1, a); fn(); g.ctx.restore(); }
+// 原子團的字預設顏色:O 淡紅、OH 淺藍、甲氧基 淡紫、其他淺灰
+const elCol = (s) => (s === 'O' ? K.O : /OCH₃|H₃CO/.test(s) ? K.ome : /OH|HO/.test(s) ? K.oh : K.c);
+
+// 鍵;k2 > 0 時畫成雙鍵(k2 是第二條線的濃淡)
+function bond(g, p, q, { color = K.bond, lw = 2.4, a = 1, k2 = 0, dash, off = 4 } = {}) {
+  alpha(g, a, () => {
+    if (k2 <= 0.01) { g.line(p.x, p.y, q.x, q.y, color, lw, dash); return; }
+    const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1, nx = (-dy / L) * off * k2, ny = (dx / L) * off * k2;
+    g.line(p.x + nx, p.y + ny, q.x + nx, q.y + ny, color, lw, dash);
+    alpha(g, k2, () => g.line(p.x - nx, p.y - ny, q.x - nx, q.y - ny, color, lw, dash));
+  });
+}
+// 原子或原子團的字,底下墊一塊底色(鍵畫到中心也不會穿過字);hl 是外框的顏色
+function label(g, p, s, { color, size = 15, a = 1, weight = 700, hl, nobg = false } = {}) {
+  alpha(g, a, () => {
+    const ctx = g.ctx; g.font(size, weight);
+    const w = ctx.measureText(s).width, h = size * g.boost;
+    if (hl) g.rrect(p.x - w / 2 - 6, p.y - h / 2 - 4, w + 12, h + 8, 7, 'rgba(15,23,22,.95)', hl, 2);
+    else if (!nobg) { ctx.fillStyle = K.bg; ctx.fillRect(p.x - w / 2 - 2, p.y - h / 2, w + 4, h); }
+    g.text(p.x, p.y + 0.5, s, { size, weight, color: color || elCol(s), align: 'center' });
+  });
+}
+// 編號的小圓(字可以是數字或 α、β、γ)
+function badge(g, p, n, { a = 1, color = K.num } = {}) {
+  alpha(g, a, () => {
+    g.circle(p.x, p.y, 9 * Math.max(1, g.boost * 0.92), color);
+    g.text(p.x, p.y + 0.5, String(n), { size: 12, weight: 800, color: '#0b1111', align: 'center', mono: /^\d+$/.test(String(n)) });
+  });
+}
+// 多行字(arr 是字串陣列)
+function lines(g, x, y, arr, { size = 15, color = C.ink2, gap = 1.6, a = 1, weight = 500, align = 'left' } = {}) {
+  alpha(g, a, () => arr.forEach((s, i) => g.text(x, y + i * size * gap * g.boost, s, { size, color, weight, align })));
+}
+// 說明卡片:標題加幾行字
+function card(g, x, y, w, h, title, color, body, a = 1, { size = 14 } = {}) {
+  alpha(g, a, () => {
+    g.rrect(x, y, w, h, 12, 'rgba(21,32,30,.92)', color, 1.6);
+    g.text(x + 16, y + 24, title, { size: 16, weight: 800, color });
+    lines(g, x + 16, y + 52, body, { size, gap: 1.55 });
+  });
+}
+// 小色塊(圖例)
+function chip(g, x, y, s, col, { align = 'center' } = {}) {
+  g.font(14, 700); const w = g.ctx.measureText(s).width + 22;
+  const x0 = align === 'left' ? x : x - w / 2;
+  g.rrect(x0, y - 14, w, 28, 14, 'rgba(15,23,22,.9)', col, 1.6);
+  g.text(x0 + w / 2, y + 0.5, s, { size: 14, weight: 700, color: col, align: 'center' });
+  return w;
+}
+// 彎的箭頭(二次曲線),bend 是往左彎的程度(負的往右)
+function carrow(g, p, q, bend, { color = C.mint, lw = 2.4, a = 1, dash } = {}) {
+  const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1;
+  const c = P((p.x + q.x) / 2 - (dy / L) * bend, (p.y + q.y) / 2 + (dx / L) * bend);
+  const at = (k) => [(1 - k) * (1 - k) * p.x + 2 * (1 - k) * k * c.x + k * k * q.x, (1 - k) * (1 - k) * p.y + 2 * (1 - k) * k * c.y + k * k * q.y];
+  const pts = Array.from({ length: 21 }, (_, i) => at(i / 20));
+  alpha(g, a, () => {
+    g.curve(pts.slice(0, 19), color, lw, { dash });
+    const [x1, y1] = pts[17], [x2, y2] = pts[20];
+    g.arrow(x1, y1, x2, y2, { color, lw, head: 10 });
+  });
+}
+
+// ================= 糖的符號(SNFG) =================
+// 國際通用的醣類符號(Symbol Nomenclature for Glycans):葡萄糖 藍圓、甘露糖 綠圓、半乳糖 黃圓、木糖 橘星、阿拉伯糖 綠星、
+// 葡萄糖醛酸 上藍下白的菱形;呋喃環在符號裡寫斜體 f。顏色照 SNFG 的表,外框在深色底上改用淺色
+const SNFG = { Glc: ['circle', '#0072BC'], Man: ['circle', '#00A651'], Gal: ['circle', '#FFD400'], Xyl: ['star', '#F47920'], Ara: ['star', '#00A651'], GlcA: ['diamond', '#0072BC'] };
+function snfg(g, kind, x, y, r = 11, { a = 1, f = false } = {}) {
+  const [shape, col] = SNFG[kind], ctx = g.ctx, edge = '#dfe7e3';
+  alpha(g, a, () => {
+    ctx.save(); ctx.lineWidth = 1.3; ctx.strokeStyle = edge; ctx.lineJoin = 'round';
+    if (shape === 'circle') g.circle(x, y, r, col, edge, 1.3);
+    else if (shape === 'star') {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) { const rr = i % 2 ? r * 0.5 : r * 1.18, an = -Math.PI / 2 + (i * Math.PI) / 5; const px = x + rr * Math.cos(an), py = y + rr * Math.sin(an); if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
+      ctx.closePath(); ctx.fillStyle = col; ctx.fill(); ctx.stroke();
+    } else {
+      const d = r * 1.18;
+      ctx.beginPath(); ctx.moveTo(x - d, y); ctx.lineTo(x, y - d); ctx.lineTo(x + d, y); ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x - d, y); ctx.lineTo(x, y + d); ctx.lineTo(x + d, y); ctx.closePath(); ctx.fillStyle = '#ffffff'; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x - d, y); ctx.lineTo(x, y - d); ctx.lineTo(x + d, y); ctx.lineTo(x, y + d); ctx.closePath(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x - d, y); ctx.lineTo(x + d, y); ctx.stroke();
+    }
+    if (f) { ctx.font = `italic 700 ${Math.round(r * 1.1 * g.boost)}px ${FONT}`; ctx.fillStyle = '#0b1111'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('f', x - 0.5, y + 1.5); }
+    ctx.restore();
+  });
+}
+
+// ================= 哈沃斯投影(和「醣類」那一頁同一套畫法) =================
+// 每個糖用局部座標:環的半徑 1,y 朝上、z 朝前;畫面座標 X = cx + s·x、Y = cy − s·y + s·k·z。
+// 環上的氧在後面,1 號碳在右端;費雪投影在右邊的朝下、左邊的朝上
+const HW = { k: 0.42, L: 0.38 };
+const PYR6 = { C1: 0, C2: 60, C3: 120, C4: 180, C5: 240, O5: 300 };
+const ANG = { glcp: PYR6, manp: PYR6, galp: PYR6, xylp: PYR6, mglca: PYR6, araf: { C1: 342, C2: 54, C3: 126, C4: 198, O4: 270 } };
+const ringOf = (kind) => (kind === 'araf' ? ['C1', 'C2', 'C3', 'C4', 'O4'] : ['C1', 'C2', 'C3', 'C4', 'C5', 'O5']);
+// 環外的原子團:[代號, 接在哪個環原子, 朝上 1 或朝下 −1, 字, 角色]。
+// 甘露糖和葡萄糖只差 2 號碳、半乳糖只差 4 號碳;木糖沒有 6 號碳;4-O-甲基葡萄糖醛酸的 6 號碳是 COOH、4 號碳的 O 接甲基。
+// α-L-阿拉伯呋喃糖(L 型):1 號碳的 OH 朝上、5 號碳朝下(對過 PubChem 的立體標記,見 MAINTENANCE.md)
+function subsOf(kind, ab) {
+  if (kind === 'araf') { const up = ab === 'a' ? 1 : -1; return [['O1', 'C1', up, 'OH', 'ano'], ['O2', 'C2', -1, 'OH'], ['O3', 'C3', 1, 'OH'], ['C5', 'C4', -1, 'CH₂OH', 'c6']]; }
+  const up = ab === 'b' ? 1 : -1;
+  const s = [['O1', 'C1', up, 'OH', 'ano'], ['O2', 'C2', -1, 'OH'], ['O3', 'C3', 1, 'OH'], ['O4', 'C4', -1, 'OH'], ['C6', 'C5', 1, 'CH₂OH', 'c6']];
+  if (kind === 'manp') s[1] = ['O2', 'C2', 1, 'OH'];
+  if (kind === 'galp') s[3] = ['O4', 'C4', 1, 'OH'];
+  if (kind === 'xylp') s.pop();
+  if (kind === 'mglca') { s[3] = ['O4', 'C4', -1, 'OCH₃', 'ome']; s[4] = ['C6', 'C5', 1, 'COOH', 'c6']; }
+  return s;
+}
+function sugar(kind, ab, { fx = false, T = [0, 0, 0] } = {}) {
+  const tf = ([x, y, z]) => { if (fx) { y = -y; z = -z; } return [x + T[0], y + T[1], z + T[2]]; };
+  const A = {};
+  for (const nm of ringOf(kind)) { const d = ANG[kind][nm] * RAD; A[nm] = { w: tf([Math.cos(d), 0, Math.sin(d)]), ring: true }; }
+  for (const [nm, on, dir, lab, role] of subsOf(kind, ab)) { const d = ANG[kind][on] * RAD; A[nm] = { w: tf([Math.cos(d), dir * HW.L, Math.sin(d)]), on, lab, role }; }
+  return { kind, ab, A, c: tf([0, 0, 0]) };
+}
+const LEFT = { OH: 'HO', 'CH₂OH': 'HOCH₂', 'OCH₃': 'H₃CO', COOH: 'HOOC' };
+// 畫一組糖。v = { cx, cy, s }。o:hide { '第幾個:代號': true }、hl { '第幾個:代號': 顏色 }、tcol { '第幾個:代號': 字的顏色 }、
+//   num 編號的濃淡、nums { '第幾個:代號': 濃淡 }、size 字的大小、a 整體濃淡
+function drawSugars(g, list, v, o = {}) {
+  const S = (w) => P(v.cx + v.s * w[0], v.cy - v.s * w[1] + v.s * HW.k * w[2]);
+  const hide = o.hide || {}, hl = o.hl || {}, nb = o.nums || {}, tc = o.tcol || {}, size = o.size || 15;
+  const skip = (i, nm, A) => !A.ring && hide[`${i}:${nm}`];
+  alpha(g, o.a ?? 1, () => {
+    list.forEach((R) => {
+      const ring = ringOf(R.kind);
+      ring.forEach((nm, j) => {
+        const a = R.A[nm], b = R.A[ring[(j + 1) % ring.length]];
+        const zm = (a.w[2] + b.w[2]) / 2 - R.c[2];
+        bond(g, S(a.w), S(b.w), { lw: 2 + 3.6 * clamp((zm + 0.15) / 0.85), color: '#c9d3ce' });
+      });
+    });
+    list.forEach((R, i) => { for (const [nm, A] of Object.entries(R.A)) if (!A.ring && !skip(i, nm, A)) bond(g, S(R.A[A.on].w), S(A.w)); });
+    list.forEach((R, i) => {
+      for (const [nm, A] of Object.entries(R.A)) {
+        const id = `${i}:${nm}`;
+        if (A.ring) { if (nm[0] === 'O') label(g, S(A.w), 'O', { color: K.O, size, hl: hl[id] }); continue; }
+        if (skip(i, nm, A)) continue;
+        const s = A.w[0] < R.c[0] - 0.25 ? LEFT[A.lab] || A.lab : A.lab;
+        label(g, S(A.w), s, { color: tc[id] || (A.role === 'ome' ? K.ome : K.oh), size, hl: hl[id] });
+      }
+    });
+    list.forEach((R, i) => {
+      const cc = S(R.c);
+      for (const [nm, A] of Object.entries(R.A)) {
+        if (nm[0] !== 'C') continue;
+        const a = nb[`${i}:${nm}`] ?? o.num ?? 0;
+        if (a <= 0.01 || skip(i, nm, A)) continue;
+        let p;
+        if (A.ring && A.w[0] < R.c[0] - 0.9) p = add(S(A.w), -20, -2);
+        // 1 號碳:放在環外、異頭碳 OH 的另一邊(甘露糖 2 號碳朝上的 OH 會落在環中間)
+        else if (nm === 'C1' && R.A.O1) p = add(S(A.w), 21, R.A.O1.w[1] > A.w[1] ? 17 : -17);
+        else if (A.ring) p = mixP(S(A.w), cc, 0.34);
+        else { const q = S(R.A[A.on].w), r = S(A.w); p = add(mixP(q, r, 0.5), r.x < cc.x ? -15 : 15, 0); }
+        badge(g, p, nm.slice(1), { a });
+      }
+    });
+  });
+  return S;
+}
+
+// ================= 鍵線式(木質素) =================
+// 原子 [x, y, 字]:鍵長 1 的座標,y 朝下;字是空的就是碳(畫成小點)。鍵 [a, b, 幾鍵]
+function mol(atoms, bonds) { return { atoms: atoms.map(([x, y, t = '']) => ({ x, y, t })), bonds: bonds.map(([a, b, n = 1]) => ({ a, b, n })) }; }
+const ZX = Math.sqrt(3) / 2;
+function drawBond(g, p, q, n = 1, col = K.bond, lw = 2.4) {
+  const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L;
+  if (n === 1) { g.line(p.x, p.y, q.x, q.y, col, lw); return; }
+  for (const o of [-3.4, 3.4]) g.line(p.x + nx * o, p.y + ny * o, q.x + nx * o, q.y + ny * o, col, lw * 0.92);
+}
+// 號碼放在原子外側(往鍵的反方向);三面都有鍵的環上原子另外指定 numOff(放到環裡面)
+function numPos(m, i, S, off) {
+  if (off && off[i]) return add(S(i), off[i][0], off[i][1]);
+  const p = S(i); let sx = 0, sy = 0;
+  for (const b of m.bonds) { const j = b.a === i ? b.b : b.b === i ? b.a : -1; if (j < 0) continue; const q = S(j), d = Math.hypot(q.x - p.x, q.y - p.y) || 1; sx += (q.x - p.x) / d; sy += (q.y - p.y) / d; }
+  let L = Math.hypot(sx, sy);
+  if (L < 0.35) { sx = 0; sy = m.atoms[i].y < 0 ? -1 : 1; L = 1; }
+  return P(p.x - (sx / L) * 20, p.y - (sy / L) * 20);
+}
+// 畫分子。v = { cx, cy, s }。o:bcol { 鍵: 顏色 }、ba { 鍵: 濃淡 }、tcol { 原子: 字的顏色 }、aa { 原子: 濃淡 }、hl { 原子: 外框顏色 }、
+//   nums { 原子: 號碼 }、numA、numCol、numOff { 原子: [dx, dy] }、size、a
+function drawMol(g, m, v, o = {}) {
+  const S = (i) => P(v.cx + v.s * m.atoms[i].x, v.cy + v.s * m.atoms[i].y);
+  alpha(g, o.a ?? 1, () => {
+    m.bonds.forEach((b, k) => alpha(g, o.ba && o.ba[k] != null ? o.ba[k] : 1, () => drawBond(g, S(b.a), S(b.b), b.n, (o.bcol && o.bcol[k]) || K.bond, o.lw || 2.4)));
+    m.atoms.forEach((A, i) => {
+      const a = o.aa && o.aa[i] != null ? o.aa[i] : 1, p = S(i), hl = o.hl && o.hl[i];
+      alpha(g, a, () => {
+        if (A.t) { label(g, p, A.t, { color: o.tcol && o.tcol[i], size: o.size || 15, hl }); return; }
+        if (hl) { g.ctx.save(); g.ctx.shadowColor = hl; g.ctx.shadowBlur = 12; g.circle(p.x, p.y, 8, null, hl, 2.2); g.ctx.restore(); }
+        g.circle(p.x, p.y, 3.2, K.dot);
+      });
+    });
+    for (const [i, n] of Object.entries(o.nums || {})) badge(g, numPos(m, +i, S, o.numOff), n, { a: o.numA ?? 1, color: o.numCol || K.num });
+  });
+  return S;
+}
+// 苯環:頂點朝上的六邊形,1 號碳在上面接側鏈、4 號碳在下面接 OH;側鏈往上是 α、β、γ(α、β 之間是反式雙鍵,和 PubChem 的 (E) 一致)
+const RING6 = [[0, -1], [ZX, -0.5], [ZX, 0.5], [0, 1], [-ZX, 0.5], [-ZX, -0.5]];
+// 三種單體:0 個甲氧基是 H(對香豆醇)、1 個在 3 號碳是 G(松柏醇)、3 與 5 號碳各一個是 S(芥子醇)
+function monolignol(nOMe) {
+  const atoms = [...RING6, [0, -2], [ZX, -2.5], [ZX, -3.5], [2 * ZX, -4, 'OH'], [0, 2, 'OH']];
+  const bonds = [[0, 1, 2], [1, 2], [2, 3, 2], [3, 4], [4, 5, 2], [5, 0], [0, 6], [6, 7, 2], [7, 8], [8, 9], [3, 10]];
+  if (nOMe >= 1) { atoms.push([2 * ZX, 1, 'OCH₃']); bonds.push([2, atoms.length - 1]); }
+  if (nOMe >= 2) { atoms.push([-2 * ZX, 1, 'H₃CO']); bonds.push([4, atoms.length - 1]); }
+  return mol(atoms, bonds);
+}
+// 環上號碼放在環裡面(往環的中心 0.42 個鍵長)
+const RINGNUM = (s, i0 = 0) => Object.fromEntries(RING6.map(([x, y], i) => [i0 + i, [-x * 0.42 * s, -y * 0.42 * s]]));
+const LIGNUMS = { 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 'α', 7: 'β', 8: 'γ' };
+// 命名法則(苯酚)的號碼:接 OH 的碳是 1 號,往甲氧基那邊數
+const IUPACNUMS = { 3: 1, 2: 2, 1: 3, 0: 4, 5: 5, 4: 6 };
+const MONO = [monolignol(0), monolignol(1), monolignol(2)];
+const MONO_INFO = [
+  { u: 'H', name: '對香豆醇', ome: '沒有甲氧基' },
+  { u: 'G', name: '松柏醇', ome: '3 號碳 1 個甲氧基' },
+  { u: 'S', name: '芥子醇', ome: '3、5 號碳各 1 個甲氧基' },
+];
+// 只畫環、側鏈的頭、4 號的 OH 與 3 號的甲氧基(「兩套號碼」那張卡片用)
+const GSTUB = mol([...RING6, [0, -1.9, '側鏈'], [0, 2, 'OH'], [2 * ZX, 1, 'OCH₃']], [[0, 1, 2], [1, 2], [2, 3, 2], [3, 4], [4, 5, 2], [5, 0], [0, 6], [3, 7], [2, 8]]);
+// 松柏醇的自由基,畫成電子分散開的樣子:苯環畫單線加一圈虛線,4 號的 C–O、1 號碳到 α、α 到 β 各加一條虛線;4 號是 O
+function drawRadical(g, v, { a = 1, size = 15 } = {}) {
+  const m = MONO[1], S = (i) => P(v.cx + v.s * m.atoms[i].x, v.cy + v.s * m.atoms[i].y);
+  alpha(g, a, () => {
+    m.bonds.forEach((b) => { const p = S(b.a), q = S(b.b); g.line(p.x, p.y, q.x, q.y, K.bond, 2.4); });
+    g.ctx.save(); g.ctx.setLineDash([4, 4]); g.circle(v.cx, v.cy, v.s * 0.56, null, K.bond, 1.6); g.ctx.restore();
+    for (const [i, j] of [[3, 10], [0, 6], [6, 7]]) {
+      const p = S(i), q = S(j), dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy), nx = (-dy / L) * 5.5, ny = (dx / L) * 5.5;
+      g.line(p.x + nx + dx * 0.12, p.y + ny + dy * 0.12, q.x + nx - dx * 0.12, q.y + ny - dy * 0.12, K.bond, 1.6, [4, 4]);
+    }
+    m.atoms.forEach((A, i) => { const p = S(i); if (A.t) label(g, p, i === 10 ? 'O' : A.t, { size }); else g.circle(p.x, p.y, 3.2, K.dot); });
+  });
+  return S;
+}
+// 不規則的網(示意):有點亂的格子,左右相鄰多半接上、上下相鄰一半接上、偶爾斜接
+const NET = (() => { const r = rng(20261031 * 2654435761); for (let i = 0; i < 20; i++) r(); const pts = []; for (let j = 0; j < 4; j++) for (let i = 0; i < 6; i++) pts.push([(i + 0.5) / 6 + (r() - 0.5) * 0.12, (j + 0.5) / 4 + (r() - 0.5) * 0.18]); return pts; })();
+const NET_E = (() => {
+  const r = rng(7 * 2654435761); for (let i = 0; i < 20; i++) r();
+  const e = [];
+  for (let j = 0; j < 4; j++) for (let i = 0; i < 6; i++) {
+    const id = j * 6 + i;
+    if (i < 5 && r() < 0.8) e.push([id, id + 1]);
+    if (j < 3 && r() < 0.55) e.push([id, id + 6]);
+    if (i < 5 && j < 3 && r() < 0.22) e.push([id, id + 7]);
+  }
+  return e;
+})();
+
+// ================= 半纖維素的六種糖(sugars 那一章) =================
+// 畫成在木材半纖維素裡實際的樣子:主鏈的木糖、甘露糖、葡萄糖是 β;支鏈的半乳糖、阿拉伯糖、甲基葡萄糖醛酸是 α。
+// hl 是和葡萄糖不一樣、要圈起來的原子;gone 是少掉的原子(畫成虛線圈)
+const SUGARS = [
+  { name: '葡萄糖', ab3: 'Glc', snfg: 'Glc', kind: 'glcp', ab: 'b', hl: [], c: 6, txt: ['環上 5 個碳加 1 個氧,6 號碳在環外', '纖維素只用這一種糖'] },
+  { name: '甘露糖', ab3: 'Man', snfg: 'Man', kind: 'manp', ab: 'b', hl: ['O2'], c: 6, txt: ['和葡萄糖只差 2 號碳:OH 朝上', '針葉樹半纖維素的主角'] },
+  { name: '半乳糖', ab3: 'Gal', snfg: 'Gal', kind: 'galp', ab: 'a', hl: ['O4'], c: 6, txt: ['和葡萄糖只差 4 號碳:OH 朝上', '針葉樹半纖維素的支鏈'] },
+  { name: '木糖', ab3: 'Xyl', snfg: 'Xyl', kind: 'xylp', ab: 'b', hl: [], gone: true, c: 5, txt: ['少了 6 號碳,只有 5 個碳', '闊葉樹半纖維素的主角'] },
+  { name: '阿拉伯糖', ab3: 'Ara', snfg: 'Ara', f: true, kind: 'araf', ab: 'a', hl: ['O4'], c: 5, txt: ['5 個碳,接成五員環(呋喃環)', '是 L 型;接在針葉樹木聚糖的旁邊'] },
+  { name: '4-O-甲基葡萄糖醛酸', ab3: 'MeGlcA', snfg: 'GlcA', kind: 'mglca', ab: 'a', hl: ['C6', 'O4'], c: 6, txt: ['6 號碳的 CH₂OH 變成 COOH(羧基)', '4 號碳的 O 再接一個甲基(CH₃)'] },
+];
+const SUGAR_T = [0, 4.5, 9, 13.5, 18, 22.5];
+const SPECIES_CUE = '針葉樹的木質素幾乎都是 G(九成五以上);闊葉樹是 G 加 S,S 常比 G 多;稻草、麥稈這類禾本科三種都有。';
+// 三種單元的比例(示意用的代表值,範圍見資料來源):[名字, H, G, S, 說明]
+const HGS = [['針葉樹', 3, 97, 0, 'G 占 95% 以上'], ['闊葉樹', 2, 38, 60, 'S 約占 45% 到 75%'], ['稻草', 15, 45, 40, 'H 15、G 45、S 40']];
+
+// ================= 數值(來源見頁面下方的資料來源與 MAINTENANCE.md) =================
+// 每 100 克乾木材的代表值;常見範圍寫在 RANGE。灰分不到 1 克,不畫成格子
+const COMP = {
+  soft: [['纖維素', 44, K.cel, '骨架'], ['半纖維素', 24, K.hem, '包住骨架、牽在中間'], ['木質素', 28, K.lig, '填滿、黏住、防水'], ['萃取物', 4, K.ext, '顏色、香味、耐腐']],
+  hard: [['纖維素', 45, K.cel, '骨架'], ['半纖維素', 28, K.hem, '包住骨架、牽在中間'], ['木質素', 23, K.lig, '填滿、黏住、防水'], ['萃取物', 4, K.ext, '顏色、香味、耐腐']],
+};
+const RANGE = { soft: ['常見 40 到 50 克', '常見 20 到 30 克', '常見 26 到 32 克', '溫帶樹種多半在 10 克以下'], hard: ['常見 40 到 50 克', '常見 20 到 30 克', '常見 20 到 28 克', '溫帶樹種多半在 10 克以下'] };
+// 細胞壁各層:[名字, 簡稱, 橫切面上畫的厚度 px, 顏色, 微纖絲角(和細胞長軸的夾角)的範圍, 畫斜線用的角度]
+const LAYERS = [
+  ['中膠層', 'ML', 12, '#b08a5e', '', 0],
+  ['初生壁', 'P', 5, '#7f9a8f', '方向雜亂', 0],
+  ['次生壁外層', 'S1', 10, '#6fae95', '50° 到 70°', 62],
+  ['次生壁中層', 'S2', 58, '#4f9c7c', '5° 到 30°', 14],
+  ['次生壁內層', 'S3', 5, '#86c9ad', '70° 以上', 78],
+];
+// 木質素的鍵:每 100 個單元大約有幾個 [名字, 針葉樹, 闊葉樹]
+const LINKS = [['β-O-4', [45, 50], [50, 65]], ['β-5', [9, 12], [3, 11]], ['β-β', [2, 6], [3, 16]], ['5-5', [2.5, 11], [0.5, 4]]];
+// 橫切面上的細胞(示意):5 欄 6 列,寬高稍微不一樣
+const CELLS = (() => {
+  const r = rng(31 * 2654435761); for (let i = 0; i < 20; i++) r();
+  const out = [];
+  for (let j = 0; j < 6; j++) for (let i = 0; i < 5; i++) out.push({ x: 48 + i * 68 + (r() - 0.5) * 4, y: 64 + j * 72 + (r() - 0.5) * 4, w: 62 + (r() - 0.5) * 6, h: 66 + (r() - 0.5) * 8 });
+  return out;
+})();
+// 一根微纖絲(橫放的棒子)
+function rod(g, x, y, len, r, { a = 1 } = {}) {
+  alpha(g, a, () => {
+    g.rrect(x, y - r, len, 2 * r, r, 'rgba(165,243,205,.22)', K.cel, 1.5);
+    g.line(x + r, y - r * 0.35, x + len - r, y - r * 0.35, 'rgba(225,255,240,.45)', 1.4);
+  });
+}
+// 纖維素鏈的哈沃斯投影:n 個葡萄糖用 β(1→4) 接起來,每隔一個翻面;兩端畫成往外的鍵(還接著別的葡萄糖)
+const D14 = 2.7;
+function celluloseChain(g, v, n, { a = 1, nums, hl } = {}) {
+  const list = Array.from({ length: n }, (_, i) => sugar('glcp', 'b', { T: [i * D14, 0, 0], fx: i % 2 === 1 }));
+  const hide = {};
+  for (let i = 0; i < n; i++) { if (i < n - 1) hide[`${i}:O1`] = true; if (i > 0) hide[`${i}:O4`] = true; }
+  let Sx = null;
+  alpha(g, a, () => {
+    Sx = drawSugars(g, list, v, { hide, size: 14, nums: nums || {}, hl: hl || {} });
+    for (let i = 0; i < n - 1; i++) {
+      const B = Sx([i * D14 + D14 / 2, i % 2 ? -HW.L : HW.L, 0]);
+      bond(g, Sx(list[i].A.C1.w), B); bond(g, B, Sx(list[i + 1].A.C4.w)); label(g, B, 'O', { color: K.O, size: 14 });
+    }
+  });
+  return { list, Sx };
+}
+// 微纖絲的截面:18 條鏈排成 2、3、4、4、3、2 六層(每一個扁方塊是一條鏈,從鏈的方向看過去)
+const FIB = [2, 3, 4, 4, 3, 2].flatMap((n, j) => Array.from({ length: n }, (_, i) => ({ row: j, x: (i - (n - 1) / 2) * 34, y: (j - 2.5) * 26 })));
+// β-O-4 雙體:A 的環在左、側鏈往右,β 碳經過一個 O 接到 B 的 4 號碳
+const BO4 = mol([
+  [1, 0], [0.5, -ZX], [-0.5, -ZX], [-1, 0], [-0.5, ZX], [0.5, ZX],          // 0–5:A 的 1 到 6 號碳
+  [2, 0], [2.5, ZX], [2, 2 * ZX], [2.5, -ZX, 'OH'], [-2, 0, 'O'], [-1, -2 * ZX, 'OCH₃'], [2.5, 3 * ZX, 'OH'], // 6 α、7 β、8 γ、9 α 的 OH、10 A 的 4 號 O、11 A 的甲氧基、12 γ 的 OH
+  [3.5, ZX, 'O'],                                                          // 13:醚鍵的 O
+  [6.5, ZX], [6, 0], [5, 0], [4.5, ZX], [5, 2 * ZX], [6, 2 * ZX],          // 14–19:B 的 1 到 6 號碳
+  [4.5, -ZX, 'OCH₃'], [7.5, ZX, '⋯'],                                       // 20 B 的甲氧基、21 B 的側鏈(往下接)
+], [[0, 1, 2], [1, 2], [2, 3, 2], [3, 4], [4, 5, 2], [5, 0], [0, 6], [6, 7], [7, 8], [6, 9], [3, 10], [2, 11], [8, 12], [7, 13], [13, 17],
+  [14, 15, 2], [15, 16], [16, 17, 2], [17, 18], [18, 19, 2], [19, 14], [16, 20], [14, 21]]);
+// 比較 G 與 S 的 5 號碳用:S 單元的片段(和 LIGR 同一個方向,5 號碳也有甲氧基)
+const SR = mol([[1, 0], [0.5, -ZX], [-0.5, -ZX], [-1, 0], [-0.5, ZX], [0.5, ZX], [2, 0], [-2, 0, 'OH'], [-1, -2 * ZX, 'OCH₃'], [-1, 2 * ZX, 'OCH₃']],
+  [[0, 1, 2], [1, 2], [2, 3, 2], [3, 4], [4, 5, 2], [5, 0], [0, 6], [3, 7], [2, 8], [4, 9]]);
+const GR = mol([[1, 0], [0.5, -ZX], [-0.5, -ZX], [-1, 0], [-0.5, ZX], [0.5, ZX], [2, 0], [-2, 0, 'OH'], [-1, -2 * ZX, 'OCH₃']],
+  [[0, 1, 2], [1, 2], [2, 3, 2], [3, 4], [4, 5, 2], [5, 0], [0, 6], [3, 7], [2, 8]]);
+
+// ================= 木質素和半纖維素之間的鍵(lcc 那一章) =================
+// 木質素單元的片段,環在左、側鏈往右:0 到 5 是環上 1 到 6 號碳、6 α、7 β、8 γ、9 α 碳上的 O、10 4 號的 O、11 3 號的甲氧基、12 γ 的 OH
+const LIGR = (o9 = 'O') => mol([[1, 0], [0.5, -ZX], [-0.5, -ZX], [-1, 0], [-0.5, ZX], [0.5, ZX], [2, 0], [2.5, ZX], [2, 2 * ZX], [2.5, -ZX, o9], [-2, 0, 'O'], [-1, -2 * ZX, 'OCH₃'], [2.5, 3 * ZX, 'OH']],
+  [[0, 1, 2], [1, 2], [2, 3, 2], [3, 4], [4, 5, 2], [5, 0], [0, 6], [6, 7], [7, 8], [6, 9], [3, 10], [2, 11], [8, 12]]);
+// 細胞壁裡三者的樣子(示意):木質素那一團的外形
+const LIG_BLOB = Array.from({ length: 28 }, (_, i) => { const a = (i / 28) * Math.PI * 2; const k = 1 + 0.1 * Math.sin(a * 3 + 1) + 0.07 * Math.sin(a * 5 + 2); return [Math.cos(a) * k, Math.sin(a) * k]; });
+
+// ================= 章節 =================
+const chapters = [
+  {
+    key: 'overview', name: '木材裡有什麼', dur: 18,
+    cues: [[0, '把木材烘乾、磨成粉,100 克裡各是什麼?大部分是三種大分子:纖維素、半纖維素和木質素,合起來占九成以上。'],
+      [6, '纖維素最多,大約四成多;半纖維素和木質素各大約兩到三成;剩下的幾克是萃取物(精油、樹脂、單寧這類用溶劑洗得出來的成分,林產化學也叫抽出物),還有不到 1 克的灰分(礦物質)。'],
+      [12.5, '針葉樹(例如松、杉、檜木)和闊葉樹(例如樟樹、相思樹、櫸木)的比例不太一樣:針葉樹的木質素多一點,闊葉樹的半纖維素多一點。可以在「自己調整」切換。']],
+    draw(g, t, S) {
+      const parts = COMP[S.wt];
+      // 一開始:一段木頭的橫切面
+      alpha(g, 1 - fin(t, 2.2, 0.8), () => {
+        g.circle(220, 280, 168, '#5a4030');
+        for (let r = 10; r >= 1; r--) g.circle(220, 280, 158 * (r / 10), r % 2 ? '#d8b98c' : '#c4a06d');
+        g.circle(220, 280, 10, '#8c6a45');
+        g.text(220, 482, '一段木頭的橫切面', { size: 15, color: C.ink2, align: 'center' });
+      });
+      // 100 格:每一格 1 克
+      const colors = parts.flatMap(([, n, col]) => Array(n).fill(col));
+      const shown = Math.round(100 * seg(t, 2.6, 6));
+      alpha(g, fin(t, 2.4), () => {
+        g.text(230, 66, '100 克乾木材,每一格 1 克', { size: 15, weight: 700, color: C.ink2, align: 'center' });
+        for (let i = 0; i < 100; i++) {
+          const r = Math.floor(i / 10), c = i % 10, x = 52 + c * 36, y = 450 - r * 36;
+          const on = i < shown;
+          g.rrect(x, y - 32, 32, 32, 3, on ? colors[i] : 'rgba(255,255,255,.04)', on ? null : C.line, 1);
+        }
+      });
+      // 右邊的說明
+      alpha(g, fin(t, 3), () => g.tag(690, 52, S.wt === 'soft' ? '針葉樹(例如松、杉、檜木)' : '闊葉樹(例如樟樹、相思樹、櫸木)', { size: 15, color: C.mint }));
+      parts.forEach(([nm, n, col, role], i) => alpha(g, fin(t, 3.2 + i * 0.6), () => {
+        const y = 112 + i * 86;
+        g.rrect(450, y - 30, 486, 72, 12, 'rgba(21,32,30,.9)', col, 1.4);
+        g.rrect(468, y - 10, 20, 20, 3, col);
+        g.text(502, y, nm, { size: 19, weight: 800, color: col });
+        g.text(916, y, `${n} 克`, { size: 24, weight: 800, color: C.ink, align: 'right', mono: true });
+        g.text(502, y + 26, `${role}・${RANGE[S.wt][i]}`, { size: 13, color: C.ink2 });
+      }));
+      alpha(g, fin(t, 6.6), () => g.text(468, 476, '灰分(礦物質):不到 1 克', { size: 14, color: K.ash }));
+    },
+  },
+  {
+    key: 'cellwall', name: '細胞壁:一層一層', dur: 24,
+    cues: [[0, '把木材橫著切開放大,是一格一格的細胞。針葉樹的木材大部分是假導管(也叫管胞):又細又長的死細胞,中間空的地方叫細胞腔。'],
+      [5.5, '放大一個細胞的壁:最外面是兩個細胞共用的中膠層,接著是很薄的初生壁,再來是次生壁。次生壁又分成外層(S1)、中層(S2)、內層(S3),S2 最厚。'],
+      [11, '每一層裡纖維素微纖絲的方向不一樣:S1 和 S3 幾乎是橫著繞,S2 幾乎和細胞的長軸平行。微纖絲和長軸的夾角叫微纖絲角;S2 的角度小,所以木材順著紋理的方向特別強。'],
+      [17.5, '木質素的濃度在中膠層和細胞隅角(幾個細胞交會的角落)最高,把細胞黏在一起;但次生壁厚得多,所以大約七成的木質素其實在次生壁裡,主要在 S2。纖維素也大多在 S2。']],
+    draw(g, t) {
+      // 左:橫切面
+      g.panel(24, 30, 380, 488, '木材的橫切面(示意)');
+      const hi = 12;
+      CELLS.forEach((c, i) => {
+        g.rrect(c.x, c.y, c.w, c.h, 8, '#4f7a6a', '#b08a5e', 1.6);
+        g.rrect(c.x + 8, c.y + 8, c.w - 16, c.h - 16, 5, K.bg);
+        if (i === hi) alpha(g, fin(t, 3.4), () => { g.ctx.save(); g.ctx.shadowColor = C.mint; g.ctx.shadowBlur = 14; g.rrect(c.x - 2, c.y - 2, c.w + 4, c.h + 4, 9, null, C.mint, 2.4); g.ctx.restore(); });
+      });
+      alpha(g, win(t, 0.8, 5.4), () => { const c = CELLS[7]; g.tag(c.x + c.w / 2, c.y + c.h / 2, '細胞腔', { size: 13, color: C.ink }); });
+      const c0 = CELLS[hi];
+      alpha(g, fin(t, 4.6) * (1 - win(t, 11, 17.6)), () => { g.line(c0.x + c0.w, c0.y, 420, 70, 'rgba(165,243,205,.35)', 1.4, [4, 4]); g.line(c0.x + c0.w, c0.y + c0.h, 420, 510, 'rgba(165,243,205,.35)', 1.4, [4, 4]); });
+      // 右:放大的細胞壁(橫切面),11 秒換成微纖絲方向,17.5 秒再換回來看木質素
+      g.panel(420, 30, 516, 488, t < 11 || t >= 17.5 ? '一個細胞的壁(橫切面)' : '各層微纖絲的方向(把各層剝開來看)');
+      const cx = 616, cy = 290, H = 150;
+      const sec = (a, lig) => alpha(g, a, () => {
+        let h = H;
+        LAYERS.forEach(([, , th, col], i) => {
+          const fill = lig > 0 ? mix(col, i === 0 ? '#6b4a2c' : i === 3 ? '#8d6b49' : '#7a6650', lig * (i === 0 ? 0.9 : i === 3 ? 0.45 : 0.3)) : col;
+          g.rrect(cx - h, cy - h, 2 * h, 2 * h, Math.max(6, 26 - (H - h) * 0.2), fill);
+          h -= i === 0 ? th : th;
+        });
+        g.rrect(cx - h, cy - h, 2 * h, 2 * h, 10, K.bg);
+        if (lig > 0) for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) alpha(g, lig, () => { g.circle(cx + sx * (H + 4), cy + sy * (H + 4), 16, '#5c3d22'); });
+      });
+      const aSec = Math.min(fin(t, 5.4), 1 - fin(t, 10.6, 0.6)) + fin(t, 17.4, 0.6);
+      sec(Math.min(1, aSec), fin(t, 17.8, 1));
+      // 各層的名字(橫切面)
+      alpha(g, Math.min(fin(t, 6.2), 1 - fin(t, 10.6, 0.6)), () => {
+        // 每一條引線都在那一層的右邊、水平拉出去(y 都落在那一層的直邊上)
+        const ly = [164, 200, 236, 270, 306, 340];
+        let h = H;
+        LAYERS.forEach(([nm, ab, th], k) => {
+          const px = cx + h - th / 2;
+          g.line(px, ly[k], 788, ly[k], C.ink2, 1.1); g.circle(px, ly[k], 2.6, C.ink);
+          g.text(796, ly[k] - 7, nm, { size: 13, weight: 700, color: C.ink });
+          g.text(796, ly[k] + 10, ab, { size: 12, color: C.muted, mono: true });
+          h -= th;
+        });
+        g.line(cx + 30, ly[5], 788, ly[5], C.ink2, 1.1); g.circle(cx + 30, ly[5], 2.6, C.ink);
+        g.text(796, ly[5] + 2, '細胞腔', { size: 13, weight: 700, color: C.ink });
+      });
+      // 剝開來看:由下往上依序是初生壁、S1、S2、S3,每一段的斜線是微纖絲的方向
+      alpha(g, win(t, 11, 17.6), () => {
+        const segs = [[1, 500, 440, 150], [2, 440, 380, 145], [3, 380, 196, 133], [4, 196, 92, 76]];
+        for (const [li, y1, y0, hw] of segs) {
+          const [nm, ab, , col, mfa, ang] = LAYERS[li];
+          const x0 = cx - hw, w = 2 * hw, ctx = g.ctx;
+          g.rrect(x0, y0, w, y1 - y0, 4, mix(col, '#0f1716', 0.35), col, 1.4);
+          ctx.save(); ctx.beginPath(); ctx.rect(x0, y0, w, y1 - y0); ctx.clip();
+          if (li === 1) { const r = rng(5 * 2654435761); for (let k = 0; k < 40; k++) r(); for (let k = 0; k < 26; k++) { const a = r() * Math.PI, px = x0 + r() * w, py = y0 + r() * (y1 - y0); g.line(px - 30 * Math.cos(a), py - 30 * Math.sin(a), px + 30 * Math.cos(a), py + 30 * Math.sin(a), 'rgba(225,255,240,.5)', 1.2); } }
+          else { const dx = Math.tan(ang * RAD) * (y1 - y0); for (let x = x0 - Math.abs(dx) - 20; x < x0 + w + Math.abs(dx) + 20; x += 9) g.line(x, y1, x + dx, y0, 'rgba(225,255,240,.55)', 1.3); }
+          ctx.restore();
+          g.ctx.save(); g.ctx.beginPath(); g.ctx.ellipse(cx, y0, hw, hw * 0.16, 0, 0, Math.PI * 2); g.ctx.fillStyle = mix(col, '#0f1716', 0.15); g.ctx.fill(); g.ctx.lineWidth = 1.4; g.ctx.strokeStyle = col; g.ctx.stroke(); g.ctx.restore();
+          g.text(cx + hw + 14, (y0 + y1) / 2 - 9, `${ab} ${nm}`, { size: 13, weight: 700, color: C.ink });
+          g.text(cx + hw + 14, (y0 + y1) / 2 + 10, mfa, { size: 13, color: C.mint });
+        }
+        g.ctx.save(); g.ctx.beginPath(); g.ctx.ellipse(cx, 92, 68, 68 * 0.16, 0, 0, Math.PI * 2); g.ctx.fillStyle = K.bg; g.ctx.fill(); g.ctx.restore();
+        g.arrow(458, 470, 458, 110, { color: C.ink2, lw: 1.8, head: 8 });
+        g.text(470, 104, '細胞的長軸', { size: 12, color: C.ink2 });
+        g.text(cx, 524 - 8, '右邊的角度:微纖絲和長軸的夾角(微纖絲角)', { size: 12, color: C.muted, align: 'center' });
+      });
+      // 木質素:濃度與總量
+      alpha(g, fin(t, 18.4), () => {
+        g.tag(cx, 66, '深棕色:木質素濃度最高的中膠層與細胞隅角', { size: 13, color: K.lig });
+        g.rrect(780, 300, 148, 130, 10, 'rgba(15,23,22,.92)', K.lig, 1.3);
+        lines(g, 792, 324, ['濃度最高:', '中膠層、細胞隅角', '總量最多:', '次生壁(約七成)'], { size: 13, color: C.ink, gap: 1.45 });
+      });
+    },
+  },
+  {
+    key: 'composite', name: '三種成分怎麼搭在一起', dur: 20,
+    cues: [[0, '放大到細胞壁裡面:纖維素先聚成很細的微纖絲,一根一根排好,是細胞壁的骨架。'],
+      [5, '半纖維素貼在微纖絲的表面,也在微纖絲之間牽來牽去,靠氫鍵和纖維素黏在一起。'],
+      [10, '木質素最後才填進去,把空隙塞滿、把東西黏住,也讓細胞壁變硬、比較不怕水。'],
+      [15, '常有人拿鋼筋混凝土來比:纖維素像鋼筋,承受拉力;木質素像混凝土,把空隙填滿。半纖維素則幫忙把兩者連在一起。']],
+    draw(g, t) {
+      const ys = [150, 212, 274, 336, 398];
+      // 木質素填在後面
+      alpha(g, fin(t, 10, 1.2), () => {
+        g.rrect(70, 108, 580, 330, 28, 'rgba(210,154,98,.28)', K.lig, 1.4);
+        const ctx = g.ctx;
+        for (const [x, y] of [[130, 181], [250, 243], [380, 181], [520, 305], [190, 367], [450, 367], [600, 243], [320, 305]]) {
+          ctx.beginPath(); for (let k = 0; k < 6; k++) { const a = (k * Math.PI) / 3; const px = x + 10 * Math.cos(a), py = y + 10 * Math.sin(a); if (k) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
+          ctx.closePath(); ctx.strokeStyle = 'rgba(232,192,143,.85)'; ctx.lineWidth = 1.4; ctx.stroke();
+        }
+        g.text(360, 460, '木質素:填滿空隙', { size: 14, weight: 700, color: K.lig, align: 'center' });
+      });
+      // 微纖絲
+      ys.forEach((y, i) => rod(g, 96, y, 528, 11, { a: fin(t, 0.3 + i * 0.35) }));
+      alpha(g, fin(t, 1.5), () => g.text(360, 92, '纖維素:微纖絲(骨架)', { size: 14, weight: 700, color: K.cel, align: 'center' }));
+      // 半纖維素:沿著微纖絲,也牽在兩根之間
+      alpha(g, fin(t, 5, 0.8), () => {
+        const k = seg(t, 5, 7.5);
+        ys.forEach((y, i) => {
+          const pts = []; for (let x = 104; x <= 104 + 512 * k; x += 6) pts.push([x, y - 14 + 3 * Math.sin(x / 11 + i)]);
+          g.curve(pts, K.hem, 2);
+          if (i < ys.length - 1) for (const bx of [170 + i * 37, 380 - i * 23, 540 - i * 11]) if (bx < 104 + 512 * k) {
+            const q = []; for (let s = 0; s <= 1.0001; s += 0.08) q.push([bx + 16 * s + 5 * Math.sin(s * 9), y + 12 + (ys[i + 1] - y - 26) * s]);
+            g.curve(q, K.hem, 1.8);
+          }
+        });
+      });
+      // 右邊三張說明
+      card(g, 676, 96, 260, 104, '纖維素', K.cel, ['聚成微纖絲,是骨架', '負責承受拉力'], fin(t, 1.2));
+      card(g, 676, 212, 260, 104, '半纖維素', K.hem, ['貼在微纖絲上,也牽在中間', '把骨架和填充物連起來'], fin(t, 5.6));
+      card(g, 676, 328, 260, 104, '木質素', K.lig, ['填滿空隙、把東西黏住', '讓細胞壁變硬、不怕水'], fin(t, 10.6));
+      alpha(g, fin(t, 15.2), () => {
+        g.rrect(70, 470, 866, 50, 12, 'rgba(15,23,22,.95)', C.mint, 1.4);
+        let x = 92;
+        for (const [s, col] of [['纖維素 ≈ 鋼筋', K.cel], ['木質素 ≈ 混凝土', K.lig], ['半纖維素:幫忙連起兩者', K.hem]]) { x += chip(g, x, 495, s, col, { align: 'left' }) + 14; }
+        g.text(916, 495, '(比喻)', { size: 13, color: C.muted, align: 'right' });
+      });
+    },
+  },
+  {
+    key: 'cellulose', name: '纖維素:很長的直鏈', dur: 18,
+    cues: [[0, '纖維素是葡萄糖用 β(1→4) 接成的長鏈:1 號碳接下一個葡萄糖的 4 號碳,每一個都和隔壁上下翻面,所以鏈又直又平(接法的細節在「醣類」那一頁)。'],
+      [6, '木材裡一條纖維素鏈大約有一萬個葡萄糖,這個數字叫聚合度。每個葡萄糖約 0.52 nm 長,一條鏈大約 5 μm 長,寬卻不到 1 nm。'],
+      [12, '每個葡萄糖還留著 2、3、6 號碳上的三個 OH。整條鏈伸直以後,這些 OH 剛好可以和旁邊的鏈形成氫鍵,下一章看很多條鏈怎麼排在一起。']],
+    draw(g, t) {
+      const n = 4, v = { cx: 128, cy: 168, s: 74 };
+      const nums = {}; for (let i = 0; i < n; i++) { if (i < n - 1) nums[`${i}:C1`] = fin(t, 1.2); if (i > 0) nums[`${i}:C4`] = fin(t, 1.2); }
+      const hl = t > 12 ? { '1:O2': K.oh, '1:O3': K.oh, '1:C6': K.oh } : {};
+      if (t > 12) { nums['1:C2'] = fin(t, 12.3); nums['1:C3'] = fin(t, 12.3); nums['1:C6'] = fin(t, 12.3); }
+      const { Sx } = celluloseChain(g, v, n, { nums, hl });
+      // 兩端還接著
+      alpha(g, 0.7, () => { const p = Sx([-1.25, 0, 0]), q = Sx([(n - 1) * D14 + 1.25, 0, 0]); g.text(p.x - 8, p.y, '⋯', { size: 22, color: C.ink2, align: 'right' }); g.text(q.x + 8, q.y, '⋯', { size: 22, color: C.ink2 }); });
+      alpha(g, win(t, 0.6, 6), () => g.tag(480, 40, 'β(1→4):每一個都和隔壁上下翻面', { size: 14, color: C.ink }));
+      // 長度:一萬個葡萄糖
+      alpha(g, fin(t, 6.2), () => {
+        g.panel(24, 300, 912, 218, '一條纖維素鏈有多長(示意)');
+        const k = ease(seg(t, 6.6, 9));
+        g.line(70, 410, 70 + 820 * k, 410, K.cel, 3);
+        for (let i = 0; i <= 10; i++) if (i / 10 <= k) g.line(70 + 82 * i, 402, 70 + 82 * i, 418, K.cel, 1.6);
+        g.circle(70, 410, 16, null, C.ink2, 1.4);
+        g.line(70, 394, 120, 352, C.ink2, 1.2);
+        g.text(126, 346, '上面那 4 個葡萄糖只有這麼一點點(約 2 nm)', { size: 13, color: C.ink2 });
+        alpha(g, fin(t, 8.6), () => {
+          g.text(480, 448, '約 1 萬個葡萄糖 × 0.52 nm ≈ 5 μm', { size: 18, weight: 800, color: K.cel, align: 'center' });
+          g.text(480, 478, '寬度不到 1 nm:長度是寬度的好幾千倍', { size: 14, color: C.ink2, align: 'center' });
+        });
+      });
+      alpha(g, fin(t, 12.6), () => g.tag(480, 40, '2、3、6 號碳的 OH:可以和旁邊的鏈形成氫鍵', { size: 14, color: K.oh }));
+    },
+  },
+  {
+    key: 'fibril', name: '微纖絲:排得整整齊齊的鏈', dur: 22,
+    cues: [[0, '很多條纖維素鏈並排:同一層裡的鏈靠 OH 之間的氫鍵連成平平的一片,一片一片再疊起來。'],
+      [6, '大約 18 條鏈捆成一束(確切的數目還有爭議),寬約 3 nm,這是最基本的微纖絲。針葉樹的微纖絲再聚成約 10 到 20 nm 粗的束。'],
+      [12, '微纖絲大部分排得很整齊,叫結晶區;表面和少數地方排得比較亂,叫非結晶區。木材纖維素的結晶度依測法不同,大約一半到三分之二。'],
+      [17, '結晶區裡水和酵素都鑽不進去,所以纖維素不溶於水、很強、很難分解;吸水和化學反應大多發生在表面和非結晶區。']],
+    draw(g, t) {
+      // 左:截面
+      g.panel(24, 30, 430, 488, '微纖絲的截面(示意,沿著鏈的方向看)');
+      const cx = 238, cy = 262;
+      const FX = (f) => cx + f.x * 1.5, FY = (f) => cy + f.y * 1.25;
+      FIB.forEach((f) => alpha(g, fin(t, 0.3 + f.row * 0.35), () => {
+        g.ctx.save(); g.ctx.translate(FX(f), FY(f)); g.ctx.rotate(-0.18);
+        g.rrect(-17, -6.5, 34, 13, 5, 'rgba(165,243,205,.35)', K.cel, 1.4);
+        g.ctx.restore();
+      }));
+      // 同一層:氫鍵;層與層:凡得瓦力
+      alpha(g, fin(t, 2.6), () => {
+        FIB.forEach((f, i) => { const nb = FIB[i + 1]; if (nb && nb.row === f.row) g.line(FX(f) + 18, FY(f) - 2, FX(nb) - 18, FY(nb) + 2, K.hb, 2.2, [3, 3]); });
+        g.tag(238, 92, '虛線:同一層裡的氫鍵', { size: 13, color: K.hb });
+      });
+      alpha(g, fin(t, 4.2), () => {
+        g.text(cx + 128, cy - 16, '層', { size: 13, color: C.ink2 });
+        g.line(cx + 120, cy - 34, cx + 120, cy + 2, C.ink2, 1.2);
+        g.text(238, 470, '層和層之間:靠凡得瓦力疊在一起', { size: 13, color: C.ink2, align: 'center' });
+      });
+      alpha(g, fin(t, 6.4), () => {
+        const ctx = g.ctx, hx = [[-54, -101], [54, -101], [105, -16], [105, 16], [54, 101], [-54, 101], [-105, 16], [-105, -16]];
+        ctx.save(); ctx.setLineDash([5, 4]); ctx.beginPath(); hx.forEach(([x, y], i) => { if (i) ctx.lineTo(cx + x, cy + y); else ctx.moveTo(cx + x, cy + y); }); ctx.closePath(); ctx.strokeStyle = C.mint; ctx.lineWidth = 1.4; ctx.stroke(); ctx.restore();
+        g.line(cx - 105, 396, cx + 105, 396, C.mint, 1.6); g.line(cx - 105, 388, cx - 105, 404, C.mint, 1.6); g.line(cx + 105, 388, cx + 105, 404, C.mint, 1.6);
+        g.text(cx, 420, '約 3 nm(這裡畫成 18 條鏈)', { size: 14, weight: 700, color: C.mint, align: 'center' });
+      });
+      // 右:沿著長邊看,結晶區與非結晶區
+      g.panel(470, 30, 466, 488, '沿著長邊看(示意)');
+      alpha(g, fin(t, 11.6), () => {
+        const x0 = 494, x1 = 912, y0 = 150;
+        for (let k = 0; k < 10; k++) {
+          const y = y0 + k * 14, pts = [];
+          for (let x = x0; x <= x1; x += 4) {
+            const dis = (x > 640 && x < 712) || k === 0 || k === 9 ? 1 : 0;
+            pts.push([x, y + dis * 4 * Math.sin(x / 7 + k * 1.7) * (k === 0 || k === 9 ? 0.6 : 1)]);
+          }
+          g.curve(pts, k === 0 || k === 9 ? 'rgba(255,173,102,.8)' : K.cel, 1.6);
+        }
+        g.tag(570, 116, '結晶區', { size: 13, color: K.cel });
+        g.tag(676, 316, '非結晶區', { size: 13, color: K.hem });
+        g.tag(820, 116, '結晶區', { size: 13, color: K.cel });
+        g.text(703, 360, '表面的鏈也比較亂', { size: 13, color: K.hem, align: 'center' });
+      });
+      alpha(g, fin(t, 13), () => {
+        g.rrect(494, 392, 418, 104, 12, 'rgba(15,23,22,.92)', C.mint, 1.4);
+        g.text(512, 418, '結晶度:約一半到三分之二(依測法)', { size: 16, weight: 800, color: C.mint });
+        lines(g, 512, 446, ['結晶區:水和酵素鑽不進去', '非結晶區與表面:吸水、反應從這裡開始'], { size: 13, color: C.ink, gap: 1.5 });
+      });
+    },
+  },
+  {
+    key: 'sugars', name: '半纖維素的糖:差在哪一號碳', dur: 27,
+    cues: [[0, '纖維素只用葡萄糖,半纖維素卻用好幾種糖。用碳的編號來認最快:這是葡萄糖,環上是 1 到 5 號碳加一個氧,6 號碳在環外。'],
+      [4.5, '甘露糖和葡萄糖只差在 2 號碳:OH 朝上。針葉樹的半纖維素主要是甘露糖接成的。'],
+      [9, '半乳糖只差在 4 號碳:OH 朝上。它在針葉樹的半纖維素裡當支鏈。'],
+      [13.5, '木糖少了 6 號碳,只有 5 個碳,其他和葡萄糖一樣。闊葉樹的半纖維素主要是木糖接成的。'],
+      [18, '阿拉伯糖也是 5 個碳,但在半纖維素裡接成五員環(呋喃環),而且是 L 型。它接在針葉樹木聚糖的旁邊。'],
+      [22.5, '4-O-甲基葡萄糖醛酸:6 號碳的 CH₂OH 變成羧基(COOH),4 號碳的 O 再接一個甲基。右邊是國際通用的醣類符號,下一章用它們畫半纖維素。']],
+    draw(g, t) {
+      const k = SUGAR_T.findLastIndex((s) => t >= s);
+      const v = { cx: 296, cy: 256, s: 124 };
+      // 糖的結構:前後兩個交疊淡入淡出
+      SUGARS.forEach((sg, i) => {
+        const a = Math.min(fin(t, SUGAR_T[i] - (i ? 0.3 : 0), 0.6), i < SUGARS.length - 1 ? 1 - fin(t, SUGAR_T[i + 1] - 0.3, 0.6) : 1);
+        if (a <= 0.01) return;
+        const R = sugar(sg.kind, sg.ab);
+        const hl = Object.fromEntries(sg.hl.map((nm) => [`0:${nm}`, K.ac]));
+        const nums = Object.fromEntries(Object.keys(R.A).filter((nm) => nm[0] === 'C').map((nm) => [`0:${nm}`, 1]));
+        const S = drawSugars(g, [R], v, { hl, nums, size: 16, a });
+        if (sg.gone) alpha(g, a * fin(t, SUGAR_T[i] + 0.8), () => {
+          const p = S([Math.cos(240 * RAD), HW.L, Math.sin(240 * RAD)]);
+          g.ctx.save(); g.ctx.setLineDash([4, 4]); g.circle(p.x, p.y, 22, null, K.ac, 2); g.ctx.restore();
+          g.tag(p.x - 4, p.y - 40, '沒有 6 號碳', { size: 14, color: K.ac });
+        });
+      });
+      // 下方:名字與兩行說明
+      const sg = SUGARS[k];
+      alpha(g, fin(t, SUGAR_T[k], 0.5), () => {
+        g.rrect(48, 426, 500, 92, 12, 'rgba(21,32,30,.9)', C.line, 1.4);
+        snfg(g, sg.snfg, 80, 452, 12, { f: sg.f });
+        g.text(104, 452, sg.name, { size: 19, weight: 800, color: C.ink });
+        g.font(19, 800); const w = g.ctx.measureText(sg.name).width;
+        g.text(114 + w, 453, sg.ab3, { size: 15, color: C.muted, mono: true });
+        lines(g, 70, 482, sg.txt.slice(0, 1), { size: 15, color: C.ink });
+        lines(g, 70, 504, sg.txt.slice(1), { size: 14, color: C.ink2 });
+      });
+      // 右邊:六種糖的清單與符號
+      g.panel(600, 30, 336, 488, '六種糖與符號(SNFG)');
+      SUGARS.forEach((s, i) => {
+        const y = 92 + i * 64, on = i === k, seen = t >= SUGAR_T[i] - 0.3;
+        alpha(g, seen ? (on ? 1 : 0.55) : 0.18, () => {
+          if (on) g.rrect(612, y - 24, 312, 48, 10, 'rgba(165,243,205,.1)', C.mintDim, 1.4);
+          snfg(g, s.snfg, 642, y, 12, { f: s.f });
+          g.text(668, y - 7, s.name, { size: s.name.length > 6 ? 15 : 17, weight: 700, color: C.ink });
+          g.text(668, y + 13, `${s.ab3}・${s.c} 個碳`, { size: 12, color: C.muted });
+        });
+      });
+      alpha(g, fin(t, 23.5), () => lines(g, 618, 488, ['阿拉伯糖的 f 表示五員環;', '醛酸寫成 GlcA,另外標 4Me'], { size: 12, color: C.muted, gap: 1.45 }));
+    },
+  },
+  {
+    key: 'hemi', name: '半纖維素:短、有分支', dur: 26,
+    cues: [[0, '半纖維素的主鏈也是用 β(1→4) 接起來的,但比纖維素短得多,大約只有一兩百個糖,而且掛著支鏈和乙醯基,所以排不整齊、不結晶。'],
+      [5, '闊葉樹的半纖維素主要是木聚糖:木糖接成主鏈,大約每 10 個木糖有 1 個在 2 號碳接著 4-O-甲基葡萄糖醛酸,7 個左右在 2 或 3 號碳帶著乙醯基。'],
+      [12, '針葉樹的主要是半乳葡甘露聚糖:甘露糖和葡萄糖接成主鏈(甘露糖約是葡萄糖的 3 到 4 倍),有些甘露糖的 6 號碳接著半乳糖,大約每 3 到 4 個糖有 1 個乙醯基。另外還有一些木聚糖,支鏈是葡萄糖醛酸和阿拉伯糖,沒有乙醯基。'],
+      [20, '比起纖維素,半纖維素短、有分支、不結晶,用鹼液就能溶出來,也比較容易被酸水解。']],
+    draw(g, t) {
+      const lab = (x, y, s, col = C.muted) => g.text(x, y, s, { size: 11, color: col, align: 'center' });
+      const chainLine = (xs, y) => g.line(xs[0], y, xs[xs.length - 1], y, '#9fb0aa', 2);
+      // 闊葉樹:葡萄糖醛酸木聚糖
+      alpha(g, win(t, 0.4, 11.8), () => {
+        g.text(40, 64, '闊葉樹:木聚糖', { size: 18, weight: 800, color: K.hem });
+        const xs = Array.from({ length: 14 }, (_, i) => 92 + i * 60), y = 200;
+        const k = seg(t, 0.8, 3.4);
+        chainLine(xs.slice(0, Math.max(2, Math.ceil(14 * k))), y);
+        xs.forEach((x, i) => { if (i < 14 * k) snfg(g, 'Xyl', x, y, 12); });
+        lab(xs[0] + 30, y - 22, 'β(1→4)');
+        alpha(g, fin(t, 5.2), () => {
+          for (const i of [3, 11]) { g.line(xs[i], y - 12, xs[i], y - 54, '#9fb0aa', 2); snfg(g, 'GlcA', xs[i], y - 68, 12); lab(xs[i] + 30, y - 36, 'α(1→2)'); g.text(xs[i] + 22, y - 72, '4Me', { size: 12, weight: 700, color: C.ink }); }
+        });
+        alpha(g, fin(t, 7.2), () => { [0, 1, 2, 4, 5, 7, 8, 10, 12, 13].forEach((i, j) => g.text(xs[i], y + 30, j % 3 ? '2Ac' : '3Ac', { size: 12, weight: 700, color: K.ac, align: 'center' })); });
+        alpha(g, fin(t, 8.6), () => card(g, 40, 300, 560, 120, '葡萄糖醛酸木聚糖(闊葉樹)', K.hem, ['占木材乾重約 15% 到 30%', '每 10 個木糖:約 1 個醛酸支鏈、約 7 個乙醯基', '另有少量葡甘露聚糖(約 2% 到 5%)']));
+      });
+      // 針葉樹:半乳葡甘露聚糖 + 阿拉伯糖葡萄糖醛酸木聚糖
+      alpha(g, fin(t, 12, 0.6), () => {
+        g.text(40, 64, '針葉樹:半乳葡甘露聚糖', { size: 18, weight: 800, color: K.hem });
+        const xs = Array.from({ length: 14 }, (_, i) => 92 + i * 60), y = 150;
+        const seq = ['Man', 'Man', 'Man', 'Glc', 'Man', 'Man', 'Man', 'Man', 'Glc', 'Man', 'Man', 'Man', 'Glc', 'Man'];
+        chainLine(xs, y);
+        xs.forEach((x, i) => snfg(g, seq[i], x, y, 12));
+        for (const i of [1, 9]) { g.line(xs[i], y - 12, xs[i], y - 48, '#9fb0aa', 2); snfg(g, 'Gal', xs[i], y - 60, 11); lab(xs[i] + 30, y - 32, 'α(1→6)'); }
+        [0, 4, 7, 10].forEach((i, j) => g.text(xs[i], y + 28, j % 2 ? '3Ac' : '2Ac', { size: 12, weight: 700, color: K.ac, align: 'center' }));
+        g.text(40, 240, '和少量的阿拉伯糖葡萄糖醛酸木聚糖', { size: 15, weight: 700, color: K.hem });
+        const xs2 = Array.from({ length: 10 }, (_, i) => 92 + i * 60), y2 = 296;
+        chainLine(xs2, y2);
+        xs2.forEach((x) => snfg(g, 'Xyl', x, y2, 11));
+        for (const i of [5, 8]) { g.line(xs2[i], y2 - 11, xs2[i], y2 - 36, '#9fb0aa', 2); snfg(g, 'GlcA', xs2[i], y2 - 48, 11); g.text(xs2[i] + 22, y2 - 50, '4Me', { size: 12, weight: 700, color: C.ink }); }
+        for (const i of [3]) { g.line(xs2[i], y2 + 11, xs2[i], y2 + 36, '#9fb0aa', 2); snfg(g, 'Ara', xs2[i], y2 + 48, 11, { f: true }); lab(xs2[i] + 30, y2 + 26, 'α(1→3)'); }
+        g.text(700, y2, '沒有乙醯基', { size: 13, color: C.ink2 });
+      });
+      alpha(g, win(t, 13, 20), () => card(g, 40, 372, 560, 120, '針葉樹的半纖維素', K.hem, ['半乳葡甘露聚糖:占木材乾重約 20%', '阿拉伯糖葡萄糖醛酸木聚糖:約 7% 到 10%', '甘露糖約是葡萄糖的 3 到 4 倍']));
+      // 比較
+      alpha(g, fin(t, 20.2), () => {
+        g.rrect(40, 372, 896, 140, 12, 'rgba(15,23,22,.95)', C.mint, 1.4);
+        const rows = [['', '纖維素', '半纖維素'], ['用的糖', '只有葡萄糖', '好幾種,有支鏈'], ['鏈多長', '約 1 萬個糖', '約 100 到 200 個'], ['排列', '大多結晶', '不結晶'], ['化學性質', '很難溶、難水解', '鹼液溶得出來,較易水解']];
+        rows.forEach((r, i) => r.forEach((s, j) => g.text([60, 220, 520][j], 394 + i * 26, s, { size: i ? 13.5 : 14, weight: i && j ? 500 : 700, color: i === 0 ? [C.ink2, K.cel, K.hem][j] : j ? C.ink : C.ink2 })));
+      });
+      // 圖例
+      alpha(g, fin(t, 1) * (1 - fin(t, 19.8, 0.5)), () => {
+        const L = [['Xyl', '木糖'], ['Man', '甘露糖'], ['Glc', '葡萄糖'], ['Gal', '半乳糖'], ['Ara', '阿拉伯糖'], ['GlcA', '葡萄糖醛酸']];
+        g.rrect(640, 384, 296, 124, 10, 'rgba(15,23,22,.9)', C.line, 1.2);
+        L.forEach(([k2, nm], i) => { const x = 660 + (i % 2) * 140, y = 406 + Math.floor(i / 2) * 36; snfg(g, k2, x, y, 9, { f: k2 === 'Ara' }); g.text(x + 18, y, nm, { size: 13, color: C.ink }); });
+      });
+    },
+  },
+  {
+    key: 'monolignols', name: '木質素的三種單體', dur: 27,
+    cues: [[0, '木質素的原料是三種很像的小分子,叫木質素單體。每一個都是一個苯環接一條 3 個碳的側鏈,側鏈末端和苯環的對面各有一個 OH。'],
+      [4.5, '木質素有自己的編號習慣:從接側鏈的那個碳數起,苯環是 1 到 6 號,側鏈的三個碳叫 α、β、γ。這是松柏醇:3 號碳上有一個甲氧基(OCH₃),4 號碳接 OH。'],
+      [10.5, '照命名法則,苯酚是從接 OH 的碳開始數,所以英文名稱裡甲氧基是 2 號、側鏈在 4 號。兩套號碼都對;讀木質素的文獻時用的是木質素這一套。'],
+      [16, '三種單體只差在甲氧基:對香豆醇沒有,松柏醇在 3 號碳有一個,芥子醇在 3 號和 5 號碳各一個。接進木質素以後,分別叫 H、G、S 單元。'],
+      [21.5, SPECIES_CUE]],
+    draw(g, t) {
+      const kk = ease(seg(t, 15.6, 17));
+      // 松柏醇從左邊的大圖移到中間那一格
+      const vG = { cx: lerp(290, 480, kk), cy: lerp(334, 296, kk), s: lerp(58, 44, kk) };
+      const mG = MONO[1];
+      const SG = drawMol(g, mG, vG, { hl: t > 4.5 ? { 11: K.ome } : {}, size: lerp(17, 15, kk) });
+      // 號碼一個一個出現
+      [0, 1, 2, 3, 4, 5, 6, 7, 8].forEach((i, j) => badge(g, numPos(mG, i, SG, RINGNUM(vG.s)), LIGNUMS[i], { a: fin(t, 4.8 + j * 0.45, 0.4) * (1 - 0.35 * kk) }));
+      alpha(g, win(t, 0.5, 4.4), () => card(g, 560, 150, 376, 150, '苯丙烷單元', K.lig, ['一個苯環(6 個碳)', '加上 3 個碳的側鏈', '所以叫「苯丙烷」單元']));
+      // 兩套號碼並排:左邊木質素的習慣、右邊命名法則(苯酚)
+      alpha(g, win(t, 10.5, 15.8), () => {
+        g.rrect(548, 56, 388, 372, 12, 'rgba(21,32,30,.95)', K.ac, 1.6);
+        g.text(566, 82, '同一個分子,兩套號碼', { size: 16, weight: 800, color: K.ac });
+        for (const [cx, nums, col, cap] of [[652, LIGNUMS, K.num, ['木質素的習慣', '接側鏈的碳是 1 號']], [830, IUPACNUMS, K.ac, ['命名法則(苯酚)', '接 OH 的碳是 1 號']]]) {
+          const vv = { cx, cy: 226, s: 42 };
+          const S2 = drawMol(g, GSTUB, vv, { size: 13, lw: 2.2 });
+          for (const [i, n] of Object.entries(nums)) if (+i < 6) badge(g, numPos(GSTUB, +i, S2, RINGNUM(vv.s)), n, { color: col });
+          g.text(cx, 346, cap[0], { size: 14, weight: 700, color: col, align: 'center' });
+          g.text(cx, 368, cap[1], { size: 13, color: C.ink2, align: 'center' });
+        }
+        g.text(742, 406, '4-[(E)-3-hydroxyprop-1-enyl]-2-methoxyphenol', { size: 12, color: C.ink, mono: true, align: 'center', max: 360 });
+      });
+      // 三種單體並排
+      const xs = [170, 480, 790];
+      [0, 2].forEach((u) => {
+        const a = fin(t, 16.4 + (u ? 0.3 : 0));
+        if (a <= 0.01) return;
+        const v = { cx: xs[u], cy: 296, s: 44 };
+        const S = drawMol(g, MONO[u], v, { hl: u === 2 ? { 11: K.ome, 12: K.ome } : {}, size: 15, a });
+        Object.keys(LIGNUMS).forEach((i) => badge(g, numPos(MONO[u], +i, S, RINGNUM(v.s)), LIGNUMS[i], { a: a * 0.65 }));
+      });
+      MONO_INFO.forEach((m, u) => alpha(g, fin(t, 16.4 + u * 0.25), () => {
+        g.text(xs[u], 420, m.name, { size: 18, weight: 800, color: C.ink, align: 'center' });
+        g.text(xs[u], 444, `${m.u} 單元`, { size: 15, weight: 700, color: K.lig, align: 'center' });
+        g.text(xs[u], 468, m.ome, { size: 13, color: K.ome, align: 'center' });
+      }));
+      // 三種植物的 H、G、S 比例(示意的代表值)
+      alpha(g, fin(t, 21.6), () => {
+        const HC = ['#c3a8ff', K.lig, K.ac];
+        g.rrect(24, 486, 912, 50, 10, 'rgba(15,23,22,.95)', C.line, 1.2);
+        HGS.forEach(([nm, h, gg, s, note], i) => {
+          const x = 40 + i * 300;
+          g.text(x, 500, `${nm}:${note}`, { size: 12.5, weight: 700, color: C.ink });
+          let x0 = x;
+          [h, gg, s].forEach((v, j) => { const w = 2.7 * v; if (w > 0) g.rrect(x0, 512, w, 14, 2, HC[j]); x0 += w; });
+        });
+        [['H', '#c3a8ff'], ['G', K.lig], ['S', K.ac]].forEach(([s, col], j) => g.text(870 + j * 22, 500, s, { size: 13, weight: 800, color: col }));
+      });
+    },
+  },
+  {
+    key: 'coupling', name: '自由基偶合:木質素怎麼長大', dur: 24,
+    cues: [[0, '單體被送到細胞壁以後,過氧化酶或漆酶把 4 號碳 OH 上的氫拿走(一個質子加一個電子),單體變成自由基:有一個沒有配對的電子。'],
+      [6.5, '這個沒配對的電子不只待在氧上,也分散到 1、3、5 號碳和側鏈的 β 碳。松柏醇的 3 號碳已經接了甲氧基,所以實際能接的是 4 號的氧、5 號碳、β 碳,1 號碳偶爾。'],
+      [13, '兩個自由基碰在一起,各用一個位置接成鍵。最常見的是一個的 β 碳接到另一個 4 號碳上的氧,叫 β-O-4;鍵的名字就是接起來的兩個位置。'],
+      [19, '接哪兩個位置、接到誰身上,都沒有酵素或模板控制,所以木質素沒有固定的重複單位,長成不規則的立體網狀。']],
+    draw(g, t) {
+      const pulse = 0.75 + 0.25 * Math.sin(t * 5);
+      const radAt = (p, a, crossed) => alpha(g, a, () => {
+        g.ctx.save(); g.ctx.shadowColor = K.rad; g.ctx.shadowBlur = 14 * pulse; g.circle(p.x, p.y, 6.5, K.rad); g.ctx.restore();
+        if (crossed) g.line(p.x - 9, p.y - 9, p.x + 9, p.y + 9, C.ink, 2);
+      });
+      // 左邊:松柏醇變成自由基
+      g.panel(24, 30, 452, 488, '一個單體變成自由基');
+      const v = { cx: 206, cy: 306, s: 50 }, m = MONO[1];
+      const k1 = ease(seg(t, 3, 4.5)), kd = ease(seg(t, 6.6, 7.6));
+      // 4 號碳的 OH 失去 H:字從 OH 變成 O;電子分散開以後改畫成虛線
+      const mm = { atoms: m.atoms.map((A, i) => (i === 10 ? { ...A, t: k1 > 0.5 ? 'O' : 'OH' } : A)), bonds: m.bonds };
+      let S = drawMol(g, mm, v, { hl: { 11: K.ome }, size: 15, a: 1 - kd });
+      if (kd > 0.01) S = drawRadical(g, v, { a: kd });
+      Object.keys(LIGNUMS).forEach((i) => badge(g, numPos(m, +i, S, RINGNUM(v.s)), LIGNUMS[i], { a: 0.5 }));
+      // 酵素
+      const ex = lerp(400, 330, ease(seg(t, 0.6, 2.6))), ey = lerp(486, 456, ease(seg(t, 0.6, 2.6)));
+      alpha(g, fin(t, 0.4) * (1 - fin(t, 6, 0.8)), () => g.blob(ex, ey, 52, 30, '#b8a4f4', '酵素', { wobble: 1, t, size: 15 }));
+      alpha(g, fin(t, 0.8) * (1 - fin(t, 6, 0.8)), () => g.text(ex, ey + 44, '過氧化酶或漆酶', { size: 13, color: C.lav, align: 'center' }));
+      // 飛走的 H
+      alpha(g, k1 > 0 ? 1 - fin(t, 5, 0.8) : 0, () => { const p = add(S(10), 26 + 70 * k1, 2 + 22 * k1); g.text(p.x, p.y, 'H', { size: 16, weight: 800, color: K.h, align: 'center' }); g.text(p.x + 2, p.y + 20, '(質子加電子)', { size: 12, color: C.muted, align: 'center' }); });
+      // 沒配對的電子:先在氧上,再分散到 1、3、5 號碳與 β 碳
+      radAt(add(S(10), 18, -6), fin(t, 4.4));
+      radAt(add(S(4), -17, -8), fin(t, 7.4));
+      radAt(add(S(0), -16, -14), fin(t, 8.2) * 0.8);
+      radAt(add(S(2), 15, -12), fin(t, 9), t > 10.2);
+      radAt(add(S(7), 16, 2), fin(t, 9.8));
+      alpha(g, fin(t, 10.2), () => {
+        const d = add(S(2), 15, -12);
+        g.line(d.x + 10, d.y - 4, 318, 290, K.ome, 1.4, [3, 3]);
+        g.tag(392, 288, '3 號碳有甲氧基:接不上', { size: 13, color: K.ome });
+        g.text(250, 92, '紅點:沒配對的電子可以在的位置', { size: 14, weight: 700, color: K.rad, align: 'center' });
+      });
+      // 右邊:兩個自由基接起來(A 的 β 碳接 B 的 4 號 O)
+      g.panel(488, 30, 448, 488, '兩個自由基接成鍵');
+      const k2 = ease(seg(t, 13.4, 15.2)), out = 1 - fin(t, 18.8, 0.6);
+      const vA = { cx: 592, cy: 386, s: 26 }, vB = { cx: lerp(800, 706, k2), cy: lerp(168, 214, k2), s: 26 };
+      let Sa = null, Sb = null;
+      alpha(g, fin(t, 12.6) * out, () => {
+        Sa = drawRadical(g, vA, { size: 12 });
+        Sb = drawRadical(g, vB, { size: 12 });
+        radAt(add(Sa(7), 13, 2), 1 - k2);
+        radAt(add(Sb(10), 14, -5), 1 - k2);
+        g.text(vA.cx - 52, vA.cy + 4, 'A', { size: 16, weight: 800, color: C.ink2, align: 'center' });
+        g.text(vB.cx + 56, vB.cy, 'B', { size: 16, weight: 800, color: C.ink2, align: 'center' });
+      });
+      if (Sa && Sb) alpha(g, fin(t, 14.8, 0.5) * out, () => {
+        const pa = Sa(7), pb = Sb(10);
+        g.line(pa.x, pa.y, pb.x - 6, pb.y + 6, K.ac, 3.4);
+        const mx = lerp(pa.x, pb.x, 0.5) + 70, my = lerp(pa.y, pb.y, 0.5) + 12;
+        g.tag(mx, my, 'β-O-4', { size: 16, color: K.ac });
+        g.text(mx, my + 26, 'A 的 β 碳接 B 的 4 號 O', { size: 12, color: C.ink2, align: 'center' });
+      });
+      alpha(g, fin(t, 16.2), () => {
+        g.text(712, 456, '其他組合也會出現:', { size: 14, color: C.ink2, align: 'center' });
+        let x = 528;
+        for (const s of ['β-5', 'β-β', '5-5', '4-O-5', 'β-1']) { const w = chip(g, x, 490, s, K.lig, { align: 'left' }); x += w + 10; }
+      });
+      // 不規則的網
+      alpha(g, fin(t, 19.2), () => {
+        const pts = NET.map(([x, y]) => P(520 + x * 384, 70 + y * 300));
+        for (const [i, j] of NET_E) g.line(pts[i].x, pts[i].y, pts[j].x, pts[j].y, 'rgba(210,154,98,.75)', 2);
+        pts.forEach((p, i) => g.circle(p.x, p.y, 6, ['#d29a62', '#e8c08f', '#9a6a3f'][i % 3]));
+        g.text(712, 404, '沒有固定順序:長成不規則的立體網(示意)', { size: 14, weight: 700, color: K.lig, align: 'center' });
+      });
+    },
+  },
+  {
+    key: 'linkages', name: '木質素的鍵:用號碼命名', dur: 26,
+    cues: [[0, '木質素裡單元和單元之間的鍵,名字就是接起來的位置。最多的是 β-O-4:A 單元的 β 碳經過一個氧,接到 B 單元的 4 號碳,是一種醚鍵。'],
+      [7, 'β-O-4 占所有鍵的比例:針葉樹大約 45% 到 50%,闊葉樹 50% 到 65%。其餘主要是 β-5、β-β、5-5 這類碳和碳直接接起來的鍵,還有少量 4-O-5、β-1。'],
+      [14.5, 'β-O-4 這種醚鍵比較容易打斷,製漿時主要就是拆它;碳和碳之間的鍵很難拆。'],
+      [19, '為什麼闊葉樹的 β-O-4 比較多?S 單元的 5 號碳已經接了甲氧基,不能用 5 號碳去接(5-5、β-5 都要用到 5 號碳),只好多用 β-O-4。所以闊葉樹的木質素比較容易拆開。']],
+    draw(g, t) {
+      // 左:β-O-4 的結構
+      g.panel(24, 30, 452, 488, t < 18.6 ? 'β-O-4(一種醚鍵)' : '5 號碳:G 空著,S 被甲氧基佔住');
+      alpha(g, 1 - fin(t, 18.4, 0.6), () => {
+        const v = { cx: 130, cy: 226, s: 40 };
+        const hlB = fin(t, 1.2);
+        const S = drawMol(g, BO4, v, { size: 14, hl: hlB > 0.5 ? { 13: K.ac } : {}, bcol: hlB > 0.5 ? { 13: K.ac, 14: K.ac } : {} });
+        badge(g, add(S(6), -6, -20), 'α'); badge(g, add(S(7), 16, 12), 'β'); badge(g, add(S(8), -18, 6), 'γ');
+        badge(g, mixP(S(17), P(v.cx + 5.5 * v.s, v.cy + ZX * v.s), 0.42), 4, { color: K.ac });
+        badge(g, mixP(S(3), P(v.cx, v.cy), 0.42), 4);
+        g.text(v.cx - 66, v.cy + 54, 'A', { size: 18, weight: 800, color: C.ink2, align: 'center' });
+        g.text(v.cx + 5.5 * v.s, v.cy + ZX * v.s + 66, 'B', { size: 18, weight: 800, color: C.ink2, align: 'center' });
+        alpha(g, fin(t, 2.4), () => lines(g, 48, 424, ['A 的 β 碳 − O − B 的 4 號碳', '所以叫 β-O-4'], { size: 15, color: K.ac, weight: 700 }));
+      });
+      // G 與 S 的 5 號碳
+      alpha(g, fin(t, 18.8), () => {
+        for (const [m, cx, nm, ok] of [[GR, 150, 'G 單元(松柏醇來的)', true], [SR, 350, 'S 單元(芥子醇來的)', false]]) {
+          const v = { cx, cy: 230, s: 38 };
+          const S = drawMol(g, m, v, { size: 13, hl: { 9: ok ? null : K.rad } });
+          badge(g, mixP(S(4), P(cx, 230), 0.42), 5, { color: ok ? C.mint : K.rad });
+          g.text(cx, 344, nm, { size: 14, weight: 700, color: C.ink, align: 'center' });
+          g.text(cx, 368, ok ? '5 號碳空著:可以接 5-5、β-5' : '5 號碳有甲氧基:接不上', { size: 12.5, weight: 700, color: ok ? C.mint : K.rad, align: 'center' });
+        }
+        lines(g, 48, 420, ['闊葉樹有 S 單元:C–C 鍵少、β-O-4 多,', '木質素比較容易拆開(製漿比較容易)'], { size: 14, color: C.ink, gap: 1.6 });
+      });
+      // 右:每 100 個單元的鍵
+      g.panel(490, 30, 446, 488, '各種鍵占的比例(%)');
+      alpha(g, fin(t, 6.6), () => {
+        const ax = g.axes(552, 92, 360, 300, { xmin: 0, xmax: LINKS.length, ymin: 0, ymax: 70, yticks: [0, 20, 40, 60], ylab: '%' });
+        const k = ease(seg(t, 7, 9.5));
+        // 長條畫的是範圍(從最低到最高)
+        LINKS.forEach(([nm, [s0, s1], [h0, h1]], i) => {
+          const x = ax.X(i + 0.5);
+          g.rrect(x - 24, ax.Y(s1 * k), 20, Math.max(3, ax.Y(s0 * k) - ax.Y(s1 * k)), 3, K.lig);
+          g.rrect(x + 4, ax.Y(h1 * k), 20, Math.max(3, ax.Y(h0 * k) - ax.Y(h1 * k)), 3, '#e8c08f');
+          g.text(x, 410, nm, { size: 13, weight: 700, color: i === 0 ? K.ac : C.ink, align: 'center' });
+        });
+        g.rrect(560, 440, 14, 14, 2, K.lig); g.text(580, 447, '針葉樹', { size: 13, color: C.ink });
+        g.rrect(660, 440, 14, 14, 2, '#e8c08f'); g.text(680, 447, '闊葉樹', { size: 13, color: C.ink });
+        g.text(560, 478, '長條是常見的範圍,依樹種與測法不同', { size: 12, color: C.muted });
+        g.text(560, 498, '另有少量 4-O-5、β-1', { size: 12, color: C.muted });
+      });
+      alpha(g, fin(t, 14.6), () => g.tag(712, 74, '醚鍵(β-O-4、4-O-5)較好拆;C–C 鍵很難拆', { size: 13, color: K.ac }));
+    },
+  },
+  {
+    key: 'lcc', name: '三種成分之間的鍵', dur: 20,
+    cues: [[0, '三種成分不是各自分開的。半纖維素貼在纖維素微纖絲的表面,靠的是氫鍵;木質素填在外面,把它們包住。'],
+      [6, '木質素和半纖維素之間還有共價鍵,合起來叫木質素-碳水化合物複合體。常見的有三種,都可以用號碼說清楚。'],
+      [9, '一、木質素側鏈 α 碳上的 O 接到糖的 OH(醚鍵);二、α 碳上的 O 接到葡萄糖醛酸 6 號碳的羧基(酯鍵);三、木質素 4 號碳的 O 接到糖的 1 號碳(糖苷鍵)。'],
+      [15.5, '所以要把木材的纖維分開(製漿),或把纖維素變成糖,都得先拆開木質素和這些鍵。這也是木材耐用、不容易分解的原因之一。']],
+    draw(g, t) {
+      // 上半:微纖絲、貼在上面的半纖維素、外面的木質素
+      alpha(g, fin(t, 0.2), () => {
+        g.rrect(90, 148, 780, 30, 15, 'rgba(165,243,205,.2)', K.cel, 1.6);
+        for (let k = 0; k < 3; k++) g.line(104, 156 + k * 7, 856, 156 + k * 7, 'rgba(165,243,205,.35)', 1.2);
+        g.text(480, 163, '纖維素(微纖絲)', { size: 13, weight: 700, color: K.cel, align: 'center' });
+      });
+      const up = Array.from({ length: 12 }, (_, i) => P(164 + i * 34, 126)), dn = Array.from({ length: 11 }, (_, i) => P(436 + i * 34, 202));
+      alpha(g, fin(t, 1.2), () => {
+        g.line(up[0].x, up[0].y, up[11].x, up[11].y, K.hem, 2);
+        up.forEach((p, i) => { if (seg(t, 1.2, 3) * 12 > i) snfg(g, 'Xyl', p.x, p.y, 8); });
+        g.line(up[3].x, up[3].y, up[3].x - 8, up[3].y - 24, K.hem, 1.6); snfg(g, 'GlcA', up[3].x - 10, up[3].y - 30, 7);
+        g.line(dn[0].x, dn[0].y, dn[10].x, dn[10].y, K.hem, 2);
+        dn.forEach((p, i) => { if (seg(t, 1.6, 3.2) * 11 > i) snfg(g, i % 4 === 2 ? 'Glc' : 'Man', p.x, p.y, 7.5); });
+        g.text(150, 126, '半纖維素', { size: 13, weight: 700, color: K.hem, align: 'right' });
+      });
+      alpha(g, fin(t, 3.4), () => {
+        up.forEach((p) => g.line(p.x, 136, p.x, 147, K.hb, 1.6, [2, 3]));
+        dn.forEach((p) => g.line(p.x, 179, p.x, 192, K.hb, 1.6, [2, 3]));
+      });
+      alpha(g, fin(t, 4.8), () => {
+        const ctx = g.ctx; ctx.beginPath();
+        LIG_BLOB.forEach(([x, y], i) => { const px = 560 + x * 250, py = 70 + y * 34; if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); });
+        ctx.closePath(); ctx.fillStyle = 'rgba(210,154,98,.28)'; ctx.fill(); ctx.lineWidth = 1.6; ctx.strokeStyle = K.lig; ctx.stroke();
+        for (const [x, y] of [[372, 70], [436, 60], [512, 80], [590, 62], [660, 78], [730, 66]]) { ctx.beginPath(); for (let k = 0; k < 6; k++) { const a = (k * Math.PI) / 3; const px = x + 9 * Math.cos(a), py = y + 9 * Math.sin(a); if (k) ctx.lineTo(px, py); else ctx.moveTo(px, py); } ctx.closePath(); ctx.strokeStyle = 'rgba(232,192,143,.8)'; ctx.lineWidth = 1.3; ctx.stroke(); }
+        g.text(800, 70, '木質素', { size: 14, weight: 700, color: K.lig, align: 'center' });
+      });
+      alpha(g, fin(t, 6.3), () => {
+        for (const i of [6, 8, 10]) { const p = up[i]; g.line(p.x, p.y - 9, p.x + 4, 98, K.rad, 2.4); g.circle(p.x + 4, 98, 4, K.rad); }
+        g.tag(712, 118, '共價鍵', { size: 13, color: K.rad });
+      });
+      alpha(g, fin(t, 3.6), () => g.tag(268, 228, '虛線:氫鍵', { size: 13, color: K.hb }));
+      // 下半:三種共價鍵
+      const cards = [
+        { x: 30, title: '醚鍵', col: K.oh, txt: ['α 碳上的 O 接到糖的 OH'], mol: LIGR('O'), sugar: ['Xyl', 9, [3.5, -ZX]], a0: 8.8 },
+        { x: 340, title: '酯鍵', col: K.ac, txt: ['α 碳上的 O 接到醛酸的 6 號碳'], mol: LIGR('O'), ester: true, a0: 9.8 },
+        { x: 650, title: '糖苷鍵', col: K.O, txt: ['4 號碳的 O 接到糖的 1 號碳'], mol: LIGR('OH'), sugar: ['Glc', 10, [-3, 0]], a0: 10.8 },
+      ];
+      for (const c of cards) alpha(g, fin(t, c.a0), () => {
+        g.rrect(c.x, 268, 280, 250, 12, 'rgba(21,32,30,.92)', c.col, 1.6);
+        g.text(c.x + 16, 290, c.title, { size: 17, weight: 800, color: c.col });
+        lines(g, c.x + 16, 494, c.txt, { size: 13, color: C.ink });
+        const v = { cx: c.x + (c.sugar && c.sugar[1] === 10 ? 176 : 112), cy: 390, s: 27 };
+        const S = drawMol(g, c.mol, v, { size: 12, lw: 2.2, hl: c.ester || (c.sugar && c.sugar[1] === 9) ? { 9: c.col } : { 10: c.col } });
+        badge(g, add(S(6), -4, -18), 'α');
+        badge(g, mixP(S(3), P(v.cx, v.cy), 0.42), 4);
+        if (c.sugar) {
+          const [kind, at, [sx, sy]] = c.sugar, q = P(v.cx + sx * v.s, v.cy + sy * v.s), o = S(at);
+          g.line(o.x + (sx > 0 ? 8 : -8), o.y, q.x - (sx > 0 ? 12 : -12), q.y, K.bond, 2.2);
+          snfg(g, kind, q.x, q.y, 11);
+          g.text(q.x, q.y + 24, '糖', { size: 12, color: C.ink2, align: 'center' });
+          if (at === 10) badge(g, add(q, 16, -16), 1, { color: K.O });
+        } else {
+          // 酯鍵:α 碳的 O − C(=O) − 葡萄糖醛酸(這個 C 就是醛酸的 6 號碳)
+          const o = S(9), cc = P(v.cx + 3.5 * v.s, v.cy - ZX * v.s), od = P(v.cx + 4 * v.s, v.cy), gq = P(v.cx + 4.1 * v.s, v.cy - 2 * ZX * v.s);
+          g.line(o.x + 8, o.y, cc.x, cc.y, K.bond, 2.2);
+          drawBond(g, cc, add(od, -3, -5), 2, K.bond, 2.2); label(g, od, 'O', { size: 12 });
+          g.line(cc.x, cc.y, gq.x - 6, gq.y + 8, K.bond, 2.2);
+          g.circle(cc.x, cc.y, 3.2, K.dot);
+          snfg(g, 'GlcA', gq.x + 2, gq.y - 4, 11);
+          badge(g, add(cc, -16, -14), 6, { color: K.ac });
+          g.text(gq.x + 2, gq.y + 22, '醛酸', { size: 12, color: C.ink2, align: 'center' });
+        }
+      });
+      alpha(g, fin(t, 15.6), () => g.tag(480, 248, '要分開纖維或把纖維素變成糖,得先拆開這些鍵', { size: 14, color: C.ink }));
+    },
+  },
+  {
+    key: 'measure', name: '實驗室怎麼分開來量', dur: 25,
+    cues: [[0, '實驗室怎麼知道一塊木材有幾成纖維素、幾成木質素?靠化學分析,把成分一步一步分開來秤重。先把木材烘乾、磨成粉,用有機溶劑(例如乙醇加甲苯)洗掉萃取物。'],
+      [6, '洗過的木粉加 72% 的濃硫酸,把纖維素和半纖維素水解成單醣溶掉,再稀釋、加熱;剩下溶不掉的棕色固體就是酸不溶木質素。溶液裡還有少量酸可溶木質素,用紫外光測。'],
+      [12.5, '另一份木粉用亞氯酸鈉加醋酸,把木質素氧化溶掉,剩下白色的全纖維素,也就是纖維素加半纖維素。再泡 17.5% 的氫氧化鈉溶液,溶不掉的是 α-纖維素,大約就是纖維素;溶掉的大多是半纖維素。'],
+      [19.5, '這些含量是照方法定出來的,換一種方法數字會差一點,所以報告要寫明用的是哪一個標準方法。灰分是另取一份,在 525 到 575 °C 燒掉有機物以後剩下的礦物質。']],
+    draw(g, t) {
+      const box = (x, y, w, h, title, sub, col, a0) => alpha(g, fin(t, a0), () => {
+        g.rrect(x, y, w, h, 10, 'rgba(21,32,30,.94)', col, 1.6);
+        g.text(x + w / 2, y + (sub ? h / 2 - 9 : h / 2), title, { size: 15, weight: 800, color: col, align: 'center', max: w - 16 });
+        if (sub) g.text(x + w / 2, y + h / 2 + 12, sub, { size: 12, color: C.ink2, align: 'center', max: w - 14 });
+      });
+      const arr = (x1, y1, x2, y2, col, a0) => alpha(g, fin(t, a0), () => g.arrow(x1, y1, x2, y2, { color: col, lw: 2, head: 8 }));
+      box(40, 64, 190, 56, '木粉', '烘乾、磨細', C.ink2, 0.3);
+      arr(135, 122, 135, 156, C.ink2, 0.9);
+      box(40, 160, 190, 56, '有機溶劑萃取', '例如乙醇加甲苯', K.ext, 1.2);
+      arr(232, 188, 256, 188, K.ext, 2.2);
+      box(260, 160, 170, 56, '萃取物', '萃取前後的重量差', K.ext, 2.5);
+      arr(135, 218, 135, 252, C.ink2, 3.6);
+      box(40, 256, 190, 56, '洗過的木粉', '(脫萃取物木粉)', C.ink2, 4);
+      // 木質素這一支
+      arr(232, 270, 298, 104, K.lig, 5.8);
+      box(300, 64, 240, 60, '72% 硫酸,再稀釋、加熱', '纖維素、半纖維素變成單醣溶掉', K.lig, 6.2);
+      arr(542, 84, 578, 68, K.lig, 7.5);
+      box(580, 40, 350, 52, '溶不掉的固體:酸不溶木質素', '(Klason 木質素)', K.lig, 7.8);
+      arr(542, 106, 578, 126, C.ink2, 9.1);
+      box(580, 104, 350, 52, '溶液:酸可溶木質素與單醣', '木質素用紫外光(約 205 nm)測,單醣用層析測', C.ink2, 9.4);
+      // 醣類這一支
+      arr(232, 292, 298, 288, K.hem, 12.8);
+      box(300, 256, 240, 60, '亞氯酸鈉加醋酸,加熱', '把木質素氧化溶掉', K.hem, 13.2);
+      arr(542, 286, 578, 286, K.cel, 14.2);
+      box(580, 258, 350, 56, '全纖維素(白色)', '纖維素 + 半纖維素', K.cel, 14.5);
+      arr(755, 316, 755, 350, C.ink2, 15.4);
+      box(580, 352, 350, 50, '泡 17.5% 氫氧化鈉溶液', '', C.ink2, 15.8);
+      arr(664, 404, 664, 442, K.cel, 16.6); arr(846, 404, 846, 442, K.hem, 16.8);
+      box(580, 446, 168, 60, 'α-纖維素', '溶不掉:約等於纖維素', K.cel, 17);
+      box(762, 446, 168, 60, '溶掉的部分', '大多是半纖維素', K.hem, 17.4);
+      // 灰分
+      alpha(g, fin(t, 19.6), () => carrow(g, P(40, 100), P(40, 378), 22, { color: K.ash, lw: 1.8, dash: [4, 4] }));
+      box(40, 352, 190, 56, '灰分', '另取一份,525 到 575 °C 燒', K.ash, 19.8);
+      alpha(g, fin(t, 20.4), () => card(g, 40, 430, 500, 88, '含量是照方法定出來的', C.mint, ['報告要寫明用哪一個標準方法(例如 TAPPI、CNS)'], 1));
+    },
+  },
+  {
+    key: 'compare', name: '比一比:三大成分', dur: 16,
+    cues: [[0, '最後把三種成分放在一起比:纖維素是骨架,半纖維素把骨架和填充物連起來,木質素填滿空隙、把細胞黏住。'],
+      [8, '它們的單元、接法和形狀都不一樣,但都可以用碳的編號說清楚:纖維素的 β(1→4)、半纖維素支鏈接在幾號碳、木質素的 β-O-4。']],
+    draw(g, t) {
+      const cols = [
+        ['纖維素', K.cel, ['葡萄糖'], ['β(1→4),一直線'], '約 1 萬個糖', '大多結晶', '骨架(微纖絲)', ['約 40% 到 50%']],
+        ['半纖維素', K.hem, ['木糖、甘露糖等', '好幾種糖'], ['主鏈 β(1→4)', '有支鏈'], '約 100 到 200 個糖', '不結晶', '包住、連接', ['約 20% 到 30%']],
+        ['木質素', K.lig, ['H、G、S 三種', '苯丙烷單元'], ['自由基偶合', 'β-O-4 最多'], '沒有固定的大小', '不結晶,立體網狀', '填滿、黏住、防水', ['針葉樹約 26% 到 32%', '闊葉樹約 20% 到 28%']],
+      ];
+      cols.forEach(([nm, col, unit, link, size, form, role, pct], i) => {
+        const x = 30 + i * 306;
+        alpha(g, fin(t, 0.4 + i * 0.5), () => {
+          g.rrect(x, 26, 286, 492, 14, 'rgba(21,32,30,.9)', col, 1.6);
+          g.text(x + 143, 56, nm, { size: 21, weight: 800, color: col, align: 'center' });
+          const rows = [['單元', unit], ['怎麼接', link], ['大小', [size]], ['排列', [form]], ['在細胞壁裡', [role]], ['占乾重', pct]];
+          rows.forEach(([h, v], r) => {
+            const y = 96 + r * 70;
+            g.text(x + 20, y, h, { size: 13, color: C.muted });
+            lines(g, x + 20, y + 22, v, { size: 15, color: C.ink, gap: 1.4 });
+          });
+        });
+      });
+    },
+  }
+];
+createLesson({
+  chapters,
+  state: { wt: 'soft' },
+  controls: [
+    { id: 'wt', label: '樹種', type: 'seg', options: [{ v: 'soft', label: '針葉樹' }, { v: 'hard', label: '闊葉樹' }], chapters: ['overview'] },
+  ],
+});
+</script>
+</body>
+</html>

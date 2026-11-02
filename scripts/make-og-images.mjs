@@ -47,7 +47,8 @@ const SHOTS = [
   { name: 'phylogenetics', url: 'phylogenetics/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('bootstrap'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
   { name: 'gene-function', url: 'gene-function/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('gfp'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
   { name: 'nomenclature', url: 'nomenclature/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('rs'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
-  { name: 'carbohydrates', url: 'carbohydrates/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('ring'); __lesson.time = 1 * __lesson.duration - 0.001; __lesson.redraw()" },
+  { name: 'wood-components', url: 'wood-components/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('cellwall'); __lesson.time = 15.5; __lesson.redraw()" },
+  { name: 'carbohydrates', url: 'carbohydrates/', wait: 3, js: "document.querySelector('.nav-wrap').style.display='none'; document.querySelector('header.top').style.display='none'; __lesson.pause(); __lesson.go('ring'); __lesson.time = 23.9; __lesson.redraw()" },
 ].filter((s) => !only.length || only.includes(s.name));
 
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'og-profile-'));
