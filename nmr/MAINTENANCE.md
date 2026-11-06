@@ -104,6 +104,15 @@
 - 直拿的觸控手機開頁 1.5 秒後提示一次「建議轉成橫式觀看」(`sessionStorage` 的 `mp-rotate-hint`,8 秒後或按 × 收起)。
 - 手機版的樣式是 CSS 最後 `html.mp` 開頭的那一段(橫拿時另外把標題排成一行、讀值卡變矮):標題縮小、讀值卡排成一列、導言與頁尾不顯示、控制面板兩欄(翻倒角度跨兩欄)、譜的螢幕改成一欄(三個讀值排在圖下方一列)、圖例保留(原本 560 px 以下藏起來)。桌機與平板不符合 `MOBILE_QUERY`,不加任何 class,版面和以前相同;`scripts/check-mobile-panels.mjs` 檢查共用樣式表的每條規則都限定在 `html.mp` 底下,也檢查本頁的接線。
 
+## 畫面大小:大螢幕放大與小螢幕取景(2026-11-06)
+
+- 使用者要求 1024×768、1080P、2K、4K 都看得清楚主體,做法見 README「畫面大小」。這一頁載入 `../assets/ui-scale.css`(放大倍數 `--ui`:1080P 的瀏覽器視窗 1 倍、2K 1.33 倍、4K 2 倍);CSS 最後一段把 `.hud`、`.load`、`.ctl`、`.help`、`.console`、`.foot`、`.cap`、`.titlecard`、`#tourExit`、`.cmp` 與元件標籤 `.lbl` 套上 `zoom: var(--ui,1)`。3D 畫布與 CSS2D 的定位層(`.labels`、`.lw`)不放大;`.blbl` 本身就是定位的元素,只把字級乘上 `--ui`。
+- 放大的元素裡 vw、vh 也會跟著放大,所以主樣式表裡(手機的 `html.mp` 規則與 `max-width:760px` 那幾條除外,手機上 `--ui` 一定是 1)每個 vw、vh 都寫成 `100vw / var(--ui,1)` 的形式,例如導覽時譜的螢幕寬 `min(640px,42vw / var(--ui,1))`。
+- 面板裡的畫布:`drawPlot()` 的實際像素乘上 `currentCSSZoom`,畫的座標仍是放大前的 CSS 像素;譜圖上的提示框把 `e.clientX - r.left` 除以 `currentCSSZoom`(變數 `pz`)才是畫圖用的座標。沒有 `currentCSSZoom` 的瀏覽器改用 `uiScale()`(`../assets/render-quality.js`,讀 `--ui`)。
+- 3D 的解析度:`quality.pixelRatio()` 的像素預算在自動與完整模式乘上 `--ui` 的平方,4K 時接近每個 CSS 像素畫一點(2026-11-06 在作者電腦的 RTX 2080 SUPER 量到 60 FPS);流暢模式不變。
+- 桌機小螢幕(寬 981 到 1279 px,或寬 981 px 以上且高不到 900 px,例如 1024×768、1366×768):CSS 收起導言 `.lede`、譜圖 `#plot` 改成 120 px 高;`render()` 在 `mp.applyView(camera)` 沒有接手時呼叫 `fv.apply(camera)`(`../assets/free-view.js`,`fv` 在 `render()` 前一行建立),把投影中心移到 `.hud`、`#ctl`、`#console`、`#help` 之間最大的空地,空地小時稍微拉遠(`camera.zoom` 最小 0.72),約 0.3 秒移到位;導覽與影片(`tour.on`、`FILM`)不作用。1280×900 以上(含 1080P 與放大後的 2K、4K)畫面和原本相同。
+- 修改時:新的面板要加進 zoom 那一行,會擋到 3D 的也加進 `createFreeView` 的 `panels`;`scripts/check-ui-scale.mjs` 會檢查 vw、vh 有沒有除以 `--ui`、`fv` 有沒有接上。改完在 1024×768、1920×1080、2560×1440、3840×2160 各看一次。
+
 ## 修改後的檢查
 
 - 手機尺寸(390×844 與 844×390,觸控):兩條細條有名稱與內容說明、預設收起、點了展開;按「收訊」譜自動展開;導覽中細條藏起來,結束後回到原本的狀態;詳見 `docs/VALIDATION.md` 的「手機版面板收合」。

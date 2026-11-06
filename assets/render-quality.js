@@ -23,10 +23,13 @@ export class RenderBudget {
     if (lower) this.level = 'smooth';
     return lower;
   }
-  pixelRatio(w, h, device = 1, fullCap = 1.5) {
+  // ui: the interface scale from ui-scale.css (--ui, 2 on a 4K screen). Big screens get a bigger pixel budget (times ui²)
+  // in auto and full, so a 4K screen still draws close to one pixel per CSS pixel instead of half; smooth stays small
+  // because it is the fallback for slow graphics cards.
+  pixelRatio(w, h, device = 1, fullCap = 1.5, ui = 1) {
     const full = this.level === 'full', smooth = this.level === 'smooth';
     const cap = full ? fullCap : smooth ? 1 : 1.25;
-    const pixels = full ? 3.4e6 : smooth ? 1.2e6 : 2e6;
+    const pixels = (full ? 3.4e6 : smooth ? 1.2e6 : 2e6) * (smooth ? 1 : Math.max(1, ui) ** 2);
     return Math.min(device || 1, cap, Math.sqrt(pixels / Math.max(1, w * h)));
   }
 }
@@ -41,6 +44,12 @@ export class FramePacer {
     if (this.next < now) this.next = now + interval;
     return true;
   }
+}
+
+// The interface scale --ui set by ui-scale.css (1 when the page does not load it).
+export function uiScale() {
+  const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui'));
+  return v > 1 ? v : 1;
 }
 
 export function createQualityControls({ host, onChange }) {
@@ -80,7 +89,7 @@ export function createQualityControls({ host, onChange }) {
   return {
     budget,
     shouldRender: now => pacer.ready(now),
-    pixelRatio: (w, h, cap) => budget.pixelRatio(w, h, devicePixelRatio, cap),
+    pixelRatio: (w, h, cap) => budget.pixelRatio(w, h, devicePixelRatio, cap, uiScale()),
     configure(renderer, composer, bloom, { recording = false, ao = null } = {}) {
       const full = recording || budget.level === 'full';
       rendererRef = renderer;

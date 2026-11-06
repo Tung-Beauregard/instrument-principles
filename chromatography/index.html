@@ -18,6 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/ui-scale.css">
 <style>
 /* 版面和 UV-Vis、NMR、質譜儀-不同分析器比較同一套:左上標題與讀值,右上控制,下方是層析圖的螢幕,導覽與影片共用字幕與片頭 */
 :root{
@@ -39,7 +40,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 
 /* 左上:標題、數值、說明 */
-.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw - 48px));pointer-events:none}
+.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw / var(--ui,1) - 48px));pointer-events:none}
 .hud::before{content:'';position:absolute;left:-80px;top:-60px;width:620px;height:300px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 25% 35%,rgba(10,15,19,.72),rgba(10,15,19,0) 70%)}
 .hud .k{display:block;font-weight:900;font-size:28px;letter-spacing:.02em;line-height:1.1}
 .hud .big{display:block;font-weight:900;font-size:44px;line-height:1.12;color:var(--cyan);text-shadow:0 0 22px rgba(116,228,255,.35)}
@@ -61,7 +62,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)} .g{color:var(--mint)}
 
 /* 網站分頁(各教材共用) */
-.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw / var(--ui,1) - 48px);overflow-x:auto;scrollbar-width:none}
 .sitenav::-webkit-scrollbar{display:none}
 .sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
 .sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
@@ -98,9 +99,9 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .help .fine{color:var(--muted);font-size:11.5px;margin:0}
 
 /* 底部:譜的螢幕 */
-.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw - 32px));padding:11px 14px 9px}
+.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw / var(--ui,1) - 32px));padding:11px 14px 9px}
 /* 寬螢幕:左欄有簡圖,主控台放在左欄右邊那一塊的正中間 */
-@media (min-width:981px){.console{left:calc(50vw + 202px);width:min(800px,calc(100vw - 440px))}}
+@media (min-width:981px){.console{left:calc(50vw / var(--ui,1) + 202px);width:min(800px,calc(100vw / var(--ui,1) - 440px))}}
 .con-head{display:flex;align-items:baseline;gap:10px;font-size:12.5px;margin-bottom:4px;white-space:nowrap}
 .con-head b{font-weight:700}
 .con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
@@ -132,7 +133,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .lbl span{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
 
 /* 導覽與影片 */
-.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw - 40px));text-align:center;padding:13px 26px 15px}
+.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw / var(--ui,1) - 40px));text-align:center;padding:13px 26px 15px}
 .cap .chap{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.16em;margin-bottom:5px}
 .cap .txt{font-size:18px;line-height:1.6;font-weight:500}
 .titlecard{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,15,19,.66) 0%,rgba(10,15,19,.4) 40%,rgba(10,15,19,0) 70%)}
@@ -148,7 +149,7 @@ html.touring .titlecard{display:flex}
 html.touring .cap.withcon{bottom:250px}
 /* 寬螢幕導覽:譜和影片一樣放右上角,鏡頭的構圖才不會被擋住;結束鈕移到上方中間 */
 @media (min-width:1100px) and (min-aspect-ratio:4/3){
-  html.touring .console{left:auto;right:24px;top:20px;bottom:auto;transform:none;width:min(640px,42vw)}
+  html.touring .console{left:auto;right:24px;top:20px;bottom:auto;transform:none;width:min(640px,42vw / var(--ui,1))}
   html.touring .cap.withcon{bottom:26px}
   html.touring #tourExit{right:auto;left:50%;transform:translateX(-50%)}
 }
@@ -285,6 +286,17 @@ html.mp.sk-open .chips,html.mp.sk-open .sk-txt,html.mp.sk-open .hud .k,html.mp.s
   html.mp .chip{padding:3px 8px 4px}
   html.mp .chip b{font-size:13px}
 }
+/* 桌機小螢幕(1024×768、1366×768 這類,2026-11-06):導言收起來、譜圖矮一點,面板讓出空間給 3D;3D 主角移到面板之間的空地
+   (../assets/free-view.js,在這些尺寸與 761 到 980 px 的平板作用)。980 px 以下照原本的窄版,手機照 html.mp */
+@media (min-width:981px) and (max-width:1279px),(min-width:981px) and (max-height:899px){
+  .lede{display:none}
+  #plot{height:120px}
+}
+/* 大螢幕(2K、4K)的放大(2026-11-06,見 ../assets/ui-scale.css):面板、字幕、片頭字卡、比較表與元件標籤依 --ui 放大,
+   3D 畫布與 CSS2D 標籤的定位層不放大(.lbl 在定位用的 .lw 裡面,.blbl 本身就是定位的元素,所以只放大字)。
+   放大的元素裡寫的 vw、vh 都已除以 var(--ui) */
+.hud,.load,.ctl,.help,.console,.foot,.cap,.titlecard,#tourExit,.cmp,.lbl{zoom:var(--ui,1)}
+.blbl{font-size:calc(14px * var(--ui,1))}
 </style>
 <script type="importmap">
 {"imports":{
@@ -363,9 +375,10 @@ html.mp.sk-open .chips,html.mp.sk-open .sk-txt,html.mp.sk-open .hud .k,html.mp.s
 
 <script type="module">
 // ==== 00_core.js ====
-import { createQualityControls } from '../assets/render-quality.js';
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
 import { createMobilePanels } from '../assets/mobile-panels.js';
+import { createFreeView } from '../assets/free-view.js';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -970,7 +983,8 @@ function keepLabelsOnScreen() {
   for (const L of Object.values(LBL)) {
     if (L.op < 0.01) continue;
     const r = L.outer.getBoundingClientRect(), dx = r.left < 8 ? 8 - r.left : r.right > W0 - 8 ? W0 - 8 - r.right : 0;
-    const s = dx ? `translateX(${Math.round(dx)}px)` : '';
+    // .lbl 有放大(zoom)時位移也跟著放大,所以除回放大前的像素
+    const s = dx ? `translateX(${Math.round(dx / (L.inner.currentCSSZoom || uiScale()))}px)` : '';
     if (L.inner.style.transform !== s) L.inner.style.transform = s;
     const rr = { left: r.left + dx, right: r.right + dx, top: r.top, bottom: r.bottom }, blocked = P.some((p) => hits(rr, p));
     const v = blocked ? 'hidden' : '';
@@ -1367,7 +1381,7 @@ function drawSketch(t) {
   const now = performance.now();
   if (!REC && now - skDrawnAt < 1000 / 30) return;
   skDrawnAt = now;
-  const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = skCv.clientWidth, h = skCv.clientHeight;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (skCv.currentCSSZoom || uiScale()), w = skCv.clientWidth, h = skCv.clientHeight; // 面板放大時多畫幾倍像素
   if (!w || !h) return;
   if (skCv.width !== Math.round(w * dpr) || skCv.height !== Math.round(h * dpr)) { skCv.width = Math.round(w * dpr); skCv.height = Math.round(h * dpr); }
   const c = skCv.getContext('2d'), k = (w * dpr) / SKV.w;
@@ -1492,7 +1506,7 @@ function drawPlot() {
     const prog = !r || inst === 'tsw' ? '' : `<span><i style="border-top:2px dashed #ffc261"></i>${inst === 'gc' ? '溫度' : '甲醇比例'}</span>`;
     el('legend').innerHTML = (g ? `<span><i style="border-top:2px solid #74e4ff"></i>這一次</span><span><i style="border-top:2px dashed #8a9ba5"></i>上一次:${(CONDS_OF[inst][g.cond] || {}).label || ''}${inst === 'lc' && g.part !== r.part ? ` ${g.part} µm` : ''}</span>` : '') + prog;
   }
-  const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = plot.clientWidth, h = plot.clientHeight;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (plot.currentCSSZoom || uiScale()), w = plot.clientWidth, h = plot.clientHeight; // 面板放大時多畫幾倍像素
   if (!w) return;
   if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
   const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
@@ -1567,11 +1581,11 @@ function drawPlot() {
 }
 plot.addEventListener('pointermove', (e) => {
   const m = plot._map; if (!m) return;
-  const rc = plot.getBoundingClientRect(), px = e.clientX - rc.left;
+  const rc = plot.getBoundingClientRect(), pz = plot.currentCSSZoom || uiScale(), px = (e.clientX - rc.left) / pz;
   if (px < m.Lp || px > m.Lp + m.pw) { tip.style.display = 'none'; return; }
   const tt = ((px - m.Lp) / m.pw) * m.tMax; let near = '';
   if (m.r) for (const cp of m.r.cpds) if (Math.abs(cp.tR - tt) < Math.max(4 * cp.sig, (3 / m.pw) * m.tMax) && cp.tR <= W.rt) near += ` · ${cp.c.name} ${cp.tR.toFixed(2)}`;
-  tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${e.clientY - rc.top}px`;
+  tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${(e.clientY - rc.top) / pz}px`;
   tip.textContent = `${tt.toFixed(2)} 分鐘${near}`;
 });
 plot.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
@@ -1634,7 +1648,8 @@ function capReserve() {
     capKey = k;
     const cs = getComputedStyle(el('cap')), tx = getComputedStyle(el('capTxt')), ch = getComputedStyle(el('chap'));
     const lh = (s) => parseFloat(s.lineHeight) || parseFloat(s.fontSize) * 1.5;
-    capH = parseFloat(cs.bottom) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + lh(ch) + parseFloat(ch.marginBottom) + 2 * lh(tx);
+    // 讀到的是字幕放大前的 CSS 像素;大螢幕放大(ui-scale.css)時乘上倍數,才是畫面上的像素
+    capH = (parseFloat(cs.bottom) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + lh(ch) + parseFloat(ch.marginBottom) + 2 * lh(tx)) * uiScale();
   }
   return capH;
 }
@@ -1658,9 +1673,11 @@ function applyShift() {
   camera.zoom = clamp((0.47 * Math.min(F.w, F.h)) / rpx, 0.45, 1);
   camera.setViewOffset(w, h, w / 2 - F.cx, h / 2 - F.cy, w, h);
 }
+// 桌機小螢幕(1024×768 這類):3D 的投影中心移到面板之間最大的空地(../assets/free-view.js);手機、導覽與影片不作用
+const fv = createFreeView({ panels: ['.hud', '#ctl', '#console', '#help'], active: () => !FILM && !tour.on });
 function render() {
   // 手機版:3D 的投影中心移到標題與停靠區之外的空地;導覽、影片與桌機照原本的 applyShift()
-  if (!mp.applyView(camera)) applyShift();
+  if (!mp.applyView(camera) && !fv.apply(camera)) applyShift();
   fitClip(controls.target);
   composer.render(); labelR.render(scene, camera);
   keepLabelsOnScreen();

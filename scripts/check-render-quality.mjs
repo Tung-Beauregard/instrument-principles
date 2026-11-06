@@ -35,6 +35,15 @@ for (const [mode, budget] of [['auto', 2e6], ['smooth', 1.2e6], ['full', 3.4e6]]
   assert.ok(3840 * 2160 * dpr * dpr <= budget + 0.001);
   assert.ok(b.pixelRatio(390, 844, 3, 2) <= (mode === 'full' ? 2 : mode === 'smooth' ? 1 : 1.25));
 }
+// Big screens (--ui from ui-scale.css, 2 on 4K): auto and full get ui² more pixels, so 4K draws close to one pixel per
+// CSS pixel; smooth (the fallback for slow cards) keeps its budget; ui 1 changes nothing.
+for (const [mode, budget] of [['auto', 2e6], ['full', 3.4e6]]) {
+  const b = new RenderBudget(mode), dpr = b.pixelRatio(3840, 2160, 1, 1.5, 2);
+  assert.ok(3840 * 2160 * dpr * dpr <= budget * 4 + 0.001);
+  assert.ok(dpr > 0.9, `${mode} draws close to one pixel per CSS pixel on 4K`);
+  assert.equal(b.pixelRatio(1920, 950, 1, 1.5, 1), b.pixelRatio(1920, 950, 1, 1.5));
+}
+assert.equal(new RenderBudget('smooth').pixelRatio(3840, 2160, 1, 1.5, 2), new RenderBudget('smooth').pixelRatio(3840, 2160, 1, 1.5, 1));
 assert.equal(new RenderBudget('invalid').mode, 'auto');
 for (const hz of [60, 120, 144, 240]) {
   const p = new FramePacer(); let frames = 0;

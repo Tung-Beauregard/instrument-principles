@@ -1,0 +1,17 @@
+/* 大螢幕的介面放大(2026-11-06,使用者要求 1024×768、1080P、2K、4K 都要看得清楚主體)。
+   基準是 1080P 螢幕上放到最大的瀏覽器視窗(約 1920×950):這個大小是 1 倍,寬與高都比它大時一級一級放大,每級 1/6 倍;
+   2K(2560×1440)是 1.33 倍,4K(3840×2160)是 2 倍,最多 3 倍。寬或高其中一邊不夠就停在那一級,超寬螢幕不會放得太大。
+   --ui 是放大倍數。2D 教材(bio-lesson.css)、入口(styles.css)與數據畫圖整頁套 zoom: var(--ui);
+   3D 教材只套在面板與標籤上,3D 畫布本身照視窗大小,畫面的解析度另由 render-quality.js 依 --ui 提高。
+   比基準小的畫面一律 1 倍:不把字縮小,小螢幕靠各頁自己的版面調整。
+   注意:在套了 zoom 的元素裡,vw、vh 這類單位也會跟著放大,寫在裡面的 100vw、100vh 要除以 var(--ui);
+   畫布的 clientWidth 是放大前的大小,要乘上 canvas.currentCSSZoom 才是螢幕上的像素,滑鼠座標要除回來。 */
+:root{--ui:1}
+@media (min-width:2240px) and (min-height:1108px){:root{--ui:1.1667}}
+@media (min-width:2560px) and (min-height:1267px){:root{--ui:1.3333}}
+@media (min-width:2880px) and (min-height:1425px){:root{--ui:1.5}}
+@media (min-width:3200px) and (min-height:1583px){:root{--ui:1.6667}}
+@media (min-width:3520px) and (min-height:1742px){:root{--ui:1.8333}}
+@media (min-width:3840px) and (min-height:1900px){:root{--ui:2}}
+@media (min-width:4800px) and (min-height:2375px){:root{--ui:2.5}}
+@media (min-width:5760px) and (min-height:2850px){:root{--ui:3}}

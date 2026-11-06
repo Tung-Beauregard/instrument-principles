@@ -18,6 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="../assets/ui-scale.css">
 <style>
 /* 版面:全螢幕 3D 舞台;左上是導覽文字,上方靠左是控制面板(右上空給較高的 ALS 與 GC),底部是儀器主控台(柱溫、層析圖、質譜) */
 :root{
@@ -204,7 +205,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
 .tip i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
 
 .modal{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:24px 16px;background:rgba(3,6,12,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
-.modal-card{position:relative;width:min(700px,100%);max-height:min(84vh,860px);overflow:auto;background:var(--glass-2);border:1px solid var(--line-2);border-radius:16px;padding:24px 28px 26px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.modal-card{position:relative;width:min(700px,100%);max-height:min(84vh / var(--ui,1),860px);overflow:auto;background:var(--glass-2);border:1px solid var(--line-2);border-radius:16px;padding:24px 28px 26px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
 .modal h2{margin:0 0 10px;font:700 22px/1.35 var(--f-body);text-wrap:balance;padding-right:36px}
 .modal h3{margin:20px 0 6px;font-size:12.5px;font-weight:600;letter-spacing:.16em;color:var(--accent)}
 .modal p{margin:0 0 8px;color:var(--ink-2);font-size:14px;line-height:1.8;max-width:64ch}
@@ -245,7 +246,7 @@ select.mini.slow{border-color:rgba(127,227,255,.6);color:var(--accent)}
   .cs-chrom{border-left:0!important}
   .console{height:212px}
   /* 控制面板收進「設定」按鈕,3D 用整個右半邊 */
-  .ctl{display:none;position:fixed;top:16px;right:16px;z-index:35;width:min(560px,calc(100vw - 32px));background:var(--glass-2);box-shadow:0 18px 50px rgba(0,0,0,.55)}
+  .ctl{display:none;position:fixed;top:16px;right:16px;z-index:35;width:min(560px,calc(100vw / var(--ui,1) - 32px));background:var(--glass-2);box-shadow:0 18px 50px rgba(0,0,0,.55)}
   .app.sheet .ctl{display:flex}
   .app.sheet .ico.ctl-x{display:grid;position:absolute;right:10px;top:10px}
   .ctl-row:first-of-type{padding-right:44px}
@@ -369,6 +370,9 @@ html.mp .console > .mp-tab + .mp-tab{border-top:1px solid var(--line)}
   /* 很矮的橫拿畫面(網址列占掉一段時):打開的圖省掉圖例與總覽條,層析圖才有高度(總覽條的跳時間可以改用拖曳層析圖) */
   html.mp .console.mp-open .legend,html.mp .console.mp-open .cv-over{display:none}
 }
+/* 大螢幕(2K、4K)的放大(2026-11-06,見 ../assets/ui-scale.css):面板格線、3D 標籤、放大鏡按鈕、提示框與說明視窗依 --ui 放大,
+   3D 畫布不放大。標籤、按鈕與提示框是 JS 用螢幕像素擺的,擺放時除以 currentCSSZoom;放大的元素裡寫的 vw、vh 都已除以 var(--ui) */
+.hud,.tag,.lens-btn,.tip,.modal,.load{zoom:var(--ui,1)}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"}}
@@ -572,7 +576,7 @@ html.mp .console > .mp-tab + .mp-tab{border-top:1px solid var(--line)}
   </div>
 </div>
 <script type="module">
-import { createQualityControls } from '../assets/render-quality.js';
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
 import { createMobilePanels } from '../assets/mobile-panels.js';
 import { createFieldDemo } from '../assets/analyzer-fields.js';
@@ -1012,7 +1016,7 @@ const SIZES = new Map();
 const ro = new ResizeObserver(es => { for (const e of es) SIZES.set(e.target, e.contentRect); markDirty(); });
 function fitCanvas(cv) {
   const r = SIZES.get(cv); if (!r || r.width < 4 || r.height < 4) return null;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2) * (cv.currentCSSZoom || uiScale()); // 面板放大時多畫幾倍像素
   const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
   if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
   const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1564,7 +1568,8 @@ function showTip(html, x, y) {
   E.tip.innerHTML = html; E.tip.hidden = false;
   const r = E.tip.getBoundingClientRect();
   const tx = clamp(x + 14, 8, innerWidth - r.width - 8), ty = clamp(y - r.height - 12, 8, innerHeight - r.height - 8);
-  E.tip.style.transform = `translate(${tx}px,${ty}px)`;
+  const z = E.tip.currentCSSZoom || uiScale(); // 提示框有放大時,位移也跟著放大,所以除回放大前的像素
+  E.tip.style.transform = `translate(${tx / z}px,${ty / z}px)`;
 }
 function openHelp(open) {
   E.help.hidden = !open;
@@ -1629,25 +1634,27 @@ function initUI() {
   E.btnSheet.addEventListener('click', () => { S.sheet = !S.sheet; E.app.classList.toggle('sheet', S.sheet); });
   E.btnSheetX.addEventListener('click', () => { S.sheet = false; E.app.classList.remove('sheet'); });
 
+  // 圖表上的滑鼠座標:offsetX、offsetY 是螢幕上的像素,面板放大(ui-scale.css)時除以倍數,才是畫圖用的座標
+  const ex = e => e.offsetX / (e.currentTarget.currentCSSZoom || uiScale()), ey = e => e.offsetY / (e.currentTarget.currentCSSZoom || uiScale());
   // 層析圖:拖曳捲動時間,點峰追蹤
   let drag = null;
   E.cvChrom.addEventListener('pointerdown', e => {
     if (!S.injected && !S.inj) finishInjection();
-    drag = { x0: e.offsetX, t0: S.t, moved: false, id: e.pointerId };
+    drag = { x0: ex(e), t0: S.t, moved: false, id: e.pointerId };
     E.cvChrom.setPointerCapture(e.pointerId); S.dragChrom = true; E.cvChrom.classList.add('drag');
   });
   E.cvChrom.addEventListener('pointermove', e => {
     if (drag) {
       const r = SIZES.get(E.cvChrom), W = winSpan(), pw = r.width - CH.pl - CH.pr;
-      if (Math.abs(e.offsetX - drag.x0) > 3) drag.moved = true;
-      if (drag.moved) setTime(drag.t0 - (e.offsetX - drag.x0) / pw * W, true);
+      if (Math.abs(ex(e) - drag.x0) > 3) drag.moved = true;
+      if (drag.moved) setTime(drag.t0 - (ex(e) - drag.x0) / pw * W, true);
       showTip(null); return;
     }
-    S.hoverChrom = { x: e.offsetX }; showTip(chromTip(e.offsetX, e.offsetY), e.clientX, e.clientY); markDirty();
+    S.hoverChrom = { x: ex(e) }; showTip(chromTip(ex(e), ey(e)), e.clientX, e.clientY); markDirty();
   });
   const endDrag = e => {
     if (!drag) return;
-    if (!drag.moved) { const c = peakNearX(e.offsetX); if (c) jumpToPeak(c.id); else animateTime(chromTimeAtX(e.offsetX)); }
+    if (!drag.moved) { const c = peakNearX(ex(e)); if (c) jumpToPeak(c.id); else animateTime(chromTimeAtX(ex(e))); }
     drag = null; S.dragChrom = false; E.cvChrom.classList.remove('drag');
   };
   E.cvChrom.addEventListener('pointerup', endDrag);
@@ -1655,14 +1662,14 @@ function initUI() {
   E.cvChrom.addEventListener('pointerleave', () => { S.hoverChrom = null; if (!drag) showTip(null); markDirty(); });
 
   let odrag = false;
-  E.cvOver.addEventListener('pointerdown', e => { odrag = true; E.cvOver.setPointerCapture(e.pointerId); setTime(overTimeAtX(e.offsetX), true); });
-  E.cvOver.addEventListener('pointermove', e => { if (odrag) setTime(overTimeAtX(e.offsetX), true); });
+  E.cvOver.addEventListener('pointerdown', e => { odrag = true; E.cvOver.setPointerCapture(e.pointerId); setTime(overTimeAtX(ex(e)), true); });
+  E.cvOver.addEventListener('pointermove', e => { if (odrag) setTime(overTimeAtX(ex(e)), true); });
   E.cvOver.addEventListener('pointerup', () => { odrag = false; });
   E.cvOver.addEventListener('pointercancel', () => { odrag = false; });
 
   E.cvMS.addEventListener('pointermove', e => {
-    if (S.msView === 'quad') { S.hoverMS = null; showTip(quadTip(e.offsetX, e.offsetY), e.clientX, e.clientY); return; }
-    const m = msAtX(e.offsetX); S.hoverMS = S.spec ? m : null; showTip(S.spec ? msTip(m) : null, e.clientX, e.clientY); markDirty();
+    if (S.msView === 'quad') { S.hoverMS = null; showTip(quadTip(ex(e), ey(e)), e.clientX, e.clientY); return; }
+    const m = msAtX(ex(e)); S.hoverMS = S.spec ? m : null; showTip(S.spec ? msTip(m) : null, e.clientX, e.clientY); markDirty();
   });
   E.cvMS.addEventListener('pointerleave', () => { S.hoverMS = null; showTip(null); markDirty(); });
   E.cvMS.addEventListener('click', e => {
@@ -1673,12 +1680,12 @@ function initUI() {
       let best = null;
       for (const o of quadIons()) {
         const q = Math.min(quadState(o.mz, S.sweep).q, QZ.qMax), px = QP.pl + q / QZ.qMax * pw, py = QP.pt + ph - Math.min(QZ.lam * q, QZ.aMax) / QZ.aMax * ph;
-        const d = Math.hypot(px - e.offsetX, py - e.offsetY); if (d < 14 && (!best || d < best.d)) best = { o, d };
+        const d = Math.hypot(px - ex(e), py - ey(e)); if (d < 14 && (!best || d < best.d)) best = { o, d };
       }
       if (best) { S.simMz = best.o.mz; syncMsView(); }
       return;
     }
-    if (!S.spec) return; const m = msAtX(e.offsetX);
+    if (!S.spec) return; const m = msAtX(ex(e));
     // 點在沒有訊號的位置就取最近的一根
     let best = m, bv = -1;
     for (let d = -2; d <= 2; d++) { const i = m + d - MZ0; if (i < 0 || i >= MZN) continue; const v = S.spec.out[i] / (1 + Math.abs(d)); if (v > bv) { bv = v; best = m + d; } }
@@ -2729,14 +2736,16 @@ function placeLensBtn(mode, want, open) {
     b.setAttribute('aria-label', open ? '收起放大鏡' : '打開' + name); b.title = open ? '收起放大鏡' : '打開' + name;
     b.style.transform = ''; b._w = b.offsetWidth; b._h = b.offsetHeight;
   }
+  // b._w、b._h 是放大前的大小;按鈕有放大(ui-scale.css)時換成螢幕上的大小來排,位移再除回去
+  const z = b.currentCSSZoom || uiScale(), bw = b._w * z, bh = b._h * z;
   let x, y;
-  if (open && G.lensRect) { x = G.lensRect.right - b._w + 6; y = G.lensRect.top - b._h + 10; }
+  if (open && G.lensRect) { x = G.lensRect.right - bw + 6; y = G.lensRect.top - bh + 10; }
   else {
     const wide = r.width / Math.max(1, r.height) > 1.45;
-    x = mode === 'ms' || !wide ? r.left + 22 : r.right - 22 - b._w;
-    y = wide ? r.bottom - 14 - b._h : r.top + 30;
+    x = mode === 'ms' || !wide ? r.left + 22 : r.right - 22 - bw;
+    y = wide ? r.bottom - 14 - bh : r.top + 30;
   }
-  b.style.transform = `translate(${Math.round(x)}px,${Math.round(y)}px)`;
+  b.style.transform = `translate(${Math.round(x / z)}px,${Math.round(y / z)}px)`;
 }
 /* ---------- 拖放大鏡、點部件放大 ---------- */
 const lensHit = (x, y) => !!(G.mag && G.mag.visible && G.lensRect && G.lensC && x >= G.lensRect.left && x <= G.lensRect.right && y >= G.lensRect.top && y <= G.lensRect.bottom);
@@ -2851,12 +2860,14 @@ function updateTags() {
       if (_v.p.z > 1 || Math.abs(_v.p.x) > 1.15 || Math.abs(_v.p.y) > 1.15) show = false;
     }
     const x = (_v.p.x + 1) / 2 * W, y = (1 - _v.p.y) / 2 * H;
+    // t.w、t.h 是放大前的大小;標籤有放大(ui-scale.css)時換成螢幕上的大小來判斷碰撞,位移再除回去
+    const tz = t.el.currentCSSZoom || uiScale(), tw = t.w * tz, th = t.h * tz;
     // 整個標籤框(從錨點往右延伸)碰到面板就不畫
     const rects = !t.lens && G.lensRect ? [...panelRects, G.lensRect] : panelRects;
-    if (show && !S.bare) for (const r of rects) if (x - 9 < r.right + 6 && x - 9 + t.w > r.left - 6 && y - t.h / 2 < r.bottom + 6 && y + t.h / 2 > r.top - 6) { show = false; break; }
+    if (show && !S.bare) for (const r of rects) if (x - 9 * tz < r.right + 6 && x - 9 * tz + tw > r.left - 6 && y - th / 2 < r.bottom + 6 && y + th / 2 > r.top - 6) { show = false; break; }
     if (t.vis !== (show ? 1 : 0)) { t.el.style.opacity = show ? '1' : '0'; t.vis = show ? 1 : 0; if (t.zoom) t.el.style.pointerEvents = show ? 'auto' : 'none'; }
     if (!show) continue;
-    t.el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-9px,-50%)`;
+    t.el.style.transform = `translate(${(x / tz).toFixed(1)}px,${(y / tz).toFixed(1)}px) translate(-9px,-50%)`;
     if (t.txtFn) { const s = t.txtFn(); if (s !== t.lastTxt) { t.lastTxt = s; t.span.textContent = s; t.w = 0; } }
     if (t.sub) { const s = t.sub(); if (s !== t.lastSub) { t.lastSub = s; if (t.em) t.em.textContent = s; t.w = 0; } }
   }
@@ -3648,7 +3659,7 @@ function xpFrame(now) {
 function xpDraw() {
   const T = XP[xp.k], cv = E.xpCv, w = cv.clientWidth, h = cv.clientHeight;
   if (w && h) {
-    const dpr = Math.min(devicePixelRatio || 1, 2), W = Math.round(w * dpr), H = Math.round(h * dpr);
+    const dpr = Math.min(devicePixelRatio || 1, 2) * (cv.currentCSSZoom || uiScale()), W = Math.round(w * dpr), H = Math.round(h * dpr);
     if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
     const c = cv.getContext('2d'), k = W / 600;
     c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, H); c.setTransform(k, 0, 0, k, 0, 0);

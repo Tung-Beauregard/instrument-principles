@@ -1,17 +1,24 @@
 /* 生化原理教材共用的版面(2026-10-26,配 bio-lesson.js)。顏色沿用入口:近黑底、薄荷綠重點、淺字。
    桌機:左邊動畫、字幕與播放列,右邊章節與「自己調整」。手機直拿:由上往下排。手機橫拿(高度 500 px 以下):
-   標題藏起來,動畫填滿左邊的高度,字幕、自己調整與章節在右邊一欄(可以捲動)。全螢幕是劇場模式(檔案最後一段)。 */
+   標題藏起來,動畫填滿左邊的高度,字幕、自己調整與章節在右邊一欄(可以捲動)。全螢幕是劇場模式(檔案最後一段)。
+   大螢幕(2K、4K,2026-11-06):整頁依 ui-scale.css 的 --ui 放大(zoom),看起來和 1080P 一樣、只是大一號;
+   zoom 裡的 vw、vh 也會放大,所以這裡用到的 100vh 都除以 var(--ui)。 */
+@import url("ui-scale.css");
 :root{color-scheme:dark;font-family:"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f0f3ee;background:#0b1111;-webkit-font-smoothing:antialiased;--line:#253430;--panel:#101818;--muted:#9caca5;--mint:#a5f3cd}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:flex;flex-direction:column}
+body{margin:0;min-height:calc(100vh / var(--ui,1));display:flex;flex-direction:column;zoom:var(--ui,1)}
 a{color:inherit}
 a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
 .skip-link{position:fixed;top:12px;left:12px;z-index:9;padding:12px 18px;background:var(--mint);color:#0b1111;transform:translateY(-160%);text-decoration:none}
 .skip-link:focus{transform:none}
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.wrap{width:min(1240px,calc(100% - 32px));margin-inline:auto}
+/* 頁面寬度跟著畫面高度(2026-11-06):動畫的高度是畫面高度扣掉上面的分頁列與標題、下面的字幕與播放列(合計約 290 px),
+   寬度依 16:9 推出來再加右欄(300 px 與間距),所以動畫、字幕與播放列一定在第一個畫面裡,螢幕越高動畫越大;
+   原本固定最寬 1240 px,1080P 時動畫只占畫面一半高,1366×768 這類矮螢幕播放列又掉到畫面外。最窄 800 px,手機照舊由 100% 限住。
+   這段高度寫在 --bio-chrome,由 bio-lesson.js 依實際版面量(動畫上方占掉的高度加 150 px,導言折成幾行都算得對);290 px 是沒有 JavaScript 時的預設值 */
+.wrap{width:min(max(800px,calc((100vh / var(--ui,1) - var(--bio-chrome,290px)) * 16 / 9 + 318px)),calc(100% - 32px));margin-inline:auto}
 /* 分頁列(生化原理這一區自己一組) */
-.nav-wrap{width:min(1240px,calc(100% - 32px));margin:12px auto 0}
+.nav-wrap{width:min(max(800px,calc((100vh / var(--ui,1) - var(--bio-chrome,290px)) * 16 / 9 + 318px)),calc(100% - 32px));margin:12px auto 0}
 .sitenav{display:flex;gap:2px;padding:3px;border-radius:10px;background:var(--panel);border:1px solid var(--line);overflow-x:auto;white-space:nowrap;max-width:max-content;scrollbar-width:none}
 .sitenav::-webkit-scrollbar{display:none}
 .sitenav a{padding:5px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--muted);text-decoration:none;flex:none}
@@ -141,9 +148,9 @@ html.bio-fs .cap{grid-area:cap;min-height:0;border:1px solid var(--line);border-
 html.bio-fs .bar{grid-area:bar}
 html.bio-fs #ops{grid-area:ops;min-height:0;overflow-y:auto;overscroll-behavior:contain}
 @media (orientation:landscape){
-  html.bio-fs main.lesson{grid-template-columns:minmax(0,1fr) clamp(160px,22vw,320px);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"stage cap" "stage ops" "stage bar";gap:8px 10px}
+  html.bio-fs main.lesson{grid-template-columns:minmax(0,1fr) clamp(160px,calc(22vw / var(--ui,1)),320px);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"stage cap" "stage ops" "stage bar";gap:8px 10px}
   html.bio-fs .stage-box{aspect-ratio:auto}
-  html.bio-fs .cap{padding:8px 10px;max-height:62vh;overflow-y:auto}
+  html.bio-fs .cap{padding:8px 10px;max-height:calc(62vh / var(--ui,1));overflow-y:auto}
   html.bio-fs .cap-tx{font-size:14px;line-height:1.55}
   html.bio-fs #ops{padding:8px 10px}
   html.bio-fs .bar{flex-wrap:wrap;gap:6px}

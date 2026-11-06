@@ -18,6 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/ui-scale.css">
 <style>
 :root{
   --bg:#0a0f13;
@@ -38,7 +39,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 
 /* 左上:標題、數值、說明 */
-.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw - 48px));pointer-events:none}
+.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw / var(--ui,1) - 48px));pointer-events:none}
 .hud::before{content:'';position:absolute;left:-80px;top:-60px;width:620px;height:300px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 25% 35%,rgba(10,15,19,.72),rgba(10,15,19,0) 70%)}
 .hud .k{display:block;font-weight:900;font-size:28px;letter-spacing:.02em;line-height:1.1}
 .hud .big{display:block;font-weight:900;font-size:44px;line-height:1.12;color:var(--cyan);text-shadow:0 0 22px rgba(116,228,255,.35)}
@@ -52,7 +53,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)}
 
 /* 網站分頁(和離子阱質譜、GC-MS 兩頁共用) */
-.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw / var(--ui,1) - 48px);overflow-x:auto;scrollbar-width:none}
 .sitenav::-webkit-scrollbar{display:none}
 .sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
 .sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
@@ -92,7 +93,7 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border:0;border-radiu
 .help .fine{color:var(--muted);font-size:11.5px;margin:0}
 
 /* 底部:光譜螢幕 */
-.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw - 32px));padding:11px 14px 9px}
+.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw / var(--ui,1) - 32px));padding:11px 14px 9px}
 .con-head{display:flex;align-items:baseline;gap:10px;font-size:12.5px;margin-bottom:4px;white-space:nowrap}
 .con-head b{font-weight:700}
 .con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
@@ -120,7 +121,7 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border:0;border-radiu
 .lbl span{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
 
 /* 導覽與影片 */
-.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw - 40px));text-align:center;padding:13px 26px 15px}
+.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw / var(--ui,1) - 40px));text-align:center;padding:13px 26px 15px}
 .cap .chap{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.16em;margin-bottom:5px}
 .cap .txt{font-size:18px;line-height:1.6;font-weight:500}
 .titlecard{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,15,19,.66) 0%,rgba(10,15,19,.4) 40%,rgba(10,15,19,0) 70%)}
@@ -210,6 +211,17 @@ html.mp .m.big b.n{font-size:20px}
   html.mp .chip{padding:3px 8px 4px}
   html.mp .chip b{font-size:13px}
 }
+/* 桌機小螢幕(1024×768、1366×768 這類,2026-11-06):導言收起來、譜圖矮一點,面板讓出空間給 3D;3D 主角移到面板之間的空地
+   (../assets/free-view.js,在這些尺寸與 761 到 980 px 的平板作用)。980 px 以下照原本的窄版,手機照 html.mp */
+@media (min-width:981px) and (max-width:1279px),(min-width:981px) and (max-height:899px){
+  .lede{display:none}
+  #plot{height:120px}
+}
+/* 大螢幕(2K、4K)的放大(2026-11-06,見 ../assets/ui-scale.css):面板、字幕、片頭字卡、比較表與元件標籤依 --ui 放大,
+   3D 畫布與 CSS2D 標籤的定位層不放大(.lbl 在定位用的 .lw 裡面,.blbl 本身就是定位的元素,所以只放大字)。
+   放大的元素裡寫的 vw、vh 都已除以 var(--ui) */
+.hud,.load,.ctl,.help,.console,.foot,.cap,.titlecard,#tourExit,.cmp,.lbl{zoom:var(--ui,1)}
+.blbl{font-size:calc(14px * var(--ui,1))}
 </style>
 <script type="importmap">
 {"imports":{
@@ -293,9 +305,10 @@ html.mp .m.big b.n{font-size:20px}
 <button class="btn" id="tourExit">結束導覽</button>
 
 <script type="module">
-import { createQualityControls } from '../assets/render-quality.js';
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
 import { createMobilePanels } from '../assets/mobile-panels.js';
+import { createFreeView } from '../assets/free-view.js';
 const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -1128,7 +1141,7 @@ function drawPlot() {
   const now = performance.now();
   if (!REC && now - plotDrawnAt < 1000 / 30) return;
   plotDrawnAt = now;
-  const dpr = REC ? 1 : Math.min(devicePixelRatio, 2), w = plot.clientWidth, h = plot.clientHeight;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (plot.currentCSSZoom || uiScale()), w = plot.clientWidth, h = plot.clientHeight; // 面板放大時多畫幾倍像素
   if (!w) return;
   if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
   const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
@@ -1200,11 +1213,11 @@ function valueAt(l) {
 }
 plot.addEventListener('pointermove', e => {
   const m = plot._map; if (!m) return;
-  const r = plot.getBoundingClientRect(), px = e.clientX - r.left;
+  const r = plot.getBoundingClientRect(), pz = plot.currentCSSZoom || uiScale(), px = (e.clientX - r.left) / pz;
   if (px < m.Lp || px > m.Lp + m.pw) { hoverL = null; tip.style.display = 'none'; return; }
   hoverL = m.x0 + (px - m.Lp) / m.pw * (m.x1 - m.x0);
   const v = valueAt(hoverL);
-  tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${e.clientY - r.top}px`;
+  tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${(e.clientY - r.top) / pz}px`;
   tip.textContent = `${hoverL.toFixed(1)} nm · 吸光度 ${v.a.toFixed(3)} · ${v.tag}`;
 });
 plot.addEventListener('pointerleave', () => { hoverL = null; tip.style.display = 'none'; });
@@ -1297,7 +1310,9 @@ function interactive(dt, now) {
   W.labels = null; W.conOp = 1; W.cap = null; W.title = W.outro = 0;
 }
 // 手機版:3D 的投影中心移到標題與停靠區之外的空地(mp.applyView,導覽與影片時不作用)
-function render() { mp.applyView(camera); composer.render(); labelR.render(scene, camera); }
+// 桌機小螢幕(1024×768 這類):3D 的投影中心移到面板之間最大的空地(../assets/free-view.js);手機、導覽與影片不作用
+const fv = createFreeView({ panels: ['.hud', '#ctl', '#console', '#help'], active: () => !FILM && !tour.on });
+function render() { if (!mp.applyView(camera)) fv.apply(camera); composer.render(); labelR.render(scene, camera); }
 function resize() {
   const w = innerWidth, h = innerHeight;
   DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);

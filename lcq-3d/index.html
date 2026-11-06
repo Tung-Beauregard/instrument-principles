@@ -19,6 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="../assets/ui-scale.css">
 <style>
 /* 版面:整個視窗是一張實驗桌,左上是標題與讀值,右上是儀器控制,下方是穩定圖與質譜兩個示波窗。
    單一深色場景(和原網站一樣只做暗色),所有顏色都從下列 token 取用。 */
@@ -76,7 +77,7 @@ button { font: inherit; color: inherit; }
 /* ---------- 左上:標題、讀值、說明 ---------- */
 .side {
   position: absolute; top: 20px; left: 20px;
-  width: min(330px, 42vw);
+  width: min(330px, 42vw / var(--ui,1));
   display: flex; flex-direction: column; gap: 10px;
   pointer-events: none;
 }
@@ -207,8 +208,8 @@ button { font: inherit; color: inherit; }
   pointer-events: auto; touch-action: none; cursor: move;
 }
 .cap i { font: 500 12px/1.2 var(--f-mono); letter-spacing: 0.12em; color: var(--ion); font-style: normal; }
-.cap b { font: 500 clamp(17px, 1.9vw, 26px)/1.45 var(--f-zh); color: var(--fg); text-wrap: balance; }
-.cap span { font: 400 clamp(13px, 1.2vw, 17px)/1.6 var(--f-zh); color: var(--fg-2); text-wrap: pretty; }
+.cap b { font: 500 clamp(17px, 1.9vw / var(--ui,1), 26px)/1.45 var(--f-zh); color: var(--fg); text-wrap: balance; }
+.cap span { font: 400 clamp(13px, 1.2vw / var(--ui,1), 17px)/1.6 var(--f-zh); color: var(--fg-2); text-wrap: pretty; }
 .cap span:empty { display: none; }
 
 /* ---------- 浮動資訊框:拖動(上緣把手或框面)與縮放(右下角) ---------- */
@@ -244,7 +245,7 @@ button { font: inherit; color: inherit; }
   padding-inline: 16px;
 }
 .modal .card {
-  position: relative; width: min(620px, 100%); max-height: min(78vh, 760px); overflow: auto;
+  position: relative; width: min(620px, 100%); max-height: min(78vh / var(--ui,1), 760px); overflow: auto;
   border-radius: 18px; padding: 22px 24px 20px; background: var(--glass-hi); border: 1px solid var(--line);
   box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
 }
@@ -405,6 +406,10 @@ html.mp #app.cine #pSpec{right:calc(12px + env(safe-area-inset-right, 0px));top:
 html.mp #app.cine .cap{left:calc((100% - var(--scol)) / 2);max-width:calc(100% - var(--scol) - 24px);bottom:calc(8px + env(safe-area-inset-bottom, 0px));padding:8px 16px 10px}
 @media (max-height:290px){html.mp #app.cine{--sfs:0.55}}
 @media (min-width:1101px){html.mp #app.cine{--scol:calc(352px * var(--sfs) + 24px)}}
+/* 大螢幕(2K、4K)的放大(2026-11-06,見 ../assets/ui-scale.css):分頁列、浮動資訊框、說明、提示與視窗依 --ui 放大,3D 與上層畫布不放大
+   (畫布上的零件標籤由 drawLabels 依 --ui 放大)。浮動資訊框的位置是 JS 用螢幕像素存的,寫進 left、top 時除以 currentCSSZoom;
+   放大的元素裡的 vw、vh 都已除以 var(--ui) */
+#sitenav,.side,.ctl,.scope,.cap,.hint,.modal,.recbox,.toast{zoom:var(--ui,1)}
 </style>
 <link rel="stylesheet" href="../assets/render-quality.css">
 <link rel="stylesheet" href="../assets/mobile-panels.css">
@@ -494,9 +499,10 @@ html.mp #app.cine .cap{left:calc((100% - var(--scol)) / 2);max-width:calc(100% -
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"}}
 </script>
 <script type="module">
-import { createQualityControls } from '../assets/render-quality.js';
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
 import { createRotateHint, createMobilePanels } from '../assets/mobile-panels.js';
+import { createFreeView } from '../assets/free-view.js';
 const quality = createQualityControls({ host: '.ctl', onChange: () => onResize() });
 const BUILD = {"target":"site","canExport":true};
 // ==== 00_core.js ====
@@ -3251,10 +3257,10 @@ function renderScene() {
 function drawUIOverlay() {
   const W = ovCanvas.width, H = ovCanvas.height, dpr = VIEW.dpr;
   ovCtx.clearRect(0, 0, W, H);
-  drawLabels(ovCtx, W, H, dpr, UI.hover);
+  drawLabels(ovCtx, W, H, dpr * uiScale(), UI.hover); // 大螢幕的標籤跟著介面放大(ui-scale.css)
   if (TOUR.on) {
     // 字幕與示波窗改用可拖動的 DOM 資訊框;畫布上只畫左上角標題
-    const s = dpr * clamp(H / dpr / 1080, 0.62, 1.3) * 1.75;
+    const s = dpr * clamp(H / dpr / 1080, 0.62, Math.max(1.3, uiScale())) * 1.75;
     const st = tourState();
     drawBug(ovCtx, W, H, s, st.bug);
     updateTourDom(st);
@@ -3271,6 +3277,7 @@ function frame(now) {
   tick(dt);
   if (!TOUR.on) camera.fov = fitFov(30);
   if (!TOUR.on && !FLY.on) { nav?.step(dt); controls.update(); }
+  fv.apply(camera); // 桌機與平板:3D 的投影中心移到資訊框之間的空地(手機、導覽與錄影時不作用)
   mp.applyView(camera); // 手機橫拿:3D 的投影中心移到標題與停靠區之外的空地(導覽與錄影時不作用)
   renderScene();
   drawUIOverlay();
@@ -3328,10 +3335,11 @@ function applyFloat(id) {
     return;
   }
   el.classList.add('pinned');
-  const a = app.getBoundingClientRect();
-  el.style.left = `${st.x}px`; el.style.top = `${st.y}px`;
+  // st.x、st.y 是螢幕像素;資訊框有放大(ui-scale.css)時 left、top 也會被放大,所以除以倍數。st.w 是放大前的寬度
+  const a = app.getBoundingClientRect(), z = el.currentCSSZoom || uiScale();
+  el.style.left = `${st.x / z}px`; el.style.top = `${st.y / z}px`;
   el.style.right = 'auto'; el.style.bottom = 'auto';
-  if (st.w) el.style.width = `${Math.min(st.w, Math.max(160, a.width - 32))}px`;
+  if (st.w) el.style.width = `${Math.min(st.w, Math.max(160, a.width / z - 32))}px`;
   el.style.setProperty('--tx', '0px');
   el.style.setProperty('--to', '0 0');
   el.style.setProperty('--fs', String(st.s));
@@ -3341,7 +3349,7 @@ function pinFloat(id) {
   const f = FLOATS.get(id), r = f.el.getBoundingClientRect(), a = app.getBoundingClientRect();
   const s = parseFloat(getComputedStyle(f.el).getPropertyValue('--fs')) || 1;
   // 固定寬度,避免改用左上角定位後內容重新換行;字幕內容會換,所以不固定
-  const w = f.fixWidth ? Math.ceil(r.width / s) + 1 : 0;
+  const w = f.fixWidth ? Math.ceil(r.width / s / (f.el.currentCSSZoom || uiScale())) + 1 : 0;
   floatState[id] = { x: r.left - a.left, y: r.top - a.top, s, w };
   applyFloat(id);
 }
@@ -3618,6 +3626,9 @@ const mp = createMobilePanels({
   suspended: () => TOUR.on || EXPORT.active,
   panels: [{ el: '.ctl', icon: 'adjust', label: '調整', items: '掃描模式、機身、交流電壓、自動循環、導覽、錄影、原理、重設版面、畫質' }],
 });
+// 3D 的投影中心移到資訊框之間最大的空地(../assets/free-view.js);資訊框拖動後跟著重量。這一頁連 1080P 時左上的說明都會擋到
+// 左端的噴霧室,所以桌機與平板一律作用(預設只在小螢幕);手機直拿照原本的排法,橫拿由 mp.applyView 處理
+const fv = createFreeView({ panels: ['#sitenav', '.side', '.ctl', '#pStab', '#pSpec'], active: () => !TOUR.on && !EXPORT.active && !mp.active(), query: '(min-width: 761px)' });
 boot();
 // 手機直拿時建議轉成橫式(../assets/mobile-panels.js 的 createRotateHint);導覽與錄影時不出現
 createRotateHint({ top: '.stats', suspended: () => TOUR.on || EXPORT.active });

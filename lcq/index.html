@@ -25,6 +25,7 @@
     if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
   })();
 </script>
+<link rel="stylesheet" href="../assets/ui-scale.css">
 <style>
 :root{
   --font:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
@@ -57,7 +58,7 @@ button,select,input{font:inherit;color:inherit}
 body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!important}
 /* 網站分頁:各教材互相切換;離子阱質譜一組有「動畫講解」(本頁)與「拆開探索」(../lcq-3d/)兩個畫面。
    分頁列在窄螢幕要能橫向捲動,畫質選單放在分頁列外面(#qhost),才不會被捲動範圍裁掉 */
-#topnav{position:fixed;left:16px;top:16px;z-index:11;display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:calc(100vw - 32px);pointer-events:none}
+#topnav{position:fixed;left:16px;top:16px;z-index:11;display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:calc(100vw / var(--ui,1) - 32px);pointer-events:none}
 #topnav>*{pointer-events:auto}
 #sitenav{display:flex;gap:2px;padding:3px;border-radius:11px;background:var(--panel);border:1px solid var(--line);
   -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow);max-width:100%;overflow-x:auto;scrollbar-width:none}
@@ -166,7 +167,7 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!importa
   .icon{width:34px;height:34px}
   #labBtn{padding:0 10px}
   #lab{left:8px;right:8px;top:auto;bottom:66px;width:auto;max-height:46%}
-  #topnav{left:8px;top:8px;max-width:calc(100vw - 16px)}
+  #topnav{left:8px;top:8px;max-width:calc(100vw / var(--ui,1) - 16px)}
   #hint{top:102px}
 }
 @media (prefers-reduced-motion: reduce){
@@ -177,6 +178,9 @@ body.rec #bar,body.rec #lab,body.rec #hint,body.rec #topnav{display:none!importa
    字幕往下、儀器面板往上,用整個畫面;點一下、移動滑鼠或按任一鍵就回來。暫停、操作台與錄影時不收 */
 #topnav,#bar{transition:opacity .35s}
 html.immersive #topnav,html.immersive #bar,html.immersive #topnav>*{opacity:0;pointer-events:none}
+/* 大螢幕(2K、4K)的放大(2026-11-06,見 ../assets/ui-scale.css):分頁列、播放列、提示框、操作台、說明視窗與載入畫面依 --ui 放大;
+   字幕與片頭畫在畫布上,本來就跟著畫面大小縮放。提示框是 JS 用螢幕像素擺的,擺放時除以 currentCSSZoom;放大的元素裡的 vw、vh 都已除以 var(--ui) */
+#topnav,#bar,#tip,#lab,#about,#hint,#loading{zoom:var(--ui,1)}
 </style>
 <script type="importmap">
 {
@@ -300,7 +304,7 @@ html.immersive #topnav,html.immersive #bar,html.immersive #topnav>*{opacity:0;po
 <div id="loading"><div class="box"><b>離子阱質譜原理</b><span>正在載入立體模型</span><div class="bar"><i></i></div></div></div>
 
 <script type="module">
-import { createQualityControls } from '../assets/render-quality.js';
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
 import { createCameraNav } from '../assets/camera-nav.js';
 import { createRotateHint } from '../assets/mobile-panels.js';
 const quality = createQualityControls({ host: '#qhost', onChange: () => resize() });
@@ -2942,9 +2946,10 @@ rail.addEventListener('pointermove', (e) => {
   const t = railTime(e.clientX), ch = CHAPTERS[chapterAt(t)];
   tip.textContent = `${ch.title}  ${fmtT(t)}`;
   tip.style.display = 'block';
-  const r = tip.getBoundingClientRect();
-  tip.style.left = `${clamp(e.clientX - r.width / 2, 8, innerWidth - r.width - 8)}px`;
-  tip.style.top = `${rail.getBoundingClientRect().top - r.height - 10}px`;
+  // 提示框有放大(ui-scale.css)時,left、top 也跟著放大,所以寫進去的是螢幕像素除以倍數
+  const r = tip.getBoundingClientRect(), z = tip.currentCSSZoom || uiScale();
+  tip.style.left = `${clamp(e.clientX - r.width / 2, 8, innerWidth - r.width - 8) / z}px`;
+  tip.style.top = `${(rail.getBoundingClientRect().top - r.height - 10) / z}px`;
 });
 rail.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
 rail.addEventListener('keydown', (e) => {

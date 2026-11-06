@@ -254,6 +254,13 @@ HTML：`#gl`（3D 畫布）、`#tags`（3D 標籤層）、`#lensBtn`（放大鏡
 - 3D 的取景本來就跟著 `#hole` 的大小（`updateViewOffset()` 的 ResizeObserver），收合不用另外處理。
 - 桌機與平板不符合上面的判斷，不加任何 class，版面和以前相同；`scripts/check-mobile-panels.mjs` 檢查接線。
 
+## 畫面大小：大螢幕放大（2026-11-06）
+
+- 使用者要求 1024×768、1080P、2K、4K 都看得清楚主體，做法見 README「畫面大小」。這一頁載入 `../assets/ui-scale.css`；CSS 最後一行把整片面板格線 `.hud`（含 `#hole`）、3D 標籤 `.tag`、放大鏡按鈕 `.lens-btn`、提示框 `.tip`、說明與動畫視窗 `.modal`、載入提示 `.load` 套上 `zoom: var(--ui,1)`，2K、4K 看起來和 1080P 一樣、只是大一號；3D 畫布 `#gl` 不放大。主角投影在 `#hole` 正中央的做法不變（`#hole` 用 `getBoundingClientRect()` 量，已是螢幕像素），小螢幕也照這樣，所以不另外接 `free-view.js`。
+- JS 用螢幕像素擺的元素，寫位移時除以 `currentCSSZoom`：`updateTags()` 的標籤（碰撞判斷用 `tw`、`th`，也就是 `t.w`、`t.h` 乘上倍數）、`placeLensBtn()` 的按鈕（`bw`、`bh`）、`showTip()` 的提示框。2026-11-06 實測：「ALS 自動進樣器」標籤在 3840×2160 的位置剛好是 1920×1080 的兩倍。
+- 圖表：`fitCanvas()` 與動畫說明 `xpDraw()` 的實際像素乘上 `currentCSSZoom`；`initUI()` 裡層析圖、總覽與質譜的滑鼠事件改用 `ex(e)`、`ey(e)`（`offsetX`、`offsetY` 是螢幕像素，除以 `currentCSSZoom`）。2026-11-06 實測：時間固定在 12 min，1920×1080 與 3840×2160 指在層析圖同一個相對位置都讀到 11.12 min，質譜都讀到 m/z 126。
+- 主樣式表的 vw、vh 除以 `var(--ui,1)`（手機的 `html.mp` 規則除外）；沒有 `currentCSSZoom` 的瀏覽器改用 `uiScale()`（`../assets/render-quality.js`）。3D 的解析度：自動與完整模式的像素預算乘上 `--ui` 的平方，4K 時接近每個 CSS 像素畫一點（60 FPS，RTX 2080 SUPER）。
+
 ## 修改後要檢查
 
 - 手機尺寸（390×844、844×390，以及實機橫拿的 742×298，觸控）：三條細條有名稱與內容說明、預設收起；「說明」展開說明框、「層析圖・質譜」展開圖、「調整」打開設定面板；收起時播放鈕在細條上；導覽中細條藏起來、主控台和原本一樣高，結束後回到原本的狀態；詳見 `docs/VALIDATION.md` 的「手機版面板收合」。

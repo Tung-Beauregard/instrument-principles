@@ -238,7 +238,25 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     g.boost = Math.min(1.3, Math.max(1, 0.5 / (view.s / dpr)));
   }
   new ResizeObserver(resize).observe(canvas);
+  // 大螢幕的放大倍數(ui-scale.css 的 --ui)換一級時,畫布在版面上的大小可能沒變、只有螢幕上的大小變了,
+  // ResizeObserver 不一定通知,所以視窗大小改變時也重量一次
+  addEventListener('resize', resize);
   resize();
+  // 頁寬跟著畫面高度(bio-lesson.css 的 --bio-chrome,2026-11-06):動畫上方實際占掉的高度(分頁列、標題與折成幾行的導言)
+  // 依版面量,下方的字幕、播放列與底部留白固定算 150 px(字幕的最小高度;講解中字幕長短變化,動畫不會跟著縮放)。
+  // 導言比較長、或分頁列與標題被藏起來(例如截分享預覽圖)時,動畫照樣剛好放得下;寬度變窄讓導言多折一行時會再量一次
+  const stageBox = canvas.closest('.stage-box') || canvas, rootEl = document.documentElement;
+  let chromeSet = null;
+  function fitChrome() {
+    if (rootEl.classList.contains('bio-fs')) return;
+    const z = stageBox.currentCSSZoom || parseFloat(getComputedStyle(rootEl).getPropertyValue('--ui')) || 1;
+    const c = Math.round((stageBox.getBoundingClientRect().top + scrollY) / z + 150);
+    if (chromeSet === null || Math.abs(c - chromeSet) > 2) { chromeSet = c; rootEl.style.setProperty('--bio-chrome', `${c}px`); }
+  }
+  const chromeRo = new ResizeObserver(() => fitChrome());
+  for (const sel of ['.nav-wrap', 'header.top']) { const el = document.querySelector(sel); if (el) chromeRo.observe(el); }
+  addEventListener('resize', fitChrome);
+  fitChrome();
   // 點畫面:章節有 pointer(type, x, y, S) 時,把 down / move / up 換成邏輯座標交給它;傳回 true 表示使用者動過(這一章播完停住)
   let dragging = false;
   const pointer = (type, e) => {

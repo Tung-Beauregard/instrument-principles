@@ -29,6 +29,8 @@ assets/
   app.js                   教材清單載入、到站人數
   render-quality.js        教材共用畫質、幀率上限與可選效能顯示
   render-quality.css       畫質選單
+  ui-scale.css             大螢幕的介面放大（2K、4K）：依畫面大小定義放大倍數 `--ui`，以 1080P 的瀏覽器視窗為 1 倍
+  free-view.js             桌機小螢幕（1024×768 這類）的取景：3D 主角移到面板之間最大的空地
   camera-nav.js            教材共用的視角操作：滾輪、觸控板、方向鍵與 WASD
   mobile-panels.js         手機版的面板收合：控制面板、譜與說明收成畫面右緣的「‹」把手，點了才彈出；全螢幕鈕；直拿時建議轉成橫式；分頁列排不下時捲到目前這一頁
   mobile-panels.css        右緣把手、停靠區與轉向提示的樣式（只在手機尺寸作用）
@@ -87,6 +89,7 @@ scripts/check-fields.mjs   四種電場示意的物理（穩定條件、射出�
 scripts/make-og-images.mjs 重產 assets/og/ 的分享預覽圖（用本機的 Chrome 或 Edge 無頭截圖）
 scripts/check-plot.mjs     數據畫圖的讀檔與畫圖檢查（在程式裡合成各種格式的小檔案，不需要真實數據）
 scripts/check-bio.mjs      生化原理、生化進階與官能基編號每一頁的接線檢查：共用播放器、必要元素、分頁列順序、章節代號、module 語法、維護說明
+scripts/check-ui-scale.mjs 畫面大小的檢查：放大的級距、每一頁的接線、放大的面板裡 vw 與 vh 都除以 `--ui`、小螢幕取景的空地
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
 INSTRUMENTS.md             各儀器功能、數據與示意說明
@@ -137,6 +140,7 @@ node scripts/check-mobile-panels.mjs
 node scripts/check-fields.mjs
 node scripts/check-plot.mjs
 node scripts/check-bio.mjs
+node scripts/check-ui-scale.mjs
 ```
 
 另需實際檢查：桌面與手機入口排版、每份教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
@@ -167,9 +171,18 @@ node scripts/make-og-images.mjs http://127.0.0.1:8000/
 
 維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)；生化原理：[中心法則](./central-dogma/MAINTENANCE.md)、[PCR 與電泳](./pcr/MAINTENANCE.md)、[DNA 定序](./sequencing/MAINTENANCE.md)、[DNA 鑑定](./dna-markers/MAINTENANCE.md)、[基因選殖](./cloning/MAINTENANCE.md)、[萜類合成酶](./terpene-synthase/MAINTENANCE.md)、[CRISPR](./crispr/MAINTENANCE.md)、[抗體檢測](./immunoassay/MAINTENANCE.md)、[流式細胞儀](./flow-cytometry/MAINTENANCE.md)、[蛋白質定序](./proteomics/MAINTENANCE.md)；生化進階：[轉錄體分析](./transcriptomics/MAINTENANCE.md)、[萜類前驅物](./terpenoid-precursors/MAINTENANCE.md)、[酵素動力學](./enzyme-kinetics/MAINTENANCE.md)、[族群遺傳與產地鑑定](./population-genetics/MAINTENANCE.md)、[演化樹](./phylogenetics/MAINTENANCE.md)、[在植物裡驗證基因功能](./gene-function/MAINTENANCE.md)；官能基編號：[有機化學命名法則](./nomenclature/MAINTENANCE.md)、[醣類](./carbohydrates/MAINTENANCE.md)、[木材三大成分](./wood-components/MAINTENANCE.md)。
 
+## 畫面大小（1024×768 到 4K）
+
+使用者 2026-11-06 要求 1024×768、1080P、2K、4K 都要看得清楚主體。
+
+- 大螢幕：`assets/ui-scale.css` 依畫面大小定義放大倍數 `--ui`。基準是 1080P 螢幕上放到最大的瀏覽器視窗（約 1920×950），寬與高都比它大時一級一級放大（每級 1/6 倍），2K（2560×1440）是 1.33 倍，4K（3840×2160）是 2 倍，最多 3 倍；比基準小一律 1 倍。2D 教材（`bio-lesson.css`）、入口（`styles.css`）與數據畫圖整頁套 `zoom: var(--ui)`，看起來和 1080P 一樣、只是大一號；3D 教材只放大面板、字幕、片頭字卡與元件標籤，3D 畫布照視窗大小。畫質的像素預算在「自動」與「完整」乘上 `--ui` 的平方（`render-quality.js`），4K 時 3D 也接近每個 CSS 像素畫一點（原本只畫一半，邊緣有鋸齒）；「流暢」不變，留給較弱的顯示卡。
+- 2D 教材的頁面寬度跟著畫面高度：動畫的高度是畫面高度扣掉上方實際占掉的高度（分頁列、標題與折成幾行的導言，由播放器量）和下方的字幕、播放列與留白（150 px），寬度依 16:9 推出來，所以動畫、字幕與播放列一定在第一個畫面裡。1920×950 的視窗時動畫從 922×519 放大到約 1184×666；1366×768 這類矮螢幕播放列不再掉到畫面外。
+- 小螢幕：寬 981 到 1279 px、或高不到 900 px 的桌機視窗（手機照 `mobile-panels.js`），UV-Vis、NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC 收起導言、譜圖矮一點，3D 主角的投影中心移到面板之間最大的空地（`assets/free-view.js`，空地小時稍微拉遠，鏡頭位置不動）；拆開探索在桌機與平板一律這樣取景，因為 1080P 時左上的說明也會擋到左端的噴霧室。GC-MS 原本就把主角放在面板之間的空地，動畫講解的介面只有上下兩條，這兩頁不另外取景。導覽與影片都不受影響。
+- 維護時：新加的面板、字幕或標籤要套 `zoom: var(--ui,1)`；放大的元素裡 `vw`、`vh` 會跟著放大，要寫成 `100vh / var(--ui,1)` 這種形式；面板裡的畫布用 `currentCSSZoom` 多畫幾倍像素，滑鼠座標（含 `offsetX`）除回去；JS 用像素擺放的元素（提示框、標籤、浮動資訊框）寫 `left`、`top`、`translate` 時除以 `currentCSSZoom`，沒有這個屬性的瀏覽器改用 `--ui` 的值（`render-quality.js` 的 `uiScale()`）。`scripts/check-ui-scale.mjs` 會檢查接線。
+
 ## 生化原理的播放器
 
-生化原理的十頁、生化進階的六頁與官能基編號的三頁共用 `assets/bio-lesson.js`：每頁只寫章節（名稱、長度、字幕時間點、畫面）與「自己調整」的選項，播放、暫停、上一章與下一章、進度條、章節清單、字幕、全螢幕與網址 `#章節代號` 都由播放器處理。畫布用 960 × 540 的邏輯座標，依畫面大小等比例縮放；手機上畫面很小時字會放大一些（最多 1.3 倍）。使用者動過選項或點過畫面，這一章播完就停住，不自動跳下一章。鍵盤：空白鍵播放或暫停、左右鍵換章。偏好減少動態效果時不自動播放；手機上開頁也不自動播放（見下一段）。
+生化原理的十頁、生化進階的六頁與官能基編號的三頁共用 `assets/bio-lesson.js`：每頁只寫章節（名稱、長度、字幕時間點、畫面）與「自己調整」的選項，播放、暫停、上一章與下一章、進度條、章節清單、字幕、全螢幕與網址 `#章節代號` 都由播放器處理。畫布用 960 × 540 的邏輯座標，依畫面大小等比例縮放；頁面寬度跟著畫面高度，動畫、字幕與播放列一定在第一個畫面裡，2K、4K 時整頁放大（2026-11-06，見「畫面大小」）；手機上畫面很小時字會放大一些（最多 1.3 倍）。使用者動過選項或點過畫面，這一章播完就停住，不自動跳下一章。鍵盤：空白鍵播放或暫停、左右鍵換章。偏好減少動態效果時不自動播放；手機上開頁也不自動播放（見下一段）。
 
 版面：桌機畫面在左、選項與章節在右；手機直拿是單欄，選項排在畫面下方；手機橫拿（高度 500 px 以下）畫面在左，字幕、選項與章節在右邊一欄，頁首收起。播放列最右邊是全螢幕鈕：全螢幕時是劇場模式，只留動畫、字幕、播放列與「自己調整」，動畫盡量大，手機上會自動轉成橫的。手機上講解一律全螢幕（使用者 2026-10-31 要求）：開頁不自動播放，動畫中間有「開始講解」；按它、播放鈕、章節清單、進度列或「自己調整」開始播放時先進全螢幕，離開全螢幕（全螢幕鈕或返回鍵）就暫停，講解不在頁面裡的小框播。iPhone 的 Safari 不支援網頁全螢幕，改用同一套劇場版面蓋滿瀏覽器的畫面（網址列還在，也不能替使用者轉向），所以手機上一定有全螢幕鈕。手機直拿與一般橫拿時，動畫都被約 200 px 的高度限住（Galaxy S23 Ultra 實測，圖上 13 單位的字約 6.3 px），全螢幕時放大到約 7.9 px；觸控手機直拿時提示一次「按播放會全螢幕」（不能網頁全螢幕的瀏覽器另外建議把手機轉成橫的），提示排在播放列下面，不擋播放鈕。
 
