@@ -61,6 +61,13 @@
 
 ## 更新紀錄
 
+### 2026-11-06：推送與部署確認（動畫講解的 4K 解析度）
+
+- 提交 `55cd61b`，以 fast-forward 推送到 `main`（推送前 `git fetch` 確認遠端仍是 `663102b`）。
+- 通過：GitHub Actions 的 `pages build and deployment` 成功；正式網址上這次改到的 6 個檔（`lcq/index.html`、`lcq/MAINTENANCE.md`、`scripts/check-ui-scale.mjs`、`README.md`、`docs/VALIDATION.md`、`docs/HANDOFF.md`）都和提交的版本完全相同（比對 SHA-256）。
+- 通過：無頭 Chrome 開正式網址的 `lcq/?perf=1`（先標記已計數，並擋掉計數網址）：3840×2160 是 60 FPS、DPR 0.98，3D 畫布 3771×2121（修正前 2458×1382）；1920×1080 是 59 FPS、DPR 0.98；沒有 console 錯誤。
+- 未執行：實體 4K 螢幕、Safari、Firefox。
+
 ### 2026-11-06：推送與部署確認（畫面大小），修正動畫講解的 4K 解析度
 
 - 提交 `663102b`，以 fast-forward 推送到 `main`（推送前 `git fetch` 確認遠端仍是 `9b9576a`）。
