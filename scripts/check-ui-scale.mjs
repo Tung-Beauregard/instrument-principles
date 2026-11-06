@@ -40,6 +40,10 @@ for (const l of LESSONS3D) {
   }
   // 面板裡的畫布、提示框或標籤要用 currentCSSZoom 換算(畫布多畫幾倍像素、滑鼠座標除回來)
   assert.ok(/currentCSSZoom|uiScale\(\)/.test(html), `${l}: 要依放大倍數換算畫布或座標`);
+  // 頁面自己另設的每格像素上限(動畫講解的 resize())也要乘上 --ui 的平方,寫死的話 4K 只畫一部分解析度
+  for (const m of html.matchAll(/pr \* pr > ([^)]+)\)/g)) {
+    assert.ok(!/^[\d.e]+$/.test(m[1].trim()), `${l}: 每格的像素上限 ${m[1].trim()} 是寫死的,要乘上 uiScale() 的平方`);
+  }
 }
 assert.match(read('assets/bio-lesson.css'), /@import url\("ui-scale\.css"\);[\s\S]*body\{[^}]*zoom:var\(--ui,1\)/, '2D 教材的 bio-lesson.css 要匯入 ui-scale.css 並放大整頁');
 assert.match(read('assets/styles.css'), /@import url\("ui-scale\.css"\);[\s\S]*body \{[^}]*zoom: var\(--ui, 1\)/, '入口的 styles.css 要匯入 ui-scale.css 並放大整頁');

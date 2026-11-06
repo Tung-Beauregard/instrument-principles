@@ -3315,7 +3315,9 @@ function resize(prOverride) {
   quality.configure(renderer, composer, bloom, { ao: gtao });
   view.ao = gtao.enabled;
   let pr = prOverride ?? quality.pixelRatio(w, h, 2);
-  if (w * h * pr * pr > 3.4e6) pr = Math.sqrt(3.4e6 / (w * h));
+  // 每格最多約 340 萬像素(和完整模式的預算相同),大螢幕跟著 --ui 的平方放大,4K 才接近每個 CSS 像素畫一點
+  const cap = 3.4e6 * Math.max(1, uiScale()) ** 2;
+  if (w * h * pr * pr > cap) pr = Math.sqrt(cap / (w * h));
   setRenderSize(w, h, pr);
   const barH = $('#bar').getBoundingClientRect().height + 22;
   ovResize(w, h, pr, barH, $('#topnav').getBoundingClientRect());
