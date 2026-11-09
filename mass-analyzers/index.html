@@ -2,8 +2,9 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>質譜儀-不同分析器比較</title>
+<title data-en="Mass spectrometers: comparing analyzers">質譜儀-不同分析器比較</title>
 <meta name="description" content="用 3D 模型和簡圖比較質譜儀的四種分法:四極柱、離子阱、飛行時間與 Orbitrap。同一組離子,看它們各自怎麼依 m/z(質量除以電荷)分開,誰分得比較細、量得比較準、比較快。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="儀器原理">
@@ -154,11 +155,13 @@ html.touring .ctl,html.touring .help,html.touring .lede,html.touring .sk-txt,htm
 html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
 html.touring .titlecard{display:flex}
 html.touring .cap.withcon{bottom:250px}
-/* 寬螢幕導覽:譜和影片一樣放右上角,鏡頭的構圖才不會被擋住;結束鈕移到上方中間 */
+/* 寬螢幕導覽:譜和影片一樣放右上角,鏡頭的構圖才不會被擋住;結束鈕在右上角,譜從它下面開始。
+   2026-11-09 以前結束鈕放在上方中間、譜貼齊頂端:分頁列比半個畫面寬時(1600 px 以下的視窗)結束鈕壓在分頁列上,
+   1280 px 以下譜也蓋到分頁列的尾端 */
 @media (min-width:1100px) and (min-aspect-ratio:4/3){
-  html.touring .console{left:auto;right:24px;top:20px;bottom:auto;transform:none;width:min(640px,42vw / var(--ui,1))}
+  html.touring .console{left:auto;right:24px;top:62px;bottom:auto;transform:none;width:min(640px,42vw / var(--ui,1))}
   html.touring .cap.withcon{bottom:26px}
-  html.touring #tourExit{right:auto;left:50%;transform:translateX(-50%)}
+  html.touring #tourExit{right:24px}
 }
 
 html.film .ctl,html.film .help,html.film .lede,html.film .sk-txt,html.film .foot,html.film #tourExit,html.film .sitenav,html.film .load{display:none}
@@ -175,6 +178,13 @@ html.film .hud{left:52px;top:44px;width:600px}
 html.film .hud::before{width:900px;height:420px}
 html.film .hud .k{font-size:34px}
 html.film .hud .big{font-size:54px}
+/* 英文(2026-11-06,../assets/i18n.js):標題比中文寬,字小一點,桌機時一行放得下;說明框比中文長很多,矮的螢幕在框裡捲動,不超出畫面。手機照原本的 html.mp */
+html[lang="en"]:not(.mp):not(.film) .hud .k{font-size:24px}
+html[lang="en"]:not(.mp):not(.film) .hud .big{font-size:35px}
+html[lang="en"]:not(.mp) .help{max-height:calc(100vh / var(--ui,1) - 216px);overflow-y:auto;overscroll-behavior:contain}
+/* 英文的字幕常是兩行,兩行排得一樣長(不會只剩一個字在第二行);片尾的小字英文有兩行,限制寬度,不從畫面的一邊排到另一邊 */
+html[lang="en"] .cap .txt{text-wrap:balance}
+html[lang="en"] .titlecard .t4{max-width:min(1120px,calc(100% - 48px));text-wrap:balance}
 html.film .chips{margin-top:16px;gap:12px}
 html.film .chip{min-width:150px;padding:10px 16px 11px}
 html.film .chip small{font-size:14px}
@@ -260,6 +270,8 @@ html.mp.touring .cap.withcon{bottom:calc(var(--mp-dock-h,230px) + 20px)}
   html.mp.touring .cap,html.mp.touring .cap.withcon{left:12px;right:auto;bottom:12px;transform:none;max-width:calc(100vw - min(380px,46vw) - 36px)}
 }
 html.mp .ctl{grid-template-columns:minmax(0,1fr);gap:8px}
+/* 英文:四個分析器的名稱比較長,手機的面板放不下一排,排成兩排、每排兩個 */
+html[lang="en"].mp #segAna{display:grid;grid-template-columns:1fr 1fr}
 html.mp .con-body{grid-template-columns:minmax(0,1fr);gap:8px}
 html.mp .meters{flex-direction:row;align-items:flex-end;gap:12px}
 html.mp .meters .m{flex:1;min-width:0}
@@ -304,46 +316,46 @@ html.mp.sk-open.sk-field .hud{z-index:7}
 </head>
 <body>
 <div id="stage"></div>
-<div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
+<div class="load" id="load"><i></i><span data-en="Loading the 3D model">3D 模型載入中</span></div>
 
 <header class="hud">
-  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="./" aria-current="page">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="../chromatography/">層析</a><a href="../plot/">數據畫圖</a></nav>
-  <span class="k">質譜儀</span>
-  <span class="big">不同分析器比較</span>
-  <p class="lede">質譜儀先讓分子帶電變成離子,再依 m/z(離子的質量除以電荷)把它們分開。這裡的離子都只帶一個正電荷,m/z 就是離子的質量。分開的方法有四種:像篩子、先關起來再放出、比賽跑、量擺動快慢。同一組離子換一種分析器量一次,比比看差在哪裡。</p>
+  <nav class="sitenav" aria-label="儀器原理" data-en-aria-label="Instrument Principles"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../lcq/" data-en="Ion trap MS">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="./" aria-current="page" data-en="Mass analyzers">質譜儀-不同分析器比較</a><a href="../spectroscopy/" data-en="Light and molecules">光與分子</a><a href="../chromatography/" data-en="Chromatography">層析</a><a href="../plot/" data-en="Data plotting">數據畫圖</a></nav>
+  <span class="k" data-en="Mass spectrometers">質譜儀</span>
+  <span class="big" data-en="Comparing analyzers">不同分析器比較</span>
+  <p class="lede" data-en="A mass spectrometer first gives molecules a charge, making them ions, then sorts them by m/z (the ion's mass divided by its charge). Every ion here has one positive charge, so m/z is just the ion's mass. There are four ways to sort: like a sieve, trap then release, a race, and timing how fast they swing. Measure the same ions with each analyzer and compare.">質譜儀先讓分子帶電變成離子,再依 m/z(離子的質量除以電荷)把它們分開。這裡的離子都只帶一個正電荷,m/z 就是離子的質量。分開的方法有四種:像篩子、先關起來再放出、比賽跑、量擺動快慢。同一組離子換一種分析器量一次,比比看差在哪裡。</p>
   <div class="chips">
-    <div class="chip panel"><small>能分開的差距</small><b id="cR">—</b></div>
-    <div class="chip panel"><small>量到的偏差</small><b id="cA">—</b></div>
-    <div class="chip panel"><small>量一張譜</small><b id="cT">—</b></div>
+    <div class="chip panel"><small data-en="Smallest gap">能分開的差距</small><b id="cR">—</b></div>
+    <div class="chip panel"><small data-en="Off by">量到的偏差</small><b id="cA">—</b></div>
+    <div class="chip panel"><small data-en="Per spectrum">量一張譜</small><b id="cT">—</b></div>
   </div>
   <div class="note panel sketch" id="note">
-    <div class="sk-head"><b id="skTitle"></b><span id="skSub"></span><button class="sk-fld" id="skField" type="button" aria-pressed="false" hidden>電場形狀</button></div>
-    <canvas id="sketch" role="img" aria-label="目前分析器的簡圖:離子從哪裡進來、怎麼走、在哪裡被量到"></canvas>
+    <div class="sk-head"><b id="skTitle"></b><span id="skSub"></span><button class="sk-fld" id="skField" type="button" aria-pressed="false" hidden data-en="Field shape">電場形狀</button></div>
+    <canvas id="sketch" role="img" aria-label="目前分析器的簡圖:離子從哪裡進來、怎麼走、在哪裡被量到" data-en-aria-label="Sketch of the selected analyzer: where the ions come in, how they move and where they are measured"></canvas>
     <p class="sk-txt" id="skTxt"></p>
   </div>
 </header>
 
 <aside class="ctl panel" id="ctl">
-  <div class="grp span2 wide"><h6>分析器</h6>
-    <div class="seg" id="segAna"><button data-v="q" class="on">四極柱</button><button data-v="it">離子阱</button><button data-v="tof">飛行時間</button><button data-v="orb">Orbitrap</button></div>
+  <div class="grp span2 wide"><h6 data-en="Analyzer">分析器</h6>
+    <div class="seg" id="segAna"><button data-v="q" class="on" data-en="Quadrupole">四極柱</button><button data-v="it" data-en="Ion trap">離子阱</button><button data-v="tof" data-en="Time of flight">飛行時間</button><button data-v="orb">Orbitrap</button></div>
   </div>
-  <div class="grp span2 wide"><h6><span class="rl" id="resName">篩得多細</span></h6>
+  <div class="grp span2 wide"><h6><span class="rl" id="resName" data-en="How fine">篩得多細</span></h6>
     <div class="seg" id="segRes"></div>
   </div>
-  <div class="grp wide"><h6>外殼</h6>
+  <div class="grp wide"><h6 data-en="Case">外殼</h6>
     <div class="row">
-      <div class="seg" id="segShell"><button data-v="0">組裝</button><button data-v="1" class="on">剖開</button></div>
-      <button class="btn" id="btnRun">收譜</button>
-      <button class="btn" id="btnTour">導覽</button>
-      <button class="btn" id="btnSketch">簡圖</button>
-      <button class="btn sq" id="btnHelp" aria-label="說明">?</button>
+      <div class="seg" id="segShell"><button data-v="0" data-en="Closed">組裝</button><button data-v="1" class="on" data-en="Open">剖開</button></div>
+      <button class="btn" id="btnRun" data-en="Measure">收譜</button>
+      <button class="btn" id="btnTour" data-en="Tour">導覽</button>
+      <button class="btn" id="btnSketch" data-en="Sketch">簡圖</button>
+      <button class="btn sq" id="btnHelp" aria-label="說明" data-en-aria-label="Help">?</button>
     </div>
   </div>
 </aside>
 
 <div class="help panel" id="help">
-  <b>操作</b>
-  <ul>
+  <b data-en="Controls">操作</b>
+  <ul lang="zh-Hant">
     <li>選一種分析器,鏡頭會移過去,左邊的簡圖說明它怎麼分;按「收譜」量一張譜。換一種再量,上一張會以虛線留著比較</li>
     <li>點下方的譜可以放大:先放大 m/z 195(咖啡因和阿魏酸),再放大 MRFA 旁邊的同位素小峰;第三下回到整張</li>
     <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
@@ -351,27 +363,36 @@ html.mp.sk-open.sk-field .hud{z-index:7}
     <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
     <li>「導覽」自動播一遍,內容和影片相同,按 Esc 結束</li>
   </ul>
-  <p class="fine" id="helpFine">示意圖,四台都不是依某一台實際儀器建模,尺寸、電壓與速度都經過調整。數值取自代表機型的規格與文獻:四極柱參考 Agilent 5977 系列單四極,離子阱參考 Thermo LCQ Fleet 的 3D 離子阱(實驗室的 LCQ Deca XP 是同系列較早的機型,一般掃描約每秒 5,500 u),飛行時間參考 Agilent 6546(正交加速加反射鏡),Orbitrap 參考 Thermo Q Exactive。四極柱的「提高解析」與飛行時間的「反射鏡關」是示意的對照設定。譜是依理論質量與同位素比例模擬的,雜訊經過放大,不是實測數據。</p>
+  <ul lang="en">
+    <li>Pick an analyzer and the camera moves to it; the sketch on the left shows how it sorts. Press "Measure" to take a spectrum. Switch and measure again, and the previous spectrum stays as a dashed line for comparison</li>
+    <li>Click the spectrum below to zoom in: first on m/z 195 (caffeine and ferulic acid), then on the small isotope peaks beside MRFA; a third click shows the whole spectrum again</li>
+    <li>Mouse: drag to rotate the view; right-drag or Shift-drag to pan; scroll to zoom</li>
+    <li>Trackpad: swipe with two fingers to pan, pinch to zoom; touch screen: one finger rotates, two fingers pan and zoom</li>
+    <li>Keyboard: arrow keys or W A S D to move, Q E to turn, + − to zoom, hold Shift to go faster; R resets the view</li>
+    <li>"Tour" plays through automatically, the same as the video; press Esc to end it</li>
+  </ul>
+  <p class="fine" id="helpFine" lang="zh-Hant">示意圖,四台都不是依某一台實際儀器建模,尺寸、電壓與速度都經過調整。數值取自代表機型的規格與文獻:四極柱參考 Agilent 5977 系列單四極,離子阱參考 Thermo LCQ Fleet 的 3D 離子阱(實驗室的 LCQ Deca XP 是同系列較早的機型,一般掃描約每秒 5,500 u),飛行時間參考 Agilent 6546(正交加速加反射鏡),Orbitrap 參考 Thermo Q Exactive。四極柱的「更細」與飛行時間的「反射鏡關」是示意的對照設定。譜是依理論質量與同位素比例模擬的,雜訊經過放大,不是實測數據。</p>
+  <p class="fine" lang="en">Schematic. None of the four is modeled on one real instrument; sizes, voltages and speeds are adjusted. Values come from the specifications and literature of representative models: the quadrupole follows the Agilent 5977 series single quadrupole; the ion trap follows the 3D ion trap of the Thermo LCQ Fleet (the lab's LCQ Deca XP is an earlier model of the same series, with a normal scan of about 5,500 u per second); the time of flight follows the Agilent 6546 (orthogonal acceleration plus a reflector); the Orbitrap follows the Thermo Q Exactive. The quadrupole's "Finer" setting and the time of flight's reflector "Off" are illustrative comparison settings. The spectra are simulated from theoretical masses and isotope ratios, with the noise exaggerated; they are not measured data.</p>
 </div>
 
 <section class="console panel" id="console">
-  <div class="con-head"><b id="conTitle">質譜</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
+  <div class="con-head"><b id="conTitle" data-en="Mass spectrum">質譜</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
   <div class="con-body">
-    <div class="plotwrap"><canvas id="plot" title="點一下放大 m/z 195,再點一下放大 MRFA 旁邊的同位素小峰,第三下回到整張譜"></canvas><div class="tip" id="tip"></div></div>
+    <div class="plotwrap"><canvas id="plot" title="點一下放大 m/z 195,再點一下放大 MRFA 旁邊的同位素小峰,第三下回到整張譜" data-en-title="Click to zoom in on m/z 195, again for the small isotope peaks beside MRFA, and a third time for the whole spectrum"></canvas><div class="tip" id="tip"></div></div>
     <div class="meters">
-      <div class="m"><div class="t">能分開的差距<b id="vR">—</b></div><div class="bar"><i id="mR"></i></div></div>
-      <div class="m"><div class="t">量到的偏差<b id="vA">—</b></div><div class="bar"><i id="mA"></i></div></div>
-      <div class="m big"><div class="t">咖啡因和阿魏酸(差 0.02)</div><b class="n" id="vS">—</b></div>
+      <div class="m"><div class="t"><span lang="zh-Hant">能分開的差距</span><span lang="en">Smallest gap</span><b id="vR">—</b></div><div class="bar"><i id="mR"></i></div></div>
+      <div class="m"><div class="t"><span lang="zh-Hant">量到的偏差</span><span lang="en">Off by</span><b id="vA">—</b></div><div class="bar"><i id="mA"></i></div></div>
+      <div class="m big"><div class="t" data-en="Caffeine and ferulic acid (0.02 apart)">咖啡因和阿魏酸(差 0.02)</div><b class="n" id="vS">—</b></div>
     </div>
   </div>
 </section>
 
-<div class="foot" id="foot">質譜儀四種分析器的原理比較;示意圖,譜依理論值模擬。數值參考 Agilent 5977、Thermo LCQ Fleet、Agilent 6546 與 Thermo Q Exactive。</div>
+<div class="foot" id="foot" data-en="How four mass analyzers work, compared; schematic, spectra simulated from theoretical values. Values based on the Agilent 5977, Thermo LCQ Fleet, Agilent 6546 and Thermo Q Exactive.">質譜儀四種分析器的原理比較;示意圖,譜依理論值模擬。數值參考 Agilent 5977、Thermo LCQ Fleet、Agilent 6546 與 Thermo Q Exactive。</div>
 
 <div class="cap panel" id="cap"><div class="chap" id="chap"></div><div class="txt" id="capTxt"></div></div>
 <div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
 <div class="cmp panel" id="cmp"></div>
-<button class="btn" id="tourExit">結束導覽</button>
+<button class="btn" id="tourExit" data-en="End tour">結束導覽</button>
 <div class="fdim" id="fdim"></div>
 
 <script type="module">
@@ -405,7 +426,7 @@ const mp = createMobilePanels({
   dock: true, top: '.hud', rotateHint: true,
   suspended: () => FILM || root.classList.contains('touring'),
   panels: [
-    { el: '#ctl', icon: 'adjust', label: '調整', items: () => `分析器、${el('resName').textContent}、外殼、收譜、導覽、簡圖、說明、畫質`, onToggle: (open) => { if (!open) el('help').classList.remove('show'); } },
+    { el: '#ctl', icon: 'adjust', label: zhEn('調整', 'Adjust'), items: () => zhEn(`分析器、${el('resName').textContent}、外殼、收譜、導覽、簡圖、說明、畫質`, `analyzer, ${el('resName').textContent.toLowerCase()}, case, measure, tour, sketch, help, quality`), onToggle: (open) => { if (!open) el('help').classList.remove('show'); } },
     { el: '#console', icon: 'chart', label: () => el('conTitle').textContent, items: () => el('conSample').textContent },
   ],
 });
@@ -474,8 +495,8 @@ function isoPattern(formula, charge = 1, minRel = 1e-4) {
   return dist.filter((d) => d[1] >= mx * minRel).map(([m, p]) => ({ mz: (m - charge * M_E) / charge, rel: p / mx })).sort((a, b) => a.mz - b.mz);
 }
 const CPDS = [
-  { id: 'caf', name: '咖啡因', formula: { C: 8, H: 11, N: 4, O: 2 }, fstr: 'C₈H₁₁N₄O₂⁺', amt: 1.0, col: '#74e4ff' },
-  { id: 'fer', name: '阿魏酸', formula: { C: 10, H: 11, O: 4 }, fstr: 'C₁₀H₁₁O₄⁺', amt: 0.62, col: '#5dffb0' },
+  { id: 'caf', name: zhEn('咖啡因', 'Caffeine'), formula: { C: 8, H: 11, N: 4, O: 2 }, fstr: 'C₈H₁₁N₄O₂⁺', amt: 1.0, col: '#74e4ff' },
+  { id: 'fer', name: zhEn('阿魏酸', 'Ferulic acid'), formula: { C: 10, H: 11, O: 4 }, fstr: 'C₁₀H₁₁O₄⁺', amt: 0.62, col: '#5dffb0' },
   { id: 'mrfa', name: 'MRFA', formula: { C: 23, H: 38, N: 7, O: 5, S: 1 }, fstr: 'C₂₃H₃₈N₇O₅S⁺', amt: 0.8, col: '#ffc261' },
 ];
 for (const c of CPDS) {
@@ -493,16 +514,16 @@ LINES.sort((a, b) => a.mz - b.mz);
 // res:「解析度設定」的選項;fwhm(峰半高寬,u)直接給,或由解析度 R = m/Δm 換算;err:系統質量偏差(u);
 // spec:收一張 m/z 100 到 600 的譜大約要多久(秒,真實時間)
 const ANA = {
-  q: { id: 'q', name: '四極柱', resName: '篩得多細',
-    res: [{ label: '一般', fwhm: 0.6, gain: 1 }, { label: '更細', fwhm: 0.3, gain: 0.3 }],
+  q: { id: 'q', name: zhEn('四極柱', 'Quadrupole'), resName: zhEn('篩得多細', 'How fine'),
+    res: [{ label: zhEn('一般', 'Normal'), fwhm: 0.6, gain: 1 }, { label: zhEn('更細', 'Finer'), fwhm: 0.3, gain: 0.3 }],
     err: (mz, ri) => 0.07, spec: (ri) => 500 / 12500 },
-  it: { id: 'it', name: '離子阱', resName: '掃描速度',
-    res: [{ label: '一般', fwhm: 0.7, gain: 1, rate: 12500 }, { label: '慢一點、更細', fwhm: 0.45, gain: 1, rate: 5000 }],
+  it: { id: 'it', name: zhEn('離子阱', 'Ion trap'), resName: zhEn('掃描速度', 'Scan speed'),
+    res: [{ label: zhEn('一般', 'Normal'), fwhm: 0.7, gain: 1, rate: 12500 }, { label: zhEn('慢一點、更細', 'Slower, finer'), fwhm: 0.45, gain: 1, rate: 5000 }],
     err: (mz, ri) => (ri ? -0.05 : -0.09), spec: (ri) => 0.03 + 500 / ANA.it.res[ri].rate },
-  tof: { id: 'tof', name: '飛行時間', resName: '反射鏡',
-    res: [{ label: '關', R: 3000, gain: 1 }, { label: '開', R: 30000, gain: 0.85 }],
+  tof: { id: 'tof', name: zhEn('飛行時間', 'Time of flight'), resName: zhEn('反射鏡', 'Reflector'),
+    res: [{ label: zhEn('關', 'Off'), R: 3000, gain: 1 }, { label: zhEn('開', 'On'), R: 30000, gain: 0.85 }],
     err: (mz, ri) => mz * (ri ? 0.7 : 8) * 1e-6, spec: () => 1 / 50 },
-  orb: { id: 'orb', name: 'Orbitrap', resName: '記錄多久',
+  orb: { id: 'orb', name: 'Orbitrap', resName: zhEn('記錄多久', 'Recording time'),
     res: [64, 128, 256, 512].map((ms, i) => ({ label: `${ms} ms`, T: ms / 1000, R200: 17500 * 2 ** i, gain: 1, hz: 12 / 2 ** i })),
     err: (mz, ri) => -mz * 0.4e-6, spec: (ri) => 1 / ANA.orb.res[ri].hz },
 };
@@ -631,22 +652,22 @@ function screenTex(kind) {
     c.strokeStyle = c.fillStyle = 'rgba(200,244,255,.95)'; c.lineWidth = 4; c.lineCap = 'round'; c.lineJoin = 'round';
     c.textAlign = 'center';
     c.font = `600 26px ${SANS}`;
-    c.fillText(['四極柱', '離子阱', '飛行時間', 'Orbitrap'][kind], w / 2, 52);
+    c.fillText(zhEn(['四極柱', '離子阱', '飛行時間', 'Orbitrap'], ['Quadrupole', 'Ion trap', 'Time of flight', 'Orbitrap'])[kind], w / 2, 52);
     c.font = `600 34px ${SANS}`;
     if (kind === 0) { // 兩根桿子,中間只有一種穿得過去
       c.lineWidth = 14; c.beginPath(); c.moveTo(120, 140); c.lineTo(520, 140); c.moveTo(120, 230); c.lineTo(520, 230); c.stroke();
       c.lineWidth = 3; c.beginPath(); for (let i = 0; i <= 200; i++) { const x = 90 + i * 2.2; c.lineTo(x, 185 + 14 * Math.sin(i / 7)); } c.stroke();
-      c.fillText('只放行一種 m/z', w / 2, 320);
+      c.fillText(zhEn('只放行一種 m/z', 'Only one m/z gets through'), w / 2, 320);
     } else if (kind === 1) { // 8 字形軌跡
       c.beginPath(); for (let i = 0; i <= 200; i++) { const u = (i / 200) * TAU; c.lineTo(320 + 150 * Math.sin(u), 175 + 70 * Math.sin(2 * u)); } c.stroke();
-      c.fillText('關起來,再依序放出', w / 2, 320);
+      c.fillText(zhEn('關起來,再依序放出', 'Trap, then release in order'), w / 2, 320);
     } else if (kind === 2) { // 輕的先到
       c.lineWidth = 3; c.beginPath(); c.moveTo(80, 250); c.lineTo(560, 250); c.stroke();
       for (const [x, hh] of [[230, 120], [270, 70], [440, 100]]) { c.beginPath(); c.moveTo(x, 250); c.lineTo(x, 250 - hh); c.stroke(); }
-      c.fillText('輕的先到終點', w / 2, 320);
+      c.fillText(zhEn('輕的先到終點', 'Lighter ones finish first'), w / 2, 320);
     } else { // 衰減的正弦
       c.lineWidth = 3; c.beginPath(); for (let i = 0; i <= 480; i++) { const u = i / 480; c.lineTo(80 + i, 175 - 80 * Math.exp(-u * 1.6) * Math.cos(u * 70) * (0.6 + 0.4 * Math.cos(u * 9))); } c.stroke();
-      c.fillText('越輕擺得越快', w / 2, 320);
+      c.fillText(zhEn('越輕擺得越快', 'Lighter swings faster'), w / 2, 320);
     }
   });
 }
@@ -1434,26 +1455,26 @@ function labelOp(key, a) {
   const up = (p, dy, dz = 0, dx = 0) => p.clone().add(v3(dx, dy, dz));
   // 各台的名牌
   const tag = (key, S, y, title, sub) => { const p = W3(S, 0, y, 0); label(key, up(p, 14), up(p, 30, 4), title, sub); };
-  tag('tq', QS, 45, '四極柱', '像篩子');
-  tag('tit', TS, 34, '離子阱', '關起來再放出');
-  { const p = W3(FS, 112, 40, -10); label('ttof', p, up(p, 4, 10, -30), '飛行時間', '比賽跑'); }
-  tag('torb', OS, 62, 'Orbitrap', '量擺動快慢');
-  label('src', v3(SRC.x, SRC.needleY, SRC.z + 14), v3(SRC.x - 26, SRC.needleY + 22, SRC.z + 20), '離子源', '讓分子帶電');
+  tag('tq', QS, 45, zhEn('四極柱', 'Quadrupole'), zhEn('像篩子', 'like a sieve'));
+  tag('tit', TS, 34, zhEn('離子阱', 'Ion trap'), zhEn('關起來再放出', 'trap, then release'));
+  { const p = W3(FS, 112, 40, -10); label('ttof', p, up(p, 4, 10, -30), zhEn('飛行時間', 'Time of flight'), zhEn('比賽跑', 'a race')); }
+  tag('torb', OS, 62, 'Orbitrap', zhEn('量擺動快慢', 'times the swing'));
+  label('src', v3(SRC.x, SRC.needleY, SRC.z + 14), v3(SRC.x - 26, SRC.needleY + 22, SRC.z + 20), zhEn('離子源', 'Ion source'), zhEn('讓分子帶電', 'charges the molecules'));
   // 四極柱
-  label('q_rods', W3(QS, 4.6, 40, 4.6), up(W3(QS, 4.6, 40, 4.6), 16, 10), '金屬桿', '電壓正負交替');
-  label('q_det', W3(QS, 5, 90, 0), up(W3(QS, 5, 90, 0), 14, 10), '偵測器', '數離子');
+  label('q_rods', W3(QS, 4.6, 40, 4.6), up(W3(QS, 4.6, 40, 4.6), 16, 10), zhEn('金屬桿', 'Metal rods'), zhEn('電壓正負交替', 'voltage flips + and −'));
+  label('q_det', W3(QS, 5, 90, 0), up(W3(QS, 5, 90, 0), 14, 10), zhEn('偵測器', 'Detector'), zhEn('數離子', 'counts ions'));
   // 離子阱
-  label('it_ring', W3(TS, 0, TD.yc, 14), up(W3(TS, 0, TD.yc, 14), 18, 8), '環形電極', '把離子關住');
-  label('it_he', W3(TS, 0, TD.yc, 4), up(W3(TS, 0, TD.yc, 4), 2, 14, -26), '氦氣', '讓離子慢下來');
-  label('it_det', W3(TS, TD.dyn[0], TD.dyn[1], 0), up(W3(TS, TD.dyn[0], TD.dyn[1], 0), 14, 12), '偵測器', '數離子');
+  label('it_ring', W3(TS, 0, TD.yc, 14), up(W3(TS, 0, TD.yc, 14), 18, 8), zhEn('環形電極', 'Ring electrode'), zhEn('把離子關住', 'traps the ions'));
+  label('it_he', W3(TS, 0, TD.yc, 4), up(W3(TS, 0, TD.yc, 4), 2, 14, -26), zhEn('氦氣', 'Helium'), zhEn('讓離子慢下來', 'slows the ions'));
+  label('it_det', W3(TS, TD.dyn[0], TD.dyn[1], 0), up(W3(TS, TD.dyn[0], TD.dyn[1], 0), 14, 12), zhEn('偵測器', 'Detector'), zhEn('數離子', 'counts ions'));
   // 飛行時間
-  label('tof_push', W3(FS, -3, FD.yp, 6), up(W3(FS, -3, FD.yp, 6), -12, 14, -12), '推板', '同時推出去');
-  label('tof_ref', W3(FS, FD.top + 26, 34, 9), up(W3(FS, FD.top + 26, 34, 9), 6, 12, -12), '反射鏡', '把離子彈回來');
-  label('tof_det', W3(FS, FD.det[0], FD.det[1], 6), up(W3(FS, FD.det[0], FD.det[1], 6), -14, 14, -14), '偵測器', '記下抵達時間');
+  label('tof_push', W3(FS, -3, FD.yp, 6), up(W3(FS, -3, FD.yp, 6), -12, 14, -12), zhEn('推板', 'Pusher'), zhEn('同時推出去', 'pushes all at once'));
+  label('tof_ref', W3(FS, FD.top + 26, 34, 9), up(W3(FS, FD.top + 26, 34, 9), 6, 12, -12), zhEn('反射鏡', 'Reflector'), zhEn('把離子彈回來', 'bounces ions back'));
+  label('tof_det', W3(FS, FD.det[0], FD.det[1], 6), up(W3(FS, FD.det[0], FD.det[1], 6), -14, 14, -14), zhEn('偵測器', 'Detector'), zhEn('記下抵達時間', 'records arrival time'));
   // Orbitrap
-  label('orb_ct', W3(OS, 2, 16, 4), up(W3(OS, 2, 16, 4), 16, 10), '收集器', '先存一批');
-  label('orb_sp', W3(OS, 0, OD.ye - 18, 3), up(W3(OS, 0, OD.ye - 18, 3), 16, 12, -28), '紡錘', '吸住離子');
-  label('orb_out', W3(OS, -13, OD.ye + 8, 0), up(W3(OS, -13, OD.ye + 8, 0), 14, 16, 12), '外殼', '記下擺動的訊號');
+  label('orb_ct', W3(OS, 2, 16, 4), up(W3(OS, 2, 16, 4), 16, 10), zhEn('收集器', 'Collector'), zhEn('先存一批', 'stores a batch'));
+  label('orb_sp', W3(OS, 0, OD.ye - 18, 3), up(W3(OS, 0, OD.ye - 18, 3), 16, 12, -28), zhEn('紡錘', 'Spindle'), zhEn('吸住離子', 'pulls ions in'));
+  label('orb_out', W3(OS, -13, OD.ye + 8, 0), up(W3(OS, -13, OD.ye + 8, 0), 14, 16, 12), zhEn('外殼', 'Outer shell'), zhEn('記下擺動的訊號', 'records the swings'));
 }
 const LBL_KEYS = Object.keys(LBL);
 // 互動模式:每台選到時顯示的標籤;沒選到的只留名牌
@@ -1481,19 +1502,19 @@ const SCRIPT_DUR = 118, FILM_SLOW = 1.2;
 // 講完每一台,停下來看那一台的電場:簡圖換成電場示意(assets/analyzer-fields.js),3D 停在那一格並調暗。
 // at 是腳本時間;seg 是電場示意要播的片段 [起, 迄](好幾段就接起來播);caps 是停頓期間的字幕 [停頓後第幾秒, 字]
 const FHOLD = [
-  { at: 33.8, ana: 'q', chap: '02 · 四極柱', seg: [[5, 19]], caps: [
-    [0, '電場的樣子:四根桿子之間像一個翻來翻去的馬鞍;翻得夠快,離子還沒滾遠就被推回中間。'],
-    [6, '再加上直流電壓,只有一種 m/z 留得住:太輕的被甩出去,太重的被慢慢拉走。'] ] },
-  { at: 53.6, ana: 'it', chap: '03 · 離子阱', seg: [[12, 16.5], [26, 37.5]], caps: [
-    [0, '離子阱的電場也是翻轉的馬鞍;翻得夠快,離子就被關在中間。'],
-    [4.5, '收譜時把電壓調大,最輕的先撐不住,沿著軸向被甩出去打到偵測器,接著是下一種。'] ] },
-  { at: 75.6, ana: 'tof', chap: '04 · 飛行時間', seg: [[3.5, 17.5]], caps: [
-    [0, '飛行時間的電場畫成地形:推斥區是陡坡,每個離子滑下來得到一樣多的能量,越輕的跑得越快;飛行管是平地,速度不變。'],
-    [6, '反射鏡是上坡:跑得快的衝得比較高、多繞一點路,和慢的幾乎同時回到偵測器。'] ] },
+  { at: 33.8, ana: 'q', chap: zhEn('02 · 四極柱', '02 · Quadrupole'), seg: [[5, 19]], caps: [
+    [0, zhEn('電場的樣子:四根桿子之間像一個翻來翻去的馬鞍;翻得夠快,離子還沒滾遠就被推回中間。', 'The field is a saddle flipping between the four rods; fast flips push ions back before they roll far.')],
+    [6, zhEn('再加上直流電壓,只有一種 m/z 留得住:太輕的被甩出去,太重的被慢慢拉走。', 'Add a steady (DC) voltage and only one m/z stays: lighter ions are flung out, heavier ones slowly dragged away.')] ] },
+  { at: 53.6, ana: 'it', chap: zhEn('03 · 離子阱', '03 · Ion trap'), seg: [[12, 16.5], [26, 37.5]], caps: [
+    [0, zhEn('離子阱的電場也是翻轉的馬鞍;翻得夠快,離子就被關在中間。', "The ion trap's field is a flipping saddle too; fast flips keep ions inside.")],
+    [4.5, zhEn('收譜時把電壓調大,最輕的先撐不住,沿著軸向被甩出去打到偵測器,接著是下一種。', 'To take a spectrum the voltage is raised: the lightest ions give way first, flung out along the axis to the detector, then the next kind.')] ] },
+  { at: 75.6, ana: 'tof', chap: zhEn('04 · 飛行時間', '04 · Time of flight'), seg: [[3.5, 17.5]], caps: [
+    [0, zhEn('飛行時間的電場畫成地形:推斥區是陡坡,每個離子滑下來得到一樣多的能量,越輕的跑得越快;飛行管是平地,速度不變。', 'As terrain: a steep pusher slope gives each ion equal energy, lighter ones faster; flat tube, steady speed.')],
+    [6, zhEn('反射鏡是上坡:跑得快的衝得比較高、多繞一點路,和慢的幾乎同時回到偵測器。', 'The reflector is uphill: faster ions climb higher and go a bit farther, reaching the detector almost with the slower ones.')] ] },
   { at: 97.6, ana: 'orb', chap: '05 · Orbitrap', seg: [[1, 5], [15, 26]], caps: [
-    [0, 'Orbitrap 的電場:中間的紡錘把離子往內吸,離子繞著它轉。'],
-    [4, '沿著紡錘的方向像一個碗,離子左右擺盪;越輕擺得越快,快慢只看 m/z。'],
-    [10, '外殼記下擺動的訊號,再拆成各種頻率:一種頻率就是一種 m/z。'] ] },
+    [0, zhEn('Orbitrap 的電場:中間的紡錘把離子往內吸,離子繞著它轉。', 'Orbitrap field: the central spindle pulls ions in; they circle it.')],
+    [4, zhEn('沿著紡錘的方向像一個碗,離子左右擺盪;越輕擺得越快,快慢只看 m/z。', 'Along the spindle it is like a bowl: ions swing back and forth, lighter ones faster, paced only by m/z.')],
+    [10, zhEn('外殼記下擺動的訊號,再拆成各種頻率:一種頻率就是一種 m/z。', 'The shell records the swings; the signal splits into frequencies, one per m/z.')] ] },
 ];
 for (const h of FHOLD) h.dur = h.seg.reduce((s, [a, b]) => s + b - a, 0);
 const FILM_DUR = (SCRIPT_DUR + FHOLD.reduce((s, h) => s + h.dur, 0)) * FILM_SLOW;
@@ -1552,21 +1573,21 @@ const CAMK = [
   [115.2, [190, 270, 560], [0, 112, -20]], [118, [196, 274, 572], [0, 112, -20]],
 ];
 const CAPS = [
-  [6.2, 13.4, '01 · 質譜儀', '質譜儀先讓分子帶電變成離子,再依 m/z(質量除以電荷)分開;這裡比較四種分法。'],
-  [15.2, 21.0, '02 · 四極柱', '四極柱像篩子:四根金屬桿上的電壓快速正負交替,只讓一種 m/z 穩穩穿過。'],
-  [21.2, 27.4, '02 · 四極柱', '太輕或太重的離子越晃越大,撞上金屬桿;把電壓慢慢調大,放行的 m/z 跟著變大。'],
-  [27.6, 33.6, '02 · 四極柱', '四極柱能分開相差約 0.6 的 m/z;咖啡因和阿魏酸只差 0.02,看起來是同一根峰。'],
-  [35.4, 41.2, '03 · 離子阱', '離子阱先把離子全部關在中間,讓它們撞一撞氦氣慢下來,在中間繞小圈。'],
-  [41.4, 47.2, '03 · 離子阱', '接著把電壓慢慢調大,輕的離子先待不住,從小孔被甩出去,從輕到重依序量到。'],
-  [47.4, 53.4, '03 · 離子阱', '也能只留下一種離子、把它撞碎再量碎片,用來推敲分子的結構。'],
-  [55.6, 61.6, '04 · 飛行時間', '飛行時間像賽跑:推板把離子同時推出去,給的能量一樣,越輕的跑得越快。'],
-  [61.8, 68.4, '04 · 飛行時間', '同一種離子也有快有慢;反射鏡讓快的多繞一點路,和慢的同時到終點。'],
-  [68.6, 75.4, '04 · 飛行時間', '量到達時間就知道多重:能分開相差不到 0.01 的 m/z,咖啡因和阿魏酸分成兩根峰。'],
-  [77.6, 83.6, '05 · Orbitrap', 'Orbitrap 先在收集器裡存一批離子,再一口氣送進中間的紡錘和外殼之間。'],
-  [83.8, 90.2, '05 · Orbitrap', '離子繞著紡錘轉圈,同時左右來回擺動;越輕擺得越快,快慢只看 m/z。'],
-  [90.4, 97.4, '05 · Orbitrap', '外殼記下擺動的訊號,再拆成各種頻率;記得越久,連只差一點點的 m/z 都分得開。'],
-  [99.0, 105.4, '06 · 比一比', '放大 m/z 195:四極柱和離子阱只看到一根峰,飛行時間和 Orbitrap 分得出兩種分子。'],
-  [105.6, 112.2, '06 · 比一比', '四種各有長處:四極柱快又穩,離子阱能拆碎片,飛行時間快又細,Orbitrap 最準。'],
+  [6.2, 13.4, zhEn('01 · 質譜儀', '01 · Mass spectrometers'), zhEn('質譜儀先讓分子帶電變成離子,再依 m/z(質量除以電荷)分開;這裡比較四種分法。', 'A mass spectrometer makes molecules into charged ions, then sorts them by m/z (mass divided by charge). We compare four ways.')],
+  [15.2, 21.0, zhEn('02 · 四極柱', '02 · Quadrupole'), zhEn('四極柱像篩子:四根金屬桿上的電壓快速正負交替,只讓一種 m/z 穩穩穿過。', 'The quadrupole is like a sieve: voltage on four metal rods flips + and − fast; just one m/z passes.')],
+  [21.2, 27.4, zhEn('02 · 四極柱', '02 · Quadrupole'), zhEn('太輕或太重的離子越晃越大,撞上金屬桿;把電壓慢慢調大,放行的 m/z 跟著變大。', 'Ions too light or heavy wobble wider and hit the rods; a slowly rising voltage lets through higher m/z.')],
+  [27.6, 33.6, zhEn('02 · 四極柱', '02 · Quadrupole'), zhEn('四極柱能分開相差約 0.6 的 m/z;咖啡因和阿魏酸只差 0.02,看起來是同一根峰。', 'It splits m/z values about 0.6 apart; caffeine and ferulic acid, only 0.02 apart, look like one peak.')],
+  [35.4, 41.2, zhEn('03 · 離子阱', '03 · Ion trap'), zhEn('離子阱先把離子全部關在中間,讓它們撞一撞氦氣慢下來,在中間繞小圈。', 'The ion trap first holds all the ions in the middle; bumping into helium slows them into small loops.')],
+  [41.4, 47.2, zhEn('03 · 離子阱', '03 · Ion trap'), zhEn('接著把電壓慢慢調大,輕的離子先待不住,從小孔被甩出去,從輕到重依序量到。', 'As the voltage slowly rises, lighter ions are flung out a small hole first: measured light to heavy.')],
+  [47.4, 53.4, zhEn('03 · 離子阱', '03 · Ion trap'), zhEn('也能只留下一種離子、把它撞碎再量碎片,用來推敲分子的結構。', 'It can also keep one kind of ion, break it into pieces and measure them, to work out the structure.')],
+  [55.6, 61.6, zhEn('04 · 飛行時間', '04 · Time of flight'), zhEn('飛行時間像賽跑:推板把離子同時推出去,給的能量一樣,越輕的跑得越快。', 'Time of flight is a race: the pusher starts all ions together with equal energy; lighter ones run faster.')],
+  [61.8, 68.4, zhEn('04 · 飛行時間', '04 · Time of flight'), zhEn('同一種離子也有快有慢;反射鏡讓快的多繞一點路,和慢的同時到終點。', 'Even ions of one kind vary in speed; the reflector sends fast ones a bit farther, so they finish with the slow ones.')],
+  [68.6, 75.4, zhEn('04 · 飛行時間', '04 · Time of flight'), zhEn('量到達時間就知道多重:能分開相差不到 0.01 的 m/z,咖啡因和阿魏酸分成兩根峰。', 'Arrival time gives the mass: it splits m/z values under 0.01 apart, so caffeine and ferulic acid form two peaks.')],
+  [77.6, 83.6, '05 · Orbitrap', zhEn('Orbitrap 先在收集器裡存一批離子,再一口氣送進中間的紡錘和外殼之間。', 'The Orbitrap stores a batch of ions in a collector, then sends it all at once between spindle and shell.')],
+  [83.8, 90.2, '05 · Orbitrap', zhEn('離子繞著紡錘轉圈,同時左右來回擺動;越輕擺得越快,快慢只看 m/z。', 'Ions circle the spindle while swinging back and forth; lighter ones swing faster, and only m/z sets the pace.')],
+  [90.4, 97.4, '05 · Orbitrap', zhEn('外殼記下擺動的訊號,再拆成各種頻率;記得越久,連只差一點點的 m/z 都分得開。', 'The shell records the swings and the signal is split into frequencies; record longer and even very close m/z values split.')],
+  [99.0, 105.4, zhEn('06 · 比一比', '06 · Compare'), zhEn('放大 m/z 195:四極柱和離子阱只看到一根峰,飛行時間和 Orbitrap 分得出兩種分子。', 'Zoomed in on m/z 195: the quadrupole and ion trap show one peak; time of flight and Orbitrap split it in two.')],
+  [105.6, 112.2, zhEn('06 · 比一比', '06 · Compare'), zhEn('四種各有長處:四極柱快又穩,離子阱能拆碎片,飛行時間快又細,Orbitrap 最準。', 'Strengths: quadrupole fast and steady, ion trap breaks ions up, time of flight fast and fine, Orbitrap most accurate.')],
 ];
 const LBL_WIN = [
   [6.6, 13.4, ['src', 'tq', 'tit', 'ttof', 'torb']],
@@ -1650,9 +1671,9 @@ function startRun(now) {
   if (S.spec && (S.spec.ana !== ana || S.spec.ri !== ri)) S.ghost = S.spec;
   S.spec = null;
   S.run = { ana, ri, t0: now, dur: runDur(ana, ri) };
-  el('btnRun').classList.add('on'); el('btnRun').textContent = '停止';
+  el('btnRun').classList.add('on'); el('btnRun').textContent = zhEn('停止', 'Stop');
 }
-function stopRun() { if (!S.run) return; S.run = null; el('btnRun').classList.remove('on'); el('btnRun').textContent = '收譜'; }
+function stopRun() { if (!S.run) return; S.run = null; el('btnRun').classList.remove('on'); el('btnRun').textContent = zhEn('收譜', 'Measure'); }
 // 沒在收譜時各台的待機動作
 const IDLE = { itT0: 0, orbT0: 0 };
 function interactive(dt, now) {
@@ -1756,7 +1777,7 @@ const SKC = {
   metal: '#8ea2ae', metalD: '#3e4c55', gold: '#d7b56d', goldD: '#8a6f3a', cyan: '#74e4ff', mint: '#5dffb0', amber: '#ffc261', he: 'rgba(175,195,205,.6)',
 };
 // 每台的名字與一句比喻(簡圖的標題)
-const SK_HEAD = { q: ['四極柱', '像篩子'], it: ['離子阱', '先關起來,再依序放出'], tof: ['飛行時間', '比賽跑'], orb: ['Orbitrap', '量擺動的快慢'] };
+const SK_HEAD = { q: [zhEn('四極柱', 'Quadrupole'), zhEn('像篩子', 'like a sieve')], it: [zhEn('離子阱', 'Ion trap'), zhEn('先關起來,再依序放出', 'trap, then release in order')], tof: [zhEn('飛行時間', 'Time of flight'), zhEn('比賽跑', 'a race')], orb: ['Orbitrap', zhEn('量擺動的快慢', 'timing the swing')] };
 
 function skText(c, s, x, y, o = {}) {
   const { size = 19, color = SKC.ink2, align = 'left', weight = 500, font = SANS } = o;
@@ -1807,9 +1828,9 @@ function skQuad(c, t) {
   const up = Math.sin(TAU * 1.4 * t) > 0;
   for (const [y, plus] of [[CY - G - RH / 2, up], [CY + G + RH / 2, !up]]) for (const x of [R1 + 34, (R0 + R1) / 2, R0 - 34]) skText(c, plus ? '+' : '−', x, y + 1, { size: 19, weight: 800, color: '#2d2106', align: 'center', font: MONO });
   c.fillStyle = '#16222a'; c.strokeStyle = SKC.mint; c.lineWidth = 2.5; skRound(c, DX, CY - 26, 26, 52, 5); c.fill(); c.stroke();
-  skText(c, '偵測器', DX + 13, CY + 44, { align: 'center' });
+  skText(c, zhEn('偵測器', 'Detector'), DX + 13, CY + 44, { align: 'center' });
   skArrow(c, XI, CY, R0 + 14, CY);
-  skText(c, '離子進來', XI, CY - 24, { align: 'right' });
+  skText(c, zhEn('離子進來', 'Ions come in'), XI, CY - 24, { align: 'right' });
   // m/z 195 的兩種離子(咖啡因、阿魏酸)在這裡的走法一樣;MRFA 是 524
   const groups = [{ m: BYID.caf.mono, cols: [SKC.cyan, SKC.mint], seed: 1 }, { m: BYID.mrfa.mono, cols: [SKC.amber], seed: 7 }];
   const yAt = (x, fate) => {
@@ -1836,13 +1857,13 @@ function skQuad(c, t) {
       else skSpark(c, xe, yAt(xe, fate), (xe - x) / (v * 0.45), col);
     }
   }
-  skText(c, '四根金屬桿,電壓一秒內正負翻轉上百萬次', (R0 + R1) / 2, 62, { align: 'center' });
+  skText(c, zhEn('四根金屬桿,電壓一秒內正負翻轉上百萬次', 'Four metal rods; voltage flips millions of times a second'), (R0 + R1) / 2, 62, { align: 'center' });
   skLead(c, (R0 + R1) / 2 + 70, 74, (R0 + R1) / 2 + 70, CY - G - RH);
   const ly = 250;
-  skDot(c, 34, ly, passCol || SKC.muted, 5); skText(c, '放行的 m/z:穩穩穿過,打到偵測器', 50, ly, { color: SKC.ink });
-  skDot(c, 34, ly + 32, SKC.muted, 5); skText(c, '其他 m/z:越晃越大,撞上金屬桿', 50, ly + 32);
-  skText(c, '把電壓慢慢調大,放行的 m/z 跟著變大', 26, ly + 66, { size: 17, color: SKC.muted });
-  skStatus(c, `現在放行:m/z ${set.toFixed(1)}`);
+  skDot(c, 34, ly, passCol || SKC.muted, 5); skText(c, zhEn('放行的 m/z:穩穩穿過,打到偵測器', 'm/z let through: passes steadily to the detector'), 50, ly, { color: SKC.ink });
+  skDot(c, 34, ly + 32, SKC.muted, 5); skText(c, zhEn('其他 m/z:越晃越大,撞上金屬桿', 'Other m/z: wobbles wider and hits a rod'), 50, ly + 32);
+  skText(c, zhEn('把電壓慢慢調大,放行的 m/z 跟著變大', 'Raise the voltage slowly and the m/z let through rises'), 26, ly + 66, { size: 17, color: SKC.muted });
+  skStatus(c, zhEn(`現在放行:m/z ${set.toFixed(1)}`, `Letting through: m/z ${set.toFixed(1)}`));
 }
 
 // ---------- 離子阱:上下是環形電極、左右是蓋子;離子關在中間,電壓調大時從右邊的小孔依序出去 ----------
@@ -1864,7 +1885,7 @@ function skTrap(c, t) {
     c.closePath(); c.fillStyle = SKC.metal; c.fill();
   }
   c.fillStyle = '#16222a'; c.strokeStyle = SKC.mint; c.lineWidth = 2.5; skRound(c, DX, CY - 26, 26, 52, 5); c.fill(); c.stroke();
-  skText(c, '偵測器', DX + 13, CY + 44, { align: 'center' });
+  skText(c, zhEn('偵測器', 'Detector'), DX + 13, CY + 44, { align: 'center' });
   skArrow(c, 26, CY, CX - z0 - 20, CY);
   // 氦氣
   for (let k = 0; k < 14; k++) { const a = hash1(k * 1.3), b = hash1(k * 2.7); skDot(c, CX + 40 * Math.sin(t * (0.4 + a) + b * 9), CY + 32 * Math.sin(t * (0.5 + b) + a * 7), SKC.he, 2.4, 0.8); }
@@ -1889,15 +1910,16 @@ function skTrap(c, t) {
     }
     skDot(c, x, y, cp.col, 4);
   }
-  skText(c, '環形電極', 26, 66); skLead(c, 108, 66, CX - zMax + 12, CY - RO + 16);
-  skText(c, '蓋子(中間有小孔)', 26, 252); skLead(c, 182, 252, CX - Math.sqrt(z0 * z0 + 1250) - 4, CY + 50);
-  skText(c, '氦氣:撞一撞,讓離子慢下來', 26, 292); skLead(c, 274, 292, CX - 8, CY + 26);
-  skText(c, '電壓調大,輕的先被甩出去', 574, 66, { align: 'right' }); skLead(c, 470, 78, CX + z0 + 10, CY - 4);
+  skText(c, zhEn('環形電極', 'Ring electrode'), 26, 66); skLead(c, zhEn(108, 164), 66, CX - zMax + 12, CY - RO + 16); // 英文的字比較長,引線從字的後面開始
+  skText(c, zhEn('蓋子(中間有小孔)', 'End cap with hole'), 26, 252); skLead(c, zhEn(182, 193), 252, CX - Math.sqrt(z0 * z0 + 1250) - 4, CY + 50);
+  skText(c, zhEn('氦氣:撞一撞,讓離子慢下來', 'Helium: bumping slows the ions'), 26, 292); skLead(c, zhEn(274, 322), 292, CX - 8, CY + 26);
+  // 英文的字比較長,放在電極上方那一條空白(字小一點),才不會壓到電極
+  skText(c, zhEn('電壓調大,輕的先被甩出去', 'Voltage up: light ones thrown out first'), 574, zhEn(66, 45), { align: 'right', size: zhEn(19, 17) }); skLead(c, 470, zhEn(78, 56), CX + z0 + 10, CY - 4);
   let st;
-  if (t < cyc.t0 + 0.9) st = '離子進來';
-  else if (!scanning || t < cyc.scan0) st = '撞氦氣慢下來,在中間繞小圈';
-  else if (t < cyc.scan0 + cyc.dur) st = `電壓調大中:現在甩出 m/z ${trapMzAt(cyc, t).toFixed(0)}`;
-  else st = '從輕到重,依序量完';
+  if (t < cyc.t0 + 0.9) st = zhEn('離子進來', 'Ions coming in');
+  else if (!scanning || t < cyc.scan0) st = zhEn('撞氦氣慢下來,在中間繞小圈', 'Slowed by helium, circling in the middle');
+  else if (t < cyc.scan0 + cyc.dur) st = zhEn(`電壓調大中:現在甩出 m/z ${trapMzAt(cyc, t).toFixed(0)}`, `Voltage rising: now flinging out m/z ${trapMzAt(cyc, t).toFixed(0)}`);
+  else st = zhEn('從輕到重,依序量完', 'Done: measured from light to heavy');
   skStatus(c, st);
 }
 
@@ -1937,7 +1959,7 @@ function skTof(c, t) {
   }
   // 抵達時間的刻度(真實的微秒)
   const AX0 = 70, AX1 = 560, AY = 300, US = 50, X = (us) => AX0 + (us / US) * (AX1 - AX0);
-  skText(c, '抵達時間(微秒,百萬分之一秒)', AX0, 276, { size: 16, color: SKC.muted });
+  skText(c, zhEn('抵達時間(微秒,百萬分之一秒)', 'Arrival time (microseconds, millionths of a second)'), AX0, 276, { size: 16, color: SKC.muted });
   c.strokeStyle = SKC.faint; c.lineWidth = 1.5; c.beginPath(); c.moveTo(AX0, AY); c.lineTo(AX1, AY); c.stroke();
   for (let us = 0; us <= US; us += 10) skText(c, String(us), X(us), AY + 16, { size: 14, color: SKC.muted, align: 'center', font: MONO });
   const usNow = fresh ? Math.max(0, (tau / T195) * TOF_US195) : 0;
@@ -1947,10 +1969,10 @@ function skTof(c, t) {
     c.strokeStyle = cp.col; c.lineWidth = refl ? 3 : 2; c.beginPath(); c.moveTo(X(us), AY); c.lineTo(X(us), AY - 18 * cp.amt); c.stroke();
   }
   if (fresh && usNow < US) { c.strokeStyle = 'rgba(116,228,255,.9)'; c.lineWidth = 2; c.beginPath(); c.moveTo(X(usNow), AY - 22); c.lineTo(X(usNow), AY + 4); c.stroke(); }
-  skText(c, '推板:同時推出去', 538, 236, { align: 'right' });
-  skText(c, '終點(偵測器)', 538, 62, { align: 'right' });
-  skText(c, refl ? '反射鏡:快的鑽得深、多繞一點' : '反射鏡關掉:直直飛到底', 38, 236, { size: 17 });
-  skStatus(c, !fresh ? '等推板推' : allIn ? '輕的先到;量到達時間,就知道多重' : `出發後 ${usNow.toFixed(1)} 微秒`);
+  skText(c, zhEn('推板:同時推出去', 'Pusher: all start at once'), 538, 236, { align: 'right' });
+  skText(c, zhEn('終點(偵測器)', 'Finish (detector)'), 538, 62, { align: 'right' });
+  skText(c, refl ? zhEn('反射鏡:快的鑽得深、多繞一點', 'Reflector: fast ones go deeper') : zhEn('反射鏡關掉:直直飛到底', 'Reflector off: straight to the end'), 38, 236, { size: 17 });
+  skStatus(c, !fresh ? zhEn('等推板推', 'Waiting for the pusher') : allIn ? zhEn('輕的先到;量到達時間,就知道多重', 'Lighter first; arrival time gives the mass') : zhEn(`出發後 ${usNow.toFixed(1)} 微秒`, `${usNow.toFixed(1)} microseconds after launch`));
 }
 
 // ---------- Orbitrap:收集器先存一批,送進紡錘和外殼之間;離子繞圈並左右擺動,外殼記下的訊號在下方 ----------
@@ -1989,7 +2011,7 @@ function skOrb(c, t) {
   }
   // 外殼記下的訊號:最近 3.2 秒,畫面右端是現在
   const TX0 = 60, TX1 = 560, TY = 292, span = 3.2;
-  skText(c, '外殼記下的訊號', TX0, 256, { size: 16, color: SKC.muted });
+  skText(c, zhEn('外殼記下的訊號', 'Signal recorded by the shell'), TX0, 256, { size: 16, color: SKC.muted });
   c.strokeStyle = SKC.faint; c.lineWidth = 1; c.beginPath(); c.moveTo(TX0, TY); c.lineTo(TX1, TY); c.stroke();
   if (s0 > 0) {
     c.strokeStyle = 'rgba(93,255,176,.9)'; c.lineWidth = 1.8; c.beginPath(); let on = false;
@@ -2001,17 +2023,17 @@ function skOrb(c, t) {
     }
     c.stroke();
   }
-  skText(c, '收集器', 76, 134, { align: 'center' });
-  skText(c, '紡錘(吸住離子)', 150, 230); skLead(c, 200, 222, CX - 150, CY + 6);
-  skText(c, '外殼(分成左右兩半)', 576, 50, { align: 'right' }); skLead(c, 470, 60, CX + 96, CY - 62);
-  skText(c, '越輕擺得越快', 576, 230, { align: 'right' });
+  skText(c, zhEn('收集器', 'Collector'), 76, 134, { align: 'center' });
+  skText(c, zhEn('紡錘(吸住離子)', 'Spindle (pulls ions in)'), 150, 230); skLead(c, 200, 222, CX - 150, CY + 6);
+  skText(c, zhEn('外殼(分成左右兩半)', 'Outer shell (two halves)'), 576, 50, { align: 'right' }); skLead(c, 470, 60, CX + 96, CY - 62);
+  skText(c, zhEn('越輕擺得越快', 'Lighter swings faster'), 576, 230, { align: 'right' });
   let st;
   if (t < B.t0) st = '';
-  else if (tau < 0) st = '收集器:先存一批離子';
-  else if (s0 < 0) st = '一口氣送進去';
-  else if (!isFinite(B.acq)) st = '繞著紡錘轉,同時左右擺動';
-  else if (t < B.fft) st = `記錄中:m/z 195 每秒來回約 ${Math.round((ORB_F200 * Math.sqrt(200 / 195.0877)) / 1e4)} 萬次`;
-  else st = '把訊號拆成各種頻率,就得到一張譜';
+  else if (tau < 0) st = zhEn('收集器:先存一批離子', 'Collector: storing a batch of ions');
+  else if (s0 < 0) st = zhEn('一口氣送進去', 'Sent in all at once');
+  else if (!isFinite(B.acq)) st = zhEn('繞著紡錘轉,同時左右擺動', 'Circling the spindle while swinging side to side');
+  else if (t < B.fft) st = zhEn(`記錄中:m/z 195 每秒來回約 ${Math.round((ORB_F200 * Math.sqrt(200 / 195.0877)) / 1e4)} 萬次`, `Recording: m/z 195, about ${(Math.round((ORB_F200 * Math.sqrt(200 / 195.0877)) / 1e4) * 1e4).toLocaleString('en-US')} swings a second`);
+  else st = zhEn('把訊號拆成各種頻率,就得到一張譜', 'Split the signal into frequencies: a spectrum');
   if (st) skStatus(c, st);
 }
 
@@ -2019,7 +2041,7 @@ function skOrb(c, t) {
 // 互動模式按「電場形狀」時畫,播完停 2.5 秒再從頭;影片與導覽在講完每一台時停下來播(W.field,見 50_film.js 的 FHOLD)
 const SKF = { q: null, it: null, tof: null, orb: null, last: 0, hold: 0 }, SKFF = {};
 const SKF_KIND = { q: 'quad', it: 'trap', tof: 'tof', orb: 'orb' };
-const SKF_SUB = { q: '電場形狀:翻轉的馬鞍', it: '電場形狀:翻轉的馬鞍', tof: '電場形狀:陡坡、平地、上坡', orb: '電場形狀:繞著轉、來回擺' };
+const SKF_SUB = { q: zhEn('電場形狀:翻轉的馬鞍', 'Field: a flipping saddle'), it: zhEn('電場形狀:翻轉的馬鞍', 'Field: a flipping saddle'), tof: zhEn('電場形狀:陡坡、平地、上坡', 'Field: steep, flat, uphill'), orb: zhEn('電場形狀:繞著轉、來回擺', 'Field: circling, swinging') };
 const skFieldOn = (ana) => !(FILM || tour.on) && S.skField && !!SKF_KIND[ana];
 // 影片用另一組示意,和互動模式的互不干擾
 const skFieldFilm = (ana) => SKFF[ana] || (SKFF[ana] = createFieldDemo(SKF_KIND[ana], { font: SANS, ions: ana === 'q' ? [{ mz: 160, label: 'm/z 160' }, { mz: 195, label: 'm/z 195' }, { mz: 285, label: 'm/z 285' }] : undefined }));
@@ -2028,19 +2050,19 @@ function skFieldDemo(ana) {
   if (ana === 'tof') return (SKF.tof = createFieldDemo('tof', {
     font: SANS,
     cues: [
-      [0, '飛行時間裡的電場畫成地形:推斥區是一道陡坡,飛行管是平地(沒有電場),反射鏡是一道上坡。'],
-      [4, '推斥極一推,離子從陡坡滑下來,每一個都得到一樣多的能量;越輕的跑得越快,在平地上一直維持同樣的速度。'],
-      [9, '反射鏡是上坡:跑得快的衝得比較高、多繞一點路,所以同一種離子不管快慢,幾乎同時回到偵測器。'],
-      [16, '把反射鏡關掉(控制面板的「反射鏡」也能切),離子直直飛到最後面:同一種離子有快有慢,到達的時間就散開,峰變寬,咖啡因和阿魏酸就分不開了。'],
+      [0, zhEn('飛行時間裡的電場畫成地形:推斥區是一道陡坡,飛行管是平地(沒有電場),反射鏡是一道上坡。', 'The time-of-flight field is drawn as terrain: the pusher region is a steep slope, the flight tube is flat (no field), and the reflector is an uphill slope.')],
+      [4, zhEn('推斥極一推,離子從陡坡滑下來,每一個都得到一樣多的能量;越輕的跑得越快,在平地上一直維持同樣的速度。', 'The pusher fires and the ions slide down the slope, each gaining the same energy; lighter ones go faster and keep that speed on the flat.')],
+      [9, zhEn('反射鏡是上坡:跑得快的衝得比較高、多繞一點路,所以同一種離子不管快慢,幾乎同時回到偵測器。', 'The reflector is uphill: faster ions climb higher and travel a bit farther, so ions of one kind, fast or slow, reach the detector at almost the same time.')],
+      [16, zhEn('把反射鏡關掉(控制面板的「反射鏡」也能切),離子直直飛到最後面:同一種離子有快有慢,到達的時間就散開,峰變寬,咖啡因和阿魏酸就分不開了。', 'Turn the reflector off (the Reflector setting in the control panel does it too) and the ions fly straight to the far end: ions of one kind arrive spread out in time, peaks widen, and caffeine and ferulic acid merge.')],
     ],
   }));
   if (ana === 'orb') return (SKF.orb = createFieldDemo('orb', {
     font: SANS,
     cues: [
-      [0, 'Orbitrap 中間是一根紡錘形的電極,外面包著兩半的外殼。紡錘把帶正電的離子往內吸,離子繞著它轉,像衛星繞地球,不會撞上去。'],
-      [6, '沿著紡錘的方向,電場像一個碗:離中間越遠,被推回來越用力,所以離子會左右來回擺盪。'],
-      [13, '擺盪的快慢只看 m/z:越輕擺得越快,和離子帶多少能量、一開始在哪裡都沒有關係。真的 Orbitrap 裡,m/z 195 每秒來回約 59 萬次。'],
-      [21, '外殼的兩半記下離子擺來擺去造成的訊號;混在一起的擺動再拆成各種頻率,一種頻率就是一種 m/z。記得越久,頻率分得越細。'],
+      [0, zhEn('Orbitrap 中間是一根紡錘形的電極,外面包著兩半的外殼。紡錘把帶正電的離子往內吸,離子繞著它轉,像衛星繞地球,不會撞上去。', 'An Orbitrap has a spindle-shaped electrode in the middle and a two-part outer shell. The spindle pulls positive ions inward, and they circle it like satellites around Earth, never hitting it.')],
+      [6, zhEn('沿著紡錘的方向,電場像一個碗:離中間越遠,被推回來越用力,所以離子會左右來回擺盪。', 'Along the spindle the field is like a bowl: the farther from the middle, the harder the push back, so the ions swing back and forth.')],
+      [13, zhEn('擺盪的快慢只看 m/z:越輕擺得越快,和離子帶多少能量、一開始在哪裡都沒有關係。真的 Orbitrap 裡,m/z 195 每秒來回約 59 萬次。', 'How fast they swing depends only on m/z: lighter ions swing faster, whatever their energy or starting point. In a real Orbitrap, m/z 195 swings back and forth about 590,000 times a second.')],
+      [21, zhEn('外殼的兩半記下離子擺來擺去造成的訊號;混在一起的擺動再拆成各種頻率,一種頻率就是一種 m/z。記得越久,頻率分得越細。', 'The two halves of the shell record the signal of the swinging ions; the mixed swings are split into frequencies, one frequency for each m/z. The longer it records, the finer the split.')],
     ],
   }));
   SKF[ana] = ana === 'q'
@@ -2048,21 +2070,21 @@ function skFieldDemo(ana) {
       font: SANS,
       ions: [{ mz: 160, label: 'm/z 160' }, { mz: 195, label: 'm/z 195' }, { mz: 285, label: 'm/z 285' }],
       cues: [
-        [0, '四極柱的四根桿子之間,電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。不動的話,離子(球)一定會滾下去。'],
-        [5, '桿子上的電壓快速正負交替,馬鞍跟著翻來翻去。翻得夠快,球還沒滾遠就被推回來,離子就能沿著中間一路往前走。'],
-        [11, '再加上一個不變的直流電壓,馬鞍往一邊偏。這時只有一種 m/z 留得住:比 195 輕的跟著翻轉越擺越大,被甩出去;比它重的反應太慢,被直流慢慢拉走。'],
-        [22, '把兩種電壓按固定比例一起調高,留得住的 m/z 就往上換。一路掃過去,每種 m/z 輪流穿過、打到偵測器,就量出一張質譜;「篩得更細」就是讓這個窗口更窄。'],
+        [0, zhEn('四極柱的四根桿子之間,電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。不動的話,離子(球)一定會滾下去。', 'Between the four rods of a quadrupole the electric field is like a saddle: it pushes inward one way and pulls outward the other. If it stays still, the ion (the ball) always rolls off.')],
+        [5, zhEn('桿子上的電壓快速正負交替,馬鞍跟著翻來翻去。翻得夠快,球還沒滾遠就被推回來,離子就能沿著中間一路往前走。', 'The rod voltages swap between plus and minus quickly, so the saddle flips back and forth. Fast enough, and the ball is pushed back before it gets far, so the ion travels on down the middle.')],
+        [11, zhEn('再加上一個不變的直流電壓,馬鞍往一邊偏。這時只有一種 m/z 留得住:比 195 輕的跟著翻轉越擺越大,被甩出去;比它重的反應太慢,被直流慢慢拉走。', 'Add a steady DC voltage and the saddle tilts to one side. Now only one m/z stays: ions lighter than 195 swing wider with each flip and are thrown out; heavier ones respond too slowly and the DC drags them away.')],
+        [22, zhEn('把兩種電壓按固定比例一起調高,留得住的 m/z 就往上換。一路掃過去,每種 m/z 輪流穿過、打到偵測器,就量出一張質譜;「篩得更細」就是讓這個窗口更窄。', 'Raise both voltages at a fixed ratio and the m/z that stays moves up. Sweeping all the way, each m/z takes its turn through to the detector, giving a mass spectrum; the "Finer" setting just makes this window narrower.')],
       ],
     })
     : createFieldDemo('trap', {
       font: SANS,
       cues: [
-        [0, '離子阱裡的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。把球放在不動的馬鞍上,它一定會滾下去。'],
-        [6, '讓馬鞍翻來翻去,剛剛往外拉的方向就變成往中間推。可是翻得太慢,球在翻過來之前就滾遠了。'],
-        [12, '翻得夠快,球還沒滾遠就被推回來,離子就這樣被關在中間。真正的離子阱,環形電極的電壓每秒正負翻轉 76 萬次。'],
-        [16.5, '平均下來,離子就像待在碗底。圖上的碗是翻轉的平均效果,不是真的有一個碗。'],
-        [20, '同樣的翻轉速度,越輕的離子反應越快。太輕的(橙色)越擺越大,一樣留不住,所以離子阱關得住的 m/z 有下限。'],
-        [26, '收譜的時候把電壓慢慢調高:每顆球都被推得更用力,最輕的先撐不住,沿著軸向被甩出去打到偵測器,接著是下一種。這就是「關起來,再依序放出」。'],
+        [0, zhEn('離子阱裡的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。把球放在不動的馬鞍上,它一定會滾下去。', 'In an ion trap the electric field is like a saddle: it pushes inward one way and pulls outward the other. A ball on a still saddle always rolls off.')],
+        [6, zhEn('讓馬鞍翻來翻去,剛剛往外拉的方向就變成往中間推。可是翻得太慢,球在翻過來之前就滾遠了。', 'Flip the saddle back and forth and the outward direction turns inward. But flipped too slowly, the ball rolls away before the flip comes.')],
+        [12, zhEn('翻得夠快,球還沒滾遠就被推回來,離子就這樣被關在中間。真正的離子阱,環形電極的電壓每秒正負翻轉 76 萬次。', 'Flipped fast enough, the ball is pushed back before it gets far, so the ion stays trapped. In a real ion trap, the ring electrode voltage flips between + and − 760,000 times a second.')],
+        [16.5, zhEn('平均下來,離子就像待在碗底。圖上的碗是翻轉的平均效果,不是真的有一個碗。', 'On average the ion sits as if at the bottom of a bowl. The bowl shows the average effect of the flipping; there is no real bowl.')],
+        [20, zhEn('同樣的翻轉速度,越輕的離子反應越快。太輕的(橙色)越擺越大,一樣留不住,所以離子阱關得住的 m/z 有下限。', 'At the same flipping speed, lighter ions respond faster. One that is too light (orange) swings wider and wider and escapes too, so an ion trap has a lowest m/z it can hold.')],
+        [26, zhEn('收譜的時候把電壓慢慢調高:每顆球都被推得更用力,最輕的先撐不住,沿著軸向被甩出去打到偵測器,接著是下一種。這就是「關起來,再依序放出」。', 'To take a spectrum the voltage rises slowly: every ball is pushed harder, the lightest gives way first and is thrown out along the axis to the detector, then the next. This is "trap, then release in order".')],
       ],
     });
   return SKF[ana];
@@ -2081,7 +2103,7 @@ function drawSketch(t, ana) {
   const head = SK_HEAD[ana][0] + '|' + sub;
   if (head !== skLastHead) {
     skLastHead = head; el('skTitle').textContent = SK_HEAD[ana][0]; el('skSub').textContent = sub;
-    skCv.setAttribute('aria-label', field ? '電場形狀:把電場畫成地形,球照真的運動方程式移動' : '目前分析器的簡圖:離子從哪裡進來、怎麼走、在哪裡被量到');
+    skCv.setAttribute('aria-label', field ? zhEn('電場形狀:把電場畫成地形,球照真的運動方程式移動', 'Field shape: the electric field drawn as terrain, with balls that follow the real equations of motion') : zhEn('目前分析器的簡圖:離子從哪裡進來、怎麼走、在哪裡被量到', 'Sketch of the selected analyzer: where the ions come in, how they move and where they are measured'));
   }
   const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (skCv.currentCSSZoom || uiScale()), w = skCv.clientWidth, h = skCv.clientHeight; // 面板放大時多畫幾倍像素
   if (!w || !h) return;
@@ -2118,11 +2140,13 @@ const timeText = (ana, ri) => { const s = ANA[ana].spec(ri); return s >= 1 ? `${
 function sketchText() {
   if (skFieldOn(S.ana)) { const d = skFieldDemo(S.ana); return d.cueAt(d.t); }
   const a = S.ana, ri = S.resi[a], g = fmtGap(gapOf(a, ri));
-  if (a === 'q') return ri ? `篩得更細:能分開相差約 ${g} 的 m/z,但穿得過去的離子只剩約三成,訊號變弱。` : `能分開相差約 ${g} 的 m/z。咖啡因和阿魏酸只差 0.02,在這裡是同一根峰;四極柱的長處是快又穩,常用來測含量。`;
-  if (a === 'it') return ri ? `掃慢一點(每秒約 5,000 個 m/z 單位),能分開相差約 ${g}。` : `每秒掃過約 12,500 個 m/z 單位,能分開相差約 ${g}。關在裡面的離子也能只留一種,撞碎後再量碎片。`;
-  if (a === 'tof') return ri ? `反射鏡開著:同一種離子有快有慢也能一起抵達,能分開相差約 ${g},咖啡因和阿魏酸分得開。` : `反射鏡關掉:同一種離子有快有慢,到達時間散開,只能分開相差約 ${g}。`;
-  return `記錄 ${ANA.orb.res[ri].label}:能分開相差約 ${g}。記得越久分得越細,但量一張譜也越慢。`;
+  if (a === 'q') return ri ? zhEn(`篩得更細:能分開相差約 ${g} 的 m/z,但穿得過去的離子只剩約三成,訊號變弱。`, `Finer sieve: splits m/z values about ${g} apart, but only about 30% of the ions get through, so the signal is weaker.`) : zhEn(`能分開相差約 ${g} 的 m/z。咖啡因和阿魏酸只差 0.02,在這裡是同一根峰;四極柱的長處是快又穩,常用來測含量。`, `Splits m/z values about ${g} apart. Caffeine and ferulic acid differ by only 0.02, so here they make one peak; the quadrupole is fast and steady, so it is often used to measure amounts.`);
+  if (a === 'it') return ri ? zhEn(`掃慢一點(每秒約 5,000 個 m/z 單位),能分開相差約 ${g}。`, `Scanning slower (about 5,000 m/z units a second) splits values about ${g} apart.`) : zhEn(`每秒掃過約 12,500 個 m/z 單位,能分開相差約 ${g}。關在裡面的離子也能只留一種,撞碎後再量碎片。`, `Scans about 12,500 m/z units a second and splits values about ${g} apart. It can also keep just one kind of trapped ion, break it up and measure the pieces.`);
+  if (a === 'tof') return ri ? zhEn(`反射鏡開著:同一種離子有快有慢也能一起抵達,能分開相差約 ${g},咖啡因和阿魏酸分得開。`, `Reflector on: ions of one kind arrive together even at different speeds, splitting values about ${g} apart, so caffeine and ferulic acid separate.`) : zhEn(`反射鏡關掉:同一種離子有快有慢,到達時間散開,只能分開相差約 ${g}。`, `Reflector off: ions of one kind travel at different speeds and arrive spread out, so it only splits values about ${g} apart.`);
+  return zhEn(`記錄 ${ANA.orb.res[ri].label}:能分開相差約 ${g}。記得越久分得越細,但量一張譜也越慢。`, `Recording ${ANA.orb.res[ri].label}: splits values about ${g} apart. Recording longer splits finer, but each spectrum takes longer.`);
 }
+// 圖例裡的設定:英文只寫 On、Off 看不出是什麼,飛行時間前面加上 reflector;中文照原本的選項名稱
+const legSet = (a, ri) => zhEn(ANA[a].res[ri].label, a === 'tof' ? `reflector ${ANA[a].res[ri].label.toLowerCase()}` : ANA[a].res[ri].label.toLowerCase());
 let lastSkOp = -1, lastNote = '', lastLegend = '', lastCap = '', lastTitle = '', lastHead = '', lastCmp = -1;
 function updateDOM(t) {
   const a = W.spec ? W.spec.ana : FILM || tour.on ? W.ana || 'q' : S.ana;
@@ -2149,18 +2173,19 @@ function updateDOM(t) {
   el('vA').textContent = errText(a, ri); el('mA').style.width = `${clamp(Math.log10(Math.max(1, ppmOf(a, ri))) / 3, 0.03, 1) * 100}%`;
   el('mA').style.background = ppmOf(a, ri) > 50 ? 'var(--amber)' : 'var(--mint)';
   const vs = el('vS');
-  vs.textContent = v < 0.5 ? '分得開' : v < 0.9 ? '勉強分開' : '分不開';
+  vs.textContent = v < 0.5 ? zhEn('分得開', 'Split') : v < 0.9 ? zhEn('勉強分開', 'Barely split') : zhEn('分不開', 'Merged');
   vs.classList.toggle('no', v >= 0.5);
   // 主控台標題與圖例
-  const head = W.conMode === 'cmp' ? '比一比:m/z 195' : W.sig ? `${ANA[W.sig.ana].name}收譜中` : '質譜';
+  // 英文收譜中只寫 Measuring:分析器的名稱圖例裡已經有,英文寫全會把圖例擠出主控台
+  const head = W.conMode === 'cmp' ? zhEn('比一比:m/z 195', 'Compare: m/z 195') : W.sig ? zhEn(`${ANA[W.sig.ana].name}收譜中`, 'Measuring') : zhEn('質譜', 'Mass spectrum');
   if (head !== lastHead) { lastHead = head; el('conTitle').textContent = head; }
-  el('conSample').textContent = '咖啡因、阿魏酸、MRFA(各多帶一個 H⁺)';
+  el('conSample').textContent = zhEn('咖啡因、阿魏酸、MRFA(各多帶一個 H⁺)', 'Caffeine, ferulic acid, MRFA (each + H⁺)');
   let lg = '';
-  if (W.conMode === 'cmp') lg = '<span>四種分析器,各自的最高點 = 100%</span>';
+  if (W.conMode === 'cmp') lg = zhEn('<span>四種分析器,各自的最高點 = 100%</span>', "<span>Each analyzer's top = 100%</span>");
   else {
-    if (W.spec) lg += `<span><i style="border-top:2px solid var(--cyan)"></i>${W.sig ? '本次' : '本次'} ${ANA[W.spec.ana].name} · ${ANA[W.spec.ana].res[W.spec.ri].label}</span>`;
-    if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>上一次 ${ANA[W.ghost.ana].name} · ${ANA[W.ghost.ana].res[W.ghost.ri].label}</span>`;
-    if (!W.spec && !W.ghost) lg = '<span>按「收譜」收一張譜</span>';
+    if (W.spec) lg += `<span><i style="border-top:2px solid var(--cyan)"></i>${W.sig ? zhEn('本次', 'Now:') : zhEn('本次', 'Now:')} ${ANA[W.spec.ana].name} · ${legSet(W.spec.ana, W.spec.ri)}</span>`;
+    if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>${zhEn('上一次', 'Last:')} ${ANA[W.ghost.ana].name} · ${legSet(W.ghost.ana, W.ghost.ri)}</span>`;
+    if (!W.spec && !W.ghost) lg = zhEn('<span>按「收譜」收一張譜</span>', '<span>Press Measure to take a spectrum</span>');
   }
   if (lg !== lastLegend) { lastLegend = lg; el('legend').innerHTML = lg; }
   const con = el('console');
@@ -2180,8 +2205,8 @@ function updateDOM(t) {
     if (tk !== lastTitle) {
       lastTitle = tk;
       const tx = tk === 't'
-        ? ['質譜儀', '不同分析器比較', '四極柱、離子阱、飛行時間、Orbitrap,同一組離子比比看', '']
-        : ['質譜儀-不同分析器比較', '篩子 · 關起來 · 賽跑 · 量擺動', '四極柱 · 離子阱 · 飛行時間 · Orbitrap', '質譜儀不同分析器的原理比較;示意動畫,尺寸、速度與時間都經過調整。數值參考 Agilent 5977、Thermo LCQ Fleet、Agilent 6546 與 Thermo Q Exactive,譜是依理論值模擬的。'];
+        ? zhEn(['質譜儀', '不同分析器比較', '四極柱、離子阱、飛行時間、Orbitrap,同一組離子比比看', ''], ['Mass spectrometers', 'Comparing analyzers', 'Quadrupole, ion trap, time of flight, Orbitrap: the same ions, compared', ''])
+        : zhEn(['質譜儀-不同分析器比較', '篩子 · 關起來 · 賽跑 · 量擺動', '四極柱 · 離子阱 · 飛行時間 · Orbitrap', '質譜儀不同分析器的原理比較;示意動畫,尺寸、速度與時間都經過調整。數值參考 Agilent 5977、Thermo LCQ Fleet、Agilent 6546 與 Thermo Q Exactive,譜是依理論值模擬的。'], ['Mass spectrometers: comparing analyzers', 'Sieve · trap · race · swing', 'Quadrupole · ion trap · time of flight · Orbitrap', 'How different mass analyzers work, compared; schematic animation with sizes, speeds and times adjusted. Values based on the Agilent 5977, Thermo LCQ Fleet, Agilent 6546 and Thermo Q Exactive; spectra simulated from theoretical values.']);
       ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => { el(id).textContent = tx[i]; });
       el('titlecard').classList.toggle('outro', tk === 'o');
     }
@@ -2190,14 +2215,21 @@ function updateDOM(t) {
   }
 }
 // 比較表(影片最後一段)
-el('cmp').innerHTML = `<table>
+el('cmp').innerHTML = zhEn(`<table>
 <tr><th></th><th>四極柱</th><th>離子阱</th><th>飛行時間</th><th>Orbitrap</th></tr>
 <tr><td>怎麼分</td><td>像篩子</td><td>關起來再依序放出</td><td>比賽跑</td><td>量擺動快慢</td></tr>
 <tr><td>能分開的差距</td><td><b>≈ 0.6</b></td><td><b>0.45 至 0.7</b></td><td><b>≈ 0.007</b></td><td><b>0.001 至 0.01</b></td></tr>
 <tr><td>量到的偏差</td><td>≈ 0.1</td><td>≈ 0.15</td><td>≈ 0.0002</td><td>≈ 0.0002</td></tr>
 <tr><td>量一張譜</td><td>≈ 40 ms</td><td>70 至 130 ms</td><td>≈ 20 ms</td><td>83 至 670 ms</td></tr>
 <tr><td>長處</td><td>快又穩,測含量</td><td>能拆碎片</td><td>快又細</td><td>最準</td></tr>
-</table>`;
+</table>`, `<table>
+<tr><th></th><th>Quadrupole</th><th>Ion trap</th><th>Time of flight</th><th>Orbitrap</th></tr>
+<tr><td>How it sorts</td><td>Like a sieve</td><td>Trap, then release in order</td><td>A race</td><td>Timing the swing</td></tr>
+<tr><td>Smallest gap</td><td><b>≈ 0.6</b></td><td><b>0.45 to 0.7</b></td><td><b>≈ 0.007</b></td><td><b>0.001 to 0.01</b></td></tr>
+<tr><td>Off by</td><td>≈ 0.1</td><td>≈ 0.15</td><td>≈ 0.0002</td><td>≈ 0.0002</td></tr>
+<tr><td>Per spectrum</td><td>≈ 40 ms</td><td>70 to 130 ms</td><td>≈ 20 ms</td><td>83 to 670 ms</td></tr>
+<tr><td>Strength</td><td>Fast, steady; measures amounts</td><td>Breaks ions up</td><td>Fast and fine</td><td>Most accurate</td></tr>
+</table>`);
 
 // ---------- 主控台的圖 ----------
 const plot = el('plot'), tip = el('tip');
@@ -2272,7 +2304,7 @@ function drawSpec(c, x0, y0, W0, H0) {
   if (W.ghost) trace(W.ghost, 'rgba(255,194,97,.85)', FILM ? 2 : 1.5, [5, 3], 1, false, 7);
   if (W.spec) trace(W.spec, '#74e4ff', FILM ? 2.2 : 1.6, null, W.spec.reveal, W.spec.build, 1);
   c.restore();
-  if (z >= 1.5 && W.spec) { const M = specModel(W.spec.ana, W.spec.ri), k = M.top / yScale(M); c.fillStyle = COL.muted; c.font = `500 ${fs}px ${MONO}`; c.textAlign = 'right'; c.textBaseline = 'top'; c.fillText(`高度放大 ${Math.round(k)} 倍`, Lp + pw - 4, Tp); }
+  if (z >= 1.5 && W.spec) { const M = specModel(W.spec.ana, W.spec.ri), k = M.top / yScale(M); c.fillStyle = COL.muted; c.font = `500 ${fs}px ${MONO}`; c.textAlign = 'right'; c.textBaseline = 'top'; c.fillText(zhEn(`高度放大 ${Math.round(k)} 倍`, `Height ×${Math.round(k)}`), Lp + pw - 4, Tp); }
   // 峰的標註
   const sp = W.spec;
   if (!sp || (sp.build && sp.reveal < 1)) return;
@@ -2282,16 +2314,17 @@ function drawSpec(c, x0, y0, W0, H0) {
     const x = X(mz); if (x < Lp + 20 || x > Lp + pw - 20) return;
     const v = specMax(M, mz - 0.6 * fwhmOf(sp.ana, sp.ri, mz), mz + 0.6 * fwhmOf(sp.ana, sp.ri, mz)) / top, y = Y(v) - 8 - dy;
     c.fillStyle = col; c.font = `600 ${fs + 1}px ${MONO}`; c.fillText(mz.toFixed(hr ? 4 : 1), x, y);
-    if (name) { c.font = `500 ${fs}px ${SANS}`; c.fillStyle = COL.ink2; c.fillText(name, x, y - fs - 3); }
+    // 英文的名稱比較寬,靠近左緣時往右挪,才不會超出圖的左邊
+    if (name) { c.font = `500 ${fs}px ${SANS}`; c.fillStyle = COL.ink2; c.fillText(name, zhEn(x, Math.max(x, x0 + 2 + c.measureText(name).width / 2)), y - fs - 3); }
   };
   if (z < 0.5) {
     const e = (mz) => mz + ANA[sp.ana].err(mz, sp.ri);
-    lab(e(BYID.caf.mono), hr ? '咖啡因與阿魏酸' : '咖啡因 + 阿魏酸', COL.ink);
+    lab(e(BYID.caf.mono), hr ? zhEn('咖啡因與阿魏酸', 'Caffeine and ferulic acid') : zhEn('咖啡因 + 阿魏酸', 'Caffeine + ferulic acid'), COL.ink);
     lab(e(BYID.mrfa.mono), 'MRFA', '#ffc261');
   } else if (z < 1.5 && z > 0.6) {
     const e = (mz) => mz + ANA[sp.ana].err(mz, sp.ri);
-    if (doubletValley(sp.ana, sp.ri) < 0.6) { lab(e(BYID.fer.mono), '阿魏酸', '#5dffb0'); lab(e(BYID.caf.mono), '咖啡因', '#74e4ff'); }
-    else { const mid = specPeak(M, 194.9, 195.3); lab(mid, '咖啡因 + 阿魏酸', COL.ink); }
+    if (doubletValley(sp.ana, sp.ri) < 0.6) { lab(e(BYID.fer.mono), zhEn('阿魏酸', 'Ferulic acid'), '#5dffb0'); lab(e(BYID.caf.mono), zhEn('咖啡因', 'Caffeine'), '#74e4ff'); }
+    else { const mid = specPeak(M, 194.9, 195.3); lab(mid, zhEn('咖啡因 + 阿魏酸', 'Caffeine + ferulic acid'), COL.ink); }
   }
   c.globalAlpha = 1;
 }
@@ -2308,9 +2341,11 @@ function drawCompare(c, w, h) {
   const Lp = FILM ? 120 : 92, Rp = 10, Tp = FILM ? 24 : 18, Bp = FILM ? 28 : 20, pw = w - Lp - Rp, rowH = (h - Tp - Bp) / 4;
   const X = (m) => Lp + ((m - m0) / span) * pw;
   c.font = `500 ${fs}px ${SANS}`;
-  for (const [mz, nm, col] of [[BYID.fer.mono, '阿魏酸', '#5dffb0'], [BYID.caf.mono, '咖啡因', '#74e4ff']]) {
+  for (const [mz, nm, col] of [[BYID.fer.mono, zhEn('阿魏酸', 'Ferulic acid'), '#5dffb0'], [BYID.caf.mono, zhEn('咖啡因', 'Caffeine'), '#74e4ff']]) {
     const x = X(mz); c.strokeStyle = col; c.globalAlpha = 0.5; c.setLineDash([3, 4]); c.beginPath(); c.moveTo(x, Tp - 2); c.lineTo(x, h - Bp); c.stroke(); c.setLineDash([]); c.globalAlpha = 1;
-    c.fillStyle = col; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.fillText(`${nm} ${mz.toFixed(4)}`, x + (nm === '咖啡因' ? 46 : -46), Tp - 2);
+    // 英文的名稱比較長:兩段字貼著各自的虛線往外排(咖啡因往右、阿魏酸往左),才不會疊在一起
+    const caf = nm === zhEn('咖啡因', 'Caffeine');
+    c.fillStyle = col; c.textAlign = zhEn('center', caf ? 'left' : 'right'); c.textBaseline = 'bottom'; c.fillText(`${nm} ${mz.toFixed(4)}`, x + zhEn(caf ? 46 : -46, caf ? 5 : -5), Tp - 2);
   }
   names.forEach((a, k) => {
     const M = specModel(a, ris[a]), y1 = Tp + (k + 1) * rowH, y0 = y1 - rowH + 6, n = Math.round(pw * 1.4);
@@ -2320,7 +2355,7 @@ function drawCompare(c, w, h) {
     for (let i = 0; i < n; i++) { const a0 = m0 + (i / n) * span, b0 = m0 + ((i + 1) / n) * span, v = specMax(M, a0, b0) / mx; const x = Lp + ((i + 0.5) / n) * pw, y = y1 - 2 - v * (rowH - 10); i ? c.lineTo(x, y) : c.moveTo(x, y); }
     c.stroke(); c.lineWidth = 1;
     c.fillStyle = COL.ink; c.font = `600 ${fs + 1}px ${SANS}`; c.textAlign = 'right'; c.textBaseline = 'middle'; c.fillText(ANA[a].name, Lp - 10, y1 - rowH / 2 + 2);
-    c.fillStyle = COL.muted; c.font = `${fs - 1}px ${MONO}`; c.fillText(`差距 ≈ ${fmtGap(gapOf(a, ris[a]))}`, Lp - 10, y1 - rowH / 2 + fs + 4);
+    c.fillStyle = COL.muted; c.font = `${fs - 1}px ${MONO}`; c.fillText(zhEn(`差距 ≈ ${fmtGap(gapOf(a, ris[a]))}`, `gap ≈ ${fmtGap(gapOf(a, ris[a]))}`), Lp - 10, y1 - rowH / 2 + fs + 4);
   });
   c.fillStyle = COL.muted; c.font = `${fs}px ${MONO}`; c.textAlign = 'center'; c.textBaseline = 'top';
   for (const m of [194.8, 195.0, 195.2, 195.4]) c.fillText(m.toFixed(1), X(m), h - Bp + 6);

@@ -76,6 +76,14 @@
 - 相對定量:Livak 與 Schmittgen 2001(Methods 25:402–408,doi:10.1006/meth.2001.1262;只讀到摘要,2^(−ΔΔCT) 的名稱與用途);Pfaffl 2001(Nucleic Acids Res 29:e45,PMC55695:比值 = E目標^ΔCP目標(對照 − 樣品) ÷ E參考^ΔCP參考(對照 − 樣品)、E = 10^(−1/斜率)、E = 2 是理想值、兩個 E 都是 2 時才化簡成 ΔΔ 法、ΔΔ 法只適合快速估計);MIQE 7.4.1 節(ΔΔCq 法以單一參考基因校正,兩個基因的效率要相近;效率不同時標準曲線斜率不同,目標與參考的 Cq 差會隨模板量改變);Thermo Fisher Real-time PCR handbook 4.3 節(ΔΔCt 法要兩個基因效率相同,相對效率圖斜率 < 0.1 可接受;效率校正的式子出自 Pfaffl)與效率 90% 到 110%、目標與參考基因效率要相近的段落。
 - 熔解曲線:Ririe KM, et al. Anal Biochem 1997;245(2):154–160(doi:10.1006/abio.1996.9916;摘要:用 SYBR Green I 在 PCR 中取得熔解曲線,形狀與位置由 GC/AT 比、長度與序列決定,Tm 差不到 2 °C 也分得出,可以不必跑膠);Thermo Fisher Real-time PCR handbook(專一的擴增在熔解曲線上是一個窄峰;引子二聚體是螢光較低、較寬、在 70 多 °C 熔解的峰,因為長短不一;和不加模板的對照比對,沒有模板時更常見;模板越少引子二聚體越多;熔解曲線出現多個峰表示反應物被分走、會影響效率;HRM 一節描述慢慢升溫時螢光在接近 Tm 時陡降)。−dF/dT 是取曲線負斜率的常見畫法,原文摘要沒有寫這個詞,頁面把它當成作圖方法說明。
 
+## 英文版(2026-11-06)
+
+- 做法見 `docs/I18N.md`。這一頁是 2D 教材的範本:標題、導言、畫布的 aria-label 用 `data-en`;重點整理與資料來源各是一組 `<ul lang="zh-Hant">` 與 `<ul lang="en">`;程式裡的字一律 `zhEn('中文', 'English')`,包括章名、字幕、圖上的字、選項與 `fmtCopies` 這類組字的函式。
+- 份數:中文用萬、億、兆,英文用 million、billion、trillion(`fmtCopies` 的單位表也用 `zhEn` 換);一份時寫 copy。`verdict()` 的英文也用半形冒號分開,膠的那一章只顯示冒號前面的字(Too low、Too high、Just right)。
+- 只有英文改了位置或分兩行的地方(手機上圖上的字放大 1.3 倍,英文才放得下):膠的那一章右邊的說明分兩行,底下兩行往下移 10(`zhEn(186, 196)`、`zhEn(212, 222)`);qPCR 推回的份數在 10⁶ 以上時改成靠右對齊;黏合那一章右上的說明拿掉「primer」只寫 Tm;引子設計那一章右下的說明改短。
+- 改中文時英文一起改;改完跑 `node scripts/check-i18n.mjs --list pcr/index.html`(要沒有輸出)與 `node scripts/check-i18n-layout.mjs pcr`(桌機與手機都比對中英的字有沒有超出、疊在一起)。英文播放約 222 秒(中文 149 秒,長的字幕那一段播放器自動放慢)。
+- 黏合溫度太低時錯配引子旁的標籤,英文往上移 4(`y - zhEn(36, 40)`),延伸那一章才不碰到 5′→3′。
+
 ## 修改後要檢查
 
 - 語法:把 module script 抽出來 `node --check`;`node scripts/check-site.mjs`、`node scripts/check-bio.mjs`。

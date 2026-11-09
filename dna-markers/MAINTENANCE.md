@@ -125,3 +125,11 @@
 - 這份教材的規劃說明把 2020 年那篇寫成紅檜;查證後是臺灣扁柏(*C. taiwanensis*),2022 年那篇才是紅檜(*C. formosensis*)。頁面已依論文改正。
 - 大果油茶 *C. oleifera*、小果油茶(短柱山茶)*C. brevistyla* 的對應,是從搜尋引擎對農業部那份 PDF 的摘錄確認的;PDF 本身的中文字抽不出來,沒有逐字核對。苦茶油那篇論文的摘要也用 *C. brevistyla*,兩者一致。
 - 第 7 章「油裡的核 SSR 幾乎驗不到」是示意的極端情況;實際上冷壓或粗製的油有時也能驗核 DNA,所以字幕只說葉綠體標記「比較容易」。
+
+## 英文版(2026-11-06)
+
+- 英文和中文寫在同一份 `index.html`:標題、導言、畫布的 `aria-label` 用 `data-en`;重點整理與資料來源是 `lang="zh-Hant"` 與 `lang="en"` 兩份清單;畫面上的字一律 `zhEn('中文', 'English')`,`ALN`、`SAMPLES`、`OILS` 裡的名稱、標示與結論也是。改中文時英文一起改。
+- `trees()` 的英文不用萬、億:一百萬以下照寫數字,以上寫 million、billion(6,000 萬寫 60 million),1 棵寫 tree。其他寫死萬的字(虛線的說明、第 4 章第 4 句字幕、重點整理、資料來源)英文已換算(3,200 萬 = 32 million)。
+- 候選父本的鍵 `甲 / 乙 / 丙`(`FATHERS`、`state.father`、選項的 `v`)不改,那兩行加註 `zh-only`;英文畫面用 `FATHER_EN` 換成 A / B / C。第 8 章樣品槽名稱的顏色判斷改成 `name === zhEn('這瓶油', 'This oil')`。
+- 名稱:紅檜 Taiwan red cypress;臺灣扁柏只寫學名 *Chamaecyparis taiwanensis*(英文俗名說法不一);扁柏屬 *Chamaecyparis*;苦茶油 camellia oil;大果油茶、小果油茶 large-fruit / small-fruit oil camellia。第 8 章第一句字幕裡的別名(油茶)(短柱山茶)英文不放,學名寫在英文重點整理的最後一條(*Camellia oleifera*、*C. brevistyla*)。
+- 只有英文分行或挪動的字(手機上圖上的字放大 1.3 倍時才放得下):第 1 章 Same / species、第 5 章表格的 Candidate / father A、第 7 章 Nuclear / SSR 與下方說明、第 8 章 Chloroplast / SSR PCR 分兩行;第 3 章「橘:已知長度的標準片段」x 520 → 552;第 4 章虛線下的說明 y 多 3(不然碰到曲線最後的點);第 7 章「葉綠體」「SSR」y 各上移 5;第 8 章膠下的 Small-fruit、Large-fruit 英文左右各挪 6、4(`lanes` 的第三個值),英文不寫「對照」(放不下,字幕寫明是已知的兩種)。

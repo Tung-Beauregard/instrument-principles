@@ -151,3 +151,10 @@
 - Huang 2022 的摘要寫自我指派 88.44%,Table 6 與內文是 88.04%(81/92),頁面用 81/92;內文寫 GW 與 HV 的 Nm 是 6.382,Table 5 是 6.832,頁面用表格的值。
 - Evanno 2005、Paetkau 1995、Manel 2005 的全文沒有讀到;ΔK 的算法依 Structure Harvester 的程式與 STRUCTURE 說明文件。Cornuet 1999、Janes 2017、Degen 2013、Dormontt 2015 只讀到摘要。Whitlock 與 McCauley 1999 的內容由課程摘要與他文引述確認。
 - Hale 2012 的資料是兩種鳥、一種哺乳類與一種昆蟲,不是樹;頁面只引用「每族群 25 到 30 個」的結論。
+
+## 英文版(2026-11-06)
+
+- 做法見 `docs/I18N.md`:標題、導言、畫布的 aria-label 用 `data-en`;「先看:」那一行、重點整理與資料來源各有 `lang="zh-Hant"` 與 `lang="en"` 兩份;程式裡給人看的字一律 `zhEn('中文', 'English')`,包括章名、字幕、圖上的字、`chip()` 的預設標籤(「A 區」/ Region A)、`WOODS` 的名稱與控制項。
+- 紅檜 4 區的方位英文用縮寫(西南 SW、西北 NW、東部 E),表格與長條的欄寬才夠(`HUANG_AREAS`、`HUANG_ASSIGN`)。
+- 只有英文改位置或改短的地方(中文的畫法沒動):第 4 章右下面板的兩行英文改短(Allows for the trees and populations sampled、Different methods do not compare),第 5 章「第 n 代」英文是 Generation 比較寬,所以 Fst 那一段 x 196 → 240,右下的「假設很少成立」英文改成 Assumptions rarely hold: just compare Fst。
+- 改中文時英文一起改;改完跑 `node scripts/check-i18n.mjs --list population-genetics/index.html`(要沒有輸出)與 `node scripts/check-i18n-layout.mjs population-genetics`(桌機與手機都比對中英的字有沒有超出畫面、疊在一起)。英文播放約 224 秒(中文 132 秒;長的字幕那一段播放器自動放慢)。

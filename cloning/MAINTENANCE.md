@@ -128,3 +128,10 @@
 5. 改了字幕或文字:不用破折號、中文句子用半形逗號與冒號、句號用全形;文獻只寫第一作者加 et al.,依 AGENTS.md 第 1 節不寫提供研究主題的研究者姓名(`scripts/check-bio.mjs` 會擋)。
 6. 改了 `EX` / `IN`、`VEC` / `TOPF`、`FOLD`、`PUR` 的時間或 `LX` / `MARK`:重新確認標籤沒有疊在一起(各章表格裡的時間點都要看)。
 7. 改了進階三章的常數(`GB`、`GB_P`、`GG_SEQ`、`GG_SETS`、`GG_OUT`、`GG_COLONY`、`EC`、`SEQ_ORIG` / `SEQ_OPT`):照「計算與驗算」那一節用 node 重算一次,確認畫面上的數字和算出來的一樣。
+
+## 英文版(2026-11-06)
+
+- 做法見 `docs/I18N.md`:標題、導言、畫布的 aria-label 用 `data-en`;重點整理與資料來源各是一組 `<ul lang="zh-Hant">` 與 `<ul lang="en">`;程式裡給人看的字一律 `zhEn('中文', 'English')`,包括章名、字幕、圖上的字、`STEPS` / `LANES` / `AA_ZH` 這類表與控制項的標籤。
+- 只有英文改位置或改短的地方(中文的畫法一個都沒動;手機上圖上的字放大 1.3 倍,英文才放得下):質體的標籤英文只能一行,不然第 3、5 章的字數和中文對不起來、檢查工具無法逐段對照,所以「複製起點」英文寫 Origin(完整名稱在字幕與重點整理)、「T7 啟動子」英文用 13 px 並靠近環(`RING_PARTS` 的 `size`、`dist` 用 `zhEn`);第 5 章質體的 T7 標籤 `dist` 58 → 46、「T7 RNA 聚合酶」的 y 312 → 304;第 7 章樹脂放大圖的框題英文較短(Resin surface (illustrative)),洗滌的標籤 x 700 → 740;第 8 章「小的跑得快」那四行英文往右 22 px;第 11 章的標題 y 44 → 38。
+- 「原始序列:植物基因的開頭(示意)」英文只寫 Original sequence (illustrative):整句放不下,前後的字幕與密碼子表已經說明是植物基因的開頭。
+- 改中文時英文一起改;改完跑 `node scripts/check-i18n.mjs --list cloning/index.html`(要沒有輸出)與 `node scripts/check-i18n-layout.mjs cloning`(桌機與手機都比對中英的字有沒有超出畫面、疊在一起)。英文播放約 265 秒(中文 182 秒;長的字幕那一段播放器自動放慢)。

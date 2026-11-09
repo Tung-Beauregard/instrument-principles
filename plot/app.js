@@ -2,6 +2,9 @@
 import { parseFile, msSticks, fmtNL, trimTurnarounds } from './parsers.js';
 import { spectrumFigure, dscFigure, tgaFigure, msFigure, ticStrip } from './figure.js';
 
+// 中英切換(assets/i18n.js,2026-11-06);沒有載入 i18n.js 時(Node 的 check-plot.mjs)一律中文
+const zhEn = globalThis.zhEn ?? ((zh) => zh);
+
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
 
@@ -12,8 +15,8 @@ const state = { files: [], seq: 0, opts: {
   ms: { xmin: '', xmax: '', nLabels: 6, minRel: 2, showScans: false, h: 0.65 },
 } };
 
-const KIND_NAME = { spectrum: '光譜', dsc: 'DSC', tga: 'TGA', ms: '質譜' };
-const KIND_TITLE = { spectrum: '光譜疊圖(FTIR 等)', dsc: 'DSC 升溫與降溫', tga: 'TGA 失重與 DTG', ms: '質譜(平均掃描)' };
+const KIND_NAME = { spectrum: zhEn('光譜', 'Spectrum'), dsc: 'DSC', tga: 'TGA', ms: zhEn('質譜', 'Mass spectrum') };
+const KIND_TITLE = { spectrum: zhEn('光譜疊圖(FTIR 等)', 'Overlaid spectra (FTIR and others)'), dsc: zhEn('DSC 升溫與降溫', 'DSC heating and cooling'), tga: zhEn('TGA 失重與 DTG', 'TGA weight loss and DTG'), ms: zhEn('質譜(平均掃描)', 'Mass spectrum (averaged scans)') };
 
 // ---------------------------------------------------------------- 讀檔
 async function addFiles(fileList) {
@@ -47,24 +50,24 @@ function removeFile(id) {
 function renderFiles() {
   const box = $('#files');
   box.replaceChildren();
-  if (!state.files.length) { box.append(el('p', 'muted', '還沒有檔案。')); return; }
+  if (!state.files.length) { box.append(el('p', 'muted', zhEn('還沒有檔案。', 'No files yet.'))); return; }
   for (const f of state.files) {
     const card = el('article', 'file' + (f.error ? ' bad' : ''));
     const head = el('div', 'file-head');
-    const on = el('input'); on.type = 'checkbox'; on.checked = f.enabled; on.disabled = !!f.error; on.title = '畫進圖裡';
-    on.setAttribute('aria-label', '畫進圖裡:' + f.name);
+    const on = el('input'); on.type = 'checkbox'; on.checked = f.enabled; on.disabled = !!f.error; on.title = zhEn('畫進圖裡', 'Include in the figure');
+    on.setAttribute('aria-label', zhEn('畫進圖裡:', 'Include in the figure: ') + f.name);
     on.addEventListener('change', () => { f.enabled = on.checked; renderFigures(); });
     const name = el('span', 'file-name', f.name);
-    const kind = el('span', 'tag', f.error ? '讀不出來' : KIND_NAME[f.ds.kind] || f.ds.kind);
-    const rm = el('button', 'icon', '×'); rm.type = 'button'; rm.title = '移除'; rm.setAttribute('aria-label', '移除 ' + f.name);
+    const kind = el('span', 'tag', f.error ? zhEn('讀不出來', 'Unreadable') : KIND_NAME[f.ds.kind] || f.ds.kind);
+    const rm = el('button', 'icon', '×'); rm.type = 'button'; rm.title = zhEn('移除', 'Remove'); rm.setAttribute('aria-label', zhEn('移除 ', 'Remove ') + f.name);
     rm.addEventListener('click', () => removeFile(f.id));
     head.append(on, name, kind, rm);
     card.append(head);
     if (f.error) { card.append(el('p', 'err', f.error)); box.append(card); continue; }
-    const meta = Object.entries(f.ds.meta || {}).filter(([, v]) => v !== '' && v !== undefined).map(([k, v]) => k + ' ' + v).join('　');
+    const meta = Object.entries(f.ds.meta || {}).filter(([, v]) => v !== '' && v !== undefined).map(([k, v]) => k + zhEn(' ', ': ') + v).join(zhEn('　', ' · '));
     card.append(el('p', 'meta', meta));
     if (f.ds.kind !== 'tga' || !f.ds.series) {
-      const lab = el('label', 'row'); lab.append(el('span', 'k', '圖上的名稱'));
+      const lab = el('label', 'row'); lab.append(el('span', 'k', zhEn('圖上的名稱', 'Name on the figure')));
       const inp = el('input'); inp.type = 'text'; inp.value = f.label; inp.addEventListener('input', () => { f.label = inp.value; renderFigures(); });
       lab.append(inp); card.append(lab);
     }
@@ -76,22 +79,22 @@ function renderFiles() {
 
 function msControls(f) {
   const wrap = el('div', 'ms-ctl');
-  const sel = el('select'); sel.setAttribute('aria-label', '掃描種類');
-  for (const r of f.ds.ranges) { const o = el('option', '', `m/z ${r.key.replace('-', ' 至 ')}(${r.count} 張)`); o.value = r.key; sel.append(o); }
+  const sel = el('select'); sel.setAttribute('aria-label', zhEn('掃描種類', 'Scan type'));
+  for (const r of f.ds.ranges) { const o = el('option', '', zhEn(`m/z ${r.key.replace('-', ' 至 ')}(${r.count} 張)`, `m/z ${r.key.replace('-', ' to ')} (${r.count} ${r.count === 1 ? 'scan' : 'scans'})`)); o.value = r.key; sel.append(o); }
   sel.value = f.rangeKey;
   sel.addEventListener('change', () => { f.rangeKey = sel.value; renderFigures(); });
   const row = el('div', 'row');
-  row.append(el('span', 'k', '掃描種類'), sel);
+  row.append(el('span', 'k', zhEn('掃描種類', 'Scan type')), sel);
   wrap.append(row);
   const row2 = el('div', 'row');
-  const a = el('input'); a.type = 'number'; a.min = f.ds.first; a.max = f.ds.last; a.value = f.scanFrom; a.setAttribute('aria-label', '起始掃描');
-  const z = el('input'); z.type = 'number'; z.min = f.ds.first; z.max = f.ds.last; z.value = f.scanTo; z.setAttribute('aria-label', '結束掃描');
+  const a = el('input'); a.type = 'number'; a.min = f.ds.first; a.max = f.ds.last; a.value = f.scanFrom; a.setAttribute('aria-label', zhEn('起始掃描', 'First scan'));
+  const z = el('input'); z.type = 'number'; z.min = f.ds.first; z.max = f.ds.last; z.value = f.scanTo; z.setAttribute('aria-label', zhEn('結束掃描', 'Last scan'));
   const upd = () => { f.scanFrom = Math.max(f.ds.first, Math.min(+a.value || f.ds.first, +z.value || f.ds.last)); f.scanTo = Math.min(f.ds.last, Math.max(+z.value || f.ds.last, f.scanFrom)); a.value = f.scanFrom; z.value = f.scanTo; strip.innerHTML = ticStrip(f.ds.scans, [f.scanFrom, f.scanTo]); renderFigures(); };
   a.addEventListener('change', upd); z.addEventListener('change', upd);
-  row2.append(el('span', 'k', '平均的掃描'), a, el('span', 'k', '至'), z);
+  row2.append(el('span', 'k', zhEn('平均的掃描', 'Scans to average')), a, el('span', 'k', zhEn('至', 'to')), z);
   wrap.append(row2);
   const strip = el('div', 'tic');
-  strip.title = '總離子流;在圖上拖一段就是要平均的掃描範圍';
+  strip.title = zhEn('總離子流;在圖上拖一段就是要平均的掃描範圍', 'Total ion current; drag across it to choose the scans to average');
   strip.innerHTML = ticStrip(f.ds.scans, [f.scanFrom, f.scanTo]);
   let drag = null;
   const numAt = ev => {
@@ -108,14 +111,14 @@ function msControls(f) {
 
 function seriesControls(f) {
   const wrap = el('div', 'series');
-  wrap.append(el('p', 'k', '要畫的曲線(勾選)與圖上的名稱'));
+  wrap.append(el('p', 'k', zhEn('要畫的曲線(勾選)與圖上的名稱', 'Curves to draw (ticked) and their names on the figure')));
   f.ds.series.forEach((s, i) => {
     const row = el('label', 'row');
     const cb = el('input'); cb.type = 'checkbox'; cb.checked = f.seriesOn[i];
     cb.addEventListener('change', () => { f.seriesOn[i] = cb.checked; renderFigures(); });
-    const inp = el('input'); inp.type = 'text'; inp.value = s.label || s.name; inp.setAttribute('aria-label', '曲線名稱');
+    const inp = el('input'); inp.type = 'text'; inp.value = s.label || s.name; inp.setAttribute('aria-label', zhEn('曲線名稱', 'Curve name'));
     inp.addEventListener('input', () => { s.label = inp.value; renderFigures(); });
-    const info = el('span', 'meta', (s.w0 !== null && s.w0 !== undefined ? s.w0.toFixed(2) + ' mg' : '已是 %') + (s.extra ? '，升溫後另有 ' + s.extra + ' 列沒有溫度' : ''));
+    const info = el('span', 'meta', (s.w0 !== null && s.w0 !== undefined ? s.w0.toFixed(2) + ' mg' : zhEn('已是 %', 'already in %')) + (s.extra ? zhEn('，升溫後另有 ' + s.extra + ' 列沒有溫度', `; ${s.extra} more ${s.extra === 1 ? 'row has' : 'rows have'} no temperature after heating`) : ''));
     row.append(cb, inp, info);
     wrap.append(row);
   });
@@ -141,28 +144,29 @@ function check(obj, key) {
 }
 function numPair(obj, k1, k2, ph1, ph2) {
   const wrap = el('span', 'pair');
-  wrap.append(textInput(obj, k1, ph1, 'number'), el('span', 'k', '至'), textInput(obj, k2, ph2, 'number'));
+  wrap.append(textInput(obj, k1, ph1, 'number'), el('span', 'k', zhEn('至', 'to')), textInput(obj, k2, ph2, 'number'));
   return wrap;
 }
 
+const AUTO = zhEn('自動', 'auto');   // 空白時的提示
 function optionsForm(kind) {
   const o = state.opts[kind];
   const form = el('div', 'opts');
   if (kind === 'spectrum') {
-    form.append(field('X 範圍', numPair(o, 'xmin', 'xmax', '自動', '自動')), field('X 軸由大到小', check(o, 'reverse')),
-      field('每條的位移(空白為自動)', textInput(o, 'step', '自動', 'number')), field('正規化(最高峰拉成 1)', check(o, 'normalize')),
-      field('標示的峰位(逗號分開)', textInput(o, 'marks', '例如 1741, 1692, 990')), field('X 軸名稱', textInput(o, 'xlabel')), field('Y 軸名稱', textInput(o, 'ylabel')));
+    form.append(field(zhEn('X 範圍', 'X range'), numPair(o, 'xmin', 'xmax', AUTO, AUTO)), field(zhEn('X 軸由大到小', 'X axis from high to low'), check(o, 'reverse')),
+      field(zhEn('每條的位移(空白為自動)', 'Offset between curves (blank = auto)'), textInput(o, 'step', AUTO, 'number')), field(zhEn('正規化(最高峰拉成 1)', 'Normalize (tallest peak to 1)'), check(o, 'normalize')),
+      field(zhEn('標示的峰位(逗號分開)', 'Peak positions to mark (comma-separated)'), textInput(o, 'marks', zhEn('例如 1741, 1692, 990', 'e.g. 1741, 1692, 990'))), field(zhEn('X 軸名稱', 'X axis title'), textInput(o, 'xlabel')), field(zhEn('Y 軸名稱', 'Y axis title'), textInput(o, 'ylabel')));
   } else if (kind === 'dsc') {
-    form.append(field('下方加升溫與降溫圖', check(o, 'showCool')), field('升降溫接在一起(不去掉反轉處)', check(o, 'connect')),
-      field('endo / exo 箭頭圖例', check(o, 'legend')), field('右上角的量測條件', textInput(o, 'cond', '例如 10 °C/min，30 至 350 °C')),
-      field('每列幾個樣品', textInput(o, 'cols', '', 'number')), field('溫度範圍', numPair(o, 'xmin', 'xmax', '自動', '自動')));
+    form.append(field(zhEn('下方加升溫與降溫圖', 'Add heating and cooling plots below'), check(o, 'showCool')), field(zhEn('升降溫接在一起(不去掉反轉處)', 'Join heating and cooling (keep the turnaround)'), check(o, 'connect')),
+      field(zhEn('endo / exo 箭頭圖例', 'endo / exo arrow legend'), check(o, 'legend')), field(zhEn('右上角的量測條件', 'Measurement conditions (top right)'), textInput(o, 'cond', zhEn('例如 10 °C/min，30 至 350 °C', 'e.g. 10 °C/min, 30 to 350 °C'))),
+      field(zhEn('每列幾個樣品', 'Samples per row'), textInput(o, 'cols', '', 'number')), field(zhEn('溫度範圍', 'Temperature range'), numPair(o, 'xmin', 'xmax', AUTO, AUTO)));
   } else if (kind === 'tga') {
-    form.append(field('溫度範圍', numPair(o, 'xmin', 'xmax', '30', '800')), field('畫 DTG', check(o, 'showDtg')),
-      field('DTG 平滑(前後各幾度)', textInput(o, 'half', '', 'number')), field('降溫段(藍色)', check(o, 'showCool')), field('圖的標題', textInput(o, 'title', '')));
+    form.append(field(zhEn('溫度範圍', 'Temperature range'), numPair(o, 'xmin', 'xmax', '30', '800')), field(zhEn('畫 DTG', 'Draw DTG'), check(o, 'showDtg')),
+      field(zhEn('DTG 平滑(前後各幾度)', 'DTG smoothing (degrees on each side)'), textInput(o, 'half', '', 'number')), field(zhEn('降溫段(藍色)', 'Cooling segment (blue)'), check(o, 'showCool')), field(zhEn('圖的標題', 'Figure title'), textInput(o, 'title', '')));
   } else if (kind === 'ms') {
-    form.append(field('m/z 範圍', numPair(o, 'xmin', 'xmax', '自動', '自動')), field('標示幾個峰', textInput(o, 'nLabels', '', 'number')),
-      field('標示的最低相對強度(%)', textInput(o, 'minRel', '', 'number')), field('合併視窗(± m/z)', textInput(o, 'h', '', 'number')),
-      field('寫出平均的掃描張數', check(o, 'showScans')));
+    form.append(field(zhEn('m/z 範圍', 'm/z range'), numPair(o, 'xmin', 'xmax', AUTO, AUTO)), field(zhEn('標示幾個峰', 'Peaks to label'), textInput(o, 'nLabels', '', 'number')),
+      field(zhEn('標示的最低相對強度(%)', 'Lowest relative intensity to label (%)'), textInput(o, 'minRel', '', 'number')), field(zhEn('合併視窗(± m/z)', 'Merge window (± m/z)'), textInput(o, 'h', '', 'number')),
+      field(zhEn('寫出平均的掃描張數', 'Show the number of averaged scans'), check(o, 'showScans')));
   }
   return form;
 }
@@ -220,13 +224,13 @@ function renderFigures() {
       const section = el('section', 'figure');
       const h2 = el('h2', '', KIND_TITLE[kind] || kind);
       const tools = el('div', 'tools');
-      const svgBtn = el('button', 'btn', '下載 SVG'); svgBtn.type = 'button';
-      const pngBtn = el('button', 'btn', '下載 PNG'); pngBtn.type = 'button';
+      const svgBtn = el('button', 'btn', zhEn('下載 SVG', 'Download SVG')); svgBtn.type = 'button';
+      const pngBtn = el('button', 'btn', zhEn('下載 PNG', 'Download PNG')); pngBtn.type = 'button';
       tools.append(svgBtn, pngBtn);
       const head = el('div', 'fig-head'); head.append(h2, tools);
       const figBox = el('div', 'paper');
       const details = el('details', 'optbox'); details.open = true;
-      const sum = el('summary', '', '圖的設定'); details.append(sum, optionsForm(kind));
+      const sum = el('summary', '', zhEn('圖的設定', 'Figure settings')); details.append(sum, optionsForm(kind));
       section.append(head, figBox, details);
       host.append(section);
       sec = { section, figBox };
@@ -238,7 +242,7 @@ function renderFigures() {
       sec.figBox.innerHTML = buildSvg(kind, files);
       sec.figBox.classList.remove('bad');
     } catch (e) {
-      sec.figBox.textContent = '畫不出來:' + (e.message || e);
+      sec.figBox.textContent = zhEn('畫不出來:', 'Could not draw the figure: ') + (e.message || e);
       sec.figBox.classList.add('bad');
       console.error(e);
     }

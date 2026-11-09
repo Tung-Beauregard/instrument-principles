@@ -29,6 +29,9 @@ const lerp = (a, b, k) => a + (b - a) * k;
 const smooth = (a, b, x) => { const k = clamp((x - a) / (b - a), 0, 1); return k * k * (3 - 2 * k); };
 function rng(seed) { let s = seed >>> 0 || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
 
+// 中英切換(assets/i18n.js,2026-11-06);沒有載入 i18n.js 時(檢查腳本)一律中文
+const zhEn = globalThis.zhEn ?? ((zh) => zh);
+
 const DEF_COLORS = {
   ink: '#eaf3f6', ink2: '#a8bcc6', muted: '#71858f', lo: [41, 140, 255], hi: [255, 133, 56],
   push: '#5dffb0', pull: '#ffc261', plus: '#ff8a6b', minus: '#6fb3ff', zero: '#71858f', win: 'rgba(93,255,176,.16)', winLine: '#5dffb0',
@@ -37,18 +40,18 @@ const DEF_COLORS = {
 // ---------- 兩種腳本 ----------
 // 每顆離子用 rel(m/z 和參考離子的比)決定反應快慢:同樣的電場,越輕的 q 越大
 const TRAP_CUES = [
-  [0, '離子阱裡的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。把球放在不動的馬鞍上,它一定會滾下去。'],
-  [6, '讓馬鞍翻來翻去,剛剛往外拉的方向就變成往中間推。可是翻得太慢,球在翻過來之前就滾遠了。'],
-  [12, '翻得夠快,球還沒滾遠就被推回來,離子就這樣被關在中間。真正的離子阱每秒翻轉幾十萬次。'],
-  [16.5, '平均下來,離子就像待在碗底。圖上的碗是翻轉的平均效果,不是真的有一個碗。'],
-  [20, '同樣的翻轉速度,越輕的離子反應越快。太輕的(橙色)越擺越大,一樣留不住,所以離子阱關得住的 m/z 有下限。'],
-  [26, '量的時候把電壓慢慢調高:每顆球都被推得更用力,最輕的先撐不住,沿著軸向被甩出去打到偵測器,接著是下一種。依序打到偵測器的順序,就排成一張質譜。'],
+  [0, zhEn('離子阱裡的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。把球放在不動的馬鞍上,它一定會滾下去。', 'In an ion trap the electric field is like a saddle: it pushes inward one way and pulls outward the other. A ball on a still saddle always rolls off.')],
+  [6, zhEn('讓馬鞍翻來翻去,剛剛往外拉的方向就變成往中間推。可是翻得太慢,球在翻過來之前就滾遠了。', 'Flip the saddle back and forth and the outward direction turns inward. But flipped too slowly, the ball rolls away before the flip comes.')],
+  [12, zhEn('翻得夠快,球還沒滾遠就被推回來,離子就這樣被關在中間。真正的離子阱每秒翻轉幾十萬次。', 'Flipped fast enough, the ball is pushed back before it gets far, so the ion stays trapped. A real ion trap flips hundreds of thousands of times a second.')],
+  [16.5, zhEn('平均下來,離子就像待在碗底。圖上的碗是翻轉的平均效果,不是真的有一個碗。', 'On average the ion sits as if at the bottom of a bowl. The bowl shows the average effect of the flipping; there is no real bowl.')],
+  [20, zhEn('同樣的翻轉速度,越輕的離子反應越快。太輕的(橙色)越擺越大,一樣留不住,所以離子阱關得住的 m/z 有下限。', 'At the same flipping speed, lighter ions respond faster. One that is too light (orange) swings wider and wider and escapes too, so an ion trap has a lowest m/z it can hold.')],
+  [26, zhEn('量的時候把電壓慢慢調高:每顆球都被推得更用力,最輕的先撐不住,沿著軸向被甩出去打到偵測器,接著是下一種。依序打到偵測器的順序,就排成一張質譜。', 'To measure, the voltage rises slowly: every ball is pushed harder, the lightest gives way first and is thrown out along the axis to the detector, then the next. The order of arrival makes a mass spectrum.')],
 ];
 const QUAD_CUES = [
-  [0, '四根桿子之間的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。不動的話,球一定會滾下去。'],
-  [5, '桿子上的電壓快速正負交替,馬鞍跟著翻來翻去。翻得夠快,球還沒滾遠就被推回來,離子就能沿著中間一路往前走。'],
-  [11, '再加上一個不變的直流電壓,馬鞍往一邊偏。這時只有一種 m/z 留得住:太輕的跟著翻轉越擺越大,被甩出去;太重的反應太慢,被直流慢慢拉走。'],
-  [22, '把兩種電壓按固定比例一起調高,留得住的 m/z 就往上換:輕的先通過,接著是下一種。一路掃過去,每種 m/z 輪流穿過、打到偵測器,就量出一張質譜。'],
+  [0, zhEn('四根桿子之間的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。不動的話,球一定會滾下去。', 'Between the four rods the electric field is like a saddle: it pushes inward one way and pulls outward the other. If it stays still, the ball always rolls off.')],
+  [5, zhEn('桿子上的電壓快速正負交替,馬鞍跟著翻來翻去。翻得夠快,球還沒滾遠就被推回來,離子就能沿著中間一路往前走。', 'The rod voltages swap between plus and minus quickly, so the saddle flips back and forth. Fast enough, and the ball is pushed back before it gets far, so the ion travels on down the middle.')],
+  [11, zhEn('再加上一個不變的直流電壓,馬鞍往一邊偏。這時只有一種 m/z 留得住:太輕的跟著翻轉越擺越大,被甩出去;太重的反應太慢,被直流慢慢拉走。', 'Add a steady DC voltage and the saddle tilts to one side. Now only one m/z stays: ions too light swing wider with each flip and are thrown out; ions too heavy respond too slowly and the DC drags them away.')],
+  [22, zhEn('把兩種電壓按固定比例一起調高,留得住的 m/z 就往上換:輕的先通過,接著是下一種。一路掃過去,每種 m/z 輪流穿過、打到偵測器,就量出一張質譜。', 'Raise both voltages at a fixed ratio and the m/z that stays moves up: the light one passes first, then the next. Sweeping all the way, each m/z takes its turn to the detector, giving a mass spectrum.')],
 ];
 
 function trapScript(ions) {
@@ -69,11 +72,11 @@ function trapScript(ions) {
       P.mix = t < 16.5 ? 0 : t < 20 ? smooth(16.5, 17.6, t) * (1 - smooth(19, 20, t)) : 0;
       P.damp = t >= 26 ? 0.1 : t >= 12 ? 0.22 : 0;
       P.s = t < 26 ? 1 : 1 + 0.14 * (t - 26);
-      if (t < 6) { P.omega = 0; P.status = '電場不動'; sim.respawn = { main: [0.05, 0.22] }; }
-      else if (t < 12) { P.omega = OM_SLOW; P.status = '翻轉:太慢'; sim.respawn = { main: [0.06, 0.2] }; }
-      else if (t < 20) { P.omega = OM_FAST; P.status = t < 16.5 ? '翻轉:夠快' : '翻轉:夠快(平均像一個碗)'; sim.respawn = { main: [0.3, 0.32] }; }
-      else if (t < 26) { P.omega = OM_FAST; P.status = '太輕的留不住'; sim.respawn = { light: [0.12, 0.1] }; }
-      else { P.omega = OM_FAST; P.status = '電壓慢慢調高'; sim.respawn = {}; }
+      if (t < 6) { P.omega = 0; P.status = zhEn('電場不動', 'Field standing still'); sim.respawn = { main: [0.05, 0.22] }; }
+      else if (t < 12) { P.omega = OM_SLOW; P.status = zhEn('翻轉:太慢', 'Flipping: too slow'); sim.respawn = { main: [0.06, 0.2] }; }
+      else if (t < 20) { P.omega = OM_FAST; P.status = t < 16.5 ? zhEn('翻轉:夠快', 'Flipping: fast enough') : zhEn('翻轉:夠快(平均像一個碗)', 'Fast enough (on average, a bowl)'); sim.respawn = { main: [0.3, 0.32] }; }
+      else if (t < 26) { P.omega = OM_FAST; P.status = zhEn('太輕的留不住', 'Too light to hold'); sim.respawn = { light: [0.12, 0.1] }; }
+      else { P.omega = OM_FAST; P.status = zhEn('電壓慢慢調高', 'Voltage slowly rising'); sim.respawn = {}; }
       sim.once(6, () => sim.place('main', 0.06, 0.2));
       sim.once(12, () => sim.place('main', 0.3, 0.32));
       sim.once(20, () => { sim.addIon('heavy', heavy, Q_MAIN * main.mz / heavy.mz, -0.18, 0.25); sim.addIon('light', light, Q_MAIN * main.mz / light.mz, 0.12, 0.1); });
@@ -100,7 +103,7 @@ function quadScript(ions) {
       P.dc = t < 11 ? 0 : smooth(11, 12.5, t);
       P.s = t < 22 ? 1 : lerp(0.74, 1.62, clamp((t - 22) / 14, 0, 1));
       P.omega = t < 5 ? 0 : OM_FAST;
-      P.status = t < 5 ? '電場不動' : t < 11 ? '只有交流電壓:翻來翻去' : t < 22 ? '加上直流電壓:只留一種 m/z' : '兩種電壓一起調高';
+      P.status = t < 5 ? zhEn('電場不動', 'Field standing still') : t < 11 ? zhEn('只有交流電壓:翻來翻去', 'AC only: flipping') : t < 22 ? zhEn('加上直流電壓:只留一種 m/z', 'Plus DC: one m/z stays') : zhEn('兩種電壓一起調高', 'Both voltages rising');
       P.win = t >= 11;
       sim.respawn = t < 5 ? { main: [0.05, 0.22] } : t < 11 ? { main: [0.18, 0.14] } : { light: [0.06, 0.05], main: [0.05, -0.06], heavy: [-0.06, 0.05] };
       sim.once(5, () => sim.place('main', 0.18, 0.14));
@@ -352,7 +355,7 @@ function createSaddleDemo(kind, opts = {}) {
       c.fillStyle = o.color; c.beginPath(); c.arc(x, Y, inside ? 5.5 : 3.8, 0, TAU); c.fill();
       text(c, String(o.mz), x, Y + 20, { color: inside ? C.ink : C.muted, size: 12.5, weight: inside ? 800 : 600, align: 'center' });
     }
-    text(c, '穿得過的 m/z', X0, Y - 22, { color: C.winLine, size: 12.5, weight: 700 });
+    text(c, zhEn('穿得過的 m/z', 'm/z that gets through'), X0, Y - 22, { color: C.winLine, size: 12.5, weight: 700 });
     c.globalAlpha = 1;
   }
   // 離子阱掃描:打到偵測器的離子依序排成譜
@@ -360,7 +363,7 @@ function createSaddleDemo(kind, opts = {}) {
     if (!sim.detect) return;
     const X0 = 474, X1 = 588, Y0 = 84, Hh = 40;
     c.strokeStyle = C.muted; c.lineWidth = 1.2; c.beginPath(); c.moveTo(X0, Y0); c.lineTo(X1, Y0); c.stroke();
-    text(c, '偵測器收到的順序', X1, Y0 - Hh - 12, { color: C.ink2, size: 12.5, weight: 700, align: 'right' });
+    text(c, zhEn('偵測器收到的順序', 'Order at the detector'), X1, Y0 - Hh - 12, { color: C.ink2, size: 12.5, weight: 700, align: 'right' });
     const all = script.scanIons.map((o) => o.mz), lo = Math.min(...all), hi = Math.max(...all);
     for (const o of script.scanIons) text(c, String(o.mz), lerp(X0 + 16, X1 - 16, (o.mz - lo) / (hi - lo)), Y0 + 13, { color: o.color, size: 12, weight: 700, align: 'center' });
     for (const m of new Set(sim.hits.map((h) => h.mz))) {
@@ -375,7 +378,7 @@ function createSaddleDemo(kind, opts = {}) {
       const hit = sim.hits.filter((h) => h.side === s && sim.t - h.t < 0.6).pop();
       if (hit) { const k = (sim.t - hit.t) / 0.6; c.globalAlpha = 1 - k; c.strokeStyle = hit.color; c.lineWidth = 2.4; c.beginPath(); c.arc(tmp[0], tmp[1], 6 + 22 * k, 0, TAU); c.stroke(); c.globalAlpha = 1; }
     }
-    proj(1.75, 0, 0, tmp); text(c, '偵測器', tmp[0], tmp[1] + 26, { color: C.ink2, size: 12.5, align: 'center' });
+    proj(1.75, 0, 0, tmp); text(c, zhEn('偵測器', 'Detector'), tmp[0], tmp[1] + 26, { color: C.ink2, size: 12.5, align: 'center' });
   }
 
   return {
@@ -400,8 +403,8 @@ function createSaddleDemo(kind, opts = {}) {
         drawWindow(c); drawLegend(c); if (kind === 'trap') drawHits(c);
         text(c, sim.P.status, 22, 22, { color: '#74e4ff', size: 17, weight: 800 });
         // 圖例
-        c.fillStyle = C.push; c.fillRect(22, 318, 14, 3); text(c, '往中間推', 42, 319.5, { size: 12.5 });
-        c.fillStyle = C.pull; c.fillRect(110, 318, 14, 3); text(c, '往外拉', 130, 319.5, { size: 12.5 });
+        c.fillStyle = C.push; c.fillRect(22, 318, 14, 3); text(c, zhEn('往中間推', 'Pushes in'), 42, 319.5, { size: 12.5 });
+        c.fillStyle = C.pull; c.fillRect(110, 318, 14, 3); text(c, zhEn('往外拉', 'Pulls out'), 130, 319.5, { size: 12.5 });
       }
     },
   };
@@ -457,16 +460,16 @@ const cueIndexOf = (cues) => (t) => { let k = 0; cues.forEach(([at], i) => { if 
 // 離子在橫向(y)本來就有一點速度,和 m/z 的平方根成反比,飛行時間又和平方根成正比,所以不同 m/z 都落在同一個偵測器上。
 export const TOF = { P: 0.1, R0: 0.66, VR: 1.3, V0: 0.06, XD: 0.12, VY: 0.22, Y0: -0.75 };
 const TOF_CUES = [
-  [0, '飛行時間裡的電場畫成地形:推斥區是一道陡坡,飛行管是平地(沒有電場),反射鏡是一道上坡。'],
-  [4, '推斥極一推,離子從陡坡滑下來,每一個都得到一樣多的能量;越輕的跑得越快,在平地上一直維持同樣的速度。'],
-  [9, '反射鏡是上坡:跑得快的衝得比較高、多繞一點路,所以同一種離子不管快慢,幾乎同時回到偵測器。'],
-  [16, '把反射鏡關掉,離子直直飛到最後面:同一種離子有快有慢,到達的時間就散開,峰變寬,只差一點點的 m/z 就分不開。'],
+  [0, zhEn('飛行時間裡的電場畫成地形:推斥區是一道陡坡,飛行管是平地(沒有電場),反射鏡是一道上坡。', 'The time-of-flight field is drawn as terrain: the pusher region is a steep slope, the flight tube is flat (no field), and the reflector is an uphill slope.')],
+  [4, zhEn('推斥極一推,離子從陡坡滑下來,每一個都得到一樣多的能量;越輕的跑得越快,在平地上一直維持同樣的速度。', 'The pusher fires and the ions slide down the slope, each gaining the same energy; lighter ones go faster and keep that speed on the flat.')],
+  [9, zhEn('反射鏡是上坡:跑得快的衝得比較高、多繞一點路,所以同一種離子不管快慢,幾乎同時回到偵測器。', 'The reflector is uphill: faster ions climb higher and travel a bit farther, so ions of one kind, fast or slow, reach the detector at almost the same time.')],
+  [16, zhEn('把反射鏡關掉,離子直直飛到最後面:同一種離子有快有慢,到達的時間就散開,峰變寬,只差一點點的 m/z 就分不開。', 'Turn the reflector off and the ions fly straight to the far end: ions of one kind arrive spread out in time, peaks widen, and close m/z values blur together.')],
 ];
 function tofScript(ions) {
   const I = (i, d) => Object.assign({}, d, ions && ions[i]);
   // 兩顆 m/z 一樣(其中一顆在推斥區的起點遠一點、得到的能量少兩成,畫白框),一顆重的
   const a = I(0, { mz: 195, label: 'm/z 195', color: '#74e4ff', x0: 0.01 });
-  const b = I(1, { mz: 195, label: 'm/z 195(能量少一點)', color: '#74e4ff', x0: 0.03, ring: true });
+  const b = I(1, { mz: 195, label: zhEn('m/z 195(能量少一點)', 'm/z 195 (less energy)'), color: '#74e4ff', x0: 0.03, ring: true });
   const h = I(2, { mz: 524, label: 'm/z 524', color: '#ffc261', x0: 0.01 });
   return { ions: [a, b, h], push: [4.5, 18], dur: 26, marks: [0, 4, 9, 16] };
 }
@@ -556,11 +559,11 @@ function createTofDemo(opts) {
     if (r < 0.98) { c.globalAlpha = 1 - r; P(1, -0.45); const a0 = tmp[0], b0 = tmp[1]; P(1, 0.45); c.lineWidth = 7; c.strokeStyle = 'rgba(160,190,205,.85)'; c.beginPath(); c.moveTo(a0, b0); c.lineTo(tmp[0], tmp[1]); c.stroke(); c.globalAlpha = 1; }
     if (bare) return;
     // 標示
-    P(0.0, -1, 0.04); text(c, '推斥區:陡坡', tmp[0] + 26, tmp[1] + 4, { color: '#ff8a6b', size: 13.5, weight: 700 });
-    P(0.4, -1, 0.02); text(c, '飛行管:平地,沒有電場', tmp[0], tmp[1] - 14, { color: C.ink2, size: 13.5, weight: 700, align: 'center' });
-    if (r > 0.05) { c.globalAlpha = r; P(0.86, -1, 0.06); text(c, '反射鏡:上坡', tmp[0], tmp[1] - 16, { color: '#ffc261', size: 13.5, weight: 700, align: 'center' }); c.globalAlpha = 1; }
-    if (r > 0.5) { P(TOF.XD, 1.05); text(c, '偵測器', tmp[0] + 4, tmp[1] + 14, { color: C.ink2, size: 12.5, align: 'center' }); }
-    else { P(1, 0.5); text(c, '偵測器', tmp[0] + 10, tmp[1] + 10, { color: C.ink2, size: 12.5 }); }
+    P(0.0, -1, 0.04); text(c, zhEn('推斥區:陡坡', 'Pusher: steep slope'), tmp[0] + 26, tmp[1] + 4, { color: '#ff8a6b', size: 13.5, weight: 700 });
+    P(0.4, -1, 0.02); text(c, zhEn('飛行管:平地,沒有電場', 'Flight tube: flat, no field'), tmp[0], tmp[1] - 14, { color: C.ink2, size: 13.5, weight: 700, align: 'center' });
+    if (r > 0.05) { c.globalAlpha = r; P(0.86, -1, 0.06); text(c, zhEn('反射鏡:上坡', 'Reflector: uphill'), tmp[0], tmp[1] - 16, { color: '#ffc261', size: 13.5, weight: 700, align: 'center' }); c.globalAlpha = 1; }
+    if (r > 0.5) { P(TOF.XD, 1.05); text(c, zhEn('偵測器', 'Detector'), tmp[0] + 4, tmp[1] + 14, { color: C.ink2, size: 12.5, align: 'center' }); }
+    else { P(1, 0.5); text(c, zhEn('偵測器', 'Detector'), tmp[0] + 10, tmp[1] + 10, { color: C.ink2, size: 12.5 }); }
     // 推出去的方向
     P(0.16, 0.0, 0.03); const ax = tmp[0], ay = tmp[1]; P(0.3, 0.0, 0.03); arrow(c, ax, ay, tmp[0], tmp[1], 'rgba(234,243,246,.55)', 1.8);
   }
@@ -590,8 +593,8 @@ function createTofDemo(opts) {
   // 底下:推出去之後幾秒到達偵測器,上排反射鏡開、下排反射鏡關
   function drawArrivals(c) {
     const X0 = 150, X1 = 560, T = 12, xOf = (s) => X0 + (X1 - X0) * s / T;
-    text(c, '到達偵測器的時間', 22, 250, { color: C.ink, size: 13.5, weight: 700 });
-    for (const [run, y, lab] of [[0, 278, '反射鏡開'], [1, 314, '反射鏡關']]) {
+    text(c, zhEn('到達偵測器的時間', 'Arrival time'), 22, 250, { color: C.ink, size: 13.5, weight: 700 });
+    for (const [run, y, lab] of [[0, 278, zhEn('反射鏡開', 'Reflector on')], [1, 314, zhEn('反射鏡關', 'Reflector off')]]) {
       const on = sim.run >= run;
       c.globalAlpha = on ? 1 : 0.35;
       text(c, lab, 22, y, { color: run ? '#ffc261' : C.ink2, size: 13 });
@@ -604,7 +607,7 @@ function createTofDemo(opts) {
       c.globalAlpha = 1;
     }
     for (let s = 0; s <= T; s += 2) text(c, String(s), xOf(s), 333, { color: C.muted, size: 11, align: 'center' });
-    text(c, '秒', X1 + 14, 333, { color: C.muted, size: 11 });
+    text(c, zhEn('秒', 's'), X1 + 14, 333, { color: C.muted, size: 11 });
   }
   return {
     kind: 'tof', dur: script.dur, marks: script.marks, cues,
@@ -613,14 +616,14 @@ function createTofDemo(opts) {
     advance(dt) { const to = Math.min(script.dur, sim.t + dt); while (sim.t < to - 1e-6) sim.step(Math.min(FRAME, to - sim.t)); },
     reset() { sim.reset(); },
     cueAt: cueAtOf(cues), cueIndex: cueIndexOf(cues),
-    status() { return sim.t < script.push[0] ? '電場畫成地形' : sim.t < 16 ? '反射鏡開著' : '反射鏡關掉'; },
+    status() { return sim.t < script.push[0] ? zhEn('電場畫成地形', 'Field drawn as terrain') : sim.t < 16 ? zhEn('反射鏡開著', 'Reflector on') : zhEn('反射鏡關掉', 'Reflector off'); },
     draw(c, o = {}) {
       drawLand(c); drawParts(c, o.bare); drawIons(c, o.bare);
       if (o.bare) return;
       drawArrivals(c);
       text(c, this.status(), 22, 22, { color: '#74e4ff', size: 17, weight: 800 });
       // 圖例:同一種 m/z 的兩顆用白框分
-      const L = [['#74e4ff', 'm/z 195', false, 196], ['#74e4ff', 'm/z 195(能量少一點)', true, 278], ['#ffc261', 'm/z 524', false, 444]];
+      const L = [['#74e4ff', 'm/z 195', false, 196], ['#74e4ff', zhEn('m/z 195(能量少一點)', 'm/z 195 (less energy)'), true, 278], ['#ffc261', 'm/z 524', false, 444]];
       for (const [cc, s, ring, x] of L) { ball(c, x, 250, 5, cc, 1, ring); text(c, s, x + 12, 250.5, { color: cc, size: 12.5, weight: 700 }); }
     },
   };
@@ -630,10 +633,10 @@ function createTofDemo(opts) {
 // 擺盪頻率 f = F0 × √(195 ÷ m/z):軸向是簡諧運動,頻率和擺幅、能量都無關。畫面放慢到 m/z 195 每秒擺 0.9 次
 const ORB_F0 = 0.9;
 const ORB_CUES = [
-  [0, 'Orbitrap 中間是一根紡錘形的電極,外面包著兩半的外殼。紡錘把帶正電的離子往內吸,離子繞著它轉,像衛星繞地球,不會撞上去。'],
-  [6, '沿著紡錘的方向,電場像一個碗:離中間越遠,被推回來越用力,所以離子會左右來回擺盪。'],
-  [13, '擺盪的快慢只看 m/z:越輕擺得越快,和離子帶多少能量、一開始在哪裡都沒有關係。'],
-  [21, '外殼的兩半記下離子擺來擺去造成的訊號;混在一起的擺動再拆成各種頻率,一種頻率就是一種 m/z。'],
+  [0, zhEn('Orbitrap 中間是一根紡錘形的電極,外面包著兩半的外殼。紡錘把帶正電的離子往內吸,離子繞著它轉,像衛星繞地球,不會撞上去。', 'An Orbitrap has a spindle-shaped electrode in the middle and a two-part outer shell. The spindle pulls positive ions inward, and they circle it like satellites around Earth, never hitting it.')],
+  [6, zhEn('沿著紡錘的方向,電場像一個碗:離中間越遠,被推回來越用力,所以離子會左右來回擺盪。', 'Along the spindle the field is like a bowl: the farther from the middle, the harder the push back, so the ions swing back and forth.')],
+  [13, zhEn('擺盪的快慢只看 m/z:越輕擺得越快,和離子帶多少能量、一開始在哪裡都沒有關係。', 'How fast they swing depends only on m/z: lighter ions swing faster, whatever their energy or starting point.')],
+  [21, zhEn('外殼的兩半記下離子擺來擺去造成的訊號;混在一起的擺動再拆成各種頻率,一種頻率就是一種 m/z。', 'The two halves of the shell record the signal of the swinging ions; the mixed swings are split into frequencies, one frequency for each m/z.')],
 ];
 function createOrbDemo(opts) {
   const { C, text, arrow, ball } = makeKit(opts);
@@ -692,12 +695,12 @@ function createOrbDemo(opts) {
     const a = smooth(6, 7, t); if (a <= 0) return;
     c.globalAlpha = a;
     const X = 155, Y = 318, SX = 112, SY = 84;
-    text(c, '沿著紡錘方向:像一個碗', 30, 210, { color: C.ink, size: 13.5, weight: 700 });
+    text(c, zhEn('沿著紡錘方向:像一個碗', 'Along the spindle: a bowl'), 30, 210, { color: C.ink, size: 13.5, weight: 700 });
     c.strokeStyle = C.muted; c.lineWidth = 1.6; c.beginPath();
     for (let i = 0; i <= 40; i++) { const zn = -1 + 2 * i / 40, x = X + zn * SX, y = Y - SY * zn * zn; i ? c.lineTo(x, y) : c.moveTo(x, y); }
     c.stroke();
     arrow(c, X - SX + 4, Y - SY + 18, X - SX + 30, Y - SY + 40, C.push, 1.8); arrow(c, X + SX - 4, Y - SY + 18, X + SX - 30, Y - SY + 40, C.push, 1.8);
-    text(c, '推回中間', X + SX - 24, Y - SY + 6, { color: C.push, size: 12 });
+    text(c, zhEn('推回中間', 'Back to center'), X + SX - 24, Y - SY + 6, { color: C.push, size: 12 });
     c.setLineDash([3, 4]); c.strokeStyle = 'rgba(160,190,205,.35)'; c.beginPath(); c.moveTo(X, Y - SY); c.lineTo(X, Y + 4); c.stroke(); c.setLineDash([]);
     for (let k = 0; k < 3; k++) { const zn = zOf(k, t); if (zn === null) continue; ball(c, X + zn * SX, Y - SY * zn * zn - 6, 6, ions[k].color, smooth(0, 0.6, t - born[k]) * a); }
     c.globalAlpha = 1;
@@ -707,7 +710,7 @@ function createOrbDemo(opts) {
     const a = smooth(21, 22, t); if (a <= 0) return;
     c.globalAlpha = a;
     const X0 = 316, X1 = 466, Y = 270, A = 22;
-    text(c, '外殼記下的訊號', X0, 210, { color: C.ink, size: 13.5, weight: 700 });
+    text(c, zhEn('外殼記下的訊號', 'Signal on the shell'), X0, 210, { color: C.ink, size: 13.5, weight: 700 });
     for (let k = 0; k < 3; k++) {
       c.strokeStyle = ions[k].color; c.lineWidth = 1; c.globalAlpha = a * 0.45; c.beginPath();
       for (let i = 0; i <= 90; i++) { const tt = t - 2.5 + 2.5 * i / 90, zn = zOf(k, tt) || 0, x = X0 + (X1 - X0) * i / 90, y = Y + 34 + A * 0.55 * zn; i ? c.lineTo(x, y) : c.moveTo(x, y); }
@@ -716,13 +719,13 @@ function createOrbDemo(opts) {
     c.globalAlpha = a; c.strokeStyle = C.ink; c.lineWidth = 1.8; c.beginPath();
     for (let i = 0; i <= 120; i++) { const tt = t - 2.5 + 2.5 * i / 120; let s = 0; for (let k = 0; k < 3; k++) s += zOf(k, tt) || 0; const x = X0 + (X1 - X0) * i / 120, y = Y - A * s / 2; i ? c.lineTo(x, y) : c.moveTo(x, y); }
     c.stroke();
-    text(c, '加在一起', X0, Y - A - 10, { color: C.muted, size: 11.5 });
+    text(c, zhEn('加在一起', 'Added up'), X0, Y - A - 10, { color: C.muted, size: 11.5 });
     // 拆成頻率:一根線一種 m/z(由輕到重排)
     const b = smooth(24.5, 25.5, t);
     if (b > 0) {
       c.globalAlpha = a * b;
       const F0 = 482, F1 = 588, base = 318;
-      text(c, '拆成頻率', F0, 210, { color: C.ink, size: 13.5, weight: 700 });
+      text(c, zhEn('拆成頻率', 'Frequencies'), F0, 210, { color: C.ink, size: 13.5, weight: 700 });
       c.strokeStyle = C.muted; c.lineWidth = 1; c.beginPath(); c.moveTo(F0, base); c.lineTo(F1, base); c.stroke();
       for (let k = 0; k < 3; k++) {
         const x = lerp(F0 + 14, F1 - 14, k / 2), h = 70 * b;
@@ -739,7 +742,7 @@ function createOrbDemo(opts) {
     advance(dt) { t = Math.min(DUR, t + dt); },
     reset() { t = 0; },
     cueAt: cueAtOf(cues), cueIndex: cueIndexOf(cues),
-    status() { return t < 6 ? '紡錘把離子往內吸' : t < 13 ? '沿著紡錘:像一個碗' : t < 21 ? '越輕擺得越快' : '記下訊號,拆成頻率'; },
+    status() { return t < 6 ? zhEn('紡錘把離子往內吸', 'The spindle pulls ions in') : t < 13 ? zhEn('沿著紡錘:像一個碗', 'Along the spindle: a bowl') : t < 21 ? zhEn('越輕擺得越快', 'Lighter swings faster') : zhEn('記下訊號,拆成頻率', 'Record, then split by frequency'); },
     freqOf: (k) => freq(k),
     draw(c, o = {}) {
       drawElectrodes(c, false);
@@ -747,14 +750,14 @@ function createOrbDemo(opts) {
       drawElectrodes(c, true);
       for (let k = 0; k < 3; k++) drawIon(c, k, true);
       if (o.bare) return;
-      text(c, '紡錘(中心電極)', CX, CY + 68, { color: C.ink2, size: 12.5, align: 'center' });
-      text(c, '外殼左半', CX - LZ * 0.62, CY + 68, { color: C.muted, size: 12, align: 'center' });
-      text(c, '外殼右半', CX + LZ * 0.62, CY + 68, { color: C.muted, size: 12, align: 'center' });
+      text(c, zhEn('紡錘(中心電極)', 'Spindle (center)'), CX, CY + 68, { color: C.ink2, size: 12.5, align: 'center' });
+      text(c, zhEn('外殼左半', 'Shell, left'), CX - LZ * 0.62, CY + 68, { color: C.muted, size: 12, align: 'center' });
+      text(c, zhEn('外殼右半', 'Shell, right'), CX + LZ * 0.62, CY + 68, { color: C.muted, size: 12, align: 'center' });
       drawBowl(c); drawSignal(c);
       text(c, this.status(), 22, 22, { color: '#74e4ff', size: 17, weight: 800 });
       // 圖例:相對的擺盪快慢,剛好是 m/z 比值開根號的倒數
       const vis = [0, 1, 2].filter((k) => t >= born[k]);
-      if (vis.length > 1) vis.forEach((k, i) => { ball(c, 432, 22 + i * 20, 5, ions[k].color); text(c, `${ions[k].label}:快慢 ${(freq(k) / freq(0)).toFixed(2)}`, 446, 22.5 + i * 20, { color: ions[k].color, size: 12.5, weight: 700 }); });
+      if (vis.length > 1) vis.forEach((k, i) => { ball(c, 432, 22 + i * 20, 5, ions[k].color); text(c, zhEn(`${ions[k].label}:快慢 ${(freq(k) / freq(0)).toFixed(2)}`, `${ions[k].label}: speed ${(freq(k) / freq(0)).toFixed(2)}`), 446, 22.5 + i * 20, { color: ions[k].color, size: 12.5, weight: 700 }); });
     },
   };
 }

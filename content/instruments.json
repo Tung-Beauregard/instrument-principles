@@ -2,41 +2,50 @@
   "categories": [
     {
       "id": "ms",
-      "name": "質譜"
+      "name": "質譜",
+      "nameEn": "Mass spectrometry"
     },
     {
       "id": "chrom",
-      "name": "層析"
+      "name": "層析",
+      "nameEn": "Chromatography"
     },
     {
       "id": "spec",
-      "name": "光譜"
+      "name": "光譜",
+      "nameEn": "Spectroscopy"
     },
     {
       "id": "nmr",
-      "name": "NMR"
+      "name": "NMR",
+      "nameEn": "NMR"
     },
     {
       "id": "bio",
-      "name": "生化原理"
+      "name": "生化原理",
+      "nameEn": "Biochemistry"
     },
     {
       "id": "bio-adv",
-      "name": "生化進階"
+      "name": "生化進階",
+      "nameEn": "Advanced biochemistry"
     },
     {
       "id": "fg",
-      "name": "官能基編號"
+      "name": "官能基編號",
+      "nameEn": "Functional groups and numbering"
     },
     {
       "id": "tools",
-      "name": "工具"
+      "name": "工具",
+      "nameEn": "Tools"
     }
   ],
   "instruments": [
     {
       "id": "lcq",
       "name": "離子阱質譜",
+      "nameEn": "Ion trap mass spectrometry",
       "categories": [
         "ms"
       ],
@@ -44,11 +53,13 @@
       "theme": "mint",
       "image": "./assets/lcq.svg",
       "imageAlt": "離子阱質譜儀結構示意",
+      "imageAltEn": "Schematic of an ion trap mass spectrometer",
       "href": "./lcq/"
     },
     {
       "id": "mass-analyzers",
       "name": "質譜儀-不同分析器比較",
+      "nameEn": "Mass spectrometers: comparing analyzers",
       "categories": [
         "ms"
       ],
@@ -56,11 +67,13 @@
       "theme": "lavender",
       "image": "./assets/mass-analyzers.svg",
       "imageAlt": "質譜儀的四種分析器:四極柱、離子阱、飛行時間與 Orbitrap 的概念示意",
+      "imageAltEn": "Concept sketch of four mass analyzers: quadrupole, ion trap, time of flight and Orbitrap",
       "href": "./mass-analyzers/"
     },
     {
       "id": "chromatography",
       "name": "層析-GC 與 HPLC",
+      "nameEn": "Chromatography: GC and HPLC",
       "categories": [
         "chrom"
       ],
@@ -68,11 +81,13 @@
       "theme": "mint",
       "image": "./assets/chromatography.svg",
       "imageAlt": "玻璃管柱裡分開的色素帶,與一支一支出來的層析圖峰",
+      "imageAltEn": "Pigment bands separating in a glass column, and chromatogram peaks coming out one by one",
       "href": "./chromatography/"
     },
     {
       "id": "gc-ms",
       "name": "GC-MS",
+      "nameEn": "GC-MS",
       "categories": [
         "ms",
         "chrom"
@@ -81,23 +96,28 @@
       "theme": "blue",
       "image": "./assets/gc-ms.svg",
       "imageAlt": "氣相層析儀連接質譜儀的結構示意",
+      "imageAltEn": "Schematic of a gas chromatograph connected to a mass spectrometer",
       "href": "./gc-ms/"
     },
     {
       "id": "spectroscopy",
       "name": "光譜-光與分子",
+      "nameEn": "Spectroscopy: light and molecules",
       "categories": [
         "spec"
       ],
       "status": "ready",
       "theme": "lavender",
       "image": "./assets/spectroscopy.svg",
+      "imageEn": "./assets/spectroscopy-en.svg",
       "imageAlt": "分子、能量階梯與從無線電波到 X 光的電磁波色帶",
+      "imageAltEn": "A molecule, an energy ladder and the band of electromagnetic waves from radio to X-rays",
       "href": "./spectroscopy/"
     },
     {
       "id": "uv-vis",
       "name": "UV-Vis 分光光度計",
+      "nameEn": "UV-Vis spectrophotometer",
       "categories": [
         "spec"
       ],
@@ -105,11 +125,13 @@
       "theme": "lavender",
       "image": "./assets/uv-vis.svg",
       "imageAlt": "光源、光柵與樣品槽的光路概念示意",
+      "imageAltEn": "Concept sketch of the light path through a lamp, a grating and a sample cell",
       "href": "./uv-vis/"
     },
     {
       "id": "nmr",
       "name": "NMR 核磁共振",
+      "nameEn": "NMR: nuclear magnetic resonance",
       "categories": [
         "nmr"
       ],
@@ -117,11 +139,13 @@
       "theme": "blue",
       "image": "./assets/nmr.svg",
       "imageAlt": "剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意",
+      "imageAltEn": "Concept sketch of a cut-open superconducting magnet, spins inside the coil and a proton spectrum",
       "href": "./nmr/"
     },
     {
       "id": "central-dogma",
       "name": "中心法則",
+      "nameEn": "The central dogma",
       "categories": [
         "bio"
       ],
@@ -129,11 +153,13 @@
       "theme": "mint",
       "image": "./assets/central-dogma.svg",
       "imageAlt": "DNA 雙股螺旋轉錄成 mRNA,核糖體沿著 mRNA 接出一串胺基酸",
+      "imageAltEn": "A DNA double helix is transcribed into mRNA, and a ribosome moves along the mRNA joining amino acids into a chain",
       "href": "./central-dogma/"
     },
     {
       "id": "pcr",
       "name": "PCR 與電泳",
+      "nameEn": "PCR and gel electrophoresis",
       "categories": [
         "bio"
       ],
@@ -141,11 +167,13 @@
       "theme": "blue",
       "image": "./assets/pcr.svg",
       "imageAlt": "分開的雙股 DNA 黏上引子,數量一輪一輪加倍,旁邊是跑出條帶的洋菜膠",
+      "imageAltEn": "Separated DNA strands with primers attached, the number of copies doubling round after round, and an agarose gel with bands",
       "href": "./pcr/"
     },
     {
       "id": "sequencing",
       "name": "DNA 定序",
+      "nameEn": "DNA sequencing",
       "categories": [
         "bio"
       ],
@@ -153,11 +181,13 @@
       "theme": "lavender",
       "image": "./assets/sequencing.svg",
       "imageAlt": "一股 DNA 的鹼基對到四色峰圖的峰,旁邊是流動槽上一叢一叢發出四種顏色的 DNA",
+      "imageAltEn": "The bases of a DNA strand matched to the peaks of a four-color trace, and clusters of DNA on a flow cell glowing in four colors",
       "href": "./sequencing/"
     },
     {
       "id": "dna-markers",
       "name": "DNA 鑑定與分子標記",
+      "nameEn": "DNA identification and molecular markers",
       "categories": [
         "bio"
       ],
@@ -165,11 +195,13 @@
       "theme": "mint",
       "image": "./assets/dna-markers.svg",
       "imageAlt": "一段木頭的切面與一片葉子,旁邊是 DNA 的重複序列與電泳圖上的兩個峰",
+      "imageAltEn": "The cut face of a log and a leaf, next to a repeated DNA sequence and two peaks on an electropherogram",
       "href": "./dna-markers/"
     },
     {
       "id": "cloning",
       "name": "基因選殖與蛋白表現",
+      "nameEn": "Gene cloning and protein expression",
       "categories": [
         "bio"
       ],
@@ -177,11 +209,13 @@
       "theme": "blue",
       "image": "./assets/cloning.svg",
       "imageAlt": "從葉片取得的基因片段帶著黏性末端,接進大腸桿菌裡的環狀質體,細菌做出一團團帶 His 標籤的酵素",
+      "imageAltEn": "A gene fragment from a leaf with sticky ends is joined into a ring-shaped plasmid inside E. coli, and the bacteria make clumps of His-tagged enzyme",
       "href": "./cloning/"
     },
     {
       "id": "terpene-synthase",
       "name": "萜類合成酶",
+      "nameEn": "Terpene synthases",
       "categories": [
         "bio"
       ],
@@ -189,11 +223,13 @@
       "theme": "lavender",
       "image": "./assets/terpene-synthase.svg",
       "imageAlt": "臺灣杉的小枝旁,一條碳鏈鑽進萜類合成酶的口袋,口袋裡接成雙環的 pinene,右下是層析圖上的一支峰",
+      "imageAltEn": "Beside a sprig of Taiwania, a carbon chain slips into the pocket of a terpene synthase and closes into the two rings of pinene; a chromatogram peak at lower right",
       "href": "./terpene-synthase/"
     },
     {
       "id": "crispr",
       "name": "CRISPR 基因編輯",
+      "nameEn": "CRISPR gene editing",
       "categories": [
         "bio"
       ],
@@ -201,11 +237,13 @@
       "theme": "mint",
       "image": "./assets/crispr.svg",
       "imageAlt": "Cas9 蛋白套在雙股 DNA 上,嚮導 RNA 和其中一股配對,旁邊框起來的是 PAM,兩股在同一個位置被剪開",
+      "imageAltEn": "Cas9 sits on double-stranded DNA with its guide RNA paired to one strand; the boxed PAM is beside it, and both strands are cut at the same spot",
       "href": "./crispr/"
     },
     {
       "id": "immunoassay",
       "name": "抗體檢測:西方墨點法與 ELISA",
+      "nameEn": "Antibody tests: western blot and ELISA",
       "categories": [
         "bio"
       ],
@@ -213,11 +251,13 @@
       "theme": "blue",
       "image": "./assets/immunoassay.svg",
       "imageAlt": "兩支 Y 字形的抗體夾住目標蛋白,左邊是有發光條帶的膜,右邊是顏色深淺不同的孔盤",
+      "imageAltEn": "Two Y-shaped antibodies clamp a target protein; a membrane with glowing bands on the left and a well plate in different shades on the right",
       "href": "./immunoassay/"
     },
     {
       "id": "flow-cytometry",
       "name": "流式細胞儀",
+      "nameEn": "Flow cytometry",
       "categories": [
         "bio"
       ],
@@ -225,11 +265,13 @@
       "theme": "lavender",
       "image": "./assets/flow-cytometry.svg",
       "imageAlt": "細胞在細細的液流裡排成一列通過雷射,散射出的光變成點圖上的兩群點,其中一群被圈起來",
+      "imageAltEn": "Cells line up in a thin stream and pass a laser one by one; the scattered light becomes two clusters on a dot plot, one of them circled",
       "href": "./flow-cytometry/"
     },
     {
       "id": "proteomics",
       "name": "蛋白質質譜定序",
+      "nameEn": "Protein sequencing by mass spectrometry",
       "categories": [
         "bio"
       ],
@@ -237,11 +279,13 @@
       "theme": "mint",
       "image": "./assets/proteomics.svg",
       "imageAlt": "一條胺基酸串成的胜肽斷成兩段,旁邊的碎片質譜上,兩根相鄰峰之間的距離對應一個胺基酸",
+      "imageAltEn": "A peptide chain of amino acids breaks into two pieces; on the fragment spectrum beside it, the gap between two neighboring peaks matches one amino acid",
       "href": "./proteomics/"
     },
     {
       "id": "transcriptomics",
       "name": "轉錄體分析:從定序資料找出候選基因",
+      "nameEn": "Transcriptomics: from sequencing data to candidate genes",
       "categories": [
         "bio-adv"
       ],
@@ -249,11 +293,13 @@
       "theme": "mint",
       "image": "./assets/transcriptomics.svg",
       "imageAlt": "短的定序片段疊在基因的外顯子上,其中幾條(琥珀色)跨過內含子;右邊的火山圖裡,右上角幾個薄荷綠的點是處理後顯著上升的基因",
+      "imageAltEn": "Short reads stacked on the exons of a gene, a few (amber) spanning an intron; on the volcano plot at right, the mint dots at upper right are genes that rose significantly after treatment",
       "href": "./transcriptomics/"
     },
     {
       "id": "terpenoid-precursors",
       "name": "萜類前驅物:MEP 與 MVA 兩條路",
+      "nameEn": "Terpenoid precursors: the MEP and MVA pathways",
       "categories": [
         "bio-adv"
       ],
@@ -261,11 +307,13 @@
       "theme": "blue",
       "image": "./assets/terpenoid-precursors.svg",
       "imageAlt": "植物細胞裡,細胞質與質體各用一條路做出 5 碳積木,質體把積木送到細胞質;右邊是積木接成的三環樹脂酸骨架與一滴松脂",
+      "imageAltEn": "In a plant cell, the cytoplasm and the plastid each make 5-carbon building blocks by their own pathway, and the plastid sends blocks to the cytoplasm; at right, the three-ring skeleton of a resin acid and a drop of pine resin",
       "href": "./terpenoid-precursors/"
     },
     {
       "id": "enzyme-kinetics",
       "name": "酵素動力學:Km 與 kcat 怎麼量",
+      "nameEn": "Enzyme kinetics: measuring Km and kcat",
       "categories": [
         "bio-adv"
       ],
@@ -273,11 +321,13 @@
       "theme": "lavender",
       "image": "./assets/enzyme-kinetics.svg",
       "imageAlt": "一段碳鏈卡在酵素的口袋裡,做出的環狀產物飄向右邊;右邊是初速度對受質濃度的飽和曲線,虛線標出最大速度與速度一半時的受質濃度",
+      "imageAltEn": "A carbon chain held in the pocket of an enzyme, with the ring-shaped product drifting to the right; at right, the saturation curve of initial rate against substrate concentration, with dashed lines marking the maximum rate and the substrate concentration at half that rate",
       "href": "./enzyme-kinetics/"
     },
     {
       "id": "population-genetics",
       "name": "族群遺傳與產地鑑定",
+      "nameEn": "Population genetics and tracing origin",
       "categories": [
         "bio-adv"
       ],
@@ -285,11 +335,13 @@
       "theme": "mint",
       "image": "./assets/population-genetics.svg",
       "imageAlt": "三群針葉樹各圍成一圈,一段查獲的木材用虛線箭頭指回其中一群,底下是依各群比例上色的分群長條圖",
+      "imageAltEn": "Three groups of conifers, each in its own circle; a dashed arrow points from a seized piece of timber back to one group; below, a cluster bar chart colored by each group's share",
       "href": "./population-genetics/"
     },
     {
       "id": "phylogenetics",
       "name": "演化樹:從序列推親緣關係",
+      "nameEn": "Phylogenetic trees: relationships from sequences",
       "categories": [
         "bio-adv"
       ],
@@ -297,11 +349,13 @@
       "theme": "blue",
       "image": "./assets/phylogenetics.svg",
       "imageAlt": "左邊是排好的多序列比對,其中一欄所有序列都一樣;右邊是一棵演化樹,其中一條枝特別長",
+      "imageAltEn": "A multiple sequence alignment at left, with one column identical in every sequence; a phylogenetic tree at right, with one especially long branch",
       "href": "./phylogenetics/"
     },
     {
       "id": "gene-function",
       "name": "在植物裡驗證基因功能",
+      "nameEn": "Testing gene function in plants",
       "categories": [
         "bio-adv"
       ],
@@ -309,11 +363,13 @@
       "theme": "lavender",
       "image": "./assets/gene-function.svg",
       "imageAlt": "針筒把農桿菌的菌液推進一片葉子,葉子下方是左右邊界之間分段上色的 T-DNA,右邊是葉綠體裡亮起的綠色訊號與層析圖上新出現的一支峰",
+      "imageAltEn": "A syringe pushes Agrobacterium culture into a leaf; below the leaf, a T-DNA between its left and right borders, colored in segments; at right, a green signal lighting up in chloroplasts and a new peak on a chromatogram",
       "href": "./gene-function/"
     },
     {
       "id": "nomenclature",
       "name": "有機化學命名法則:從主鏈編號到 R/S 與 E/Z",
+      "nameEn": "Organic nomenclature: from chain numbering to R/S and E/Z",
       "categories": [
         "fg"
       ],
@@ -321,11 +377,13 @@
       "theme": "lavender",
       "image": "./assets/nomenclature.svg",
       "imageAlt": "左邊是編好號的碳鏈,有一個雙鍵、一個 C=O 和一個甲基;右邊是立體中心,四個原子團標上名次 1 到 4,箭頭順時針繞一圈是 R",
+      "imageAltEn": "A numbered carbon chain with a double bond, a C=O and a methyl group at left; a stereocenter at right with its four groups ranked 1 to 4, and a clockwise arrow meaning R",
       "href": "./nomenclature/"
     },
     {
       "id": "carbohydrates",
       "name": "醣類:從葡萄糖到纖維素與澱粉",
+      "nameEn": "Carbohydrates: from glucose to cellulose and starch",
       "categories": [
         "fg"
       ],
@@ -333,23 +391,28 @@
       "theme": "mint",
       "image": "./assets/carbohydrates.svg",
       "imageAlt": "葡萄糖的六員環,六個碳標上 1 到 6 號;右邊是拉直的纖維素鏈與捲成螺旋的澱粉",
+      "imageAltEn": "The six-membered ring of glucose with its carbons numbered 1 to 6; at right, a straight cellulose chain and a coiled starch helix",
       "href": "./carbohydrates/"
     },
     {
       "id": "wood-components",
       "name": "木材三大成分:纖維素、半纖維素與木質素",
+      "nameEn": "The three main components of wood: cellulose, hemicellulose and lignin",
       "categories": [
         "fg"
       ],
       "status": "ready",
       "theme": "blue",
       "image": "./assets/wood-components.svg",
+      "imageEn": "./assets/wood-components-en.svg",
       "imageAlt": "左邊是細胞壁的橫切面,一層一層;右邊由上到下是纖維素鏈、帶支鏈的半纖維素與木質素的單元",
+      "imageAltEn": "A cross-section of the cell wall, layer by layer, at left; at right, from top to bottom, a cellulose chain, a branched hemicellulose and the units of lignin",
       "href": "./wood-components/"
     },
     {
       "id": "plot",
       "name": "數據畫圖",
+      "nameEn": "Data plotting",
       "categories": [
         "tools"
       ],
@@ -357,6 +420,7 @@
       "theme": "mint",
       "image": "./assets/plot.svg",
       "imageAlt": "一個檔案落進畫框,框裡畫出一條黑白的光譜曲線",
+      "imageAltEn": "A file drops into a frame, and a black-and-white spectrum curve is drawn inside it",
       "href": "./plot/"
     }
   ]

@@ -129,3 +129,10 @@
   - 改 `VEPS`:判讀的分界會移動(例如 ε = 1% 時,深度 10 讀到 1 條 T 判成 0/0、2 條判成 0/1),字幕「Q20 是 1%」與左上那一行也要改。
   - 改 `GREPS`、`GANC`、`GRL` 或 `GDROP`:重算三種讀長的 contig 數與 N50,以及丟掉短 contig 前後的 N50;右上的「重複序列約佔 53%」是由 `GREPF` 現算的。
   - de Bruijn 的例子:`DBS` 兩段序列只能在 ACGTC 的三個節點重疊(其他 3 個鹼基不能重複),`DBROW`、`DBU5` 要跟著改。
+
+## 英文版(2026-11-06)
+
+- 英文和中文寫在同一個 `index.html`:標題、導言與畫布的 aria-label 用 `data-en`;重點整理與資料來源是 `lang="zh-Hant"` 與 `lang="en"` 兩份 `<ul>`;程式裡的章名、字幕、圖上的字、控制項與組字串的地方一律 `zhEn('中文', 'English')`。改中文時英文一起改,做法見 `docs/I18N.md`。
+- 數字:萬、億照實換算(幾百萬到幾百億寫 millions to tens of billions;第 8 章刻度 `EXP` 的英文是 1,000、10,000 到 1 million、100 billion),英文的數字用 `toLocaleString('en-US')`,read、gap、contig、base 分單複數;奈米孔的滑桿因此改用 `format`(中文顯示不變)。名詞:火炬松 loblolly pine、柏科 cypress family、判讀 call;參考在圖上寫 Ref.(Reference 會超出畫面左緣),第 5 章讀出表的「叢 1」寫 #1。
+- 只在英文改的版面:第 2 章 ddNTPs 與新股的標籤分兩行;第 3 章偵測器的框寬 76(中文 64),單張峰圖下那行說明往下 12 px、字 13(拆成兩張時才不疊到判讀);第 6 章反轉錄酶的泡泡 46 × 21、字 10.5 分兩行,長條圖下的基因名稱分兩行、往下 4 px,「差很多:候選基因」往右 14 px;第 8 章縱軸標題往左到 x = 26(刻度 100 billion 比較寬),卡片的數值從 x + 96 開始,其中三格分兩行;進階 1 的 Poisson 圖例往右 32 px;進階 2 基因型三行的字 13、右下三種深度那三行的字 12。
+- 改了圖上的字或位置,用 `node scripts/check-i18n-layout.mjs sequencing --shots <資料夾>` 重跑,並看截圖。

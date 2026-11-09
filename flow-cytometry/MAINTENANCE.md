@@ -104,6 +104,13 @@
 - Galbraith DW, Harkins KR, Knapp S. Systemic endopolyploidy in *Arabidopsis thaliana*. Plant Physiol. 1991;96(3):985–989(PMC1080875,只讀到摘要,掃描的全文 PDF 沒有讀到):除了花序,各組織都有核內複製,程度隨組織的年齡與位置而變。
 - Doležel 2007(上面已列):幼嫩、長得快的葉通常最好,分化與老化的組織可能含很多核內多倍的細胞核(第 2236 頁);核內多倍出現 8C、16C、32C 以上的峰,用對數橫軸比較好看;老葉可能有很多停在 G2 期的細胞核(第 2242 頁圖 1);CV 在對數刻度上沒有意義(第 2239 頁)。
 
+## 英文版(2026-11-06)
+
+- 英文和中文寫在同一個 `index.html`:標題、導言與畫布的 aria-label 用 `data-en`;重點整理與資料來源是 `lang="zh-Hant"` 與 `lang="en"` 兩份 `<ul>`;程式裡的章名、字幕、圖上的字與控制項一律 `zhEn('中文', 'English')`,`fmtN` 英文用 `en-US`。改中文時英文一起改,做法見 `docs/I18N.md`。
+- 要一起改的地方:第 5 章 `pointer()` 的 `pressSeg(zhEn('圈哪一群', 'Population to gate'), …)` 比對的是控制項的 aria-label,兩處的英文要一樣。`GATES` 的英文名稱也是選項按鈕的字,圖上句中用 `toLowerCase()` 改小寫;`PLOIDY.mix.name` 英文寫完整的 Two plants chopped together(樣品標題),選項按鈕另寫 Chopped together;`ENDO_NAME` 英文是小寫複數(leaves、stems,只用在第 10 章右上的標題)。
+- 只在英文改的地方(手機上圖上的字放大 1.3 倍):第 2 章鞘液只寫 Sheath(字幕寫 sheath fluid)、「流體聚焦:樣品被擠細」分兩行;第 3 章擋光條分兩行,液流說明的第一行寫 Stream: from behind;第 4 章「橘黃色螢光」分兩行並往上移 8;第 6 章「位置約 2 倍」只寫 About 2×;第 7 章 2x:、4x: 後面空一格;第 8 章偏轉板的兩行往下移 8;第 9 章兩個偵測器範圍的標籤寫 FITC detector、PE detector(寫成 green、orange detector 會疊在一起),PE positive 放在那一群的左邊(靠右對齊),補償的判斷只寫 just right、too little、too much,「變寬 / 扣不掉」寫 Spread / remains;第 10 章表格的三個列名往左移 8,比例寫 Share (%)。字幕「圈選,英文 gating」英文只寫 (gating)。
+- 英文播放約 245 秒(中文 161 秒)。改了圖上的字或位置,用 `node scripts/check-i18n-layout.mjs flow-cytometry --shots <資料夾>` 重跑並看截圖。
+
 ## 修改後要檢查
 
 - 語法:把 module script 抽出來 `node --check`;統整進清單後再跑 `node scripts/check-site.mjs`、`node scripts/check-bio.mjs`。

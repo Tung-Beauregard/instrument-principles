@@ -57,7 +57,7 @@ for (const file of files) {
     assert.ok(target.startsWith(root + path.sep) || target === root, `Path leaves site: ${url}`);
     assert.ok(fs.existsSync(target), `Broken local link in ${file}: ${url}`);
   }
-  if (file !== 'index.html') assert.match(source, /href="\.\.\/">← 儀器入口<\/a>/, `Missing return link in ${file}`);
+  if (file !== 'index.html') assert.match(source, /href="\.\.\/"(?: data-en="← All lessons")?>← 儀器入口<\/a>/, `Missing return link in ${file}`);
   // 控制字元:node --check 會接受,但瀏覽器解析 HTML 時把 NUL 換成 U+FFFD,module 就壞了(踩過的坑)
   const ctl = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.exec(source);
   assert.equal(ctl, null, `Control character U+${ctl ? ctl[0].charCodeAt(0).toString(16).padStart(4, '0') : ''} in ${file}`);

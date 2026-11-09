@@ -2,6 +2,8 @@
 
 互動儀器教材入口。頁面只保留「儀器原理」、儀器圖與名稱連結、返回主頁及到站人數，色彩延續 W AI Studio。
 
+2026-11-06 起全站有英文版：每一頁分頁列的「← 儀器入口」後面（入口在標題列右邊）有切換鈕，中文頁寫 EN、英文頁寫「中文」，網址加 `?lang=en` 也會直接打開英文。做法、寫法與用詞對照見 [docs/I18N.md](./docs/I18N.md)。
+
 - [儀器入口](https://tung-beauregard.github.io/instrument-principles/)
 - [離子阱質譜](https://tung-beauregard.github.io/instrument-principles/lcq/)（動畫講解；另一個畫面是[拆開探索](https://tung-beauregard.github.io/instrument-principles/lcq-3d/)）
 - [UV-Vis 分光光度計](https://tung-beauregard.github.io/instrument-principles/uv-vis/)
@@ -27,6 +29,7 @@ index.html                 儀器入口；含完整靜態備援內容
 assets/
   styles.css               入口頁樣式與響應式版面
   app.js                   教材清單載入、到站人數
+  i18n.js                  中英切換（2026-11-06）：每一頁在 <head> 最前面同步載入；決定語言、換掉 data-en 的文字與屬性、提供 zhEn()、放切換鈕
   render-quality.js        教材共用畫質、幀率上限與可選效能顯示
   render-quality.css       畫質選單
   ui-scale.css             大螢幕的介面放大（2K、4K）：依畫面大小定義放大倍數 `--ui`，以 1080P 的瀏覽器視窗為 1 倍
@@ -89,6 +92,10 @@ scripts/check-fields.mjs   四種電場示意的物理（穩定條件、射出�
 scripts/make-og-images.mjs 重產 assets/og/ 的分享預覽圖（用本機的 Chrome 或 Edge 無頭截圖）
 scripts/check-plot.mjs     數據畫圖的讀檔與畫圖檢查（在程式裡合成各種格式的小檔案，不需要真實數據）
 scripts/check-bio.mjs      生化原理、生化進階與官能基編號每一頁的接線檢查：共用播放器、必要元素、分頁列順序、章節代號、module 語法、維護說明
+scripts/check-i18n.mjs     英文版的靜態檢查：每一段給人看的中文都有英文（HTML、JS、content/instruments.json），英文不用彎引號與破折號
+scripts/check-i18n-layout.mjs  英文版的 2D 教材檢查：用本機 Chrome 逐章逐秒畫一遍中英兩版，比對畫布上的字有沒有超出、疊在一起，字幕要放慢多少
+scripts/check-i18n-film.mjs    英文版的 3D 教材檢查（有影片模式的五頁）：影片每秒一格比對中英兩版的字，字幕速度，四種尺寸的一般模式
+scripts/check-i18n-zh.mjs      中文版有沒有被改到：和指定的 git 版本比，畫面上每一段文字與樣式、2D 教材每一格的字幕與畫布上的字
 scripts/check-ui-scale.mjs 畫面大小的檢查：放大的級距、每一頁的接線、放大的面板裡 vw 與 vh 都除以 `--ui`、小螢幕取景的空地
 .nojekyll                  GitHub Pages 靜態網站設定
 README.md                  專案導覽與預覽方式
@@ -99,6 +106,7 @@ docs/
   HANDOFF.md               交接紀錄：最近變更、驗證結果、缺口與下一步
   VALIDATION.md            檢查命令與各教材的操作步驟、預期結果
   AI-MAINTENANCE-PROMPT.md 給其他 AI 的維護資料更新提示詞
+  I18N.md                  英文版：切換的做法、頁面怎麼寫英文、英文的寫法、檢查與用詞對照
 ```
 
 根目錄現在是入口頁；原本位於根目錄的離子阱教學移至 `lcq/`。GC-MS 網址維持 `gc-ms/`，各教材都能返回入口並互相切換。教材本身的模型、科學計算與原有控制功能保留。
@@ -111,8 +119,8 @@ HTTP 網站會載入 `content/instruments.json`；此檔是儀器卡片的主要
 - `status: "upcoming"`：僅顯示準備中狀態，不產生可點擊的教材連結。
 - `theme`：`mint`、`blue` 或 `lavender`。
 - `categories`：所屬分類的 `id`，可以填好幾個（GC-MS 同時屬於質譜與層析）。分類本身列在檔案最上方的 `categories`，依那裡的順序分區；同一分類裡依教材陣列的順序。分類裡沒有教材時不顯示那一區。「工具」分類（`tools`，2026-10-22 起）放數據畫圖這類不是教材的頁面。
-- `name`：儀器名稱，也是入口連結文字。
-- `image`：本站 SVG 或其他靜態圖片相對路徑。
+- `name`：儀器名稱，也是入口連結文字。`nameEn` 是英文版的名稱（2026-11-06 起，分類也有 `nameEn`）。
+- `image`：本站 SVG 或其他靜態圖片相對路徑。圖上有中文字的另有英文版的圖（`imageEn`，目前是光譜與木材三大成分兩張，檔名加 `-en`）；`imageAlt` 的英文是 `imageAltEn`。靜態備援卡片用 `data-en`、`data-en-alt`、`data-en-src` 寫同樣的英文。
 - 修改資料後，同步更新 `index.html` 的靜態備援卡片。執行檢查避免兩份內容不一致。
 
 新增教材時，先以 `upcoming` 建立項目；完成獨立教材頁面並驗證後，更新名稱、連結與狀態。同時更新入口靜態備援（每個分類一區，卡片標題的 `id` 是「分類-教材-title」）。W AI Studio 只有本站入口這一張卡片，不為各教材另加卡片。各教材上方的分頁列也要加上新教材的連結。
@@ -141,7 +149,10 @@ node scripts/check-fields.mjs
 node scripts/check-plot.mjs
 node scripts/check-bio.mjs
 node scripts/check-ui-scale.mjs
+node scripts/check-i18n.mjs
 ```
+
+英文版的版面檢查要用本機的 Chrome 或 Edge（`CHECK_BROWSER` 指定路徑），自己會開靜態伺服器：`node scripts/check-i18n-layout.mjs [2D 教材的資料夾名稱 ...]`、`node scripts/check-i18n-film.mjs [uv-vis nmr mass-analyzers spectroscopy chromatography]`；改英文時用 `node scripts/check-i18n-zh.mjs` 確認中文沒變。用法見 docs/I18N.md。
 
 另需實際檢查：桌面與手機入口排版、每份教材的載入、入口與返回連結、鍵盤焦點、減少動態效果偏好。瀏覽器檢查才能確認外部 CDN 與 WebGL 的實際可用性。
 

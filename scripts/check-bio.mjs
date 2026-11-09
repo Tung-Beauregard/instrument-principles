@@ -49,9 +49,10 @@ assert.ok(player.includes('pseudo = true'), 'bio-lesson.js:不支援網頁全螢
 
 // 分頁列:← 儀器入口,然後是清單裡同一區的每一頁(順序相同),本頁 aria-current
 const navOf = (html, label) => {
-  const m = html.match(new RegExp(`<nav class="sitenav" aria-label="${label}">([\\s\\S]*?)</nav>`));
+  // 2026-11-06 起分頁列帶英文(data-en-aria-label、data-en,見 assets/i18n.js)
+  const m = html.match(new RegExp(`<nav class="sitenav" aria-label="${label}"(?: data-en-aria-label="[^"]+")?>([\\s\\S]*?)</nav>`));
   assert.ok(m, `缺少${label}的分頁列`);
-  return [...m[1].matchAll(/<a href="([^"]+)"( aria-current="page")?>([^<]+)<\/a>/g)].map((x) => ({ href: x[1], current: !!x[2], text: x[3] }));
+  return [...m[1].matchAll(/<a href="([^"]+)"( aria-current="page")?(?: data-en="[^"]+")?>([^<]+)<\/a>/g)].map((x) => ({ href: x[1], current: !!x[2], text: x[3] }));
 };
 const NEED = ['id="stage"', 'class="cap-no"', 'class="cap-ch"', 'class="cap-tx"', 'id="btnPrev"', 'id="btnPlay"', 'id="btnNext"', 'id="prog"', 'id="chName"', 'id="chapters"', 'class="ops-body"', 'id="btnFs"'];
 // 提供研究主題的老師姓名不寫進頁面與文件(使用者 2026-10-26 決定);名字本身也不寫進這個公開的檔案,只放雜湊。
@@ -83,7 +84,8 @@ for (const { name: label, items: group } of groups) for (const item of group) {
   assert.ok(mod, `${dir}: 缺少 module script`);
   nodeCheck(mod[1], dir + 'module');
   // 章節一律寫成 { key: '…', name: '…', …};只看這個寫法,資料物件裡的 key 欄位不算
-  const keys = [...mod[1].matchAll(/key: '([a-z0-9-]+)', name: '/g)].map((m) => m[1]);
+  // 2026-11-06 起章名寫成 name: zhEn('中文', 'English')
+  const keys = [...mod[1].matchAll(/key: '([a-z0-9-]+)', name: (?:zhEn\()?'/g)].map((m) => m[1]);
   assert.ok(keys.length >= 4, `${dir}: 章節太少`);
   assert.equal(new Set(keys).size, keys.length, `${dir}: 章節代號重複`);
   assert.ok(fs.existsSync(path.join(root, dir, 'MAINTENANCE.md')), `${dir}: 缺少 MAINTENANCE.md`);

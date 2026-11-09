@@ -134,6 +134,13 @@ Protein Prospector MS-Product 對同一個胜肽的結果:b2 214.1186、b3 327.2
 
 建議但沒有用上的來源:Steen H, Mann M. Nat Rev Mol Cell Biol. 2004;5:699–711(The ABC's (and XYZ's) of peptide sequencing)與 Aebersold R, Mann M. Nature. 2003;422:198–207 全文需訂閱,這次沒有讀到內文,頁面的敘述不以它們為依據;日後能讀到時可以補進來源。
 
+## 英文版(2026-11-06)
+
+- 做法見 `docs/I18N.md`,英文和中文寫在同一份檔案裡:標題、導言、畫布的 aria-label 用 `data-en`;重點整理與資料來源各是一組 `<ul lang="zh-Hant">` 與 `<ul lang="en">`;程式裡給人看的字一律 `zhEn('中文', 'English')`,包括章名、字幕、圖上的字與控制項。
+- 示意蛋白質「甲、乙、丙」英文是 I、II、III(A、B 留給定量那兩章的樣品 A、B);`AA_NAME` 整組用 `zhEn` 換成英文的胺基酸名;`fint` 的千分位 `toLocaleString` 英文用 `'en-US'`;候選數與「還有幾個候選」的英文有單複數。
+- 只有英文改了位置或分兩行的地方(手機上圖上的字放大 1.3 倍,英文才放得下):第 3 章出口的「質譜儀」英文寫 Mass spec,不然噴出來的「+」會疊上去;第 5 章碰撞室的標題英文改畫在框的左下角(左上角有飄過的 He),畫字的次數與順序和中文一樣;第 9 章 TMT 的「樣品 A」「樣品 B」與「灰:干擾」英文都分兩行。
+- 改中文時英文一起改;改完跑 `node scripts/check-i18n.mjs --list proteomics/index.html`(要沒有輸出)與 `node scripts/check-i18n-layout.mjs proteomics`(桌機與手機各比對一次中英的字有沒有超出畫面、疊在一起)。英文播放約 251 秒(中文 164 秒,長的字幕那一段播放器自動放慢)。
+
 ## 修改後要檢查什麼
 
 1. 語法:把 `<script type="module">` 抽出來跑 `node --check`。

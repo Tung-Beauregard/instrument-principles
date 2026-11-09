@@ -2,8 +2,9 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>離子阱質譜原理</title>
+<title data-en="How an ion trap mass spectrometer works">離子阱質譜原理</title>
 <meta name="description" content="離子阱質譜原理的互動 3D 解說,以 LCQ Deca XP 為例:從電灑游離、進入真空、離子導引到離子阱掃描,說明儀器怎麼分辨不同質荷比的離子,再看加成離子、同位素峰、負離子模式與串聯質譜。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="儀器原理">
@@ -194,114 +195,129 @@ html.immersive #topnav,html.immersive #bar,html.immersive #topnav>*{opacity:0;po
 <link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
-<div id="stage" aria-label="離子阱質譜原理的立體解說動畫,以 LCQ Deca XP 為例">
+<div id="stage" aria-label="離子阱質譜原理的立體解說動畫,以 LCQ Deca XP 為例" data-en-aria-label="3D animation explaining how an ion trap mass spectrometer works, with the LCQ Deca XP as the example">
   <canvas id="ov"></canvas>
 </div>
 
 <div id="topnav">
-<nav id="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><span class="sn-lesson" role="group" aria-label="離子阱質譜"><span class="sn-name" aria-hidden="true">離子阱質譜</span><a href="./" aria-current="page">動畫講解</a><a href="../lcq-3d/">拆開探索</a></span><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="../chromatography/">層析</a><a href="../plot/">數據畫圖</a></nav>
+<nav id="sitenav" aria-label="儀器原理" data-en-aria-label="Instrument Principles"><a href="../" data-en="← All lessons">← 儀器入口</a><span class="sn-lesson" role="group" aria-label="離子阱質譜" data-en-aria-label="Ion trap MS"><span class="sn-name" aria-hidden="true" data-en="Ion trap MS">離子阱質譜</span><a href="./" aria-current="page" data-en="Animated guide">動畫講解</a><a href="../lcq-3d/" data-en="Take it apart">拆開探索</a></span><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/" data-en="Mass analyzers">質譜儀-不同分析器比較</a><a href="../spectroscopy/" data-en="Light and molecules">光與分子</a><a href="../chromatography/" data-en="Chromatography">層析</a><a href="../plot/" data-en="Data plotting">數據畫圖</a></nav>
 <div id="qhost"></div>
 </div>
 <div id="bar">
-  <button id="play" class="icon" aria-label="播放"><svg viewBox="0 0 24 24"><path id="playIcon" d="M8 5v14l11-7z"/></svg></button>
-  <div id="rail" role="slider" tabindex="0" aria-label="章節與時間" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+  <button id="play" class="icon" aria-label="播放" data-en-aria-label="Play"><svg viewBox="0 0 24 24"><path id="playIcon" d="M8 5v14l11-7z"/></svg></button>
+  <div id="rail" role="slider" tabindex="0" aria-label="章節與時間" data-en-aria-label="Chapters and time" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
   <span id="time">00:00 / 00:00</span>
-  <span id="visits" hidden title="以裝置計算,同一台裝置重複開啟只算一次"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C6.6 5 2.8 9.1 1.5 12c1.3 2.9 5.1 7 10.5 7s9.2-4.1 10.5-7C21.2 9.1 17.4 5 12 5zm0 11.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-7a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg><span class="lab">到站人數</span><b id="visitsN">0</b></span>
-  <button id="labBtn" class="pill" aria-pressed="false">自己操作</button>
-  <button id="themeBtn" class="icon" aria-label="切換深淺色"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
-  <button id="fsBtn" class="icon" aria-label="全螢幕"><svg viewBox="0 0 24 24"><path d="M4 9V4h5v2H6v3zm10-5h6v5h-2V6h-4zM4 15h2v3h3v2H4zm14 0h2v5h-5v-2h3z"/></svg></button>
-  <button id="infoBtn" class="icon" aria-label="說明與資料來源"><svg viewBox="0 0 24 24"><path d="M11 10h2v7h-2zm0-3h2v2h-2zm1-5a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg></button>
+  <span id="visits" hidden title="以裝置計算,同一台裝置重複開啟只算一次" data-en-title="Counted per device; repeat visits from the same device count once"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C6.6 5 2.8 9.1 1.5 12c1.3 2.9 5.1 7 10.5 7s9.2-4.1 10.5-7C21.2 9.1 17.4 5 12 5zm0 11.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-7a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg><span class="lab" data-en="Visitors">到站人數</span><b id="visitsN">0</b></span>
+  <button id="labBtn" class="pill" aria-pressed="false" data-en="Try it yourself">自己操作</button>
+  <button id="themeBtn" class="icon" aria-label="切換深淺色" data-en-aria-label="Switch between light and dark"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  <button id="fsBtn" class="icon" aria-label="全螢幕" data-en-aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5v2H6v3zm10-5h6v5h-2V6h-4zM4 15h2v3h3v2H4zm14 0h2v5h-5v-2h3z"/></svg></button>
+  <button id="infoBtn" class="icon" aria-label="說明與資料來源" data-en-aria-label="Help and sources"><svg viewBox="0 0 24 24"><path d="M11 10h2v7h-2zm0-3h2v2h-2zm1-5a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg></button>
 </div>
 <div id="tip"></div>
 <div id="hint"></div>
 <div id="capLive" class="sr-only" aria-live="polite"></div>
 
-<aside id="lab" hidden aria-label="離子阱操作台">
-  <h2>離子阱操作台</h2>
-  <p class="sub">調高環形電極電壓的振幅,看哪一種離子先對上端帽的節拍、先被排出。</p>
-  <label>樣品
+<aside id="lab" hidden aria-label="離子阱操作台" data-en-aria-label="Ion trap control panel">
+  <h2 data-en="Ion trap control panel">離子阱操作台</h2>
+  <p class="sub" data-en="Turn up the ring electrode voltage amplitude and see which ion falls into step with the end caps first and is ejected first.">調高環形電極電壓的振幅,看哪一種離子先對上端帽的節拍、先被排出。</p>
+  <label><span data-en="Sample">樣品</span>
     <select id="labSample">
-      <option value="cal">校正液:咖啡因、MRFA、Ultramark</option>
-      <option value="np">天然物:檜木醇、兒茶素、槲皮素、扁柏脂素、蘆丁</option>
-      <option value="rutin">蘆丁標準品:看加成離子與團簇離子</option>
+      <option value="cal" data-en="Calibration mix: caffeine, MRFA, Ultramark">校正液:咖啡因、MRFA、Ultramark</option>
+      <option value="np" data-en="Natural products: hinokitiol, catechin, quercetin, hinokinin, rutin">天然物:檜木醇、兒茶素、槲皮素、扁柏脂素、蘆丁</option>
+      <option value="rutin" data-en="Rutin standard: adduct and cluster ions">蘆丁標準品:看加成離子與團簇離子</option>
     </select>
   </label>
-  <div class="pair" role="group" aria-label="離子模式"><button id="labPos" aria-pressed="true">正離子</button><button id="labNeg" aria-pressed="false">負離子</button></div>
-  <div class="row"><span>環形電極電壓振幅</span><output id="labVOut">500 V</output></div>
-  <input type="range" id="labV" min="0" max="8500" step="1" value="500" aria-label="環形電極電壓振幅">
+  <div class="pair" role="group" aria-label="離子模式" data-en-aria-label="Ion mode"><button id="labPos" aria-pressed="true" data-en="Positive ions">正離子</button><button id="labNeg" aria-pressed="false" data-en="Negative ions">負離子</button></div>
+  <div class="row"><span data-en="Ring voltage amplitude">環形電極電壓振幅</span><output id="labVOut">500 V</output></div>
+  <input type="range" id="labV" min="0" max="8500" step="1" value="500" aria-label="環形電極電壓振幅" data-en-aria-label="Ring electrode voltage amplitude">
   <div class="scale"><span>0 V</span><span>8500 V</span></div>
-  <label class="chk"><input type="checkbox" id="labAC" checked>端帽交流電壓(約 280 kHz)</label>
+  <label class="chk"><input type="checkbox" id="labAC" checked><span data-en="End-cap AC voltage (about 280 kHz)">端帽交流電壓(約 280 kHz)</span></label>
   <div class="btns">
-    <button id="labInject">重新裝填</button>
-    <button id="labScan" class="main">自動掃描</button>
+    <button id="labInject" data-en="Refill the trap">重新裝填</button>
+    <button id="labScan" class="main" data-en="Auto scan">自動掃描</button>
   </div>
   <details>
-    <summary>串聯質譜(MS/MS、MS³)</summary>
-    <label>挑一種離子撞碎
+    <summary data-en="Tandem MS (MS/MS, MS³)">串聯質譜(MS/MS、MS³)</summary>
+    <label><span data-en="Pick an ion to break apart">挑一種離子撞碎</span>
       <select id="labPrec"></select>
     </label>
-    <div class="pair" role="group" aria-label="撞碎幾次"><button id="labMs2" aria-pressed="true">MS²:撞一次</button><button id="labMs3" aria-pressed="false">MS³:再撞碎片</button></div>
-    <button id="labMsmsGo" class="go">開始</button>
-    <p class="hint">先把其他離子趕出去,只留下挑的那一種;再照它的振盪頻率輕推,撞氦氣碎裂;最後掃描排出碎片。MS³ 是從碎片裡再挑一種撞碎。</p>
+    <div class="pair" role="group" aria-label="撞碎幾次" data-en-aria-label="How many rounds of breaking"><button id="labMs2" aria-pressed="true" data-en="MS²: break once">MS²:撞一次</button><button id="labMs3" aria-pressed="false" data-en="MS³: break again">MS³:再撞碎片</button></div>
+    <button id="labMsmsGo" class="go" data-en="Start">開始</button>
+    <p class="hint" data-en="First all other ions are pushed out, leaving only the one you picked; then it is nudged at its own oscillation frequency until collisions with helium break it; finally a scan ejects the fragments. MS³ picks one of the fragments and breaks it again.">先把其他離子趕出去,只留下挑的那一種;再照它的振盪頻率輕推,撞氦氣碎裂;最後掃描排出碎片。MS³ 是從碎片裡再挑一種撞碎。</p>
   </details>
   <details>
-    <summary>放大掃描(看同位素峰)</summary>
-    <label>離子
+    <summary data-en="Zoom scan (see isotope peaks)">放大掃描(看同位素峰)</summary>
+    <label><span data-en="Ion">離子</span>
       <select id="labZoomIon"></select>
     </label>
-    <button id="labZoomGo" class="go">開始</button>
-    <p class="hint">把掃描放慢、只掃一小段,峰變窄,看得出相鄰的同位素峰。間距 1 是帶一個電荷,0.5 是兩個。</p>
+    <button id="labZoomGo" class="go" data-en="Start">開始</button>
+    <p class="hint" data-en="Scanning slowly over a short range narrows the peaks, so neighboring isotope peaks can be told apart. A spacing of 1 means one charge; 0.5 means two.">把掃描放慢、只掃一小段,峰變窄,看得出相鄰的同位素峰。間距 1 是帶一個電荷,0.5 是兩個。</p>
   </details>
   <details>
-    <summary>裝填量與空間電荷</summary>
-    <div class="row"><span>樣品濃度</span><output id="labConcOut">1×</output></div>
-    <input type="range" id="labConc" min="-2" max="3" step="1" value="0" aria-label="樣品濃度">
+    <summary data-en="Ion load and space charge">裝填量與空間電荷</summary>
+    <div class="row"><span data-en="Sample concentration">樣品濃度</span><output id="labConcOut">1×</output></div>
+    <input type="range" id="labConc" min="-2" max="3" step="1" value="0" aria-label="樣品濃度" data-en-aria-label="Sample concentration">
     <div class="scale"><span>0.25×</span><span>8×</span></div>
-    <label class="chk"><input type="checkbox" id="labAGC" checked>自動增益控制</label>
-    <p class="hint">自動增益控制先快速試掃一次,再決定要收集多久,讓阱裡的離子數維持在目標值。關掉時濃度越高、裝進去的離子越多;離子太擠會互相推擠,峰的位置偏移、峰也變寬(示意)。</p>
+    <label class="chk"><input type="checkbox" id="labAGC" checked><span data-en="Automatic gain control">自動增益控制</span></label>
+    <p class="hint" data-en="Automatic gain control (AGC) first does a quick trial scan, then decides how long to collect ions so that the number in the trap stays at a target. With it off, a higher concentration loads more ions; crowded ions push on each other, so the peaks shift and get wider (illustrative).">自動增益控制先快速試掃一次,再決定要收集多久,讓阱裡的離子數維持在目標值。關掉時濃度越高、裝進去的離子越多;離子太擠會互相推擠,峰的位置偏移、峰也變寬(示意)。</p>
   </details>
   <div class="read" id="labRead"></div>
-  <p class="hint">關掉端帽交流電壓,離子要等到 q = 0.908 留不住時才被甩出;儀器仍照 0.83 換算,算出的質荷比會偏大約 9%,峰也比較寬。按「自動掃描」會先把交流電壓打勾,要看關掉的效果,開始掃描後再取消。</p>
-  <p class="hint">拖曳旋轉視角,右鍵平移,滾輪縮放;方向鍵或 WASD 移動,R 回到預設視角。</p>
+  <p class="hint" data-en="With the end-cap AC voltage off, ions are only thrown out at q = 0.908, when they can no longer be held; the instrument still converts as if at 0.83, so the m/z comes out about 9% too high and the peaks are wider. Auto scan ticks the AC voltage again first; to see the effect of turning it off, untick it after the scan starts.">關掉端帽交流電壓,離子要等到 q = 0.908 留不住時才被甩出;儀器仍照 0.83 換算,算出的質荷比會偏大約 9%,峰也比較寬。按「自動掃描」會先把交流電壓打勾,要看關掉的效果,開始掃描後再取消。</p>
+  <p class="hint" data-en="Drag to rotate the view, right-drag to pan, scroll to zoom; arrow keys or WASD to move, R resets the view.">拖曳旋轉視角,右鍵平移,滾輪縮放;方向鍵或 WASD 移動,R 回到預設視角。</p>
 </aside>
 
 <dialog id="about">
   <div class="in">
-    <h2>關於這段動畫</h2>
-    <p>這是離子阱質譜原理的解說動畫,以 Thermo Finnigan LCQ Deca XP 為例。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比(質量除以電荷,m/z)把離子分開,再看真實質譜上常見的加成離子、團簇離子、同位素峰與負離子模式,最後是串聯質譜。</p>
-    <p>分頁列的「拆開探索」是同一台儀器的另一種看法:把機身展開成一排零件,點零件看說明,旁邊同時畫出穩定圖和質譜。</p>
-    <h3>操作</h3>
-    <ul>
+    <h2 data-en="About this animation">關於這段動畫</h2>
+    <p lang="zh-Hant">這是離子阱質譜原理的解說動畫,以 Thermo Finnigan LCQ Deca XP 為例。前半段沿著離子走的路徑看一遍硬體,後半段說明離子阱怎麼依質荷比(質量除以電荷,m/z)把離子分開,再看真實質譜上常見的加成離子、團簇離子、同位素峰與負離子模式,最後是串聯質譜。</p>
+    <p lang="en">This animation explains how an ion trap mass spectrometer works, using the Thermo Finnigan LCQ Deca XP as an example. The first half follows the ions along their path through the hardware; the second half shows how the ion trap separates ions by mass-to-charge ratio (mass divided by charge, m/z), then looks at adduct ions, cluster ions, isotope peaks and negative-ion mode, which are common in real spectra, and ends with tandem mass spectrometry.</p>
+    <p lang="zh-Hant">分頁列的「拆開探索」是同一台儀器的另一種看法:把機身展開成一排零件,點零件看說明,旁邊同時畫出穩定圖和質譜。</p>
+    <p lang="en">Take it apart, in the tab bar, is another way to look at the same instrument: the body is laid out as a row of parts; click a part to read about it, with a stability diagram and a mass spectrum drawn alongside.</p>
+    <h3 data-en="Controls">操作</h3>
+    <ul lang="zh-Hant">
       <li>空白鍵播放或暫停;播放中左右方向鍵切換章節,時間軸取得焦點時也可以用方向鍵切換。</li>
       <li>暫停或「自己操作」時可以改變視角:滑鼠拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;觸控板雙指滑動平移、兩指捏合縮放;觸控螢幕單指旋轉、雙指平移與縮放。</li>
       <li>鍵盤:方向鍵或 W A S D 移動(左右平移、上下前後),Q E 轉向,+ − 縮放,按住 Shift 加快;R 回到動畫的鏡頭(操作台則回到預設視角)。</li>
       <li>「自己操作」會開啟離子阱操作台,可以自己調環形電極的電壓振幅、做掃描,也可以切換正負離子、做串聯質譜、放大掃描看同位素峰,或改變裝填量看空間電荷的影響。</li>
       <li>網址會跟著目前的章節改變(例如 <code>#scan</code>),複製網址分享,對方打開就從那一章開始;也可以在網址後面加 <code>?t=3:00</code> 指定時間,<code>#lab</code> 直接開操作台。</li>
     </ul>
-    <h3>字幕文字稿</h3>
+    <ul lang="en">
+      <li>Space plays or pauses; while playing, the left and right arrow keys change chapters, and so do the arrow keys when the timeline has focus.</li>
+      <li>When paused or in Try it yourself, you can change the view. Mouse: drag to rotate the view; right-drag or Shift-drag to pan; scroll to zoom. Trackpad: swipe with two fingers to pan, pinch to zoom; touch screen: one finger rotates, two fingers pan and zoom.</li>
+      <li>Keyboard: arrow keys or W A S D to move (left and right to pan, up and down to go forward and back), Q E to turn, + − to zoom, hold Shift to go faster; R returns to the animation camera (in the control panel, to the default view).</li>
+      <li>Try it yourself opens the ion trap control panel: set the ring electrode voltage amplitude and run scans yourself, switch between positive and negative ions, do tandem mass spectrometry, run a zoom scan to see isotope peaks, or change the ion load to see the effect of space charge.</li>
+      <li>The address follows the current chapter (for example <code>#scan</code>); copy it to share, and it opens at that chapter. You can also add a time, as in <code>?lang=en&amp;t=3:00</code>, or open the control panel directly with <code>#lab</code>.</li>
+    </ul>
+    <h3 data-en="Transcript">字幕文字稿</h3>
     <details id="transcript">
-      <summary>展開每一章的字幕</summary>
-      <p class="tnote">點章名可以從那一章開始播放。</p>
+      <summary data-en="Show the subtitles of every chapter">展開每一章的字幕</summary>
+      <p class="tnote" data-en="Click a chapter name to play from there.">點章名可以從那一章開始播放。</p>
       <ol id="transcriptList"></ol>
     </details>
-    <h3>數值與示意</h3>
-    <p>射頻頻率 760 kHz、振幅 0 至 8500 V(零到峰值)、掃描速率每秒約 5,500 個 m/z 單位、氦氣約 10⁻³ Torr、轉換二次發射電極 ±15 kV、倍增器增益約 3×10⁵、各區氣壓等數值取自 Finnigan LCQ Series Hardware Manual(LCQ Deca XP MAX)與 LCQ Deca Hardware Manual。離子阱尺寸 r₀ = 7.07 mm、z₀ = 7.85 mm 取自 March(1999,Encyclopedia of Spectroscopy and Spectrometry)對 LCQ 離子阱的描述;排出點 q = 0.83 取自 Wong 與 Cooks(1997)。約 280 kHz 的端帽交流頻率與每 m/z 約 4.25 V 是依上述數值計算的,手冊沒有直接寫;實機的對應關係由質量校正決定。</p>
-    <p>機身尺寸與 MSⁿ 取自 LCQ Deca XP Plus 規格表;噴針約 4.5 kV、毛細管最高 350 °C 取自 Thermo 應用報告 315;活化 q = 0.25、30 ms 取自已發表的 Deca XP Plus 方法。蘆丁的碎片是黃酮苷常見的裂解方式,不是這台儀器的實測。截取錐錯開約 1.5 mm 是從零件標示推定的。</p>
-    <p>為什麼在 q = 0.83 就用共振推出,而不等到留不住的邊界 0.908:這樣推出的峰比較窄;而且在 0.908 才排出的話,8500 V 只掃得到約 m/z 1830,用 0.83 才到得了 2000。</p>
-    <p>毛細管長度、桿子粗細、孔徑、偵測器尺寸等手冊沒有寫的部分是示意。離子源畫成探針由上方噴入;XP Plus 的正交離子源是從側面水平噴入,XP MAX 的 Ion Max 離子源約 60 度,原理相同。液滴、離子雲和振盪幅度都放大過,時間也放慢了很多倍,才看得到。</p>
-    <p>加成離子與團簇離子的 m/z 依 Fiehn 實驗室整理的 ESI 加成離子表(根據 Huang 等,1999)計算,蘆丁的分子量 610.1534 與緩激肽的分子量取自 ChEBI;峰的高低是示意。同位素峰的高度依 IUPAC 的同位素豐度計算。蘆丁負離子 609 的碎片 301 與 300 都見於已發表的 LC-MS/MS 資料,哪一個高要看儀器與碰撞能量,這裡各畫一半;扁柏脂素沒有酸性的 OH,負離子模式畫得很弱。放大掃描的用途、自動增益控制與各種掃描的峰寬(一般約 0.45、放大掃描約 0.3)取自 LCQ Fleet 規格表,那是同系列較新的機型;空間電荷只畫出偏移與變寬的方向,數值是示意。偵測負離子時轉換電極改加正電壓、撞出正離子,依偵測器廠商的技術說明。</p>
-    <h3>錄成影片</h3>
-    <p>可以把整段動畫錄成 1920×1080 的 MP4,沿用目前的深色或淺色模式。錄製時畫面會逐格算圖,通常一到幾分鐘。</p>
-    <p id="recNo" hidden>這個瀏覽器不能錄影,請改用電腦版的 Chrome 或 Edge。</p>
+    <h3 data-en="Values and what is illustrative">數值與示意</h3>
+    <p lang="zh-Hant">射頻頻率 760 kHz、振幅 0 至 8500 V(零到峰值)、掃描速率每秒約 5,500 個 m/z 單位、氦氣約 10⁻³ Torr、轉換二次發射電極 ±15 kV、倍增器增益約 3×10⁵、各區氣壓等數值取自 Finnigan LCQ Series Hardware Manual(LCQ Deca XP MAX)與 LCQ Deca Hardware Manual。離子阱尺寸 r₀ = 7.07 mm、z₀ = 7.85 mm 取自 March(1999,Encyclopedia of Spectroscopy and Spectrometry)對 LCQ 離子阱的描述;排出點 q = 0.83 取自 Wong 與 Cooks(1997)。約 280 kHz 的端帽交流頻率與每 m/z 約 4.25 V 是依上述數值計算的,手冊沒有直接寫;實機的對應關係由質量校正決定。</p>
+    <p lang="en">The RF frequency of 760 kHz, the amplitude of 0 to 8500 V (zero to peak), the scan rate of about 5,500 m/z units per second, helium at about 10⁻³ Torr, the conversion dynode at ±15 kV, the multiplier gain of about 3×10⁵ and the pressure of each region are from the Finnigan LCQ Series Hardware Manual (LCQ Deca XP MAX) and the LCQ Deca Hardware Manual. The trap dimensions r₀ = 7.07 mm and z₀ = 7.85 mm are from the description of the LCQ ion trap in March (1999, Encyclopedia of Spectroscopy and Spectrometry); the ejection point q = 0.83 is from Wong and Cooks (1997). The end-cap AC frequency of about 280 kHz and the roughly 4.25 V per m/z were calculated from these values; the manuals do not state them directly, and on the real instrument the relation is set by mass calibration.</p>
+    <p lang="zh-Hant">機身尺寸與 MSⁿ 取自 LCQ Deca XP Plus 規格表;噴針約 4.5 kV、毛細管最高 350 °C 取自 Thermo 應用報告 315;活化 q = 0.25、30 ms 取自已發表的 Deca XP Plus 方法。蘆丁的碎片是黃酮苷常見的裂解方式,不是這台儀器的實測。截取錐錯開約 1.5 mm 是從零件標示推定的。</p>
+    <p lang="en">The body dimensions and MSⁿ are from the LCQ Deca XP Plus data sheet; the needle at about 4.5 kV and the capillary at up to 350 °C are from Thermo Application Report 315; activation at q = 0.25 for 30 ms is from a published Deca XP Plus method. The rutin fragments follow common fragmentation pathways of flavonoid glycosides; they are not measurements from this instrument. The skimmer offset of about 1.5 mm is inferred from the part markings.</p>
+    <p lang="zh-Hant">為什麼在 q = 0.83 就用共振推出,而不等到留不住的邊界 0.908:這樣推出的峰比較窄;而且在 0.908 才排出的話,8500 V 只掃得到約 m/z 1830,用 0.83 才到得了 2000。</p>
+    <p lang="en">Why eject by resonance at q = 0.83 instead of waiting for the stability limit at 0.908: the peaks come out narrower; and if ions were only ejected at 0.908, 8500 V would scan only up to about m/z 1830, while 0.83 reaches 2000.</p>
+    <p lang="zh-Hant">毛細管長度、桿子粗細、孔徑、偵測器尺寸等手冊沒有寫的部分是示意。離子源畫成探針由上方噴入;XP Plus 的正交離子源是從側面水平噴入,XP MAX 的 Ion Max 離子源約 60 度,原理相同。液滴、離子雲和振盪幅度都放大過,時間也放慢了很多倍,才看得到。</p>
+    <p lang="en">Parts the manuals do not specify, such as the capillary length, rod thickness, hole sizes and detector size, are illustrative. The ion source is drawn as a probe spraying from above; the XP Plus orthogonal source sprays horizontally from the side and the XP MAX Ion Max source at about 60 degrees, on the same principle. Droplets, ion clouds and oscillations are enlarged, and time is slowed down many times, so that they can be seen.</p>
+    <p lang="zh-Hant">加成離子與團簇離子的 m/z 依 Fiehn 實驗室整理的 ESI 加成離子表(根據 Huang 等,1999)計算,蘆丁的分子量 610.1534 與緩激肽的分子量取自 ChEBI;峰的高低是示意。同位素峰的高度依 IUPAC 的同位素豐度計算。蘆丁負離子 609 的碎片 301 與 300 都見於已發表的 LC-MS/MS 資料,哪一個高要看儀器與碰撞能量,這裡各畫一半;扁柏脂素沒有酸性的 OH,負離子模式畫得很弱。放大掃描的用途、自動增益控制與各種掃描的峰寬(一般約 0.45、放大掃描約 0.3)取自 LCQ Fleet 規格表,那是同系列較新的機型;空間電荷只畫出偏移與變寬的方向,數值是示意。偵測負離子時轉換電極改加正電壓、撞出正離子,依偵測器廠商的技術說明。</p>
+    <p lang="en">The m/z values of the adduct and cluster ions are calculated from the ESI adduct ion table compiled by the Fiehn lab (based on Huang et al., 1999); the molecular masses of rutin (610.1534) and bradykinin are from ChEBI; peak heights are illustrative. Isotope peak heights are calculated from IUPAC isotope abundances. The fragments 301 and 300 of the rutin negative ion 609 both appear in published LC-MS/MS data, and which one is taller depends on the instrument and the collision energy, so each is drawn at half; hinokinin has no acidic OH, so it is drawn very weak in negative mode. The uses of the zoom scan, automatic gain control and the peak widths of each scan type (about 0.45 normally, about 0.3 for the zoom scan) are from the LCQ Fleet data sheet, a newer model of the same series; for space charge only the direction of the shift and widening is shown, and the values are illustrative. For negative ions the conversion dynode switches to a positive voltage and knocks out positive ions, according to technical notes from the detector maker.</p>
+    <h3 data-en="Record a video">錄成影片</h3>
+    <p lang="zh-Hant">可以把整段動畫錄成 1920×1080 的 MP4,沿用目前的深色或淺色模式。錄製時畫面會逐格算圖,通常一到幾分鐘。</p>
+    <p lang="en">You can record the whole animation as a 1920×1080 MP4, in the current dark or light mode. Recording renders the frames one by one and usually takes one to a few minutes.</p>
+    <p id="recNo" hidden data-en="This browser cannot record video; please use Chrome or Edge on a computer.">這個瀏覽器不能錄影,請改用電腦版的 Chrome 或 Edge。</p>
   </div>
   <div class="foot">
     <span id="recState"></span>
-    <button id="recBtn" hidden>錄成影片</button>
-    <button id="aboutClose" class="main">關閉</button>
+    <button id="recBtn" hidden data-en="Record video">錄成影片</button>
+    <button id="aboutClose" class="main" data-en="Close">關閉</button>
   </div>
 </dialog>
 
-<div id="loading"><div class="box"><b>離子阱質譜原理</b><span>正在載入立體模型</span><div class="bar"><i></i></div></div></div>
+<div id="loading"><div class="box"><b data-en="How an ion trap mass spectrometer works">離子阱質譜原理</b><span data-en="Loading the 3D model">正在載入立體模型</span><div class="bar"><i></i></div></div></div>
 
 <script type="module">
 import { createQualityControls, uiScale } from '../assets/render-quality.js';
@@ -389,39 +405,39 @@ const BETA_EJECT = betaOf(PHYS.qEject);
 // m/z values are monoisotopic; relative abundances (ab) are illustrative.
 const SAMPLES = {
   cal: [
-    { name: '咖啡因', label: '[M+H]⁺', mz: 195.09, ab: 1.0, f: 'C8H11N4O2' },
+    { name: zhEn('咖啡因', 'Caffeine'), label: '[M+H]⁺', mz: 195.09, ab: 1.0, f: 'C8H11N4O2' },
     { name: 'MRFA', label: '[M+H]⁺', mz: 524.26, ab: 0.8, f: 'C23H38N7O5S' },
     { name: 'Ultramark', label: '', mz: 1222.0, ab: 0.7 },
   ],
   np: [
-    { name: '檜木醇', label: '[M+H]⁺', mz: 165.09, ab: 0.55, f: 'C10H13O2' },
-    { name: '兒茶素', label: '[M+H]⁺', mz: 291.09, ab: 0.7, f: 'C15H15O6' },
-    { name: '槲皮素', label: '[M+H]⁺', mz: 303.05, ab: 1.0, f: 'C15H11O7' },
-    { name: '扁柏脂素', label: '[M+H]⁺', mz: 355.12, ab: 0.45, f: 'C20H19O6' },
-    { name: '蘆丁', label: '[M+H]⁺', mz: 611.16, ab: 0.85, f: 'C27H31O16' },
+    { name: zhEn('檜木醇', 'Hinokitiol'), label: '[M+H]⁺', mz: 165.09, ab: 0.55, f: 'C10H13O2' },
+    { name: zhEn('兒茶素', 'Catechin'), label: '[M+H]⁺', mz: 291.09, ab: 0.7, f: 'C15H15O6' },
+    { name: zhEn('槲皮素', 'Quercetin'), label: '[M+H]⁺', mz: 303.05, ab: 1.0, f: 'C15H11O7' },
+    { name: zhEn('扁柏脂素', 'Hinokinin'), label: '[M+H]⁺', mz: 355.12, ab: 0.45, f: 'C20H19O6' },
+    { name: zhEn('蘆丁', 'Rutin'), label: '[M+H]⁺', mz: 611.16, ab: 0.85, f: 'C27H31O16' },
   ],
   // rutin standard (M = 610.1534): adduct ions and non-covalent clusters (dimers)
   rutin: [
-    { name: '蘆丁', label: '[M+H]⁺', mz: 611.16, ab: 1.0, f: 'C27H31O16' },
-    { name: '蘆丁', label: '[M+Na]⁺', mz: 633.14, ab: 0.55, f: 'C27H30O16Na' },
-    { name: '蘆丁', label: '[M+K]⁺', mz: 649.12, ab: 0.25, f: 'C27H30O16K' },
-    { name: '蘆丁', label: '[2M+H]⁺', mz: 1221.31, ab: 0.3, f: 'C54H61O32' },
-    { name: '蘆丁', label: '[2M+Na]⁺', mz: 1243.30, ab: 0.4, f: 'C54H60O32Na' },
+    { name: zhEn('蘆丁', 'Rutin'), label: '[M+H]⁺', mz: 611.16, ab: 1.0, f: 'C27H31O16' },
+    { name: zhEn('蘆丁', 'Rutin'), label: '[M+Na]⁺', mz: 633.14, ab: 0.55, f: 'C27H30O16Na' },
+    { name: zhEn('蘆丁', 'Rutin'), label: '[M+K]⁺', mz: 649.12, ab: 0.25, f: 'C27H30O16K' },
+    { name: zhEn('蘆丁', 'Rutin'), label: '[2M+H]⁺', mz: 1221.31, ab: 0.3, f: 'C54H61O32' },
+    { name: zhEn('蘆丁', 'Rutin'), label: '[2M+Na]⁺', mz: 1243.30, ab: 0.4, f: 'C54H60O32Na' },
   ],
 };
 // negative-ion mode: [M-H]- and its adducts; the calibration solution is only shown in positive mode
 const SAMPLES_NEG = {
   np: [
-    { name: '檜木醇', label: '[M−H]⁻', mz: 163.08, ab: 0.6, f: 'C10H11O2' },
-    { name: '兒茶素', label: '[M−H]⁻', mz: 289.07, ab: 0.75, f: 'C15H13O6' },
-    { name: '槲皮素', label: '[M−H]⁻', mz: 301.04, ab: 1.0, f: 'C15H9O7' },
-    { name: '扁柏脂素', label: '[M−H]⁻', mz: 353.10, ab: 0.04, f: 'C20H17O6' }, // no acidic H: hardly any [M-H]-
-    { name: '蘆丁', label: '[M−H]⁻', mz: 609.15, ab: 0.9, f: 'C27H29O16' },
+    { name: zhEn('檜木醇', 'Hinokitiol'), label: '[M−H]⁻', mz: 163.08, ab: 0.6, f: 'C10H11O2' },
+    { name: zhEn('兒茶素', 'Catechin'), label: '[M−H]⁻', mz: 289.07, ab: 0.75, f: 'C15H13O6' },
+    { name: zhEn('槲皮素', 'Quercetin'), label: '[M−H]⁻', mz: 301.04, ab: 1.0, f: 'C15H9O7' },
+    { name: zhEn('扁柏脂素', 'Hinokinin'), label: '[M−H]⁻', mz: 353.10, ab: 0.04, f: 'C20H17O6' }, // no acidic H: hardly any [M-H]-
+    { name: zhEn('蘆丁', 'Rutin'), label: '[M−H]⁻', mz: 609.15, ab: 0.9, f: 'C27H29O16' },
   ],
   rutin: [
-    { name: '蘆丁', label: '[M−H]⁻', mz: 609.15, ab: 1.0, f: 'C27H29O16' },
-    { name: '蘆丁', label: '[M+HCOO]⁻', mz: 655.15, ab: 0.35, f: 'C28H31O18' },
-    { name: '蘆丁', label: '[2M−H]⁻', mz: 1219.30, ab: 0.3, f: 'C54H59O32' },
+    { name: zhEn('蘆丁', 'Rutin'), label: '[M−H]⁻', mz: 609.15, ab: 1.0, f: 'C27H29O16' },
+    { name: zhEn('蘆丁', 'Rutin'), label: '[M+HCOO]⁻', mz: 655.15, ab: 0.35, f: 'C28H31O18' },
+    { name: zhEn('蘆丁', 'Rutin'), label: '[2M−H]⁻', mz: 1219.30, ab: 0.3, f: 'C54H59O32' },
   ],
 };
 // MS/MS products by precursor m/z (p = share of precursors giving that product, illustrative; label = neutral loss)
@@ -440,7 +456,7 @@ function pickProduct(mz, r) {
   return list[list.length - 1];
 }
 // a doubly charged example for the isotope spacing (bradykinin [M+2H]2+, M = 1059.5614)
-const BRADYKININ = { name: '緩激肽', label: '[M+2H]²⁺', mz: 530.79, f: 'C50H75N15O11', z: 2 };
+const BRADYKININ = { name: zhEn('緩激肽', 'Bradykinin'), label: '[M+2H]²⁺', mz: 530.79, f: 'C50H75N15O11', z: 2 };
 // isotope pattern from IUPAC abundances; returns [{d, ab}] (d = mass offset in u from the monoisotopic peak, tallest = 1)
 const ISO = {
   C: [[0, 0.9893], [1.003355, 0.0107]], H: [[0, 0.999885], [1.006277, 0.000115]],
@@ -1761,6 +1777,9 @@ function ovResize(w, h, pr, bottomCss, nav = null) {
   // area taken by the site navigation and quality menu (#topnav), so the panels can start below it
   OV.navRight = nav ? nav.right * pr : 0;
   OV.navBottom = nav ? (nav.bottom + 10) * pr : 0;
+  // 英文:分頁列與畫質選單各自的範圍,3D 標籤避開用(見 drawLabel);中文、錄影(不帶 nav)都是空的
+  OV.navBoxes = nav && globalThis.I18N?.en ? ['#sitenav', '#qhost .quality-control'].map((s) => document.querySelector(s)).filter(Boolean)
+    .map((el) => el.getBoundingClientRect()).filter((r) => r.width > 0).map((r) => ({ x0: (r.left - 8) * pr, x1: (r.right + 8) * pr, y1: (r.bottom + 8) * pr })) : [];
   OV.botNow = OV.navNow = null; // the next frame starts from the exact positions (still shots right after a resize)
 }
 function ovTheme(dark) { OV.C = dark ? OV_COL.dark : OV_COL.light; }
@@ -1837,11 +1856,6 @@ function drawLabel(g, L) {
   if (az > 1 || L.a <= 0.01) return;
   const dx = (L.dx ?? 60) * U, dy = (L.dy ?? -50) * U;
   const lx = ax + dx, ly = ay + dy;
-  g.globalAlpha = L.a;
-  g.strokeStyle = C.text; g.lineWidth = 1.4 * U;
-  g.beginPath(); g.moveTo(ax, ay); g.lineTo(lx, ly); g.stroke();
-  g.fillStyle = C.accent;
-  g.beginPath(); g.arc(ax, ay, 3.6 * U, 0, Math.PI * 2); g.fill();
   g.font = fnt(500, 21 * U);
   const tw = g.measureText(L.text).width;
   g.font = fnt(400, 15 * U, true);
@@ -1850,7 +1864,16 @@ function drawLabel(g, L) {
   let right = dx >= 0;
   if (right && lx + bw > OV.W - 12 * U) right = false;
   else if (!right && lx - bw < 12 * U) right = true;
-  const bx = right ? lx : lx - bw, by = clamp(ly - bh / 2, 10 * U, OV.H - bh - 10 * U);
+  const bx = right ? lx : lx - bw;
+  // 英文的分頁列比中文寬、畫質選單也跟著往右:標籤框碰到它們(OV.navBoxes,只有英文有)時移到下面,引線接到框邊;手機橫拿收起分頁列時跟著回來
+  let top = 10 * U;
+  for (const b of OV.navBoxes || []) if (bx < b.x1 && bx + bw > b.x0) top = Math.max(top, Math.min(b.y1, OV.navNow ?? b.y1));
+  const by = clamp(ly - bh / 2, top, OV.H - bh - 10 * U), lyEnd = top > 10 * U && by > ly - bh / 2 ? by + bh / 2 : ly;
+  g.globalAlpha = L.a;
+  g.strokeStyle = C.text; g.lineWidth = 1.4 * U;
+  g.beginPath(); g.moveTo(ax, ay); g.lineTo(lx, lyEnd); g.stroke();
+  g.fillStyle = C.accent;
+  g.beginPath(); g.arc(ax, ay, 3.6 * U, 0, Math.PI * 2); g.fill();
   g.fillStyle = C.panel;
   rrect(g, bx, by, bw, bh, 7 * U); g.fill();
   g.strokeStyle = C.line; g.lineWidth = 1 * U; g.stroke();
@@ -1875,7 +1898,7 @@ function panelBox(g, x, y, w, h, title, a, right) {
 function drawRF(g, x, y, w, a, V, note) {
   const { U, C } = OV;
   const h = 112 * U;
-  panelBox(g, x, y, w, h, '環形電極電壓的振幅(零到峰值)', a, '760 kHz');
+  panelBox(g, x, y, w, h, zhEn('環形電極電壓的振幅(零到峰值)', 'Ring voltage amplitude (zero to peak)'), a, '760 kHz');
   g.fillStyle = C.text; g.font = fnt(600, 42 * U, true);
   g.fillText(`${fmtV(V)} V`, x + 18 * U, y + 84 * U);
   const bx = x + 250 * U, bw = w - 270 * U, byy = y + 70 * U;
@@ -1890,7 +1913,7 @@ function drawRF(g, x, y, w, a, V, note) {
 function drawQ(g, x, y, w, a, V, species, hidden) {
   const { U, C } = OV;
   const h = 150 * U;
-  panelBox(g, x, y, w, h, 'q 值:同一個電壓下,質荷比越小 q 越大', a);
+  panelBox(g, x, y, w, h, zhEn('q 值:同一個電壓下,質荷比越小 q 越大', 'q value: at one voltage, smaller m/z means larger q'), a);
   const ax0 = x + 26 * U, ax1 = x + w - 26 * U, ay = y + 104 * U;
   const qx = (q) => ax0 + (ax1 - ax0) * clamp(q / 0.95, 0, 1);
   // stable band, ejection point, boundary
@@ -1899,7 +1922,7 @@ function drawQ(g, x, y, w, a, V, species, hidden) {
   g.strokeStyle = C.warn; g.lineWidth = 2 * U; g.setLineDash([5 * U, 4 * U]);
   g.beginPath(); g.moveTo(qx(PHYS.qEject), ay - 34 * U); g.lineTo(qx(PHYS.qEject), ay + 12 * U); g.stroke(); g.setLineDash([]);
   g.fillStyle = C.warn; g.font = fnt(500, 13 * U); g.textAlign = 'right';
-  g.fillText('對上節拍 0.83', qx(PHYS.qEject) - 6 * U, ay - 22 * U);
+  g.fillText(zhEn('對上節拍 0.83', 'In step 0.83'), qx(PHYS.qEject) - 6 * U, ay - 22 * U);
   g.textAlign = 'left'; g.fillStyle = C.sub; g.fillText('0.908', qx(PHYS.qMax) + 4 * U, ay - 22 * U);
   g.fillStyle = C.sub; g.font = fnt(400, 13 * U, true);
   for (const q of [0, 0.2, 0.4, 0.6]) { g.fillText(q.toFixed(1), qx(q) - 8 * U, ay + 30 * U); g.fillRect(qx(q), ay + 6 * U, 1 * U, 6 * U); }
@@ -1925,7 +1948,7 @@ function drawScope(g, x, y, w, a, trap, species, acOn) {
   const { U, C } = OV;
   const rows = species.length + 1, rh = 42 * U;
   const h = (52 + 8) * U + rows * rh;
-  panelBox(g, x, y, w, h, '示波器:在端帽間的位置', a, '最近 4 秒');
+  panelBox(g, x, y, w, h, zhEn('示波器:在端帽間的位置', 'Oscilloscope: position between end caps'), a, zhEn('最近 4 秒', 'last 4 s'));
   const x0 = x + 112 * U, x1 = x + w - 16 * U;
   const tr = trap.tracer;
   for (let k = 0; k < rows; k++) {
@@ -1933,7 +1956,7 @@ function drawScope(g, x, y, w, a, trap, species, acOn) {
     g.strokeStyle = C.grid; g.lineWidth = 1 * U;
     g.beginPath(); g.moveTo(x0, cy); g.lineTo(x1, cy); g.stroke();
     if (k === 0) {
-      g.fillStyle = C.warn; g.font = fnt(500, 13 * U); g.fillText('端帽交流', x + 18 * U, cy + 5 * U);
+      g.fillStyle = C.warn; g.font = fnt(500, 13 * U); g.fillText(zhEn('端帽交流', 'End-cap AC'), x + 18 * U, cy + 5 * U);
       if (acOn > 0.01) {
         g.strokeStyle = C.warn; g.lineWidth = 1.6 * U; g.globalAlpha = a * acOn;
         g.beginPath();
@@ -1973,7 +1996,7 @@ function drawScope(g, x, y, w, a, trap, species, acOn) {
 function drawSpectrum(g, x, y, w, a, spec, view) {
   const { U, C } = OV;
   const h = (view.h ?? 250) * U;
-  panelBox(g, x, y, w, h, view.title || '質譜:偵測器訊號', a, view.right || '');
+  panelBox(g, x, y, w, h, view.title || zhEn('質譜:偵測器訊號', 'Mass spectrum: detector signal'), a, view.right || '');
   const px0 = x + 26 * U, px1 = x + w - 22 * U, top = y + 92 * U, base = y + h - 46 * U;
   const { lo, hi } = view;
   const mx = (mz) => px0 + ((mz - lo) / (hi - lo)) * (px1 - px0);
@@ -1990,7 +2013,7 @@ function drawSpectrum(g, x, y, w, a, spec, view) {
   }
   g.textAlign = 'left';
   g.fillText('m/z', px1 - 26 * U, base + 40 * U);
-  if (view.vAxis) { g.fillStyle = C.faint; g.fillText('排出時的電壓振幅(V)', px0, top - 40 * U); }
+  if (view.vAxis) { g.fillStyle = C.faint; g.fillText(zhEn('排出時的電壓振幅(V)', 'Voltage amplitude at ejection (V)'), px0, top - 40 * U); }
   // peaks; view.ionLabels adds the ion notation ([M+Na]⁺, −146 …) above the m/z, labels are lifted when they would overlap
   const max = view.norm || spec.max || 1;
   const tags = [], lh = 15 * U, ceil = y + 48 * U;
@@ -2033,7 +2056,7 @@ function drawSpectrum(g, x, y, w, a, spec, view) {
 function drawWell(g, x, y, w, a, V, species) {
   const { U, C } = OV;
   const h = 232 * U;
-  panelBox(g, x, y, w, h, '平均下來的「碗」:沿中心軸的位能', a, `V = ${fmtV(V)} V`);
+  panelBox(g, x, y, w, h, zhEn('平均下來的「碗」:沿中心軸的位能', 'Averaged bowl: potential along the axis'), a, `V = ${fmtV(V)} V`);
   const cx = x + w * 0.42, top = y + 64 * U, bottom = y + h - 26 * U, half = w * 0.3;
   const depths = species.map((s) => { const q = qOf(V, s.mz); return (q * V) / 8; });
   const dmax = Math.max(...depths);
@@ -2050,7 +2073,7 @@ function drawWell(g, x, y, w, a, V, species) {
     g.fillStyle = cssForMz(s.mz); g.font = fnt(600, 14 * U, true);
     g.fillText(`m/z ${Math.round(s.mz)}`, cx + half + 18 * U, yl - 4 * U);
     g.fillStyle = C.sub; g.font = fnt(400, 12.5 * U, true);
-    g.fillText(`深約 ${depths[i].toFixed(0)} V`, cx + half + 18 * U, yl + 14 * U);
+    g.fillText(zhEn(`深約 ${depths[i].toFixed(0)} V`, `~${depths[i].toFixed(0)} V deep`), cx + half + 18 * U, yl + 14 * U);
   });
   g.globalAlpha = 1;
   return h;
@@ -2058,7 +2081,7 @@ function drawWell(g, x, y, w, a, V, species) {
 function drawSteps(g, x, y, w, a, steps, cur, prog) {
   const { U, C } = OV;
   const h = 70 * U + steps.length * 40 * U;
-  panelBox(g, x, y, w, h, '串聯質譜:同一個阱,按時間先後', a);
+  panelBox(g, x, y, w, h, zhEn('串聯質譜:同一個阱,按時間先後', 'Tandem MS: one trap, steps in sequence'), a);
   steps.forEach((s, i) => {
     const yy = y + 66 * U + i * 40 * U;
     const on = i === cur, done = i < cur;
@@ -2151,8 +2174,8 @@ function drawOverlay(story) {
     g.shadowColor = C.shadow; g.shadowBlur = 24 * U;
     g.fillStyle = C.text;
     fitText(g, 'Ion Trap MS', 600, 96 * U, true, W / 2, ty, maxW);
-    const t2 = fitText(g, '離子阱質譜原理', 700, 46 * U, false, W / 2, ty + 80 * U, maxW);
-    drawWrapped(g, '以 Thermo Finnigan LCQ Deca XP 為例', fnt(400, 24 * U), W / 2, ty + 80 * U + t2 * 0.6 + 34 * U, Math.min(maxW, 980 * U), 36 * U, a, C.sub);
+    const t2 = fitText(g, zhEn('離子阱質譜原理', 'How an ion trap mass spectrometer works'), 700, 46 * U, false, W / 2, ty + 80 * U, maxW);
+    drawWrapped(g, zhEn('以 Thermo Finnigan LCQ Deca XP 為例', 'Using the Thermo Finnigan LCQ Deca XP as an example'), fnt(400, 24 * U), W / 2, ty + 80 * U + t2 * 0.6 + 34 * U, Math.min(maxW, 980 * U), 36 * U, a, C.sub);
     g.shadowBlur = 0;
     g.textAlign = 'left'; g.globalAlpha = 1;
   }
@@ -2176,12 +2199,12 @@ function drawEndCard(g, a) {
   const maxW = W - 64 * U, y0 = H * 0.4;
   g.fillStyle = C.text;
   fitText(g, 'Ion Trap MS', 600, 84 * U, true, W / 2, y0, maxW);
-  fitText(g, '離子阱質譜原理', 700, 40 * U, false, W / 2, y0 + 70 * U, maxW);
+  fitText(g, zhEn('離子阱質譜原理', 'How an ion trap mass spectrometer works'), 700, 40 * U, false, W / 2, y0 + 70 * U, maxW);
   g.fillStyle = C.sub;
-  fitText(g, '以 Thermo Finnigan LCQ Deca XP 為例', 400, 22 * U, false, W / 2, y0 + 112 * U, maxW);
+  fitText(g, zhEn('以 Thermo Finnigan LCQ Deca XP 為例', 'Using the Thermo Finnigan LCQ Deca XP as an example'), 400, 22 * U, false, W / 2, y0 + 112 * U, maxW);
   let yy = y0 + 170 * U;
-  yy += drawWrapped(g, '數值取自 Finnigan LCQ Series Hardware Manual、LCQ Deca Hardware Manual、LCQ Deca XP Plus 規格表、March (1999) 與 Wong & Cooks (1997)。', fnt(400, 19 * U), W / 2, yy, Math.min(maxW, 1300 * U), 30 * U, a, C.sub);
-  drawWrapped(g, '毛細管長度、桿子尺寸與偵測器幾何為示意;液滴、離子雲與振盪幅度已放大,時間也放慢了很多倍。', fnt(400, 19 * U), W / 2, yy + 4 * U, Math.min(maxW, 1300 * U), 30 * U, a, C.sub);
+  yy += drawWrapped(g, zhEn('數值取自 Finnigan LCQ Series Hardware Manual、LCQ Deca Hardware Manual、LCQ Deca XP Plus 規格表、March (1999) 與 Wong & Cooks (1997)。', 'Values from the Finnigan LCQ Series Hardware Manual, the LCQ Deca Hardware Manual, the LCQ Deca XP Plus data sheet, March (1999) and Wong & Cooks (1997).'), fnt(400, 19 * U), W / 2, yy, Math.min(maxW, 1300 * U), 30 * U, a, C.sub);
+  drawWrapped(g, zhEn('毛細管長度、桿子尺寸與偵測器幾何為示意;液滴、離子雲與振盪幅度已放大,時間也放慢了很多倍。', 'Capillary length, rod sizes and detector geometry are illustrative; droplets, ion clouds and oscillations are enlarged, and time is slowed down many times.'), fnt(400, 19 * U), W / 2, yy + 4 * U, Math.min(maxW, 1300 * U), 30 * U, a, C.sub);
   g.globalAlpha = 1;
 }
 function drawRecap(g, a, lines, reveal) {
@@ -2194,7 +2217,7 @@ function drawRecap(g, a, lines, reveal) {
   rrect(g, bx, by, bw, bh, 18 * U); g.fill();
   g.strokeStyle = C.line; g.lineWidth = 1 * U; g.stroke();
   g.globalAlpha = a;
-  g.fillStyle = C.accent; g.font = fnt(700, 20 * U); g.fillText('為什麼分得出不同的質荷比', bx + pad, by + 60 * U);
+  g.fillStyle = C.accent; g.font = fnt(700, 20 * U); g.fillText(zhEn('為什麼分得出不同的質荷比', 'Why different m/z values can be told apart'), bx + pad, by + 60 * U);
   let yy = by + 116 * U;
   lays.forEach((L, i) => {
     const la = a * clamp(reveal - i, 0, 1);
@@ -2303,10 +2326,10 @@ function windowKeys(t0, m0, windows, fast = 1.2, mEnd = null, tail = 1) {
 }
 const M_START = 500 / (PHYS.kV * PHYS.qEject); // ejection point while ions are stored at 500 V
 const RECAP_LINES = [
-  '同樣的電壓下,每種質荷比的 **q** 不同,振盪頻率也不同。',
-  '端帽上固定頻率的交流電壓,只推得動頻率對上的那一種離子。',
-  '電壓振幅等速上升,離子依質荷比由小到大,輪流對上節拍被排出。',
-  '排出的時刻對應電壓振幅,電壓振幅對應 **m/z**,這就是質譜的橫軸。',
+  zhEn('同樣的電壓下,每種質荷比的 **q** 不同,振盪頻率也不同。', 'At the same voltage, each m/z has its own **q** and oscillation frequency.'),
+  zhEn('端帽上固定頻率的交流電壓,只推得動頻率對上的那一種離子。', 'The end-cap AC has a fixed frequency: it pushes only the matching ion.'),
+  zhEn('電壓振幅等速上升,離子依質荷比由小到大,輪流對上節拍被排出。', 'As the amplitude rises steadily, ions fall into step and leave, low m/z first.'),
+  zhEn('排出的時刻對應電壓振幅,電壓振幅對應 **m/z**,這就是質譜的橫軸。', 'Ejection time gives the amplitude, which gives **m/z**: the horizontal axis.'),
 ];
 // shared by the three "reading a real spectrum" chapters: the scan panel set-up
 function readSpecUpdate(ST, t, scanFrom, view) {
@@ -2318,39 +2341,39 @@ function readSpecUpdate(ST, t, scanFrom, view) {
   ST.trap.V = m * PHYS.kV * PHYS.qEject;
   F.ring = 0.35 + 0.65 * ST.trap.V / 6000;
   OVS.hudA = 1;
-  OVS.hud = { rf: 1, spec: 1, V: ST.trap.V, spectrum: ST.spectrum, rfNote: t > scanFrom ? '動畫在兩組峰之間快轉' : '',
+  OVS.hud = { rf: 1, spec: 1, V: ST.trap.V, spectrum: ST.spectrum, rfNote: t > scanFrom ? zhEn('動畫在兩組峰之間快轉', 'Animation sped up between peak groups') : '',
     specView: { ...view, cursor: t > scanFrom && m > view.lo && m < view.hi ? m : null } };
   return m;
 }
 const CAL = () => SAMPLES.cal;
 const CHAPTERS = [
   {
-    key: 'intro', title: '開場', dur: 7,
-    transcript: ['離子阱質譜原理(Ion Trap MS),以 Thermo Finnigan LCQ Deca XP 為例。'],
+    key: 'intro', title: zhEn('開場', 'Opening'), dur: 7,
+    transcript: [zhEn('離子阱質譜原理(Ion Trap MS),以 Thermo Finnigan LCQ Deca XP 為例。', 'How an ion trap mass spectrometer (Ion Trap MS) works, using the Thermo Finnigan LCQ Deca XP as an example.')],
     start: KP(0, V3(2.3, 1.4, 3.3), V3(0, 0.32, 0), { sy: -0.13 }),
     cam: [KP(7, V3(1.55, 0.98, 2.35), V3(0, 0.3, 0), { sy: -0.1 })],
     cues: [],
     update(ST, t) { OVS.title = win(t, 0.8, 6.6, 0.9); F.scanLed = 1; F.winGlow = 0.6; },
   },
   {
-    key: 'outside', title: '質譜儀在做什麼', dur: 11,
+    key: 'outside', title: zhEn('質譜儀在做什麼', 'What a mass spectrometer does'), dur: 11,
     cam: [KP(4.5, V3(0.33, 0.72, 1.92), V3(-0.02, 0.31, 0.3)), KP(11, V3(-0.62, 0.64, 1.16), V3(-0.2, 0.33, 0.4))],
     cues: [
-      [0.4, '質譜儀做三件事:讓分子帶電成為**離子**、依**質荷比**(m/z,質量除以電荷)分開、再把離子數出來。下面打開機器,跟著離子走一遍。'],
+      [0.4, zhEn('質譜儀做三件事:讓分子帶電成為**離子**、依**質荷比**(m/z,質量除以電荷)分開、再把離子數出來。下面打開機器,跟著離子走一遍。', 'A mass spectrometer does three things: charges molecules into **ions**, sorts them by **mass-to-charge ratio** (m/z, mass divided by charge), and counts them. Now we follow them inside.')],
     ],
     update(ST, t) {
       F.scanLed = 1; F.winGlow = 0.6;
       OVS.labels = labels(ST, t, [
-        ['cab:source', '離子源', '樣品在這裡變成離子', 2, 10.6, -70, -70],
+        ['cab:source', zhEn('離子源', 'Ion source'), zhEn('樣品在這裡變成離子', 'sample becomes ions here'), 2, 10.6, -70, -70],
       ]);
     },
   },
   {
-    key: 'open', title: '拆開來看', dur: 16,
+    key: 'open', title: zhEn('拆開來看', 'A look inside'), dur: 16,
     cam: [KP(4.2, V3(0.95, 1.55, 1.95), V3(-0.1, 0.38, 0.1)), KP(10.8, V3(0.05, 0.98, 2.15), V3(-0.04, 0.6, 0)), KP(16, V3(0.13, 0.93, 2.02), V3(-0.04, 0.6, 0))],
     cues: [
-      [0.3, '打開上蓋,離子走的路在左半邊:從前門的離子源一路往機器後方,走到最裡面的偵測器。'],
-      [8.4, '沿途分成四段氣壓:大氣壓 760 Torr、1 Torr、10⁻³ Torr,分析區只剩 2×10⁻⁵ Torr。越往裡面越空,離子才不會一路撞上氣體分子。'],
+      [0.3, zhEn('打開上蓋,離子走的路在左半邊:從前門的離子源一路往機器後方,走到最裡面的偵測器。', 'Under the top cover, the ion path runs through the left half: from the ion source at the front door back to the detector at the far end.')],
+      [8.4, zhEn('沿途分成四段氣壓:大氣壓 760 Torr、1 Torr、10⁻³ Torr,分析區只剩 2×10⁻⁵ Torr。越往裡面越空,離子才不會一路撞上氣體分子。', 'Four pressure stages: 760 Torr (air), 1 Torr, 10⁻³ Torr, and 2×10⁻⁵ Torr in the analyzer. Emptier inside, so ions do not hit gas.')],
     ],
     update(ST, t) {
       F.cover = sstep(0.4, 3.0, t); F.door = sstep(1.4, 4.2, t);
@@ -2358,77 +2381,77 @@ const CHAPTERS = [
       F.cab = 1 - sstep(6.2, 10.4, t); F.cabSlide = sstep(5.5, 10.5, t);
       F.gas = sstep(8.6, 10.5, t); F.scanLed = 1;
       OVS.labels = labels(ST, t, [
-        ['asm:reg0', '大氣壓', '760 Torr', 9.2, 16, -40, 80],
-        ['asm:reg1', '1 Torr', '前級幫浦抽氣', 9.8, 16, -50, -120],
-        ['asm:reg2', '10⁻³ Torr', '渦輪分子幫浦', 10.4, 16, 20, -120],
-        ['asm:reg3', '2×10⁻⁵ Torr', '分析區', 11, 16, 50, -110],
+        ['asm:reg0', zhEn('大氣壓', 'Atmospheric pressure'), '760 Torr', 9.2, 16, -40, 80],
+        ['asm:reg1', '1 Torr', zhEn('前級幫浦抽氣', 'forepump'), 9.8, 16, -50, -120],
+        ['asm:reg2', '10⁻³ Torr', zhEn('渦輪分子幫浦', 'turbo pump'), 10.4, 16, 20, -120],
+        ['asm:reg3', '2×10⁻⁵ Torr', zhEn('分析區', 'analyzer region'), 11, 16, 50, -110],
       ]);
     },
   },
   {
-    key: 'esi', title: '電灑游離', dur: 30, prewarm: 0,
+    key: 'esi', title: zhEn('電灑游離', 'Electrospray ionization'), dur: 30, prewarm: 0,
     cam: [K(3.5, D(-12, 6, 0), [0.04, 0.012, 0.12], { fov: 28 }), K(9.2, D(-11, 2, 0), [0.04, 0.014, 0.15], { fov: 28 }),
       K(16.2, D(-10, -5, 0), [0.05, 0.03, 0.26]), K(24.2, D(-8, -3, 0), [0.06, 0.03, 0.27]), K(30, D(-5, -1, 0), [0.08, 0.035, 0.28])],
     cues: [
-      [0.3, '樣品溶液從噴針流出,噴針加了約 **+4.5 kV** 的高壓。液面被電場拉成尖錐,也就是**泰勒錐**,尖端噴出帶正電的細小液滴。'],
-      [8.2, '噴針外圈的氮氣(**鞘氣**)把液滴吹散。溶劑蒸發,液滴越縮越小,表面電荷越擠越密。'],
-      [14.4, '電荷擠到極限,液滴就噴出一串更小的液滴,把電荷分走;縮到只剩幾奈米時,離子直接從表面脫離。要測的分子 M 在酸性溶液裡多半已多帶一個 H⁺,所以出來的是 **[M+H]⁺**。'],
-      [22.6, '沒蒸發完的大液滴被氣流帶開,從底部的廢液口排掉;離子被電場拉向入口,連同氣體一起被吸進毛細管。'],
+      [0.3, zhEn('樣品溶液從噴針流出,噴針加了約 **+4.5 kV** 的高壓。液面被電場拉成尖錐,也就是**泰勒錐**,尖端噴出帶正電的細小液滴。', 'The sample flows from a needle at about **+4.5 kV**; the field pulls the liquid into a **Taylor cone** that sprays tiny positive droplets.')],
+      [8.2, zhEn('噴針外圈的氮氣(**鞘氣**)把液滴吹散。溶劑蒸發,液滴越縮越小,表面電荷越擠越密。', 'Nitrogen **sheath gas** spreads droplets; as solvent evaporates they shrink, crowding their surface charge.')],
+      [14.4, zhEn('電荷擠到極限,液滴就噴出一串更小的液滴,把電荷分走;縮到只剩幾奈米時,離子直接從表面脫離。要測的分子 M 在酸性溶液裡多半已多帶一個 H⁺,所以出來的是 **[M+H]⁺**。', 'At the charge limit, droplets shed smaller charged ones; at a few nm, ions escape. In acid the molecule M usually has an extra H⁺: **[M+H]⁺**.')],
+      [22.6, zhEn('沒蒸發完的大液滴被氣流帶開,從底部的廢液口排掉;離子被電場拉向入口,連同氣體一起被吸進毛細管。', 'Big leftover droplets are blown to the drain below; the field draws ions to the inlet; gas sweeps them into the capillary.')],
     ],
     update(ST, t) {
       F.pose = 1; F.cab = 0; F.cabSlide = 1;
       F.spray = sstep(0.6, 1.6, t); F.sprayVis = 1; F.transVis = 1; F.gas = 1 - sstep(0, 2, t);
       OVS.labels = labels(ST, t, [
-        ['asm:needle', '噴針', '常用 +4.5 kV', 0.8, 8.0, -60, -70],
-        ['asm:spray', '液滴(放大示意)', '實際只有幾微米', 8.6, 14.2, -70, 60],
-        ['asm:cone', '離子入口', '毛細管前端', 22.8, 30, 60, -70],
+        ['asm:needle', zhEn('噴針', 'Spray needle'), zhEn('常用 +4.5 kV', 'usually +4.5 kV'), 0.8, 8.0, -60, -70],
+        ['asm:spray', zhEn('液滴(放大示意)', 'Droplets (enlarged)'), zhEn('實際只有幾微米', 'actually a few µm'), 8.6, 14.2, -70, zhEn(60, 0)], // 英文字幕多一行,標籤放高
+        ['asm:cone', zhEn('離子入口', 'Ion inlet'), zhEn('毛細管前端', 'front of the capillary'), 22.8, 30, 60, -70],
       ]);
     },
   },
   {
-    key: 'vacuum', title: '進入真空', dur: 18, prewarm: 4,
+    key: 'vacuum', title: zhEn('進入真空', 'Into the vacuum'), dur: 18, prewarm: 4,
     cam: [K(5, D(40, 1.5, 0), [0.04, 0.09, 0.36]), K(9.4, D(108, 1, 0), [0.02, 0.05, 0.2]), K(14, D(118, 0, 0), [0.03, 0.035, 0.13]), K(18, D(124, 0, 0), [0.05, 0.04, 0.15])],
     cues: [
-      [0.3, '入口是一根內徑 **0.45 mm** 的不鏽鋼毛細管,外面套著加熱塊,溫度 200 到 350 °C,把殘留的溶劑烤乾。'],
-      [8.8, '毛細管後方是錐形擋板(**截取錐**),頂端小孔刻意和毛細管錯開約 1.5 mm。離子被**管狀透鏡**的電場導進小孔,中性分子直直撞上錐面,被前級幫浦抽走。'],
+      [0.3, zhEn('入口是一根內徑 **0.45 mm** 的不鏽鋼毛細管,外面套著加熱塊,溫度 200 到 350 °C,把殘留的溶劑烤乾。', 'The inlet is a stainless steel capillary, **0.45 mm** wide inside, in a heater block at 200 to 350 °C that bakes off leftover solvent.')],
+      [8.8, zhEn('毛細管後方是錐形擋板(**截取錐**),頂端小孔刻意和毛細管錯開約 1.5 mm。離子被**管狀透鏡**的電場導進小孔,中性分子直直撞上錐面,被前級幫浦抽走。', 'Behind it, a cone (the **skimmer**) has a hole offset about 1.5 mm on purpose. The **tube lens** steers ions in; neutral molecules hit the cone and are pumped off.')],
     ],
     update(ST, t) {
       F.pose = 1; F.cab = 0; F.cabSlide = 1;
       F.spray = 1; F.sprayVis = 1; F.transVis = 1; F.heater = sstep(0, 1.5, t); F.neutrals = sstep(8, 9.5, t);
       F.gas = sstep(9, 10.5, t) * 0.8;
       OVS.labels = labels(ST, t, [
-        ['asm:capillary', '離子傳輸毛細管', '內徑 0.45 mm', 0.8, 8.6, 30, -80],
-        ['asm:heater', '加熱塊', '200～350 °C', 1.8, 8.6, -60, -80],
-        ['asm:tubeLens', '管狀透鏡', '聚焦,兼當閘門', 9.2, 18, -70, -80],
-        ['asm:skimmer', '截取錐', '接地,錯開約 1.5 mm(推定)', 9.8, 18, 60, -90],
+        ['asm:capillary', zhEn('離子傳輸毛細管', 'Ion transfer capillary'), zhEn('內徑 0.45 mm', 'inner diameter 0.45 mm'), 0.8, 8.6, 30, -80],
+        ['asm:heater', zhEn('加熱塊', 'Heater block'), zhEn('200～350 °C', '200 to 350 °C'), 1.8, 8.6, -60, -80],
+        ['asm:tubeLens', zhEn('管狀透鏡', 'Tube lens'), zhEn('聚焦,兼當閘門', 'focuses; also a gate'), 9.2, 18, -70, -80],
+        ['asm:skimmer', zhEn('截取錐', 'Skimmer'), zhEn('接地,錯開約 1.5 mm(推定)', 'grounded; 1.5 mm offset (inferred)'), 9.8, 18, 60, -90],
       ]);
     },
   },
   {
-    key: 'guides', title: '離子導引', dur: 17, prewarm: 7,
+    key: 'guides', title: zhEn('離子導引', 'Ion guides'), dur: 17, prewarm: 7,
     cam: [K(5, D(162, 0, 0), [0.02, 0.08, 0.25]), K(10, D(200, 0, 0), [0.0, 0.07, 0.24]), K(17, D(230, 0, 0), [0.03, 0.06, 0.22])],
     cues: [
-      [0.3, '接著是**方形四極桿**和**八極桿**:四根、八根金屬桿圍成通道,桿上電壓每秒正負來回 245 萬次,把各種質荷比的離子都約束在中心線附近,沿桿子往前送。'],
-      [8.6, '兩組桿子中間的透鏡兼當閘門:要裝離子時打開,裝夠了就升到 **+130 V** 把後面的離子擋住。裝多少,由儀器先快速試掃一次再決定(**自動增益控制**)。'],
+      [0.3, zhEn('接著是**方形四極桿**和**八極桿**:四根、八根金屬桿圍成通道,桿上電壓每秒正負來回 245 萬次,把各種質荷比的離子都約束在中心線附近,沿桿子往前送。', 'Next, a **square quadrupole** and an **octapole**: 4 and 8 rods whose voltage flips 2.45 million times a second keep ions of any m/z near the axis.')],
+      [8.6, zhEn('兩組桿子中間的透鏡兼當閘門:要裝離子時打開,裝夠了就升到 **+130 V** 把後面的離子擋住。裝多少,由儀器先快速試掃一次再決定(**自動增益控制**)。', 'The middle lens is a gate: open to load ions, then **+130 V** to block the rest. A quick trial scan first sets how many (**automatic gain control**).')],
     ],
     update(ST, t) {
       F.pose = 1; F.cab = 0; F.cabSlide = 1;
       F.spray = 1; F.transVis = 1; F.rfGuide = 1; F.neutrals = 0.3;
       F.gateOpen = !(t > 11 && t < 15.8);
       OVS.labels = labels(ST, t, [
-        ['asm:quad', '方形四極桿', '2.45 MHz,峰到谷 400 V', 0.8, 8.4, -40, -90],
-        ['asm:octa', '八極桿', '2.45 MHz', 2, 8.4, 40, -90],
-        ['asm:inter', F.gateOpen ? '桿間透鏡(閘門):打開' : '桿間透鏡(閘門):關閉', F.gateOpen ? '傳輸時 ±20 V 以內' : '+130 V,擋住離子', 9, 17, -40, -100],
+        ['asm:quad', zhEn('方形四極桿', 'Square quadrupole'), zhEn('2.45 MHz,峰到谷 400 V', '2.45 MHz, 400 V peak to peak'), 0.8, 8.4, -40, -90],
+        ['asm:octa', zhEn('八極桿', 'Octapole'), '2.45 MHz', 2, 8.4, 40, -90],
+        ['asm:inter', F.gateOpen ? zhEn('桿間透鏡(閘門):打開', 'Inter-rod lens (gate): open') : zhEn('桿間透鏡(閘門):關閉', 'Inter-rod lens (gate): closed'), F.gateOpen ? zhEn('傳輸時 ±20 V 以內', 'within ±20 V while passing ions') : zhEn('+130 V,擋住離子', '+130 V, blocks ions'), 9, 17, -40, -100],
       ]);
     },
   },
   {
-    key: 'trap', title: '離子阱', dur: 25,
+    key: 'trap', title: zhEn('離子阱', 'The ion trap'), dur: 25,
     cam: [K(3, D(266, 0, 0), [0.06, 0.07, 0.24]), K(9.5, D(266, 2, 0), [0.03, 0.05, 0.23]), K(15.5, D(262, 0, 0), [0.02, 0.03, 0.17]), K(25, D(266, 0, 0), [0.02, 0.025, 0.15])],
     cues: [
-      [0.3, '分開離子的**質量分析器**就是這組**離子阱**:中間一圈**環形電極**,前後各一片**端帽電極**,內面都是雙曲面,用石英環隔開;空腔只有約 1.4 公分寬、1.6 公分長。'],
-      [8.8, '環形電極接上 **760 kHz** 的交流電壓(每秒正負來回 76 萬次),振幅可以從 0 調到 **8500 V**。阱裡另外通進約 10⁻³ Torr 的**氦氣**(比外面濃得多),從出口端帽的小管送進來。'],
-      [16.6, '離子從入口端帽中心的小孔進來,一路和氦原子碰撞、失去動能,最後聚在離中心約 1 mm 以內的一小團裡。'],
+      [0.3, zhEn('分開離子的**質量分析器**就是這組**離子阱**:中間一圈**環形電極**,前後各一片**端帽電極**,內面都是雙曲面,用石英環隔開;空腔只有約 1.4 公分寬、1.6 公分長。', 'The **ion trap** is the **mass analyzer**: a **ring electrode** between two **end caps**, hyperbolic inside, spaced by quartz; the cavity: about 1.4 by 1.6 cm.')],
+      [8.8, zhEn('環形電極接上 **760 kHz** 的交流電壓(每秒正負來回 76 萬次),振幅可以從 0 調到 **8500 V**。阱裡另外通進約 10⁻³ Torr 的**氦氣**(比外面濃得多),從出口端帽的小管送進來。', 'The ring gets **760 kHz** AC, 0 to **8500 V** in amplitude. **Helium** at about 10⁻³ Torr, far denser than outside, enters via the exit end cap.')],
+      [16.6, zhEn('離子從入口端帽中心的小孔進來,一路和氦原子碰撞、失去動能,最後聚在離中心約 1 mm 以內的一小團裡。', 'Ions enter through the hole in the entrance end cap, lose energy hitting helium atoms, and gather in a cloud within about 1 mm of the center.')],
     ],
     enter(ST) { ST.trap.reset(31); ST.trap.V = 500; setSample('cal'); },
     update(ST, t) {
@@ -2437,26 +2460,26 @@ const CHAPTERS = [
       F.he = sstep(9.4, 11.4, t); F.ring = sstep(8.8, 10.2, t) * 0.5; F.trapVis = 1; F.trails = sstep(17, 19, t) * 0.5;
       F.transVis = 1; F.spray = 0; F.feed = t > 16.4 && t < 19.8 ? 16 : 0; F.feedFrom = 222; F.trapAccept = t > 16.2 && t < 21.5;
       OVS.labels = labels(ST, t, [
-        ['asm:capIn', '入口端帽電極', '中心有小孔', 2.4, 8.6, -50, -110],
-        ['asm:ring', '環形電極', '內半徑 7.07 mm', 2.8, 8.6, 30, -125],
-        ['asm:capOut', '出口端帽電極', '', 3.2, 8.6, 60, -95],
-        ['asm:spacer', '石英間隔環', '絕緣兼定位', 3.6, 8.6, 70, 40],
-        ['asm:he', '氦氣入口', '約 1 mL/min', 10, 16.4, 50, -70],
+        ['asm:capIn', zhEn('入口端帽電極', 'Entrance end cap'), zhEn('中心有小孔', 'small hole in the center'), 2.4, 8.6, -50, -110],
+        ['asm:ring', zhEn('環形電極', 'Ring electrode'), zhEn('內半徑 7.07 mm', 'inner radius 7.07 mm'), 2.8, 8.6, 30, -125],
+        ['asm:capOut', zhEn('出口端帽電極', 'Exit end cap'), '', 3.2, 8.6, 60, -95],
+        ['asm:spacer', zhEn('石英間隔環', 'Quartz spacer ring'), zhEn('絕緣兼定位', 'insulates and aligns'), 3.6, 8.6, 70, 40],
+        ['asm:he', zhEn('氦氣入口', 'Helium inlet'), zhEn('約 1 mL/min', 'about 1 mL/min'), 10, 16.4, 50, -70],
       ]);
       OVS.scale = { obj: ST.asm.group, p0: V3(252, -24, 0), p1: V3(262, -24, 0), text: '10 mm', a: win(t, 2, 16.4, 0.6) };
     },
   },
   {
-    key: 'saddle', title: '為什麼困得住', dur: 32,
+    key: 'saddle', title: zhEn('為什麼困得住', 'Why the ions stay trapped'), dur: 32,
     cam: [K(1.6, D(266, 50, 0), [0.0, 0.1, 0.5]), K(4, D(266, 140, -6), [0.0, 0.2, 0.42]), K(12, D(266, 140, -6), [0.11, 0.17, 0.4]), K(21.6, D(266, 140, -6), [0.05, 0.15, 0.43]),
       K(32, D(266, 140, -6), [0.03, 0.12, 0.45], { sx: 0.13 })],
     cues: [
-      [0.3, '環形電極和端帽之間的電位分布像一個**馬鞍面**:某一瞬間在端帽方向往中心推、在環的方向往外拉,下一瞬間剛好反過來。'],
-      [6.6, '放一顆球在靜止的馬鞍上,它一定會滾下去;翻轉得太慢,也一樣留不住。'],
-      [11.6, '翻得夠快,球還沒滾遠就被推回來。環形電極的電壓每秒正負來回 76 萬次,離子就是這樣被困在中心。'],
-      [16.8, '而且往中心推的那半週,球剛好離中心比較遠、受力比較大,所以平均下來,淨力朝向中心。'],
-      [21.8, '平均下來,離子像待在碗底;同樣的電壓下,質荷比越小,碗越深。'],
-      [25.6, '但質荷比太小時,電場對它來說翻得太慢,平均的碗就不成立,離子留不住,這叫**低質量截止**;用下一段的參數來說,就是 q 超過 0.908。'],
+      [0.3, zhEn('環形電極和端帽之間的電位分布像一個**馬鞍面**:某一瞬間在端帽方向往中心推、在環的方向往外拉,下一瞬間剛好反過來。', 'The potential is a **saddle**: it pushes ions in along the cap axis, out toward the ring, then the reverse.')],
+      [6.6, zhEn('放一顆球在靜止的馬鞍上,它一定會滾下去;翻轉得太慢,也一樣留不住。', 'A ball on a still saddle always rolls off; flipping too slowly cannot hold it either.')],
+      [11.6, zhEn('翻得夠快,球還沒滾遠就被推回來。環形電極的電壓每秒正負來回 76 萬次,離子就是這樣被困在中心。', 'Flip fast and it comes back in time: at 760,000 flips a second, ions stay in the center.')],
+      [16.8, zhEn('而且往中心推的那半週,球剛好離中心比較遠、受力比較大,所以平均下來,淨力朝向中心。', 'Inward pushes are stronger, as the ball is then farther out: the net force is inward.')],
+      [21.8, zhEn('平均下來,離子像待在碗底;同樣的電壓下,質荷比越小,碗越深。', 'On average: a bowl, deeper for smaller m/z at the same voltage.')],
+      [25.6, zhEn('但質荷比太小時,電場對它來說翻得太慢,平均的碗就不成立,離子留不住,這叫**低質量截止**;用下一段的參數來說,就是 q 超過 0.908。', 'For too small an m/z, the flips are too slow for it: no bowl, no trap. This **low-mass cutoff** is q over 0.908.')],
     ],
     enter(ST, cont) { ST.saddle.reset(7); ST._sr1 = ST._sr2 = 0; if (!cont || ST.trap.ions.length < 10) { ST.trap.reset(32); ST.trap.V = 500; setSample('cal'); ST.trap.fill(14); } },
     update(ST, t) {
@@ -2471,12 +2494,12 @@ const CHAPTERS = [
     },
   },
   {
-    key: 'rhythm', title: '每種質荷比都有自己的節奏', dur: 24,
+    key: 'rhythm', title: zhEn('每種質荷比都有自己的節奏', 'Each m/z has its own rhythm'), dur: 24,
     cam: [K(2.2, D(266, 30, 0), [0.02, 0.06, 0.42], { sx: HUDX }), K(4.6, D(266, 0, 0), [0.015, 0.022, 0.135], { sx: HUDX }), K(24, D(266, 0, 0), [0.03, 0.026, 0.13], { sx: HUDX })],
     cues: [
-      [0.3, '現在阱裡同時關著校正液裡的三種離子:{195|咖啡因 m/z 195}、{524|MRFA m/z 524}、{1222|Ultramark m/z 1222}。三種混在同一團裡,位置上分不開。'],
-      [8.4, '分得開的是節奏。每種離子在兩片端帽之間來回振盪,快慢由一個叫 **q** 的數值決定:q 跟電壓成正比、跟質荷比成反比。'],
-      [16.6, '所以質荷比小的振得快,質荷比大的振得慢。示波器把三種離子在端帽間的位置各畫成一條線,儀器就是靠這個頻率差來分辨質荷比。'],
+      [0.3, zhEn('現在阱裡同時關著校正液裡的三種離子:{195|咖啡因 m/z 195}、{524|MRFA m/z 524}、{1222|Ultramark m/z 1222}。三種混在同一團裡,位置上分不開。', 'Three calibration ions share the trap: {195|caffeine m/z 195}, {524|MRFA m/z 524}, {1222|Ultramark m/z 1222}, in one cloud; position cannot separate them.')],
+      [8.4, zhEn('分得開的是節奏。每種離子在兩片端帽之間來回振盪,快慢由一個叫 **q** 的數值決定:q 跟電壓成正比、跟質荷比成反比。', 'Rhythm can. Each ion swings between the end caps at a rate set by the number **q**: proportional to voltage, inversely proportional to m/z.')],
+      [16.6, zhEn('所以質荷比小的振得快,質荷比大的振得慢。示波器把三種離子在端帽間的位置各畫成一條線,儀器就是靠這個頻率差來分辨質荷比。', 'So low m/z swings fast, high m/z slowly. The oscilloscope traces all three; this frequency gap is how m/z is told apart.')],
     ],
     enter(ST) { ST.trap.reset(33); ST.trap.V = 500; setSample('cal'); ST.trap.fill(22); ST.spectrum.reset(); },
     update(ST, t) {
@@ -2484,18 +2507,18 @@ const CHAPTERS = [
       F.saddle = 1 - sstep(0, 1.4, t); F.saddleMix = 1;
       OVS.hudA = sstep(0.4, 1.4, t);
       OVS.hud = { rf: 1, q: 1, scope: sstep(8.4, 9.4, t), V: ST.trap.V, species: CAL(), trap: ST.trap, ac: 0, hide: (s) => !ST.counts[s.mz] };
-      OVS.labels = labels(ST, t, [['asm:cavity', '三種離子混在同一團', '振幅已放大,方便看出節奏', 1, 8, -70, -90]]);
+      OVS.labels = labels(ST, t, [['asm:cavity', zhEn('三種離子混在同一團', 'Three ions in one cloud'), zhEn('振幅已放大,方便看出節奏', 'swings enlarged to show the rhythm'), 1, 8, -70, -90]]);
     },
   },
   {
-    key: 'scan', title: '掃描排出', dur: 42,
+    key: 'scan', title: zhEn('掃描排出', 'Scanning the ions out'), dur: 42,
     cam: [K(4, D(279, -4, 0), [0.03, 0.04, 0.235], { sx: HUDX }), K(42, D(281, -4, 0), [0.045, 0.045, 0.245], { sx: HUDX })],
     cues: [
-      [0.3, '端帽上另外加一個小小的交流電壓,頻率固定在約 **280 kHz**,等於離子在 q = 0.83 時的振盪頻率。它只推得動頻率對上的離子,就像照固定節拍推鞦韆。'],
-      [8.6, '接著把環形電極電壓的振幅以固定速率往上調。所有離子的 q 和振盪頻率一起變大,質荷比最小的{195|咖啡因}最先走到 **q = 0.83**,對上節拍。'],
-      [16.2, '對上節拍的離子越盪越大,很快就從端帽中心的小孔飛出去。把離子送出去的是共振;電壓變大本身不會推出離子,阱反而抓得更緊。'],
-      [23.4, '接著輪到 {524|MRFA},最後是 {1222|Ultramark}。排序看的是質荷比,不是質量:帶兩個電荷的離子,會落在質量一半的位置。'],
-      [31.6, '排出時的電壓振幅和質荷比成正比,m/z 每多 1 約高 4.25 V(依文獻尺寸計算):{195|m/z 195} 約在 830 V、{524|524} 約 2230 V、{1222|1222} 約 5190 V。'],
+      [0.3, zhEn('端帽上另外加一個小小的交流電壓,頻率固定在約 **280 kHz**,等於離子在 q = 0.83 時的振盪頻率。它只推得動頻率對上的離子,就像照固定節拍推鞦韆。', 'The end caps add a small AC voltage at about **280 kHz**, the swing rate at q = 0.83. Like pushing a swing in time, it only moves ions in step.')],
+      [8.6, zhEn('接著把環形電極電壓的振幅以固定速率往上調。所有離子的 q 和振盪頻率一起變大,質荷比最小的{195|咖啡因}最先走到 **q = 0.83**,對上節拍。', 'The ring amplitude now rises steadily, and every q with it. {195|Caffeine}, the lowest m/z, reaches **q = 0.83** first and falls in step.')],
+      [16.2, zhEn('對上節拍的離子越盪越大,很快就從端帽中心的小孔飛出去。把離子送出去的是共振;電壓變大本身不會推出離子,阱反而抓得更緊。', 'In step, it swings wider and flies out the end-cap hole. Resonance ejects it; a higher voltage alone traps it tighter.')],
+      [23.4, zhEn('接著輪到 {524|MRFA},最後是 {1222|Ultramark}。排序看的是質荷比,不是質量:帶兩個電荷的離子,會落在質量一半的位置。', 'Then comes {524|MRFA}, and last {1222|Ultramark}. The order follows m/z, not mass: an ion with two charges appears at half its mass.')],
+      [31.6, zhEn('排出時的電壓振幅和質荷比成正比,m/z 每多 1 約高 4.25 V(依文獻尺寸計算):{195|m/z 195} 約在 830 V、{524|524} 約 2230 V、{1222|1222} 約 5190 V。', 'The ejection voltage is proportional to m/z, about 4.25 V more per m/z unit (calculated from published dimensions): {195|m/z 195} at about 830 V, {524|524} about 2230 V, {1222|1222} about 5190 V.')],
     ],
     enter(ST, cont) {
       if (!cont) { ST.trap.reset(34); ST.trap.V = 500; setSample('cal'); ST.trap.fill(22); }
@@ -2510,22 +2533,22 @@ const CHAPTERS = [
       ST.trap.V = m * PHYS.kV * PHYS.qEject;
       F.ring = 0.35 + 0.65 * ST.trap.V / 6000; F.acGlow = ac;
       OVS.hudA = 1;
-      OVS.hud = { rf: 1, q: 1, scope: 1, spec: sstep(8.6, 9.6, t), V: ST.trap.V, species: CAL(), trap: ST.trap, ac, spectrum: ST.spectrum, rfNote: t > 9 ? '動畫在兩種離子之間快轉' : '',
+      OVS.hud = { rf: 1, q: 1, scope: 1, spec: sstep(8.6, 9.6, t), V: ST.trap.V, species: CAL(), trap: ST.trap, ac, spectrum: ST.spectrum, rfNote: t > 9 ? zhEn('動畫在兩種離子之間快轉', 'Animation sped up between ions') : '',
         specView: { lo: 100, hi: 1400, step: 200, vAxis: true, cursor: t > 9 ? m : null }, hide: (s) => !ST.counts[s.mz] };
       OVS.labels = labels(ST, t, [
-        ['asm:capIn', '端帽交流電壓', '約 280 kHz(計算值)', 1.4, 8.4, -40, -120],
-        ['asm:capOut', '兩片端帽一推一拉', '相差 180°', 2.2, 8.4, 50, -105],
+        ['asm:capIn', zhEn('端帽交流電壓', 'End-cap AC voltage'), zhEn('約 280 kHz(計算值)', 'about 280 kHz (calculated)'), 1.4, 8.4, -40, -120],
+        ['asm:capOut', zhEn('兩片端帽一推一拉', 'Caps push and pull in turn'), zhEn('相差 180°', '180° out of phase'), 2.2, 8.4, 50, -105],
       ]);
     },
   },
   {
-    key: 'detect', title: '偵測與質譜', dur: 26,
+    key: 'detect', title: zhEn('偵測與質譜', 'Detection and the spectrum'), dur: 26,
     cam: [K(4, D(296, -4, 0), [0.035, 0.025, 0.25], { sx: HUDX }), K(10, D(292, -3, 0), [0.045, 0.03, 0.26], { sx: HUDX }),
       K(17.5, D(280, 0, 0), [0.05, 0.05, 0.27], { sx: HUDX }), K(26, D(250, -8, 0), [0.1, 0.12, 0.62], { sx: HUDX })],
     cues: [
-      [0.3, '從出口端帽出去的離子被 **−15 kV** 的**轉換二次發射電極**吸過去,撞出電子和負離子;它們進入**電子倍增器**,電子每撞一次管壁就變多,共放大約 30 萬倍。'],
-      [8.8, '偵測器本身分不出質荷比,只記錄每個時刻收到多少電荷。電腦知道那一刻的電壓振幅,再照校正液定好的關係換算成 m/z,訊號對時間的曲線就成了質譜。'],
-      [17.2, '往另一側端帽飛出的離子收不到,大約只有一半進到偵測器。實際的掃描每秒約掃過 5,500 個 m/z 單位,從 150 掃到 2000 只要 0.34 秒。'],
+      [0.3, zhEn('從出口端帽出去的離子被 **−15 kV** 的**轉換二次發射電極**吸過去,撞出電子和負離子;它們進入**電子倍增器**,電子每撞一次管壁就變多,共放大約 30 萬倍。', 'Exiting ions hit the **conversion dynode** at **−15 kV**, knocking out electrons and negative ions; the **electron multiplier** boosts them about 300,000×.')],
+      [8.8, zhEn('偵測器本身分不出質荷比,只記錄每個時刻收到多少電荷。電腦知道那一刻的電壓振幅,再照校正液定好的關係換算成 m/z,訊號對時間的曲線就成了質譜。', 'The detector counts charge, not m/z. The computer turns the voltage at each moment into m/z by calibration: signal over time is the spectrum.')],
+      [17.2, zhEn('往另一側端帽飛出的離子收不到,大約只有一半進到偵測器。實際的掃描每秒約掃過 5,500 個 m/z 單位,從 150 掃到 2000 只要 0.34 秒。', 'Ions exiting the other end cap are lost; about half are detected. A real scan covers about 5,500 m/z units a second: 150 to 2000 in 0.34 s.')],
     ],
     enter(ST) {
       ST.trap.reset(35); ST.trap.V = 500; setSample('cal'); ST.trap.fill(26); ST.spectrum.reset();
@@ -2537,39 +2560,39 @@ const CHAPTERS = [
       const m = warpScan(t, ST.scan);
       ST.trap.V = m * PHYS.kV * PHYS.qEject; F.ring = 0.35 + 0.65 * ST.trap.V / 6000;
       OVS.hudA = 1;
-      OVS.hud = { rf: 1, spec: 1, V: ST.trap.V, spectrum: ST.spectrum, rfNote: '動畫在兩種離子之間快轉', specView: { lo: 100, hi: 1400, step: 200, vAxis: true, cursor: m < 1310 ? m : null } };
+      OVS.hud = { rf: 1, spec: 1, V: ST.trap.V, spectrum: ST.spectrum, rfNote: zhEn('動畫在兩種離子之間快轉', 'Animation sped up between ions'), specView: { lo: 100, hi: 1400, step: 200, vAxis: true, cursor: m < 1310 ? m : null } };
       OVS.labels = labels(ST, t, [
-        ['asm:dynode', '轉換二次發射電極', '−15 kV,吸引正離子', 0.8, 8.6, 70, 10],
-        ['asm:mult', '電子倍增器', '放大約 30 萬倍', 1.6, 8.6, 70, -40],
+        ['asm:dynode', zhEn('轉換二次發射電極', 'Conversion dynode'), zhEn('−15 kV,吸引正離子', '−15 kV, attracts positive ions'), 0.8, 8.6, 70, 10],
+        ['asm:mult', zhEn('電子倍增器', 'Electron multiplier'), zhEn('放大約 30 萬倍', 'gain about 300,000'), 1.6, 8.6, 70, -40],
       ]);
-      OVS.banner = { text: '實際速度:m/z 150 掃到 2000 只要 0.34 秒', a: win(t, 19.6, 26, 0.5) };
+      OVS.banner = { text: zhEn('實際速度:m/z 150 掃到 2000 只要 0.34 秒', 'Real speed: m/z 150 to 2000 in just 0.34 s'), a: win(t, 19.6, 26, 0.5) };
     },
   },
   {
-    key: 'adducts', title: '加成離子與團簇離子', dur: 34,
+    key: 'adducts', title: zhEn('加成離子與團簇離子', 'Adduct and cluster ions'), dur: 34,
     cam: [K(3.5, D(270, -2, 0), [0.03, 0.035, 0.21], { sx: HUDX }), K(34, D(268, -2, 0), [0.035, 0.04, 0.23], { sx: HUDX })],
     cues: [
-      [0.3, '同一個分子在質譜上常常不只一根峰。以蘆丁標準品為例,分子量 610.15,接上 H⁺ 的 **[M+H]⁺** 落在 {611|m/z 611}。'],
-      [8.5, '溶液和玻璃器皿裡有微量的鈉、鉀,分子也會接上 Na⁺、K⁺,落在 {633|633} 和 {649|649},這些叫**加成離子**;611 和 633 正好差 22,常用來確認分子量。'],
-      [17, '濃度高時,兩個分子會靠較弱的非共價作用黏在一起再帶電,落在 {1221|[2M+H]⁺ 1221} 和 {1243|[2M+Na]⁺ 1243},這叫**團簇離子**。'],
-      [26, '團簇不是樣品裡另一個大分子,多寡和濃度、離子源的條件有關;毛細管溫度高一點,常能把它拆開。'],
+      [0.3, zhEn('同一個分子在質譜上常常不只一根峰。以蘆丁標準品為例,分子量 610.15,接上 H⁺ 的 **[M+H]⁺** 落在 {611|m/z 611}。', 'One molecule often gives more than one peak. Take a rutin standard, molecular mass 610.15: with H⁺ attached, **[M+H]⁺** lands at {611|m/z 611}.')],
+      [8.5, zhEn('溶液和玻璃器皿裡有微量的鈉、鉀,分子也會接上 Na⁺、K⁺,落在 {633|633} 和 {649|649},這些叫**加成離子**;611 和 633 正好差 22,常用來確認分子量。', 'Traces of Na⁺ and K⁺ from the solution and glassware attach too: {633|633} and {649|649}, **adduct ions**. 611 to 633 is exactly 22, a common mass check.')],
+      [17, zhEn('濃度高時,兩個分子會靠較弱的非共價作用黏在一起再帶電,落在 {1221|[2M+H]⁺ 1221} 和 {1243|[2M+Na]⁺ 1243},這叫**團簇離子**。', 'At high concentration, two molecules cling by weak non-covalent forces and then take a charge: {1221|[2M+H]⁺ 1221} and {1243|[2M+Na]⁺ 1243}, **cluster ions**.')],
+      [26, zhEn('團簇不是樣品裡另一個大分子,多寡和濃度、離子源的條件有關;毛細管溫度高一點,常能把它拆開。', 'A cluster is not a bigger molecule in the sample; it varies with concentration and source settings. A hotter capillary often splits it.')],
     ],
     enter(ST) {
       ST.trap.reset(46); ST.trap.V = 500; setSample('rutin'); ST.trap.fill(28); ST.spectrum.reset();
       ST.scan = windowKeys(5, M_START, [[592, 664, 9], [1192, 1262, 7]], 1.2, 1300, 1);
     },
     update(ST, t) {
-      readSpecUpdate(ST, t, 5, { lo: 550, hi: 1300, step: 100, ionLabels: true, title: '質譜:蘆丁標準品(正離子)' });
+      readSpecUpdate(ST, t, 5, { lo: 550, hi: 1300, step: 100, ionLabels: true, title: zhEn('質譜:蘆丁標準品(正離子)', 'Mass spectrum: rutin standard (positive ions)') });
     },
   },
   {
-    key: 'isotopes', title: '同位素峰與電荷數', dur: 31,
+    key: 'isotopes', title: zhEn('同位素峰與電荷數', 'Isotope peaks and charge'), dur: 31,
     cam: [K(3.5, D(268, -2, 0), [0.03, 0.035, 0.2], { sx: HUDX }), K(31, D(266, -1, 0), [0.03, 0.03, 0.19], { sx: HUDX })],
     cues: [
-      [0.3, '把掃描放慢、只掃一小段(**放大掃描**),峰就變窄。蘆丁 {611|611} 的旁邊還有 612、613:分子裡約有 1.1% 的碳是較重的 ¹³C。'],
-      [8.8, '蘆丁有 27 個碳,含一個 ¹³C 的分子約是一個都不含的三成,所以 612 約有 611 的三成高。峰和峰相差 1,表示離子帶一個電荷。'],
-      [16.5, '這是**緩激肽**(一種胜肽)接上兩個 H⁺ 的 [M+2H]²⁺:同位素峰只差 0.5,因為質量差 1、再除以電荷 2。'],
-      [24, '所以看同位素峰的間距就知道電荷數:間距 1 是一價,0.5 是二價,約 0.33 是三價。'],
+      [0.3, zhEn('把掃描放慢、只掃一小段(**放大掃描**),峰就變窄。蘆丁 {611|611} 的旁邊還有 612、613:分子裡約有 1.1% 的碳是較重的 ¹³C。', 'A slow scan over a short range (**zoom scan**) narrows the peaks. Next to rutin {611|611} sit 612 and 613: about 1.1% of carbon is the heavier ¹³C.')],
+      [8.8, zhEn('蘆丁有 27 個碳,含一個 ¹³C 的分子約是一個都不含的三成,所以 612 約有 611 的三成高。峰和峰相差 1,表示離子帶一個電荷。', 'Rutin has 27 carbons, so molecules with one ¹³C are about 30% of those with none: 612 is about 30% of 611. A gap of 1: one charge.')],
+      [16.5, zhEn('這是**緩激肽**(一種胜肽)接上兩個 H⁺ 的 [M+2H]²⁺:同位素峰只差 0.5,因為質量差 1、再除以電荷 2。', 'This is **bradykinin** (a peptide) with two H⁺, [M+2H]²⁺: isotope peaks are just 0.5 apart, a mass gap of 1 divided by charge 2.')],
+      [24, zhEn('所以看同位素峰的間距就知道電荷數:間距 1 是一價,0.5 是二價,約 0.33 是三價。', 'So isotope spacing tells the charge: 1 means one charge, 0.5 means two, about 0.33 means three.')],
     ],
     enter(ST) {
       ST._zoomB = false;
@@ -2577,7 +2600,7 @@ const CHAPTERS = [
       ST.trap.reset(39); ST.trap.V = 500; setSample(isotopeSpecies(ion)); ST.trap.fill(30);
       ST.trap.res = 0.13; ST.trap.wRes = 0.004; ST.spectrum.reset();
       ST.scan = windowKeys(4, M_START, [[609.3, 615.3, 8]], 1.2);
-      ST.zoomView = { lo: 608.6, hi: 615.6, step: 1, dp: 2, title: '放大掃描:蘆丁 [M+H]⁺' };
+      ST.zoomView = { lo: 608.6, hi: 615.6, step: 1, dp: 2, title: zhEn('放大掃描:蘆丁 [M+H]⁺', 'Zoom scan: Rutin [M+H]⁺') };
     },
     update(ST, t) {
       if (t >= 15 && !ST._zoomB) {
@@ -2586,20 +2609,20 @@ const CHAPTERS = [
         ST.trap.reset(40); ST.trap.V = 500; setSample(isotopeSpecies(BRADYKININ, 2)); ST.trap.fill(30);
         ST.trap.res = 0.13; ST.trap.wRes = 0.004; ST.spectrum.reset();
         ST.scan = windowKeys(16.5, M_START, [[529.6, 533.4, 7.5]], 1.2);
-        ST.zoomView = { lo: 529.2, hi: 533.8, step: 0.5, dp: 2, title: '放大掃描:緩激肽 [M+2H]²⁺' };
+        ST.zoomView = { lo: 529.2, hi: 533.8, step: 0.5, dp: 2, title: zhEn('放大掃描:緩激肽 [M+2H]²⁺', 'Zoom scan: Bradykinin [M+2H]²⁺') };
       }
       readSpecUpdate(ST, t, t < 15 ? 4 : 16.5, ST.zoomView);
       OVS.hud.rfNote = '';
     },
   },
   {
-    key: 'negative', title: '負離子模式', dur: 30,
+    key: 'negative', title: zhEn('負離子模式', 'Negative-ion mode'), dur: 30,
     cam: [K(3.5, D(288, -6, 0), [0.04, 0.03, 0.24], { sx: HUDX }), K(30, D(284, -4, 0), [0.045, 0.04, 0.25], { sx: HUDX })],
     cues: [
-      [0.3, '把噴針改接負高壓,就是**負離子模式**:分子失去一個 H⁺,變成 **[M−H]⁻**。蘆丁出現在 {609|609},比正離子模式的 611 少 2。'],
-      [9.5, '酚類、黃酮類帶有容易解離的酸性 H,常用負離子模式量;流動相加了甲酸時,還會看到接上甲酸根的 {655|[M+HCOO]⁻ 655}。'],
-      [17, '濃度高時一樣有團簇 {1219|[2M−H]⁻ 1219}。離子阱照樣依 m/z 由小到大排出,q 只看質量除以電荷的大小。'],
-      [23.5, '偵測器的轉換二次發射電極改成 **+15 kV** 去吸負離子;撞出的正離子再進電子倍增器,放大成訊號。'],
+      [0.3, zhEn('把噴針改接負高壓,就是**負離子模式**:分子失去一個 H⁺,變成 **[M−H]⁻**。蘆丁出現在 {609|609},比正離子模式的 611 少 2。', 'With a negative high voltage on the needle (**negative-ion mode**), the molecule loses an H⁺: **[M−H]⁻**. Rutin shows at {609|609}, 2 below the positive-mode 611.')],
+      [9.5, zhEn('酚類、黃酮類帶有容易解離的酸性 H,常用負離子模式量;流動相加了甲酸時,還會看到接上甲酸根的 {655|[M+HCOO]⁻ 655}。', 'Phenols and flavonoids lose acidic H easily, ideal for negative mode; formic acid in the solvent adds formate: {655|[M+HCOO]⁻ 655}.')],
+      [17, zhEn('濃度高時一樣有團簇 {1219|[2M−H]⁻ 1219}。離子阱照樣依 m/z 由小到大排出,q 只看質量除以電荷的大小。', 'Clusters again: {1219|[2M−H]⁻ 1219}. Ions still leave from low to high m/z; q depends only on the size of m/z.')],
+      [23.5, zhEn('偵測器的轉換二次發射電極改成 **+15 kV** 去吸負離子;撞出的正離子再進電子倍增器,放大成訊號。', 'The conversion dynode goes to **+15 kV** for negative ions; the positive ions it knocks out feed the multiplier.')],
     ],
     enter(ST) {
       ST.trap.reset(46); ST.trap.V = 500; setSample('rutin', '-'); ST.trap.fill(28); ST.spectrum.reset();
@@ -2607,21 +2630,21 @@ const CHAPTERS = [
       ST.scan = windowKeys(6, M_START, [[590, 672, 9], [1190, 1250, 5]], 1.2, 1300, 1);
     },
     update(ST, t) {
-      readSpecUpdate(ST, t, 6, { lo: 550, hi: 1300, step: 100, ionLabels: true, title: '質譜:蘆丁標準品(負離子)' });
+      readSpecUpdate(ST, t, 6, { lo: 550, hi: 1300, step: 100, ionLabels: true, title: zhEn('質譜:蘆丁標準品(負離子)', 'Mass spectrum: rutin standard (negative ions)') });
       OVS.labels = labels(ST, t, [
-        ['asm:dynode', '轉換二次發射電極', '+15 kV,吸引負離子', 21, 30, 70, 10],
-        ['asm:mult', '電子倍增器', '收下撞出的正離子', 22, 30, 70, -40],
+        ['asm:dynode', zhEn('轉換二次發射電極', 'Conversion dynode'), zhEn('+15 kV,吸引負離子', '+15 kV, attracts negative ions'), 21, 30, 70, 10],
+        ['asm:mult', zhEn('電子倍增器', 'Electron multiplier'), zhEn('收下撞出的正離子', 'collects the freed positive ions'), 22, 30, 70, -40],
       ]);
     },
   },
   {
-    key: 'msms', title: '串聯質譜 MS/MS', dur: 34,
+    key: 'msms', title: zhEn('串聯質譜 MS/MS', 'Tandem MS (MS/MS)'), dur: 34,
     cam: [K(3, D(266, 0, 0), [0.015, 0.02, 0.15], { sx: HUDX }), K(34, D(272, -2, 0), [0.03, 0.03, 0.17], { sx: HUDX })],
     cues: [
-      [0.3, '同一個離子阱還能做**串聯質譜**:挑一種離子撞碎再量碎片。先用混了多種頻率的電壓,把{611|蘆丁 [M+H]⁺ m/z 611}以外的離子都甩出去。'],
-      [8.6, '再把電壓振幅調到讓 611 停在 **q = 0.25**,照它自己的振盪頻率輕輕推 30 ms。離子和氦原子一次次碰撞,累積能量後斷鍵、裂成碎片。'],
-      [16.8, '掉了末端的鼠李糖(少 146)得到 {465|m/z 465},整個芸香糖(雙糖,少 308)都掉了,剩下{303|槲皮素 m/z 303}。最後照樣掃描排出,得到碎片的質譜。'],
-      [27.6, 'MS/MS 不需要第二個分析器,每一步都在同一個阱裡按時間先後完成;碎片還能再挑出來拆,最多做到 MS¹⁰。'],
+      [0.3, zhEn('同一個離子阱還能做**串聯質譜**:挑一種離子撞碎再量碎片。先用混了多種頻率的電壓,把{611|蘆丁 [M+H]⁺ m/z 611}以外的離子都甩出去。', '**Tandem MS** in the same trap: break one ion, measure the fragments. A multi-frequency voltage first ejects all but {611|rutin [M+H]⁺ m/z 611}.')],
+      [8.6, zhEn('再把電壓振幅調到讓 611 停在 **q = 0.25**,照它自己的振盪頻率輕輕推 30 ms。離子和氦原子一次次碰撞,累積能量後斷鍵、裂成碎片。', 'Next, 611 is set to **q = 0.25** and nudged at its own frequency for 30 ms. Hitting helium again and again, it gains energy and breaks apart.')],
+      [16.8, zhEn('掉了末端的鼠李糖(少 146)得到 {465|m/z 465},整個芸香糖(雙糖,少 308)都掉了,剩下{303|槲皮素 m/z 303}。最後照樣掃描排出,得到碎片的質譜。', 'Losing the end sugar, rhamnose (−146), gives {465|m/z 465}; losing the whole rutinose (two sugars, −308) leaves {303|quercetin m/z 303}. A final scan ejects them, giving the fragment spectrum.')],
+      [27.6, zhEn('MS/MS 不需要第二個分析器,每一步都在同一個阱裡按時間先後完成;碎片還能再挑出來拆,最多做到 MS¹⁰。', 'MS/MS needs no second analyzer: the steps run in turn in one trap; fragments can be split again, up to MS¹⁰.')],
     ],
     enter(ST) {
       ST.trap.reset(60); ST.trap.V = 500; setSample('np'); ST.trap.fill(18); ST.spectrum.reset();
@@ -2658,14 +2681,14 @@ const CHAPTERS = [
       const step = t < 2.2 ? 0 : t < 8.6 ? 1 : t < 16.8 ? 2 : 3;
       const stepT = [[0, 2.2], [2.2, 8.6], [8.6, 16.8], [16.8, 34]][step];
       OVS.hudA = 1;
-      OVS.hud = { q: 1, steps: 1, stepList: ['裝入離子', '只留下 m/z 611', '照節拍輕推,撞氦氣碎裂', '掃描排出碎片離子'], step, stepProg: (t - stepT[0]) / (stepT[1] - stepT[0]),
+      OVS.hud = { q: 1, steps: 1, stepList: [zhEn('裝入離子', 'Load ions'), zhEn('只留下 m/z 611', 'Keep only m/z 611'), zhEn('照節拍輕推,撞氦氣碎裂', 'Nudge in step; collisions break it'), zhEn('掃描排出碎片離子', 'Scan out the fragment ions')], step, stepProg: (t - stepT[0]) / (stepT[1] - stepT[0]),
         spec: sstep(17, 18, t), V: tr.V, species: ST.speciesNow(), spectrum: ST.spectrum,
-        specView: { lo: 150, hi: 700, step: 100, cursor: m, ionLabels: true, title: '碎片的質譜:m/z 611 撞碎後', right: 'MS²' }, hide: (s) => !ST.counts[s.mz] };
+        specView: { lo: 150, hi: 700, step: 100, cursor: m, ionLabels: true, title: zhEn('碎片的質譜:m/z 611 撞碎後', 'Fragment spectrum of m/z 611'), right: 'MS²' }, hide: (s) => !ST.counts[s.mz] };
     },
   },
   {
-    key: 'recap', title: '重點整理', dur: 17,
-    transcript: ['為什麼分得出不同的質荷比:', ...RECAP_LINES],
+    key: 'recap', title: zhEn('重點整理', 'Key points'), dur: 17,
+    transcript: [zhEn('為什麼分得出不同的質荷比:', 'Why different m/z values can be told apart:'), ...RECAP_LINES],
     cam: [KP(8, V3(0.12, 1.0, 2.25), V3(-0.04, 0.6, 0)), KP(17, V3(0.26, 1.04, 2.34), V3(-0.04, 0.6, 0))],
     cues: [],
     enter(ST) { ST.trap.reset(37); setSample('cal'); ST.trap.fill(10); ST.trap.V = 500; },
@@ -2922,7 +2945,7 @@ function updateBar(force) {
   });
   timeEl.textContent = `${fmtT(t)} / ${fmtT(TOTAL)}`;
   rail.setAttribute('aria-valuenow', String(Math.round((t / TOTAL) * 100)));
-  rail.setAttribute('aria-valuetext', `${CHAPTERS[APP.chapter].title},${fmtT(t)}`);
+  rail.setAttribute('aria-valuetext', `${CHAPTERS[APP.chapter].title}${zhEn(',', ', ')}${fmtT(t)}`);
   syncHash();
 }
 function railTime(clientX) {
@@ -2980,8 +3003,8 @@ function setPlaying(p) {
   APP.playing = p;
   controls.enabled = !p || APP.mode === 'lab';
   $('#playIcon').setAttribute('d', p ? 'M7 5h4v14H7zm6 0h4v14h-4z' : 'M8 5v14l11-7z');
-  playBtn.setAttribute('aria-label', p ? '暫停' : '播放');
-  if (!p && APP.mode === 'story') showHint('暫停中:拖曳或用方向鍵改變視角,按空白鍵繼續');
+  playBtn.setAttribute('aria-label', p ? zhEn('暫停', 'Pause') : zhEn('播放', 'Play'));
+  if (!p && APP.mode === 'story') showHint(zhEn('暫停中:拖曳或用方向鍵改變視角,按空白鍵繼續', 'Paused: drag or arrow keys to look around; Space resumes'));
   wakeControls();
 }
 function showHint(text) {
@@ -3110,13 +3133,13 @@ function labFill() {
   trap.secCol = LAB.pol === '-' ? COL.posIon : null;
   trap.fill(22 * LAB.fill);
   spectrum.reset();
-  labMsmsGo.textContent = '開始';
+  labMsmsGo.textContent = zhEn('開始', 'Start');
   labControls();
 }
 function labControls() {
   const negOK = !!SAMPLES_NEG[labSample.value];
   labNeg.disabled = !negOK;
-  labNeg.title = negOK ? '' : '校正液在這裡只示範正離子';
+  labNeg.title = negOK ? '' : zhEn('校正液在這裡只示範正離子', 'The calibration mix is shown in positive mode only');
   labPos.setAttribute('aria-pressed', String(LAB.pol === '+'));
   labNeg.setAttribute('aria-pressed', String(LAB.pol === '-'));
   // precursors with known products
@@ -3128,14 +3151,14 @@ function labControls() {
   // zoom scan: ions of this sample with a known formula, plus a doubly charged peptide in positive mode
   LAB.zoomList = [...base.filter((s) => s.f).map((s) => ({ ...s, z: 1 })), ...(LAB.pol === '+' ? [BRADYKININ] : [])];
   const zkeep = +labZoomIon.value || 0;
-  labZoomIon.replaceChildren(...LAB.zoomList.map((s, i) => new Option(`${s.name} ${s.label} m/z ${s.mz.toFixed(2)}${s.z > 1 ? ',帶 2 個電荷' : ''}`, String(i))));
+  labZoomIon.replaceChildren(...LAB.zoomList.map((s, i) => new Option(`${s.name} ${s.label} m/z ${s.mz.toFixed(2)}${s.z > 1 ? zhEn(',帶 2 個電荷', ', 2 charges') : ''}`, String(i))));
   labZoomIon.value = String(zkeep < LAB.zoomList.length ? zkeep : 0);
 }
 function labMsUpdate() {
   const prec = +labPrec.value;
   const ms3 = !!prec && (productsOf(prec) || []).some((p) => productsOf(p.mz));
   labMs3.disabled = !ms3;
-  labMs3.title = ms3 ? '' : '這種離子的碎片沒有再往下拆的資料';
+  labMs3.title = ms3 ? '' : zhEn('這種離子的碎片沒有再往下拆的資料', 'No data for breaking the fragments of this ion further');
   if (!ms3) LAB.level = 2;
   labMs2.setAttribute('aria-pressed', String(LAB.level === 2));
   labMs3.setAttribute('aria-pressed', String(LAB.level === 3));
@@ -3146,12 +3169,12 @@ function labStartMsms() {
   const level = LAB.level;
   labFill();
   const second = level === 3 ? productsOf(prec).find((p) => productsOf(p.mz)) : null;
-  const steps = [`只留下 m/z ${prec.toFixed(0)}`, '照節拍輕推,撞氦氣碎裂'];
-  if (second) steps.push(`只留下碎片 m/z ${second.mz.toFixed(0)}`, '再推一次,碎片再裂開');
-  steps.push('掃描排出碎片離子');
+  const steps = [zhEn(`只留下 m/z ${prec.toFixed(0)}`, `Keep only m/z ${prec.toFixed(0)}`), zhEn('照節拍輕推,撞氦氣碎裂', 'Nudge in step; collisions break it')];
+  if (second) steps.push(zhEn(`只留下碎片 m/z ${second.mz.toFixed(0)}`, `Keep only fragment m/z ${second.mz.toFixed(0)}`), zhEn('再推一次,碎片再裂開', 'Nudge again; the fragment breaks'));
+  steps.push(zhEn('掃描排出碎片離子', 'Scan out the fragment ions'));
   LAB.mode = 'msms';
   LAB.seq = { prec, second, target: prec, phase: 'iso', t: 0, step: 0, steps, ms: second ? 'MS³' : 'MS²', v0: trap.V, m0: 0 };
-  labMsmsGo.textContent = '進行中';
+  labMsmsGo.textContent = zhEn('進行中', 'Running');
 }
 // one tick of the MS/MS sequence: isolate (broadband kick), activate at q = 0.25, optionally again for MS3, then scan out
 function labSeqStep(dt) {
@@ -3180,7 +3203,7 @@ function labSeqStep(dt) {
         LAB.auto = true; LAB.m = S.m0 = tr.V / (PHYS.kV * PHYS.qEject); labAC.checked = true;
       }
     }
-  } else if (S.phase === 'scan' && !LAB.auto) { S.phase = 'done'; labMsmsGo.textContent = '再做一次'; }
+  } else if (S.phase === 'scan' && !LAB.auto) { S.phase = 'done'; labMsmsGo.textContent = zhEn('再做一次', 'Run again'); }
   if (S.phase === 'iso' || S.phase === 'act') labV.value = String(Math.round(tr.V));
 }
 function labStartZoom() {
@@ -3193,7 +3216,7 @@ function labStartZoom() {
   trap.secCol = LAB.pol === '-' && ion.z === 1 ? COL.posIon : null;
   trap.fill(30);
   spectrum.reset();
-  LAB.zoom = { lo: ion.mz - 1.2 / ion.z, hi: ion.mz + 4.6 / ion.z, z: ion.z, title: `放大掃描:${ion.name} ${ion.label}` };
+  LAB.zoom = { lo: ion.mz - 1.2 / ion.z, hi: ion.mz + 4.6 / ion.z, z: ion.z, title: zhEn(`放大掃描:${ion.name} ${ion.label}`, `Zoom scan: ${ion.name} ${ion.label}`) };
   LAB.auto = true; LAB.m = M_START; labAC.checked = true;
 }
 // spacing of the first two isotope peaks after a zoom scan -> charge state
@@ -3201,7 +3224,7 @@ function labZoomResult() {
   const pk = spectrum.peaks.filter((p) => p.n >= 2).sort((a, b) => a.mz - b.mz);
   if (pk.length < 2) return '';
   const d = pk[1].mz - pk[0].mz, z = Math.max(1, Math.round(1 / d));
-  return `相鄰同位素峰相差 ${d.toFixed(2)}${z > 1 ? `(約 1/${z})` : ''} → 帶 ${z} 個電荷`;
+  return zhEn(`相鄰同位素峰相差 ${d.toFixed(2)}${z > 1 ? `(約 1/${z})` : ''} → 帶 ${z} 個電荷`, `Neighboring isotope peaks ${d.toFixed(2)} apart${z > 1 ? ` (about 1/${z})` : ''} → ${z === 1 ? '1 charge' : `${z} charges`}`);
 }
 function enterLab() {
   APP.mode = 'lab'; APP.playing = false;
@@ -3236,7 +3259,7 @@ $('#labScan').addEventListener('click', () => {
   LAB.auto = true; LAB.m = trap.V / (PHYS.kV * PHYS.qEject);
   labAC.checked = true;
 });
-labV.addEventListener('input', () => { LAB.auto = false; if (LAB.seq) { LAB.seq = null; LAB.mode = 'full'; trap.excite = null; labMsmsGo.textContent = '開始'; } });
+labV.addEventListener('input', () => { LAB.auto = false; if (LAB.seq) { LAB.seq = null; LAB.mode = 'full'; trap.excite = null; labMsmsGo.textContent = zhEn('開始', 'Start'); } });
 labPos.addEventListener('click', () => { if (LAB.pol !== '+') { LAB.pol = '+'; labFill(); } });
 labNeg.addEventListener('click', () => { if (LAB.pol !== '-') { LAB.pol = '-'; labFill(); } });
 labPrec.addEventListener('change', labMsUpdate);
@@ -3273,7 +3296,7 @@ function labStep(dt) {
   F.ring = 0.35 + 0.65 * trap.V / 8500;
   simStep(dt);
   labVOut.textContent = `${fmtV(trap.V)} V`;
-  $('#labScan').textContent = LAB.auto && !S ? '停止掃描' : '自動掃描';
+  $('#labScan').textContent = LAB.auto && !S ? zhEn('停止掃描', 'Stop scan') : zhEn('自動掃描', 'Auto scan');
   // read-out: one line per ion species in the trap (or about to be loaded), then the trap state
   const L = sampleState.list;
   const rows = LAB.mode === 'msms'
@@ -3281,26 +3304,26 @@ function labStep(dt) {
     : L;
   const lines = rows.map((s) => {
     const q = qOf(trap.V, s.mz), n = ST.counts[s.mz] || 0;
-    const state = n ? (q >= PHYS.qMax ? '留不住' : `q ${q.toFixed(3)}`) : '已排出';
+    const state = n ? (q >= PHYS.qMax ? zhEn('留不住', 'not held') : `q ${q.toFixed(3)}`) : zhEn('已排出', 'ejected');
     return `<span style="color:${cssForMz(s.mz)}">●</span> ${s.name ? `${s.name} ` : ''}${s.label ? `${s.label} ` : ''}m/z ${s.mz.toFixed(LAB.zoom ? 2 : 1)}  ${state}`;
   });
-  if (S) lines.unshift(`${S.ms}:${S.steps[Math.min(S.step, S.steps.length - 1)]}${S.phase === 'done' ? '(完成)' : ''}`);
+  if (S) lines.unshift(`${S.ms}${zhEn(':', ': ')}${S.steps[Math.min(S.step, S.steps.length - 1)]}${S.phase === 'done' ? zhEn('(完成)', ' (done)') : ''}`);
   if (LAB.zoom && !LAB.auto) { const res = labZoomResult(); if (res) lines.push(res); }
-  lines.push(`留得住的最小 m/z ${(trap.V / (PHYS.kV * PHYS.qMax)).toFixed(0)}`);
+  lines.push(zhEn(`留得住的最小 m/z ${(trap.V / (PHYS.kV * PHYS.qMax)).toFixed(0)}`, `Lowest m/z held: ${(trap.V / (PHYS.kV * PHYS.qMax)).toFixed(0)}`));
   const conc = labConcX();
-  if (labAGC.checked) lines.push(`自動增益控制:裝填維持在目標值${conc > 1 ? `(注入時間縮成 1/${conc})` : conc < 1 ? `(注入時間拉長 ${1 / conc} 倍)` : ''}`);
-  else lines.push(`裝填:目標值的 ${LAB.fill} 倍${LAB.fill > 1 ? ',離子太擠,峰會偏移、變寬' : LAB.fill < 1 ? ',離子少,訊號弱' : ''}`);
+  if (labAGC.checked) lines.push(zhEn(`自動增益控制:裝填維持在目標值${conc > 1 ? `(注入時間縮成 1/${conc})` : conc < 1 ? `(注入時間拉長 ${1 / conc} 倍)` : ''}`, `AGC: fill kept at the target${conc > 1 ? ` (injection time cut to 1/${conc})` : conc < 1 ? ` (injection time ${1 / conc}× longer)` : ''}`));
+  else lines.push(zhEn(`裝填:目標值的 ${LAB.fill} 倍${LAB.fill > 1 ? ',離子太擠,峰會偏移、變寬' : LAB.fill < 1 ? ',離子少,訊號弱' : ''}`, `Fill: ${LAB.fill}× the target${LAB.fill > 1 ? '; ions crowded, peaks shift and widen' : LAB.fill < 1 ? '; few ions, weak signal' : ''}`));
   labRead.innerHTML = lines.join('<br>');
   // panels: spectrum range follows the mode
   const cursor = trap.V / (PHYS.kV * PHYS.qEject);
   let specView;
   if (LAB.zoom) specView = { lo: LAB.zoom.lo - 0.6 / LAB.zoom.z, hi: LAB.zoom.hi, step: LAB.zoom.z > 1 ? 0.5 : 1, dp: 2, title: LAB.zoom.title, cursor };
   else if (S) specView = { lo: 100, hi: Math.ceil((S.prec * 1.08) / 100) * 100, step: 100, ionLabels: true, cursor: S.phase === 'scan' ? cursor : null, right: S.ms,
-    title: `碎片的質譜:m/z ${S.prec.toFixed(0)}${S.second ? ` → ${S.second.mz.toFixed(0)}` : ''} 撞碎後` };
+    title: zhEn(`碎片的質譜:m/z ${S.prec.toFixed(0)}${S.second ? ` → ${S.second.mz.toFixed(0)}` : ''} 撞碎後`, `Fragment spectrum of m/z ${S.prec.toFixed(0)}${S.second ? ` → ${S.second.mz.toFixed(0)}` : ''}`) };
   else {
     const top = Math.max(...L.map((s) => s.mz)), hi = top < 650 ? 700 : 1400;
     specView = { lo: L[0].mz < 200 ? 100 : 150, hi, step: hi > 1000 ? 200 : 100, vAxis: true, ionLabels: true, cursor,
-      title: sampleState.pol === '-' ? '質譜:偵測器訊號(負離子)' : '質譜:偵測器訊號' };
+      title: sampleState.pol === '-' ? zhEn('質譜:偵測器訊號(負離子)', 'Mass spectrum: detector signal (negative ions)') : zhEn('質譜:偵測器訊號', 'Mass spectrum: detector signal') };
   }
   const stepProg = !S ? 0 : S.phase === 'iso' ? S.t / 2.4 : S.phase === 'act' ? S.t / 4.4 : S.phase === 'done' ? 1 : clamp((LAB.m - S.m0) / (S.prec * 1.05 - S.m0), 0, 1);
   OVS.hudA = 1;
@@ -3369,7 +3392,7 @@ async function record(opt = {}) {
       if (i % 30 === 0) {
         state.progress = i / N;
         state.fps = i / ((performance.now() - state.t0) / 1000);
-        if (recState) recState.textContent = `錄製中 ${Math.round(state.progress * 100)}%`;
+        if (recState) recState.textContent = zhEn(`錄製中 ${Math.round(state.progress * 100)}%`, `Recording ${Math.round(state.progress * 100)}%`);
         await yieldTask();
       }
     }
@@ -3387,10 +3410,10 @@ async function record(opt = {}) {
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     }
-    if (recState) recState.textContent = `完成,${(buf.byteLength / 1e6).toFixed(0)} MB`;
+    if (recState) recState.textContent = zhEn(`完成,${(buf.byteLength / 1e6).toFixed(0)} MB`, `Done, ${(buf.byteLength / 1e6).toFixed(0)} MB`);
   } catch (e) {
     state.error = String(e && e.stack || e);
-    if (recState) recState.textContent = '錄製失敗:' + (e && e.message || e);
+    if (recState) recState.textContent = zhEn('錄製失敗:', 'Recording failed: ') + (e && e.message || e);
   } finally {
     state.done = true;
     if (state.restoreGrain != null) finish.uniforms.uGrain.value = state.restoreGrain;
@@ -3435,10 +3458,10 @@ async function loadVisits() {
     if (!Number.isSafeInteger(data.value) || data.value < 0) throw new Error('invalid count');
     if (op === 'hit') { try { localStorage.setItem('lcq-visited', '1'); } catch (err) { /* ignore */ } }
     num.textContent = data.value.toLocaleString('en-US');
-    el.title = '以裝置計算,同一台裝置重複開啟只算一次';
+    el.title = zhEn('以裝置計算,同一台裝置重複開啟只算一次', 'Counted per device; repeat visits from the same device count once');
   } catch (err) {
     num.textContent = '—';
-    el.title = '到站人數暫時無法載入';
+    el.title = zhEn('到站人數暫時無法載入', 'The visitor count could not be loaded');
   } finally {
     clearTimeout(to);
     el.hidden = false;

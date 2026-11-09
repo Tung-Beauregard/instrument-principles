@@ -186,6 +186,13 @@
 7. 改了 `BGENE`、`BPS`、`EDI` 的窗口或 `PEDITS` 時重新驗算:`protein(BGENE)` 15 個、沒有終止;上股除了 PAM 只有第 3 到 5 個是 NGG;CBE 命中第 4、8 格、ABE 命中第 5、7 格,各改兩個胺基酸;`peNew` 三種都是 12 個鹼基;替換的蛋白質還是 15 個、插入 16 個、缺失 14 個,而且是從第 9 或第 10 個胺基酸開始不一樣。驗算腳本放在暫存目錄,不進儲存庫。
 8. 改了 `TOL`、`MMK`、`OSITES` 或 `mmSet` 時:`mmSet(p, n)` 對 1 到 20 格、1 到 3 個的每一種組合都要回傳 n 個互不相同、落在 1 到 20 的位置;`mmKey` 在這條嚮導上只會產生 rU:dG、rC:dA、rA:dC、rG:dT 四種,都要在 `MMK` 裡;分數很小時要走 `f3` 與「< 0.1 分」的寫法。動過權重之後,頁面「資料來源」與本檔案的「示意」兩節也要跟著改。
 
+## 英文版(2026-11-06)
+
+- 英文和中文在同一個檔案裡:HTML 用 `data-en` 與 `data-en-aria-label`,重點整理與資料來源各有 `lang="zh-Hant"` 與 `lang="en"` 兩份;教材程式裡給人看的字一律寫成 `zhEn('中文', 'English')`(含 `INDEL_TXT`、`AA3` 的終止、`EDI`、`PEDITS`、`USES`、`LIMITS` 與 `rateOff`、`guideVerdict`、`beVerdict`、`proteinBars` 這些算出文字的地方)。做法見 `docs/I18N.md`。
+- 只有英文不一樣的版面(中文的畫法一個像素都沒有動):第 8 章的卡片英文寫成三行,`card()` 的起點與行距改用 `zhEn(72, 66)` 與 `zhEn(28, 22)`;第 6 章右上角那兩行英文從 x 730 移到 700,「不用模板」那一行分兩行;第 9 章化學變化的三個標籤英文分兩行、y 從 352 移到 358;第 10 章「基因體」英文移到兩股中間(y 228),「切帶 PAM 的那一股」英文靠右對齊到切點,才不會壓到新合成的那一段;第 11 章「位置權重(示意)」英文只排得下 Position / weights,「示意」改寫在右上角那一行裡。
+- 畫面上縮寫成 PBS 與 RT template(反轉錄模板),全名寫在字幕與重點整理裡;嚮導 RNA guide RNA、種子區 seed region、脫靶 off-target、旁觀編輯 bystander editing。
+- 英文字幕約中文字數的 2.4 倍,播放器會把那一段放慢(整份英文約 283 秒,中文 176 秒)。改英文之後跑 `node scripts/check-i18n.mjs --list crispr/index.html`(要沒有輸出)與 `node scripts/check-i18n-layout.mjs crispr`(要 PASS);字幕長度用暫存目錄的 `cueratio.py` 看。
+
 ## 已知限制與待統整
 
 - 第 7 章點畫面選 PAM 時用共用播放器的 `L.set('pam', j)`(2026-10-26 統整時加進播放器),右邊的按鈕會跟著變;原本本頁自己寫的 `syncSeg` 已經拿掉。

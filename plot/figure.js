@@ -3,6 +3,10 @@
 // 版面沿用國科會進度報告裡的圖(原本以 300 dpi 像素畫,這裡換算成 pt:1 px = 0.24 pt)。
 
 export const FONT = 'Arial, "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif';
+// 中英切換(assets/i18n.js,2026-11-06);沒有載入 i18n.js 時(Node 的 check-plot.mjs)一律中文
+const zhEn = globalThis.zhEn ?? ((zh) => zh);
+// 英文的序數(1st、2nd、3rd、4th),給 DSC 的圖例用
+const ordEn = n => n + (n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th');
 const GRAY = '#8C8C8C';
 export const HEAT = ['#C00000', '#E57373', '#F0A8A8'];   // 第 1、2、3 次升溫(紅,越後面越淺)
 export const COOL = ['#1F4E9E', '#6C9BD8', '#A9C4EA'];   // 第 1、2、3 次降溫(藍,越後面越淺)
@@ -350,12 +354,12 @@ export function dscFigure(items, o = {}) {
         if (row === rows.length - 1) ax.xlabel('Temperature (°C)', 25.4, 10.5);
       });
     });
-    const legA = [{ label: '第 1 次升溫', color: '#000' }, { label: '第 2 次升溫', color: GRAY }, { label: '第 3 次升溫', color: '#000', dash: [3.8, 2.2] }].slice(0, Math.max(1, ncyc));
+    const legA = [{ label: zhEn('第 1 次升溫', '1st heating'), color: '#000' }, { label: zhEn('第 2 次升溫', '2nd heating'), color: GRAY }, { label: zhEn('第 3 次升溫', '3rd heating'), color: '#000', dash: [3.8, 2.2] }].slice(0, Math.max(1, ncyc));
     legend(fig, XL, top + 13.4, legA, 9.6);
     if (o.cond) fig.text(XR, top + 13.4, o.cond, { size: 9, anchor: 'rm' });
     if (showCool) {
       const legB = [];
-      for (let i = 0; i < Math.max(1, ncyc); i++) legB.push({ label: `第 ${i + 1} 次升溫`, color: HEAT[Math.min(i, 2)] }, { label: `第 ${i + 1} 次降溫`, color: COOL[Math.min(i, 2)] });
+      for (let i = 0; i < Math.max(1, ncyc); i++) legB.push({ label: zhEn(`第 ${i + 1} 次升溫`, `${ordEn(i + 1)} heating`), color: HEAT[Math.min(i, 2)] }, { label: zhEn(`第 ${i + 1} 次降溫`, `${ordEn(i + 1)} cooling`), color: COOL[Math.min(i, 2)] });
       legend(fig, XL, top + 189.6, legB, 9.6, 16.8, 10.6);
     }
     if (o.legend !== false) {
@@ -447,7 +451,7 @@ export function tgaFigure(series, o = {}) {
     axw.xlabel('Temperature (°C)', 25.4);
   }
   const entries = series.map((s, i) => ({ label: s.label, ...(s.style || styleOf(i)) }));
-  if (o.showCool && series.some(s => s.cool)) entries.push({ label: '降溫', color: COOL[0] });
+  if (o.showCool && series.some(s => s.cool)) entries.push({ label: zhEn('降溫', 'Cooling'), color: COOL[0] });
   legend(fig, x0, 14.9, entries, 10);
   if (o.title) fig.text(x0, wy[0] - 8.2, o.title, { size: 10.5, bold: true, anchor: 'lm' });
   return fig.svg();
@@ -477,7 +481,7 @@ export function msFigure(items, o = {}) {
     const xt = niceTicks(xlim[0], xlim[1], 8);
     ax.xticks(xt.ticks, t => fmtTick(t, xt.step), k === items.length - 1);
     fig.text(x0 + 6.2, y0 + 10.1, it.label, { size: 11, bold: true, anchor: 'lm' });
-    const sub = (o.showScans && it.n ? `平均 ${it.n} 張掃描，` : '') + 'NL ' + (it.nlText || '');
+    const sub = (o.showScans && it.n ? zhEn(`平均 ${it.n} 張掃描，`, `average of ${it.n} ${it.n === 1 ? 'scan' : 'scans'}, `) : '') + 'NL ' + (it.nlText || '');
     fig.text(x0 + 6.2, y0 + 24, sub, { size: 9, anchor: 'lm' });
     // 峰標示:由強到弱挑,同一區只標最強的那根;放不下就左右移開
     const cand = it.sticks.filter(s => s[0] >= xlim[0] && s[0] <= xlim[1] && 100 * s[1] / nl >= (o.minRel ?? 2)).sort((a, b) => b[1] - a[1]);

@@ -163,6 +163,14 @@ DESeq2 實際上是用廣義線性模型擬合、每個基因的離散度從資�
 
 頁面的「資料來源」只列其中最主要的幾條。
 
+## 英文版(2026-11-06)
+
+- 做法見 `docs/I18N.md`(範本是 `pcr/`):標題、導言與畫布的 aria-label 用 `data-en`;「先看」那一行、重點整理與資料來源各是一組 `lang="zh-Hant"` 與 `lang="en"`;程式裡的章名、字幕、圖上的字、選項與組字的函式一律 `zhEn('中文', 'English')`。
+- 數字:`wan()` 中文用萬,英文直接寫完整的數字(千分位,例如 1,104,972),第 4 章 RPKM 與 TPM 的算式照樣算得出來;第 4、5 章的總讀數英文寫成 10 million reads 這種寫法。
+- 要一起改的地方:第 4 章的字幕與下方的字提到開關的英文名稱「Terpene synthase up 8-fold」,第 8 章的字幕提到候選 A、B、C,改控制項的英文時一起改。
+- 只在英文改的地方:第 3 章「挪威雲杉」分兩行;第 4 章的「Terpene synthase」與第 6 章長條裡的 Sequencing、Individual 加了只給英文的 `max`(手機上壓縮,不碰到長條);第 8 章英文的「Candidate A」較寬,右邊兩行 BLAST 的字從 x = 470 挪到 512(`max` 460 改成 418),圖例第三項(Plastid transit peptide)往右挪 25 px。
+- 改完跑 `node scripts/check-i18n.mjs --list transcriptomics/index.html`(要沒有輸出)與 `node scripts/check-i18n-layout.mjs transcriptomics --shots <資料夾>`,並看截圖。英文播放約 246 秒(中文 138 秒;中文字幕很密,英文字數約是中文的 2.3 倍,長的那一段播放器自動放慢)。
+
 ## 修改後要檢查什麼
 
 1. 語法:把 module script 抽出來跑 `node --check`;頁面不能有破折號(U+2014)與不該出現的姓名,文案不用空泛、猜測的詞(`scripts/check-bio.mjs` 會檢查姓名與破折號;這份教材併進清單之後才會被它檢查到)。

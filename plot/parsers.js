@@ -3,6 +3,8 @@
 //       Excel .xlsx(溫度欄配重量欄的 TGA 整理檔)、Thermo LCQ Deca XP 的 .RAW、兩欄數字的 txt/csv。
 
 const utf8 = new TextDecoder('utf-8');
+// 中英切換(assets/i18n.js,2026-11-06);沒有載入 i18n.js 時(Node 的 check-plot.mjs)一律中文
+const zhEn = globalThis.zhEn ?? ((zh) => zh);
 
 export function stem(name) {
   return String(name).replace(/\.[^.]+$/, '');
@@ -14,14 +16,14 @@ export function parseSpc(buf, name = 'spc') {
   const dv = new DataView(buf);
   const flags = dv.getUint8(0);
   const version = dv.getUint8(1);
-  if (version !== 0x4b) throw new Error('只支援新格式的 .spc(fversn 0x4B),這個檔是 0x' + version.toString(16));
+  if (version !== 0x4b) throw new Error(zhEn('只支援新格式的 .spc(fversn 0x4B),這個檔是 0x', 'Only the new .spc format (fversn 0x4B) is supported; this file is 0x') + version.toString(16));
   const fexp = dv.getInt8(3);
   const npts = dv.getInt32(4, true);
   const first = dv.getFloat64(8, true);
   const last = dv.getFloat64(16, true);
   const xtype = dv.getUint8(28);
   const ytype = dv.getUint8(29);
-  if (!(npts > 1 && npts < 1e7)) throw new Error('.spc 點數不合理:' + npts);
+  if (!(npts > 1 && npts < 1e7)) throw new Error(zhEn('.spc 點數不合理:', 'Implausible .spc point count: ') + npts);
   let pos = 512;
   let x;
   if (flags & 0x80) {           // TXVALS:X 陣列在前
@@ -47,7 +49,7 @@ export function parseSpc(buf, name = 'spc') {
   const XTYPES = { 1: 'Wavenumber (cm^{-1})', 2: 'Micrometers', 3: 'Nanometers', 4: 'Seconds', 5: 'Minutes', 7: 'Hertz' };
   const YTYPES = { 1: 'Interferogram', 2: 'Absorbance', 3: 'Kubelka-Munk', 4: 'Counts', 5: 'Volts', 6: 'Degrees', 7: 'mA', 8: 'mm', 9: 'mV', 10: 'log(1/R)', 11: 'Percent', 12: 'Intensity', 128: 'Transmission', 129: 'Reflectance', 131: 'Emission' };
   return { kind: 'spectrum', name: stem(name), x, y, xlabel: XTYPES[xtype] || 'X', ylabel: YTYPES[ytype] || 'Y',
-    meta: { 格式: 'Galactic SPC', 點數: npts, 範圍: first.toFixed(1) + ' 至 ' + last.toFixed(1) } };
+    meta: { [zhEn('格式', 'Format')]: 'Galactic SPC', [zhEn('點數', 'Points')]: npts, [zhEn('範圍', 'Range')]: first.toFixed(1) + zhEn(' 至 ', ' to ') + last.toFixed(1) } };
 }
 
 // ---------------------------------------------------------------- Agilent ASP
@@ -57,7 +59,7 @@ export function parseAsp(text, name = 'asp') {
   // 之後每行一個 Y 值,有的版本後面多一欄 X 值(Y 在前、X 在後)。
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l !== '');
   const npts = Number(lines[0].split(/\s+/)[0]);
-  if (!(npts > 1 && lines.length >= npts + 6)) throw new Error('.asp 的點數與內容不符');
+  if (!(npts > 1 && lines.length >= npts + 6)) throw new Error(zhEn('.asp 的點數與內容不符', 'The .asp point count does not match its contents'));
   const first = Number(lines[1].split(/\s+/)[0]), last = Number(lines[2].split(/\s+/)[0]);
   const data = lines.slice(lines.length - npts);
   const step = (last - first) / (npts - 1);
@@ -67,9 +69,9 @@ export function parseAsp(text, name = 'asp') {
     y.push(p[0]);
     x.push(p.length > 1 && Number.isFinite(p[1]) ? p[1] : first + i * step);
   });
-  if (y.some(v => !Number.isFinite(v))) throw new Error('.asp 有讀不出的數值');
+  if (y.some(v => !Number.isFinite(v))) throw new Error(zhEn('.asp 有讀不出的數值', 'The .asp file has values that cannot be read'));
   return { kind: 'spectrum', name: stem(name), x, y, xlabel: 'Wavenumber (cm^{-1})', ylabel: 'Absorbance',
-    meta: { 格式: 'Agilent ASP', 點數: npts, 範圍: first.toFixed(1) + ' 至 ' + last.toFixed(1) } };
+    meta: { [zhEn('格式', 'Format')]: 'Agilent ASP', [zhEn('點數', 'Points')]: npts, [zhEn('範圍', 'Range')]: first.toFixed(1) + zhEn(' 至 ', ' to ') + last.toFixed(1) } };
 }
 
 // ---------------------------------------------------------------- PerkinElmer csv(DSC、TGA)
@@ -94,13 +96,13 @@ export function isPerkinElmerCsv(text) {
 export function parsePeCsv(text, name = 'csv') {
   const lines = text.split(/\r?\n/);
   const hdr = lines.findIndex(l => /Program Temperature/.test(l));
-  if (hdr < 0) throw new Error('找不到 Program Temperature 的表頭');
+  if (hdr < 0) throw new Error(zhEn('找不到 Program Temperature 的表頭', 'No Program Temperature header found'));
   const cols = splitCsvLine(lines[hdr]);
   const idx = key => cols.findIndex(c => c.startsWith(key));
   const iT = idx('Time'), iPT = idx('Program Temperature'), iST = idx('Sample Temperature');
   const iHF = idx('Unsubtracted Heat Flow'), iW = idx('Unsubtracted Weight');
   const kind = iHF >= 0 ? 'dsc' : (iW >= 0 ? 'tga' : null);
-  if (!kind) throw new Error('沒有 Unsubtracted Heat Flow 或 Unsubtracted Weight 欄');
+  if (!kind) throw new Error(zhEn('沒有 Unsubtracted Heat Flow 或 Unsubtracted Weight 欄', 'No Unsubtracted Heat Flow or Unsubtracted Weight column'));
   const iY = kind === 'dsc' ? iHF : iW;
   const rows = [];
   for (const line of lines.slice(hdr + 1)) {
@@ -108,7 +110,7 @@ export function parsePeCsv(text, name = 'csv') {
     const pt = Number(p[iPT]), st = Number(p[iST]), y = Number(p[iY]), t = iT >= 0 ? Number(p[iT]) : rows.length;
     if (Number.isFinite(pt) && Number.isFinite(st) && Number.isFinite(y) && p[iY] !== '') rows.push({ pt, st, y, t });
   }
-  if (rows.length < 10) throw new Error('有效數據列太少');
+  if (rows.length < 10) throw new Error(zhEn('有效數據列太少', 'Too few valid data rows'));
   const segs = [];
   let cur = [], dir = null;
   for (let i = 1; i < rows.length; i++) {
@@ -128,9 +130,9 @@ export function parsePeCsv(text, name = 'csv') {
     const r = segs[0].rows;
     rate = Math.abs((r[r.length - 1].pt - r[0].pt) / Math.max(r[r.length - 1].t - r[0].t, 1e-9));
   }
-  const desc = segments.map(s => (s.kind === 'up' ? '升 ' : '降 ') + Math.round(s.T[0]) + '→' + Math.round(s.T[s.T.length - 1])).join('、');
+  const desc = segments.map(s => (s.kind === 'up' ? zhEn('升 ', 'heating ') : zhEn('降 ', 'cooling ')) + Math.round(s.T[0]) + '→' + Math.round(s.T[s.T.length - 1])).join(zhEn('、', ', '));
   return { kind, name: stem(name), segments, all: rows,
-    meta: { 格式: 'PerkinElmer csv', 段數: desc, 速率: rate ? rate.toFixed(1) + ' °C/min' : '' } };
+    meta: { [zhEn('格式', 'Format')]: 'PerkinElmer csv', [zhEn('段數', 'Segments')]: desc, [zhEn('速率', 'Rate')]: rate ? rate.toFixed(1) + ' °C/min' : '' } };
 }
 
 // 程式溫度剛反轉時樣品溫度還在往原方向走:升溫段從樣品溫度最低點起算、降溫段從最高點起算
@@ -150,12 +152,12 @@ async function unzipEntries(buf, wanted) {
   for (let i = u8.length - 22; i >= Math.max(0, u8.length - 70000); i--) {
     if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
   }
-  if (eocd < 0) throw new Error('不是 zip 檔');
+  if (eocd < 0) throw new Error(zhEn('不是 zip 檔', 'Not a zip file'));
   const count = dv.getUint16(eocd + 10, true);
   let p = dv.getUint32(eocd + 16, true);
   const out = {};
   for (let k = 0; k < count; k++) {
-    if (dv.getUint32(p, true) !== 0x02014b50) throw new Error('zip 中央目錄損壞');
+    if (dv.getUint32(p, true) !== 0x02014b50) throw new Error(zhEn('zip 中央目錄損壞', 'The zip central directory is damaged'));
     const method = dv.getUint16(p + 10, true);
     const csize = dv.getUint32(p + 20, true);
     const nlen = dv.getUint16(p + 28, true), elen = dv.getUint16(p + 30, true), clen = dv.getUint16(p + 32, true);
@@ -171,7 +173,7 @@ async function unzipEntries(buf, wanted) {
       const ds = new DecompressionStream('deflate-raw');
       const blob = new Blob([data]);
       out[fname] = new Uint8Array(await new Response(blob.stream().pipeThrough(ds)).arrayBuffer());
-    } else throw new Error('不支援的 zip 壓縮方式 ' + method);
+    } else throw new Error(zhEn('不支援的 zip 壓縮方式 ', 'Unsupported zip compression method ') + method);
   }
   return out;
 }
@@ -188,7 +190,7 @@ const xmlUnescape = s => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/
 export async function readXlsxSheet(buf) {
   const files = await unzipEntries(buf, ['xl/sharedStrings.xml', 'xl/worksheets/sheet1.xml']);
   const sheetXml = files['xl/worksheets/sheet1.xml'];
-  if (!sheetXml) throw new Error('xlsx 裡沒有 sheet1');
+  if (!sheetXml) throw new Error(zhEn('xlsx 裡沒有 sheet1', 'No sheet1 in the xlsx file'));
   const shared = [];
   if (files['xl/sharedStrings.xml']) {
     const ss = utf8.decode(files['xl/sharedStrings.xml']);
@@ -222,7 +224,7 @@ export async function readXlsxSheet(buf) {
 // 溫度欄(表頭含 Temperature 或 溫度)配後面的數值欄,直到下一個溫度欄。重量以第一點為 100%(表頭有 % 的視為已是百分比)。
 export async function parseTgaXlsx(buf, name = 'xlsx') {
   const { columns } = await readXlsxSheet(buf);
-  const isTemp = c => /temperature|溫度|\btemp\b/i.test(c.header);
+  const isTemp = c => /temperature|溫度|\btemp\b/i.test(c.header);   // zh-only:「溫度」是比對中文表頭用的,不翻譯
   const series = [];
   let tempCol = null;
   for (const c of columns) {
@@ -234,12 +236,12 @@ export async function parseTgaXlsx(buf, name = 'xlsx') {
     const w = rows.map(r => c.cells.get(r));
     const percent = /%/.test(c.header);
     const w0 = w[0];
-    const header = c.header || ('欄 ' + (c.index + 1));
+    const header = c.header || (zhEn('欄 ', 'Column ') + (c.index + 1));
     series.push({ name: header, T, w: percent ? w : w.map(v => v / w0 * 100), w0: percent ? null : w0, percentGiven: percent,
       extra: c.cells.size - rows.length });
   }
-  if (!series.length) throw new Error('找不到「溫度欄 + 數值欄」的配對;第一列要有表頭,溫度欄的表頭要含 Temperature');
-  return { kind: 'tga', name: stem(name), series, meta: { 格式: 'xlsx', 曲線數: series.length } };
+  if (!series.length) throw new Error(zhEn('找不到「溫度欄 + 數值欄」的配對;第一列要有表頭,溫度欄的表頭要含 Temperature', 'No pair of a temperature column and a value column found; the first row needs headers, and the temperature header must contain Temperature'));
+  return { kind: 'tga', name: stem(name), series, meta: { [zhEn('格式', 'Format')]: 'xlsx', [zhEn('曲線數', 'Curves')]: series.length } };
 }
 
 // ---------------------------------------------------------------- 兩欄數字的文字檔
@@ -251,8 +253,8 @@ export function parseXyText(text, name = 'txt') {
     const a = Number(p[0]), b = Number(p[1]);
     if (Number.isFinite(a) && Number.isFinite(b)) { x.push(a); y.push(b); }
   }
-  if (x.length < 3) throw new Error('讀不到兩欄數字');
-  return { kind: 'spectrum', name: stem(name), x, y, xlabel: 'X', ylabel: 'Y', meta: { 格式: '兩欄文字', 點數: x.length } };
+  if (x.length < 3) throw new Error(zhEn('讀不到兩欄數字', 'No two columns of numbers found'));
+  return { kind: 'spectrum', name: stem(name), x, y, xlabel: 'X', ylabel: 'Y', meta: { [zhEn('格式', 'Format')]: zhEn('兩欄文字', 'two-column text'), [zhEn('點數', 'Points')]: x.length } };
 }
 
 // ---------------------------------------------------------------- Thermo LCQ Deca XP .RAW(版本 62)
@@ -275,12 +277,12 @@ export function parseLcqRaw(buf, name = 'raw') {
     if (u8[s - 1] === 0 && u8[s - 2] >= 0x20 && u8[s - 2] <= 0x7e) continue;   // 要是欄位的開頭
     if (isRun(s + 520) && isRun(s + 1040) && isRun(s + 1560)) { base = s; break; }
   }
-  if (base < 0) throw new Error('找不到 run header,可能不是 LCQ Deca XP 的 .RAW');
+  if (base < 0) throw new Error(zhEn('找不到 run header,可能不是 LCQ Deca XP 的 .RAW', 'No run header found; this may not be an LCQ Deca XP .RAW file'));
   const rh = base - 592;
   const u = Array.from({ length: 12 }, (_, i) => dv.getUint32(rh + 4 * i, true));
   const first = u[2], last = u[3], idxAddr = u[7], dataAddr = u[8];
   const n = last - first + 1;
-  if (!(n > 0 && n < 1e6 && idxAddr + 72 * n <= u8.length)) throw new Error('掃描索引不合理');
+  if (!(n > 0 && n < 1e6 && idxAddr + 72 * n <= u8.length)) throw new Error(zhEn('掃描索引不合理', 'Implausible scan index'));
   const scans = [];
   for (let i = 0; i < n; i++) {
     const o = idxAddr + 72 * i;
@@ -316,7 +318,8 @@ export function parseLcqRaw(buf, name = 'raw') {
   }
   return { kind: 'ms', name: stem(name), scans, peaks, first, last, bad, empty,
     ranges: Array.from(ranges, ([k, v]) => ({ key: k, count: v })),
-    meta: { 格式: 'LCQ .RAW', 掃描: first + ' 至 ' + last, 核對: bad ? ('有 ' + bad + ' 張與索引不符') : '全部與索引一致', 空白: empty } };
+    meta: { [zhEn('格式', 'Format')]: 'LCQ .RAW', [zhEn('掃描', 'Scans')]: first + zhEn(' 至 ', ' to ') + last,
+      [zhEn('核對', 'Check')]: bad ? zhEn('有 ' + bad + ' 張與索引不符', `${bad} ${bad === 1 ? 'scan does' : 'scans do'} not match the index`) : zhEn('全部與索引一致', 'all match the index'), [zhEn('空白', 'Empty scans')]: empty } };
 }
 
 // 沿用國科會報告的做法:範圍內各掃描的峰疊在一起,中心每 0.1 取 ±h 的視窗加總,除以掃描張數;
@@ -393,6 +396,6 @@ export async function parseFile(name, buf) {
     case 'xlsx': return parseTgaXlsx(buf, name);
     case 'pe-csv': return parsePeCsv(utf8.decode(buf), name);
     case 'xy': return parseXyText(utf8.decode(buf), name);
-    default: throw new Error('不認得的檔案類型:' + name);
+    default: throw new Error(zhEn('不認得的檔案類型:', 'Unrecognized file type: ') + name);
   }
 }

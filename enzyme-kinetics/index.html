@@ -2,9 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1111">
-<title>酵素動力學:Km 與 kcat 怎麼量</title>
+<title data-en="Enzyme kinetics: measuring Km and kcat">酵素動力學:Km 與 kcat 怎麼量</title>
 <meta name="description" content="用動畫看酵素反應的模型與初速度、萜類合成酶的活性怎麼量(反應液上蓋戊烷收集產物、GC-MS 加內標定量)、Michaelis–Menten 曲線、kcat 與 kcat/Km、為什麼不用雙倒數圖擬合、三種抑制型態,以及一個胺基酸突變怎麼改變 kcat。可以自己調取樣時間、濃度範圍、量測誤差與抑制劑。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="儀器原理">
@@ -22,37 +23,38 @@
 <link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
-<a class="skip-link" href="#main">跳到動畫</a>
-<div class="nav-wrap"><nav class="sitenav" aria-label="生化進階"><a href="../">← 儀器入口</a><a href="../transcriptomics/">轉錄體分析</a><a href="../terpenoid-precursors/">萜類前驅物</a><a href="./" aria-current="page">酵素動力學</a><a href="../population-genetics/">族群遺傳</a><a href="../phylogenetics/">演化樹</a><a href="../gene-function/">基因功能驗證</a></nav></div>
+<a class="skip-link" href="#main" data-en="Skip to the animation">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化進階" data-en-aria-label="Advanced biochemistry"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../transcriptomics/" data-en="Transcriptomics">轉錄體分析</a><a href="../terpenoid-precursors/" data-en="Terpenoid precursors">萜類前驅物</a><a href="./" aria-current="page" data-en="Enzyme kinetics">酵素動力學</a><a href="../population-genetics/" data-en="Population genetics">族群遺傳</a><a href="../phylogenetics/" data-en="Phylogenetic trees">演化樹</a><a href="../gene-function/" data-en="Gene function">基因功能驗證</a></nav></div>
 <header class="top wrap">
-  <h1>酵素動力學 <span class="k">Km 與 kcat 怎麼量</span></h1>
-  <p class="lede">一支酵素有多快、對受質多敏感,要從「初速度對受質濃度」的曲線求出來。這份教材以萜類合成酶的活性測定為例,從反應的模型、取樣與定量,講到怎麼擬合出 Km 與 kcat、怎麼判斷結果可不可信,以及抑制劑與突變怎麼改變這些參數。</p>
+  <h1><span data-en="Enzyme kinetics">酵素動力學</span> <span class="k" data-en="Measuring Km and kcat">Km 與 kcat 怎麼量</span></h1>
+  <p class="lede" data-en="How fast an enzyme works and how sensitive it is to its substrate have to be worked out from the curve of initial rate against substrate concentration. Using a terpene synthase assay as the example, this lesson goes from the reaction model, sampling and quantification to fitting Km and kcat, judging whether the results can be trusted, and how inhibitors and mutations change these parameters.">一支酵素有多快、對受質多敏感,要從「初速度對受質濃度」的曲線求出來。這份教材以萜類合成酶的活性測定為例,從反應的模型、取樣與定量,講到怎麼擬合出 Km 與 kcat、怎麼判斷結果可不可信,以及抑制劑與突變怎麼改變這些參數。</p>
 </header>
 <main id="main" class="wrap lesson">
   <section class="player">
     <div class="screen">
-      <div class="stage-box"><canvas id="stage" role="img" aria-label="酵素動力學動畫"></canvas></div>
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="酵素動力學動畫" data-en-aria-label="Enzyme kinetics animation"></canvas></div>
       <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
     </div>
     <div class="bar">
-      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
-      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
-      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
-      <div id="prog" role="group" aria-label="章節進度"></div>
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章" data-en-aria-label="Previous chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" data-en-aria-label="Play" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl" data-en="Play">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章" data-en-aria-label="Next chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度" data-en-aria-label="Chapter progress"></div>
       <span id="chName"></span>
-      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" data-en-aria-label="Full screen" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
     </div>
   </section>
   <aside class="side">
-    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
-    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+    <section class="box" id="ops" aria-label="自己調整" data-en-aria-label="Try it yourself"><h2 data-en="Try it yourself">自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節" data-en-aria-label="Chapters"><h2 data-en="Chapters">章節</h2><ol id="chapters"></ol></section>
   </aside>
 </main>
-<section class="notes wrap" aria-label="重點整理與資料來源">
+<section class="notes wrap" aria-label="重點整理與資料來源" data-en-aria-label="Key points and sources">
   <div>
-    <h2>重點整理</h2>
-    <p class="pre">先看:<a href="../terpene-synthase/">萜類合成酶</a>、<a href="../cloning/">基因選殖與蛋白表現</a></p>
-    <ul>
+    <h2 data-en="Key points">重點整理</h2>
+    <p class="pre" lang="zh-Hant">先看:<a href="../terpene-synthase/">萜類合成酶</a>、<a href="../cloning/">基因選殖與蛋白表現</a></p>
+    <p class="pre" lang="en">See first: <a href="../terpene-synthase/">Terpene synthases</a>, <a href="../cloning/">Gene cloning and protein expression</a></p>
+    <ul lang="zh-Hant">
       <li>模型是 E + S ⇌ ES → E + P。動力學量的是初速度 v<sub>0</sub>:產物對時間曲線開頭直線段的斜率,這時受質還沒用掉多少、產物抑制與酵素失活也還沒有影響。實作上先做時間曲線,把反應時間定在直線段裡。</li>
       <li>萜類合成酶的測法:緩衝液裡放酵素、GPP 與 Mg<sup>2+</sup>,上面蓋一層含內標的戊烷收集揮發的產物,搖勻後取戊烷層打進 GC-MS,用產物峰對內標峰的面積比換算產物量。</li>
       <li>v<sub>0</sub> = V<sub>max</sub>[S] / (K<sub>m</sub> + [S]);K<sub>m</sub> 是速度到 V<sub>max</sub> 一半時的受質濃度。K<sub>m</sub> = (k<sub>−1</sub> + k<sub>cat</sub>) / k<sub>1</sub>,只有 k<sub>cat</sub> 遠小於 k<sub>−1</sub> 時才約等於 ES 的解離常數。</li>
@@ -61,10 +63,19 @@
       <li>抑制劑:α = 1 + [I]/K<sub>i</sub>。競爭型 K<sub>m</sub> 變大 α 倍、V<sub>max</sub> 不變;非競爭型 V<sub>max</sub> 變小 α 倍、K<sub>m</sub> 不變;反競爭型兩者都變小 α 倍。雙倒數圖適合拿來看型態。</li>
       <li>西加雲杉的 PsTPS-3car2 把口袋裡 596 號的 Leu 換成 Phe,主產物從 (+)-3-carene 變成 (−)-sabinene,k<sub>cat</sub> 增加約 6.6 倍,K<sub>m</sub> 幾乎不變。</li>
     </ul>
+    <ul lang="en">
+      <li>The model is E + S ⇌ ES → E + P. Kinetics measures the initial rate v<sub>0</sub>: the slope of the straight early part of the product-versus-time curve, while little substrate has been used and product inhibition and enzyme inactivation have not yet set in. In practice, run a time course first and keep the reaction time within the straight part.</li>
+      <li>Assaying a terpene synthase: the enzyme, GPP and Mg<sup>2+</sup> go into buffer under a layer of pentane that holds an internal standard and collects the volatile products; after mixing, the pentane layer is injected into the GC-MS, and the area ratio of the product peak to the internal standard peak converts to the amount of product.</li>
+      <li>v<sub>0</sub> = V<sub>max</sub>[S] / (K<sub>m</sub> + [S]); K<sub>m</sub> is the substrate concentration at which the rate reaches half of V<sub>max</sub>. K<sub>m</sub> = (k<sub>−1</sub> + k<sub>cat</sub>) / k<sub>1</sub>, which is close to the dissociation constant of ES only when k<sub>cat</sub> is much smaller than k<sub>−1</sub>.</li>
+      <li>k<sub>cat</sub> = V<sub>max</sub> / [E]<sub>t</sub> is how many substrate molecules each enzyme molecule converts per second; k<sub>cat</sub>/K<sub>m</sub> is the efficiency when substrate is scarce. Terpene synthases are slow: the four listed here have k<sub>cat</sub> values of about 0.02 to 0.5 per second, while the median for enzymes in the literature is about 10 per second.</li>
+      <li>Do not fit with the double-reciprocal plot: taking reciprocals magnifies the errors of the low-concentration points (to about δ/v<sub>0</sub><sup>2</sup>). Fit the raw data directly by nonlinear regression, with concentrations on both sides of K<sub>m</sub>; when all the points are below K<sub>m</sub>, neither K<sub>m</sub> nor V<sub>max</sub> can be estimated well on its own.</li>
+      <li>Inhibitors: α = 1 + [I]/K<sub>i</sub>. Competitive: K<sub>m</sub> grows α-fold and V<sub>max</sub> is unchanged; noncompetitive: V<sub>max</sub> shrinks α-fold and K<sub>m</sub> is unchanged; uncompetitive: both shrink α-fold. The double-reciprocal plot is good for seeing the type.</li>
+      <li>In Sitka spruce PsTPS-3car2, replacing Leu at position 596 in the pocket with Phe changes the main product from (+)-3-carene to (−)-sabinene, raises k<sub>cat</sub> about 6.6-fold and leaves K<sub>m</sub> almost unchanged.</li>
+    </ul>
   </div>
   <div class="src">
-    <h2>資料來源</h2>
-    <ul>
+    <h2 data-en="Sources">資料來源</h2>
+    <ul lang="zh-Hant">
       <li>Johnson KA, Goody RS. The original Michaelis constant: translation of the 1913 Michaelis–Menten paper. Biochemistry. 2011;50(39):8264–8269. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3381512/">PMC3381512</a>(1913 年用蔗糖酶、只量反應早期的速度以避開產物的影響,蔗糖的常數 16.7 mM;1925 年 Briggs 與 Haldane 的穩定態推導;1934 年 Lineweaver 與 Burk 的雙倒數圖)</li>
       <li>Jakubowski H, Flatt P. Fundamentals of Biochemistry(LibreTexts):<a href="https://bio.libretexts.org/Bookshelves/Biochemistry/Fundamentals_of_Biochemistry_(Jakubowski_and_Flatt)/01%3A_Unit_I-_Structure_and_Catalysis/06%3A_Enzyme_Activity/6.03%3A_Kinetics_with_Enzymes">6.3 Kinetics with Enzymes</a>(初速度、Michaelis–Menten 式與 K<sub>m</sub> 的定義、k<sub>cat</sub> 與 V<sub>M</sub> = k<sub>cat</sub>E<sub>0</sub>、k<sub>cat</sub>/K<sub>M</sub> 與擴散上限 10<sup>8</sup> 到 10<sup>9</sup> M<sup>−1</sup>s<sup>−1</sup>、雙倒數圖不要用線性迴歸分析)、<a href="https://bio.libretexts.org/Bookshelves/Biochemistry/Fundamentals_of_Biochemistry_(Jakubowski_and_Flatt)/01%3A_Unit_I-_Structure_and_Catalysis/06%3A_Enzyme_Activity/6.04%3A_Enzyme_Inhibition">6.4 Enzyme Inhibition</a>(三種抑制的速率式、表觀參數與雙倒數圖的型態)</li>
       <li>GraphPad Prism 9 Curve Fitting Guide:<a href="https://www.graphpad.com/guides/prism/latest/curve-fitting/avoidscatchard_lineweaver_burkeandsimilartransforms.htm">Avoid Scatchard, Lineweaver-Burk and similar transforms</a>(轉換會扭曲實驗誤差,應該用非線性迴歸擬合原始數據,轉換的圖只用來呈現)</li>
@@ -74,9 +85,19 @@
       <li>Bar-Even A, et al. The moderately efficient enzyme: evolutionary and physicochemical trends shaping enzyme parameters. Biochemistry. 2011;50(21):4402–4410. <a href="https://doi.org/10.1021/bi2002289">doi:10.1021/bi2002289</a>(數千筆文獻值:k<sub>cat</sub> 中位數約 10 s<sup>−1</sup>、k<sub>cat</sub>/K<sub>m</sub> 約 10<sup>5</sup> M<sup>−1</sup>s<sup>−1</sup>;次級代謝的 k<sub>cat</sub> 中位數 2.5 s<sup>−1</sup>,依摘要與 <a href="https://bionumbers.hms.harvard.edu/bionumber.aspx?id=111415">BioNumbers</a>)</li>
       <li>示意:第 1、2 章的時間曲線(速度、失活與產物抑制的常數)、反應瓶與層析圖的樣子;第 2 章的內標量 1.25 nmol 是由論文的 2.5 μM × 0.5 mL 算出,面積比與校正係數是示意;第 3、5、6 章以 V<sub>max</sub> = 1 的相對速度、K<sub>m</sub> = 15.8 μM 畫曲線;9 個濃度的取法、量測誤差的大小與分布(常態、固定標準差)、第 4 章從蛋白質濃度換算的數字(0.65 mg/mL、65 kDa、稀釋 50 萬倍、20 pM)、第 6 章的抑制劑濃度、第 7 章口袋與側鏈的畫法都是示意。第 4、7 章的 k<sub>cat</sub>、K<sub>m</sub> 與產物比例取自上面的論文;模擬的數據不是任何實驗的實測結果。</li>
     </ul>
+    <ul lang="en">
+      <li>Johnson KA, Goody RS. The original Michaelis constant: translation of the 1913 Michaelis–Menten paper. Biochemistry. 2011;50(39):8264–8269. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3381512/">PMC3381512</a> (in 1913, invertase, with only the early rates measured to avoid effects of the products, and a constant of 16.7 mM for sucrose; the 1925 steady-state derivation by Briggs and Haldane; the 1934 double-reciprocal plot of Lineweaver and Burk)</li>
+      <li>Jakubowski H, Flatt P. Fundamentals of Biochemistry (LibreTexts): <a href="https://bio.libretexts.org/Bookshelves/Biochemistry/Fundamentals_of_Biochemistry_(Jakubowski_and_Flatt)/01%3A_Unit_I-_Structure_and_Catalysis/06%3A_Enzyme_Activity/6.03%3A_Kinetics_with_Enzymes">6.3 Kinetics with Enzymes</a> (initial rates, the Michaelis–Menten equation and the definition of K<sub>m</sub>, k<sub>cat</sub> and V<sub>M</sub> = k<sub>cat</sub>E<sub>0</sub>, k<sub>cat</sub>/K<sub>M</sub> and the diffusion limit of 10<sup>8</sup> to 10<sup>9</sup> M<sup>−1</sup>s<sup>−1</sup>, and not analyzing double-reciprocal plots by linear regression), <a href="https://bio.libretexts.org/Bookshelves/Biochemistry/Fundamentals_of_Biochemistry_(Jakubowski_and_Flatt)/01%3A_Unit_I-_Structure_and_Catalysis/06%3A_Enzyme_Activity/6.04%3A_Enzyme_Inhibition">6.4 Enzyme Inhibition</a> (rate equations for the three types of inhibition, the apparent parameters and their patterns on the double-reciprocal plot)</li>
+      <li>GraphPad Prism 9 Curve Fitting Guide: <a href="https://www.graphpad.com/guides/prism/latest/curve-fitting/avoidscatchard_lineweaver_burkeandsimilartransforms.htm">Avoid Scatchard, Lineweaver-Burk and similar transforms</a> (transforms distort the experimental error; fit the raw data by nonlinear regression and use transformed plots only for display)</li>
+      <li>Roach CR, et al. Plasticity and evolution of (+)-3-carene synthase and (−)-sabinene synthase functions of a Sitka spruce monoterpene synthase gene family associated with weevil resistance. J Biol Chem. 2014;289(34):23859–23869. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4156071/">PMC4156071</a> (500 μL reactions with HEPES, KCl, 10 mM MgCl<sub>2</sub> and GPP, overlaid with 500 μL of pentane containing 2.5 μM isobutylbenzene; 30 °C for 10 or 20 minutes; 9 GPP concentrations from 1 to 60 μM; GC-MS quantification with the response factor of the internal standard, and nonlinear regression; product proportions from Table 1 and k<sub>cat</sub> and K<sub>m</sub> from Table 3)</li>
+      <li>Vardakou M, et al. Comparative analysis and validation of the malachite green assay for the high throughput biochemical characterization of terpene synthases. MethodsX. 2014;1:187–196. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4472957/">PMC4472957</a> (reactions in GC vials under a hexane overlay, with a time course first to find the straight part before the steady-state experiments; measured three ways, the same enzyme gave K<sub>m</sub> and k<sub>cat</sub> values up to about 7-fold apart, yet similar k<sub>cat</sub>/K<sub>m</sub>). This single-vial GC-MS assay comes from O'Maille PE, et al. Anal Biochem. 2004;335:210–217, <a href="https://doi.org/10.1016/j.ab.2004.09.011">doi:10.1016/j.ab.2004.09.011</a> (from the abstract).</li>
+      <li>Srividya N, et al. Functional analysis of (4S)-limonene synthase mutants reveals determinants of catalytic outcome in a model monoterpene synthase. Proc Natl Acad Sci USA. 2015;112(11):3332–3337. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4371936/">PMC4371936</a> (kinetic assays timed so that no more than 20% of the substrate was used; K<sub>m</sub> 12.6 μM, k<sub>cat</sub> 0.037 s<sup>−1</sup>; mutating the aspartates that hold the metal ions abolished activity)</li>
+      <li>Bar-Even A, et al. The moderately efficient enzyme: evolutionary and physicochemical trends shaping enzyme parameters. Biochemistry. 2011;50(21):4402–4410. <a href="https://doi.org/10.1021/bi2002289">doi:10.1021/bi2002289</a> (thousands of literature values: median k<sub>cat</sub> about 10 s<sup>−1</sup> and k<sub>cat</sub>/K<sub>m</sub> about 10<sup>5</sup> M<sup>−1</sup>s<sup>−1</sup>; median k<sub>cat</sub> in secondary metabolism 2.5 s<sup>−1</sup>; from the abstract and <a href="https://bionumbers.hms.harvard.edu/bionumber.aspx?id=111415">BioNumbers</a>)</li>
+      <li>Illustrative: the time curves in chapters 1 and 2 (rate, inactivation and product-inhibition constants) and the look of the vial and the chromatogram; the internal standard amount in chapter 2, 1.25 nmol, is calculated from the 2.5 μM × 0.5 mL in the paper, while the area ratio and response factor are illustrative; chapters 3, 5 and 6 draw curves with relative rates (V<sub>max</sub> = 1) and K<sub>m</sub> = 15.8 μM; the choice of the 9 concentrations, the size and distribution of the measurement error (normal, with a fixed standard deviation), the conversion from protein concentration in chapter 4 (0.65 mg/mL, 65 kDa, a 500,000-fold dilution, 20 pM), the inhibitor concentration in chapter 6 and the drawing of the pocket and side chains in chapter 7 are all illustrative. The k<sub>cat</sub>, K<sub>m</sub> and product proportions in chapters 4 and 7 come from the papers above; the simulated data are not measurements from any experiment.</li>
+    </ul>
   </div>
 </section>
-<footer class="site wrap">生化進階・<a href="../">回儀器入口</a></footer>
+<footer class="site wrap"><span lang="zh-Hant">生化進階・<a href="../">回儀器入口</a></span><span lang="en">Advanced biochemistry · <a href="../">Back to all lessons</a></span></footer>
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, seg, ease, clamp, lerp, rng, mix } from '../assets/bio-draw.js';
@@ -187,7 +208,7 @@ const FAM = {
   car: { name: 'PsTPS-3car2', mutName: 'L596F', aaW: 'Leu', aaM: 'Phe', wt: { kcat: 5.86, km: 15.8, prod: [67.5, 6.9, 15.4, 10.2] }, mut: { kcat: 38.57, km: 15.3, prod: [12.3, 37.4, 35.4, 14.9] } },
   sab: { name: 'PsTPS-sab', mutName: 'F596L', aaW: 'Phe', aaM: 'Leu', wt: { kcat: 32.68, km: 35.7, prod: [1.3, 44.7, 35.9, 18.1] }, mut: { kcat: 4.95, km: 31.6, prod: [28.6, 18.7, 24.9, 27.8] } },
 };
-const PROD = ['(+)-3-carene', '(−)-sabinene', 'terpinolene', '其他'];
+const PROD = ['(+)-3-carene', '(−)-sabinene', 'terpinolene', zhEn('其他', 'Other')];
 // 第 4 章 kcat/Km 數線上的萜類合成酶(M⁻¹s⁻¹):檸檬烯合成酶(Srividya et al. 2015)、PsTPS-3car2、
 // 青蒿的 β-farnesene 合成酶(Vardakou et al. 2014 放射性方法的 10.3 mM⁻¹s⁻¹)、PsTPS-sab
 const TPS_EFF = [perMs(0.037 * 60, 12.6), perMs(5.86, 15.8), 1.03e4, perMs(32.68, 35.7)];
@@ -281,7 +302,7 @@ function diamond(g, x, y, r, color, alpha = 1) {
   ctx.fillStyle = color; ctx.fill(); ctx.restore();
 }
 // Km 顯示用:定不出來寫「算不出」,太大寫「> 1000」
-const fmtK = (k) => (!Number.isFinite(k) ? '算不出' : k <= 0 ? '負的' : k >= 1000 ? '> 1000 μM' : `${k >= 100 ? k.toFixed(0) : k.toFixed(1)} μM`);
+const fmtK = (k) => (!Number.isFinite(k) ? zhEn('算不出', 'not determined') : k <= 0 ? zhEn('負的', 'is negative') : k >= 1000 ? '> 1000 μM' : `${k >= 100 ? k.toFixed(0) : k.toFixed(1)} μM`);
 
 // 第 2 章的反應瓶(示意):瓶身 VX 到 VX + VW、VT 到 VB;上層戊烷 214 到 330、下層反應液 330 到瓶底
 const VX = 60, VW = 140, VT = 96, VB = 470;
@@ -305,11 +326,11 @@ const replay = (t0) => { if (lesson) { lesson.time = t0; lesson.play(); } };
 
 const chapters = [
   {
-    key: 'model', name: '酵素反應的模型與初速度', dur: 16,
-    cues: [[0, '酵素(E)先和受質(S)結合成複合物 ES;ES 可以分開回去,也可以把受質變成產物(P)放出來。'],
-      [4.5, 'k₁、k₋₁、kcat 是三步的速率常數。酵素反應完被放回來,同一個分子可以一直重複做。'],
-      [9, '產物對時間的曲線開頭是直線,後來變彎:受質越來越少、產物佔住酵素(產物抑制)、酵素慢慢失去活性。'],
-      [13, '所以動力學量的是初速度 v₀:曲線開頭直線段的斜率,這時受質濃度幾乎還是一開始的值。']],
+    key: 'model', name: zhEn('酵素反應的模型與初速度', 'The reaction model and initial rate'), dur: 16,
+    cues: [[0, zhEn('酵素(E)先和受質(S)結合成複合物 ES;ES 可以分開回去,也可以把受質變成產物(P)放出來。', 'The enzyme (E) binds the substrate (S) to form ES, which either falls apart or turns S into product (P) and releases it.')],
+      [4.5, zhEn('k₁、k₋₁、kcat 是三步的速率常數。酵素反應完被放回來,同一個分子可以一直重複做。', 'k₁, k₋₁ and kcat are the rate constants of the three steps. Freed each time, one enzyme works again and again.')],
+      [9, zhEn('產物對時間的曲線開頭是直線,後來變彎:受質越來越少、產物佔住酵素(產物抑制)、酵素慢慢失去活性。', 'The curve starts straight, then bends as substrate runs low, product inhibits the enzyme and its activity slowly fades.')],
+      [13, zhEn('所以動力學量的是初速度 v₀:曲線開頭直線段的斜率,這時受質濃度幾乎還是一開始的值。', 'So kinetics measures the initial rate v₀, the slope of the straight start, when [S] has barely changed.')]],
     draw(g, t) {
       const ctx = g.ctx, a0 = ease(seg(t, 0, 0.8)), hk = ease(seg(t, 4.5, 5.2));
       // 左半邊(反應式、酵素、計數)在右邊的圖出現前置中,8 到 8.8 秒滑到左邊
@@ -350,7 +371,7 @@ const chapters = [
           const a = 1 - seg(u, 0.88, 1);
           zig(g, sx, sy, 46, C.amber, { alpha: a });
           g.text(sx, sy - 24, 'S', { size: 16, weight: 700, color: C.amber, align: 'center', alpha: a });
-          if (u > 0.56 && u < 0.95) g.tag(150, 214, '沒反應就分開(k₋₁)', { size: 14, color: C.amber, alpha: Math.min(seg(u, 0.56, 0.62), 1 - seg(u, 0.88, 0.95)) });
+          if (u > 0.56 && u < 0.95) g.tag(150, 214, zhEn('沒反應就分開(k₋₁)', 'Falls off unreacted (k₋₁)'), { size: 14, color: C.amber, alpha: Math.min(seg(u, 0.56, 0.62), 1 - seg(u, 0.88, 0.95)) });
         } else {
           const cv = ease(seg(u, 0.5, 0.62)), po = ease(seg(u, 0.62, 0.92));
           const px = lerp(sit[0], to[0], po), py = lerp(sit[1], to[1], po) - Math.sin(po * Math.PI) * 28;
@@ -364,18 +385,18 @@ const chapters = [
             g.text(px, py - 28, 'P', { size: 16, weight: 700, color: C.mint, align: 'center', alpha: a });
           }
         }
-        if (u > 0.3 && u < 0.56) g.tag(ex + 132, ey2 - 66, 'ES 複合物', { size: 15, color: C.lav, alpha: Math.min(seg(u, 0.3, 0.36), 1 - seg(u, 0.5, 0.56)) });
+        if (u > 0.3 && u < 0.56) g.tag(ex + 132, ey2 - 66, zhEn('ES 複合物', 'ES complex'), { size: 15, color: C.lav, alpha: Math.min(seg(u, 0.3, 0.36), 1 - seg(u, 0.5, 0.56)) });
       }
       // 左下:計數
       fade(g, ease(seg(t, 4.5, 5.2)), () => {
         g.panel(40, 384, 440, 112, '');
-        g.text(62, 418, '同一個酵素分子', { size: 15, color: C.ink2 });
-        g.text(62, 458, `已經做出 ${made} 個產物`, { size: 21, weight: 700, color: C.mint });
+        g.text(62, 418, zhEn('同一個酵素分子', 'The same enzyme molecule'), { size: 15, color: C.ink2 });
+        g.text(62, 458, zhEn(`已經做出 ${made} 個產物`, `has made ${made} product${made === 1 ? '' : 's'}`), { size: 21, weight: 700, color: C.mint });
       });
       ctx.restore();
       // 右:產物對時間
       fade(g, ease(seg(t, 8.6, 9.4)), () => {
-        const A = axes(g, 610, 92, 300, 200, { xmax: 60, ymax: 5, xticks: [0, 20, 40, 60], yticks: [0, 2, 4], xlab: '時間(分鐘)', ylab: '產物 [P](μM)' });
+        const A = axes(g, 610, 92, 300, 200, { xmax: 60, ymax: 5, xticks: [0, 20, 40, 60], yticks: [0, 2, 4], xlab: zhEn('時間(分鐘)', 'Time (minutes)'), ylab: zhEn('產物 [P](μM)', 'Product [P] (μM)') });
         const ta = ease(seg(t, 13, 13.8));
         if (ta > 0) fade(g, ta, () => g.rrect(A.X(0), A.Y(5), A.X(10) - A.X(0), A.Y(0) - A.Y(5), 0, 'rgba(165,243,205,.08)'));
         const tt = 60 * ease(seg(t, 9, 11.5));
@@ -385,21 +406,21 @@ const chapters = [
         if (ta > 0) {
           const tEnd = 4.8 / V01;
           g.line(A.X(0), A.Y(0), A.X(tEnd * ta), A.Y(V01 * tEnd * ta), C.amber, 2.2, [7, 5]);
-          g.tag(A.X(23), A.Y(V01 * 23) - 24, '初速度 v₀ = 斜率', { size: 15, color: C.amber, alpha: ta });
-          g.text(A.X(5), A.Y(5) + 14, '直線段', { size: 13, color: C.mint, align: 'center', alpha: ta });
+          g.tag(A.X(23), A.Y(V01 * 23) - 24, zhEn('初速度 v₀ = 斜率', 'Initial rate v₀ = slope'), { size: 15, color: C.amber, alpha: ta });
+          g.text(A.X(5), A.Y(5) + 14, zhEn('直線段', 'Linear'), { size: 13, color: C.mint, align: 'center', alpha: ta });
         }
       });
-      const R = ['受質越來越少', '產物佔住酵素(產物抑制)', '酵素慢慢失去活性'];
-      fade(g, ease(seg(t, 9.4, 10)), () => g.text(560, 388, '曲線變彎的原因', { size: 15, weight: 700, color: C.ink }));
+      const R = [zhEn('受質越來越少', 'Substrate runs low'), zhEn('產物佔住酵素(產物抑制)', 'Product inhibition (P binds E)'), zhEn('酵素慢慢失去活性', 'Enzyme slowly loses activity')];
+      fade(g, ease(seg(t, 9.4, 10)), () => g.text(560, 388, zhEn('曲線變彎的原因', 'Why the curve bends'), { size: 15, weight: 700, color: C.ink }));
       R.forEach((s, i) => g.text(560, 420 + i * 30, `${i + 1}. ${s}`, { size: 15, color: C.ink2, alpha: ease(seg(t, 9.8 + i * 0.7, 10.4 + i * 0.7)) }));
     },
   },
   {
-    key: 'assay', name: '怎麼量:取樣、萃取與內標', dur: 17,
-    cues: [[0, '以西加雲杉的單萜合成酶為例(Roach et al. 2014):緩衝液裡放酵素、GPP 與 Mg²⁺,上面蓋一層戊烷。'],
-      [4.5, '30 °C 反應 10 到 20 分鐘。單萜幾乎不溶於水又容易揮發,會跑進上層的戊烷;最後用力搖勻,把產物萃取上來。'],
-      [9, '取戊烷層打進 GC-MS。戊烷裡有已知量的內標(異丁基苯),用產物峰對內標峰的面積比換算產物量。'],
-      [13, '事先做時間曲線,把反應時間定在直線段裡;產物濃度除以時間就是初速度。右邊可以改取樣時間。']],
+    key: 'assay', name: zhEn('怎麼量:取樣、萃取與內標', 'Assay: extraction, internal standard'), dur: 17,
+    cues: [[0, zhEn('以西加雲杉的單萜合成酶為例(Roach et al. 2014):緩衝液裡放酵素、GPP 與 Mg²⁺,上面蓋一層戊烷。', 'Take a Sitka spruce monoterpene synthase (Roach et al. 2014): enzyme, GPP and Mg²⁺ go into buffer, topped with a layer of pentane.')],
+      [4.5, zhEn('30 °C 反應 10 到 20 分鐘。單萜幾乎不溶於水又容易揮發,會跑進上層的戊烷;最後用力搖勻,把產物萃取上來。', 'React 10 to 20 minutes at 30 °C. Monoterpenes, nearly insoluble in water and volatile, move into the pentane; a final hard shake extracts them.')],
+      [9, zhEn('取戊烷層打進 GC-MS。戊烷裡有已知量的內標(異丁基苯),用產物峰對內標峰的面積比換算產物量。', 'The pentane goes into the GC-MS. A known amount of internal standard (isobutylbenzene) turns peak area ratios into product amounts.')],
+      [13, zhEn('事先做時間曲線,把反應時間定在直線段裡;產物濃度除以時間就是初速度。右邊可以改取樣時間。', 'A prior time course keeps the reaction in its straight part, so product ÷ time is v₀. Try it at right.')]],
     draw(g, t, S) {
       const ctx = g.ctx, a0 = ease(seg(t, 0, 0.8));
       const vort = t > 8 && t < 9.3 ? Math.sin(Math.PI * seg(t, 8, 9.3)) : 0;
@@ -431,34 +452,34 @@ const chapters = [
       });
       // 瓶子右邊:分層與圖例
       fade(g, ease(seg(t, 0.6, 1.4)), () => {
-        g.text(218, 246, '上層:戊烷', { size: 15, weight: 700, color: C.blue });
-        diamond(g, 226, 272, 6, C.blue); g.text(240, 272, '內標', { size: 14, color: C.ink2 });
-        g.text(218, 352, '下層:反應液', { size: 15, weight: 700, color: C.lav });
-        g.blob(227, 380, 10, 8, C.lav, ''); g.text(244, 380, '酵素', { size: 14, color: C.ink2 });
+        g.text(218, 246, zhEn('上層:戊烷', 'Top: pentane'), { size: 15, weight: 700, color: C.blue });
+        diamond(g, 226, 272, 6, C.blue); g.text(240, 272, zhEn('內標', 'Internal standard'), { size: 14, color: C.ink2 });
+        g.text(218, 352, zhEn('下層:反應液', 'Bottom: reaction mix'), { size: 15, weight: 700, color: C.lav });
+        g.blob(227, 380, 10, 8, C.lav, ''); g.text(244, 380, zhEn('酵素', 'Enzyme'), { size: 14, color: C.ink2 });
         zig(g, 227, 406, 18, C.backbone, { lw: 2 }); g.text(244, 406, 'GPP', { size: 14, color: C.ink2 });
         g.circle(227, 432, 3.6, C.amber); g.text(244, 432, 'Mg²⁺', { size: 14, color: C.ink2 });
       });
-      fade(g, ease(seg(t, 5, 5.6)), () => { hexa(g, 227, 458, 6, C.mint, { lw: 2 }); g.text(244, 458, '產物', { size: 14, color: C.ink2 }); });
+      fade(g, ease(seg(t, 5, 5.6)), () => { hexa(g, 227, 458, 6, C.mint, { lw: 2 }); g.text(244, 458, zhEn('產物', 'Product'), { size: 14, color: C.ink2 }); });
       // 瓶子下面:現在在做什麼
       const min = Math.round(10 * seg(t, 4.5, 8));
-      const st = t < 4.5 ? '反應瓶(示意)' : t < 8 ? `30 °C・第 ${min} 分鐘` : t < 9.3 ? '搖勻,萃取產物' : '取上層打進 GC-MS';
+      const st = t < 4.5 ? zhEn('反應瓶(示意)', 'Vial (illustrative)') : t < 8 ? zhEn(`30 °C・第 ${min} 分鐘`, `30 °C · minute ${min}`) : t < 9.3 ? zhEn('搖勻,萃取產物', 'Shake to extract') : zhEn('取上層打進 GC-MS', 'Top layer to GC-MS');
       g.text(VX + VW / 2, 500, st, { size: 17, weight: 700, color: t < 4.5 ? C.ink2 : C.mint, align: 'center', alpha: a0 });
       // 右邊:論文的條件(層析圖出來前)
       fade(g, ease(seg(t, 0.8, 1.6)) * (1 - ease(seg(t, 8.6, 9.2))), () => {
         g.panel(400, 70, 520, 270, '');
-        g.text(422, 104, 'Roach et al. 2014 的條件', { size: 16, weight: 700, color: C.mint });
-        rich(g, 422, 146, '反應液 500 μL:HEPES 緩衝液、KCl、', { size: 16 });
-        rich(g, 422, 174, '10 mM MgCl_{2}、GPP、純化的酵素', { size: 16 });
-        rich(g, 422, 216, '上蓋 500 μL 戊烷,含 2.5 μM 異丁基苯', { size: 16, alpha: ease(seg(t, 1.6, 2.2)) });
-        rich(g, 422, 258, '30 °C 反應 10 或 20 分鐘(依酵素)', { size: 16, alpha: ease(seg(t, 4.5, 5.1)) });
-        rich(g, 422, 300, '搖勻 30 秒,離心分層', { size: 16, alpha: ease(seg(t, 7.6, 8.2)) });
+        g.text(422, 104, zhEn('Roach et al. 2014 的條件', 'Conditions in Roach et al. 2014'), { size: 16, weight: 700, color: C.mint });
+        rich(g, 422, 146, zhEn('反應液 500 μL:HEPES 緩衝液、KCl、', '500 μL reaction: HEPES buffer, KCl,'), { size: 16 });
+        rich(g, 422, 174, zhEn('10 mM MgCl_{2}、GPP、純化的酵素', '10 mM MgCl_{2}, GPP, purified enzyme'), { size: 16 });
+        rich(g, 422, 216, zhEn('上蓋 500 μL 戊烷,含 2.5 μM 異丁基苯', '500 μL pentane on top (2.5 μM isobutylbenzene)'), { size: 16, alpha: ease(seg(t, 1.6, 2.2)) });
+        rich(g, 422, 258, zhEn('30 °C 反應 10 或 20 分鐘(依酵素)', '30 °C for 10 or 20 minutes (by enzyme)'), { size: 16, alpha: ease(seg(t, 4.5, 5.1)) });
+        rich(g, 422, 300, zhEn('搖勻 30 秒,離心分層', 'Vortex 30 seconds, centrifuge to separate'), { size: 16, alpha: ease(seg(t, 7.6, 8.2)) });
       });
       // 右上:層析圖
       fade(g, ease(seg(t, 9.2, 9.8)), () => {
         const CX = 400, CW = 520, CY = 46, CH = 150, X = (m) => CX + (m / 14) * CW, Y = (v) => CY + CH - v * CH;
         g.line(CX, CY + CH, CX + CW, CY + CH, C.ink2, 1.6);
         for (const m of [0, 4, 8, 12]) { g.line(X(m), CY + CH, X(m), CY + CH + 5, C.ink2, 1.4); g.text(X(m), CY + CH + 17, String(m), { size: 13, color: C.muted, align: 'center', mono: true }); }
-        g.text(CX + CW / 2, CY + CH + 38, '滯留時間(分鐘)', { size: 14, color: C.ink2, align: 'center' });
+        g.text(CX + CW / 2, CY + CH + 38, zhEn('滯留時間(分鐘)', 'Retention time (minutes)'), { size: 14, color: C.ink2, align: 'center' });
         const upto = 14 * ease(seg(t, 9.6, 11.4)), fill = ease(seg(t, 11.4, 12));
         if (fill > 0) for (const [rt, , is] of PEAKS.slice(0, 2)) {
           const pts = [[X(rt - 0.3), Y(0)]];
@@ -469,19 +490,19 @@ const chapters = [
         const pts = [];
         for (let m = 0; m <= upto + 1e-9; m += 0.02) pts.push([X(m), Y(chrom(m))]);
         g.curve(pts, C.ink2, 1.8);
-        if (upto > 5) g.tag(X(4.6), Y(0.82) - 16, '內標', { size: 14, color: C.blue });
-        if (upto > 8.5) g.tag(X(8.1), Y(0.56) - 16, '產物', { size: 14, color: C.mint });
+        if (upto > 5) g.tag(X(4.6), Y(0.82) - 16, zhEn('內標', 'Internal standard'), { size: 14, color: C.blue });
+        if (upto > 8.5) g.tag(X(8.1), Y(0.56) - 16, zhEn('產物', 'Product'), { size: 14, color: C.mint });
       });
       // 中:換算
       fade(g, ease(seg(t, 11.4, 12)), () => {
-        g.text(400, 266, '產物量 = 峰面積比 × 內標量 ÷ 校正係數', { size: 17, weight: 700 });
-        g.text(400, 294, '峰面積比 = 產物峰 ÷ 內標峰', { size: 14, color: C.ink2 });
-        g.text(400, 318, '內標量 = 2.5 μM × 0.5 mL = 1.25 nmol', { size: 14, color: C.ink2 });
+        g.text(400, 266, zhEn('產物量 = 峰面積比 × 內標量 ÷ 校正係數', 'Product = area ratio × standard ÷ response factor'), { size: 17, weight: 700 });
+        g.text(400, 294, zhEn('峰面積比 = 產物峰 ÷ 內標峰', 'Area ratio = product peak ÷ standard peak'), { size: 14, color: C.ink2 });
+        g.text(400, 318, zhEn('內標量 = 2.5 μM × 0.5 mL = 1.25 nmol', 'Standard = 2.5 μM × 0.5 mL = 1.25 nmol'), { size: 14, color: C.ink2 });
       });
       // 右下:時間曲線與取樣時間
       fade(g, ease(seg(t, 13, 13.6)), () => {
-        g.text(470, 344, '[S]₀ = 5 μM 的時間曲線(示意)', { size: 13, color: C.muted });
-        const A = axes(g, 470, 362, 240, 104, { xmax: 60, ymax: 2.5, xticks: [0, 20, 40, 60], yticks: [0, 1, 2], xlab: '時間(分鐘)', ylab: '產物(μM)' });
+        g.text(470, 344, zhEn('[S]₀ = 5 μM 的時間曲線(示意)', 'Time course at [S]₀ = 5 μM (illustrative)'), { size: 13, color: C.muted });
+        const A = axes(g, 470, 362, 240, 104, { xmax: 60, ymax: 2.5, xticks: [0, 20, 40, 60], yticks: [0, 1, 2], xlab: zhEn('時間(分鐘)', 'Time (minutes)'), ylab: zhEn('產物(μM)', 'Product (μM)') });
         g.line(A.X(0), A.Y(0), A.X(2.45 / V02), A.Y(2.45), C.ink2, 1.6, [6, 5]);
         const pts = [];
         for (let m = 0; m <= 60; m += 0.5) pts.push([A.X(m), A.Y(pAt(PC2, m))]);
@@ -490,22 +511,22 @@ const chapters = [
         const ts = S.tsamp, P = pAt(PC2, ts), used = P / 5, ratio = P / ts / V02, ok = used <= 0.2, col = ok ? C.mint : C.amber;
         g.line(A.X(0), A.Y(0), A.X(ts), A.Y(P), col, 2.4);
         g.circle(A.X(ts), A.Y(P), 6, col);
-        g.text(752, 370, `取樣 ${ts} 分鐘`, { size: 17, weight: 700 });
-        g.text(752, 400, `受質用掉 ${Math.round(used * 100)}%`, { size: 15, color: col });
-        g.text(752, 428, `P ÷ t = v₀ 的 ${Math.round(ratio * 100)}%`, { size: 15, color: col });
-        g.text(752, 458, ok ? '還在直線段裡' : '速度被低估了', { size: 15, weight: 700, color: col });
+        g.text(752, 370, zhEn(`取樣 ${ts} 分鐘`, `Sample at ${ts} min`), { size: 17, weight: 700 });
+        g.text(752, 400, zhEn(`受質用掉 ${Math.round(used * 100)}%`, `Substrate used: ${Math.round(used * 100)}%`), { size: 15, color: col });
+        g.text(752, 428, zhEn(`P ÷ t = v₀ 的 ${Math.round(ratio * 100)}%`, `P ÷ t = ${Math.round(ratio * 100)}% of v₀`), { size: 15, color: col });
+        g.text(752, 458, ok ? zhEn('還在直線段裡', 'Still linear') : zhEn('速度被低估了', 'Rate underestimated'), { size: 15, weight: 700, color: col });
       });
     },
   },
   {
-    key: 'mm', name: 'Michaelis–Menten 曲線', dur: 17,
-    cues: [[0, '用 9 個受質濃度各量一個初速度(論文是 1 到 60 μM),把 v₀ 對 [S] 作圖。'],
-      [4.5, '點連起來是一條飽和曲線:v₀ = Vmax[S]/(Km + [S])。受質很多時酵素都被佔滿,速度趨近最大值 Vmax。'],
-      [8, 'Km 是速度到一半 Vmax 時的受質濃度,這支酵素約 15.8 μM;受質遠少於 Km 時,速度和 [S] 幾乎成正比。'],
-      [12.5, 'Km = (k₋₁ + kcat)/k₁,kcat 遠小於 k₋₁ 時才約等於解離常數。右邊可以換濃度範圍,看點都在 Km 以下會怎樣。']],
+    key: 'mm', name: zhEn('Michaelis–Menten 曲線', 'The Michaelis–Menten curve'), dur: 17,
+    cues: [[0, zhEn('用 9 個受質濃度各量一個初速度(論文是 1 到 60 μM),把 v₀ 對 [S] 作圖。', 'Measure v₀ at 9 substrate concentrations (1 to 60 μM in the paper) and plot v₀ against [S].')],
+      [4.5, zhEn('點連起來是一條飽和曲線:v₀ = Vmax[S]/(Km + [S])。受質很多時酵素都被佔滿,速度趨近最大值 Vmax。', 'The points trace a saturation curve, v₀ = Vmax[S]/(Km + [S]). With lots of substrate all enzyme is occupied and the rate nears its maximum, Vmax.')],
+      [8, zhEn('Km 是速度到一半 Vmax 時的受質濃度,這支酵素約 15.8 μM;受質遠少於 Km 時,速度和 [S] 幾乎成正比。', 'Km is the substrate concentration at half of Vmax, about 15.8 μM for this enzyme; far below Km, the rate is nearly proportional to [S].')],
+      [12.5, zhEn('Km = (k₋₁ + kcat)/k₁,kcat 遠小於 k₋₁ 時才約等於解離常數。右邊可以換濃度範圍,看點都在 Km 以下會怎樣。', 'Km = (k₋₁ + kcat)/k₁, close to the dissociation constant only when kcat is much smaller than k₋₁. Try ranges at right: what if every point is below Km?')]],
     draw(g, t, S) {
       const pts = concs(S.range);
-      const A = axes(g, 100, 54, 470, 330, { xmax: 170, ymax: 1.15, xticks: [0, 50, 100, 150], yticks: [0, 0.5, 1], xlab: '受質濃度 [S](μM)', ylab: '初速度 v₀(Vmax = 1)', fmtY: (v) => v.toFixed(1) });
+      const A = axes(g, 100, 54, 470, 330, { xmax: 170, ymax: 1.15, xticks: [0, 50, 100, 150], yticks: [0, 0.5, 1], xlab: zhEn('受質濃度 [S](μM)', 'Substrate concentration [S] (μM)'), ylab: zhEn('初速度 v₀(Vmax = 1)', 'Initial rate v₀ (Vmax = 1)'), fmtY: (v) => v.toFixed(1) });
       // 曲線:量過的範圍畫實線,外面畫虛線
       const cu = ease(seg(t, 4.5, 6.5));
       if (cu > 0) {
@@ -514,7 +535,7 @@ const chapters = [
         g.curve(in1, C.mint, 3);
         if (out.length) g.curve([in1[in1.length - 1], ...out], C.mint, 2, { dash: [6, 6], alpha: 0.55 });
       }
-      fade(g, ease(seg(t, 6.5, 7.2)), () => g.text(A.X(60), A.Y(0.16), '實線:量過的範圍;虛線:沒量到的部分', { size: 13, color: C.muted }));
+      fade(g, ease(seg(t, 6.5, 7.2)), () => g.text(A.X(60), A.Y(0.16), zhEn('實線:量過的範圍;虛線:沒量到的部分', 'Solid: measured; dashed: not measured'), { size: 13, color: C.muted }));
       // 低濃度時的直線(斜率 Vmax/Km)
       const la = ease(seg(t, 9.5, 10.3));
       if (la > 0) clipped(g, 100, 54, 470, 330, () => g.line(A.X(0), A.Y(0), A.X(19 * la), A.Y((19 * la) / KM), C.blue, 2.2, [7, 5]));
@@ -529,67 +550,67 @@ const chapters = [
         g.line(A.X(KM), A.Y(0.5), A.X(KM), A.Y(0), C.amber, 1.8, [5, 5]);
         g.circle(A.X(KM), A.Y(0.5), 6, C.amber);
         rich(g, A.X(KM) + 14, A.Y(0.5) + 24, 'K_{m} = 15.8 μM', { size: 17, weight: 700, color: C.amber });
-        rich(g, A.X(KM) + 14, A.Y(0.5) + 50, '這時 v₀ = V_{max}/2', { size: 15, color: C.amber });
+        rich(g, A.X(KM) + 14, A.Y(0.5) + 50, zhEn('這時 v₀ = V_{max}/2', 'Here v₀ = V_{max}/2'), { size: 15, color: C.amber });
       });
       // 點(最後畫,蓋在線上)
       pts.forEach((s, i) => fade(g, ease(seg(t, 0.6 + i * 0.38, 1 + i * 0.38)), () => g.circle(A.X(s), A.Y(mm(s, 1, KM)), 6, C.ink, C.bg, 2)));
       // 右:公式與意義
       const R = 612, ra = (at) => ease(seg(t, at, at + 0.6));
       rich(g, R, 90, 'v_{0} = V_{max}[S] / (K_{m} + [S])', { size: 19, weight: 700, alpha: ra(4.6) });
-      rich(g, R, 140, 'K_{m}:速度一半時的 [S]', { size: 16, color: C.amber, alpha: ra(8.2) });
+      rich(g, R, 140, zhEn('K_{m}:速度一半時的 [S]', 'K_{m}: [S] at half the maximum rate'), { size: 16, color: C.amber, alpha: ra(8.2) });
       fade(g, ra(9.5), () => {
         g.line(R, 186, R + 26, 186, C.blue, 2.4, [6, 4]);
-        rich(g, R + 36, 186, '[S] ≪ K_{m}:近乎直線', { size: 15, color: C.ink });
-        rich(g, R + 36, 210, '斜率 = V_{max}/K_{m}', { size: 15, color: C.ink2 });
+        rich(g, R + 36, 186, zhEn('[S] ≪ K_{m}:近乎直線', '[S] ≪ K_{m}: nearly linear'), { size: 15, color: C.ink });
+        rich(g, R + 36, 210, zhEn('斜率 = V_{max}/K_{m}', 'Slope = V_{max}/K_{m}'), { size: 15, color: C.ink2 });
         g.line(R, 248, R + 26, 248, C.ink2, 1.8, [6, 6]);
-        rich(g, R + 36, 248, '[S] ≫ K_{m}:趨近 V_{max}', { size: 15, color: C.ink });
-        rich(g, R + 36, 272, '酵素都被佔滿(飽和)', { size: 15, color: C.ink2 });
+        rich(g, R + 36, 248, zhEn('[S] ≫ K_{m}:趨近 V_{max}', '[S] ≫ K_{m}: approaches V_{max}'), { size: 15, color: C.ink });
+        rich(g, R + 36, 272, zhEn('酵素都被佔滿(飽和)', 'All enzyme occupied (saturated)'), { size: 15, color: C.ink2 });
       });
       fade(g, ra(12.6), () => {
         rich(g, R, 322, 'K_{m} = (k_{−1} + k_{cat}) / k_{1}', { size: 18, weight: 700 });
-        rich(g, R, 352, 'k_{cat} ≪ k_{−1} 時 K_{m} ≈ K_{d}', { size: 15, color: C.ink2 });
-        rich(g, R, 376, '(K_{d}:ES 的解離常數)', { size: 14, color: C.muted });
+        rich(g, R, 352, zhEn('k_{cat} ≪ k_{−1} 時 K_{m} ≈ K_{d}', 'If k_{cat} ≪ k_{−1}, K_{m} ≈ K_{d}'), { size: 15, color: C.ink2 });
+        rich(g, R, 376, zhEn('(K_{d}:ES 的解離常數)', '(K_{d}: dissociation constant of ES)'), { size: 14, color: C.muted });
       });
       fade(g, ra(14), () => {
-        g.text(R, 426, '1913 年 Michaelis 與 Menten', { size: 14, color: C.muted });
-        g.text(R, 448, '量蔗糖酶:蔗糖的常數 16.7 mM', { size: 14, color: C.muted });
+        g.text(R, 426, zhEn('1913 年 Michaelis 與 Menten', 'In 1913, Michaelis and Menten'), { size: 14, color: C.muted });
+        g.text(R, 448, zhEn('量蔗糖酶:蔗糖的常數 16.7 mM', 'measured invertase: 16.7 mM for sucrose'), { size: 14, color: C.muted });
       });
     },
   },
   {
-    key: 'kcat', name: 'kcat 與催化效率', dur: 16,
-    cues: [[0, 'Vmax 和放了多少酵素有關;除以酵素總濃度 [E]ₜ 得到 kcat:每個酵素分子每秒把幾個受質變成產物。'],
-      [4.5, '[E]ₜ 由蛋白質濃度(g/L)除以分子量(g/mol)換算。PsTPS-3car2 的 kcat 是每分鐘 5.86 次,約 10 秒才做一個。'],
-      [9, '萜類合成酶是慢的酵素,這四支的 kcat 約每秒 0.02 到 0.5 次;Bar-Even et al. 2011 整理的中位數約每秒 10 次。'],
-      [12.5, 'kcat/Km 是受質很少時的效率:v₀ ≈ (kcat/Km)[E]ₜ[S];上限是分子擴散碰撞的速度,約 10⁸ 到 10⁹ M⁻¹s⁻¹。']],
+    key: 'kcat', name: zhEn('kcat 與催化效率', 'kcat and catalytic efficiency'), dur: 16,
+    cues: [[0, zhEn('Vmax 和放了多少酵素有關;除以酵素總濃度 [E]ₜ 得到 kcat:每個酵素分子每秒把幾個受質變成產物。', 'Vmax depends on enzyme amount; Vmax ÷ total enzyme concentration [E]ₜ = kcat, the substrates one enzyme converts per second.')],
+      [4.5, zhEn('[E]ₜ 由蛋白質濃度(g/L)除以分子量(g/mol)換算。PsTPS-3car2 的 kcat 是每分鐘 5.86 次,約 10 秒才做一個。', '[E]ₜ is protein concentration (g/L) divided by molecular weight (g/mol). PsTPS-3car2 has a kcat of 5.86 per minute: one product about every 10 seconds.')],
+      [9, zhEn('萜類合成酶是慢的酵素,這四支的 kcat 約每秒 0.02 到 0.5 次;Bar-Even et al. 2011 整理的中位數約每秒 10 次。', 'Terpene synthases are slow: these four have kcat of about 0.02 to 0.5 per second; the median enzyme does about 10 (Bar-Even et al. 2011).')],
+      [12.5, zhEn('kcat/Km 是受質很少時的效率:v₀ ≈ (kcat/Km)[E]ₜ[S];上限是分子擴散碰撞的速度,約 10⁸ 到 10⁹ M⁻¹s⁻¹。', 'kcat/Km is the efficiency when substrate is scarce: v₀ ≈ (kcat/Km)[E]ₜ[S]; it is capped by how fast molecules meet by diffusion, about 10⁸ to 10⁹ M⁻¹s⁻¹.')]],
     draw(g, t) {
       const ctx = g.ctx, la = (at) => ease(seg(t, at, at + 0.6));
       // 左上:換算
       g.panel(24, 22, 452, 266, '');
-      rich(g, 44, 50, '從 V_{max} 到 k_{cat}', { size: 16, weight: 700, color: C.mint, alpha: la(0.2) });
+      rich(g, 44, 50, zhEn('從 V_{max} 到 k_{cat}', 'From V_{max} to k_{cat}'), { size: 16, weight: 700, color: C.mint, alpha: la(0.2) });
       rich(g, 44, 88, 'k_{cat} = V_{max} ÷ [E]_{t}', { size: 20, weight: 700, alpha: la(0.6) });
-      rich(g, 44, 126, '[E]_{t} = 蛋白質濃度 ÷ 分子量', { size: 17, alpha: la(4.6) });
-      g.text(44, 154, '例(示意):0.65 mg/mL ÷ 65 kDa = 10 μM', { size: 15, color: C.ink2, alpha: la(5.2) });
-      g.text(44, 178, '稀釋 50 萬倍 → 反應裡 20 pM', { size: 15, color: C.ink2, alpha: la(5.8) });
-      rich(g, 44, 212, 'V_{max} = 117.2 pM/min(示意)', { size: 16, alpha: la(6.5) });
+      rich(g, 44, 126, zhEn('[E]_{t} = 蛋白質濃度 ÷ 分子量', '[E]_{t} = protein (g/L) ÷ molecular weight'), { size: 17, alpha: la(4.6) });
+      g.text(44, 154, zhEn('例(示意):0.65 mg/mL ÷ 65 kDa = 10 μM', 'Illustrative: 0.65 mg/mL ÷ 65 kDa = 10 μM'), { size: 15, color: C.ink2, alpha: la(5.2) });
+      g.text(44, 178, zhEn('稀釋 50 萬倍 → 反應裡 20 pM', 'Diluted 500,000-fold → 20 pM in the reaction'), { size: 15, color: C.ink2, alpha: la(5.8) });
+      rich(g, 44, 212, zhEn('V_{max} = 117.2 pM/min(示意)', 'V_{max} = 117.2 pM/min (illustrative)'), { size: 16, alpha: la(6.5) });
       rich(g, 44, 242, 'k_{cat} = 117.2 ÷ 20 = 5.86 min^{−1}', { size: 18, weight: 700, color: C.mint, alpha: la(7.1) });
-      rich(g, 44, 270, '= 0.098 s^{−1}:約 10 秒做出一個', { size: 15, color: C.mint, alpha: la(7.7) });
+      rich(g, 44, 270, zhEn('= 0.098 s^{−1}:約 10 秒做出一個', '= 0.098 s^{−1}: about one every 10 seconds'), { size: 15, color: C.mint, alpha: la(7.7) });
       // 右上:每個酵素分子做產物(真實時間)
       g.panel(500, 22, 436, 266, '');
-      g.text(518, 46, '每個酵素分子做產物的速度(真實時間)', { size: 14, color: C.ink2 });
+      g.text(518, 46, zhEn('每個酵素分子做產物的速度(真實時間)', 'Products per enzyme molecule (real time)'), { size: 14, color: C.ink2 });
       const tau = Math.max(0, t - 4.5);
-      [{ y: 116, name: 'PsTPS-3car2', rate: 5.86 / 60, txt: '每秒 0.098 個' }, { y: 218, name: '酵素的中位數', rate: 10, txt: '每秒約 10 個' }].forEach((r, i) => {
+      [{ y: 116, name: 'PsTPS-3car2', rate: 5.86 / 60, txt: zhEn('每秒 0.098 個', '0.098 per second') }, { y: 218, name: zhEn('酵素的中位數', 'Median enzyme'), rate: 10, txt: zhEn('每秒約 10 個', 'about 10 per second') }].forEach((r, i) => {
         g.text(530, r.y - 36, r.name, { size: 16, weight: 700, color: i ? C.ink : C.mint });
         g.blob(548, r.y, 22, 17, C.lav, '', { wobble: 1, t: t + i });
         const n = tau > 0 ? Math.floor(tau * r.rate + 0.5) : 0;
-        g.text(530, r.y + 36, `${r.txt}・已做出 ${n} 個`, { size: 14, color: C.ink2 });
+        g.text(530, r.y + 36, zhEn(`${r.txt}・已做出 ${n} 個`, `${r.txt} · ${n} made so far`), { size: 14, color: C.ink2 });
         for (let k = Math.max(0, n - 80); k < n; k++) {
           const born = (k + 0.5) / r.rate, x = 580 + (tau - born) * 50;
           if (x > 920) continue;
           hexa(g, x, r.y + Math.sin(k * 1.7) * 6, 4.5, i ? C.ink2 : C.mint, { lw: 1.8, alpha: 1 - seg(x, 870, 920) });
         }
       });
-      g.text(918, 270, `經過 ${tau.toFixed(1)} 秒`, { size: 13, color: C.muted, align: 'right', mono: true });
+      g.text(918, 270, zhEn(`經過 ${tau.toFixed(1)} 秒`, `${tau.toFixed(1)} s elapsed`), { size: 13, color: C.muted, align: 'right', mono: true });
       // 下(9 秒起):kcat 的數線(對數),12.4 秒換成 kcat/Km 的數線
       const AY = 428;
       // 一排萜類合成酶的點,上面用括號標出範圍
@@ -597,45 +618,46 @@ const chapters = [
         const x0 = Math.min(...xs), x1 = Math.max(...xs);
         xs.forEach((x) => g.circle(x, AY, 6, C.mint, C.bg, 1.5));
         g.line(x0, AY - 18, x1, AY - 18, C.mint, 1.6); g.line(x0, AY - 18, x0, AY - 12, C.mint, 1.6); g.line(x1, AY - 18, x1, AY - 12, C.mint, 1.6);
-        g.text((x0 + x1) / 2, AY - 36, '萜類合成酶', { size: 15, weight: 700, color: C.mint, align: 'center' });
+        // 英文的標籤比較寬,往左移一點(不碰到右邊的中位數)
+        g.text((x0 + x1) / 2 - zhEn(0, 30), AY - 36, zhEn('萜類合成酶', 'Terpene synthases'), { size: 15, weight: 700, color: C.mint, align: 'center' });
       };
       fade(g, la(9) * (1 - ease(seg(t, 12, 12.4))), () => {
-        rich(g, 40, 318, 'k_{cat}(每秒,對數)', { size: 16, weight: 700 });
-        g.text(936, 318, '中位數取自 Bar-Even et al. 2011', { size: 13, color: C.muted, align: 'right' });
+        rich(g, 40, 318, zhEn('k_{cat}(每秒,對數)', 'k_{cat} (per second, log scale)'), { size: 16, weight: 700 });
+        g.text(936, 318, zhEn('中位數取自 Bar-Even et al. 2011', 'Medians from Bar-Even et al. 2011'), { size: 13, color: C.muted, align: 'right' });
         const LX = (v) => 70 + ((Math.log10(v) + 2) / 5) * 840;
         g.line(70, AY, 910, AY, C.ink2, 1.6);
         [0.01, 0.1, 1, 10, 100, 1000].forEach((v) => { g.line(LX(v), AY - 5, LX(v), AY + 5, C.ink2, 1.4); g.text(LX(v), AY + 22, String(v), { size: 13, color: C.muted, align: 'center', mono: true }); });
         tpsGroup(TPS_KCAT.map(LX));
-        g.circle(LX(2.5), AY, 6.5, C.ink2); g.text(LX(2.5), AY - 30, '次級代謝 2.5', { size: 15, color: C.ink2, align: 'center' });
-        g.circle(LX(10), AY, 6.5, C.ink); g.text(LX(10), AY + 50, '全部的中位數 10', { size: 15, color: C.ink, align: 'center' });
+        g.circle(LX(2.5), AY, 6.5, C.ink2); g.text(LX(2.5), AY - 30, zhEn('次級代謝 2.5', 'Secondary metabolism 2.5'), { size: 15, color: C.ink2, align: 'center' });
+        g.circle(LX(10), AY, 6.5, C.ink); g.text(LX(10), AY + 50, zhEn('全部的中位數 10', 'Overall median 10'), { size: 15, color: C.ink, align: 'center' });
       });
       fade(g, la(12.4), () => {
-        rich(g, 40, 318, 'k_{cat}/K_{m}(M^{−1}s^{−1},對數)', { size: 16, weight: 700 });
+        rich(g, 40, 318, zhEn('k_{cat}/K_{m}(M^{−1}s^{−1},對數)', 'k_{cat}/K_{m} (M^{−1}s^{−1}, log scale)'), { size: 16, weight: 700 });
         rich(g, 936, 318, 'v₀ ≈ (k_{cat}/K_{m})[E]_{t}[S]', { size: 15, color: C.ink2, align: 'right' });
         const LX = (v) => 70 + ((Math.log10(v) - 2) / 8) * 840;
         g.line(70, AY, 910, AY, C.ink2, 1.6);
         for (let e = 2; e <= 10; e++) { g.line(LX(10 ** e), AY - 5, LX(10 ** e), AY + 5, C.ink2, 1.4); if (e % 2 === 0) rich(g, LX(10 ** e), AY + 24, `10^{${e}}`, { size: 14, color: C.muted, align: 'center' }); }
         g.rrect(LX(1e8), AY - 13, LX(1e9) - LX(1e8), 26, 4, 'rgba(127,184,255,.25)', C.blue);
-        g.text((LX(1e8) + LX(1e9)) / 2, AY - 32, '擴散的上限', { size: 15, color: C.blue, align: 'center' });
+        g.text((LX(1e8) + LX(1e9)) / 2, AY - 32, zhEn('擴散的上限', 'Diffusion limit'), { size: 15, color: C.blue, align: 'center' });
         g.circle(LX(1e5), AY, 6.5, C.ink);
-        rich(g, LX(1e5), AY - 30, '中位數 10^{5}', { size: 15, color: C.ink, align: 'center' });
+        rich(g, LX(1e5), AY - 30, zhEn('中位數 10^{5}', 'Median 10^{5}'), { size: 15, color: C.ink, align: 'center' });
         tpsGroup(TPS_EFF.map(LX));
-        rich(g, 40, 496, 'PsTPS-3car2:0.37 μM^{−1}min^{−1} = 0.37 × 10^{6} ÷ 60 ≈ 6.2 × 10^{3} M^{−1}s^{−1}', { size: 14, color: C.ink2 });
+        rich(g, 40, 496, zhEn('PsTPS-3car2:0.37 μM^{−1}min^{−1} = 0.37 × 10^{6} ÷ 60 ≈ 6.2 × 10^{3} M^{−1}s^{−1}', 'PsTPS-3car2: 0.37 μM^{−1}min^{−1} = 0.37 × 10^{6} ÷ 60 ≈ 6.2 × 10^{3} M^{−1}s^{−1}'), { size: 14, color: C.ink2 });
       });
     },
   },
   {
-    key: 'fit', name: '為什麼不用雙倒數圖擬合', dur: 18,
-    cues: [[0, '把 1/v₀ 對 1/[S] 作圖會變成直線(Lineweaver–Burk 雙倒數圖),以前常用截距與斜率求 Vmax 與 Km。'],
-      [5, '但倒數會放大誤差:v₀ 的誤差是 δ 時,1/v₀ 的誤差約 δ/v₀²。低濃度的點速度小、誤差最大,又在最右邊,最能拉動直線。'],
-      [10, '現在的做法是非線性迴歸:直接把 Michaelis–Menten 式套到原始數據,找殘差平方和最小的 Km 與 Vmax。'],
-      [14, '下方把同樣的實驗模擬 200 次,比較兩種方法的 Km。右邊可以調誤差大小、濃度範圍,或換一組誤差。']],
+    key: 'fit', name: zhEn('為什麼不用雙倒數圖擬合', 'Why not fit a Lineweaver–Burk plot'), dur: 18,
+    cues: [[0, zhEn('把 1/v₀ 對 1/[S] 作圖會變成直線(Lineweaver–Burk 雙倒數圖),以前常用截距與斜率求 Vmax 與 Km。', '1/v₀ against 1/[S] is a straight line (the Lineweaver–Burk double-reciprocal plot); its intercept and slope were long used to get Vmax and Km.')],
+      [5, zhEn('但倒數會放大誤差:v₀ 的誤差是 δ 時,1/v₀ 的誤差約 δ/v₀²。低濃度的點速度小、誤差最大,又在最右邊,最能拉動直線。', 'But reciprocals magnify errors: an error δ in v₀ becomes about δ/v₀² in 1/v₀. Low-[S] points, the slowest and least certain, sit far right and pull the line most.')],
+      [10, zhEn('現在的做法是非線性迴歸:直接把 Michaelis–Menten 式套到原始數據,找殘差平方和最小的 Km 與 Vmax。', 'Now nonlinear regression is used: fit the Michaelis–Menten equation to raw data, finding the Km and Vmax that minimize squared residuals.')],
+      [14, zhEn('下方把同樣的實驗模擬 200 次,比較兩種方法的 Km。右邊可以調誤差大小、濃度範圍,或換一組誤差。', 'Below, 200 simulated repeats compare the Km from both methods. At right, change the error size or range, or draw new errors.')]],
     draw(g, t, S) {
       const F = fit5(S), ctx = g.ctx, top = S.range, xs = F.conc, v = F.v;
       // 左:原始數據
-      g.text(80, 24, '原始數據', { size: 15, weight: 700, color: C.ink });
+      g.text(80, 24, zhEn('原始數據', 'Raw data'), { size: 15, weight: 700, color: C.ink });
       const tk = { 8: [0, 2, 4, 6, 8], 30: [0, 10, 20, 30], 60: [0, 20, 40, 60], 160: [0, 50, 100, 150] }[top];
-      const A = axes(g, 80, 44, 330, 206, { xmax: top * 1.1, ymax: 1.3, xticks: tk, yticks: [0, 0.5, 1], xlab: '[S](μM)', ylab: 'v₀(相對)', fmtY: (y) => y.toFixed(1) });
+      const A = axes(g, 80, 44, 330, 206, { xmax: top * 1.1, ymax: 1.3, xticks: tk, yticks: [0, 0.5, 1], xlab: zhEn('[S](μM)', '[S] (μM)'), ylab: zhEn('v₀(相對)', 'v₀ (relative)'), fmtY: (y) => y.toFixed(1) });
       clipped(g, 80, 44, 330, 206, () => {
         plotFn(g, A, (s) => mm(s, 1, KM), 0, top * 1.1, C.muted, 1.8, { dash: [5, 5] });
         if (F.lb.ok) fade(g, ease(seg(t, 7.5, 8.3)), () => plotFn(g, A, (s) => mm(s, F.lb.V, F.lb.K), 0, top * 1.1, C.amber, 2.6));
@@ -653,7 +675,7 @@ const chapters = [
         g.line(LX0, YL(0), LX0 + LW, YL(0), C.ink2, 1.6); g.line(XL(0), LY0, XL(0), LY0 + LH, C.ink2, 1.6);
         for (const x of [0, 0.5, 1]) { g.line(XL(x), YL(0), XL(x), YL(0) + 5, C.ink2, 1.4); g.text(XL(x), YL(0) + 17, String(x), { size: 13, color: C.muted, align: 'center', mono: true }); }
         for (const y of [10, 20]) { g.line(XL(0) - 5, YL(y), XL(0), YL(y), C.ink2, 1.4); g.line(XL(0), YL(y), LX0 + LW, YL(y), 'rgba(255,255,255,.06)', 1); g.text(XL(0) - 9, YL(y), String(y), { size: 13, color: C.muted, align: 'right', mono: true }); }
-        g.text(LX0 + LW / 2 + 20, YL(0) + 40, '1/[S](μM⁻¹)', { size: 14, color: C.ink2, align: 'center' });
+        g.text(LX0 + LW / 2 + 20, YL(0) + 40, zhEn('1/[S](μM⁻¹)', '1/[S] (μM⁻¹)'), { size: 14, color: C.ink2, align: 'center' });
         g.text(XL(0) + 10, LY0 + 10, '1/v₀', { size: 14, color: C.ink2 });
       });
       // 點從左邊飛到右邊
@@ -681,25 +703,27 @@ const chapters = [
         } else fade(g, fly, () => g.text(pL[i][0], pL[i][1] - 16, '≤ 0', { size: 13, weight: 700, color: C.red, align: 'center' }));
       });
       fade(g, ease(seg(t, 5.2, 5.9)), () => rich(g, XL(0.06), LY0 + 46, 'δ(1/v₀) ≈ δ/v_{0}^{2}', { size: 16, weight: 700, color: C.amber }));
-      g.tag(XL(0.53), LY0 + 14, '最右邊的點誤差最大', { size: 14, color: C.red, alpha: Math.min(ease(seg(t, 5.6, 6.2)), 1 - ease(seg(t, 9.4, 10))) });
+      // 英文的標籤比較寬:改成箭頭指向最右邊的點,放在 1/v₀ 軸標的右邊
+      g.tag(XL(zhEn(0.53, 0.73)), LY0 + 14, zhEn('最右邊的點誤差最大', 'Biggest error →'), { size: 14, color: C.red, alpha: Math.min(ease(seg(t, 5.6, 6.2)), 1 - ease(seg(t, 9.4, 10))) });
       // 圖例
-      const lg = [[C.muted, '真正的曲線', 0, [5, 5]], [C.amber, '雙倒數擬合', 7.5], [C.mint, '非線性擬合', 10]];
-      lg.forEach(([c, s, at, dash], i) => fade(g, at ? ease(seg(t, at, at + 0.6)) : 1, () => { g.line(80 + i * 170, 314, 108 + i * 170, 314, c, 2.6, dash); g.text(116 + i * 170, 314, s, { size: 14, color: C.ink2 }); }));
-      fade(g, ease(seg(t, 5, 5.6)), () => { g.line(600, 306, 600, 322, C.amber, 1.6); g.text(612, 314, '誤差棒:± δ/v₀²', { size: 14, color: C.ink2 }); });
+      const lg = [[C.muted, zhEn('真正的曲線', 'True curve'), 0, [5, 5]], [C.amber, zhEn('雙倒數擬合', 'Lineweaver–Burk fit'), 7.5], [C.mint, zhEn('非線性擬合', 'Nonlinear fit'), 10]];
+      const LGX = zhEn([0, 170, 340], [0, 150, 360]); // 圖例三項的位置(英文的第二項比較長)
+      lg.forEach(([c, s, at, dash], i) => fade(g, at ? ease(seg(t, at, at + 0.6)) : 1, () => { g.line(80 + LGX[i], 314, 108 + LGX[i], 314, c, 2.6, dash); g.text(116 + LGX[i], 314, s, { size: 14, color: C.ink2 }); }));
+      fade(g, ease(seg(t, 5, 5.6)), () => { g.line(600, 306, 600, 322, C.amber, 1.6); g.text(612, 314, zhEn('誤差棒:± δ/v₀²', 'Error bars: ± δ/v₀²'), { size: 14, color: C.ink2 }); });
       // 下:重做 200 次
       fade(g, ease(seg(t, 14, 14.8)), () => {
         const R = F.rep;
-        rich(g, 40, 352, '重做 200 次:K_{m} 估計值的中間 95%', { size: 16, weight: 700 });
-        if (R.lb.fail > 0) g.text(936, 352, `雙倒數有 ${R.lb.fail} 次算不出`, { size: 13, color: C.amber, align: 'right' });
+        rich(g, 40, 352, zhEn('重做 200 次:K_{m} 估計值的中間 95%', 'Repeated 200 times: middle 95% of K_{m} estimates'), { size: 16, weight: 700 });
+        if (R.lb.fail > 0) g.text(936, 352, zhEn(`雙倒數有 ${R.lb.fail} 次算不出`, `Lineweaver–Burk failed ${R.lb.fail} time${R.lb.fail === 1 ? '' : 's'}`), { size: 13, color: C.amber, align: 'right' });
         const KX = (k) => 330 + (Math.log10(k) / 3) * 580, AY = 486;
         g.line(330, AY, 910, AY, C.ink2, 1.4);
         [1, 10, 100, 1000].forEach((k) => { g.line(KX(k), AY, KX(k), AY + 5, C.ink2, 1.4); g.text(KX(k), AY + 18, k === 1000 ? '1000 μM' : String(k), { size: 13, color: C.muted, align: 'center', mono: true }); });
         g.line(KX(KM), 374, KX(KM), AY, C.ink, 1.4, [4, 4]);
-        g.text(KX(KM), 370, '真值 15.8', { size: 13, color: C.ink, align: 'center' });
-        [['非線性擬合', C.mint, R.nl, F.nl, 410], ['雙倒數擬合', C.amber, R.lb, F.lb, 458]].forEach(([nm, col, r, cur, y]) => {
+        g.text(KX(KM), 370, zhEn('真值 15.8', 'True 15.8'), { size: 13, color: C.ink, align: 'center' });
+        [[zhEn('非線性擬合', 'Nonlinear fit'), C.mint, R.nl, F.nl, 410], [zhEn('雙倒數擬合', 'Lineweaver–Burk fit'), C.amber, R.lb, F.lb, 458]].forEach(([nm, col, r, cur, y]) => {
           g.text(40, y - 11, nm, { size: 16, weight: 700, color: col });
-          const kk = nm === '雙倒數擬合' && !cur.ok ? (cur.K === 0 ? 0 : Infinity) : cur.edge ? Infinity : cur.K;
-          rich(g, 40, y + 12, `這次 K_{m} = ${fmtK(kk)}`, { size: 14, color: C.ink2 });
+          const kk = nm === zhEn('雙倒數擬合', 'Lineweaver–Burk fit') && !cur.ok ? (cur.K === 0 ? 0 : Infinity) : cur.edge ? Infinity : cur.K;
+          rich(g, 40, y + 12, zhEn(`這次 K_{m} = ${fmtK(kk)}`, `This run: K_{m}${kk > 0 && kk < 1000 ? ' =' : ''} ${fmtK(kk)}`), { size: 14, color: C.ink2 });
           const lo = Number.isFinite(r.lo) && r.lo > 0 ? clamp(KX(r.lo), 330, 910) : 330, hi = Number.isFinite(r.hi) ? clamp(KX(r.hi), 330, 910) : 910;
           g.rrect(lo, y - 7, Math.max(4, hi - lo), 14, 7, col === C.mint ? 'rgba(165,243,205,.45)' : 'rgba(255,209,102,.45)', col);
           if (!Number.isFinite(r.hi) || r.hi > 1000) g.arrow(906, y, 930, y, { color: col, lw: 2, head: 8 });
@@ -710,21 +734,21 @@ const chapters = [
     },
   },
   {
-    key: 'inhibit', name: '抑制劑的三種型態', dur: 17,
-    cues: [[0, '抑制劑讓酵素變慢。依它和酵素的哪一種形式結合分成三型;α = 1 + [I]/Ki,Ki 是抑制劑的解離常數。'],
-      [4.5, '競爭型:Km 變大 α 倍、Vmax 不變;非競爭型:Vmax 變小 α 倍、Km 不變;反競爭型:兩者都變小 α 倍。'],
-      [9, '競爭型只和游離的酵素結合(和受質搶口袋),受質夠多就擠得掉;反競爭型只和 ES 結合;非競爭型兩種都結合。'],
-      [13, '雙倒數圖上三型很好認:交在 y 軸、交在 x 軸、互相平行;適合拿來看,數值仍用非線性擬合。右邊可以換型態與濃度。']],
+    key: 'inhibit', name: zhEn('抑制劑的三種型態', 'Three types of inhibition'), dur: 17,
+    cues: [[0, zhEn('抑制劑讓酵素變慢。依它和酵素的哪一種形式結合分成三型;α = 1 + [I]/Ki,Ki 是抑制劑的解離常數。', 'Inhibitors slow enzymes; the three types differ in which enzyme form they bind. α = 1 + [I]/Ki, Ki being the inhibitor dissociation constant.')],
+      [4.5, zhEn('競爭型:Km 變大 α 倍、Vmax 不變;非競爭型:Vmax 變小 α 倍、Km 不變;反競爭型:兩者都變小 α 倍。', 'Competitive: Km rises α-fold, Vmax unchanged; noncompetitive: Vmax falls α-fold, Km unchanged; uncompetitive: both fall α-fold.')],
+      [9, zhEn('競爭型只和游離的酵素結合(和受質搶口袋),受質夠多就擠得掉;反競爭型只和 ES 結合;非競爭型兩種都結合。', 'Competitive ones bind only free enzyme, fighting S for the pocket, so enough S wins; uncompetitive ones bind only ES; noncompetitive ones, both.')],
+      [13, zhEn('雙倒數圖上三型很好認:交在 y 軸、交在 x 軸、互相平行;適合拿來看,數值仍用非線性擬合。右邊可以換型態與濃度。', 'The double-reciprocal plot shows the type (lines meet on the y axis, on the x axis, or run parallel); fit values nonlinearly. Try it at right.')]],
     draw(g, t, S) {
       const type = S.inh, a = lerp(1, 1 + S.ii, ease(seg(t, 1.5, 4)));
       const f = INHIB[type], [Va, Ka] = appVK(type, 1, KM, a);
       // 左:v₀ 對 [S]
-      const A = axes(g, 80, 44, 340, 226, { xmax: 100, ymax: 1.1, xticks: [0, 25, 50, 75, 100], yticks: [0, 0.5, 1], xlab: '[S](μM)', ylab: 'v₀(相對)', fmtY: (y) => y.toFixed(1) });
+      const A = axes(g, 80, 44, 340, 226, { xmax: 100, ymax: 1.1, xticks: [0, 25, 50, 75, 100], yticks: [0, 0.5, 1], xlab: zhEn('[S](μM)', '[S] (μM)'), ylab: zhEn('v₀(相對)', 'v₀ (relative)'), fmtY: (y) => y.toFixed(1) });
       plotFn(g, A, (s) => mm(s, 1, KM), 0, 100, C.muted, 2.2);
       plotFn(g, A, (s) => f(s, 1, KM, a), 0, 100, C.amber, 3.2);
       // 圖例放在左上(曲線從左下往右上長,這一角是空的)
-      g.line(A.X(3), A.Y(1.06), A.X(9), A.Y(1.06), C.muted, 2.2); g.text(A.X(11), A.Y(1.06), '沒有抑制劑', { size: 13, color: C.muted });
-      g.line(A.X(38), A.Y(1.06), A.X(44), A.Y(1.06), C.amber, 3.2); g.text(A.X(46), A.Y(1.06), '加抑制劑', { size: 13, color: C.amber });
+      g.line(A.X(3), A.Y(1.06), A.X(9), A.Y(1.06), C.muted, 2.2); g.text(A.X(11), A.Y(1.06), zhEn('沒有抑制劑', 'No inhibitor'), { size: 13, color: C.muted });
+      g.line(A.X(zhEn(38, 41)), A.Y(1.06), A.X(zhEn(44, 47)), A.Y(1.06), C.amber, 3.2); g.text(A.X(zhEn(46, 49)), A.Y(1.06), zhEn('加抑制劑', 'With inhibitor'), { size: 13, color: C.amber }); // 英文第一項比較長,第二項往右移
       fade(g, ease(seg(t, 4.2, 4.9)), () => {
         g.line(A.X(0), A.Y(Va), A.X(100), A.Y(Va), C.amber, 1.4, [5, 5]);
         if (Ka <= 100) {
@@ -739,23 +763,23 @@ const chapters = [
       const YMAX = Math.max(10, ...lines.map(([m, b]) => b + m * XMAX)) * 1.08;
       const XL = (x) => LX0 + ((x - XMIN) / (XMAX - XMIN)) * LW, YL = (y) => LY0 + LH - (y / YMAX) * LH;
       fade(g, ease(seg(t, 4.6, 5.4)), () => {
-        g.text(LX0, 24, '雙倒數圖(只拿來看型態)', { size: 15, weight: 700 });
+        g.text(LX0, 24, zhEn('雙倒數圖(只拿來看型態)', 'Double-reciprocal plot (for type only)'), { size: 15, weight: 700 });
         g.line(LX0, YL(0), LX0 + LW, YL(0), C.ink2, 1.6); g.line(XL(0), LY0, XL(0), LY0 + LH, C.ink2, 1.6);
         for (const x of [-0.2, 0, 0.2, 0.4]) { g.line(XL(x), YL(0), XL(x), YL(0) + 5, C.ink2, 1.4); g.text(XL(x), YL(0) + 17, String(x), { size: 13, color: C.muted, align: 'center', mono: true }); }
-        g.text(LX0 + LW / 2, YL(0) + 40, '1/[S](μM⁻¹)', { size: 14, color: C.ink2, align: 'center' });
+        g.text(LX0 + LW / 2, YL(0) + 40, zhEn('1/[S](μM⁻¹)', '1/[S] (μM⁻¹)'), { size: 14, color: C.ink2, align: 'center' });
         g.text(XL(0) + 10, LY0 + 10, '1/v₀', { size: 14, color: C.ink2 });
         clipped(g, LX0, LY0, LW, LH, () => lines.forEach(([m, b], i) => g.line(XL(XMIN), YL(b + m * XMIN), XL(XMAX), YL(b + m * XMAX), i ? C.amber : C.muted, i === 2 ? 2.8 : 1.8, i === 1 ? [6, 5] : undefined)));
-        const pat = type === 'comp' ? '交在 y 軸上' : type === 'non' ? '交在 x 軸上' : '互相平行';
+        const pat = type === 'comp' ? zhEn('交在 y 軸上', 'Cross on\nthe y axis') : type === 'non' ? zhEn('交在 x 軸上', 'Cross on\nthe x axis') : zhEn('互相平行', 'Parallel');
         if (S.ii > 0) {
           if (type === 'comp') g.circle(XL(0), YL(1), 6, C.ink);
           else if (type === 'non') g.circle(XL(-1 / KM), YL(0), 6, C.ink);
-          g.tag(XL(-0.14), LY0 + 40, pat, { size: 15, color: C.amber });
+          g.tag(XL(-0.14), LY0 + zhEn(40, 36), pat, { size: 15, color: C.amber }); // 英文分兩行,往上移一點
         }
-        ['實線:[I]', '虛線:[I]/2', '灰線:沒有 I'].forEach((s, i) => g.text(LX0 + 6, LY0 + 76 + i * 22, s, { size: 13, color: i === 2 ? C.muted : C.amber }));
+        [zhEn('實線:[I]', 'Solid: [I]'), zhEn('虛線:[I]/2', 'Dashed: [I]/2'), zhEn('灰線:沒有 I', 'Gray: no I')].forEach((s, i) => g.text(LX0 + 6, LY0 + 76 + i * 22, s, { size: 13, color: i === 2 ? C.muted : C.amber }));
       });
       // 左下:抑制劑和誰結合
       fade(g, ease(seg(t, 8.8, 9.6)), () => {
-        g.text(40, 346, '抑制劑(I)和誰結合', { size: 15, weight: 700 });
+        g.text(40, 346, zhEn('抑制劑(I)和誰結合', 'What the inhibitor (I) binds'), { size: 15, weight: 700 });
         const bindE = type !== 'unc', bindES = type !== 'comp';
         g.blob(120, 420, 46, 34, C.lav, 'E', { size: 18, wobble: 1, t });
         g.blob(320, 420, 46, 34, C.lav, 'ES', { size: 18, wobble: 1, t: t + 1 });
@@ -765,36 +789,37 @@ const chapters = [
         const iBlob = (x, y) => { g.circle(x, y, 13, C.red); g.text(x, y + 0.5, 'I', { size: 15, weight: 800, color: '#0b1111', align: 'center' }); };
         if (bindE) iBlob(type === 'comp' ? 120 : 164, type === 'comp' ? 386 : 446);
         if (bindES) iBlob(364, 446);
-        g.text(120, 482, bindE ? (type === 'comp' ? '會結合(佔住口袋)' : '會結合') : '不結合', { size: 14, color: bindE ? C.red : C.muted, align: 'center' });
-        g.text(320, 482, bindES ? '會結合' : '不結合', { size: 14, color: bindES ? C.red : C.muted, align: 'center' });
+        g.text(120, 482, bindE ? (type === 'comp' ? zhEn('會結合(佔住口袋)', 'Binds (blocks the pocket)') : zhEn('會結合', 'Binds')) : zhEn('不結合', 'Does not bind'), { size: 14, color: bindE ? C.red : C.muted, align: 'center' });
+        g.text(320, 482, bindES ? zhEn('會結合', 'Binds') : zhEn('不結合', 'Does not bind'), { size: 14, color: bindES ? C.red : C.muted, align: 'center' });
       });
       // 右下:公式與表觀參數
-      const rows = [['comp', '競爭型', 'v_{0} = V_{max}[S] ÷ (αK_{m} + [S])'], ['non', '非競爭型', 'v_{0} = (V_{max}/α)[S] ÷ (K_{m} + [S])'], ['unc', '反競爭型', 'v_{0} = V_{max}[S] ÷ (K_{m} + α[S])']];
+      const rows = [['comp', zhEn('競爭型', 'Competitive'), 'v_{0} = V_{max}[S] ÷ (αK_{m} + [S])'], ['non', zhEn('非競爭型', 'Noncompetitive'), 'v_{0} = (V_{max}/α)[S] ÷ (K_{m} + [S])'], ['unc', zhEn('反競爭型', 'Uncompetitive'), 'v_{0} = V_{max}[S] ÷ (K_{m} + α[S])']];
       fade(g, ease(seg(t, 4.5, 5.2)), () => {
         rows.forEach(([k, nm, fx], i) => {
           const on = k === type, y = 358 + i * 32;
-          g.text(470, y, nm, { size: 15, weight: on ? 700 : 500, color: on ? C.amber : C.muted });
-          rich(g, 560, y, fx, { size: 16, weight: on ? 700 : 500, color: on ? C.ink : C.muted });
+          // 英文的型態名稱比較長:名稱往左、速率式往右
+          g.text(zhEn(470, 440), y, nm, { size: 15, weight: on ? 700 : 500, color: on ? C.amber : C.muted });
+          rich(g, zhEn(560, 596), y, fx, { size: 16, weight: on ? 700 : 500, color: on ? C.ink : C.muted });
         });
-        rich(g, 470, 466, `α = 1 + [I]/K_{i} = ${a.toFixed(1)}`, { size: 17, weight: 700 });
-        rich(g, 470, 498, `K_{m,app} = ${Ka.toFixed(1)} μM、V_{max,app} = ${Va.toFixed(2)}`, { size: 16, color: C.mint });
+        rich(g, zhEn(470, 440), 466, `α = 1 + [I]/K_{i} = ${a.toFixed(1)}`, { size: 17, weight: 700 });
+        rich(g, zhEn(470, 440), 498, zhEn(`K_{m,app} = ${Ka.toFixed(1)} μM、V_{max,app} = ${Va.toFixed(2)}`, `K_{m,app} = ${Ka.toFixed(1)} μM, V_{max,app} = ${Va.toFixed(2)}`), { size: 16, color: C.mint });
       });
     },
   },
   {
-    key: 'mutant', name: '一個突變怎麼改變參數', dur: 17,
-    cues: [[0, '西加雲杉有兩支很像的單萜合成酶:PsTPS-3car2 主要做 (+)-3-carene,PsTPS-sab 主要做 (−)-sabinene。'],
-      [4.5, '口袋裡的 596 號胺基酸,3car2 是 Leu、sab 是 Phe。把 3car2 的 Leu 換成 Phe,主產物就變成 sabinene。'],
-      [9.5, 'kcat 從每分鐘 5.86 升到 38.57(約 6.6 倍),Km 幾乎不變(15.8 與 15.3 μM);sab 反過來換,kcat 降約 6.6 倍。'],
-      [14, '萜類合成酶教材裡,臺灣杉的 Tyr 換成 Phe 改變了產物;這裡一個側鏈同時改變了產物與 kcat。右邊可以換方向。']],
+    key: 'mutant', name: zhEn('一個突變怎麼改變參數', 'One mutation, new kinetic parameters'), dur: 17,
+    cues: [[0, zhEn('西加雲杉有兩支很像的單萜合成酶:PsTPS-3car2 主要做 (+)-3-carene,PsTPS-sab 主要做 (−)-sabinene。', 'Sitka spruce has two similar monoterpene synthases: PsTPS-3car2 mainly makes (+)-3-carene, and PsTPS-sab mainly makes (−)-sabinene.')],
+      [4.5, zhEn('口袋裡的 596 號胺基酸,3car2 是 Leu、sab 是 Phe。把 3car2 的 Leu 換成 Phe,主產物就變成 sabinene。', 'Amino acid 596 in the pocket is Leu in 3car2 and Phe in sab. Changing the Leu of 3car2 to Phe makes sabinene the main product.')],
+      [9.5, zhEn('kcat 從每分鐘 5.86 升到 38.57(約 6.6 倍),Km 幾乎不變(15.8 與 15.3 μM);sab 反過來換,kcat 降約 6.6 倍。', 'kcat rises from 5.86 to 38.57 per minute (about 6.6-fold) while Km barely changes (15.8 and 15.3 μM); the reverse swap in sab cuts kcat about 6.6-fold.')],
+      [14, zhEn('萜類合成酶教材裡,臺灣杉的 Tyr 換成 Phe 改變了產物;這裡一個側鏈同時改變了產物與 kcat。右邊可以換方向。', 'In "Terpene synthases", Tyr to Phe in Taiwania changed products; here one side chain changes both products and kcat. Try it at right.')]],
     draw(g, t, S) {
       const ctx = g.ctx, F = FAM[S.dir], other = FAM[S.dir === 'car' ? 'sab' : 'car'];
       const mo = ease(seg(t, 4.8, 7.2));
       const kc = lerp(F.wt.kcat, F.mut.kcat, mo), km = lerp(F.wt.km, F.mut.km, mo);
       // 左上:每個酵素每分鐘的產物對 [GPP]
-      const A = axes(g, 84, 44, 380, 230, { xmax: 150, ymax: 45, xticks: [0, 50, 100, 150], yticks: [0, 20, 40], xlab: '[GPP](μM)', ylab: '每分鐘的產物(每個酵素)' });
+      const A = axes(g, 84, 44, 380, 230, { xmax: 150, ymax: 45, xticks: [0, 50, 100, 150], yticks: [0, 20, 40], xlab: zhEn('[GPP](μM)', '[GPP] (μM)'), ylab: zhEn('每分鐘的產物(每個酵素)', 'Products per minute per enzyme') });
       g.rrect(A.X(1), 44, A.X(60) - A.X(1), 230, 0, 'rgba(165,243,205,.05)');
-      g.text(A.X(30.5), 58, '論文量的範圍', { size: 13, color: C.muted, align: 'center' });
+      g.text(A.X(30.5), 58, zhEn('論文量的範圍', 'Range in the paper'), { size: 13, color: C.muted, align: 'center' });
       fade(g, 0.35 * ease(seg(t, 11, 12)), () => { plotFn(g, A, (s) => mm(s, other.wt.kcat, other.wt.km), 0, 150, C.muted, 1.6); plotFn(g, A, (s) => mm(s, other.mut.kcat, other.mut.km), 0, 150, C.muted, 1.6, { dash: [4, 4] }); });
       plotFn(g, A, (s) => mm(s, F.wt.kcat, F.wt.km), 0, 150, C.ink2, 2.2, { dash: [7, 5] });
       if (mo > 0) plotFn(g, A, (s) => mm(s, kc, km), 0, 150, C.mint, 3.2);
@@ -806,15 +831,16 @@ const chapters = [
           rich(g, A.X(150) - 2, A.Y(e.kcat) - 12, `k_{cat} ${e.kcat}`, { size: 14, color: col, align: 'right', weight: 700 });
         }
       });
-      g.text(A.X(150) - 2, A.Y(mm(150, F.wt.kcat, F.wt.km)) + 16, `野生型(${F.aaW})`, { size: 13, color: C.ink2, align: 'right' });
+      g.text(A.X(150) - 2, A.Y(mm(150, F.wt.kcat, F.wt.km)) + 16, zhEn(`野生型(${F.aaW})`, `Wild type (${F.aaW})`), { size: 13, color: C.ink2, align: 'right' });
       // 突變的名字放在曲線上方;會壓到 kcat 虛線時移到虛線上方
       let ly = A.Y(mm(70, F.mut.kcat, F.mut.km)) - 20;
       if (Math.abs(ly - A.Y(F.mut.kcat)) < 12) ly = A.Y(F.mut.kcat) - 14;
-      fade(g, mo, () => g.text(A.X(70), ly, `${F.mutName}(${F.aaM})`, { size: 14, weight: 700, color: C.mint, align: 'right' }));
+      fade(g, mo, () => g.text(A.X(70), ly, zhEn(`${F.mutName}(${F.aaM})`, `${F.mutName} (${F.aaM})`), { size: 14, weight: 700, color: C.mint, align: 'right' }));
       // 右上:產物比例
-      g.text(520, 26, `${F.name} 的產物(%)`, { size: 15, weight: 700 });
-      fade(g, ease(seg(t, 4.8, 5.4)), () => { g.rrect(752, 18, 12, 10, 2, C.mint); g.text(770, 23, F.mutName, { size: 13, color: C.ink2 }); });
-      g.rrect(842, 18, 12, 10, 2, 'rgba(185,199,192,.45)'); g.text(860, 23, '野生型', { size: 13, color: C.ink2 });
+      g.text(520, 26, zhEn(`${F.name} 的產物(%)`, `${F.name} products (%)`), { size: 15, weight: 700 });
+      // 英文的標題比較長,右上的圖例往右移
+      fade(g, ease(seg(t, 4.8, 5.4)), () => { g.rrect(zhEn(752, 772), 18, 12, 10, 2, C.mint); g.text(zhEn(770, 790), 23, F.mutName, { size: 13, color: C.ink2 }); });
+      g.rrect(zhEn(842, 852), 18, 12, 10, 2, 'rgba(185,199,192,.45)'); g.text(zhEn(860, 870), 23, zhEn('野生型', 'Wild type'), { size: 13, color: C.ink2 });
       PROD.forEach((p, i) => {
         const y = 66 + i * 44, w0 = F.wt.prod[i], w1 = lerp(w0, F.mut.prod[i], mo);
         g.text(520, y + 4, p, { size: 14, color: C.ink2 });
@@ -829,7 +855,7 @@ const chapters = [
       fade(g, ease(seg(t, 9.5, 10.3)), () => {
         g.panel(520, 236, 416, 192, '');
         const cx = [700, 800, 890];
-        ['野生型', F.mutName, '倍數'].forEach((h, i) => g.text(cx[i], 260, h, { size: 15, weight: 700, color: i === 1 ? C.mint : C.ink2, align: 'center' }));
+        [zhEn('野生型', 'Wild type'), F.mutName, zhEn('倍數', 'Fold')].forEach((h, i) => g.text(cx[i], 260, h, { size: 15, weight: 700, color: i === 1 ? C.mint : C.ink2, align: 'center' }));
         const rowsP = [['k_{cat}', F.wt.kcat, F.mut.kcat, 2], ['K_{m}', F.wt.km, F.mut.km, 1], ['k_{cat}/K_{m}', F.wt.kcat / F.wt.km, F.mut.kcat / F.mut.km, 2]];
         rowsP.forEach(([nm, w, m, d], i) => {
           const y = 296 + i * 34;
@@ -838,16 +864,16 @@ const chapters = [
           g.text(cx[1], y, m.toFixed(d), { size: 15, weight: 700, color: C.mint, align: 'center', mono: true });
           g.text(cx[2], y, `× ${(m / w).toFixed(2)}`, { size: 15, color: Math.abs(Math.log(m / w)) > 0.4 ? C.amber : C.ink2, align: 'center', mono: true });
         });
-        rich(g, 536, 404, '單位:min^{−1}、μM、μM^{−1}min^{−1}', { size: 13, color: C.muted });
+        rich(g, 536, 404, zhEn('單位:min^{−1}、μM、μM^{−1}min^{−1}', 'Units: min^{−1}, μM, μM^{−1}min^{−1}'), { size: 13, color: C.muted });
       });
       fade(g, ease(seg(t, 10.5, 11.2)), () => {
-        const kr = F.mut.km / F.wt.km, kmTxt = Math.abs(1 - kr) < 0.05 ? '幾乎不變' : `只差約 ${Math.round(Math.abs(1 - kr) * 100)}%`;
-        rich(g, 520, 456, `k_{cat} 變了約 ${Math.max(F.mut.kcat / F.wt.kcat, F.wt.kcat / F.mut.kcat).toFixed(1)} 倍,K_{m} ${kmTxt}`, { size: 16, weight: 700, color: C.mint });
-        g.text(520, 484, '作者推測差在最後幾步與產物離開口袋', { size: 13, color: C.muted });
+        const kr = F.mut.km / F.wt.km, kmTxt = Math.abs(1 - kr) < 0.05 ? zhEn('幾乎不變', 'almost the same') : zhEn(`只差約 ${Math.round(Math.abs(1 - kr) * 100)}%`, `about ${Math.round(Math.abs(1 - kr) * 100)}% apart`);
+        rich(g, 520, 456, zhEn(`k_{cat} 變了約 ${Math.max(F.mut.kcat / F.wt.kcat, F.wt.kcat / F.mut.kcat).toFixed(1)} 倍,K_{m} ${kmTxt}`, `k_{cat}: about ${Math.max(F.mut.kcat / F.wt.kcat, F.wt.kcat / F.mut.kcat).toFixed(1)}-fold; K_{m}: ${kmTxt}`), { size: 16, weight: 700, color: C.mint });
+        g.text(520, 484, zhEn('作者推測差在最後幾步與產物離開口袋', 'Authors suspect the last steps and product exit'), { size: 13, color: C.muted });
       });
       // 左下:596 號在口袋裡(同源模型,示意)
       fade(g, ease(seg(t, 4.5, 5.2)), () => {
-        g.text(40, 356, 'helix J 的 596 號(依同源模型,示意)', { size: 13, color: C.muted });
+        g.text(40, 356, zhEn('helix J 的 596 號(依同源模型,示意)', 'Residue 596 on helix J (homology model, illustrative)'), { size: 13, color: C.muted });
         ctx.save(); ctx.translate(150, 448); ctx.rotate(-0.32);
         g.rrect(-120, -14, 220, 28, 14, 'rgba(184,164,244,.18)', 'rgba(184,164,244,.6)');
         ctx.strokeStyle = 'rgba(184,164,244,.45)'; ctx.lineWidth = 1.3;
@@ -856,7 +882,7 @@ const chapters = [
         const cat = [394, 448], H = [214, 420];
         hexa(g, cat[0], cat[1], 24, C.hot, { lw: 2.6, fill: 'rgba(255,154,92,.14)' });
         g.text(cat[0], cat[1], '+', { size: 20, weight: 800, color: C.hot, align: 'center' });
-        g.text(cat[0], cat[1] + 42, 'α-terpinyl 陽離子', { size: 13, color: C.hot, align: 'center' });
+        g.text(cat[0], cat[1] + 42, zhEn('α-terpinyl 陽離子', 'α-terpinyl cation'), { size: 13, color: C.hot, align: 'center' });
         const phe = (S.dir === 'car') === (mo >= 0.5);
         const aRes = mo < 0.5 ? 1 - seg(mo, 0.3, 0.5) : seg(mo, 0.5, 0.7);
         fade(g, aRes, () => {
@@ -883,13 +909,13 @@ lesson = createLesson({
   chapters,
   state: { tsamp: 10, range: 60, noise: 3, seed: 1, inh: 'comp', ii: 2, dir: 'car' },
   controls: [
-    { id: 'tsamp', label: '取樣時間', type: 'range', min: 5, max: 60, step: 5, unit: ' 分鐘', chapters: ['assay'], onChange: () => { if (lesson && lesson.time < 13.6) replay(13.6); } },
-    { id: 'range', label: '受質濃度範圍(9 個點)', type: 'seg', options: [{ v: 8, label: '1 到 8 μM' }, { v: 30, label: '1 到 30 μM' }, { v: 60, label: '1 到 60 μM(論文)' }, { v: 160, label: '1 到 160 μM' }], chapters: ['mm', 'fit'], onChange: () => { if (!lesson) return; if (lesson.chapter === 'mm' && lesson.time < 9) replay(9); if (lesson.chapter === 'fit' && lesson.time < 14.8) replay(14.8); } },
-    { id: 'noise', label: '量測誤差(Vmax 的幾 %)', type: 'range', min: 0, max: 10, step: 1, format: (v) => `${v}%`, chapters: ['fit'], onChange: () => { if (lesson && lesson.time < 14.8) replay(14.8); } },
-    { id: 'reseed', label: '換一組誤差', type: 'button', chapters: ['fit'], onClick: (S) => { S.seed = (S.seed % 97) + 1; if (lesson && lesson.time < 14.8) replay(14.8); } },
-    { id: 'inh', label: '抑制型態', type: 'seg', options: [{ v: 'comp', label: '競爭型' }, { v: 'non', label: '非競爭型' }, { v: 'unc', label: '反競爭型' }], chapters: ['inhibit'], onChange: () => { if (lesson && lesson.time < 5.4) replay(5.4); } },
-    { id: 'ii', label: '抑制劑濃度 [I]/Ki', type: 'range', min: 0, max: 5, step: 0.5, format: (v) => `${v}`, chapters: ['inhibit'], onChange: () => { if (lesson && lesson.time < 5.4) replay(5.4); } },
-    { id: 'dir', label: '596 號換成什麼', type: 'seg', options: [{ v: 'car', label: '3car2:Leu → Phe' }, { v: 'sab', label: 'sab:Phe → Leu' }], chapters: ['mutant'], onChange: () => replay(4.4) },
+    { id: 'tsamp', label: zhEn('取樣時間', 'Sampling time'), type: 'range', min: 5, max: 60, step: 5, unit: zhEn(' 分鐘', ' min'), chapters: ['assay'], onChange: () => { if (lesson && lesson.time < 13.6) replay(13.6); } },
+    { id: 'range', label: zhEn('受質濃度範圍(9 個點)', 'Substrate range (9 points)'), type: 'seg', options: [{ v: 8, label: zhEn('1 到 8 μM', '1 to 8 μM') }, { v: 30, label: zhEn('1 到 30 μM', '1 to 30 μM') }, { v: 60, label: zhEn('1 到 60 μM(論文)', '1 to 60 μM (paper)') }, { v: 160, label: zhEn('1 到 160 μM', '1 to 160 μM') }], chapters: ['mm', 'fit'], onChange: () => { if (!lesson) return; if (lesson.chapter === 'mm' && lesson.time < 9) replay(9); if (lesson.chapter === 'fit' && lesson.time < 14.8) replay(14.8); } },
+    { id: 'noise', label: zhEn('量測誤差(Vmax 的幾 %)', 'Measurement error (% of Vmax)'), type: 'range', min: 0, max: 10, step: 1, format: (v) => `${v}%`, chapters: ['fit'], onChange: () => { if (lesson && lesson.time < 14.8) replay(14.8); } },
+    { id: 'reseed', label: zhEn('換一組誤差', 'New set of errors'), type: 'button', chapters: ['fit'], onClick: (S) => { S.seed = (S.seed % 97) + 1; if (lesson && lesson.time < 14.8) replay(14.8); } },
+    { id: 'inh', label: zhEn('抑制型態', 'Inhibition type'), type: 'seg', options: [{ v: 'comp', label: zhEn('競爭型', 'Competitive') }, { v: 'non', label: zhEn('非競爭型', 'Noncompetitive') }, { v: 'unc', label: zhEn('反競爭型', 'Uncompetitive') }], chapters: ['inhibit'], onChange: () => { if (lesson && lesson.time < 5.4) replay(5.4); } },
+    { id: 'ii', label: zhEn('抑制劑濃度 [I]/Ki', 'Inhibitor concentration [I]/Ki'), type: 'range', min: 0, max: 5, step: 0.5, format: (v) => `${v}`, chapters: ['inhibit'], onChange: () => { if (lesson && lesson.time < 5.4) replay(5.4); } },
+    { id: 'dir', label: zhEn('596 號換成什麼', 'Residue 596 swap'), type: 'seg', options: [{ v: 'car', label: zhEn('3car2:Leu → Phe', '3car2: Leu → Phe') }, { v: 'sab', label: zhEn('sab:Phe → Leu', 'sab: Phe → Leu') }], chapters: ['mutant'], onChange: () => replay(4.4) },
   ],
 });
 </script>

@@ -2,9 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1111">
-<title>萜類合成酶:樹木怎麼做出精油成分</title>
+<title data-en="Terpene synthases: how trees make the compounds of essential oils">萜類合成酶:樹木怎麼做出精油成分</title>
 <meta name="description" content="用動畫看萜類合成酶怎麼把 GPP 變成 pinene、limonene、linalool 與 geraniol,口袋形狀與一個胺基酸怎麼改變產物,以及研究者怎麼從臺灣杉的轉錄體找出這些酵素、用 GC-MS 確認產物。可以自己選鏈長、酵素與基因。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="儀器原理">
@@ -22,46 +23,53 @@
 <link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
-<a class="skip-link" href="#main">跳到動畫</a>
-<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理"><a href="../">← 儀器入口</a><a href="../central-dogma/">中心法則</a><a href="../pcr/">PCR 與電泳</a><a href="../sequencing/">DNA 定序</a><a href="../dna-markers/">DNA 鑑定</a><a href="../cloning/">基因選殖</a><a href="./" aria-current="page">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/">抗體檢測</a><a href="../flow-cytometry/">流式細胞儀</a><a href="../proteomics/">蛋白質定序</a></nav></div>
+<a class="skip-link" href="#main" data-en="Skip to the animation">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理" data-en-aria-label="Biochemistry"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../central-dogma/" data-en="Central dogma">中心法則</a><a href="../pcr/" data-en="PCR and gels">PCR 與電泳</a><a href="../sequencing/" data-en="DNA sequencing">DNA 定序</a><a href="../dna-markers/" data-en="DNA markers">DNA 鑑定</a><a href="../cloning/" data-en="Cloning">基因選殖</a><a href="./" aria-current="page" data-en="Terpene synthases">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/" data-en="Immunoassays">抗體檢測</a><a href="../flow-cytometry/" data-en="Flow cytometry">流式細胞儀</a><a href="../proteomics/" data-en="Protein sequencing">蛋白質定序</a></nav></div>
 <header class="top wrap">
-  <h1>萜類合成酶 <span class="k">樹木怎麼做出精油成分</span></h1>
-  <p class="lede">樹木精油裡的 pinene、limonene、linalool,都是萜類合成酶從 10 個碳的 GPP 做出來的:拉掉二磷酸後,帶正電的碳鏈在口袋裡轉動、成環或接上水。以臺灣杉為例,看研究者怎麼找出這些基因、做出酵素,再用 GC-MS 認出產物。</p>
+  <h1><span data-en="Terpene synthases">萜類合成酶</span> <span class="k" data-en="How trees make the compounds of essential oils">樹木怎麼做出精油成分</span></h1>
+  <p class="lede" data-en="Pinene, limonene and linalool in tree essential oils are all made by terpene synthases from GPP, a molecule with 10 carbons: once the diphosphate is pulled off, the positively charged carbon chain turns, closes rings or picks up water inside a pocket of the enzyme. Using Taiwania as the example, see how researchers found these genes, made the enzymes and identified the products by GC-MS.">樹木精油裡的 pinene、limonene、linalool,都是萜類合成酶從 10 個碳的 GPP 做出來的:拉掉二磷酸後,帶正電的碳鏈在口袋裡轉動、成環或接上水。以臺灣杉為例,看研究者怎麼找出這些基因、做出酵素,再用 GC-MS 認出產物。</p>
 </header>
 <main id="main" class="wrap lesson">
   <section class="player">
     <div class="screen">
-      <div class="stage-box"><canvas id="stage" role="img" aria-label="萜類合成酶動畫"></canvas></div>
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="萜類合成酶動畫" data-en-aria-label="Terpene synthase animation"></canvas></div>
       <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
     </div>
     <div class="bar">
-      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
-      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
-      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
-      <div id="prog" role="group" aria-label="章節進度"></div>
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章" data-en-aria-label="Previous chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" data-en-aria-label="Play" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl" data-en="Play">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章" data-en-aria-label="Next chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度" data-en-aria-label="Chapter progress"></div>
       <span id="chName"></span>
-      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" data-en-aria-label="Full screen" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
     </div>
   </section>
   <aside class="side">
-    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
-    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+    <section class="box" id="ops" aria-label="自己調整" data-en-aria-label="Try it yourself"><h2 data-en="Try it yourself">自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節" data-en-aria-label="Chapters"><h2 data-en="Chapters">章節</h2><ol id="chapters"></ol></section>
   </aside>
 </main>
-<section class="notes wrap" aria-label="重點整理與資料來源">
+<section class="notes wrap" aria-label="重點整理與資料來源" data-en-aria-label="Key points and sources">
   <div>
-    <h2>重點整理</h2>
-    <ul>
+    <h2 data-en="Key points">重點整理</h2>
+    <ul lang="zh-Hant">
       <li>萜類由 5 個碳的 IPP 與 DMAPP 頭尾相接而成:10 個碳的 GPP 做單萜,15 個碳的 FPP 做倍半萜,20 個碳的 GGPP 做雙萜;接長鏈的酵素口袋有多深,鏈就停在多長。</li>
       <li>萜類合成酶用 DDxxD 等序列固定的金屬離子(Mg²⁺,有的酵素用 Mn²⁺)拉走二磷酸,留下帶正電的碳陽離子;碳陽離子在口袋裡轉動、成環,最後放掉一個 H⁺ 變成烯類,或接上水變成醇類。</li>
       <li>同一個 GPP 可以變成 geraniol、linalool、limonene、terpinolene、α-pinene、β-pinene 等;口袋的形狀決定走哪一條路,有的酵素一次做出好幾種產物。</li>
       <li>口袋裡一個胺基酸就可能改變產物:臺灣杉一支做 α-pinene 與 terpinolene 的酵素,把口袋旁的酪胺酸(Tyr)換成苯丙胺酸(Phe)後,就不再偏好做 α-pinene。</li>
       <li>功能要靠實驗確認:臺灣杉的 TcTPS13、15、16 序列都最像紅檜的 α-pinene 合成酶,在大腸桿菌做出酵素、加 GPP 反應,再用 SPME 與 GC-MS 對照標準品,產物分別是 geraniol、linalool 與 β-pinene。</li>
     </ul>
+    <ul lang="en">
+      <li>Terpenes are built by joining the 5-carbon units IPP and DMAPP head to tail: GPP (10 carbons) makes monoterpenes, FPP (15 carbons) makes sesquiterpenes and GGPP (20 carbons) makes diterpenes. The chain stops at a length set by how deep the pocket of the chain-building enzyme is.</li>
+      <li>Terpene synthases use metal ions (Mg²⁺, or Mn²⁺ in some enzymes), held by sequences such as DDxxD, to pull off the diphosphate, leaving a positively charged carbocation. The carbocation turns and closes rings in the pocket, and finally loses an H⁺ to become an alkene, or picks up water to become an alcohol.</li>
+      <li>The same GPP can become geraniol, linalool, limonene, terpinolene, α-pinene, β-pinene and more; the shape of the pocket decides which path is taken, and some enzymes make several products at once.</li>
+      <li>A single amino acid in the pocket can change the product: in a Taiwania enzyme that makes α-pinene and terpinolene, swapping a tyrosine (Tyr) beside the pocket for phenylalanine (Phe) means it no longer favors α-pinene.</li>
+      <li>The function has to be shown by experiment: the sequences of Taiwania TcTPS13, 15 and 16 all most resemble an α-pinene synthase from Taiwan red cypress, but when the enzymes were made in E. coli and given GPP, and the products were compared with standards by SPME and GC-MS, they turned out to make geraniol, linalool and β-pinene.</li>
+    </ul>
   </div>
   <div class="src">
-    <h2>資料來源</h2>
-    <ul>
+    <h2 data-en="Sources">資料來源</h2>
+    <ul lang="zh-Hant">
       <li>Ma LT, et al. Unveiling Monoterpene Biosynthesis in <i>Taiwania cryptomerioides</i> via Functional Characterization. Plants. 2021;10(11):2404. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/">PMC8625326</a>(臺灣杉針葉含 limonene、pinene 等單萜;從針葉與毬果轉錄體挑出 TcTPS13 到 17 與各自最相近的已知酵素(表 1);在大腸桿菌 C41(DE3) 表現,加 GPP 與 MnCl₂ 於 30 °C 反應 1 小時,SPME 收集後 GC-MS 對照標準品;geraniol 約 12.5 分、linalool 8.44 分、β-pinene 5.61 分;區域 1 的 Cys/Ser 推測)</li>
       <li>Hsu LJ, et al. Plasticity residues involved in secondary cyclization of terpene synthesis in <i>Taiwania cryptomerioides</i>. Tree Genet Genomes. 2015;11:796. <a href="https://doi.org/10.1007/s11295-014-0796-z">doi:10.1007/s11295-014-0796-z</a>(兩支約 97% 相似的臺灣杉單萜合成酶產物不同;Y327、Y429、Y575 換成 Phe 後不再偏好 α-pinene;依摘要)</li>
       <li>Bohlmann J, et al. Plant terpenoid synthases: Molecular biology and phylogenetic analysis. Proc Natl Acad Sci USA. 1998;95(8):4126–4133. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC22453/">PMC22453</a>(IPP 與 DMAPP 接成 GPP、FPP、GGPP;金屬離子通常是 Mg²⁺ 或 Mn²⁺、DDxxD;GPP 經 linalyl 二磷酸到 α-terpinyl 陽離子,最後放掉 H⁺ 或被水接上;一支酵素可做多種產物;只靠序列比對無法判定功能)</li>
@@ -69,9 +77,17 @@
       <li>電子撞擊質譜:NIST Chemistry WebBook 的 <a href="https://webbook.nist.gov/cgi/cbook.cgi?ID=C106241&amp;Mask=200">geraniol</a>、<a href="https://webbook.nist.gov/cgi/cbook.cgi?ID=C78706&amp;Mask=200">linalool</a>、<a href="https://webbook.nist.gov/cgi/cbook.cgi?ID=C127913&amp;Mask=200">β-pinene</a>。</li>
       <li>示意:酵素與口袋的形狀、金屬離子與側鏈的位置、分子在口袋裡的動作(第 3、5 章把立體的轉動畫在平面上)、第 5 章長條的高度、臺灣杉小枝的樣子、層析圖的峰形與高度都是示意。層析圖只有滯留時間取自 Ma et al. 2021;質譜取自 NIST 資料庫,不是該研究的實測譜。</li>
     </ul>
+    <ul lang="en">
+      <li>Ma LT, et al. Unveiling Monoterpene Biosynthesis in <i>Taiwania cryptomerioides</i> via Functional Characterization. Plants. 2021;10(11):2404. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/">PMC8625326</a> (Taiwania needles contain monoterpenes such as limonene and pinene; TcTPS13 to 17 were picked from needle and cone transcriptomes, with the closest known enzyme for each (Table 1); expressed in E. coli C41(DE3), reacted with GPP and MnCl₂ at 30 °C for 1 hour, collected by SPME and compared with standards by GC-MS; geraniol at about 12.5 min, linalool at 8.44 min, β-pinene at 5.61 min; the suggestion about Cys and Ser in region 1)</li>
+      <li>Hsu LJ, et al. Plasticity residues involved in secondary cyclization of terpene synthesis in <i>Taiwania cryptomerioides</i>. Tree Genet Genomes. 2015;11:796. <a href="https://doi.org/10.1007/s11295-014-0796-z">doi:10.1007/s11295-014-0796-z</a> (two Taiwania monoterpene synthases about 97% similar make different products; with Y327, Y429 and Y575 changed to Phe, α-pinene is no longer favored; based on the abstract)</li>
+      <li>Bohlmann J, et al. Plant terpenoid synthases: Molecular biology and phylogenetic analysis. Proc Natl Acad Sci USA. 1998;95(8):4126–4133. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC22453/">PMC22453</a> (IPP and DMAPP join into GPP, FPP and GGPP; the metal ion is usually Mg²⁺ or Mn²⁺, held by DDxxD; GPP goes through linalyl diphosphate to the α-terpinyl cation, which finally loses H⁺ or is captured by water; one enzyme can make several products; sequence comparison alone cannot tell the function)</li>
+      <li>Christianson DW. Structural and Chemical Biology of Terpenoid Cyclases. Chem Rev. 2017;117(17):11570–11648. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5599884/">PMC5599884</a> (head-to-tail chain elongation, with the pocket acting as a "ruler" that sets the chain length; three Mg²⁺ held by the DDXXD and NSE/DTE sequences; GPP must first become linalyl diphosphate before it can close a six-membered ring; the pocket shape is a template for the reaction)</li>
+      <li>Electron-impact mass spectra: NIST Chemistry WebBook, <a href="https://webbook.nist.gov/cgi/cbook.cgi?ID=C106241&amp;Mask=200">geraniol</a>, <a href="https://webbook.nist.gov/cgi/cbook.cgi?ID=C78706&amp;Mask=200">linalool</a>, <a href="https://webbook.nist.gov/cgi/cbook.cgi?ID=C127913&amp;Mask=200">β-pinene</a>.</li>
+      <li>Illustrative: the shapes of the enzyme and pocket, the positions of the metal ions and side chains, the motion of the molecule in the pocket (chapters 3 and 5 draw 3D turns in a flat plane), the bar heights in chapter 5, the look of the Taiwania sprig, and the peak shapes and heights in the chromatograms. In the chromatograms only the retention times come from Ma et al. 2021; the mass spectra come from the NIST database and are not measured spectra from that study.</li>
+    </ul>
   </div>
 </section>
-<footer class="site wrap">生化原理・<a href="../">回儀器入口</a></footer>
+<footer class="site wrap"><span lang="zh-Hant">生化原理・<a href="../">回儀器入口</a></span><span lang="en">Biochemistry · <a href="../">Back to all lessons</a></span></footer>
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, FONT, seg, ease, clamp, lerp, rng, mix } from '../assets/bio-draw.js';
@@ -344,14 +360,14 @@ function state3(t) {
 // ================= 第 4 章:反應路線圖 =================
 const MAP = {
   gpp: { m: MOL.gpp, x: 104, y: 76, b: 14, name: 'GPP' },
-  ger: { m: MOL.ger, x: 104, y: 246, b: 14, name: 'geranyl 陽離子' },
+  ger: { m: MOL.ger, x: 104, y: 246, b: 14, name: zhEn('geranyl 陽離子', 'geranyl cation') },
   geraniol: { m: MOL.geraniol, x: 392, y: 60, b: 14, name: 'geraniol', prod: true },
   linalool: { m: MOL.linalool, x: 392, y: 172, b: 14, name: 'linalool', prod: true },
   lpp: { m: MOL.lpp, x: 392, y: 300, b: 14, name: 'LPP' },
-  terp: { m: MOL.terp, x: 588, y: 286, b: 16, name: 'α-terpinyl 陽離子' },
+  terp: { m: MOL.terp, x: 588, y: 286, b: 16, name: zhEn('α-terpinyl 陽離子', 'α-terpinyl cation') },
   limonene: { m: MOL.limonene, x: 772, y: 88, b: 16, name: 'limonene', prod: true },
   terpinolene: { m: MOL.terpinolene, x: 772, y: 270, b: 16, name: 'terpinolene', prod: true },
-  pinyl: { m: MOL.pinyl, x: 704, y: 442, b: 18, name: 'pinyl 陽離子' },
+  pinyl: { m: MOL.pinyl, x: 704, y: 442, b: 18, name: zhEn('pinyl 陽離子', 'pinyl cation') },
   apinene: { m: MOL.apinene, x: 884, y: 356, b: 18, name: 'α-pinene', prod: true },
   bpinene: { m: MOL.bpinene, x: 884, y: 464, b: 18, name: 'β-pinene', prod: true },
 };
@@ -366,12 +382,12 @@ for (const N of Object.values(MAP)) {
   N.bx = [Math.min(x0 - 4, cx - half), y0 - 4, Math.max(x1 + wide + 4, cx + half), N.ny + 10];
 }
 // [起點, 終點, 說明, 說明放在線上的哪裡(0 到 1), 說明往哪一側偏(1 或 −1)]
-const EDGES = [['gpp', 'ger', '拉走 OPP', 0.5, 1], ['ger', 'geraniol', '水接在 1 號碳', 0.55, -1], ['ger', 'linalool', '水接在 3 號碳', 0.55, -1], ['ger', 'lpp', 'OPP 移到 3 號碳', 0.5, 1], ['lpp', 'terp', '成環', 0.5, -1],
-  ['terp', 'limonene', '放掉 H⁺', 0.5, -1], ['terp', 'terpinolene', '放掉 H⁺', 0.5, -1], ['terp', 'pinyl', '再接一個環', 0.5, -1], ['pinyl', 'apinene', '放掉環上的 H⁺', 0.45, -1], ['pinyl', 'bpinene', '放掉甲基的 H⁺', 0.55, -1]];
+const EDGES = [['gpp', 'ger', zhEn('拉走 OPP', 'OPP pulled off'), 0.5, 1], ['ger', 'geraniol', zhEn('水接在 1 號碳', 'Water at carbon 1'), 0.55, -1], ['ger', 'linalool', zhEn('水接在 3 號碳', 'Water at carbon 3'), 0.55, -1], ['ger', 'lpp', zhEn('OPP 移到 3 號碳', 'OPP to carbon 3'), 0.5, 1], ['lpp', 'terp', zhEn('成環', 'Ring closes'), 0.5, -1],
+  ['terp', 'limonene', zhEn('放掉 H⁺', 'Loses H⁺'), 0.5, -1], ['terp', 'terpinolene', zhEn('放掉 H⁺', 'Loses H⁺'), 0.5, -1], ['terp', 'pinyl', zhEn('再接一個環', 'Second ring'), 0.5, -1], ['pinyl', 'apinene', zhEn('放掉環上的 H⁺', 'Loses a ring H⁺'), 0.45, -1], ['pinyl', 'bpinene', zhEn('放掉甲基的 H⁺', 'Methyl H⁺ off'), 0.55, -1]];
 const PATHS = {
-  ger: { name: 'geraniol 合成酶', who: '臺灣杉的 TcTPS13、TcTPS14', nodes: ['gpp', 'ger', 'geraniol'] },
-  lin: { name: 'linalool 合成酶', who: '臺灣杉的 TcTPS15', nodes: ['gpp', 'ger', 'linalool'] },
-  bpin: { name: 'β-pinene 合成酶', who: '臺灣杉的 TcTPS16', nodes: ['gpp', 'ger', 'lpp', 'terp', 'pinyl', 'bpinene'] },
+  ger: { name: zhEn('geraniol 合成酶', 'Geraniol synthase'), who: zhEn('臺灣杉的 TcTPS13、TcTPS14', 'Taiwania TcTPS13 and TcTPS14'), nodes: ['gpp', 'ger', 'geraniol'] },
+  lin: { name: zhEn('linalool 合成酶', 'Linalool synthase'), who: zhEn('臺灣杉的 TcTPS15', 'Taiwania TcTPS15'), nodes: ['gpp', 'ger', 'linalool'] },
+  bpin: { name: zhEn('β-pinene 合成酶', 'β-pinene synthase'), who: zhEn('臺灣杉的 TcTPS16', 'Taiwania TcTPS16'), nodes: ['gpp', 'ger', 'lpp', 'terp', 'pinyl', 'bpinene'] },
 };
 // 兩個節點之間的箭頭:從中心連線,在兩邊的外框(含名字)外面一點截斷
 function edgeEnds(a, b) {
@@ -397,11 +413,11 @@ const NAME = { geraniol: 'geraniol', linalool: 'linalool', bpinene: 'β-pinene' 
 const MW = { geraniol: 154, linalool: 154, bpinene: 136 };
 // 各基因:序列(BLAST)最相近的已知酵素與實際產物(Ma et al. 2021 表 1 與圖 3、4);滯留時間取自該文
 const GENES = {
-  13: { hit: ['紅檜', 'α-pinene 合成酶'], prod: 'geraniol', rt: 12.47, rtTxt: '約 12.5 分' },
-  14: { hit: ['日本扁柏', 'terpinolene 合成酶'], prod: 'geraniol', rt: 12.47, rtTxt: '約 12.5 分' },
-  15: { hit: ['紅檜', 'α-pinene 合成酶'], prod: 'linalool', rt: 8.44, rtTxt: '8.44 分' },
-  16: { hit: ['紅檜', 'α-pinene 合成酶'], prod: 'bpinene', rt: 5.61, rtTxt: '5.61 分' },
-  17: { hit: ['臺灣杉已知的', '單萜合成酶'], prod: null },
+  13: { hit: [zhEn('紅檜', 'Taiwan red cypress'), zhEn('α-pinene 合成酶', 'α-pinene synthase')], prod: 'geraniol', rt: 12.47, rtTxt: zhEn('約 12.5 分', 'About 12.5 min') },
+  14: { hit: [zhEn('日本扁柏', 'Japanese cypress'), zhEn('terpinolene 合成酶', 'terpinolene synthase')], prod: 'geraniol', rt: 12.47, rtTxt: zhEn('約 12.5 分', 'About 12.5 min') },
+  15: { hit: [zhEn('紅檜', 'Taiwan red cypress'), zhEn('α-pinene 合成酶', 'α-pinene synthase')], prod: 'linalool', rt: 8.44, rtTxt: zhEn('8.44 分', '8.44 min') },
+  16: { hit: [zhEn('紅檜', 'Taiwan red cypress'), zhEn('α-pinene 合成酶', 'α-pinene synthase')], prod: 'bpinene', rt: 5.61, rtTxt: zhEn('5.61 分', '5.61 min') },
+  17: { hit: [zhEn('臺灣杉已知的', 'A known Taiwania'), zhEn('單萜合成酶', 'monoterpene synthase')], prod: null },
 };
 const STD = [['bpinene', 5.61], ['linalool', 8.44], ['geraniol', 12.47]];
 function trace(g, X, y0, h, peaks, upto, color, lw, seed) {
@@ -419,13 +435,13 @@ const replay = (t0) => { if (lesson) { lesson.time = t0; lesson.play(); } };
 
 const chapters = [
   {
-    key: 'intro', name: '精油裡的萜類', dur: 16,
-    cues: [[0, '很多樹的精油香味來自萜類:由 5 個碳的單位接成的分子。臺灣杉的針葉就含不少 limonene、pinene 這類萜類。'],
-      [5, 'α-pinene、limonene、linalool、geraniol 都有 10 個碳,叫單萜;上了色會看出它們都由兩個 5 碳單位接成。'],
-      [10.5, '15 個碳(3 個單位)的叫倍半萜,例如 cadinene;20 個碳(4 個單位)的叫雙萜。做出它們的酵素叫萜類合成酶。']],
+    key: 'intro', name: zhEn('精油裡的萜類', 'Terpenes in essential oils'), dur: 16,
+    cues: [[0, zhEn('很多樹的精油香味來自萜類:由 5 個碳的單位接成的分子。臺灣杉的針葉就含不少 limonene、pinene 這類萜類。', 'Many tree essential oils smell of terpenes, built from 5-carbon units; Taiwania needles hold plenty, like limonene and pinene.')],
+      [5, zhEn('α-pinene、limonene、linalool、geraniol 都有 10 個碳,叫單萜;上了色會看出它們都由兩個 5 碳單位接成。', 'α-Pinene, limonene, linalool and geraniol have 10 carbons: monoterpenes. Coloring shows each is two 5-carbon units joined.')],
+      [10.5, zhEn('15 個碳(3 個單位)的叫倍半萜,例如 cadinene;20 個碳(4 個單位)的叫雙萜。做出它們的酵素叫萜類合成酶。', 'With 15 carbons (3 units): sesquiterpenes, such as cadinene; with 20 (4 units): diterpenes. Terpene synthases make them.')]],
     draw(g, t) {
       twig(g, t, [72, 470], [52, 270], [208, 92], { needle: 42, a: ease(seg(t, 0, 0.8)) });
-      g.text(132, 508, '臺灣杉的小枝(示意)', { size: 14, color: C.ink2, align: 'center', alpha: ease(seg(t, 0.3, 1)) });
+      g.text(132, 508, zhEn('臺灣杉的小枝(示意)', 'Taiwania sprig (illustrative)'), { size: 14, color: C.ink2, align: 'center', alpha: ease(seg(t, 0.3, 1)) });
       // 精油滴與飄出來的小分子
       const da = ease(seg(t, 0.6, 1.4));
       if (da > 0) {
@@ -434,7 +450,7 @@ const chapters = [
         ctx.beginPath(); ctx.moveTo(x, y - r * 1.8); ctx.quadraticCurveTo(x + r * 1.05, y - r * 0.6, x + r, y); ctx.arc(x, y, r, 0, Math.PI); ctx.quadraticCurveTo(x - r * 1.05, y - r * 0.6, x, y - r * 1.8);
         ctx.fillStyle = 'rgba(255,209,102,.22)'; ctx.fill(); ctx.strokeStyle = C.amber; ctx.lineWidth = 2; ctx.stroke();
         ctx.restore();
-        g.text(x, y + r + 18, '精油', { size: 15, weight: 700, color: C.amber, align: 'center', alpha: da });
+        g.text(x, y + r + 18, zhEn('精油', 'Essential oil'), { size: 15, weight: 700, color: C.amber, align: 'center', alpha: da });
       }
       const xs = [390, 500, 664, 836];
       xs.forEach((tx, i) => {
@@ -445,45 +461,45 @@ const chapters = [
       });
       // 右邊:四種單萜
       const ha = ease(seg(t, 4.6, 5.4));
-      g.text(330, 66, '單萜:10 個碳', { size: 19, weight: 700, color: C.ink, alpha: ha });
+      g.text(330, 66, zhEn('單萜:10 個碳', 'Monoterpenes: 10 carbons'), { size: 19, weight: 700, color: C.ink, alpha: ha });
       const uc = ease(seg(t, 7.6, 8.8));
       const unitOf = (i) => (i >= 4 && i <= 8 ? 1 : i === 10 ? -1 : 0);
       const colorOf = (i, j) => { const a = unitOf(i), b2 = unitOf(j); return a === b2 && a >= 0 ? mix(C.backbone, a ? C.amber : C.mint, uc) : C.backbone; };
-      const list = [[MOL.apinene, 27, 'α-pinene', 'α-蒎烯', 'C₁₀H₁₆'], [MOL.limonene, 24, 'limonene', '檸檬烯', 'C₁₀H₁₆'], [MOL.linalool, 22, 'linalool', '沉香醇', 'C₁₀H₁₈O'], [MOL.geraniol, 22, 'geraniol', '牻牛兒醇', 'C₁₀H₁₈O']];
+      const list = [[MOL.apinene, 27, 'α-pinene', zhEn('α-蒎烯', ''), 'C₁₀H₁₆'], [MOL.limonene, 24, 'limonene', zhEn('檸檬烯', ''), 'C₁₀H₁₆'], [MOL.linalool, 22, 'linalool', zhEn('沉香醇', ''), 'C₁₀H₁₈O'], [MOL.geraniol, 22, 'geraniol', zhEn('牻牛兒醇', ''), 'C₁₀H₁₈O']];
       list.forEach(([m, b, name, zh, f], i) => {
         const a = ease(seg(t, 4.9 + 0.45 * i, 5.7 + 0.45 * i));
         if (!a) return;
         mol(g, m, { ...place(m, xs[i] - (i === 3 ? 10 : 0), 182, b), alpha: a, colorOf });
         g.text(xs[i], 268, name, { size: 16, weight: 700, color: C.ink, align: 'center', alpha: a });
         g.text(xs[i], 290, zh, { size: 14, color: C.ink2, align: 'center', alpha: a });
-        g.text(xs[i], 311, f, { size: 14, color: C.muted, align: 'center', alpha: a });
+        g.text(xs[i], zhEn(311, 290), f, { size: 14, color: C.muted, align: 'center', alpha: a }); // 英文沒有中文俗名那一行,分子式往上移
       });
       if (uc > 0) {
         g.rrect(330, 339, 14, 6, 3, C.mint); g.rrect(348, 339, 14, 6, 3, C.amber);
-        g.text(372, 342, '兩種顏色是兩個 5 碳單位;白色的鍵把它們接在一起', { size: 14, color: C.ink2, alpha: uc });
+        g.text(372, 342, zhEn('兩種顏色是兩個 5 碳單位;白色的鍵把它們接在一起', 'Two colors, two 5-carbon units; the white bond joins them'), { size: 14, color: C.ink2, alpha: uc });
       }
       // 下方:倍半萜與雙萜
       const ba = ease(seg(t, 10.6, 11.6));
       if (ba > 0) {
         const ctx = g.ctx;
         ctx.save(); ctx.globalAlpha *= ba;
-        [[330, '倍半萜:15 個碳', '3 個單位,例如 cadinene', 3], [640, '雙萜:20 個碳', '4 個單位', 4]].forEach(([x, h, d, nU]) => {
+        [[330, zhEn('倍半萜:15 個碳', 'Sesquiterpenes'), zhEn('3 個單位,例如 cadinene', '15 carbons, 3 units: cadinene…'), 3], [640, zhEn('雙萜:20 個碳', 'Diterpenes'), zhEn('4 個單位', '20 carbons, 4 units'), 4]].forEach(([x, h, d, nU]) => {
           g.panel(x, 380, 290, 84, '');
           g.text(x + 16, 405, h, { size: 16, weight: 700, color: C.ink });
           g.text(x + 16, 434, d, { size: 14, color: C.ink2 });
           for (let u = 0; u < nU; u++) g.rrect(x + 290 - 18 - (nU - u) * 26, 398, 22, 8, 4, UNITC[u]);
         });
         ctx.restore();
-        g.text(330, 492, '臺灣杉:針葉多單萜;木材裡分離出的萜類多是倍半萜與雙萜。', { size: 14, color: C.ink2, alpha: ease(seg(t, 12.2, 13)) });
+        g.text(330, 492, zhEn('臺灣杉:針葉多單萜;木材裡分離出的萜類多是倍半萜與雙萜。', 'Taiwania: the needles are rich in monoterpenes; terpenes isolated\nfrom the wood are mostly sesquiterpenes and diterpenes.'), { size: 14, color: C.ink2, alpha: ease(seg(t, 12.2, 13)) });
       }
     },
   },
   {
-    key: 'units', name: '5 碳積木:IPP 與 DMAPP', dur: 16,
-    cues: [[0, '萜類的積木是兩種 5 個碳的分子:DMAPP 與 IPP,都帶著二磷酸(OPP);兩者原子一樣,只差在雙鍵的位置。'],
-      [4.5, '接長鏈的酵素先拉掉 DMAPP 的二磷酸,再讓一個 IPP 頭尾相接接上去,得到 10 個碳的 GPP。'],
-      [9, '再接一個 IPP 是 15 碳的 FPP,再一個是 20 碳的 GGPP。口袋底的大胺基酸像一把尺,決定鏈停在多長。'],
-      [13, 'GPP 做單萜,FPP 做倍半萜,GGPP 做雙萜。右邊可以選要接幾個單位。']],
+    key: 'units', name: zhEn('5 碳積木:IPP 與 DMAPP', '5-carbon blocks: IPP and DMAPP'), dur: 16,
+    cues: [[0, zhEn('萜類的積木是兩種 5 個碳的分子:DMAPP 與 IPP,都帶著二磷酸(OPP);兩者原子一樣,只差在雙鍵的位置。', 'The blocks are DMAPP and IPP: 5 carbons plus a diphosphate (OPP), same atoms, double bond in different places.')],
+      [4.5, zhEn('接長鏈的酵素先拉掉 DMAPP 的二磷酸,再讓一個 IPP 頭尾相接接上去,得到 10 個碳的 GPP。', 'A chain-building enzyme pulls the diphosphate off DMAPP and joins an IPP head to tail: 10-carbon GPP.')],
+      [9, zhEn('再接一個 IPP 是 15 碳的 FPP,再一個是 20 碳的 GGPP。口袋底的大胺基酸像一把尺,決定鏈停在多長。', 'Another IPP makes 15-carbon FPP, one more 20-carbon GGPP; a big amino acid at the pocket floor acts as a ruler for length.')],
+      [13, zhEn('GPP 做單萜,FPP 做倍半萜,GGPP 做雙萜。右邊可以選要接幾個單位。', 'GPP gives monoterpenes, FPP sesquiterpenes, GGPP diterpenes. Pick how many units at right.')]],
     draw(g, t, S) {
       const N = S.units, b = 19, XM = 560, YM = 300;
       // 上方:DMAPP 與 IPP 的結構
@@ -493,9 +509,9 @@ const chapters = [
       const pD = mol(g, D1, { ...oD, alpha: a0, colorOf: () => C.amber });
       const pI = mol(g, IPP, { ...oI, alpha: a0, colorOf: () => C.mint });
       g.text(150 - 12, 132, 'DMAPP', { size: 16, weight: 700, color: C.amber, align: 'center', alpha: a0 });
-      g.text(150 - 12, 153, '二甲基烯丙基二磷酸・5 碳', { size: 14, color: C.ink2, align: 'center', alpha: a0 });
+      g.text(150 - 12, 153, zhEn('二甲基烯丙基二磷酸・5 碳', 'Dimethylallyl diphosphate · 5 C'), { size: zhEn(14, 13), color: C.ink2, align: 'center', alpha: a0 });
       g.text(420 - 12, 132, 'IPP', { size: 16, weight: 700, color: C.mint, align: 'center', alpha: a0 });
-      g.text(420 - 12, 153, '異戊烯二磷酸・5 碳', { size: 14, color: C.ink2, align: 'center', alpha: a0 });
+      g.text(420 - 12, 153, zhEn('異戊烯二磷酸・5 碳', 'Isopentenyl diphosphate · 5 C'), { size: zhEn(14, 13), color: C.ink2, align: 'center', alpha: a0 });
       const hd = Math.min(ease(seg(t, 1.2, 2)), 1 - seg(t, 4.6, 5.4));
       if (hd > 0) {
         const ctx = g.ctx;
@@ -503,7 +519,7 @@ const chapters = [
           ctx.save(); ctx.globalAlpha *= hd; ctx.setLineDash([4, 4]); ctx.strokeStyle = C.amber; ctx.lineWidth = 1.8;
           ctx.beginPath(); ctx.ellipse((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, 21, 15, Math.atan2(q[1] - p[1], q[0] - p[0]), 0, Math.PI * 2); ctx.stroke(); ctx.restore();
         }
-        g.tag(285, 30, '雙鍵的位置不一樣', { size: 14, color: C.amber, alpha: hd });
+        g.tag(285, 30, zhEn('雙鍵的位置不一樣', 'Double bond in a different place'), { size: 14, color: C.amber, alpha: hd });
       }
       // 酵素與口袋:口袋底(大的胺基酸)的位置由 N 決定
       const ea = ease(seg(t, 1.6, 2.6));
@@ -514,7 +530,7 @@ const chapters = [
       g.rrect(floorX - 4, YM - 36, XM + 160 - floorX, 72, 30, '#0a1210', 'rgba(184,164,244,.42)');
       g.rrect(floorX - 30, YM - 44, 28, 88, 12, 'rgba(184,164,244,.55)', C.lav);
       g.ctx.restore();
-      g.text(floorX - 16, YM + 64, '口袋底', { size: 14, weight: 700, color: C.lav, align: 'center', alpha: ea });
+      g.text(floorX - 16, YM + 64, zhEn('口袋底', 'Pocket floor'), { size: 14, weight: 700, color: C.lav, align: 'center', alpha: ea });
       // 鏈在口袋裡一個單位一個單位變長
       const steps = N - 1, e = (t - 4.5) / 3, si = Math.floor(e);
       let nNow = 1;
@@ -524,7 +540,7 @@ const chapters = [
       } else if (si >= steps) {
         const M = chain(N); nNow = N;
         mol(g, M, { x: XM, y: YM, b, colorOf: chainColor(M, N) });
-        g.tag(floorX + 80, 416, '碰到口袋底,不再變長', { size: 14, color: C.lav, alpha: ease(seg(e, steps, steps + 0.3)) });
+        g.tag(floorX + 80, 416, zhEn('碰到口袋底,不再變長', 'Hits the pocket floor: stops growing'), { size: 14, color: C.lav, alpha: ease(seg(e, steps, steps + 0.3)) });
       } else {
         const n = 1 + si, u = e - si, old = chain(n);
         nNow = n + (u > 0.9 ? 1 : 0);
@@ -548,16 +564,16 @@ const chapters = [
         const kb = ease(seg(u, 0.6, 0.7));
         if (kb > 0) { g.ctx.save(); g.ctx.globalAlpha *= kb; g.line(pO[0][0], pO[0][1], pI2[3][0], pI2[3][1], C.ink, 2.2); g.ctx.restore(); }
         hLeave(g, pI2[1], [0, -1], seg(u, 0.76, 1));
-        if (u > 0.55 && u < 0.95) g.tag(XM - 70, YM - 56, '頭尾相接', { size: 14, color: C.ink, alpha: Math.min(seg(u, 0.55, 0.62), 1 - seg(u, 0.88, 0.95)) });
+        if (u > 0.55 && u < 0.95) g.tag(XM - 70, YM - 56, zhEn('頭尾相接', 'Head to tail'), { size: 14, color: C.ink, alpha: Math.min(seg(u, 0.55, 0.62), 1 - seg(u, 0.88, 0.95)) });
       }
       // 右邊排隊的 IPP
       for (let q = Math.max(0, t < 4.5 ? 0 : si + 1); q < steps; q++) {
         const o = { x: XM + 230, y: YM - 90 + 90 * q, b, colorOf: () => UNITC[q + 1], alpha: ease(seg(t, 2.2 + 0.3 * q, 3 + 0.3 * q)) };
         mol(g, IPP, o);
       }
-      g.tag(XM + 40, 184, `鏈上有 ${5 * nNow} 個碳`, { size: 15, color: C.ink, alpha: ease(seg(t, 3, 3.8)) });
+      g.tag(XM + 40, 184, zhEn(`鏈上有 ${5 * nNow} 個碳`, `${5 * nNow} carbons in the chain`), { size: 15, color: C.ink, alpha: ease(seg(t, 3, 3.8)) });
       // 下方:三種長度各做什麼
-      const rows = [['GPP:10 個碳', '做單萜(pinene、limonene…)'], ['FPP:15 個碳', '做倍半萜(cadinene…)'], ['GGPP:20 個碳', '做雙萜']];
+      const rows = [[zhEn('GPP:10 個碳', 'GPP: 10 carbons'), zhEn('做單萜(pinene、limonene…)', 'Monoterpenes (pinene…)')], [zhEn('FPP:15 個碳', 'FPP: 15 carbons'), zhEn('做倍半萜(cadinene…)', 'Sesquiterpenes (cadinene…)')], [zhEn('GGPP:20 個碳', 'GGPP: 20 carbons'), zhEn('做雙萜', 'Diterpenes')]];
       rows.forEach(([h, d], i) => {
         const x = 40 + i * 300, on = nNow === i + 2, mine = N === i + 2;
         g.rrect(x, 440, 280, 76, 12, on ? 'rgba(165,243,205,.12)' : 'rgba(21,32,30,.6)', on ? C.mint : mine ? 'rgba(165,243,205,.45)' : C.line);
@@ -567,11 +583,11 @@ const chapters = [
     },
   },
   {
-    key: 'pocket', name: '口袋裡發生什麼事', dur: 17,
-    cues: [[0, '萜類合成酶的中間有個口袋。GPP 鑽進去,二磷酸那一端被口袋口的金屬離子抓住;這些離子靠 DDxxD 等胺基酸序列固定。'],
-      [4.5, '金屬離子把二磷酸拉走,電子跟著二磷酸離開,碳鏈頭端的碳就變成帶正電的碳陽離子。'],
-      [8.5, '二磷酸先暫時接到 3 號碳,碳鏈才轉得過來;它再離開後,頭端的碳接上 6 號碳,形成六員環。'],
-      [13, '最後放掉一個 H⁺、留下雙鍵,就是 limonene 這類烯類;如果是水分子接上碳陽離子,就變成醇類。']],
+    key: 'pocket', name: zhEn('口袋裡發生什麼事', 'What happens in the pocket'), dur: 17,
+    cues: [[0, zhEn('萜類合成酶的中間有個口袋。GPP 鑽進去,二磷酸那一端被口袋口的金屬離子抓住;這些離子靠 DDxxD 等胺基酸序列固定。', 'A terpene synthase has a pocket. GPP slips in, and metal ions at the mouth, held by sequences like DDxxD, grab its diphosphate end.')],
+      [4.5, zhEn('金屬離子把二磷酸拉走,電子跟著二磷酸離開,碳鏈頭端的碳就變成帶正電的碳陽離子。', 'The ions pull off the diphosphate with its electrons, leaving the end carbon positive: a carbocation.')],
+      [8.5, zhEn('二磷酸先暫時接到 3 號碳,碳鏈才轉得過來;它再離開後,頭端的碳接上 6 號碳,形成六員環。', 'The diphosphate briefly sits on carbon 3, letting the chain turn; then it leaves and carbon 1 bonds to carbon 6, closing a six-membered ring.')],
+      [13, zhEn('最後放掉一個 H⁺、留下雙鍵,就是 limonene 這類烯類;如果是水分子接上碳陽離子,就變成醇類。', 'Losing an H⁺ leaves a double bond: alkenes like limonene. If water adds to the carbocation instead, an alcohol forms.')]],
     draw(g, t) {
       protein(g, [[150, 122], [262, 70], [420, 58], [556, 88], [612, 158], [604, 232], [606, 300], [612, 380], [542, 462], [400, 492], [250, 472], [148, 402], [110, 282]]);
       helix(g, 190, 180, 110, 62); helix(g, 205, 380, 120, -38); helix(g, 330, 440, 130, 4); helix(g, 470, 432, 110, -8); helix(g, 300, 96, 120, -6); helix(g, 470, 96, 100, 10);
@@ -581,7 +597,7 @@ const chapters = [
       g.text(588, 312, 'Mg²⁺', { size: 14, weight: 700, color: C.amber, align: 'center', alpha: ma });
       helix(g, 520, 352, 96, -12, ma); g.text(520, 352, 'DDxxD', { size: 13, weight: 700, color: C.ink, align: 'center', mono: true, alpha: ma });
       helix(g, 596, 186, 70, 76, ma); g.text(560, 174, 'NSE/DTE', { size: 13, weight: 700, color: C.ink, align: 'right', mono: true, alpha: ma });
-      g.text(132, 518, '酵素與口袋的剖面(示意)', { size: 13, color: C.muted, alpha: ma });
+      g.text(132, 518, zhEn('酵素與口袋的剖面(示意)', 'Cross-section of the enzyme and pocket (illustrative)'), { size: 13, color: C.muted, alpha: ma });
       // 分子
       const P = pos3(t);
       const [sa, sb, k] = state3(t);
@@ -589,36 +605,36 @@ const chapters = [
       const o = { x: 470 + (1 - kin) * 280, y: 252 - (1 - kin) * 20, b: 26, alpha: ease(seg(t, 0.2, 0.8)) };
       const A = { P, ...ST3[sa] }, B = sb ? { P, ...ST3[sb] } : null;
       const pp = mol(g, A, o, B, k);
-      if (t > 4.7 && t < 8.5) g.tag(pp[0][0] - 6, pp[0][1] + 42, '碳陽離子', { size: 14, color: C.hot, alpha: Math.min(seg(t, 5.3, 5.9), 1 - seg(t, 8.0, 8.5)) });
-      if (t > 8.6 && t < 10.3) g.tag(pp[2][0] - 30, pp[2][1] + 58, '暫時接到 3 號碳', { size: 14, color: C.ink, alpha: Math.min(seg(t, 8.8, 9.2), 1 - seg(t, 9.9, 10.3)) });
-      if (t > 12.1 && t < 13.4) g.tag(pp[5][0] - 82, pp[5][1] + 4, '六員環', { size: 14, color: C.mint, alpha: Math.min(seg(t, 12.1, 12.5), 1 - seg(t, 13.0, 13.4)) });
+      if (t > 4.7 && t < 8.5) g.tag(pp[0][0] - 6, pp[0][1] + 42, zhEn('碳陽離子', 'Carbocation'), { size: 14, color: C.hot, alpha: Math.min(seg(t, 5.3, 5.9), 1 - seg(t, 8.0, 8.5)) });
+      if (t > 8.6 && t < 10.3) g.tag(pp[2][0] - 30, pp[2][1] + 58, zhEn('暫時接到 3 號碳', 'Briefly on carbon 3'), { size: 14, color: C.ink, alpha: Math.min(seg(t, 8.8, 9.2), 1 - seg(t, 9.9, 10.3)) });
+      if (t > 12.1 && t < 13.4) g.tag(pp[5][0] - 82, pp[5][1] + 4, zhEn('六員環', 'Six-membered ring'), { size: 14, color: C.mint, alpha: Math.min(seg(t, 12.1, 12.5), 1 - seg(t, 13.0, 13.4)) });
       hLeave(g, pp[7], unitDir(pp[6], pp[7]), seg(t, 13.4, 14.8));
       if (t >= 14) g.tag(pp[5][0] - 92, pp[5][1] + 36, 'limonene', { size: 15, color: C.mint, alpha: ease(seg(t, 14, 14.6)) });
       // 右邊:步驟
-      const steps = [[0, '① GPP 進入口袋'], [4.5, '② 拉走二磷酸:碳陽離子'], [8.5, '③ 轉動,接成六員環'], [13, '④ 放掉 H⁺:limonene']];
+      const steps = [[0, zhEn('① GPP 進入口袋', '① GPP enters the pocket')], [4.5, zhEn('② 拉走二磷酸:碳陽離子', '② OPP pulled off: carbocation')], [8.5, zhEn('③ 轉動,接成六員環', '③ Turns and closes a ring')], [13, zhEn('④ 放掉 H⁺:limonene', '④ Loses H⁺: limonene')]];
       let cur = 0; steps.forEach(([s], i) => { if (t >= s) cur = i; });
       steps.forEach(([, s], i) => g.text(654, 98 + i * 40, s, { size: 15, weight: i === cur ? 700 : 500, color: i === cur ? C.mint : i < cur ? C.ink2 : C.muted }));
-      g.text(654, 250, '金屬離子是 Mg²⁺,有的酵素用 Mn²⁺', { size: 13.5, color: C.muted, alpha: ma });
+      g.text(654, 250, zhEn('金屬離子是 Mg²⁺,有的酵素用 Mn²⁺', 'Metal ions: Mg²⁺, or Mn²⁺ in some'), { size: 13.5, color: C.muted, alpha: ma });
       const ea = ease(seg(t, 14.4, 15.2));
       if (ea > 0) {
         const ctx = g.ctx;
         ctx.save(); ctx.globalAlpha *= ea;
-        g.panel(646, 280, 290, 196, '兩種結尾');
-        g.text(662, 326, '放掉一個 H⁺ → 留下雙鍵', { size: 15, weight: 700, color: C.ink });
-        g.text(662, 350, '烯類:limonene、pinene', { size: 14, color: C.ink2 });
-        g.text(662, 396, '接上 H₂O(再放掉 H⁺)→ -OH', { size: 15, weight: 700, color: C.ink });
-        g.text(662, 420, '醇類:geraniol、linalool', { size: 14, color: C.ink2 });
-        g.text(662, 452, '下一章看它們從哪裡分岔', { size: 13, color: C.muted });
+        g.panel(646, 280, 290, 196, zhEn('兩種結尾', 'Two endings'));
+        g.text(662, 326, zhEn('放掉一個 H⁺ → 留下雙鍵', 'Lose an H⁺ → double bond'), { size: 15, weight: 700, color: C.ink });
+        g.text(662, 350, zhEn('烯類:limonene、pinene', 'Alkenes: limonene, pinene'), { size: 14, color: C.ink2 });
+        g.text(662, 396, zhEn('接上 H₂O(再放掉 H⁺)→ -OH', 'Add H₂O (lose H⁺) → -OH'), { size: 15, weight: 700, color: C.ink });
+        g.text(662, 420, zhEn('醇類:geraniol、linalool', 'Alcohols: geraniol, linalool'), { size: 14, color: C.ink2 });
+        g.text(662, 452, zhEn('下一章看它們從哪裡分岔', 'Next: where the paths split'), { size: 13, color: C.muted });
         ctx.restore();
       }
     },
   },
   {
-    key: 'branches', name: '同一個 GPP,不同產物', dur: 17,
-    cues: [[0, '同樣是 GPP,在不同的萜類合成酶裡會走到不同的產物。這張圖是單萜常見的幾條路。'],
-      [4, '鏈狀的碳陽離子被水接上是 geraniol 或 linalool;接成六員環是 α-terpinyl 陽離子,放掉 H⁺ 是 limonene 或 terpinolene。'],
-      [9.5, 'α-terpinyl 陽離子再接出一個四員環是 pinyl 陽離子:放掉環上的 H⁺ 是 α-pinene,放掉甲基上的 H⁺ 是 β-pinene。'],
-      [13.5, '走哪一條路,由口袋的形狀決定;有的酵素一次做出好幾種。右邊可以換酵素。']],
+    key: 'branches', name: zhEn('同一個 GPP,不同產物', 'One GPP, different products'), dur: 17,
+    cues: [[0, zhEn('同樣是 GPP,在不同的萜類合成酶裡會走到不同的產物。這張圖是單萜常見的幾條路。', 'In different terpene synthases, one GPP gives different products. Common monoterpene routes:')],
+      [4, zhEn('鏈狀的碳陽離子被水接上是 geraniol 或 linalool;接成六員環是 α-terpinyl 陽離子,放掉 H⁺ 是 limonene 或 terpinolene。', 'Water on the open-chain cation gives geraniol or linalool; a six-membered ring gives the α-terpinyl cation, which loses H⁺ to give limonene or terpinolene.')],
+      [9.5, zhEn('α-terpinyl 陽離子再接出一個四員環是 pinyl 陽離子:放掉環上的 H⁺ 是 α-pinene,放掉甲基上的 H⁺ 是 β-pinene。', 'Closing a second, four-membered ring makes the pinyl cation; losing a ring H⁺ gives α-pinene, a methyl H⁺ β-pinene.')],
+      [13.5, zhEn('走哪一條路,由口袋的形狀決定;有的酵素一次做出好幾種。右邊可以換酵素。', 'Pocket shape decides the route; some enzymes make several at once. Switch enzymes at right.')]],
     draw(g, t, S) {
       const path = PATHS[S.path], nodes = path.nodes;
       const T0 = 4, T1 = 12.5, nE = nodes.length - 1, per = (T1 - T0) / nE;
@@ -657,17 +673,17 @@ const chapters = [
       g.panel(24, 392, 300, 124, '');
       g.text(40, 420, path.name, { size: 17, weight: 700, color: C.mint });
       g.text(40, 446, path.who, { size: 14, color: C.ink2 });
-      g.text(40, 476, prog >= nE ? `最後得到 ${MAP[nodes[nE]].name}` : '跟著亮起來的路走', { size: 14, color: prog >= nE ? C.ink : C.muted });
-      g.text(40, 500, '其他路線變淡', { size: 13, color: C.muted, alpha: tracing ? 1 : 0 });
+      g.text(40, 476, prog >= nE ? zhEn(`最後得到 ${MAP[nodes[nE]].name}`, `Result: ${MAP[nodes[nE]].name}`) : zhEn('跟著亮起來的路走', 'Follow the lit path'), { size: 14, color: prog >= nE ? C.ink : C.muted });
+      g.text(40, 500, zhEn('其他路線變淡', 'Other routes fade'), { size: 13, color: C.muted, alpha: tracing ? 1 : 0 });
       g.ctx.restore();
     },
   },
   {
-    key: 'residue', name: '一個胺基酸的差別', dur: 17,
-    cues: [[0, '口袋的牆由胺基酸的側鏈排成。臺灣杉有兩支單萜合成酶,胺基酸序列約 97% 相似,產物卻不一樣。'],
-      [4.5, '研究者把其中一支口袋旁的酪胺酸(Tyr)換成苯丙胺酸(Phe):兩者只差一個羥基(-OH),突變後卻不再偏好做 α-pinene。'],
-      [9.5, '作者認為這些 -OH 是接出第二個環(四員環)需要的(Hsu et al. 2015)。右邊可以切換 Tyr 與 Phe。'],
-      [13, '另一個還沒證實的推測:α-pinene 合成酶的「區域 1」某處是半胱胺酸(Cys),β-pinene 合成酶是絲胺酸(Ser)(Ma et al. 2021)。']],
+    key: 'residue', name: zhEn('一個胺基酸的差別', 'One amino acid makes a difference'), dur: 17,
+    cues: [[0, zhEn('口袋的牆由胺基酸的側鏈排成。臺灣杉有兩支單萜合成酶,胺基酸序列約 97% 相似,產物卻不一樣。', 'Amino acid side chains line the pocket. Two Taiwania monoterpene synthases, about 97% alike in sequence, make different products.')],
+      [4.5, zhEn('研究者把其中一支口袋旁的酪胺酸(Tyr)換成苯丙胺酸(Phe):兩者只差一個羥基(-OH),突變後卻不再偏好做 α-pinene。', 'Swapping a tyrosine (Tyr) by the pocket for phenylalanine (Phe), which lacks only a hydroxyl (-OH), made one enzyme stop favoring α-pinene.')],
+      [9.5, zhEn('作者認為這些 -OH 是接出第二個環(四員環)需要的(Hsu et al. 2015)。右邊可以切換 Tyr 與 Phe。', 'The authors think these -OH groups help close the second, four-membered ring (Hsu et al. 2015). Switch Tyr and Phe at right.')],
+      [13, zhEn('另一個還沒證實的推測:α-pinene 合成酶的「區域 1」某處是半胱胺酸(Cys),β-pinene 合成酶是絲胺酸(Ser)(Ma et al. 2021)。', 'Unproven idea: at one spot in "region 1", α-pinene synthase has cysteine (Cys), β-pinene synthase serine (Ser) (Ma et al. 2021).')]],
     draw(g, t, S) {
       const tyr = S.tyr === 'Y';
       protein(g, [[120, 92], [300, 62], [470, 70], [520, 160], [522, 330], [480, 470], [300, 500], [120, 470], [92, 280]]);
@@ -708,16 +724,16 @@ const chapters = [
       else if (tyr) pp = mol(g, MOL.terp, o, MOL.pinyl, ease(seg(t, 6.7, 7.2)), over);
       else pp = mol(g, MOL.terp, o, null, 0, over);
       if (tyr) hLeave(g, pp[3], [-0.8, 0.6], seg(t, 7.6, 9));
-      if (tyr && t > 6.9 && t < 9.4) g.tag(pp[6][0] - 112, pp[6][1] - 36, '第二個環', { size: 14, color: C.mint, alpha: Math.min(seg(t, 6.9, 7.3), 1 - seg(t, 9, 9.4)) });
+      if (tyr && t > 6.9 && t < 9.4) g.tag(pp[6][0] - 112, pp[6][1] - 36, zhEn('第二個環', 'Second ring'), { size: 14, color: C.mint, alpha: Math.min(seg(t, 6.9, 7.3), 1 - seg(t, 9, 9.4)) });
       if (tyr && t >= 8.4) g.tag(296 - 30, 486, 'α-pinene', { size: 15, color: C.mint, alpha: ease(seg(t, 8.4, 9)) });
-      if (!tyr && t >= 6.6) g.tag(280, 486, '第二個環比較少接上', { size: 14, color: C.amber, alpha: ease(seg(t, 6.6, 7.2)) });
-      g.text(120, 524, '口袋與側鏈的位置是示意', { size: 13, color: C.muted });
+      if (!tyr && t >= 6.6) g.tag(280, 486, zhEn('第二個環比較少接上', 'Second ring closes less often'), { size: 14, color: C.amber, alpha: ease(seg(t, 6.6, 7.2)) });
+      g.text(120, 524, zhEn('口袋與側鏈的位置是示意', 'Pocket and side-chain positions are illustrative'), { size: 13, color: C.muted });
       // 右上:α-pinene 的比例(示意)
       const ba = ease(seg(t, 7.4, 8.4));
       g.panel(560, 30, 376, 214, '');
-      g.text(578, 56, '產物裡 α-pinene 的比例', { size: 15, weight: 700, color: C.ink });
-      g.text(918, 56, '示意', { size: 13, color: C.amber, align: 'right' });
-      [['Y', 'Tyr(原本)', 0.72], ['F', 'Phe(突變)', 0.2]].forEach(([v, lab, h], i) => {
+      g.text(578, 56, zhEn('產物裡 α-pinene 的比例', 'α-pinene share of products'), { size: 15, weight: 700, color: C.ink });
+      g.text(918, 56, zhEn('示意', 'Illustrative'), { size: 13, color: C.amber, align: 'right' });
+      [['Y', zhEn('Tyr(原本)', 'Tyr (original)'), 0.72], ['F', zhEn('Phe(突變)', 'Phe (mutant)'), 0.2]].forEach(([v, lab, h], i) => {
         const x = 650 + i * 170, on = S.tyr === v, hh = 120 * h * ba;
         g.rrect(x - 28, 212 - hh, 56, hh, 6, on ? C.mint : 'rgba(165,243,205,.3)');
         g.line(x - 50, 212, x + 50, 212, C.line, 1.6);
@@ -728,9 +744,9 @@ const chapters = [
       if (ca > 0) {
         ctx.save(); ctx.globalAlpha *= ca;
         g.panel(560, 262, 376, 250, '');
-        g.text(578, 290, '推測,還沒有實驗證實', { size: 15, weight: 700, color: C.amber });
-        g.text(578, 314, '「區域 1」的同一個位置', { size: 13.5, color: C.ink2 });
-        [[650, 'α-pinene 合成酶', '臺灣杉已知的那支', 'Cys(-SH)', MOL.apinene], [842, 'β-pinene 合成酶', 'TcTPS16', 'Ser(-OH)', MOL.bpinene]].forEach(([x, h, w, aa, m]) => {
+        g.text(578, 290, zhEn('推測,還沒有實驗證實', 'Hypothesis, not yet tested'), { size: 15, weight: 700, color: C.amber });
+        g.text(578, 314, zhEn('「區域 1」的同一個位置', 'Same position in "region 1"'), { size: 13.5, color: C.ink2 });
+        [[650, zhEn('α-pinene 合成酶', 'α-pinene synthase'), zhEn('臺灣杉已知的那支', 'Known Taiwania one'), 'Cys(-SH)', MOL.apinene], [842, zhEn('β-pinene 合成酶', 'β-pinene synthase'), 'TcTPS16', 'Ser(-OH)', MOL.bpinene]].forEach(([x, h, w, aa, m]) => {
           g.text(x, 344, h, { size: 14.5, weight: 700, color: C.ink, align: 'center' });
           g.text(x, 366, w, { size: 13, color: C.muted, align: 'center' });
           g.text(x, 396, aa, { size: 16, weight: 700, color: C.lav, align: 'center' });
@@ -743,19 +759,19 @@ const chapters = [
     },
   },
   {
-    key: 'find', name: '找出基因、做出酵素', dur: 17,
-    cues: [[0, '要找這些酵素的基因,研究者先看臺灣杉針葉與毬果的轉錄體(細胞裡轉錄出來的所有 RNA 序列)。'],
-      [4.5, '用 BLAST(序列比對工具)和已知的萜類合成酶比對,挑出 5 個候選基因 TcTPS13 到 17,再把完整基因選殖出來。'],
-      [9, '把基因放進大腸桿菌做出酵素,純化後加入 GPP 與錳離子(Mn²⁺),30 °C 反應 1 小時。'],
-      [13, '試管上方的揮發物用固相微萃取(SPME)的纖維吸住,送進 GC-MS 分析。']],
+    key: 'find', name: zhEn('找出基因、做出酵素', 'Find the genes, make the enzymes'), dur: 17,
+    cues: [[0, zhEn('要找這些酵素的基因,研究者先看臺灣杉針葉與毬果的轉錄體(細胞裡轉錄出來的所有 RNA 序列)。', 'To find the genes, researchers read the transcriptome of Taiwania needles and cones: all the RNA the cells make.')],
+      [4.5, zhEn('用 BLAST(序列比對工具)和已知的萜類合成酶比對,挑出 5 個候選基因 TcTPS13 到 17,再把完整基因選殖出來。', 'BLAST (a sequence comparison tool) against known terpene synthases picked 5 candidates, TcTPS13 to 17, whose full genes were then cloned.')],
+      [9, zhEn('把基因放進大腸桿菌做出酵素,純化後加入 GPP 與錳離子(Mn²⁺),30 °C 反應 1 小時。', 'In E. coli each gene made its enzyme, which was purified, then given GPP and manganese ions (Mn²⁺) for 1 hour at 30 °C.')],
+      [13, zhEn('試管上方的揮發物用固相微萃取(SPME)的纖維吸住,送進 GC-MS 分析。', 'A solid-phase microextraction (SPME) fiber collected the vapors above the tube for GC-MS.')]],
     draw(g, t) {
       const ST = [
-        [165, 140, '① 轉錄體', '針葉、毬果的 RNA 序列', 0],
-        [480, 140, '② BLAST 比對', '挑出 5 個候選基因', 4.5],
-        [795, 140, '③ 選殖基因', '接出完整基因,放進載體', 7],
-        [795, 392, '④ 大腸桿菌做酵素', 'C41(DE3) 品系,16 °C', 9],
-        [480, 392, '⑤ 加 GPP 反應', '加 Mn²⁺,30 °C、1 小時', 11],
-        [165, 392, '⑥ SPME 與 GC-MS', '收集揮發物,對照標準品', 13],
+        [165, 140, zhEn('① 轉錄體', '① Transcriptome'), zhEn('針葉、毬果的 RNA 序列', 'RNA of needles and cones'), 0],
+        [480, 140, zhEn('② BLAST 比對', '② BLAST search'), zhEn('挑出 5 個候選基因', 'Pick 5 candidate genes'), 4.5],
+        [795, 140, zhEn('③ 選殖基因', '③ Clone the genes'), zhEn('接出完整基因,放進載體', 'Full genes, put into vectors'), 7],
+        [795, 392, zhEn('④ 大腸桿菌做酵素', '④ Enzyme in E. coli'), zhEn('C41(DE3) 品系,16 °C', 'Strain C41(DE3), 16 °C'), 9],
+        [480, 392, zhEn('⑤ 加 GPP 反應', '⑤ React with GPP'), zhEn('加 Mn²⁺,30 °C、1 小時', 'With Mn²⁺, 30 °C, 1 hour'), 11],
+        [165, 392, zhEn('⑥ SPME 與 GC-MS', '⑥ SPME and GC-MS'), zhEn('收集揮發物,對照標準品', 'Vapors vs. standards'), 13],
       ];
       let cur = 0; ST.forEach((s, i) => { if (t >= s[4]) cur = i; });
       const arr = [[290, 140, 355, 140], [605, 140, 670, 140], [795, 228, 795, 304], [670, 392, 605, 392], [355, 392, 290, 392]];
@@ -773,11 +789,11 @@ const chapters = [
     },
   },
   {
-    key: 'gcms', name: '看層析圖認產物', dur: 17,
-    cues: [[0, 'GC-MS 的結果(峰形是示意,滯留時間取自論文):最上面是酵素做出的產物,下面三排是標準品。'],
-      [4.5, 'TcTPS13 與 14 的峰約在 12.5 分,和 geraniol 標準品同時出來,質譜也一樣;TcTPS15 是 linalool,TcTPS16 是 β-pinene。'],
-      [10, 'TcTPS13、15、16 的序列都最像紅檜的 α-pinene 合成酶,做出來的卻是 geraniol、linalool 與 β-pinene:只看序列會猜錯。'],
-      [14, 'TcTPS17 沒有測到單萜產物。右邊可以換基因看看;GC-MS 的原理見網站上的 GC-MS 教材。']],
+    key: 'gcms', name: zhEn('看層析圖認產物', 'Identifying products by GC-MS'), dur: 17,
+    cues: [[0, zhEn('GC-MS 的結果(峰形是示意,滯留時間取自論文):最上面是酵素做出的產物,下面三排是標準品。', 'GC-MS results (peak shapes illustrative, retention times from the paper): top, the enzyme product; below, three standards.')],
+      [4.5, zhEn('TcTPS13 與 14 的峰約在 12.5 分,和 geraniol 標準品同時出來,質譜也一樣;TcTPS15 是 linalool,TcTPS16 是 β-pinene。', 'TcTPS13 and 14 peak at about 12.5 min with the geraniol standard, and their mass spectra match; TcTPS15 makes linalool, TcTPS16 β-pinene.')],
+      [10, zhEn('TcTPS13、15、16 的序列都最像紅檜的 α-pinene 合成酶,做出來的卻是 geraniol、linalool 與 β-pinene:只看序列會猜錯。', 'TcTPS13, 15 and 16 most resemble a Taiwan red cypress α-pinene synthase, yet make geraniol, linalool and β-pinene: sequence alone misleads.')],
+      [14, zhEn('TcTPS17 沒有測到單萜產物。右邊可以換基因看看;GC-MS 的原理見網站上的 GC-MS 教材。', 'TcTPS17 gave no monoterpene. Try other genes at right; the GC-MS lesson on this site explains how it works.')]],
     draw(g, t, S) {
       const G = GENES[S.tps], prod = G.prod;
       const X = (m) => 84 + (m / 16) * 480;
@@ -785,10 +801,10 @@ const chapters = [
       // 座標軸
       g.line(84, 330, 564, 330, C.ink2, 1.6);
       for (let m = 0; m <= 16; m += 4) { g.line(X(m), 330, X(m), 336, C.ink2, 1.4); g.text(X(m), 350, String(m), { size: 13, color: C.muted, align: 'center', mono: true }); }
-      g.text(324, 372, '滯留時間(分鐘)', { size: 13.5, color: C.ink2, align: 'center' });
+      g.text(324, 372, zhEn('滯留時間(分鐘)', 'Retention time (min)'), { size: 13.5, color: C.ink2, align: 'center' });
       // 四條訊號:酵素產物(上)與三種標準品
-      const rows = [[`TcTPS${S.tps} 的產物`, 112, 62, prod ? [[G.rt, 1]] : [], C.mint, 2.6, 30 + S.tps]];
-      STD.forEach(([k, rt], i) => rows.push([`${NAME[k]} 標準品`, 186 + i * 52, 34, [[rt, 1]], C.amber, 1.8, 7 + i]));
+      const rows = [[zhEn(`TcTPS${S.tps} 的產物`, `TcTPS${S.tps} product`), 112, 62, prod ? [[G.rt, 1]] : [], C.mint, 2.6, 30 + S.tps]];
+      STD.forEach(([k, rt], i) => rows.push([zhEn(`${NAME[k]} 標準品`, `${NAME[k]} standard`), 186 + i * 52, 34, [[rt, 1]], C.amber, 1.8, 7 + i]));
       rows.forEach(([lab, y0, h, peaks, col, lw, seed], i) => {
         g.line(84, y0, 564, y0, 'rgba(255,255,255,.05)', 1);
         trace(g, X, y0, h, peaks, upto, col, lw, seed);
@@ -798,15 +814,15 @@ const chapters = [
         const a = ease(seg(t, 4.6, 5.4)), si = STD.findIndex(([k]) => k === prod), ys = 186 + si * 52;
         g.ctx.save(); g.ctx.globalAlpha *= a; g.line(X(G.rt), 112 - 64, X(G.rt), ys + 4, C.ink, 1.4, [4, 4]); g.ctx.restore();
         g.tag(X(G.rt) + (G.rt > 10 ? -46 : 46), 70, G.rtTxt, { size: 13.5, color: C.mint, alpha: a });
-      } else if (t > 3) g.tag(330, 82, '沒有測到單萜的峰', { size: 14, color: C.amber, alpha: ease(seg(t, 3, 3.8)) });
-      g.text(84, 26, '峰形是示意;滯留時間取自 Ma et al. 2021', { size: 13, color: C.muted });
+      } else if (t > 3) g.tag(330, zhEn(82, 58), zhEn('沒有測到單萜的峰', 'No monoterpene peak found'), { size: 14, color: C.amber, alpha: ease(seg(t, 3, 3.8)) });
+      g.text(84, 26, zhEn('峰形是示意;滯留時間取自 Ma et al. 2021', 'Peak shapes illustrative; retention times from Ma et al. 2021'), { size: 13, color: C.muted });
       // 右邊:峰頂的質譜
       const mx = (m) => 650 + ((m - 35) / 130) * 270, my = (v) => 300 - (v / 100) * 178;
-      g.text(640, 50, prod ? `這支峰的質譜 = ${NAME[prod]}` : '這支峰的質譜', { size: 15, weight: 700, color: prod ? C.ink : C.muted });
+      g.text(640, 50, prod ? zhEn(`這支峰的質譜 = ${NAME[prod]}`, `Spectrum of the peak = ${NAME[prod]}`) : zhEn('這支峰的質譜', 'Spectrum of the peak'), { size: 15, weight: 700, color: prod ? C.ink : C.muted });
       g.line(650, 300, 922, 300, C.ink2, 1.6); g.line(650, 112, 650, 300, C.ink2, 1.6);
       for (const m of [40, 80, 120, 160]) { g.line(mx(m), 300, mx(m), 306, C.ink2, 1.4); g.text(mx(m), 320, String(m), { size: 13, color: C.muted, align: 'center', mono: true }); }
-      g.text(786, 344, 'm/z(質量 ÷ 電荷)', { size: 13.5, color: C.ink2, align: 'center' });
-      g.text(640, 74, 'NIST 資料庫的 70 eV 質譜', { size: 13, color: C.muted });
+      g.text(786, 344, zhEn('m/z(質量 ÷ 電荷)', 'm/z (mass ÷ charge)'), { size: 13.5, color: C.ink2, align: 'center' });
+      g.text(640, 74, zhEn('NIST 資料庫的 70 eV 質譜', 'NIST database spectrum, 70 eV'), { size: 13, color: C.muted });
       const sa = ease(seg(t, 4.6, 5.8));
       if (prod && sa > 0) {
         const spec = MS[prod];
@@ -815,19 +831,19 @@ const chapters = [
         g.tag(mx(base), my(100) - 14, `${base}`, { size: 13.5, color: C.mint, alpha: sa });
         const M = MW[prod];
         g.tag(mx(M) - 2, my(spec[M]) - 26, `${M}`, { size: 13, color: C.ink2, alpha: sa });
-        g.text(mx(M) - 2, my(spec[M]) - 46, '分子離子', { size: 13, color: C.muted, align: 'center', alpha: sa });
-      } else if (!prod) g.text(786, 200, '沒有峰可以比對', { size: 14, color: C.muted, align: 'center' });
+        g.text(mx(M) - 2, my(spec[M]) - 46, zhEn('分子離子', 'Molecular ion'), { size: 13, color: C.muted, align: 'center', alpha: sa });
+      } else if (!prod) g.text(786, 200, zhEn('沒有峰可以比對', 'No peak to compare'), { size: 14, color: C.muted, align: 'center' });
       // 下方:序列最像誰,實際做出什麼
       const ra = ease(seg(t, 10, 10.8));
       [13, 14, 15, 16, 17].forEach((n, i) => {
         const x = 24 + i * 184, on = n === S.tps, Gi = GENES[n];
         g.rrect(x, 392, 176, 130, 12, on ? 'rgba(165,243,205,.1)' : 'rgba(21,32,30,.6)', on ? C.mint : C.line, on ? 2 : 1.5);
         g.text(x + 14, 416, `TcTPS${n}`, { size: 15, weight: 700, color: on ? C.mint : C.ink, mono: true });
-        g.text(x + 14, 440, '序列最像', { size: 13, color: C.muted });
-        g.text(x + 14, 460, Gi.hit[0], { size: 13.5, color: C.ink2 });
-        g.text(x + 14, 479, Gi.hit[1], { size: 13.5, color: C.ink2 });
+        g.text(x + 14, 440, zhEn('序列最像', 'Most similar to'), { size: 13, color: C.muted });
+        g.text(x + 14, 460, Gi.hit[0], { size: zhEn(13.5, 12.5), color: C.ink2, max: zhEn(undefined, 152) }); // 英文的酵素名稱比較長
+        g.text(x + 14, 479, Gi.hit[1], { size: zhEn(13.5, 12.5), color: C.ink2, max: zhEn(undefined, 152) });
         const shown = on ? Math.max(ra, ease(seg(t, 4.6, 5.4))) : ra;
-        g.text(x + 14, 506, Gi.prod ? `做出:${NAME[Gi.prod]}` : '沒有測到單萜', { size: 14.5, weight: 700, color: Gi.prod ? C.mint : C.amber, alpha: shown });
+        g.text(x + 14, 506, Gi.prod ? zhEn(`做出:${NAME[Gi.prod]}`, `Makes: ${NAME[Gi.prod]}`) : zhEn('沒有測到單萜', 'No monoterpene'), { size: 14.5, weight: 700, color: Gi.prod ? C.mint : C.amber, alpha: shown });
       });
     },
   },
@@ -861,7 +877,7 @@ function icon6(g, i, cx, cy, dt, t) {
     if (ins > 0.98) { ctx.strokeStyle = C.mint; ctx.beginPath(); ctx.arc(px, py, rr, Math.PI * 2 - 1.15, Math.PI * 2 - 0.2); ctx.stroke(); }
     ctx.restore();
     if (ins < 0.98) g.rrect(lerp(cx + 30, px + 14, ins), lerp(cy - 20, py - 26, ins), 40, 7, 3.5, C.mint);
-    g.text(cx + 52, cy + 22, '基因', { size: 13, color: C.mint, align: 'center' });
+    g.text(cx + 52, cy + 22, zhEn('基因', 'Gene'), { size: 13, color: C.mint, align: 'center' });
   } else if (i === 3) {
     [[cx - 64, cy - 18, 0.15], [cx + 4, cy - 30, -0.2], [cx - 18, cy + 18, 0.05], [cx + 56, cy + 10, 0.3]].forEach(([x, y, a], k) => {
       ctx.save(); ctx.translate(x, y + Math.sin(t * 1.6 + k) * 2); ctx.rotate(a);
@@ -875,7 +891,7 @@ function icon6(g, i, cx, cy, dt, t) {
     for (let q = 0; q < 4; q++) { const y = cy + 30 - ((dt * 22 + q * 13) % 34); g.circle(cx - 60 + q * 3, y, 2.2, 'rgba(240,243,238,.6)'); }
     g.text(cx - 14, cy - 18, 'GPP', { size: 14, weight: 700, color: C.ink });
     g.text(cx - 14, cy + 4, '+ Mn²⁺', { size: 14, weight: 700, color: C.amber });
-    g.text(cx - 14, cy + 26, '+ 酵素', { size: 14, weight: 700, color: C.lav });
+    g.text(cx - 14, cy + 26, zhEn('+ 酵素', '+ enzyme'), { size: 14, weight: 700, color: C.lav });
   } else {
     const vx = cx - 84, vy = cy - 30;
     g.rrect(vx, vy, 40, 66, 6, 'rgba(213,221,217,.06)', C.ink2, 1.6);
@@ -897,10 +913,10 @@ lesson = createLesson({
   chapters,
   state: { units: 4, path: 'bpin', tyr: 'Y', tps: 13 },
   controls: [
-    { id: 'units', label: '接幾個 5 碳單位', type: 'seg', options: [{ v: 2, label: '2 個(GPP)' }, { v: 3, label: '3 個(FPP)' }, { v: 4, label: '4 個(GGPP)' }], chapters: ['units'], onChange: () => replay(4.3) },
-    { id: 'path', label: '選酵素', type: 'seg', options: [{ v: 'ger', label: 'geraniol 合成酶' }, { v: 'lin', label: 'linalool 合成酶' }, { v: 'bpin', label: 'β-pinene 合成酶' }], chapters: ['branches'], onChange: () => replay(3.8) },
-    { id: 'tyr', label: '口袋旁的胺基酸', type: 'seg', options: [{ v: 'Y', label: 'Tyr(有 -OH)' }, { v: 'F', label: 'Phe(沒有 -OH)' }], chapters: ['residue'], onChange: () => replay(4.4) },
-    { id: 'tps', label: '選基因', type: 'seg', options: [13, 14, 15, 16, 17].map((n) => ({ v: n, label: `TcTPS${n}` })), chapters: ['gcms'] },
+    { id: 'units', label: zhEn('接幾個 5 碳單位', 'Number of 5-carbon units'), type: 'seg', options: [{ v: 2, label: zhEn('2 個(GPP)', '2 (GPP)') }, { v: 3, label: zhEn('3 個(FPP)', '3 (FPP)') }, { v: 4, label: zhEn('4 個(GGPP)', '4 (GGPP)') }], chapters: ['units'], onChange: () => replay(4.3) },
+    { id: 'path', label: zhEn('選酵素', 'Enzyme'), type: 'seg', options: [{ v: 'ger', label: zhEn('geraniol 合成酶', 'Geraniol synthase') }, { v: 'lin', label: zhEn('linalool 合成酶', 'Linalool synthase') }, { v: 'bpin', label: zhEn('β-pinene 合成酶', 'β-pinene synthase') }], chapters: ['branches'], onChange: () => replay(3.8) },
+    { id: 'tyr', label: zhEn('口袋旁的胺基酸', 'Amino acid by the pocket'), type: 'seg', options: [{ v: 'Y', label: zhEn('Tyr(有 -OH)', 'Tyr (has -OH)') }, { v: 'F', label: zhEn('Phe(沒有 -OH)', 'Phe (no -OH)') }], chapters: ['residue'], onChange: () => replay(4.4) },
+    { id: 'tps', label: zhEn('選基因', 'Gene'), type: 'seg', options: [13, 14, 15, 16, 17].map((n) => ({ v: n, label: `TcTPS${n}` })), chapters: ['gcms'] },
   ],
 });
 </script>

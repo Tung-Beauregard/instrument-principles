@@ -45,8 +45,10 @@ const ICONS = {
 const svg = (d, cls = '') => `<svg class="${cls}" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const CHEV = '<path d="M4 10l4-4 4 4"/>';
 const val = (v) => (typeof v === 'function' ? v() : v) || '';
+// 中英切換(assets/i18n.js,2026-11-06);沒有載入 i18n.js 時(測試)一律中文
+const zhEn = globalThis.zhEn ?? ((zh) => zh);
 // 收在右緣的把手上直排的兩個字
-const SHORT = { adjust: '調整', chart: '圖譜', text: '說明' };
+const SHORT = { adjust: zhEn('調整', 'Adjust'), chart: zhEn('圖譜', 'Chart'), text: zhEn('說明', 'Info') };
 // 全螢幕:按鈕觸發才能進入(瀏覽器的規定);Safari 舊版用 webkit 前綴,iPhone 不支援網頁全螢幕
 const FS_IN = '<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>';
 const FS_OUT = '<path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/>';
@@ -69,7 +71,7 @@ function makeFullscreenButton() {
   const sync = () => {
     const fs = !!fsElement();
     b.innerHTML = svg(fs ? FS_OUT : FS_IN);
-    b.setAttribute('aria-label', fs ? '結束全螢幕' : '全螢幕');
+    b.setAttribute('aria-label', fs ? zhEn('結束全螢幕', 'Exit full screen') : zhEn('全螢幕', 'Full screen'));
     b.setAttribute('aria-pressed', String(fs));
   };
   b.addEventListener('click', toggleFullscreen);
@@ -102,7 +104,7 @@ if (typeof document !== 'undefined') {
 // (導覽、錄影、還在載入)先不出現,出現後變成 true 或轉成橫的就收起。樣式是 mobile-panels.css 的 .mp-rotate。
 // createMobilePanels({ rotateHint: true }) 會呼叫它;沒有收合面板的頁面(離子阱質譜的兩頁、生化原理)直接呼叫。
 // text 是提示的文字(生化原理是 2D 動畫,傳自己的說法)。
-export function createRotateHint({ top = null, suspended = () => false, query = MOBILE_QUERY, text = '建議轉成橫式觀看,3D 畫面比較大' } = {}) {
+export function createRotateHint({ top = null, suspended = () => false, query = MOBILE_QUERY, text = zhEn('建議轉成橫式觀看,3D 畫面比較大', 'Turn the phone sideways for a bigger 3D view') } = {}) {
   const mq = matchMedia(query), portrait = matchMedia(PORTRAIT_PHONE);
   const pick = (x) => (typeof x === 'string' ? document.querySelector(x) : x);
   const born = performance.now();
@@ -126,7 +128,7 @@ export function createRotateHint({ top = null, suspended = () => false, query = 
     const x = document.createElement('button');
     x.type = 'button';
     x.className = 'mp-rotate-x';
-    x.setAttribute('aria-label', '關閉提示');
+    x.setAttribute('aria-label', zhEn('關閉提示', 'Close tip'));
     x.innerHTML = svg('<path d="M4 4l8 8M12 4l-8 8"/>');
     x.addEventListener('click', hide);
     hint.append(x);
@@ -195,8 +197,8 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
     if (lb.textContent !== label) lb.textContent = label;
     if (it.textContent !== items) it.textContent = items;
     if (sh.textContent !== short) sh.textContent = short;
-    const verb = p.action ? '打開' : p.open ? '收起' : '展開';
-    const aria = `${verb}${label}${items ? `:${items}` : ''}`;
+    const verb = p.action ? zhEn('打開', 'Open') : p.open ? zhEn('收起', 'Collapse') : zhEn('展開', 'Expand');
+    const aria = zhEn(`${verb}${label}${items ? `:${items}` : ''}`, `${verb} ${label}${items ? `: ${items}` : ''}`);
     if (p.btn.getAttribute('aria-label') !== aria) p.btn.setAttribute('aria-label', aria);
   }
   // keep buttons: move into the bar while collapsed, back home when open or off

@@ -59,3 +59,10 @@ PNG 是把 SVG 畫到 canvas 再輸出,解析度 300 dpi(`app.js` 的 `download`
 - xlsx 只讀第一張工作表,儲存格要是數值(公式要有快取的值)。
 - 質譜只讀 LCQ Deca XP 版本 62 的 .RAW;其他 Thermo 機型的 .RAW 版面不同。
 - 瀏覽器必須支援 ES module、`DecompressionStream`、`File`/`Blob`(2023 以後的 Chrome、Edge、Firefox、Safari)。
+
+## 英文版(2026-11-06)
+
+- 機制見 `docs/I18N.md`。`index.html` 用 `data-en`,有 `<code>` 或連結的說明(`.hint`、頁尾)用 `lang` 成對的元素。`app.js`、`figure.js`、`parsers.js` 開頭都有 `const zhEn = globalThis.zhEn ?? ((zh) => zh);`:Node 的 `scripts/check-plot.mjs` 沒有載入 `i18n.js`,一律中文,所以檢查裡比對的中文圖例照樣成立。
+- 匯出的圖跟著頁面的語言:座標軸名稱本來就是英文;DSC 的圖例(1st heating、1st cooling…,序數用 `ordEn`)、TGA 的 Cooling、質譜的 average of N scans 依語言。下載的檔名也跟著(`Spectrum_日期.svg`、`Mass spectrum_日期.png`)。
+- `parsers.js` 的錯誤訊息與 `meta` 的鍵(檔案卡片上顯示的名稱)用 `zhEn`;比對 xlsx 表頭的 `溫度` 是資料,不翻譯,註 `zh-only`。英文的檔案資訊寫成「鍵: 值」,用 ` · ` 隔開,`html[lang="en"] .meta` 照字詞換行(`break-all` 會把英文字切成兩半)。
+- 新增介面文字、錯誤訊息或圖上的字時英文一起寫,改完跑 `node scripts/check-plot.mjs` 與 `node scripts/check-i18n.mjs --list plot/app.js plot/figure.js plot/parsers.js plot/index.html`。

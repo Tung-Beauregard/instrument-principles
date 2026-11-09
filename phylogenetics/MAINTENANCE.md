@@ -117,6 +117,14 @@
 - 柏科的例子:Ma LT, et al. Plants. 2021;10(11):2404,https://pmc.ncbi.nlm.nih.gov/articles/PMC8625326/ (MUSCLE 比對、MEGA X 鄰接法、100 次 bootstrap、以小立碗蘚的 CPS/KS 當根;TcTPS13、15、16 彼此較近並和紅檜 α-pinene 合成酶一群,TcTPS14、17 和日本扁柏 terpinolene 合成酶及臺灣杉的 terpinolene/α-pinene 合成酶一群;表 1 的 BLAST 最佳結果;單萜的功能不跟著親緣;產物 geraniol、geraniol、linalool、β-pinene、測不到)。第 8 章的「群內順序沒有畫出」是因為沒有讀到該文的圖 2 本身,分群只依文字描述。
 - Tc-αPIN/TEO 與 Tc-TEO 的產物照 `terpene-synthase/` 教材引用的 Hsu 2015(只讀摘要)。
 
+## 英文版(2026-11-06)
+
+- 做法見 `docs/I18N.md`(範本是 `pcr/`):標題、導言與畫布的 aria-label 用 `data-en`;「先看」那一行、重點整理與資料來源各是一組 `lang="zh-Hant"` 與 `lang="en"`;程式裡的章名、字幕、圖上的字與選項一律 `zhEn('中文', 'English')`。
+- 名詞:分支(clade)英文一律寫 clade;臺灣杉 Taiwania、紅檜 Taiwan red cypress、大冷杉 grand fir、綠薄荷 spearmint、日本扁柏 Hinoki cypress、卷柏 Selaginella;第 8 章左框的標題用 TPS 代替 terpene synthases(放不下)。
+- 要一起改的地方:第 8 章「測不到單萜」在資料(`GROUPS`)與決定顏色的比較(`real === ...`)兩處都是同一個 `zhEn('測不到單萜', 'No monoterpene')`,英文要兩處一起改,否則顏色會錯;英文字幕裡也寫死了第 2 到 7 章的數字(下一節「修改後要檢查」列的那些),改數字時中英一起改。
+- 只在英文改的地方:第 2 章「看起來沒變」「看起來只換 1 次」分兩行;第 3 章 UPGMA 的說明從 x = 560 挪到 486;第 4 章 `e.g.` 開頭的例子也用等寬字(判斷的正規表示式多了 `e\.g\.`);第 6 章 E 的標籤往上移 7 px(`eTip.y - zhEn(15, 22)`),「Root」字 12.5、靠右對齊在根的左邊(才不壓到根的豎線);第 7 章重抽次數只寫「1,000 / 1,000」,方法寫 Neighbor joining, rooted on O;第 8 章「共同祖先」與右框標題分兩行,TPS-d 框的三群寫成兩行(mostly / monoterpenes)、字 12、位置 `46 + k × 133`,底下一行往下移 3 px;第 1 章胺基酸序列的名稱與第 8 章七群的說明加了只給英文的 `max`(手機上壓縮,不超出框)。
+- 改完跑 `node scripts/check-i18n.mjs --list phylogenetics/index.html`(要沒有輸出)與 `node scripts/check-i18n-layout.mjs phylogenetics --shots <資料夾>`,並看截圖。英文播放約 243 秒(中文 136 秒;中文字幕很密,英文字數約是中文的 2.3 倍,長的那一段播放器自動放慢)。
+
 ## 修改後要檢查
 
 - 語法:把 module script 抽出來 `node --check`。這份教材進入入口清單後,`node scripts/check-bio.mjs` 與 `node scripts/check-site.mjs` 會檢查分頁列、章節代號、姓名與破折號。

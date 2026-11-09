@@ -159,3 +159,7 @@ html.bio-fs #ops{grid-area:ops;min-height:0;overflow-y:auto;overscroll-behavior:
   html.bio-fs #prog{order:9;flex:1 1 100%;min-width:0;height:14px}
 }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+/* 中英切換(2026-11-06,assets/i18n.js):原本的字距是給中文的,英文縮小 */
+html[lang="en"] h1{letter-spacing:.01em}
+html[lang="en"] .cap-h{letter-spacing:.02em}
+html[lang="en"] .box h2{letter-spacing:.04em}

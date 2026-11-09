@@ -2,9 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1111">
-<title>流式細胞儀:一秒量幾千個細胞</title>
+<title data-en="Flow cytometry: measuring thousands of cells a second">流式細胞儀:一秒量幾千個細胞</title>
 <meta name="description" content="用動畫看流式細胞儀怎麼讓細胞排成一列通過雷射、前向與側向散射光代表什麼、螢光怎麼分到不同偵測器、怎麼在點圖上圈選族群,以及用植物細胞核的 DNA 含量判斷倍性、估計基因體大小。可以自己調樣品流速、細胞大小、圈選範圍與門檻。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="儀器原理">
@@ -22,36 +23,36 @@
 <link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
-<a class="skip-link" href="#main">跳到動畫</a>
-<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理"><a href="../">← 儀器入口</a><a href="../central-dogma/">中心法則</a><a href="../pcr/">PCR 與電泳</a><a href="../sequencing/">DNA 定序</a><a href="../dna-markers/">DNA 鑑定</a><a href="../cloning/">基因選殖</a><a href="../terpene-synthase/">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/">抗體檢測</a><a href="./" aria-current="page">流式細胞儀</a><a href="../proteomics/">蛋白質定序</a></nav></div>
+<a class="skip-link" href="#main" data-en="Skip to the animation">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理" data-en-aria-label="Biochemistry"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../central-dogma/" data-en="Central dogma">中心法則</a><a href="../pcr/" data-en="PCR and gels">PCR 與電泳</a><a href="../sequencing/" data-en="DNA sequencing">DNA 定序</a><a href="../dna-markers/" data-en="DNA markers">DNA 鑑定</a><a href="../cloning/" data-en="Cloning">基因選殖</a><a href="../terpene-synthase/" data-en="Terpene synthases">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/" data-en="Immunoassays">抗體檢測</a><a href="./" aria-current="page" data-en="Flow cytometry">流式細胞儀</a><a href="../proteomics/" data-en="Protein sequencing">蛋白質定序</a></nav></div>
 <header class="top wrap">
-  <h1>流式細胞儀 <span class="k">一秒量幾千個細胞</span></h1>
-  <p class="lede">流式細胞儀(flow cytometer)讓懸浮在液體裡的細胞排成一列,一個一個通過雷射,量每個細胞的散射光與螢光;幾萬個細胞的讀值畫在一起,就看得出樣品由哪些族群組成,也能比較植物細胞核的 DNA 含量。</p>
+  <h1><span data-en="Flow cytometry">流式細胞儀</span> <span class="k" data-en="Measuring thousands of cells a second">一秒量幾千個細胞</span></h1>
+  <p class="lede" data-en="A flow cytometer lines up cells suspended in liquid so that they pass a laser one at a time, and measures the scattered light and fluorescence of each cell. Plotting the readings of tens of thousands of cells together shows which populations make up a sample, and can also compare the DNA content of plant nuclei.">流式細胞儀(flow cytometer)讓懸浮在液體裡的細胞排成一列,一個一個通過雷射,量每個細胞的散射光與螢光;幾萬個細胞的讀值畫在一起,就看得出樣品由哪些族群組成,也能比較植物細胞核的 DNA 含量。</p>
 </header>
 <main id="main" class="wrap lesson">
   <section class="player">
     <div class="screen">
-      <div class="stage-box"><canvas id="stage" role="img" aria-label="流式細胞儀動畫"></canvas></div>
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="流式細胞儀動畫" data-en-aria-label="Flow cytometry animation"></canvas></div>
       <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
     </div>
     <div class="bar">
-      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
-      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
-      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
-      <div id="prog" role="group" aria-label="章節進度"></div>
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章" data-en-aria-label="Previous chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" data-en-aria-label="Play" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl" data-en="Play">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章" data-en-aria-label="Next chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度" data-en-aria-label="Chapter progress"></div>
       <span id="chName"></span>
-      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" data-en-aria-label="Full screen" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
     </div>
   </section>
   <aside class="side">
-    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
-    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+    <section class="box" id="ops" aria-label="自己調整" data-en-aria-label="Try it yourself"><h2 data-en="Try it yourself">自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節" data-en-aria-label="Chapters"><h2 data-en="Chapters">章節</h2><ol id="chapters"></ol></section>
   </aside>
 </main>
-<section class="notes wrap" aria-label="重點整理與資料來源">
+<section class="notes wrap" aria-label="重點整理與資料來源" data-en-aria-label="Key points and sources">
   <div>
-    <h2>重點整理</h2>
-    <ul>
+    <h2 data-en="Key points">重點整理</h2>
+    <ul lang="zh-Hant">
       <li>鞘液(不含細胞的鹽水緩衝液)包著樣品往前流,把樣品擠成細細一條(流體聚焦),細胞排成一列通過雷射。一般的儀器每秒可量到上萬個細胞;樣品流速越高,中間那條越粗,量得快但數值越散,DNA 含量分析要用低流速。</li>
       <li>沿雷射方向收集的前向散射(FSC)大致反映細胞大小;和雷射約成 90° 收集的側向散射(SSC)反映細胞內部的顆粒與構造。</li>
       <li>接了螢光染料的抗體只抓它認得的蛋白;分色鏡與濾鏡把不同顏色的螢光分到不同的光電倍增管(PMT),螢光強度和結合上去的染料量成正比。</li>
@@ -61,10 +62,20 @@
       <li>進階,補償:一種染料的光會溢進別的偵測器。用只染一種顏色的對照算溢漏係數(溢漏偵測器裡陽性與陰性的中位數差 ÷ 主偵測器裡的中位數差),補償就是扣掉它,顏色多時乘上溢漏矩陣的反矩陣。補償正確的判準是陽性與陰性在溢漏偵測器的中位數相同;光子計數的誤差讓補償後的分布變寬(約和訊號的平方根成正比),補償扣不掉,判斷陽性要用少一種染料的 FMO 對照,不能憑點圖的形狀調補償。</li>
       <li>進階,核內複製:細胞不分裂而 DNA 繼續複製,直方圖出現 4C、8C、16C 等峰(用對數橫軸看);核內複製指數 EI = Σ(複製輪數 × 該峰的細胞核比例)。阿拉伯芥 Ag-0 二倍體的葉約 2.12、莖約 1.29,人工四倍體比較低;阿拉伯芥除了花序,各組織都有核內複製。量基因體大小要用幼嫩的葉。</li>
     </ul>
+    <ul lang="en">
+      <li>Sheath fluid (a saline buffer with no cells) flows around the sample and squeezes it into a thin stream (hydrodynamic focusing), so the cells pass the laser in single file. A typical instrument can measure 10,000 or more cells per second; the higher the sample flow rate, the wider the central stream, which is faster but spreads the values more, so DNA content analysis uses a low flow rate.</li>
+      <li>Forward scatter (FSC), collected along the direction of the laser, roughly reflects cell size; side scatter (SSC), collected at about 90° to the laser, reflects the granules and structures inside the cell.</li>
+      <li>An antibody carrying a fluorescent dye grabs only the protein it recognizes; dichroic mirrors and filters send each color of fluorescence to its own photomultiplier tube (PMT), and the fluorescence intensity is proportional to the amount of dye bound.</li>
+      <li>Gating: first draw a boundary around the population of interest on an FSC versus SSC dot plot, then look at the fluorescence histogram of those cells and use a threshold to separate negative from positive.</li>
+      <li>Plant DNA content: chop young leaves with a razor blade in buffer to release the nuclei, pass them through nylon mesh of about 42 μm, and stain with PI (plus RNase) or DAPI. The position of the G1 peak compares ploidy (ploidy inferred from the amount of DNA alone is called "DNA ploidy"); measured together with a standard plant of known DNA content, sample 2C = standard 2C × the ratio of the two G1 peak positions, and 1 pg of DNA is about 0.978 × 10<sup>9</sup> base pairs. A peak CV below 3% is good, and a CV above 5% is not accepted.</li>
+      <li>Cell sorting (FACS): vibration breaks the stream into droplets; a droplet holding a wanted cell is charged as it breaks off, and deflection plates pull it into a collection tube.</li>
+      <li>Advanced, compensation: light from one dye spills into other detectors. A single-stain control gives the spillover coefficient (the difference between the positive and negative medians in the spillover detector ÷ the difference in the primary detector); compensation subtracts it, and with many colors it means multiplying by the inverse of the spillover matrix. Compensation is correct when positives and negatives have the same median in the spillover detector. Photon counting error makes the compensated distribution wider (roughly in proportion to the square root of the signal), and compensation cannot remove it; deciding what is positive needs an FMO (fluorescence minus one) control, and compensation should not be adjusted by the look of the dot plot.</li>
+      <li>Advanced, endoreduplication: the DNA keeps replicating without cell division, so the histogram shows peaks at 4C, 8C, 16C and so on (best viewed on a log axis); the endoreduplication index EI = Σ(number of replication rounds × fraction of nuclei in that peak). For diploid <i>Arabidopsis</i> Ag-0 it is about 2.12 in leaves and 1.29 in stems, and lower in induced tetraploids; in <i>Arabidopsis</i>, every tissue except the inflorescence shows endoreduplication. Genome size should be measured on young leaves.</li>
+    </ul>
   </div>
   <div class="src">
-    <h2>資料來源</h2>
-    <ul>
+    <h2 data-en="Sources">資料來源</h2>
+    <ul lang="zh-Hant">
       <li>Adan A, et al. Flow cytometry: basic principles and applications. Crit Rev Biotechnol. 2017;37(2):163–176. <a href="https://doi.org/10.3109/07388551.2015.1128876">doi:10.3109/07388551.2015.1128876</a>(鞘液與流體聚焦、DNA 含量用低流速、FSC 與 SSC、光二極體與 PMT、濾鏡、圈選與直方圖、DNA 用線性放大、靜電液滴分選)</li>
       <li>McKinnon KM. Flow Cytometry: An Overview. Curr Protoc Immunol. 2018;120:5.1.1–5.1.11. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5939936/">PMC5939936</a>(一般流式細胞儀每秒約 10,000 個細胞、FSC 與 SSC、分色鏡與 PMT、振動產生液滴並帶電偏轉)</li>
       <li>Thermo Fisher Scientific. <a href="https://www.thermofisher.com/tw/zt/home/life-science/cell-analysis/cell-analysis-learning-center/molecular-probes-school-of-fluorescence/flow-cytometry-basics/flow-cytometry-fundamentals/fluidics-flow-cytometer.html">Fluidics of a Flow Cytometer</a>(鞘液流得比樣品快、壓力加大時中間的樣品流變粗、數據變散、細胞週期與 DNA 分析要低濃度低流速)</li>
@@ -74,16 +85,26 @@
       <li>Pacey EK, et al. The influence of experimentally induced polyploidy on the relationships between endopolyploidy and plant function in <i>Arabidopsis thaliana</i>. Ecol Evol. 2020;10(1):198–216. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6972801/">PMC6972801</a>(核內複製指數的公式,引 Barow 與 Meister 2003;阿拉伯芥 Ag-0 葉與莖各 DNA 等級的比例,附錄表 A2、A3;PI 染色、對數刻度、每個樣品至少 5,000 個細胞核);Lee HO, et al. Genes Dev. 2009;23(21):2461–2477. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2779750/">PMC2779750</a>(核內複製是只有 S 期與 G 期、沒有細胞分裂的循環);Galbraith DW, et al. Plant Physiol. 1991;96(3):985–989. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1080875/">PMC1080875</a>(阿拉伯芥除了花序,各組織都有核內複製,程度隨組織的年齡與位置而變;只讀到摘要)。幼嫩的葉與對數橫軸見上面 Doležel 等人 2007 第 2236、2242 頁。</li>
       <li>動畫裡的細胞數、點圖上各族群的位置與比例、陽性比例、流速對峰寬的影響、樣品的 DNA 含量(2C = 1.30 pg)、峰的高度與寬度、液滴大小與速度都是示意值,不是某個實驗的實測結果;番茄標準品的 2C 值(1.96 pg)取自 Doležel 等人 2007 的表 2。進階章節:放射光譜的形狀、濾鏡的範圍、溢漏係數 18%、每單位訊號 0.1 個光電子、電子雜訊、自發螢光、各群的亮度與細胞數都是示意(溢漏係數由模擬的單染對照算出約 17.9%);核內複製那一章各峰的比例是 Pacey 等人 2020 的實測值,峰寬、碎片與細胞的畫法是示意。</li>
     </ul>
+    <ul lang="en">
+      <li>Adan A, et al. Flow cytometry: basic principles and applications. Crit Rev Biotechnol. 2017;37(2):163–176. <a href="https://doi.org/10.3109/07388551.2015.1128876">doi:10.3109/07388551.2015.1128876</a> (sheath fluid and hydrodynamic focusing, a low flow rate for DNA content, FSC and SSC, photodiodes and PMTs, filters, gating and histograms, linear amplification for DNA, electrostatic droplet sorting)</li>
+      <li>McKinnon KM. Flow Cytometry: An Overview. Curr Protoc Immunol. 2018;120:5.1.1–5.1.11. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5939936/">PMC5939936</a> (a typical flow cytometer measures about 10,000 cells per second; FSC and SSC; dichroic mirrors and PMTs; vibration makes droplets, which are charged and deflected)</li>
+      <li>Thermo Fisher Scientific. <a href="https://www.thermofisher.com/tw/zt/home/life-science/cell-analysis/cell-analysis-learning-center/molecular-probes-school-of-fluorescence/flow-cytometry-basics/flow-cytometry-fundamentals/fluidics-flow-cytometer.html">Fluidics of a Flow Cytometer</a> (the sheath fluid flows faster than the sample; raising the pressure widens the central sample stream and spreads the data; cell cycle and DNA analysis need a low concentration and a low flow rate)</li>
+      <li>Doležel J, et al. Estimation of nuclear DNA content in plants using flow cytometry. Nat Protoc. 2007;2(9):2233–2244. <a href="https://doi.org/10.1038/nprot.2007.310">doi:10.1038/nprot.2007.310</a> (the chopping method, 42 μm nylon mesh, PI needs RNase, DAPI prefers AT, the G1 peak set at channel 200, how ploidy and 2C are calculated, the tomato standard 2C = 1.96 pg, 1 pg = 0.978 × 10<sup>9</sup> bp, CV criteria, the term DNA ploidy)</li>
+      <li>Becton Dickinson. US Patent 6,372,506 B1 (2002), <a href="https://patents.google.com/patent/US6372506B1/en">Apparatus and method for verifying drop delay in a flow cytometer</a> (vibration breaks the stream into droplets; the time a cell takes to travel from the laser to the break-off point; charging at break-off; deflection plates)</li>
+      <li>Roederer M. Spectral compensation for flow cytometry: visualization artifacts, limitations, and caveats. Cytometry. 2001;45(3):194–205. <a href="https://pubmed.ncbi.nlm.nih.gov/11746088/">PMID 11746088</a> (with correct compensation the two populations have the same median in the spillover detector; photon counting error is proportional to the square root of the signal, so compensated data spread out, and even overcompensation cannot remove the spread; medians are hard to judge on a log scale; FMO controls); Maecker HT, Trotter J. Cytometry A. 2006;69:1037–1042. <a href="https://doi.org/10.1002/cyto.a.20333">doi:10.1002/cyto.a.20333</a> (single-stain controls must be as bright as the sample or brighter; set the voltages first); Roca CP, et al. Nat Commun. 2021;12:2890. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8129071/">PMC8129071</a> (the spillover coefficient is the slope of the line through the positive and negative medians; compensation multiplies by the inverse of the spillover matrix); Parks DR, et al. Cytometry A. 2006;69(6):541–551 (biexponential scales such as Logicle, which can show the negative values left after compensation)</li>
+      <li>Pacey EK, et al. The influence of experimentally induced polyploidy on the relationships between endopolyploidy and plant function in <i>Arabidopsis thaliana</i>. Ecol Evol. 2020;10(1):198–216. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6972801/">PMC6972801</a> (the formula for the endoreduplication index, citing Barow and Meister 2003; the fraction of nuclei at each DNA level in <i>Arabidopsis</i> Ag-0 leaves and stems, appendix Tables A2 and A3; PI staining, a log scale, at least 5,000 nuclei per sample); Lee HO, et al. Genes Dev. 2009;23(21):2461–2477. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2779750/">PMC2779750</a> (endoreplication is a cycle of S and G phases without cell division); Galbraith DW, et al. Plant Physiol. 1991;96(3):985–989. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1080875/">PMC1080875</a> (every <i>Arabidopsis</i> tissue except the inflorescence shows endoreduplication, to a degree that varies with the age and position of the tissue; abstract only). For young leaves and the log axis, see Doležel et al. 2007 above, pages 2236 and 2242.</li>
+      <li>The cell counts in the animation, the positions and proportions of the populations on the dot plots, the positive fractions, the effect of flow rate on peak width, the DNA content of the sample (2C = 1.30 pg), the heights and widths of the peaks, and the size and speed of the droplets are illustrative values, not measurements from an experiment; the 2C value of the tomato standard (1.96 pg) is from Table 2 of Doležel et al. 2007. Advanced chapters: the shapes of the emission spectra, the filter ranges, the 18% spillover coefficient, 0.1 photoelectrons per unit of signal, the electronic noise, the autofluorescence, and the brightness and number of cells of each population are illustrative (the simulated single-stain control gives a spillover coefficient of about 17.9%); in the endoreduplication chapter the fraction in each peak is measured data from Pacey et al. 2020, while the peak widths, the debris and the drawings of cells are illustrative.</li>
+    </ul>
   </div>
 </section>
-<footer class="site wrap">生化原理・<a href="../">回儀器入口</a></footer>
+<footer class="site wrap"><span lang="zh-Hant">生化原理・<a href="../">回儀器入口</a></span><span lang="en">Biochemistry · <a href="../">Back to all lessons</a></span></footer>
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, seg, ease, clamp, lerp, rng } from '../assets/bio-draw.js';
 
 // ---------- 共用 ----------
 const LASER = '#7fb8ff', GREEN = '#7dff9e', ORANGE = '#ffb35c', PIRED = '#ff6f6f';
-const fmtN = (v) => Math.round(v).toLocaleString('zh-TW');
+const fmtN = (v) => Math.round(v).toLocaleString(zhEn('zh-TW', 'en-US'));
 const pct = (v) => `${Math.round(v * 100)}%`;
 const bump = (x, w) => Math.exp(-(x * x) / (2 * w * w));
 function gauss(R) { const u = Math.max(1e-9, R()), v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
@@ -136,9 +157,9 @@ const introTk = (k) => (ILY - 40 + ISP * k) / IV; // 第 k 個細胞通過雷射
 const FC = { cx: 330, top: 50, y1: 168, y2: 300, tip: 158, nr: 16, Wc: 130, Wn: 30, ly: 440, r: 5 };
 const fcW = (y) => (y < FC.y1 ? FC.Wc : y < FC.y2 ? lerp(FC.Wc, FC.Wn, ease((y - FC.y1) / (FC.y2 - FC.y1))) : FC.Wn);
 const RATES = {
-  low: { core: 4, every: 1.1, sd: 0.04, speed: 0.25, name: '低', note: ['中間的樣品流很細,', '細胞排得很整齊。'], verdict: '量得慢,數值集中' },
-  mid: { core: 11, every: 0.55, sd: 0.08, speed: 0.5, name: '中', note: ['樣品流變粗一些,', '細胞位置開始有差。'], verdict: '速度與準度折衷' },
-  high: { core: 21, every: 0.27, sd: 0.15, speed: 1, name: '高', note: ['樣品流很粗,細胞位置不一,', '有時兩個一起通過。'], verdict: '量得快,數值散開' },
+  low: { core: 4, every: 1.1, sd: 0.04, speed: 0.25, name: zhEn('低', 'Low'), note: [zhEn('中間的樣品流很細,', 'The sample stream in the middle is thin,'), zhEn('細胞排得很整齊。', 'so the cells line up neatly.')], verdict: zhEn('量得慢,數值集中', 'Slow, with tightly grouped values') },
+  mid: { core: 11, every: 0.55, sd: 0.08, speed: 0.5, name: zhEn('中', 'Medium'), note: [zhEn('樣品流變粗一些,', 'The sample stream gets a little wider,'), zhEn('細胞位置開始有差。', 'and cell positions start to vary.')], verdict: zhEn('速度與準度折衷', 'A trade-off of speed and precision') },
+  high: { core: 21, every: 0.27, sd: 0.15, speed: 1, name: zhEn('高', 'High'), note: [zhEn('樣品流很粗,細胞位置不一,', 'A wide stream: cell positions vary,'), zhEn('有時兩個一起通過。', 'and sometimes two cells pass together.')], verdict: zhEn('量得快,數值散開', 'Fast, but the values spread out') },
 };
 const fcCore = (y, core) => (y < FC.tip ? FC.nr - 3 : y < FC.y2 ? lerp(FC.nr - 3, core, ease((y - FC.tip) / (FC.y2 - FC.tip))) : core);
 // 細胞從針頭頂端往下流的位置:先把速度(管子越窄流得越快)積分成表
@@ -152,8 +173,8 @@ const SC = { px: 300, py: 230, period: 2.5, vz: 40 };
 const fscOf = (s) => 0.12 + 0.62 * s;
 const sscOf = (s, gr) => 0.06 + 0.7 * gr + 0.1 * s;
 const SCAT_REF = (() => { const R = rng(31), a = []; for (const [s, gr, n] of [[0.25, 0.05, 260], [0.65, 0.25, 80], [0.75, 0.8, 220]]) for (let i = 0; i < n; i++) a.push([clamp(fscOf(s, gr) + gauss(R) * 0.03), clamp(sscOf(s, gr) + gauss(R) * 0.035)]); return a; })();
-const sizeName = (v) => ['很小', '小', '中', '大', '很大'][Math.min(4, Math.floor(v / 20))];
-const granName = (v) => ['很少', '少', '中等', '多', '很多'][Math.min(4, Math.floor(v / 20))];
+const sizeName = (v) => [zhEn('很小', 'Very small'), zhEn('小', 'Small'), zhEn('中', 'Medium'), zhEn('大', 'Large'), zhEn('很大', 'Very large')][Math.min(4, Math.floor(v / 20))];
+const granName = (v) => [zhEn('很少', 'Very few'), zhEn('少', 'Few'), zhEn('中等', 'Some'), zhEn('多', 'Many'), zhEn('很多', 'Very many')][Math.min(4, Math.floor(v / 20))];
 
 // ---------- 第 4 章:螢光 ----------
 const FL = { cx: 200, cy: 268, r: 92 };
@@ -174,9 +195,9 @@ const BLOOD = (() => {
 })();
 const GATE_KEYS = ['lym', 'mono', 'gran'];
 const GATES = {
-  lym: { name: '淋巴球', cx: 0.30, cy: 0.13, rx: 0.125, ry: 0.095 },
-  mono: { name: '單核球', cx: 0.52, cy: 0.32, rx: 0.11, ry: 0.10 },
-  gran: { name: '顆粒球', cx: 0.60, cy: 0.67, rx: 0.17, ry: 0.21 },
+  lym: { name: zhEn('淋巴球', 'Lymphocytes'), cx: 0.30, cy: 0.13, rx: 0.125, ry: 0.095 },
+  mono: { name: zhEn('單核球', 'Monocytes'), cx: 0.52, cy: 0.32, rx: 0.11, ry: 0.10 },
+  gran: { name: zhEn('顆粒球', 'Granulocytes'), cx: 0.60, cy: 0.67, rx: 0.17, ry: 0.21 },
 };
 const HB = 56; // 直方圖的格數(對數 0 到 4)
 const gateCache = {};
@@ -219,12 +240,12 @@ const peakTop = (bins, mu) => { const b = bins[Math.min(bins.length - 1, Math.fl
 // 二倍體樣品的 G1 調在第 200 通道;樣品的 2C 值是示意,標準品(番茄 Solanum lycopersicum 'Stupické polní rané',2C = 1.96 pg,
 // Doležel et al. 2007 表 2)的 G1 位置由兩者的比換算(1.96 ÷ 1.30 × 200 ≈ 301.5)
 const SAMPLE_C2 = 1.3;
-const STD = { name: '番茄', c2: 1.96 };
+const STD = { name: zhEn('番茄', 'Tomato'), c2: 1.96 };
 STD.mu = Math.round(((200 * STD.c2) / SAMPLE_C2) * 10) / 10;
 const PLOIDY = {
-  '2x': { comps: [{ mu: 200, n: 3800, cv: 0.03 }, { mu: 400, n: 480, cv: 0.03 }], cols: [C.mint, C.mint], name: '二倍體' },
-  '4x': { comps: [{ mu: 400, n: 3800, cv: 0.03 }, { mu: 800, n: 480, cv: 0.03 }], cols: [C.lav, C.lav], name: '四倍體' },
-  mix: { comps: [{ mu: 200, n: 2600, cv: 0.03 }, { mu: 400, n: 330, cv: 0.03 }, { mu: 400, n: 2600, cv: 0.03 }, { mu: 800, n: 330, cv: 0.03 }], cols: [C.mint, C.mint, C.lav, C.lav], name: '兩株一起切' },
+  '2x': { comps: [{ mu: 200, n: 3800, cv: 0.03 }, { mu: 400, n: 480, cv: 0.03 }], cols: [C.mint, C.mint], name: zhEn('二倍體', 'Diploid') },
+  '4x': { comps: [{ mu: 400, n: 3800, cv: 0.03 }, { mu: 800, n: 480, cv: 0.03 }], cols: [C.lav, C.lav], name: zhEn('四倍體', 'Tetraploid') },
+  mix: { comps: [{ mu: 200, n: 2600, cv: 0.03 }, { mu: 400, n: 330, cv: 0.03 }, { mu: 400, n: 2600, cv: 0.03 }, { mu: 800, n: 330, cv: 0.03 }], cols: [C.mint, C.mint, C.lav, C.lav], name: zhEn('兩株一起切', 'Two plants chopped together') },
 };
 const binCache = {};
 const ploidyBins = (key, std) => (binCache[key + std] ||= dnaBins([...PLOIDY[key].comps, ...(std ? [{ mu: STD.mu, n: 2400, cv: 0.03 }, { mu: STD.mu * 2, n: 240, cv: 0.03 }] : [])], std ? 60 : 70));
@@ -279,7 +300,7 @@ function cpStats(b, k) {
   const st = { m0: median(n), m1: median(f), r0: rsd(n), r1: rsd(f) };
   // 兩群的中位數差在誤差內才算剛好(Roederer 2001:補償正確時,溢漏偵測器裡陽性與陰性的中位數相同)
   const tol = Math.max(st.r0, 0.35 * st.r1);
-  st.verdict = Math.abs(st.m1 - st.m0) <= tol ? ['剛好', C.mint] : st.m1 > st.m0 ? ['不足:還留著溢漏', C.amber] : ['過度:扣太多', C.red];
+  st.verdict = Math.abs(st.m1 - st.m0) <= tol ? [zhEn('剛好', 'just right'), C.mint] : st.m1 > st.m0 ? [zhEn('不足:還留著溢漏', 'too little'), C.amber] : [zhEn('過度:扣太多', 'too much'), C.red];
   return (cpStatCache[key] = st);
 }
 // 雙指數刻度(反雙曲正弦,Logicle 一類的畫法):零附近接近線性、看得到負值,高處接近對數
@@ -315,18 +336,18 @@ function endoBins(organ, pl) {
   }
   return (endoCache[key] = bins);
 }
-const ENDO_NAME = { leaf: '葉', stem: '莖' };
+const ENDO_NAME = { leaf: zhEn('葉', 'leaves'), stem: zhEn('莖', 'stems') };
 
 const chapters = [
   {
-    key: 'intro', name: '流式細胞儀在做什麼', dur: 15,
-    cues: [[0, '流式細胞儀讓懸浮在液體裡的細胞排成一列,一個一個流過雷射,量每一個細胞的光訊號。'],
-      [5, '細胞經過雷射時會把光散射出去,有螢光標記的還會發出螢光;偵測器把每一次閃光變成一個電訊號。'],
-      [10, '一般的儀器一秒可以量幾千到上萬個細胞。每個細胞的讀值畫成圖上的一點,看的是整群細胞怎麼分布。']],
+    key: 'intro', name: zhEn('流式細胞儀在做什麼', 'What a flow cytometer does'), dur: 15,
+    cues: [[0, zhEn('流式細胞儀讓懸浮在液體裡的細胞排成一列,一個一個流過雷射,量每一個細胞的光訊號。', 'A flow cytometer sends cells in liquid past a laser one at a time, measuring the light from each.')],
+      [5, zhEn('細胞經過雷射時會把光散射出去,有螢光標記的還會發出螢光;偵測器把每一次閃光變成一個電訊號。', 'Cells scatter the light; labeled cells also fluoresce. Each flash becomes an electrical signal in a detector.')],
+      [10, zhEn('一般的儀器一秒可以量幾千到上萬個細胞。每個細胞的讀值畫成圖上的一點,看的是整群細胞怎麼分布。', 'Instruments measure thousands to over 10,000 cells a second; each is a dot, and the plot shows how they spread.')]],
     draw(g, t) {
       const c = g.ctx, fast = t >= 10;
       // 樣品管與管路
-      g.tube(110, 150, 84, 220, { fill: 0.68, liquid: 'rgba(165,243,205,.16)', label: '細胞懸浮液' });
+      g.tube(110, 150, 84, 220, { fill: 0.68, liquid: 'rgba(165,243,205,.16)', label: zhEn('細胞懸浮液', 'Cell suspension') });
       { const R = rng(5); for (let i = 0; i < 16; i++) g.circle(80 + R() * 60, 236 + R() * 118 + Math.sin(t * 1.2 + i) * 2, 4.5, 'rgba(213,221,217,.22)', 'rgba(213,221,217,.7)', 1.2); }
       c.save(); c.setLineDash([7, 7]); c.lineDashOffset = -t * 30;
       g.curve([[110, 350], [110, 96], [124, 52], [170, 30], [ISX - 34, 26], [ISX, 46]], 'rgba(213,221,217,.55)', 2.5);
@@ -335,7 +356,7 @@ const chapters = [
       g.rrect(ISX - 13, 40, 26, 490, 6, 'rgba(127,200,255,.07)', 'rgba(185,199,192,.5)');
       // 雷射
       g.rrect(222, ILY - 15, 72, 30, 6, '#13202a', LASER);
-      g.text(258, ILY - 34, '雷射', { size: 15, weight: 700, color: LASER, align: 'center' });
+      g.text(258, ILY - 34, zhEn('雷射', 'Laser'), { size: 15, weight: 700, color: LASER, align: 'center' });
       g.line(294, ILY, ISX, ILY, LASER, 3.5);
       g.line(ISX, ILY, 470, ILY, 'rgba(127,184,255,.3)', 2);
       // 細胞
@@ -359,11 +380,11 @@ const chapters = [
       // 偵測器與電訊號
       g.rrect(470, ILY - 38, 66, 76, 8, C.panel, C.ink2);
       if (lit > 0) { c.save(); c.globalAlpha = lit; c.shadowColor = '#e6f2ff'; c.shadowBlur = 16; g.rrect(478, ILY - 30, 50, 60, 5, 'rgba(230,242,255,.35)'); c.restore(); }
-      g.text(503, ILY + 56, '偵測器', { size: 15, color: C.ink2, align: 'center' });
+      g.text(503, ILY + 56, zhEn('偵測器', 'Detector'), { size: 15, color: C.ink2, align: 'center' });
       const ea = ease(seg(t, 4.5, 5.5));
       if (ea > 0) {
         c.save(); c.globalAlpha = ea;
-        g.text(452, 394, '電訊號', { size: 14, color: C.ink2 });
+        g.text(452, 394, zhEn('電訊號', 'Electrical signal'), { size: 14, color: C.ink2 });
         g.line(452, 470, 602, 470, C.line, 1.5);
         const pts = [];
         for (let i = 0; i <= 100; i++) {
@@ -375,21 +396,21 @@ const chapters = [
         c.restore();
       }
       // 點圖
-      const A = g.axes(670, 60, 250, 250, { xlab: '散射光強度', ylab: '螢光強度' });
+      const A = g.axes(670, 60, 250, 250, { xlab: zhEn('散射光強度', 'Scattered light intensity'), ylab: zhEn('螢光強度', 'Fluorescence intensity') });
       const n = Math.min(INTRO_N, introCount(t));
       c.fillStyle = 'rgba(165,243,205,.75)';
       for (let i = 0; i < n; i++) c.fillRect(A.X(INTRO_EV[i][0]) - 1.4, A.Y(INTRO_EV[i][1]) - 1.4, 2.8, 2.8);
       if (!fast && n > 0) { const [x, y] = INTRO_EV[n - 1]; g.circle(A.X(x), A.Y(y), 4, C.ink); g.circle(A.X(x), A.Y(y), 9, null, C.ink, 1.6); }
-      if (t >= 10) g.tag(795, 38, '一個細胞 = 一個點', { size: 14, color: C.mint, alpha: ease(seg(t, 10, 10.8)) });
-      g.text(670, 410, `已量 ${fmtN(introCount(t))} 個細胞`, { size: 20, weight: 700, color: C.mint });
-      g.text(670, 444, fast ? '實際速度:每秒幾千個' : '這裡是慢動作', { size: 15, weight: fast ? 700 : 500, color: fast ? C.amber : C.muted });
+      if (t >= 10) g.tag(795, 38, zhEn('一個細胞 = 一個點', 'One cell = one dot'), { size: 14, color: C.mint, alpha: ease(seg(t, 10, 10.8)) });
+      g.text(670, 410, zhEn(`已量 ${fmtN(introCount(t))} 個細胞`, `${fmtN(introCount(t))} ${introCount(t) === 1 ? 'cell' : 'cells'} measured`), { size: 20, weight: 700, color: C.mint });
+      g.text(670, 444, fast ? zhEn('實際速度:每秒幾千個', 'Real speed: thousands a second') : zhEn('這裡是慢動作', 'Shown in slow motion'), { size: 15, weight: fast ? 700 : 500, color: fast ? C.amber : C.muted });
     },
   },
   {
-    key: 'fluidics', name: '流體聚焦:細胞排成一列', dur: 14,
-    cues: [[0, '樣品從中間的細管注入,周圍有流得比較快的鞘液(不含細胞的鹽水緩衝液)包著它一起往下流。'],
-      [5, '管子越來越窄,鞘液把樣品擠成很細的一條,細胞就排成一列,一次一個通過雷射;這叫流體聚焦。'],
-      [9.5, '右邊把樣品流速調高:中間那條變粗,量得快,但細胞通過的位置不一致,數值比較散。做 DNA 含量要用低流速。']],
+    key: 'fluidics', name: zhEn('流體聚焦:細胞排成一列', 'Hydrodynamic focusing: single file'), dur: 14,
+    cues: [[0, zhEn('樣品從中間的細管注入,周圍有流得比較快的鞘液(不含細胞的鹽水緩衝液)包著它一起往下流。', 'Sample enters through a thin central tube, wrapped in faster sheath fluid (a cell-free saline buffer).')],
+      [5, zhEn('管子越來越窄,鞘液把樣品擠成很細的一條,細胞就排成一列,一次一個通過雷射;這叫流體聚焦。', 'The channel narrows, the sheath squeezes the sample thin, and cells pass the laser singly: hydrodynamic focusing.')],
+      [9.5, zhEn('右邊把樣品流速調高:中間那條變粗,量得快,但細胞通過的位置不一致,數值比較散。做 DNA 含量要用低流速。', 'Turn up the flow at right: the core widens; faster, but cells pass off-center and values spread. DNA content needs low flow.')]],
     draw(g, t, S) {
       const c = g.ctx, R0 = RATES[S.rate], cx = FC.cx;
       const ys = []; for (let y = FC.top; y <= 540; y += 4) ys.push(y);
@@ -407,14 +428,14 @@ const chapters = [
         const xo = cx + sg * (FC.Wc + 58), xi = cx + sg * FC.Wc;
         g.rrect(Math.min(xo, xi), 84, 58, 24, 3, '#12212a', C.ink2, 1.6);
         g.arrow(xo - sg * 4, 96, xi + sg * 18 - sg * 40, 96, { color: C.cold, lw: 2.4, head: 8 });
-        g.text(xo + sg * 4 + (sg < 0 ? 26 : -26), 68, '鞘液', { size: 15, weight: 700, color: C.cold, align: 'center' });
+        g.text(xo + sg * 4 + (sg < 0 ? 26 : -26), 68, zhEn('鞘液', 'Sheath'), { size: 15, weight: 700, color: C.cold, align: 'center' });
       }
       g.rrect(cx - FC.nr, 8, FC.nr * 2, FC.tip - 8, 2, 'rgba(255,209,102,.18)');
       g.line(cx - FC.nr, 8, cx - FC.nr, FC.tip, C.ink2, 2); g.line(cx + FC.nr, 8, cx + FC.nr, FC.tip, C.ink2, 2);
-      g.text(cx + FC.nr + 10, 22, '樣品(含細胞)', { size: 14, color: C.amber });
+      g.text(cx + FC.nr + 10, 22, zhEn('樣品(含細胞)', 'Sample (with cells)'), { size: 14, color: C.amber });
       // 雷射
       g.rrect(52, FC.ly - 14, 66, 28, 6, '#13202a', LASER);
-      g.text(85, FC.ly - 31, '雷射', { size: 15, weight: 700, color: LASER, align: 'center' });
+      g.text(85, FC.ly - 31, zhEn('雷射', 'Laser'), { size: 15, weight: 700, color: LASER, align: 'center' });
       g.line(118, FC.ly, cx + FC.Wn + 26, FC.ly, LASER, 3);
       // 細胞:依流速決定多久進來一個,橫向位置固定(在樣品流裡的相對位置)
       const every = R0.every, t7 = t + 7; // 加 7 秒:一開始管子裡就已經有細胞
@@ -430,17 +451,17 @@ const chapters = [
       // 標示
       const a1 = ease(seg(t, 5, 6));
       if (a1 > 0) {
-        g.tag(cx - 106, 236, '流體聚焦:樣品被擠細', { size: 14, color: C.amber, align: 'right', alpha: a1 });
-        g.tag(cx - 52, 372, S.rate === 'high' ? '細胞的位置不一致' : '細胞排成一列', { size: 14, color: C.ink, align: 'right', alpha: a1 });
+        g.tag(cx - 106, 236, zhEn('流體聚焦:樣品被擠細', 'Focusing: sample\nsqueezed thin'), { size: 14, color: C.amber, align: 'right', alpha: a1 });
+        g.tag(cx - 52, 372, S.rate === 'high' ? zhEn('細胞的位置不一致', 'Cell positions vary') : zhEn('細胞排成一列', 'Cells in single file'), { size: 14, color: C.ink, align: 'right', alpha: a1 });
       }
       // 右邊:流速的影響
       const px = 566;
-      g.text(px, 44, `樣品流速:${R0.name}`, { size: 18, weight: 700, color: C.ink });
+      g.text(px, 44, zhEn(`樣品流速:${R0.name}`, `Sample flow rate: ${R0.name}`), { size: 18, weight: 700, color: C.ink });
       R0.note.forEach((s, i) => g.text(px, 78 + i * 24, s, { size: 14, color: C.ink2 }));
-      g.text(px, 142, '每秒通過的細胞', { size: 13, color: C.muted });
+      g.text(px, 142, zhEn('每秒通過的細胞', 'Cells passing per second'), { size: 13, color: C.muted });
       g.rrect(px, 156, 340, 12, 6, 'rgba(255,255,255,.07)');
       g.rrect(px, 156, 340 * R0.speed, 12, 6, C.mint);
-      const H = g.axes(612, 214, 300, 196, { xmin: 0.4, xmax: 1.6, ymin: 0, ymax: 1.12, xlab: '同一種細胞量到的訊號', ylab: '細胞數' });
+      const H = g.axes(612, 214, 300, 196, { xmin: 0.4, xmax: 1.6, ymin: 0, ymax: 1.12, xlab: zhEn('同一種細胞量到的訊號', 'Signal from cells of one type'), ylab: zhEn('細胞數', 'Number of cells') });
       for (const [k, r] of Object.entries(RATES)) {
         const cur = k === S.rate, pts = [];
         for (let x = 0.4; x <= 1.6001; x += 0.01) pts.push([H.X(x), H.Y((0.04 / r.sd) * Math.exp(-((x - 1) ** 2) / (2 * r.sd * r.sd)))]);
@@ -448,14 +469,14 @@ const chapters = [
         g.curve(pts, cur ? C.mint : 'rgba(185,199,192,.35)', cur ? 2.6 : 1.4, { dash: cur ? null : [4, 5] });
       }
       g.text(px, 470, R0.verdict, { size: 15, weight: 700, color: C.mint });
-      g.text(px, 496, '虛線:另外兩種流速', { size: 13, color: C.muted });
+      g.text(px, 496, zhEn('虛線:另外兩種流速', 'Dashed: the other two flow rates'), { size: 13, color: C.muted });
     },
   },
   {
-    key: 'scatter', name: '散射光:大小與內部顆粒', dur: 15,
-    cues: [[0, '細胞通過雷射時會把光散射開來。沿著雷射前進方向收集的叫前向散射(FSC),大致反映細胞的大小。'],
-      [5, '和雷射約成 90° 收集的叫側向散射(SSC):細胞裡的顆粒與構造越多,SSC 越強。'],
-      [10, '每個細胞得到一組 FSC 與 SSC,在圖上就是一個點。右邊調細胞的大小與內部顆粒,看點怎麼移動。']],
+    key: 'scatter', name: zhEn('散射光:大小與內部顆粒', 'Scattered light: size and granules'), dur: 15,
+    cues: [[0, zhEn('細胞通過雷射時會把光散射開來。沿著雷射前進方向收集的叫前向散射(FSC),大致反映細胞的大小。', 'Cells scatter the laser light. Collected along the beam, it is forward scatter (FSC), roughly showing cell size.')],
+      [5, zhEn('和雷射約成 90° 收集的叫側向散射(SSC):細胞裡的顆粒與構造越多,SSC 越強。', 'At about 90° it is side scatter (SSC): the more granules and structure inside, the stronger.')],
+      [10, zhEn('每個細胞得到一組 FSC 與 SSC,在圖上就是一個點。右邊調細胞的大小與內部顆粒,看點怎麼移動。', 'Each cell gives one FSC and one SSC value: one dot. Change size and granules at right and watch the dot move.')]],
     draw(g, t, S) {
       const c = g.ctx, { px, py } = SC, s = S.size / 100, gr = S.gran / 100;
       const r = lerp(16, 46, s), fsc = fscOf(s, gr), ssc = sscOf(s, gr);
@@ -465,14 +486,14 @@ const chapters = [
       const ks = []; for (let k = Math.floor(t / SC.period) - 1; k <= Math.floor(t / SC.period) + 4; k++) ks.push(k);
       // 液流方向的虛線
       c.save(); c.setLineDash([3, 7]); g.line(px + 0.42 * 60, py + 0.5 * 60, px - 0.42 * 230, py - 0.5 * 230, 'rgba(185,199,192,.5)', 1.6); c.restore();
-      g.text(px - 0.42 * 230 - 6, py - 0.5 * 230 + 2, '液流:從畫面後方', { size: 13, color: C.muted, align: 'right' });
-      g.text(px - 0.42 * 230 - 6, py - 0.5 * 230 + 22, '穿過雷射流向你', { size: 13, color: C.muted, align: 'right' });
+      g.text(px - 0.42 * 230 - 6, py - 0.5 * 230 + 2, zhEn('液流:從畫面後方', 'Stream: from behind,'), { size: 13, color: C.muted, align: 'right' });
+      g.text(px - 0.42 * 230 - 6, py - 0.5 * 230 + 22, zhEn('穿過雷射流向你', 'through the laser to you'), { size: 13, color: C.muted, align: 'right' });
       const drawCell = (k) => { const z = zOf(k), p = pos(z); if (p.al <= 0.01 || z > 200) return; cell(g, p.x, p.y, r * p.sc, { gran: gr, alpha: p.al, seed: 7 }); };
       ks.filter((k) => zOf(k) > 0).sort((a, b) => zOf(b) - zOf(a)).forEach(drawCell);
       // 雷射與這一刻的亮度(細胞在光束裡時才有散射光)
       const L = ks.reduce((m, k) => Math.max(m, bump(zOf(k), 13)), 0);
       g.rrect(40, py - 14, 72, 28, 6, '#13202a', LASER);
-      g.text(76, py - 32, '雷射', { size: 15, weight: 700, color: LASER, align: 'center' });
+      g.text(76, py - 32, zhEn('雷射', 'Laser'), { size: 15, weight: 700, color: LASER, align: 'center' });
       g.line(112, py, px, py, LASER, 3.5);
       g.line(px, py, 466, py, 'rgba(127,184,255,.45)', 2.5);
       // 前向散射:擋光條擋掉直射的雷射,繞過它的散射光進 FSC 偵測器
@@ -485,15 +506,15 @@ const chapters = [
         c.fillStyle = 'rgba(184,164,244,.35)'; c.fill(); c.restore();
       }
       g.rrect(466, py - 13, 11, 26, 2, '#05090a', C.ink2, 1.4);
-      g.text(471, py + 32, '擋光條', { size: 13, color: C.muted, align: 'center' });
+      g.text(471, py + 32, zhEn('擋光條', 'Beam\nblock'), { size: 13, color: C.muted, align: 'center' });
       detector(g, 508, py - 44, 64, 88, C.mint, L * fsc, t);
       g.text(540, py - 62, 'FSC', { size: 17, weight: 700, color: C.mint, align: 'center' });
-      g.text(540, py + 64, '前向散射', { size: 14, color: C.ink2, align: 'center' });
+      g.text(540, py + 64, zhEn('前向散射', 'Forward scatter'), { size: 14, color: C.ink2, align: 'center' });
       // 側向散射:約 90°,經透鏡進 SSC 偵測器
       c.save(); c.beginPath(); c.ellipse(px, 356, 42, 8, 0, 0, Math.PI * 2); c.fillStyle = 'rgba(127,200,255,.12)'; c.fill(); c.strokeStyle = C.ink2; c.lineWidth = 1.4; c.stroke(); c.restore();
       detector(g, px - 40, 382, 80, 64, C.lav, L * ssc, t);
       g.text(px + 54, 404, 'SSC', { size: 17, weight: 700, color: C.lav });
-      g.text(px + 54, 428, '側向散射', { size: 14, color: C.ink2 });
+      g.text(px + 54, 428, zhEn('側向散射', 'Side scatter'), { size: 14, color: C.ink2 });
       { const rr = r + 14; c.save(); c.beginPath(); c.arc(px, py, rr, 0.05, Math.PI / 2 - 0.05); c.strokeStyle = C.ink2; c.lineWidth = 1.4; c.stroke(); c.restore();
         g.text(px + (rr + 16) * 0.72, py + (rr + 16) * 0.72, '90°', { size: 14, color: C.ink2, align: 'center', mono: true }); }
       // 正在雷射裡的細胞與前面的細胞
@@ -501,7 +522,7 @@ const chapters = [
       if (L > 0.05) glowDot(g, px, py, r * 0.5, 'rgba(230,242,255,.25)', 24, L);
       // 右上:兩個偵測器的訊號(最近 6 秒)
       g.panel(602, 20, 330, 190, '');
-      g.text(616, 42, '偵測器的訊號(放慢)', { size: 13, weight: 700, color: C.ink2 });
+      g.text(616, 42, zhEn('偵測器的訊號(放慢)', 'Detector signals (slowed down)'), { size: 13, weight: 700, color: C.ink2 });
       const tr = (label, col, val, base) => {
         g.text(616, base - 22, label, { size: 15, weight: 700, color: col });
         g.line(660, base, 918, base, C.line, 1.4);
@@ -510,33 +531,33 @@ const chapters = [
       };
       tr('FSC', C.mint, fsc, 112); tr('SSC', C.lav, ssc, 192);
       // 右下:FSC 對 SSC 的點圖
-      const A = g.axes(660, 262, 260, 196, { xlab: 'FSC(大小)', ylab: 'SSC(內部顆粒)' });
+      const A = g.axes(660, 262, 260, 196, { xlab: zhEn('FSC(大小)', 'FSC (size)'), ylab: zhEn('SSC(內部顆粒)', 'SSC (granules inside)') });
       c.fillStyle = 'rgba(185,199,192,.32)';
       for (const [x, y] of SCAT_REF) c.fillRect(A.X(x) - 1.2, A.Y(y) - 1.2, 2.4, 2.4);
-      g.text(A.X(0.37), A.Y(0.07), '淋巴球', { size: 13, color: C.muted });
-      g.text(A.X(0.62), A.Y(0.33), '單核球', { size: 13, color: C.muted });
-      g.text(A.X(0.72), A.Y(0.86), '顆粒球', { size: 13, color: C.muted });
+      g.text(A.X(0.37), A.Y(0.07), zhEn('淋巴球', 'Lymphocytes'), { size: 13, color: C.muted });
+      g.text(A.X(0.62), A.Y(0.33), zhEn('單核球', 'Monocytes'), { size: 13, color: C.muted });
+      g.text(A.X(0.72), A.Y(0.86), zhEn('顆粒球', 'Granulocytes'), { size: 13, color: C.muted });
       const done = Math.max(0, Math.floor(t / SC.period));
       c.fillStyle = C.mint;
       for (let k = 0; k <= done && k < 40; k++) c.fillRect(A.X(clamp(fsc + (hash(k, 4) - 0.5) * 0.05)) - 1.7, A.Y(clamp(ssc + (hash(k, 5) - 0.5) * 0.06)) - 1.7, 3.4, 3.4);
       g.circle(A.X(fsc), A.Y(ssc), 8, null, C.ink, 2);
       g.circle(A.X(0.04), A.Y(0.95), 7, null, C.ink, 2);
-      g.text(A.X(0.04) + 14, A.Y(0.95), '這個細胞', { size: 13, color: C.mint });
+      g.text(A.X(0.04) + 14, A.Y(0.95), zhEn('這個細胞', 'This cell'), { size: 13, color: C.mint });
     },
   },
   {
-    key: 'fluor', name: '螢光:用抗體標記蛋白', dur: 16,
-    cues: [[0, '想知道細胞有沒有某種蛋白,就用接了螢光染料的抗體去標記;抗體只會抓住它認得的那種蛋白。'],
-      [4.5, '染料吸收雷射的藍光,再放出波長較長的光:FITC 發綠光,PE 發橘黃光。標記越多,螢光越強。'],
-      [9, '收集到的光經過分色鏡(反射一段顏色、讓其他顏色通過)與濾鏡,依顏色分到不同的偵測器。'],
-      [12.5, '偵測器是光電倍增管(PMT),把很弱的光變成電訊號並放大;一種顏色量一種標記。右邊可以換標記。']],
+    key: 'fluor', name: zhEn('螢光:用抗體標記蛋白', 'Fluorescence: antibody labels'), dur: 16,
+    cues: [[0, zhEn('想知道細胞有沒有某種蛋白,就用接了螢光染料的抗體去標記;抗體只會抓住它認得的那種蛋白。', 'To find a protein, label cells with dye-linked antibodies, which grab only the protein they recognize.')],
+      [4.5, zhEn('染料吸收雷射的藍光,再放出波長較長的光:FITC 發綠光,PE 發橘黃光。標記越多,螢光越強。', 'Dyes absorb the blue laser light and give off longer wavelengths: FITC green, PE orange-yellow. More label, brighter.')],
+      [9, zhEn('收集到的光經過分色鏡(反射一段顏色、讓其他顏色通過)與濾鏡,依顏色分到不同的偵測器。', 'Dichroic mirrors (reflect some colors, pass the rest) and filters send each color to its own detector.')],
+      [12.5, zhEn('偵測器是光電倍增管(PMT),把很弱的光變成電訊號並放大;一種顏色量一種標記。右邊可以換標記。', 'Photomultiplier tubes (PMTs) turn faint light into amplified signals; one color per label. Change labels at right.')]],
     draw(g, t, S) {
       const c = g.ctx, { cx, cy, r } = FL, hasG = S.dye.includes('g'), hasO = S.dye.includes('o');
       const ex = ease(seg(t, 4.5, 5.5)), on = ease(seg(t, 8.5, 9.6));
       // 雷射光束
       g.rrect(20, cy - 14, 60, 28, 6, '#13202a', LASER);
-      g.text(50, cy - 32, '雷射', { size: 15, weight: 700, color: LASER, align: 'center' });
-      if (ex > 0) { c.save(); c.globalAlpha = ex; const gr = c.createLinearGradient(0, cy - 36, 0, cy + 36); gr.addColorStop(0, 'rgba(127,184,255,0)'); gr.addColorStop(0.5, 'rgba(127,184,255,.32)'); gr.addColorStop(1, 'rgba(127,184,255,0)'); c.fillStyle = gr; c.fillRect(80, cy - 36, cx - 80, 72); c.restore(); g.text(50, cy + 32, '藍光', { size: 13, color: LASER, align: 'center', alpha: ex }); g.text(50, cy + 50, '488 nm', { size: 13, color: LASER, align: 'center', mono: true, alpha: ex }); }
+      g.text(50, cy - 32, zhEn('雷射', 'Laser'), { size: 15, weight: 700, color: LASER, align: 'center' });
+      if (ex > 0) { c.save(); c.globalAlpha = ex; const gr = c.createLinearGradient(0, cy - 36, 0, cy + 36); gr.addColorStop(0, 'rgba(127,184,255,0)'); gr.addColorStop(0.5, 'rgba(127,184,255,.32)'); gr.addColorStop(1, 'rgba(127,184,255,0)'); c.fillStyle = gr; c.fillRect(80, cy - 36, cx - 80, 72); c.restore(); g.text(50, cy + 32, zhEn('藍光', 'Blue light'), { size: 13, color: LASER, align: 'center', alpha: ex }); g.text(50, cy + 50, '488 nm', { size: 13, color: LASER, align: 'center', mono: true, alpha: ex }); }
       // 細胞與膜上的蛋白
       g.circle(cx, cy, r, 'rgba(213,221,217,.08)', 'rgba(213,221,217,.75)', 2);
       g.circle(cx - 18, cy - 8, 38, 'rgba(184,164,244,.14)', 'rgba(184,164,244,.5)', 1.4);
@@ -568,28 +589,28 @@ const chapters = [
         c.save(); c.globalAlpha = la;
         const ly = 474;
         g.line(36, ly + 8, 44, ly, '#d5ddd9', 2.2); g.line(52, ly + 8, 44, ly, '#d5ddd9', 2.2); g.line(44, ly, 44, ly - 12, '#d5ddd9', 2.2); g.circle(44, ly - 17, 4.5, hasG ? GREEN : ORANGE);
-        g.text(62, ly - 4, '抗體,尾巴接著螢光染料', { size: 14, color: C.ink2 });
+        g.text(62, ly - 4, zhEn('抗體,尾巴接著螢光染料', 'Antibody with a fluorescent dye on its tail'), { size: 14, color: C.ink2 });
         if (hasG) { g.circle(44, ly + 34, 4.8, PROT_COL.a); g.line(44, ly + 39, 44, ly + 48, PROT_COL.a, 3); }
         if (hasO) { const ox = hasG ? 28 : 0; g.rrect(44 + ox - 4.5, ly + 29.5, 9, 9, 1.5, PROT_COL.b); g.line(44 + ox, ly + 39, 44 + ox, ly + 48, PROT_COL.b, 3); }
-        g.text(hasG && hasO ? 90 : 62, ly + 38, hasG && hasO ? '圓頭、方頭:兩種不同的蛋白' : hasG ? '抗體認得的蛋白(圓頭)' : '抗體認得的蛋白(方頭)', { size: 14, color: C.ink2 });
+        g.text(hasG && hasO ? 90 : 62, ly + 38, hasG && hasO ? zhEn('圓頭、方頭:兩種不同的蛋白', 'Round and square heads: two different proteins') : hasG ? zhEn('抗體認得的蛋白(圓頭)', 'Protein the antibody recognizes (round head)') : zhEn('抗體認得的蛋白(方頭)', 'Protein the antibody recognizes (square head)'), { size: 14, color: C.ink2 });
         c.restore();
       }
       // 右邊:收集鏡、分色鏡、濾鏡與三個偵測器
       const by = cy, lx = 446, m1 = 548, m2 = 708, fx2 = 822;
       c.save(); c.beginPath(); c.ellipse(lx, by, 9, 46, 0, 0, Math.PI * 2); c.fillStyle = 'rgba(127,200,255,.12)'; c.fill(); c.strokeStyle = C.ink2; c.lineWidth = 1.4; c.stroke(); c.restore();
-      g.text(lx, by + 66, '收集鏡', { size: 13, color: C.muted, align: 'center' });
-      for (const mx of [m1, m2]) { g.line(mx - 20, by + 20, mx + 20, by - 20, '#cfe3ef', 3); g.text(mx, by + 40, '分色鏡', { size: 13, color: C.muted, align: 'center' }); }
+      g.text(lx, by + 66, zhEn('收集鏡', 'Collection lens'), { size: 13, color: C.muted, align: 'center' });
+      for (const mx of [m1, m2]) { g.line(mx - 20, by + 20, mx + 20, by - 20, '#cfe3ef', 3); g.text(mx, by + 40, zhEn('分色鏡', 'Dichroic mirror'), { size: 13, color: C.muted, align: 'center' }); }
       g.rrect(m1 - 16, 176, 32, 9, 2, 'rgba(127,184,255,.55)', C.ink2, 1);
       g.rrect(m2 - 16, 176, 32, 9, 2, 'rgba(125,255,158,.5)', C.ink2, 1);
       g.rrect(fx2, by - 16, 9, 32, 2, 'rgba(255,179,92,.55)', C.ink2, 1);
-      g.text(m2 + 24, 181, '濾鏡', { size: 13, color: C.muted });
+      g.text(m2 + 24, 181, zhEn('濾鏡', 'Filter'), { size: 13, color: C.muted });
       const sig = { ssc: on * 0.55, g: on * (hasG ? 0.95 : 0), o: on * (hasO ? 0.85 : 0) };
       detector(g, m1 - 36, 70, 72, 54, LASER, sig.ssc, t);
       detector(g, m2 - 36, 70, 72, 54, GREEN, sig.g, t);
       detector(g, 852, by - 30, 74, 60, ORANGE, sig.o, t);
-      g.text(m1, 52, 'SSC(藍光)', { size: 14, weight: 700, color: LASER, align: 'center' });
-      g.text(m2, 52, '綠色螢光', { size: 14, weight: 700, color: GREEN, align: 'center' });
-      g.text(889, by - 48, '橘黃色螢光', { size: 14, weight: 700, color: ORANGE, align: 'center' });
+      g.text(m1, 52, zhEn('SSC(藍光)', 'SSC (blue)'), { size: 14, weight: 700, color: LASER, align: 'center' });
+      g.text(m2, 52, zhEn('綠色螢光', 'Green fluorescence'), { size: 14, weight: 700, color: GREEN, align: 'center' });
+      g.text(889, by - zhEn(48, 56), zhEn('橘黃色螢光', 'Orange\nfluorescence'), { size: 14, weight: 700, color: ORANGE, align: 'center' });
       g.text(m2 + 44, 97, 'FITC', { size: 13, color: C.muted, mono: true });
       g.text(889, by + 48, 'PE', { size: 13, color: C.muted, align: 'center', mono: true });
       if (on > 0) {
@@ -606,22 +627,22 @@ const chapters = [
         if (hasG) g.line(m2, by, m2, 124, GREEN, 2.4);
         if (hasO) g.line(m2 + 4, by, 852, by, ORANGE, 2.4);
         c.restore();
-        g.tag(668, 404, '分色鏡:反射一段顏色,其他顏色穿過', { size: 14, color: C.ink2, alpha: ease(seg(t, 9, 9.8)) });
-        g.tag(668, 440, '濾鏡:只讓一小段顏色通過', { size: 14, color: C.ink2, alpha: ease(seg(t, 9.6, 10.4)) });
-        g.tag(668, 476, 'PMT:把很弱的光變成電訊號', { size: 14, color: C.ink2, alpha: ease(seg(t, 12.5, 13.3)) });
+        g.tag(668, 404, zhEn('分色鏡:反射一段顏色,其他顏色穿過', 'Dichroic mirror: reflects some colors, passes others'), { size: 14, color: C.ink2, alpha: ease(seg(t, 9, 9.8)) });
+        g.tag(668, 440, zhEn('濾鏡:只讓一小段顏色通過', 'Filter: passes only a narrow color band'), { size: 14, color: C.ink2, alpha: ease(seg(t, 9.6, 10.4)) });
+        g.tag(668, 476, zhEn('PMT:把很弱的光變成電訊號', 'PMT: turns faint light into an electrical signal'), { size: 14, color: C.ink2, alpha: ease(seg(t, 12.5, 13.3)) });
       }
     },
   },
   {
-    key: 'gating', name: '點圖與圈選', dur: 17, drag: true,
-    cues: [[0, '每個細胞是點圖上的一點,橫軸 FSC、縱軸 SSC。以血液的白血球為例,淋巴球、單核球、顆粒球各成一群,左下角是碎片。'],
-      [5.5, '把要看的那一群圈起來(圈選,英文 gating),接下來只分析圈內的細胞。'],
-      [9.5, '圈內細胞的螢光畫成直方圖:沒被抗體標到的在左邊(陰性),有標到的在右邊(陽性);門檻設在哪裡決定陽性的比例。'],
-      [13.5, '右邊可以換要圈的族群、移動門檻;也可以直接點畫面上的一群細胞,或拖動直方圖上的門檻。']],
+    key: 'gating', name: zhEn('點圖與圈選', 'Dot plots and gating'), dur: 17, drag: true,
+    cues: [[0, zhEn('每個細胞是點圖上的一點,橫軸 FSC、縱軸 SSC。以血液的白血球為例,淋巴球、單核球、顆粒球各成一群,左下角是碎片。', 'Each cell is a dot: FSC across, SSC up. In white blood cells, lymphocytes, monocytes and granulocytes form clusters; debris is lower left.')],
+      [5.5, zhEn('把要看的那一群圈起來(圈選,英文 gating),接下來只分析圈內的細胞。', 'Draw a gate around the cluster you want (gating); only the cells inside are analyzed.')],
+      [9.5, zhEn('圈內細胞的螢光畫成直方圖:沒被抗體標到的在左邊(陰性),有標到的在右邊(陽性);門檻設在哪裡決定陽性的比例。', 'Their fluorescence histogram: unlabeled cells left (negative), labeled right (positive); the threshold sets the positive share.')],
+      [13.5, zhEn('右邊可以換要圈的族群、移動門檻;也可以直接點畫面上的一群細胞,或拖動直方圖上的門檻。', 'Change the gate or threshold at right, or click a cluster or drag the histogram threshold directly.')]],
     draw(g, t, S) {
       gateT = t;
       const c = g.ctx, G = GATES[S.gate], d = gateData(S.gate);
-      const A = g.axes(GA.x, GA.y, GA.w, GA.h, { xlab: 'FSC(大小)', ylab: 'SSC(內部顆粒)' });
+      const A = g.axes(GA.x, GA.y, GA.w, GA.h, { xlab: zhEn('FSC(大小)', 'FSC (size)'), ylab: zhEn('SSC(內部顆粒)', 'SSC (granules inside)') });
       const show = seg(t, 0, 4), gp = ease(seg(t, 5.5, 8)), hp = ease(seg(t, 9.5, 11.5)), colorPos = ease(seg(t, 11, 12));
       BLOOD.forEach((e, i) => {
         if (e.o > show) return;
@@ -634,24 +655,24 @@ const chapters = [
       const la = ease(seg(t, 2, 3));
       if (la > 0) {
         c.save(); c.globalAlpha = la;
-        g.text(A.X(0.30), A.Y(0.275), '淋巴球', { size: 14, weight: 700, color: C.ink2, align: 'center' });
-        g.text(A.X(0.65), A.Y(0.30), '單核球', { size: 14, weight: 700, color: C.ink2 });
-        g.text(A.X(0.80), A.Y(0.86), '顆粒球', { size: 14, weight: 700, color: C.ink2 });
-        g.text(A.X(0.07), A.Y(0.19), '碎片', { size: 13, color: C.muted, align: 'center' });
+        g.text(A.X(0.30), A.Y(0.275), zhEn('淋巴球', 'Lymphocytes'), { size: 14, weight: 700, color: C.ink2, align: 'center' });
+        g.text(A.X(0.65), A.Y(0.30), zhEn('單核球', 'Monocytes'), { size: 14, weight: 700, color: C.ink2 });
+        g.text(A.X(0.80), A.Y(0.86), zhEn('顆粒球', 'Granulocytes'), { size: 14, weight: 700, color: C.ink2 });
+        g.text(A.X(0.07), A.Y(0.19), zhEn('碎片', 'Debris'), { size: 13, color: C.muted, align: 'center' });
         c.restore();
       }
       // 圈選框
       const ex = A.X(G.cx), ey = A.Y(G.cy), rx = G.rx * GA.w, ry = G.ry * GA.h;
       if (gp > 0) {
         c.save(); c.setLineDash([7, 5]); c.beginPath(); c.ellipse(ex, ey, rx, ry, 0, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * gp); c.strokeStyle = C.amber; c.lineWidth = 2.4; c.stroke(); c.restore();
-        g.text(GA.x, 448, `圈選:${G.name},占全部的 ${pct(d.frac)}`, { size: 16, weight: 700, color: C.amber, alpha: gp });
-        g.text(GA.x, 476, '點一群細胞可以改圈那一群', { size: 13, color: C.muted, alpha: gp });
+        g.text(GA.x, 448, zhEn(`圈選:${G.name},占全部的 ${pct(d.frac)}`, `Gate: ${G.name.toLowerCase()}, ${pct(d.frac)} of all cells`), { size: 16, weight: 700, color: C.amber, alpha: gp }); // 英文的族群名稱在句中用小寫
+        g.text(GA.x, 476, zhEn('點一群細胞可以改圈那一群', 'Click a cluster to gate it instead'), { size: 13, color: C.muted, alpha: gp });
       }
       // 直方圖
       if (hp > 0) {
         c.save(); c.globalAlpha = hp;
-        g.text(HA.x, 40, `圈內細胞(${G.name})的綠色螢光`, { size: 15, weight: 700, color: C.ink2 });
-        const H = g.axes(HA.x, HA.y, HA.w, HA.h, { xmin: 0, xmax: 4, ymin: 0, ymax: d.max * 1.2, xticks: [0, 1, 2, 3, 4], fmtX: (v) => `10${sup(v)}`, xlab: '螢光強度(對數刻度)', ylab: '細胞數' });
+        g.text(HA.x, 40, zhEn(`圈內細胞(${G.name})的綠色螢光`, `Green fluorescence, gated ${G.name.toLowerCase()}`), { size: 15, weight: 700, color: C.ink2 }); // 同上
+        const H = g.axes(HA.x, HA.y, HA.w, HA.h, { xmin: 0, xmax: 4, ymin: 0, ymax: d.max * 1.2, xticks: [0, 1, 2, 3, 4], fmtX: (v) => `10${sup(v)}`, xlab: zhEn('螢光強度(對數刻度)', 'Fluorescence intensity (log scale)'), ylab: zhEn('細胞數', 'Number of cells') });
         for (let b = 0; b < HB; b++) {
           const x0 = H.X((b * 4) / HB), x1 = H.X(((b + 1) * 4) / HB), v = d.bins[b] * hp, pos = ((b + 0.5) * 4) / HB >= S.cut;
           c.fillStyle = pos ? 'rgba(125,255,158,.6)' : 'rgba(185,199,192,.5)';
@@ -660,10 +681,10 @@ const chapters = [
         const xc = H.X(S.cut);
         g.line(xc, HA.y - 4, xc, H.Y(0), C.amber, 2.5);
         g.rrect(xc - 7, HA.y - 14, 14, 18, 4, C.amber);
-        g.text(xc, HA.y + 14, '門檻', { size: 13, weight: 700, color: C.amber, align: xc > HA.x + HA.w - 40 ? 'right' : 'left', alpha: 1 });
+        g.text(xc, HA.y + 14, zhEn('門檻', 'Threshold'), { size: 13, weight: 700, color: C.amber, align: xc > HA.x + HA.w - 40 ? 'right' : 'left', alpha: 1 });
         const pf = posFrac(d, S.cut);
-        g.text(HA.x, 450, `陽性(門檻右邊):${pct(pf)}`, { size: 17, weight: 700, color: GREEN });
-        g.text(HA.x, 478, `陰性:${pct(1 - pf)}`, { size: 15, color: C.ink2 });
+        g.text(HA.x, 450, zhEn(`陽性(門檻右邊):${pct(pf)}`, `Positive (right of threshold): ${pct(pf)}`), { size: 17, weight: 700, color: GREEN });
+        g.text(HA.x, 478, zhEn(`陰性:${pct(1 - pf)}`, `Negative: ${pct(1 - pf)}`), { size: 15, color: C.ink2 });
         c.restore();
       }
     },
@@ -676,7 +697,7 @@ const chapters = [
           const dx = (x - GA.x) / GA.w, dy = 1 - (y - GA.y) / GA.h;
           let best = -1, bd = 2.6;
           GATE_KEYS.forEach((k, i) => { const G = GATES[k], dd = ((dx - G.cx) / G.rx) ** 2 + ((dy - G.cy) / G.ry) ** 2; if (dd < bd) { bd = dd; best = i; } });
-          if (best >= 0) { pressSeg('圈哪一群', best); return true; }
+          if (best >= 0) { pressSeg(zhEn('圈哪一群', 'Population to gate'), best); return true; }
         }
         return false;
       }
@@ -686,10 +707,10 @@ const chapters = [
     },
   },
   {
-    key: 'nuclei', name: '植物細胞核:切碎、過濾、染色', dur: 17,
-    cues: [[0, '植物細胞大、形狀不規則,染劑也不容易進去,所以通常不量整個細胞,而是在冰的緩衝液裡用刀片把嫩葉切碎,讓細胞核掉出來。'],
-      [5.5, '用尼龍網濾掉碎片,再加會和 DNA 結合的螢光染劑,例如 PI(碘化丙啶);PI 也會染 RNA,所以要一起加 RNase 分解 RNA。'],
-      [11, '螢光強度和 DNA 量成正比:最高的峰是 G1 期(DNA 還沒複製)的細胞核,約兩倍位置的小峰是 DNA 已複製的 G2 期。']],
+    key: 'nuclei', name: zhEn('植物細胞核:切碎、過濾、染色', 'Plant nuclei: chop, filter, stain'), dur: 17,
+    cues: [[0, zhEn('植物細胞大、形狀不規則,染劑也不容易進去,所以通常不量整個細胞,而是在冰的緩衝液裡用刀片把嫩葉切碎,讓細胞核掉出來。', 'Plant cells are big, irregular and hard to stain, so instead of whole cells, nuclei are freed by chopping young leaves in ice-cold buffer.')],
+      [5.5, zhEn('用尼龍網濾掉碎片,再加會和 DNA 結合的螢光染劑,例如 PI(碘化丙啶);PI 也會染 RNA,所以要一起加 RNase 分解 RNA。', 'A nylon mesh removes debris, then a fluorescent DNA dye such as PI (propidium iodide) is added, plus RNase, since PI also stains RNA.')],
+      [11, zhEn('螢光強度和 DNA 量成正比:最高的峰是 G1 期(DNA 還沒複製)的細胞核,約兩倍位置的小峰是 DNA 已複製的 G2 期。', 'Fluorescence is proportional to DNA: the tall peak is G1 nuclei (DNA not yet copied), the small one near twice that is G2 (copied).')]],
     draw(g, t) {
       const c = g.ctx, chop = seg(t, 0.6, 5.2), filt = seg(t, 5.5, 8.3), fill3 = ease(seg(t, 8.3, 8.9)), stain = ease(seg(t, 9.3, 10.5));
       // 第 1 站:培養皿裡切葉子
@@ -709,9 +730,9 @@ const chapters = [
         c.save(); c.globalAlpha = ba; c.translate(bx, byy); c.rotate(-0.12);
         g.rrect(-3, -58, 6, 60, 1.5, '#cfd8d4', '#8a9a94', 1); g.rrect(-7, -78, 14, 22, 3, '#3b4a46', '#8a9a94', 1);
         c.restore();
-        g.text(bx + 16, byy - 68, '刀片', { size: 14, color: C.ink2, alpha: ba });
+        g.text(bx + 16, byy - 68, zhEn('刀片', 'Blade'), { size: 14, color: C.ink2, alpha: ba });
       }
-      g.text(dx, dy + 66, '嫩葉 + 冰的緩衝液', { size: 14, color: C.ink2, align: 'center' });
+      g.text(dx, dy + 66, zhEn('嫩葉 + 冰的緩衝液', 'Young leaf + ice-cold buffer'), { size: 14, color: C.ink2, align: 'center' });
       // 第 2 站:尼龍網過濾
       g.arrow(252, 200, 282, 200, { color: C.muted, lw: 2 });
       const fx = 330;
@@ -721,8 +742,8 @@ const chapters = [
       if (filt > 0 && filt < 1) for (let j = 0; j < 3; j++) { const k = (t * 1.6 + j / 3) % 1; g.circle(fx, 182 + k * 50, 3, 'rgba(127,200,255,.7)'); }
       if (filt > 0 && filt < 1) { const R = rng(17); for (let i = 0; i < 6; i++) g.rrect(fx - 26 + R() * 46, 117 - R() * 6, 6, 3, 1, '#4f9a5c'); }
       g.tube(fx, 196, 40, 96, { fill: (0.15 + 0.5 * filt) * (1 - fill3), liquid: 'rgba(127,200,255,.2)' });
-      g.text(fx, 318, '尼龍網過濾', { size: 14, color: C.ink2, align: 'center' });
-      g.text(fx, 340, '(孔約 42 μm)', { size: 13, color: C.muted, align: 'center' });
+      g.text(fx, 318, zhEn('尼龍網過濾', 'Nylon mesh filter'), { size: 14, color: C.ink2, align: 'center' });
+      g.text(fx, 340, zhEn('(孔約 42 μm)', '(pores about 42 μm)'), { size: 13, color: C.muted, align: 'center' });
       // 第 3 站:加 PI 染色
       g.arrow(366, 240, 430, 240, { color: C.muted, lw: 2 });
       const sx = 474;
@@ -732,27 +753,27 @@ const chapters = [
       const na3 = seg(fill3, 0.75, 1);
       if (na3 > 0) { const R = rng(19); for (let i = 0; i < 14; i++) { const x = sx - 14 + R() * 28, y = 236 + R() * 46 + Math.sin(t + i) * 2; if (stain > 0) glowDot(g, x, y, 2.8, PIRED, 8, stain * na3); else g.circle(x, y, 2.6, `rgba(184,164,244,${0.9 * na3})`); } }
       g.text(sx, 318, 'PI + RNase', { size: 14, color: stain > 0 ? PIRED : C.ink2, align: 'center', mono: true });
-      g.text(sx, 340, '(染 DNA)', { size: 13, color: C.muted, align: 'center' });
+      g.text(sx, 340, zhEn('(染 DNA)', '(stains DNA)'), { size: 13, color: C.muted, align: 'center' });
       // 下方:兩個放大的細胞核,DNA 多一倍、PI 多一倍
       const na = ease(seg(t, 9, 10.2));
       if (na > 0) {
         c.save(); c.globalAlpha = na;
-        g.tag(250, 384, 'DNA 越多,結合的 PI 越多,螢光越強', { size: 14, color: C.ink2 });
+        g.tag(250, 384, zhEn('DNA 越多,結合的 PI 越多,螢光越強', 'More DNA binds more PI and glows brighter'), { size: 14, color: C.ink2 });
         const nuc = (x, y, rr, ndna, label) => {
           g.circle(x, y, rr, 'rgba(184,164,244,.1)', 'rgba(184,164,244,.6)', 1.4);
           const R = rng(ndna * 7 + 3);
           for (let i = 0; i < ndna; i++) { const a = R() * Math.PI * 2, d = R() * rr * 0.5, x0 = x + Math.cos(a) * d - 12, y0 = y + Math.sin(a) * d; g.curve([[x0, y0], [x0 + 8, y0 - 5], [x0 + 16, y0 + 3], [x0 + 24, y0 - 3]], 'rgba(213,221,217,.75)', 2); glowDot(g, x0 + 6, y0 - 2, 2.3, PIRED, 8, stain); glowDot(g, x0 + 17, y0 + 1, 2.3, PIRED, 8, stain); }
           g.text(x, y + rr + 18, label, { size: 14, color: C.ink2, align: 'center' });
         };
-        nuc(140, 452, 40, 4, 'G1 期:DNA 還沒複製');
-        nuc(370, 452, 44, 8, 'G2 期:DNA 已複製');
+        nuc(140, 452, 40, 4, zhEn('G1 期:DNA 還沒複製', 'G1 phase: DNA not yet copied'));
+        nuc(370, 452, 44, 8, zhEn('G2 期:DNA 已複製', 'G2 phase: DNA copied'));
         c.restore();
       }
       // 右邊:直方圖
       const ha = ease(seg(t, 11, 11.8));
       if (ha > 0) {
         c.save(); c.globalAlpha = ha;
-        const bins = ploidyBins('2x', false), A = g.axes(624, 60, 296, 300, { xmin: 0, xmax: 500, ymin: 0, ymax: binMax(bins) * 1.15, xticks: [0, 100, 200, 300, 400, 500], xlab: '螢光強度(相對,線性刻度)', ylab: '細胞核數' });
+        const bins = ploidyBins('2x', false), A = g.axes(624, 60, 296, 300, { xmin: 0, xmax: 500, ymin: 0, ymax: binMax(bins) * 1.15, xticks: [0, 100, 200, 300, 400, 500], xlab: zhEn('螢光強度(相對,線性刻度)', 'Fluorescence (relative, linear scale)'), ylab: zhEn('細胞核數', 'Number of nuclei') });
         const grow = ease(seg(t, 11, 13.5));
         drawDnaBins(g, A, bins, ['rgba(165,243,205,.8)', 'rgba(165,243,205,.8)'], grow, 500);
         if (grow > 0.9) {
@@ -760,24 +781,24 @@ const chapters = [
           g.text(A.X(400), A.Y(peakTop(bins, 400)) - 18, 'G2', { size: 16, weight: 700, color: C.mint, align: 'center' });
           const yy = A.Y(0) - 120;
           g.arrow(A.X(214), yy, A.X(388), yy, { color: C.ink2, lw: 1.6, head: 7 });
-          g.text(A.X(300), yy - 16, '位置約 2 倍', { size: 13, color: C.ink2, align: 'center' });
-          g.text(920, 76, '共量 5,000 個細胞核', { size: 13, color: C.muted, align: 'right' });
+          g.text(A.X(300), yy - 16, zhEn('位置約 2 倍', 'About 2×'), { size: 13, color: C.ink2, align: 'center' });
+          g.text(920, 76, zhEn('共量 5,000 個細胞核', '5,000 nuclei measured'), { size: 13, color: C.muted, align: 'right' });
         }
         c.restore();
       }
     },
   },
   {
-    key: 'ploidy', name: '比峰的位置:倍性與基因體大小', dur: 17,
-    cues: [[0, '同種植物的四倍體,染色體套數是二倍體的兩倍,細胞核的 DNA 也多一倍,G1 峰就落在兩倍的位置。'],
-      [4.5, '先用已知倍性的植物把 G1 峰調到固定位置(這裡是第 200 通道),再量未知樣品,比峰的位置推出倍性。右邊可以換樣品。'],
-      [9.5, '要算 DNA 的實際含量,把已知含量的標準植物(這裡是番茄)和樣品一起切、一起染,兩個 G1 峰一起量。'],
-      [13, '樣品的 2C 值(還沒複製的細胞核所含的 DNA 量)= 標準品的 2C 值 × 樣品 G1 位置 ÷ 標準品 G1 位置。']],
+    key: 'ploidy', name: zhEn('比峰的位置:倍性與基因體大小', 'Comparing peaks: ploidy, genome size'), dur: 17,
+    cues: [[0, zhEn('同種植物的四倍體,染色體套數是二倍體的兩倍,細胞核的 DNA 也多一倍,G1 峰就落在兩倍的位置。', 'Within a species, a tetraploid has twice the chromosome sets and DNA of a diploid, so its G1 peak sits twice as far.')],
+      [4.5, zhEn('先用已知倍性的植物把 G1 峰調到固定位置(這裡是第 200 通道),再量未知樣品,比峰的位置推出倍性。右邊可以換樣品。', 'A plant of known ploidy sets the G1 peak at a fixed channel (200 here); then an unknown is compared by peak position. Try samples at right.')],
+      [9.5, zhEn('要算 DNA 的實際含量,把已知含量的標準植物(這裡是番茄)和樣品一起切、一起染,兩個 G1 峰一起量。', 'For actual DNA amounts, chop and stain a standard of known content (tomato here) with the sample and measure both G1 peaks.')],
+      [13, zhEn('樣品的 2C 值(還沒複製的細胞核所含的 DNA 量)= 標準品的 2C 值 × 樣品 G1 位置 ÷ 標準品 G1 位置。', 'Sample 2C value (the DNA in an unreplicated nucleus) = standard 2C × sample G1 position ÷ standard G1 position.')]],
     draw(g, t, S) {
       const c = g.ctx, P = PLOIDY[S.sample], std = ease(seg(t, 9.5, 10.6)) > 0, sa = ease(seg(t, 9.5, 10.6));
       const bins = ploidyBins(S.sample, std);
       const ymax = Math.max(binMax(ploidyBins(S.sample, false)), binMax(ploidyBins(S.sample, true))) * 1.18;
-      const A = g.axes(76, 54, 520, 324, { xmin: 0, xmax: 1000, ymin: 0, ymax, xticks: [0, 200, 400, 600, 800, 1000], xlab: '螢光強度(相對,線性刻度)', ylab: '細胞核數' });
+      const A = g.axes(76, 54, 520, 324, { xmin: 0, xmax: 1000, ymin: 0, ymax, xticks: [0, 200, 400, 600, 800, 1000], xlab: zhEn('螢光強度(相對,線性刻度)', 'Fluorescence (relative, linear scale)'), ylab: zhEn('細胞核數', 'Number of nuclei') });
       const grow = ease(seg(t, 0.3, 2.5));
       const cols = [...P.cols.map((x) => (x === C.mint ? 'rgba(165,243,205,.75)' : 'rgba(184,164,244,.8)')), 'rgba(255,209,102,.8)', 'rgba(255,209,102,.8)'];
       c.save();
@@ -789,7 +810,7 @@ const chapters = [
       // 已知二倍體的 G1 位置
       const ra = 1 - 0.6 * sa;
       c.save(); c.setLineDash([5, 5]); g.line(A.X(200), A.Y(0), A.X(200), 66, `rgba(240,243,238,${0.55 * ra})`, 1.6); c.restore();
-      g.text(A.X(200) + 8, 64, '已知二倍體的 G1 位置', { size: 13, color: C.ink2, alpha: ra });
+      g.text(A.X(200) + 8, 64, zhEn('已知二倍體的 G1 位置', 'G1 position of a known diploid'), { size: 13, color: C.ink2, alpha: ra });
       // 峰的標籤
       if (grow > 0.8) {
         const top = (mu) => A.Y(peakTop(bins, mu));
@@ -805,41 +826,41 @@ const chapters = [
       }
       // 右邊的讀值
       const px = 630, line = (y, s, o = {}) => g.text(px, y, s, { size: 14, color: C.ink2, ...o });
-      g.text(px, 44, '比 G1 峰的位置', { size: 16, weight: 700, color: C.ink });
-      line(74, '已知二倍體的 G1:第 200 通道');
-      if (S.sample === '2x') { line(100, '樣品 G1:第 200 通道'); line(126, '200 ÷ 200 × 2 = 2', { mono: true }); line(154, '→ DNA 二倍體', { size: 16, weight: 700, color: C.mint }); }
-      if (S.sample === '4x') { line(100, '樣品 G1:第 400 通道'); line(126, '400 ÷ 200 × 2 = 4', { mono: true }); line(154, '→ DNA 四倍體', { size: 16, weight: 700, color: C.lav }); }
-      if (S.sample === 'mix') { line(100, '兩個 G1:第 200、400 通道'); line(126, '400 ÷ 200 = 2', { mono: true }); line(154, '→ 一株 2x、一株 4x', { size: 16, weight: 700, color: C.lav }); }
-      line(182, '只看 DNA 量,所以叫「DNA 倍性」', { size: 13, color: C.muted });
+      g.text(px, 44, zhEn('比 G1 峰的位置', 'Comparing G1 peak positions'), { size: 16, weight: 700, color: C.ink });
+      line(74, zhEn('已知二倍體的 G1:第 200 通道', 'Known diploid G1: channel 200'));
+      if (S.sample === '2x') { line(100, zhEn('樣品 G1:第 200 通道', 'Sample G1: channel 200')); line(126, '200 ÷ 200 × 2 = 2', { mono: true }); line(154, zhEn('→ DNA 二倍體', '→ DNA diploid'), { size: 16, weight: 700, color: C.mint }); }
+      if (S.sample === '4x') { line(100, zhEn('樣品 G1:第 400 通道', 'Sample G1: channel 400')); line(126, '400 ÷ 200 × 2 = 4', { mono: true }); line(154, zhEn('→ DNA 四倍體', '→ DNA tetraploid'), { size: 16, weight: 700, color: C.lav }); }
+      if (S.sample === 'mix') { line(100, zhEn('兩個 G1:第 200、400 通道', 'Two G1s: channels 200 and 400')); line(126, '400 ÷ 200 = 2', { mono: true }); line(154, zhEn('→ 一株 2x、一株 4x', '→ One 2x plant, one 4x'), { size: 16, weight: 700, color: C.lav }); }
+      line(182, zhEn('只看 DNA 量,所以叫「DNA 倍性」', 'From DNA amount only, so "DNA ploidy"'), { size: 13, color: C.muted });
       if (sa > 0) {
         c.save(); c.globalAlpha = sa;
-        g.text(px, 230, '和標準品比,算 2C 值', { size: 16, weight: 700, color: C.ink });
-        line(260, `${STD.name}(標準品)2C = ${STD.c2} pg`, { color: C.amber });
-        line(286, `${STD.name} G1:第 ${STD.mu} 通道`, { color: C.amber });
+        g.text(px, 230, zhEn('和標準品比,算 2C 值', 'Finding 2C with a standard'), { size: 16, weight: 700, color: C.ink });
+        line(260, zhEn(`${STD.name}(標準品)2C = ${STD.c2} pg`, `${STD.name} (standard) 2C = ${STD.c2} pg`), { color: C.amber });
+        line(286, zhEn(`${STD.name} G1:第 ${STD.mu} 通道`, `${STD.name} G1: channel ${STD.mu}`), { color: C.amber });
         const calc = (mu) => (STD.c2 * mu) / STD.mu;
         const bp = (pg) => `${(pg * 0.978).toFixed(2)} × 10⁹ bp`;
         const sb = ease(seg(t, 13, 14));
         if (S.sample !== 'mix') {
           const mu = S.sample === '2x' ? 200 : 400;
-          line(316, `樣品 2C = ${STD.c2} × ${mu} ÷ ${STD.mu}`, { alpha: sb });
+          line(316, zhEn(`樣品 2C = ${STD.c2} × ${mu} ÷ ${STD.mu}`, `Sample 2C = ${STD.c2} × ${mu} ÷ ${STD.mu}`), { alpha: sb });
           line(344, `≈ ${calc(mu).toFixed(2)} pg ≈ ${bp(calc(mu))}`, { size: 15, weight: 700, color: S.sample === '2x' ? C.mint : C.lav, alpha: sb });
         } else {
-          line(316, `2x:${STD.c2} × 200 ÷ ${STD.mu} ≈ ${calc(200).toFixed(2)} pg`, { alpha: sb, color: C.mint });
-          line(344, `4x:${STD.c2} × 400 ÷ ${STD.mu} ≈ ${calc(400).toFixed(2)} pg`, { alpha: sb, color: C.lav });
+          line(316, zhEn(`2x:${STD.c2} × 200 ÷ ${STD.mu} ≈ ${calc(200).toFixed(2)} pg`, `2x: ${STD.c2} × 200 ÷ ${STD.mu} ≈ ${calc(200).toFixed(2)} pg`), { alpha: sb, color: C.mint });
+          line(344, zhEn(`4x:${STD.c2} × 400 ÷ ${STD.mu} ≈ ${calc(400).toFixed(2)} pg`, `4x: ${STD.c2} × 400 ÷ ${STD.mu} ≈ ${calc(400).toFixed(2)} pg`), { alpha: sb, color: C.lav });
         }
         line(376, '1 pg DNA ≈ 0.978 × 10⁹ bp', { size: 13, color: C.muted, alpha: sb });
-        g.tag(76, 470, '樣品 2C = 標準品 2C × 樣品 G1 位置 ÷ 標準品 G1 位置', { size: 15, color: C.ink, align: 'left', alpha: sb });
+        g.tag(76, 470, zhEn('樣品 2C = 標準品 2C × 樣品 G1 位置 ÷ 標準品 G1 位置', 'Sample 2C = standard 2C × sample G1 position ÷ standard G1 position'), { size: 15, color: C.ink, align: 'left', alpha: sb });
         c.restore();
       }
-      g.text(596, 30, `樣品:${P.name}(DNA 含量是示意)`, { size: 13, color: C.muted, align: 'right' });
+      g.text(596, 30, zhEn(`樣品:${P.name}(DNA 含量是示意)`, `Sample: ${P.name} (illustrative DNA content)`), { size: 13, color: C.muted, align: 'right' });
     },
   },
   {
-    key: 'sort', name: '細胞分選:把要的細胞收起來', dur: 15,
-    cues: [[0, '有分選功能的流式細胞儀(FACS,螢光活化細胞分選)量完以後,還能依訊號把要的細胞收集起來。'],
-      [4, '噴嘴一直振動,液流在下方斷成一顆顆小液滴;細胞之間有間隔,一顆液滴通常最多只包一個細胞。'],
-      [8, '量到要的細胞時,儀器算好它從雷射流到斷開點的時間,在那一滴脫離液流的瞬間讓它帶電。'],
-      [11.5, '帶電的液滴經過兩片高壓偏轉板時被拉向一邊,落進收集管;沒帶電的直直落進廢液。右邊可以改要收哪一種。']],
+    key: 'sort', name: zhEn('細胞分選:把要的細胞收起來', 'Cell sorting: collect chosen cells'), dur: 15,
+    cues: [[0, zhEn('有分選功能的流式細胞儀(FACS,螢光活化細胞分選)量完以後,還能依訊號把要的細胞收集起來。', 'A sorting cytometer (FACS, fluorescence-activated cell sorting) also collects chosen cells by signal.')],
+      [4, zhEn('噴嘴一直振動,液流在下方斷成一顆顆小液滴;細胞之間有間隔,一顆液滴通常最多只包一個細胞。', 'The vibrating nozzle breaks the stream into droplets; spaced-out cells mean at most one per droplet, usually.')],
+      [8, zhEn('量到要的細胞時,儀器算好它從雷射流到斷開點的時間,在那一滴脫離液流的瞬間讓它帶電。', 'For a wanted cell, the machine times its trip from laser to break-off and charges the droplet just then.')],
+      [11.5, zhEn('帶電的液滴經過兩片高壓偏轉板時被拉向一邊,落進收集管;沒帶電的直直落進廢液。右邊可以改要收哪一種。', 'High-voltage plates pull charged droplets into a collection tube; the rest fall to waste. Pick which cells at right.')]],
     draw(g, t, S) {
       const c = g.ctx, x0 = SO.x, want = (d) => soCell(d) && (S.pick === 'pos' ? soGreen(d) : !soGreen(d));
       const da = ease(seg(t, 4, 5));
@@ -848,7 +869,7 @@ const chapters = [
       const vib = Math.sin(t * 30) * 1.5;
       g.rrect(x0 - 64 + vib, 24, 26, 26, 4, '#2a2440', C.lav, 1.4);
       for (let i = 0; i < 3; i++) g.line(x0 - 58 + vib + i * 7, 30, x0 - 55 + vib + i * 7, 44, C.lav, 1.4);
-      g.text(x0 - 72, 37, '振動', { size: 14, color: C.lav, align: 'right' });
+      g.text(x0 - 72, 37, zhEn('振動', 'Vibration'), { size: 14, color: C.lav, align: 'right' });
       // 液流(斷開點以上連續,靠近斷開點開始一縮一縮)
       const ph = (t / SO.T) % 1;
       c.save(); c.beginPath();
@@ -856,24 +877,24 @@ const chapters = [
       for (let y = 58; y <= SO.bo; y += 2) c.lineTo(x0 - half(y), y);
       for (let y = SO.bo; y >= 58; y -= 2) c.lineTo(x0 + half(y), y);
       c.closePath(); c.fillStyle = 'rgba(127,200,255,.35)'; c.fill(); c.restore();
-      g.text(x0 + 22, SO.bo - 4, '斷開點', { size: 13, color: C.muted, alpha: da });
+      g.text(x0 + 22, SO.bo - 4, zhEn('斷開點', 'Break-off point'), { size: 13, color: C.muted, alpha: da });
       // 雷射與偵測器
       g.rrect(300, SO.ly - 12, 62, 24, 5, '#13202a', LASER);
-      g.text(331, SO.ly - 28, '雷射', { size: 14, weight: 700, color: LASER, align: 'center' });
+      g.text(331, SO.ly - 28, zhEn('雷射', 'Laser'), { size: 14, weight: 700, color: LASER, align: 'center' });
       g.line(362, SO.ly, x0, SO.ly, LASER, 3); g.line(x0, SO.ly, 478, SO.ly, 'rgba(127,184,255,.3)', 2);
       g.rrect(478, SO.ly - 20, 44, 40, 6, C.panel, C.ink2, 1.4);
-      g.text(500, SO.ly - 34, '偵測器', { size: 14, color: C.ink2, align: 'center' });
+      g.text(500, SO.ly - 34, zhEn('偵測器', 'Detector'), { size: 14, color: C.ink2, align: 'center' });
       // 偏轉板與收集管
       g.rrect(352, SO.plTop, 12, SO.plBot - SO.plTop, 3, '#1b2533', C.blue, 1.4);
       g.rrect(496, SO.plTop, 12, SO.plBot - SO.plTop, 3, '#33201f', C.red, 1.4);
       g.text(358, SO.plTop - 14, '−', { size: 20, weight: 700, color: C.blue, align: 'center' });
       g.text(502, SO.plTop - 14, '+', { size: 20, weight: 700, color: C.red, align: 'center' });
-      g.text(518, 346, '偏轉板', { size: 14, color: C.ink2 });
-      g.text(518, 368, '(兩片間高電壓)', { size: 13, color: C.muted });
+      g.text(518, zhEn(346, 354), zhEn('偏轉板', 'Deflection plates'), { size: 14, color: C.ink2 }); // 英文往下移,不擠到右邊的字
+      g.text(518, zhEn(368, 376), zhEn('(兩片間高電壓)', '(high voltage between them)'), { size: 13, color: C.muted });
       g.tube(332, 446, 46, 70, { fill: 0.3, liquid: 'rgba(125,255,158,.16)' });
-      g.text(270, 470, '收集管', { size: 14, weight: 700, color: C.mint, align: 'right' });
+      g.text(270, 470, zhEn('收集管', 'Collection tube'), { size: 14, weight: 700, color: C.mint, align: 'right' });
       g.rrect(404, 470, 56, 48, 4, '#0d1514', C.ink2, 1.4);
-      g.text(474, 498, '廢液', { size: 14, color: C.ink2 });
+      g.text(474, 498, zhEn('廢液', 'Waste'), { size: 14, color: C.ink2 });
       // 液滴與細胞:第 d 滴在 t = d × T 時從斷開點脫離
       const dNow = Math.floor(t / SO.T), delay = (SO.bo - SO.ly) / SO.v; // 液滴延遲:細胞從雷射流到斷開點的時間
       let lastMeasured = null, collected = 0, wasted = 0;
@@ -894,35 +915,35 @@ const chapters = [
         g.circle(x, y, 9.5, 'rgba(127,200,255,.22)', tgt ? C.amber : 'rgba(185,199,192,.55)', tgt ? 2 : 1.2);
         if (hasCell) g.circle(x, y, 4.8, green ? GREEN : 'rgba(240,243,238,.95)');
         if (tgt) g.text(x + 14, y - 11, '+', { size: 14, weight: 700, color: C.amber });
-        if (tgt && t - td < 0.5) { glowDot(g, x0, SO.bo, 9, C.amber, 18, 1 - (t - td) / 0.5); g.tag(x0 - 20, SO.bo + 8, '這一滴充電', { size: 13, color: C.amber, align: 'right', alpha: 1 - (t - td) / 0.5 }); }
+        if (tgt && t - td < 0.5) { glowDot(g, x0, SO.bo, 9, C.amber, 18, 1 - (t - td) / 0.5); g.tag(x0 - 20, SO.bo + 8, zhEn('這一滴充電', 'Charging this droplet'), { size: 13, color: C.amber, align: 'right', alpha: 1 - (t - td) / 0.5 }); }
       }
       // 右邊:判斷與計數
       const px = 604;
       g.panel(px, 22, 330, 200, '');
-      g.text(px + 16, 48, '這一顆要不要收?', { size: 15, weight: 700, color: C.ink });
-      g.text(px + 16, 78, S.pick === 'pos' ? '要收:有綠色螢光的細胞' : '要收:沒有螢光的細胞', { size: 14, color: C.ink2 });
+      g.text(px + 16, 48, zhEn('這一顆要不要收?', 'Collect this one?'), { size: 15, weight: 700, color: C.ink });
+      g.text(px + 16, 78, S.pick === 'pos' ? zhEn('要收:有綠色螢光的細胞', 'Collect: green fluorescent cells') : zhEn('要收:沒有螢光的細胞', 'Collect: cells with no fluorescence'), { size: 14, color: C.ink2 });
       if (lastMeasured !== null) {
         const gr = soGreen(lastMeasured), tg = want(lastMeasured);
-        g.text(px + 16, 110, gr ? '剛量到:綠色螢光 強' : '剛量到:沒有螢光', { size: 14, color: gr ? GREEN : C.ink2 });
-        g.text(px + 16, 140, tg ? '→ 這一滴帶電,收集' : '→ 不帶電,流進廢液', { size: 15, weight: 700, color: tg ? C.amber : C.muted });
-      } else g.text(px + 16, 110, '等細胞通過雷射……', { size: 14, color: C.muted });
-      g.text(px + 16, 172, '雷射到斷開點要走一段時間', { size: 13, color: C.muted });
-      g.text(px + 16, 194, '(液滴延遲),儀器算好再充電', { size: 13, color: C.muted });
-      g.text(px, 268, `收集管:${collected} 個細胞`, { size: 17, weight: 700, color: C.mint });
-      g.text(px, 298, `廢液:${wasted} 個細胞`, { size: 15, color: C.ink2 });
-      g.text(px, 330, '(空的液滴不算;這裡是慢動作)', { size: 13, color: C.muted });
+        g.text(px + 16, 110, gr ? zhEn('剛量到:綠色螢光 強', 'Just measured: bright green') : zhEn('剛量到:沒有螢光', 'Just measured: no fluorescence'), { size: 14, color: gr ? GREEN : C.ink2 });
+        g.text(px + 16, 140, tg ? zhEn('→ 這一滴帶電,收集', '→ Droplet charged, collected') : zhEn('→ 不帶電,流進廢液', '→ Not charged, goes to waste'), { size: 15, weight: 700, color: tg ? C.amber : C.muted });
+      } else g.text(px + 16, 110, zhEn('等細胞通過雷射……', 'Waiting for a cell at the laser…'), { size: 14, color: C.muted });
+      g.text(px + 16, 172, zhEn('雷射到斷開點要走一段時間', 'Laser to break-off takes time'), { size: 13, color: C.muted });
+      g.text(px + 16, 194, zhEn('(液滴延遲),儀器算好再充電', '(drop delay); charging is timed'), { size: 13, color: C.muted });
+      g.text(px, 268, zhEn(`收集管:${collected} 個細胞`, `Collection tube: ${collected} ${collected === 1 ? 'cell' : 'cells'}`), { size: 17, weight: 700, color: C.mint });
+      g.text(px, 298, zhEn(`廢液:${wasted} 個細胞`, `Waste: ${wasted} ${wasted === 1 ? 'cell' : 'cells'}`), { size: 15, color: C.ink2 });
+      g.text(px, 330, zhEn('(空的液滴不算;這裡是慢動作)', '(empty droplets not counted; slow motion)'), { size: 13, color: C.muted });
     },
   },
   {
-    key: 'compensation', name: '進階:多色螢光的補償', dur: 18,
-    cues: [[0, 'FITC 的放射光拖著長尾巴,有一段落在 PE 偵測器的範圍裡:只染 FITC 的細胞,PE 偵測器也有訊號。這叫溢漏。'],
-      [4.5, '用只染一種顏色的對照,比陽性與陰性兩群的中位數:溢漏係數 s = PE 偵測器的差 ÷ FITC 偵測器的差。'],
-      [9, '補償就是把溢漏扣掉:PE(補償後)= PE − s × FITC。顏色多時,溢漏係數排成矩陣 S,乘上它的反矩陣。'],
-      [13.5, '補償不足,陽性斜斜往上;過度,被壓到零以下。光子計數的誤差讓分布變寬,這部分扣不掉。右邊可以調。']],
+    key: 'compensation', name: zhEn('進階:多色螢光的補償', 'Advanced: multicolor compensation'), dur: 18,
+    cues: [[0, zhEn('FITC 的放射光拖著長尾巴,有一段落在 PE 偵測器的範圍裡:只染 FITC 的細胞,PE 偵測器也有訊號。這叫溢漏。', 'FITC light has a long tail into the PE detector range, so FITC-only cells also give a PE signal. This is spillover.')],
+      [4.5, zhEn('用只染一種顏色的對照,比陽性與陰性兩群的中位數:溢漏係數 s = PE 偵測器的差 ÷ FITC 偵測器的差。', 'A single-color control compares positive and negative medians: spillover s = difference in PE ÷ difference in FITC.')],
+      [9, zhEn('補償就是把溢漏扣掉:PE(補償後)= PE − s × FITC。顏色多時,溢漏係數排成矩陣 S,乘上它的反矩陣。', 'Compensation removes spillover: PE (compensated) = PE − s × FITC. For many colors, multiply by the inverse of the matrix S of coefficients.')],
+      [13.5, zhEn('補償不足,陽性斜斜往上;過度,被壓到零以下。光子計數的誤差讓分布變寬,這部分扣不掉。右邊可以調。', 'Too little: positives slant up. Too much: below zero. Photon counting widens the spread, which cannot be removed. Try it at right.')]],
     draw(g, t, S) {
       const c = g.ctx, d = cpSample(S.bright);
       // ---- 左上:放射光譜與兩個偵測器的範圍 ----
-      g.panel(24, 14, 432, 226, '放射光譜(示意)');
+      g.panel(24, 14, 432, 226, zhEn('放射光譜(示意)', 'Emission spectra (illustrative)'));
       const SA = { x: 56, y: 70, w: 384, h: 118, l0: 480, l1: 680 };
       const LX = (l) => SA.x + ((l - SA.l0) / (SA.l1 - SA.l0)) * SA.w, LY = (v) => SA.y + SA.h - v * SA.h;
       const ba = ease(seg(t, 1.2, 2.2));
@@ -930,8 +951,8 @@ const chapters = [
         c.save(); c.globalAlpha = ba;
         g.rrect(LX(BAND_F[0]), SA.y - 6, LX(BAND_F[1]) - LX(BAND_F[0]), SA.h + 6, 3, 'rgba(125,255,158,.08)', 'rgba(125,255,158,.5)', 1.2);
         g.rrect(LX(BAND_P[0]), SA.y - 6, LX(BAND_P[1]) - LX(BAND_P[0]), SA.h + 6, 3, 'rgba(255,179,92,.08)', 'rgba(255,179,92,.5)', 1.2);
-        g.text(LX(530), SA.y - 18, '綠色偵測器', { size: 13, color: GREEN, align: 'center' });
-        g.text(LX(585), SA.y - 18, '橘黃色偵測器', { size: 13, color: ORANGE, align: 'center' });
+        g.text(LX(530), SA.y - 18, zhEn('綠色偵測器', 'FITC detector'), { size: 13, color: GREEN, align: 'center' });
+        g.text(LX(585), SA.y - 18, zhEn('橘黃色偵測器', 'PE detector'), { size: 13, color: ORANGE, align: 'center' });
         c.restore();
       }
       const sa = ease(seg(t, 2.4, 3.4));
@@ -940,7 +961,7 @@ const chapters = [
         for (let l = BAND_P[0]; l <= BAND_P[1]; l += 1) c.lineTo(LX(l), LY(EM_F(l)));
         c.lineTo(LX(BAND_P[1]), LY(0)); c.closePath(); c.fillStyle = 'rgba(125,255,158,.5)'; c.fill(); c.restore();
         g.arrow(LX(646), LY(0.5), LX(596), LY(0.1), { color: C.amber, lw: 2, head: 8, alpha: sa });
-        g.tag(LX(652), LY(0.62), '溢漏', { size: 15, color: C.amber, alpha: sa });
+        g.tag(LX(652), LY(0.62), zhEn('溢漏', 'Spillover'), { size: 15, color: C.amber, alpha: sa });
       }
       const lmax = lerp(SA.l0, SA.l1, ease(seg(t, 0.2, 2)));
       const spec = (f) => { const pts = []; for (let l = SA.l0; l <= lmax; l += 2) pts.push([LX(l), LY(f(l))]); return pts; };
@@ -949,17 +970,17 @@ const chapters = [
       if (lmax > 600) g.text(LX(590), LY(0.92), 'PE', { size: 15, weight: 700, color: ORANGE });
       g.line(SA.x, LY(0), SA.x + SA.w, LY(0), C.ink2, 1.4);
       for (const l of [500, 550, 600, 650]) { g.line(LX(l), LY(0), LX(l), LY(0) + 5, C.ink2, 1.2); g.text(LX(l), LY(0) + 17, `${l}`, { size: 12, color: C.muted, align: 'center', mono: true }); }
-      g.text(SA.x + SA.w, LY(0) + 36, '波長(nm)', { size: 13, color: C.ink2, align: 'right' });
+      g.text(SA.x + SA.w, LY(0) + 36, zhEn('波長(nm)', 'Wavelength (nm)'), { size: 13, color: C.ink2, align: 'right' });
       // ---- 左下:單染對照算溢漏係數,之後是補償的算式 ----
       g.panel(24, 252, 432, 274, '');
       const cb = ease(seg(t, 4.5, 5.3)), sb = ease(seg(t, 6, 6.8)), K = CP_CTRL;
       if (cb > 0) {
         c.save(); c.globalAlpha = cb;
-        g.text(40, 278, '只染 FITC 的對照', { size: 16, weight: 700, color: C.ink });
-        g.text(318, 310, 'FITC 偵測器', { size: 13, color: GREEN, align: 'right' });
-        g.text(440, 310, 'PE 偵測器', { size: 13, color: ORANGE, align: 'right' });
-        g.text(40, 340, '陽性的中位數', { size: 15, color: C.ink2 });
-        g.text(40, 370, '陰性的中位數', { size: 15, color: C.ink2 });
+        g.text(40, 278, zhEn('只染 FITC 的對照', 'FITC-only control'), { size: 16, weight: 700, color: C.ink });
+        g.text(318, 310, zhEn('FITC 偵測器', 'FITC detector'), { size: 13, color: GREEN, align: 'right' });
+        g.text(440, 310, zhEn('PE 偵測器', 'PE detector'), { size: 13, color: ORANGE, align: 'right' });
+        g.text(40, 340, zhEn('陽性的中位數', 'Positive median'), { size: 15, color: C.ink2 });
+        g.text(40, 370, zhEn('陰性的中位數', 'Negative median'), { size: 15, color: C.ink2 });
         g.text(318, 340, fmtN(K.pF), { size: 16, color: C.ink, align: 'right', mono: true });
         g.text(440, 340, fmtN(K.pP), { size: 16, color: C.ink, align: 'right', mono: true });
         g.text(318, 370, fmtN(K.nF), { size: 16, color: C.ink, align: 'right', mono: true });
@@ -975,14 +996,14 @@ const chapters = [
       const ca = ease(seg(t, 9, 9.8));
       if (ca > 0) {
         c.save(); c.globalAlpha = ca;
-        g.text(40, 478, `補償:PE − ${S.comp}% × FITC`, { size: 17, weight: 700, color: C.mint });
-        g.text(40, 506, '多色:真的 = 量到 × S⁻¹', { size: 15, color: C.ink2, mono: false });
+        g.text(40, 478, zhEn(`補償:PE − ${S.comp}% × FITC`, `Compensation: PE − ${S.comp}% × FITC`), { size: 17, weight: 700, color: C.mint });
+        g.text(40, 506, zhEn('多色:真的 = 量到 × S⁻¹', 'Many colors: true = measured × S⁻¹'), { size: 15, color: C.ink2, mono: false });
         c.restore();
       }
       // ---- 右:FITC 對 PE 的點圖(雙指數刻度) ----
       const PA = { x: 552, y: 30, w: 368, h: 316 };
       const fm = (v) => BX_L[BX_T.indexOf(v)] ?? '';
-      const A = g.axes(PA.x, PA.y, PA.w, PA.h, { xmin: BX.lo, xmax: BX.hi, ymin: BX.lo, ymax: BX.hi, xticks: BX_T, yticks: BX_T, fmtX: fm, fmtY: fm, xlab: 'FITC(綠色偵測器)', ylab: 'PE(橘黃色偵測器)' });
+      const A = g.axes(PA.x, PA.y, PA.w, PA.h, { xmin: BX.lo, xmax: BX.hi, ymin: BX.lo, ymax: BX.hi, xticks: BX_T, yticks: BX_T, fmtX: fm, fmtY: fm, xlab: zhEn('FITC(綠色偵測器)', 'FITC (green detector)'), ylab: zhEn('PE(橘黃色偵測器)', 'PE (orange detector)') });
       g.line(A.X(0), PA.y, A.X(0), PA.y + PA.h, 'rgba(255,255,255,.12)', 1, [3, 4]);
       const k = t < 9 ? 0 : (S.comp / 100) * ease(seg(t, 9, 11));
       const show = ease(seg(t, 0.2, 1.4));
@@ -995,9 +1016,9 @@ const chapters = [
       const pv = sorted(d.fp.map(([f, p]) => p - k * f)), fx = A.X(bix(d.fq[1]));
       const yTop = A.Y(clamp(bix(quant(pv, 0.97)), BX.lo, BX.hi));
       if (show > 0.5) {
-        g.text(A.X(bix(CP.afF)), A.Y(bix(CP.afP)) + 38, '陰性', { size: 14, color: C.ink2, align: 'center' });
-        g.text(A.X(bix(CP.afF)) + 22, A.Y(bix(CP.pe)), 'PE 陽性', { size: 14, color: ORANGE });
-        g.text(fx, Math.max(PA.y + 10, yTop - 14), 'FITC 陽性', { size: 14, color: GREEN, align: 'center' });
+        g.text(A.X(bix(CP.afF)), A.Y(bix(CP.afP)) + 38, zhEn('陰性', 'Negative'), { size: 14, color: C.ink2, align: 'center' });
+        g.text(A.X(bix(CP.afF)) + zhEn(22, -22), A.Y(bix(CP.pe)), zhEn('PE 陽性', 'PE positive'), { size: 14, color: ORANGE, align: zhEn('left', 'right') }); // 英文放在 PE 陽性那一群的左邊
+        g.text(fx, Math.max(PA.y + 10, yTop - 14), zhEn('FITC 陽性', 'FITC positive'), { size: 14, color: GREEN, align: 'center' });
       }
       // 中位數:陰性一條虛線,FITC 陽性一小段粗線
       let st = null;
@@ -1013,33 +1034,33 @@ const chapters = [
         const ya = A.Y(clamp(bix(st.m1 + st.r1), BX.lo, BX.hi)), yb = A.Y(clamp(bix(st.m1 - st.r1), BX.lo, BX.hi));
         c.save(); c.globalAlpha = a;
         g.line(bxr, ya, bxr, yb, C.ink, 2); g.line(bxr - 5, ya, bxr, ya, C.ink, 2); g.line(bxr - 5, yb, bxr, yb, C.ink, 2);
-        g.text(bxr + 6, (ya + yb) / 2 - 10, '變寬', { size: 15, weight: 700, color: C.ink });
-        g.text(bxr + 6, (ya + yb) / 2 + 10, '扣不掉', { size: 13, color: C.ink2 });
+        g.text(bxr + 6, (ya + yb) / 2 - 10, zhEn('變寬', 'Spread'), { size: 15, weight: 700, color: C.ink });
+        g.text(bxr + 6, (ya + yb) / 2 + 10, zhEn('扣不掉', 'remains'), { size: 13, color: C.ink2 });
         c.restore();
       }
       // ---- 右下:讀值 ----
-      if (t < 9) g.text(492, 424, '還沒補償:FITC 陽性的細胞斜斜往上', { size: 16, weight: 700, color: C.amber, alpha: ease(seg(t, 1.2, 2)) });
-      else if (!st) g.text(492, 424, '把溢漏扣掉……', { size: 16, weight: 700, color: C.mint });
+      if (t < 9) g.text(492, 424, zhEn('還沒補償:FITC 陽性的細胞斜斜往上', 'Uncompensated: FITC positives slant up'), { size: 16, weight: 700, color: C.amber, alpha: ease(seg(t, 1.2, 2)) });
+      else if (!st) g.text(492, 424, zhEn('把溢漏扣掉……', 'Subtracting the spillover…'), { size: 16, weight: 700, color: C.mint });
       else {
-        g.text(492, 424, `補償 ${S.comp}%:${st.verdict[0]}`, { size: 18, weight: 700, color: st.verdict[1] });
-        g.text(492, 456, `FITC 陽性在 PE 的中位數 ${fmtS(st.m1)}(陰性 ${fmtS(st.m0)})`, { size: 14, color: C.ink2 });
-        g.text(492, 484, `補償後的寬度:陰性 ±${fmtN(st.r0)},FITC 陽性 ±${fmtN(st.r1)}`, { size: 14, color: C.ink2 });
-        g.text(492, 512, '虛線:陰性的中位數;粗線:FITC 陽性的中位數', { size: 13, color: C.muted });
+        g.text(492, 424, zhEn(`補償 ${S.comp}%:${st.verdict[0]}`, `Compensation ${S.comp}%: ${st.verdict[0]}`), { size: 18, weight: 700, color: st.verdict[1] });
+        g.text(492, 456, zhEn(`FITC 陽性在 PE 的中位數 ${fmtS(st.m1)}(陰性 ${fmtS(st.m0)})`, `FITC positive median in PE: ${fmtS(st.m1)} (negative ${fmtS(st.m0)})`), { size: 14, color: C.ink2 });
+        g.text(492, 484, zhEn(`補償後的寬度:陰性 ±${fmtN(st.r0)},FITC 陽性 ±${fmtN(st.r1)}`, `Compensated width: negative ±${fmtN(st.r0)}, FITC positive ±${fmtN(st.r1)}`), { size: 14, color: C.ink2 });
+        g.text(492, 512, zhEn('虛線:陰性的中位數;粗線:FITC 陽性的中位數', 'Dashed: negative median; thick: FITC positive median'), { size: 13, color: C.muted });
       }
     },
   },
   {
-    key: 'endoreduplication', name: '進階:核內複製', dur: 17,
-    cues: [[0, '植物細胞長大時常不再分裂,DNA 卻繼續複製:每一輪細胞核的 DNA 加倍,2C 變 4C、8C、16C。這叫核內複製。'],
-      [4.5, '所以葉片的直方圖常有一串峰,每個峰在前一個的兩倍位置;橫軸改用對數刻度,峰才會等距排開。'],
-      [9, '數每個峰有多少細胞核,算核內複製指數:EI = Σ(複製輪數 × 該峰的比例),就是平均每個細胞核複製了幾輪。'],
-      [13, '4C 峰也混著還在 G2 期的細胞核,流式分不出來;量基因體大小要用幼嫩的葉。右邊可以換器官與倍性。']],
+    key: 'endoreduplication', name: zhEn('進階:核內複製', 'Advanced: endoreduplication'), dur: 17,
+    cues: [[0, zhEn('植物細胞長大時常不再分裂,DNA 卻繼續複製:每一輪細胞核的 DNA 加倍,2C 變 4C、8C、16C。這叫核內複製。', 'Growing plant cells often stop dividing but keep copying their DNA, doubling it each round: 2C to 4C, 8C, 16C. This is endoreduplication.')],
+      [4.5, zhEn('所以葉片的直方圖常有一串峰,每個峰在前一個的兩倍位置;橫軸改用對數刻度,峰才會等距排開。', 'Leaf histograms often show a row of peaks, each at twice the one before; a log axis spaces them evenly.')],
+      [9, zhEn('數每個峰有多少細胞核,算核內複製指數:EI = Σ(複製輪數 × 該峰的比例),就是平均每個細胞核複製了幾輪。', 'Counting nuclei in each peak gives the endoreduplication index EI = Σ(rounds × fraction in the peak): the average rounds per nucleus.')],
+      [13, zhEn('4C 峰也混著還在 G2 期的細胞核,流式分不出來;量基因體大小要用幼嫩的葉。右邊可以換器官與倍性。', 'The 4C peak also holds G2 nuclei, which flow cannot separate; use young leaves for genome size. Try organ and ploidy at right.')]],
     draw(g, t, S) {
       const c = g.ctx, p = ENDO[S.organ][S.endoPl], off = S.endoPl === '4x' ? 1 : 0, col = off ? C.lav : C.mint;
       // ---- 左:細胞核一輪一輪複製(示意) ----
       const ta = ease(seg(t, 0.2, 1));
-      g.text(36, 40, '細胞不分裂,DNA 繼續複製', { size: 18, weight: 700, color: C.ink, alpha: ta });
-      g.text(36, 70, '每一輪,細胞核的 DNA 加倍', { size: 15, color: C.ink2, alpha: ta });
+      g.text(36, 40, zhEn('細胞不分裂,DNA 繼續複製', 'No division, but DNA keeps copying'), { size: 18, weight: 700, color: C.ink, alpha: ta });
+      g.text(36, 70, zhEn('每一輪,細胞核的 DNA 加倍', 'Each round doubles the DNA in the nucleus'), { size: 15, color: C.ink2, alpha: ta });
       const CXs = [60, 144, 246, 366], RC = [18, 26, 36, 48], RN = [8, 11, 15, 20], cy = 176;
       CXs.forEach((x, i) => {
         const a = ease(seg(t, 0.6 + i * 0.9, 1.2 + i * 0.9));
@@ -1061,7 +1082,7 @@ const chapters = [
       const bins = endoBins(S.organ, S.endoPl), ymax = Math.max(...bins.map((b) => b.v + b.deb)) * 1.18;
       const ticks = [0, 1, 2, 3, 4, 5, 6, 7];
       c.save(); c.globalAlpha = ha;
-      const A = g.axes(502, 44, 420, 238, { xmin: EU.lo, xmax: EU.hi, ymin: 0, ymax, xticks: ticks, fmtX: (v) => `${2 ** (v + 1)}C`, xlab: 'DNA 量(對數刻度,以二倍體為準)', ylab: '細胞核數' });
+      const A = g.axes(502, 44, 420, 238, { xmin: EU.lo, xmax: EU.hi, ymin: 0, ymax, xticks: ticks, fmtX: (v) => `${2 ** (v + 1)}C`, xlab: zhEn('DNA 量(對數刻度,以二倍體為準)', 'DNA amount (log scale, relative to diploid)'), ylab: zhEn('細胞核數', 'Number of nuclei') });
       for (const b of bins) {
         const x0 = A.X(b.x - EU.bw / 2), w = Math.max(1, A.X(b.x + EU.bw / 2) - x0 - 0.3);
         c.fillStyle = 'rgba(125,143,136,.55)'; c.fillRect(x0, A.Y(b.deb * grow), w, A.Y(0) - A.Y(b.deb * grow));
@@ -1074,18 +1095,18 @@ const chapters = [
       });
       if (off) {
         g.line(A.X(0), A.Y(0), A.X(0), 52, 'rgba(240,243,238,.5)', 1.4, [5, 5]);
-        g.text(A.X(0) + 6, 58, '二倍體的 2C', { size: 13, color: C.ink2 });
+        g.text(A.X(0) + 6, 58, zhEn('二倍體的 2C', 'Diploid 2C'), { size: 13, color: C.ink2 });
       }
       c.restore();
-      g.text(922, 30, `阿拉伯芥 Ag-0 的${ENDO_NAME[S.organ]}(${S.endoPl === '4x' ? '四倍體' : '二倍體'})`, { size: 13, color: C.muted, align: 'right', alpha: ha });
+      g.text(922, 30, zhEn(`阿拉伯芥 Ag-0 的${ENDO_NAME[S.organ]}(${S.endoPl === '4x' ? '四倍體' : '二倍體'})`, `Arabidopsis Ag-0 ${ENDO_NAME[S.organ]} (${S.endoPl === '4x' ? 'tetraploid' : 'diploid'})`), { size: 13, color: C.muted, align: 'right', alpha: ha });
       // ---- 右下:核內複製指數 ----
       const ea = ease(seg(t, 9, 9.8));
       if (ea > 0) {
         c.save(); c.globalAlpha = ea;
         const colX = (j) => 610 + j * 61, rows = [376, 406, 436];
-        g.text(486, rows[0], '複製輪數', { size: 14, color: C.ink2 });
-        g.text(486, rows[1], '比例(%)', { size: 14, color: C.ink2 });
-        g.text(486, rows[2], '輪數×比例', { size: 14, color: C.ink2 });
+        g.text(zhEn(486, 478), rows[0], zhEn('複製輪數', 'Rounds'), { size: 14, color: C.ink2 }); // 英文的列名往左移 8
+        g.text(zhEn(486, 478), rows[1], zhEn('比例(%)', 'Share (%)'), { size: 14, color: C.ink2 });
+        g.text(zhEn(486, 478), rows[2], zhEn('輪數×比例', 'Rounds × %'), { size: 14, color: C.ink2 });
         const rest = p.slice(5), restP = rest.reduce((a, v) => a + v, 0), restW = rest.reduce((a, v, i) => a + (i + 5) * v, 0);
         for (let j = 0; j <= 5; j++) {
           const pv = j < 5 ? p[j] : restP, wv = j < 5 ? j * p[j] : restW;
@@ -1095,7 +1116,7 @@ const chapters = [
         }
         const sumP = p.reduce((a, v) => a + v, 0), sumW = p.reduce((a, v, i) => a + i * v, 0);
         g.text(486, 476, `EI = ${sumW.toFixed(1)} ÷ ${sumP.toFixed(1)} = ${eiOf(p).toFixed(2)}`, { size: 20, weight: 700, color: col, mono: true });
-        g.text(486, 506, '平均每個細胞核複製了幾輪', { size: 14, color: C.ink2 });
+        g.text(486, 506, zhEn('平均每個細胞核複製了幾輪', 'Average rounds of copying per nucleus'), { size: 14, color: C.ink2 });
         c.restore();
       }
       // ---- 左下:判讀時要注意 ----
@@ -1103,13 +1124,13 @@ const chapters = [
       if (na > 0) {
         c.save(); c.globalAlpha = na;
         g.panel(24, 300, 420, 226, '');
-        g.text(40, 330, '4C 峰 = 複製過一輪的', { size: 15, color: C.ink });
-        g.text(40, 356, '+ 還在 G2 期、還沒分裂的', { size: 15, color: C.ink });
-        g.text(40, 382, '流式只看 DNA 量,分不出兩者', { size: 13, color: C.muted });
-        g.text(40, 422, '量基因體大小:用幼嫩的葉', { size: 15, weight: 700, color: C.mint });
-        g.text(40, 448, '老葉與分化的組織核內複製多', { size: 13, color: C.muted });
-        if (off) g.text(40, 490, '四倍體:最左邊的峰在二倍體 4C 的位置', { size: 14, color: C.lav });
-        if (off) g.text(40, 514, '輪數從自己最左邊的峰算起', { size: 13, color: C.muted });
+        g.text(40, 330, zhEn('4C 峰 = 複製過一輪的', '4C peak = nuclei copied once'), { size: 15, color: C.ink });
+        g.text(40, 356, zhEn('+ 還在 G2 期、還沒分裂的', '+ nuclei in G2, not yet divided'), { size: 15, color: C.ink });
+        g.text(40, 382, zhEn('流式只看 DNA 量,分不出兩者', 'Flow measures only DNA and cannot tell them apart'), { size: 13, color: C.muted });
+        g.text(40, 422, zhEn('量基因體大小:用幼嫩的葉', 'For genome size: use young leaves'), { size: 15, weight: 700, color: C.mint });
+        g.text(40, 448, zhEn('老葉與分化的組織核內複製多', 'Old and differentiated tissues have more'), { size: 13, color: C.muted });
+        if (off) g.text(40, 490, zhEn('四倍體:最左邊的峰在二倍體 4C 的位置', 'Tetraploid: first peak at the diploid 4C'), { size: 14, color: C.lav });
+        if (off) g.text(40, 514, zhEn('輪數從自己最左邊的峰算起', 'Count rounds from its own first peak'), { size: 13, color: C.muted });
         c.restore();
       }
     },
@@ -1120,18 +1141,18 @@ createLesson({
   chapters,
   state: { rate: 'low', size: 30, gran: 10, dye: 'go', gate: 'lym', cut: 1.8, sample: '4x', pick: 'pos', comp: 18, bright: 'mid', organ: 'leaf', endoPl: '2x' },
   controls: [
-    { id: 'rate', label: '樣品流速', type: 'seg', options: [{ v: 'low', label: '低' }, { v: 'mid', label: '中' }, { v: 'high', label: '高' }], chapters: ['fluidics'], restart: false },
-    { id: 'size', label: '細胞大小', type: 'range', min: 0, max: 100, step: 1, format: (v) => sizeName(v), chapters: ['scatter'], restart: false },
-    { id: 'gran', label: '內部顆粒', type: 'range', min: 0, max: 100, step: 1, format: (v) => granName(v), chapters: ['scatter'], restart: false },
-    { id: 'dye', label: '細胞上的標記', type: 'seg', options: [{ v: 'g', label: '綠色(FITC)' }, { v: 'o', label: '橘黃色(PE)' }, { v: 'go', label: '兩種都有' }], chapters: ['fluor'], restart: false },
-    { id: 'gate', label: '圈哪一群', type: 'seg', options: GATE_KEYS.map((k) => ({ v: k, label: GATES[k].name })), chapters: ['gating'], restart: false },
-    { id: 'cut', label: '陽性門檻', type: 'range', min: 0.5, max: 3.5, step: 0.05, format: (v) => `螢光 ${fmtN(10 ** v)}`, chapters: ['gating'], restart: false },
-    { id: 'sample', label: '樣品', type: 'seg', options: [{ v: '2x', label: '二倍體' }, { v: '4x', label: '四倍體' }, { v: 'mix', label: '兩株一起切' }], chapters: ['ploidy'], restart: false },
-    { id: 'pick', label: '要收哪一種', type: 'seg', options: [{ v: 'pos', label: '有綠色螢光' }, { v: 'neg', label: '沒有螢光' }], chapters: ['sort'], restart: false },
-    { id: 'comp', label: '補償:從 PE 扣掉 FITC 的幾 %', type: 'range', min: 0, max: 30, step: 1, unit: '%', chapters: ['compensation'], restart: false },
-    { id: 'bright', label: 'FITC 陽性細胞的亮度', type: 'seg', options: [{ v: 'dim', label: '暗' }, { v: 'mid', label: '中' }, { v: 'hi', label: '亮' }], chapters: ['compensation'], restart: false },
-    { id: 'organ', label: '器官', type: 'seg', options: [{ v: 'leaf', label: '葉' }, { v: 'stem', label: '莖' }], chapters: ['endoreduplication'], restart: false },
-    { id: 'endoPl', label: '倍性', type: 'seg', options: [{ v: '2x', label: '二倍體' }, { v: '4x', label: '人工四倍體' }], chapters: ['endoreduplication'], restart: false },
+    { id: 'rate', label: zhEn('樣品流速', 'Sample flow rate'), type: 'seg', options: [{ v: 'low', label: zhEn('低', 'Low') }, { v: 'mid', label: zhEn('中', 'Medium') }, { v: 'high', label: zhEn('高', 'High') }], chapters: ['fluidics'], restart: false },
+    { id: 'size', label: zhEn('細胞大小', 'Cell size'), type: 'range', min: 0, max: 100, step: 1, format: (v) => sizeName(v), chapters: ['scatter'], restart: false },
+    { id: 'gran', label: zhEn('內部顆粒', 'Granules inside'), type: 'range', min: 0, max: 100, step: 1, format: (v) => granName(v), chapters: ['scatter'], restart: false },
+    { id: 'dye', label: zhEn('細胞上的標記', 'Labels on the cell'), type: 'seg', options: [{ v: 'g', label: zhEn('綠色(FITC)', 'Green (FITC)') }, { v: 'o', label: zhEn('橘黃色(PE)', 'Orange (PE)') }, { v: 'go', label: zhEn('兩種都有', 'Both') }], chapters: ['fluor'], restart: false },
+    { id: 'gate', label: zhEn('圈哪一群', 'Population to gate'), type: 'seg', options: GATE_KEYS.map((k) => ({ v: k, label: GATES[k].name })), chapters: ['gating'], restart: false },
+    { id: 'cut', label: zhEn('陽性門檻', 'Positive threshold'), type: 'range', min: 0.5, max: 3.5, step: 0.05, format: (v) => zhEn(`螢光 ${fmtN(10 ** v)}`, `Fluorescence ${fmtN(10 ** v)}`), chapters: ['gating'], restart: false },
+    { id: 'sample', label: zhEn('樣品', 'Sample'), type: 'seg', options: [{ v: '2x', label: zhEn('二倍體', 'Diploid') }, { v: '4x', label: zhEn('四倍體', 'Tetraploid') }, { v: 'mix', label: zhEn('兩株一起切', 'Chopped together') }], chapters: ['ploidy'], restart: false },
+    { id: 'pick', label: zhEn('要收哪一種', 'Cells to collect'), type: 'seg', options: [{ v: 'pos', label: zhEn('有綠色螢光', 'Green fluorescent') }, { v: 'neg', label: zhEn('沒有螢光', 'No fluorescence') }], chapters: ['sort'], restart: false },
+    { id: 'comp', label: zhEn('補償:從 PE 扣掉 FITC 的幾 %', 'Compensation: % of FITC subtracted from PE'), type: 'range', min: 0, max: 30, step: 1, unit: '%', chapters: ['compensation'], restart: false },
+    { id: 'bright', label: zhEn('FITC 陽性細胞的亮度', 'Brightness of FITC-positive cells'), type: 'seg', options: [{ v: 'dim', label: zhEn('暗', 'Dim') }, { v: 'mid', label: zhEn('中', 'Medium') }, { v: 'hi', label: zhEn('亮', 'Bright') }], chapters: ['compensation'], restart: false },
+    { id: 'organ', label: zhEn('器官', 'Organ'), type: 'seg', options: [{ v: 'leaf', label: zhEn('葉', 'Leaf') }, { v: 'stem', label: zhEn('莖', 'Stem') }], chapters: ['endoreduplication'], restart: false },
+    { id: 'endoPl', label: zhEn('倍性', 'Ploidy'), type: 'seg', options: [{ v: '2x', label: zhEn('二倍體', 'Diploid') }, { v: '4x', label: zhEn('人工四倍體', 'Induced tetraploid') }], chapters: ['endoreduplication'], restart: false },
   ],
 });
 </script>

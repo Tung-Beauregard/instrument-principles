@@ -261,6 +261,14 @@ HTML：`#gl`（3D 畫布）、`#tags`（3D 標籤層）、`#lensBtn`（放大鏡
 - 圖表：`fitCanvas()` 與動畫說明 `xpDraw()` 的實際像素乘上 `currentCSSZoom`；`initUI()` 裡層析圖、總覽與質譜的滑鼠事件改用 `ex(e)`、`ey(e)`（`offsetX`、`offsetY` 是螢幕像素，除以 `currentCSSZoom`）。2026-11-06 實測：時間固定在 12 min，1920×1080 與 3840×2160 指在層析圖同一個相對位置都讀到 11.12 min，質譜都讀到 m/z 126。
 - 主樣式表的 vw、vh 除以 `var(--ui,1)`（手機的 `html.mp` 規則除外）；沒有 `currentCSSZoom` 的瀏覽器改用 `uiScale()`（`../assets/render-quality.js`）。3D 的解析度：自動與完整模式的像素預算乘上 `--ui` 的平方，4K 時接近每個 CSS 像素畫一點（60 FPS，RTX 2080 SUPER）。
 
+## 英文版（2026-11-06）
+
+- 做法見 `../docs/I18N.md`。英文和中文在同一個檔：HTML 用 `data-en`、`data-en-title`、`data-en-aria-label`（有圖示的按鈕把字包成 `<span data-en>`），說明視窗的每一段是 `lang="zh-Hant"` 與 `lang="en"` 成對的 `<p>`，升溫小字 `#ovenP` 的「保持 3 min」也是一對 `<span>`；程式裡給人看的字一律 `zhEn('中文', 'English')`，包括 `CLS` 的類別名稱、`FRAG` 的 `note`、進樣步驟、說明框、導覽、圖表上的字、提示框、3D 標籤、放大鏡、牆上說明圖、四段動畫說明（四極桿那段傳給 `createFieldDemo` 的 `cues` 也在這裡）與手機面板。
+- 導覽的英文不放慢，照每一站停留的秒數寫，1× 時每秒不超過約 17 個字母（α-Pinene、3 °C/min：進樣口 4.5 秒、管柱約 10.2 秒、傳輸線約 3.1 秒、離子源 16 秒、四極桿 12 秒、偵測器 9 秒、完成 10 秒；2026-11-06 實測英文每秒 16.3 到 17.4 個字母），所以比中文精簡：進樣口一站只留 1 μL、250 °C、分流與一小部分進管柱，傳輸線一站只留 250 °C 的傳輸線通往質譜，其餘細節在說明視窗。`columnText()`、`msStory()` 平常的說明框也用這段英文。改中文、改 `tourTick()` 的秒數或改 `TOUR` 時，英文的長度要一起看。進樣的七個步驟每步只有 0.35 到 1.5 秒，中英文都讀不完，英文各寫一句短句；10 °C/min 時管柱與傳輸線兩站更短（約 7.2 秒與 1.8 秒），中文也一樣。
+- 點部件放大的取景表 `ZOOM` 用標籤文字當鍵：英文的鍵寫成 `[zhEn('進樣口', 'Inlet')]`，要和 `tag()` 的英文一字不差；`zoomAt()` 裡放大整台的三個名稱也一樣。
+- 只有英文的版面（CSS 最後幾行，`html[lang="en"]` 開頭）：控制面板在 1181 px 以上最寬 620 px，圖示那一排換到下一行（面板一變寬，右上的 ALS、進樣口標籤與導覽中色帶、離子源、偵測器的標籤就會被面板蓋住而不畫）；層析圖的圖例 `flex: 999 1 300px`，在標題列裡縮窄、自己折成兩行，放不下才整個換行（打開的成分表從標題列下方 40 px 起，排到第二行的按鈕會被蓋住；1024 寬、有抽出離子的按鈕時「成分表」按鈕要留在第一行，才關得掉成分表）；讀值卡小標的字距 .08em；質譜面板兩顆按鈕的左右留白收窄。字也配合版面寫短：層析圖標題 Chromatogram、質譜面板標題與手機分頁 MS（標題列才和中文一樣排一行）、讀值卡 Oven temp（沒有追蹤成分時寫 `<span class="kname">Retention factor </span>k`，手機上只顯示 k）、升溫速率按鈕的小字只寫「56 min」、四極桿面板的按鈕 Animation、放大鏡讀值用 = 與 −；靠畫面右緣的 3D 標籤：Column (thin tube)、進樣口小字 250 °C, split、ALS 小字 idle、離子源與質譜儀小字省掉 electrons、放大鏡的標題 In the ion source／Inside the column。牆上說明圖的英文標題 60 px（中文 66 px，`zhEn(66, 60)`），字型先載入 Noto Sans TC 的拉丁字母（`drawPosters()` 的 `document.fonts.load` 英文是一串字母）。動畫說明「電子撞擊游離」的 Electrons 70 eV 往右下移（`fx - zhEn(34, 30)`、`zhEn(92, 102)`）、To quadrupole 往右移（`EXIT[0] + zhEn(40, 52)`），不壓到推斥極的字與出口透鏡。
+- 用詞：停留倍數 k 寫 retention factor k、液膜 film、高能倍增極 high-energy dynode、流出時間 elution time、追蹤成分 Follow compound、組裝／拆開 Closed／Open；類別 Monoterpenes、Oxygenated monoterpenes、Sesquiterpenes、Oxygenated sesquiterpenes。
+
 ## 修改後要檢查
 
 - 手機尺寸（390×844、844×390，以及實機橫拿的 742×298，觸控）：三條細條有名稱與內容說明、預設收起；「說明」展開說明框、「層析圖・質譜」展開圖、「調整」打開設定面板；收起時播放鈕在細條上；導覽中細條藏起來、主控台和原本一樣高，結束後回到原本的狀態；詳見 `docs/VALIDATION.md` 的「手機版面板收合」。

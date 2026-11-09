@@ -40,6 +40,7 @@ docs/VALIDATION.md 與 docs/HANDOFF.md，並同步更新 README 的文件索引�
 請先讀 AGENTS.md、README.md、docs/HANDOFF.md，
 以及本次涉及儀器的 MAINTENANCE.md，再處理以下需求。
 缺少文件時依 AGENTS.md 記錄並補齊本次必要部分；
+改到頁面上的文字時英文版一起改（docs/I18N.md），並執行 node scripts/check-i18n.mjs；
 完成後同步更新受影響的維護文件與交接紀錄，回報實際驗證結果。
 
 本次需求：

@@ -56,3 +56,11 @@ main { flex: 1; display: flex; align-items: center; padding-block: 76px; }
   .card-label h3 { font-size: 17px; }
   .site-footer { padding-block: 18px; }
 }
+
+/* 中英切換(2026-11-06,assets/i18n.js):切換鈕在標題列右邊;英文的標題字距縮小,名稱折成兩行時同一列的卡片一樣高 */
+.site-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.site-header .lang-sw { position: static; display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 8px; font-size: 13px; }
+html[lang="en"] h1 { letter-spacing: .05em; }
+html[lang="en"] .category-title { letter-spacing: .1em; }
+html[lang="en"] .instrument-card > a, html[lang="en"] .instrument-card > .pending { display: flex; flex-direction: column; height: 100%; }
+html[lang="en"] .card-label { flex: 1; }

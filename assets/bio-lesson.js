@@ -33,9 +33,11 @@
 import { makeG, C } from './bio-draw.js';
 // 分頁列排不下時捲到目前這一頁(模組載入就會做);全螢幕共用同一套判斷
 import { fsSupported, fsElement, createRotateHint } from './mobile-panels.js';
+// 中英切換(assets/i18n.js,2026-11-06):播放器自己的文字也用 zhEn;沒有載入 i18n.js 時(測試)一律中文
+const zhEn = globalThis.zhEn ?? ((zh) => zh);
 
 export function createLesson({ chapters, state = {}, controls = [], W = 960, H = 540, autoplay = true }) {
-  const need = (s) => { const e = document.querySelector(s); if (!e) throw new Error(`bio-lesson: 頁面缺少 ${s}`); return e; };
+  const need = (s) => { const e = document.querySelector(s); if (!e) throw new Error(`bio-lesson: 頁面缺少 ${s}`); return e; }; // zh-only(給維護者看的錯誤)
   const canvas = need('#stage'), ctx = canvas.getContext('2d');
   const capNo = need('#cap .cap-no'), capCh = need('#cap .cap-ch'), capTx = need('#cap .cap-tx');
   const btnPrev = need('#btnPrev'), btnPlay = need('#btnPlay'), btnNext = need('#btnNext'), prog = need('#prog'), chName = need('#chName');
@@ -46,11 +48,39 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
   // 手機:觸控而且畫面小(直拿寬 760 px 以下,或橫拿高 500 px 以下)
   const phone = matchMedia('(pointer: coarse) and (max-width: 760px), (pointer: coarse) and (max-height: 500px)');
   let ci = 0, t = 0, playing = false, last = performance.now(), touched = false, lastCue = -2;
+  // 英文的字幕(2026-11-06):同一句英文的字母數約是中文字數的兩倍半,照中文的時間軸會看不完。英文時每一句字幕的那一段
+  // 放慢到每秒最多 READ_CPS 個字母(最慢 MIN_RATE 倍),動畫在那一段一起放慢,字幕和畫面照樣對得上;中文一律原速。
+  const slowRead = !!(globalThis.I18N && globalThis.I18N.en), READ_CPS = 17, MIN_RATE = 0.35;
+  const paceOf = (c) => {
+    if (!c.pace) {
+      const cues = c.cues || [];
+      c.pace = cues.map(([at, tx], i) => {
+        const span = Math.max(0.01, (i + 1 < cues.length ? cues[i + 1][0] : c.dur) - at);
+        return slowRead ? Math.max(MIN_RATE, Math.min(1, span / (String(tx).length / READ_CPS))) : 1;
+      });
+    }
+    return c.pace;
+  };
+  // 這一章實際播多久(秒):英文放慢的那幾段拉長
+  const playDur = (c) => {
+    const cues = c.cues || [], pace = paceOf(c);
+    if (!cues.length) return c.dur;
+    let d = Math.max(0, cues[0][0]);
+    cues.forEach(([at], i) => { d += Math.max(0, (i + 1 < cues.length ? cues[i + 1][0] : c.dur) - at) / pace[i]; });
+    return d;
+  };
+  const rateAt = () => {
+    if (!slowRead) return 1;
+    const c = chapters[ci], cues = c.cues || [];
+    let k = -1;
+    for (let i = 0; i < cues.length; i++) if (cues[i][0] <= t + 1e-6) k = i;
+    return k >= 0 ? paceOf(c)[k] : 1;
+  };
   const view = { s: 1, ox: 0, oy: 0 };
   // 手機上畫面中間的「開始講解」:沒在播、也不在全螢幕時出現,按了等於按播放(會先進全螢幕)
   const startBtn = document.createElement('button');
   startBtn.type = 'button'; startBtn.className = 'bio-start'; startBtn.hidden = true;
-  startBtn.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.6v10.8L13.2 8z" fill="currentColor"/></svg><span>開始講解</span><small>全螢幕</small>';
+  startBtn.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.6v10.8L13.2 8z" fill="currentColor"/></svg><span>${zhEn('開始講解', 'Start')}</span><small>${zhEn('全螢幕', 'Full screen')}</small>`;
   canvas.parentElement.append(startBtn);
 
   // 章節清單與進度列
@@ -64,8 +94,8 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     b.addEventListener('click', () => { go(i); userPlay(); });
     li.append(b); list.append(li);
     const sgm = document.createElement('button');
-    sgm.type = 'button'; sgm.className = 'sg'; sgm.style.flexGrow = String(c.dur);
-    sgm.setAttribute('aria-label', `第 ${i + 1} 章:${c.name}`);
+    sgm.type = 'button'; sgm.className = 'sg'; sgm.style.flexGrow = String(playDur(c));
+    sgm.setAttribute('aria-label', zhEn(`第 ${i + 1} 章:${c.name}`, `Chapter ${i + 1}: ${c.name}`));
     sgm.innerHTML = '<i></i>';
     sgm.addEventListener('click', (e) => {
       const r = sgm.getBoundingClientRect();
@@ -144,8 +174,8 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     items.forEach((it, k) => { it.b.setAttribute('aria-current', k === ci ? 'step' : 'false'); it.sgm.classList.toggle('on', k === ci); it.sgm.classList.toggle('done', k < ci); if (k !== ci) it.fill.style.width = '0%'; });
     capNo.textContent = String(ci + 1).padStart(2, '0');
     capCh.textContent = c.name;
-    chName.textContent = `${ci + 1} / ${chapters.length}・${c.name}`;
-    canvas.setAttribute('aria-label', `第 ${ci + 1} 章:${c.name}`);
+    chName.textContent = `${ci + 1} / ${chapters.length}${zhEn('・', ' · ')}${c.name}`;
+    canvas.setAttribute('aria-label', zhEn(`第 ${ci + 1} 章:${c.name}`, `Chapter ${ci + 1}: ${c.name}`));
     refreshControls();
     if (typeof cursor === 'function') cursor();
     if (location.hash.slice(1) !== c.key) history.replaceState(null, '', `#${c.key}`);
@@ -153,8 +183,8 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
   function setPlaying(p) {
     playing = !!p;
     btnPlay.setAttribute('aria-pressed', String(playing));
-    btnPlay.setAttribute('aria-label', playing ? '暫停' : '播放');
-    btnPlay.querySelector('.lbl').textContent = playing ? '暫停' : '播放';
+    btnPlay.setAttribute('aria-label', playing ? zhEn('暫停', 'Pause') : zhEn('播放', 'Play'));
+    btnPlay.querySelector('.lbl').textContent = playing ? zhEn('暫停', 'Pause') : zhEn('播放', 'Play');
     btnPlay.classList.toggle('playing', playing);
     syncStart();
   }
@@ -183,7 +213,7 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
   function syncTheater() {
     const on = theaterOn();
     root.classList.toggle('bio-fs', on);
-    if (btnFs) { btnFs.setAttribute('aria-pressed', String(on)); btnFs.setAttribute('aria-label', on ? '結束全螢幕' : '全螢幕'); btnFs.classList.toggle('on', on); }
+    if (btnFs) { btnFs.setAttribute('aria-pressed', String(on)); btnFs.setAttribute('aria-label', on ? zhEn('結束全螢幕', 'Exit full screen') : zhEn('全螢幕', 'Full screen')); btnFs.classList.toggle('on', on); }
     if (fsElement() && phone.matches && orient && orient.lock) orient.lock('landscape').then(() => { locked = true; }, () => {});
     if (!fsElement() && locked) { locked = false; try { orient.unlock(); } catch (e) { /* already unlocked */ } }
     // 手機上離開全螢幕(按鈕、返回鍵)就暫停
@@ -294,7 +324,7 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
     if (document.hidden) return;
     if (playing) {
-      t += dt;
+      t += dt * rateAt();
       const c = chapters[ci];
       if (t >= c.dur) {
         if (!touched && ci < chapters.length - 1) go(ci + 1);
@@ -321,6 +351,6 @@ export function createLesson({ chapters, state = {}, controls = [], W = 960, H =
   // 觸控手機直拿時提示一次(mobile-panels.js 的 createRotateHint),排在播放列下面,不擋播放鈕。
   // 直拿與一般橫拿時動畫都被約 200 px 的高度限住,只有全螢幕而且橫拿才真的變大:能全螢幕的瀏覽器(Android 的 Chrome 等)
   // 進全螢幕時會自動轉成橫的;不能的(iPhone 的 Safari)只能請使用者自己把手機轉成橫的。
-  createRotateHint({ top: '.bar', suspended: theaterOn, text: fsSupported() ? '按播放會全螢幕,動畫轉成橫的、放到最大' : '按播放會全螢幕;手機轉成橫的,動畫更大' });
+  createRotateHint({ top: '.bar', suspended: theaterOn, text: fsSupported() ? zhEn('按播放會全螢幕,動畫轉成橫的、放到最大', 'Play opens full screen, turned sideways and as large as it gets') : zhEn('按播放會全螢幕;手機轉成橫的,動畫更大', 'Play opens full screen; turn the phone sideways for a bigger picture') });
   return api;
 }

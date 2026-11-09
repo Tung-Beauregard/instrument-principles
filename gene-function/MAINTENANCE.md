@@ -147,6 +147,13 @@ siRNA 累積   a(d) = 1 / (1 + e^(−(d − d½) / w))
 - Voinnet O, et al. Plant J. 2003;33(5):949–956(p19 增強暫時表現的經典論文)已於 2015 年撤稿:Plant J. 2015;84(4):846,doi:10.1111/tpj.13066(先前另有 2015;83(4):752 的更正)。撤稿公告是作者與總編輯、出版社共同同意,原因是影像重複,公告沒有聲明結論仍然成立。所以本頁的 p19 機制改引 Silhavy 等 2002,量化增益改引 Jay 等 2023(後者是同一位通訊作者在撤稿之後重做的公開取用再驗證)。頁面「資料來源」最後一條把這件事寫出來,日後維護時請不要把 Voinnet 2003 加回去。
 - Reed J, Osbourn A. Plant Cell Rep. 2018;37(10):1431–1441. https://pmc.ncbi.nlm.nih.gov/articles/PMC6153650/ 是一篇綜論,本頁沒有引用它當原始依據(它整理的倍數都來自別人的研究,而本頁需要的倍數直接引了原始研究)。它裡面「加上或去掉導向胜肽可以改變暫時表現蛋白的次細胞位置」與各種倍數可以當第 4、5 章的補充閱讀。它沒有提到大腸桿菌,也沒有給一個標準的採收天數。
 
+## 英文版(2026-11-06)
+
+- 做法見 `docs/I18N.md`,英文和中文寫在同一份檔案裡:標題、導言、畫布的 aria-label 用 `data-en`;重點整理與資料來源各是一組 `<ul lang="zh-Hant">` 與 `<ul lang="en">`,重點整理最前面連到基礎教材的那一行也是中英各一個 `<p class="pre">`(英文開頭是 Read first:);程式裡給人看的字一律 `zhEn('中文', 'English')`。
+- 詞:農桿菌 Agrobacterium、暫時表現 transient expression、浸潤 infiltration、基因沉默 gene silencing、質體 plastid(不是 plasmid)。樹名照來源:赤松是 Scots pine(Uddenberg 等 2013 的 Pinus sylvestris)、楊樹 poplar、歐洲雲杉 Norway spruce、柳 willow、橡 oak。`VIGS` 裡的 `leaf`(`'綠'` 與 `'白'`)只拿來比對顏色、不會顯示,所以沒有翻譯,那幾行加了 `zh-only` 註解。
+- 只有英文改了排法的地方:第 7 章三張卡片裡的四句話,中文排成兩欄兩列,英文一句一行、行距縮成 21 px(`zhEn` 給 x 與 y 另一組值),不然右欄會超出卡片與畫面;`TREES` 的歐洲雲杉英文用 `\n` 分成 Norway 與 spruce 兩行,長條左邊才放得下;第 1 章結論右下角的「兩支序列 95% 相同」英文只寫 95% identical,手機上才不會碰到左邊的產物名稱。
+- 改中文時英文一起改;改完跑 `node scripts/check-i18n.mjs --list gene-function/index.html`(要沒有輸出)與 `node scripts/check-i18n-layout.mjs gene-function`(桌機與手機各比對一次中英的字有沒有超出畫面、疊在一起)。英文播放約 179 秒(中文 115 秒,長的字幕那一段播放器自動放慢)。
+
 ## 修改後要檢查什麼
 
 1. 語法:把 module script 抽出來跑 `node --check`。頁面不能有破折號(U+2014)、全角逗號冒號分號括號,也不能有不該出現的姓名(`scripts/check-bio.mjs` 會檢查;這份教材併進入口清單之後才會被它檢查到)。

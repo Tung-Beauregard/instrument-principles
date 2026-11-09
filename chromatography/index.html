@@ -2,8 +2,9 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>層析-GC 與 HPLC 的原理</title>
+<title data-en="Chromatography: GC and HPLC">層析-GC 與 HPLC 的原理</title>
 <meta name="description" content="用 3D 模型看層析怎麼把成分分開:從茨維特的色素管柱開始,氣相層析(GC)用氣體推、液相層析(HPLC)用液體推,為什麼要升溫或慢慢加甲醇,峰為什麼會變寬,怎樣才分得開。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="儀器原理">
@@ -97,6 +98,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .help b{font-size:13px}
 .help ul{margin:6px 0 8px;padding-left:18px}
 .help .fine{color:var(--muted);font-size:11.5px;margin:0}
+/* 英文:說明比中文長,1366×768、1024×768 會超出畫面下緣,改成在框內捲動(手機照原本的 html.mp) */
+html[lang="en"]:not(.mp) .help{max-height:calc(100vh / var(--ui,1) - 212px);overflow-y:auto;overscroll-behavior:contain}
 
 /* 底部:譜的螢幕 */
 .console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw / var(--ui,1) - 32px));padding:11px 14px 9px}
@@ -107,6 +110,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 .con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
 .legend{margin-left:auto;display:flex;gap:14px;color:var(--ink-2);font-size:11.5px}
 .legend i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:6px}
+/* 英文:標題、樣品與圖例一行放不下時,圖例換到第二行,樣品名稱才不會被截掉(中文的字短,照原本一行;手機照 html.mp) */
+html[lang="en"]:not(.mp) .con-head{flex-wrap:wrap;row-gap:2px}
 .con-body{display:grid;grid-template-columns:1fr 168px;gap:14px;align-items:stretch}
 .plotwrap{position:relative}
 #plot{width:100%;height:170px;display:block;cursor:zoom-in}
@@ -147,11 +152,13 @@ html.touring .ctl,html.touring .help,html.touring .lede,html.touring .sk-txt,htm
 html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
 html.touring .titlecard{display:flex}
 html.touring .cap.withcon{bottom:250px}
-/* 寬螢幕導覽:譜和影片一樣放右上角,鏡頭的構圖才不會被擋住;結束鈕移到上方中間 */
+/* 寬螢幕導覽:譜和影片一樣放右上角,鏡頭的構圖才不會被擋住;結束鈕在右上角,譜從它下面開始。
+   2026-11-09 以前結束鈕放在上方中間、譜貼齊頂端:分頁列比半個畫面寬時(1600 px 以下的視窗)結束鈕壓在分頁列上,
+   1280 px 以下譜也蓋到分頁列的尾端 */
 @media (min-width:1100px) and (min-aspect-ratio:4/3){
-  html.touring .console{left:auto;right:24px;top:20px;bottom:auto;transform:none;width:min(640px,42vw / var(--ui,1))}
+  html.touring .console{left:auto;right:24px;top:62px;bottom:auto;transform:none;width:min(640px,42vw / var(--ui,1))}
   html.touring .cap.withcon{bottom:26px}
-  html.touring #tourExit{right:auto;left:50%;transform:translateX(-50%)}
+  html.touring #tourExit{right:24px}
 }
 
 html.film .ctl,html.film .help,html.film .lede,html.film .sk-txt,html.film .foot,html.film #tourExit,html.film .sitenav,html.film .load{display:none}
@@ -286,6 +293,8 @@ html.mp.sk-open .chips,html.mp.sk-open .sk-txt,html.mp.sk-open .hud .k,html.mp.s
   html.mp .chip{padding:3px 8px 4px}
   html.mp .chip b{font-size:13px}
 }
+/* 英文:讀值比中文寬(Helium · 190 °C、Petroleum ether),手機上字小一點才放得進讀值卡 */
+html[lang="en"].mp .chip b{font-size:12px}
 /* 桌機小螢幕(1024×768、1366×768 這類,2026-11-06):導言收起來、譜圖矮一點,面板讓出空間給 3D;3D 主角移到面板之間的空地
    (../assets/free-view.js,在這些尺寸與 761 到 980 px 的平板作用)。980 px 以下照原本的窄版,手機照 html.mp */
 @media (min-width:981px) and (max-width:1279px),(min-width:981px) and (max-height:899px){
@@ -309,48 +318,48 @@ html.mp.sk-open .chips,html.mp.sk-open .sk-txt,html.mp.sk-open .hud .k,html.mp.s
 </head>
 <body>
 <div id="stage"></div>
-<div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
+<div class="load" id="load"><i></i><span data-en="Loading the 3D model">3D 模型載入中</span></div>
 
 <header class="hud">
-  <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="./" aria-current="page">層析</a><a href="../plot/">數據畫圖</a></nav>
-  <span class="k">層析</span>
-  <span class="big">把混在一起的成分分開</span>
-  <p class="lede">樣品被一種會流動的東西(氣體或液體)帶著往前走,管子裡另有一種不動的東西會把分子拉住。每種分子被拉住的時間不一樣,走得快慢就不一樣,到出口時已經分開。氣相層析(GC)用氣體推,液相層析(HPLC)用液體推。</p>
+  <nav class="sitenav" aria-label="儀器原理" data-en-aria-label="Instrument Principles"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../lcq/" data-en="Ion trap MS">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/" data-en="Mass analyzers">質譜儀-不同分析器比較</a><a href="../spectroscopy/" data-en="Light and molecules">光與分子</a><a href="./" aria-current="page" data-en="Chromatography">層析</a><a href="../plot/" data-en="Data plotting">數據畫圖</a></nav>
+  <span class="k" data-en="Chromatography">層析</span>
+  <span class="big" data-en="Separating a mixture">把混在一起的成分分開</span>
+  <p class="lede" data-en="The sample is carried along by something that flows (a gas or a liquid), while something fixed inside the tube holds molecules back. Each kind of molecule is held for a different time, so each travels at a different speed, and by the exit they are apart. Gas chromatography (GC) pushes with a gas, liquid chromatography (HPLC) with a liquid.">樣品被一種會流動的東西(氣體或液體)帶著往前走,管子裡另有一種不動的東西會把分子拉住。每種分子被拉住的時間不一樣,走得快慢就不一樣,到出口時已經分開。氣相層析(GC)用氣體推,液相層析(HPLC)用液體推。</p>
   <div class="chips">
-    <div class="chip panel"><small>推著走的</small><b id="cM">—</b></div>
-    <div class="chip panel"><small>拉住分子的</small><b id="cS">—</b></div>
-    <div class="chip panel"><small>分得開嗎</small><b id="cR">—</b></div>
+    <div class="chip panel"><small data-en="Pushes along">推著走的</small><b id="cM">—</b></div>
+    <div class="chip panel"><small data-en="Holds back">拉住分子的</small><b id="cS">—</b></div>
+    <div class="chip panel"><small data-en="Separated?">分得開嗎</small><b id="cR">—</b></div>
   </div>
   <div class="note panel sketch" id="note">
-    <div class="sk-head"><b id="skTitle">管子裡面</b><span id="skSub"></span><span class="sk-tabs" id="skTabs"><button data-v="micro" class="on">管子裡面</button><button data-v="broad">峰變寬</button><button data-v="rs">分得開嗎</button></span></div>
-    <canvas id="sketch" role="img" aria-label="管子裡面的放大圖:分子在會流動的那一相和不動的那一相之間進出"></canvas>
+    <div class="sk-head"><b id="skTitle" data-en="Inside the tube">管子裡面</b><span id="skSub"></span><span class="sk-tabs" id="skTabs"><button data-v="micro" class="on" data-en="Inside the tube">管子裡面</button><button data-v="broad" data-en="Peaks widen">峰變寬</button><button data-v="rs" data-en="Separated?">分得開嗎</button></span></div>
+    <canvas id="sketch" role="img" aria-label="管子裡面的放大圖:分子在會流動的那一相和不動的那一相之間進出" data-en-aria-label="Close-up inside the tube: molecules move back and forth between the phase that flows and the phase that stays put"></canvas>
     <p class="sk-txt" id="skTxt"></p>
   </div>
 </header>
 
 <aside class="ctl panel" id="ctl">
-  <div class="grp wide"><h6>儀器</h6>
-    <div class="seg" id="segInst"><button data-v="tsw">茨維特的管柱</button><button data-v="gc" class="on">氣相層析 GC</button><button data-v="lc">液相層析 HPLC</button></div>
+  <div class="grp wide"><h6 data-en="Instrument">儀器</h6>
+    <div class="seg" id="segInst"><button data-v="tsw" data-en="Tsvet's column">茨維特的管柱</button><button data-v="gc" class="on" data-en="Gas (GC)">氣相層析 GC</button><button data-v="lc" data-en="Liquid (HPLC)">液相層析 HPLC</button></div>
   </div>
-  <div class="grp wide" id="grpCond"><h6 id="condName">溫度</h6>
+  <div class="grp wide" id="grpCond"><h6 id="condName" data-en="Temperature">溫度</h6>
     <div class="seg" id="segCond"></div>
   </div>
-  <div class="grp wide" id="grpPart"><h6>填充顆粒</h6>
+  <div class="grp wide" id="grpPart"><h6 data-en="Particle size">填充顆粒</h6>
     <div class="seg" id="segPart"><button data-v="5" class="on">5 µm</button><button data-v="1.7">1.7 µm</button></div>
   </div>
   <div class="grp wide">
     <div class="row">
-      <button class="btn" id="btnRun">進樣</button>
-      <button class="btn" id="btnTour">導覽</button>
-      <button class="btn" id="btnSketch">放大圖</button>
-      <button class="btn sq" id="btnHelp" aria-label="說明">?</button>
+      <button class="btn" id="btnRun" data-en="Inject">進樣</button>
+      <button class="btn" id="btnTour" data-en="Tour">導覽</button>
+      <button class="btn" id="btnSketch" data-en="Close-up">放大圖</button>
+      <button class="btn sq" id="btnHelp" aria-label="說明" data-en-aria-label="Help">?</button>
     </div>
   </div>
 </aside>
 
 <div class="help panel" id="help">
-  <b>操作</b>
-  <ul>
+  <b data-en="Controls">操作</b>
+  <ul lang="zh-Hant">
     <li>選一種儀器,鏡頭會移過去;按「進樣」打一針,看各成分在管子裡分開,下面的層析圖一支一支長出來</li>
     <li>GC 可以比較「恆溫」和「升溫」;HPLC 可以比較「固定比例」和「慢慢加甲醇」,也可以換更細的填充顆粒</li>
     <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
@@ -358,20 +367,29 @@ html.mp.sk-open .chips,html.mp.sk-open .sk-txt,html.mp.sk-open .hud .k,html.mp.s
     <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
     <li>「導覽」自動播一遍,內容和影片相同,按 Esc 結束</li>
   </ul>
-  <p class="fine" id="helpFine">示意圖:儀器外觀、管柱長短與流速都經過縮放。GC 的滯留模型和 GC-MS 教材相同(HP-5MS 30 m 管柱,精油成分取其中六種);HPLC 的五種植物酚類在 C18 管柱上的先後與滯留,是依常見的反相層析規律設定的示意值;茨維特色素帶的先後依他 1906 年的論文,速度是示意。來源見 INSTRUMENTS.md。</p>
+  <ul lang="en">
+    <li>Pick an instrument and the camera moves to it; press "Inject" to inject a sample, then watch the components separate in the tube while the chromatogram below grows peak by peak</li>
+    <li>GC compares a "Fixed" oven temperature with a "Rising" one; HPLC compares "Fixed 50% methanol" with "Rising methanol", and you can also switch to finer packing particles</li>
+    <li>Mouse: drag to rotate the view; right-drag or Shift-drag to pan; scroll to zoom</li>
+    <li>Trackpad: swipe with two fingers to pan, pinch to zoom; touch screen: one finger rotates, two fingers pan and zoom</li>
+    <li>Keyboard: arrow keys or W A S D to move, Q E to turn, + − to zoom, hold Shift to go faster; R resets the view</li>
+    <li>"Tour": plays through automatically, the same as the video; press Esc to end it</li>
+  </ul>
+  <p class="fine" id="helpFine" lang="zh-Hant">示意圖:儀器外觀、管柱長短與流速都經過縮放。GC 的滯留模型和 GC-MS 教材相同(HP-5MS 30 m 管柱,精油成分取其中六種);HPLC 的五種植物酚類在 C18 管柱上的先後與滯留,是依常見的反相層析規律設定的示意值;茨維特色素帶的先後依他 1906 年的論文,速度是示意。來源見 INSTRUMENTS.md。</p>
+  <p class="fine" lang="en">Schematic: the look of the instruments, the column lengths and the flow rates are all scaled. The GC retention model is the same as in the GC-MS lesson (HP-5MS 30 m column, six of its essential-oil components); the order and retention of the five plant phenolics on the C18 column are illustrative values set from common reversed-phase rules; the order of Tsvet's pigment bands follows his 1906 paper, and their speeds are illustrative. Sources are listed in INSTRUMENTS.md.</p>
 </div>
 
 <section class="console panel" id="console">
-  <div class="con-head"><b id="conTitle">層析圖</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
+  <div class="con-head"><b id="conTitle" data-en="Chromatogram">層析圖</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
   <div class="plotwrap"><canvas id="plot"></canvas><div class="tip" id="tip"></div></div>
 </section>
 
-<div class="foot" id="foot">氣相層析與液相層析的原理示意;滯留時間由簡化的模型算出,不是實測數據。</div>
+<div class="foot" id="foot" data-en="Schematic of how gas and liquid chromatography work; retention times come from a simplified model, not measured data.">氣相層析與液相層析的原理示意;滯留時間由簡化的模型算出,不是實測數據。</div>
 
 <div class="cap panel" id="cap"><div class="chap" id="chap"></div><div class="txt" id="capTxt"></div></div>
 <div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
 <div class="cmp panel" id="cmp"></div>
-<button class="btn" id="tourExit">結束導覽</button>
+<button class="btn" id="tourExit" data-en="End tour">結束導覽</button>
 
 <script type="module">
 // ==== 00_core.js ====
@@ -401,7 +419,7 @@ const mp = createMobilePanels({
   dock: true, top: '.hud', rotateHint: true,
   suspended: () => FILM || root.classList.contains('touring'),
   panels: [
-    { el: '#ctl', icon: 'adjust', label: '調整', items: () => `儀器、${el('condName').textContent}${el('grpPart').style.display === 'none' ? '' : '、填充顆粒'}、進樣、導覽、放大圖、說明、畫質`, onToggle: (open) => { if (!open) el('help').classList.remove('show'); } },
+    { el: '#ctl', icon: 'adjust', label: zhEn('調整', 'Adjust'), items: () => zhEn(`儀器、${el('condName').textContent}${el('grpPart').style.display === 'none' ? '' : '、填充顆粒'}、進樣、導覽、放大圖、說明、畫質`, `instrument, ${el('condName').textContent.toLowerCase()}${el('grpPart').style.display === 'none' ? '' : ', particle size'}, inject, tour, close-up, help, quality`), onToggle: (open) => { if (!open) el('help').classList.remove('show'); } },
     { el: '#console', icon: 'chart', label: () => el('conTitle').textContent, items: () => el('conSample').textContent },
   ],
 });
@@ -435,32 +453,32 @@ const f1 = (x) => (Math.round(x * 10) / 10).toFixed(1);
 const R_GAS = 8.314;
 const lnkGC = (ki, Tc) => { const x = ki / 100, T = Tc + 273.15; return (45000 + 4600 * (x - 10)) / (R_GAS * T) - (14.2 + 0.8 * (x - 10)); };
 const GC_CPDS = [
-  { id: 'apin', name: 'α-蒎烯', ki: 939, amt: 1.0, col: '#5aa2ff' },
-  { id: 'lim', name: '檸檬烯', ki: 1029, amt: 0.7, col: '#5dffb0' },
-  { id: 'cin', name: '1,8-桉葉油醇', ki: 1031, amt: 0.8, col: '#ff7ad1' },
-  { id: 'lin', name: '沉香醇', ki: 1096, amt: 0.6, col: '#ffc261' },
-  { id: 'camphor', name: '樟腦', ki: 1146, amt: 0.75, col: '#ff8a6b' },
-  { id: 'caryo', name: '石竹烯', ki: 1417, amt: 0.55, col: '#bba6ff' },
+  { id: 'apin', name: zhEn('α-蒎烯', 'α-Pinene'), ki: 939, amt: 1.0, col: '#5aa2ff' },
+  { id: 'lim', name: zhEn('檸檬烯', 'Limonene'), ki: 1029, amt: 0.7, col: '#5dffb0' },
+  { id: 'cin', name: zhEn('1,8-桉葉油醇', '1,8-Cineole'), ki: 1031, amt: 0.8, col: '#ff7ad1' },
+  { id: 'lin', name: zhEn('沉香醇', 'Linalool'), ki: 1096, amt: 0.6, col: '#ffc261' },
+  { id: 'camphor', name: zhEn('樟腦', 'Camphor'), ki: 1146, amt: 0.75, col: '#ff8a6b' },
+  { id: 'caryo', name: zhEn('石竹烯', 'Caryophyllene'), ki: 1417, amt: 0.55, col: '#bba6ff' },
 ];
 const GC_CONDS = {
-  iso100: { label: '恆溫 100 °C', short: '100 °C', T: () => 100, tEnd: 36 },
-  iso140: { label: '恆溫 140 °C', short: '140 °C', T: () => 140, tEnd: 8 },
-  ramp: { label: '升溫', short: '升溫', T: (t) => Math.min(60 + 10 * Math.max(0, t), 220), tEnd: 13 },
+  iso100: { label: zhEn('恆溫 100 °C', 'Fixed 100 °C'), short: '100 °C', T: () => 100, tEnd: 36 },
+  iso140: { label: zhEn('恆溫 140 °C', 'Fixed 140 °C'), short: '140 °C', T: () => 140, tEnd: 8 },
+  ramp: { label: zhEn('升溫', 'Rising'), short: zhEn('升溫', 'Rising'), T: (t) => Math.min(60 + 10 * Math.max(0, t), 220), tEnd: 13 },
 };
 const GC_COL = { tM: 1.37, N: 70000, sig0: 0.0006 };
 
 // --- HPLC:反相 C18 管柱 150 × 4.6 mm,流速 1 mL/min,水與甲醇 ---
 // log k = log kw − S × 甲醇比例(反相層析常見的線性關係);五個成分的 kw 與 S 是依它們在 C18 上的先後順序設的示意值
 const LC_CPDS = [
-  { id: 'gal', name: '沒食子酸', lkw: 1.0, S: 3.5, amt: 0.8, col: '#5aa2ff' },
-  { id: 'cat', name: '兒茶素', lkw: 2.0, S: 4.0, amt: 0.6, col: '#5dffb0' },
-  { id: 'epi', name: '表兒茶素', lkw: 2.3, S: 4.1, amt: 0.5, col: '#bba6ff' },
-  { id: 'fer', name: '阿魏酸', lkw: 2.6, S: 4.2, amt: 1.0, col: '#ffc261' },
-  { id: 'que', name: '槲皮素', lkw: 3.6, S: 4.8, amt: 0.7, col: '#ff8a6b' },
+  { id: 'gal', name: zhEn('沒食子酸', 'Gallic acid'), lkw: 1.0, S: 3.5, amt: 0.8, col: '#5aa2ff' },
+  { id: 'cat', name: zhEn('兒茶素', 'Catechin'), lkw: 2.0, S: 4.0, amt: 0.6, col: '#5dffb0' },
+  { id: 'epi', name: zhEn('表兒茶素', 'Epicatechin'), lkw: 2.3, S: 4.1, amt: 0.5, col: '#bba6ff' },
+  { id: 'fer', name: zhEn('阿魏酸', 'Ferulic acid'), lkw: 2.6, S: 4.2, amt: 1.0, col: '#ffc261' },
+  { id: 'que', name: zhEn('槲皮素', 'Quercetin'), lkw: 3.6, S: 4.8, amt: 0.7, col: '#ff8a6b' },
 ];
 const LC_CONDS = {
-  iso50: { label: '固定 50% 甲醇', short: '50%', phi: () => 0.5, tEnd: 30 },
-  grad: { label: '甲醇慢慢增加', short: '10→90%', phi: (t) => clamp(0.1 + (0.8 * (t - 0.8)) / 15, 0.1, 0.9), tEnd: 17 },
+  iso50: { label: zhEn('固定 50% 甲醇', 'Fixed 50% methanol'), short: '50%', phi: () => 0.5, tEnd: 30 },
+  grad: { label: zhEn('甲醇慢慢增加', 'Rising methanol'), short: '10→90%', phi: (t) => clamp(0.1 + (0.8 * (t - 0.8)) / 15, 0.1, 0.9), tEnd: 17 },
 };
 // 填充顆粒越細,理論板數越多(峰越窄);同樣的流速下,壓力和粒徑的平方成反比
 // 板數用常見的估法 N ≈ 300 × 管長(mm) ÷ 粒徑(µm) 再取整:150 mm、5 µm 約一萬;壓力是 50% 甲醇的估計(純水大約六成)
@@ -469,16 +487,16 @@ const LC_COL = { tM: 1.5 };
 
 // --- 茨維特的管柱:葉子的色素、碳酸鈣粉、石油醚;速度是示意 ---
 const TSW_CPDS = [
-  { id: 'car', name: '胡蘿蔔素', k: 0.15, amt: 0.8, col: '#ff9d3a' },
-  { id: 'xan', name: '葉黃素', k: 1.0, amt: 0.6, col: '#ffd84a' },
-  { id: 'cha', name: '葉綠素 a', k: 2.0, amt: 1.0, col: '#2fbf8f' },
-  { id: 'chb', name: '葉綠素 b', k: 3.0, amt: 0.7, col: '#9acd32' },
+  { id: 'car', name: zhEn('胡蘿蔔素', 'Carotene'), k: 0.15, amt: 0.8, col: '#ff9d3a' },
+  { id: 'xan', name: zhEn('葉黃素', 'Xanthophyll'), k: 1.0, amt: 0.6, col: '#ffd84a' },
+  { id: 'cha', name: zhEn('葉綠素 a', 'Chlorophyll a'), k: 2.0, amt: 1.0, col: '#2fbf8f' },
+  { id: 'chb', name: zhEn('葉綠素 b', 'Chlorophyll b'), k: 3.0, amt: 0.7, col: '#9acd32' },
 ];
 const TSW = { tM: 1.0, tEnd: 5.2 };
 
 const CPDS_OF = { tsw: TSW_CPDS, gc: GC_CPDS, lc: LC_CPDS };
 const CONDS_OF = { gc: GC_CONDS, lc: LC_CONDS };
-const NAME_OF = { tsw: '茨維特的管柱', gc: '氣相層析 GC', lc: '液相層析 HPLC' };
+const NAME_OF = { tsw: zhEn('茨維特的管柱', "Tsvet's column"), gc: zhEn('氣相層析 GC', 'Gas chromatography (GC)'), lc: zhEn('液相層析 HPLC', 'Liquid chromatography (HPLC)') };
 
 // 跑一次分析;結果記起來,同一組條件只算一次
 const RUNC = new Map();
@@ -538,7 +556,7 @@ function pairsOf(r, upto = Infinity) {
   return out;
 }
 function worstRs(r, upto = Infinity) { let w = null; for (const p of pairsOf(r, upto)) if (!w || p.rs < w.rs) w = p; return w; }
-const rsWord = (rs) => (rs < 1 ? '黏在一起' : rs < 1.5 ? '差一點' : '分開了');
+const rsWord = (rs) => (rs < 1 ? zhEn('黏在一起', 'overlap') : rs < 1.5 ? zhEn('差一點', 'not quite') : zhEn('分開了', 'apart'));
 
 // ==== 10_scene.js ====
 // ================= 場景 =================
@@ -998,18 +1016,19 @@ function keepLabelsOnScreen() {
 }
 function labelSub(key, s) { const L = LBL[key]; if (L.sub && L.sub.textContent !== s) L.sub.textContent = s; }
 const X0 = ST.tsw, X2 = ST.lc;
-label('tswCol', v3(X0 + 8, 150, 0), v3(X0 + 58, 214, 10), '玻璃管柱', '裡面塞滿碳酸鈣粉');
-label('tswSolv', v3(X0 - 6, 202, 0), v3(X0 - 52, 238, 10), '溶劑', '從上面一直往下加');
-label('he', v3(-150, 150, -40), v3(-150, 198, -40), '氦氣鋼瓶', '推著樣品走');
-label('inlet', v3(-46, 160, -14), v3(-6, 228, 0), '進樣口', '加熱讓樣品變成氣體');
-label('coil', v3(-40, 52, 12), v3(-60, 40, 46), '管柱', '30 公尺長,內徑 0.25 毫米', v3(-36, 128, 46));
-label('oven', v3(82, 70, 30), v3(140, 34, 56), '烘箱', '100 °C');
-label('det', v3(56, 166, -14), v3(92, 200, 0), '偵測器', '成分出來就有訊號');
-label('bottle', v3(X2 + 80, 176, -36), v3(X2 + 80, 192, -20), '溶劑瓶', 'A 水 · B 甲醇');
-label('pump', v3(X2 + 66, 112, 6), v3(X2 + 44, 122, 22), '幫浦', '加壓推動液體');
-label('as', v3(X2 + 100, 79, 2), v3(X2 + 92, 88, 22), '自動進樣器', '打一針樣品進去');
-label('lcCol', v3(X2 - 60, 81, 26), v3(X2 - 76, 132, 30), '管柱(放大剖開)', '15 公分,塞滿 5 µm 的小顆粒');
-label('lcDet', v3(X2 + 62, 15, 2), v3(X2 + 92, 24, 22), '偵測器', '用紫外光看成分出來');
+label('tswCol', v3(X0 + 8, 150, 0), v3(X0 + 58, 214, 10), zhEn('玻璃管柱', 'Glass column'), zhEn('裡面塞滿碳酸鈣粉', 'packed with calcium carbonate'));
+// 英文:影片與導覽時這個標籤貼著畫面上緣,英文的字又高一點會被切到,往下移一點(中文照原本的位置)
+label('tswSolv', v3(X0 - 6, 202, 0), v3(X0 - 52, 238, 10), zhEn('溶劑', 'Solvent'), zhEn('從上面一直往下加', 'keeps being added on top'), zhEn(null, v3(X0 - 52, 230, 10)));
+label('he', v3(-150, 150, -40), v3(-150, 198, -40), zhEn('氦氣鋼瓶', 'Helium cylinder'), zhEn('推著樣品走', 'pushes the sample along'));
+label('inlet', v3(-46, 160, -14), v3(-6, 228, 0), zhEn('進樣口', 'Injector'), zhEn('加熱讓樣品變成氣體', 'heats the sample into a gas'));
+label('coil', v3(-40, 52, 12), v3(-60, 40, 46), zhEn('管柱', 'Column'), zhEn('30 公尺長,內徑 0.25 毫米', '30 m long, 0.25 mm wide inside'), v3(-36, 128, 46));
+label('oven', v3(82, 70, 30), v3(140, 34, 56), zhEn('烘箱', 'Oven'), '100 °C');
+label('det', v3(56, 166, -14), v3(92, 200, 0), zhEn('偵測器', 'Detector'), zhEn('成分出來就有訊號', 'a signal as each comes out'));
+label('bottle', v3(X2 + 80, 176, -36), v3(X2 + 80, 192, -20), zhEn('溶劑瓶', 'Solvent bottles'), zhEn('A 水 · B 甲醇', 'A water · B methanol'));
+label('pump', v3(X2 + 66, 112, 6), v3(X2 + 44, 122, 22), zhEn('幫浦', 'Pump'), zhEn('加壓推動液體', 'pressurizes the liquid'));
+label('as', v3(X2 + 100, 79, 2), v3(X2 + 92, 88, 22), zhEn('自動進樣器', 'Autosampler'), zhEn('打一針樣品進去', 'injects the sample'));
+label('lcCol', v3(X2 - 60, 81, 26), v3(X2 - 76, 132, 30), zhEn('管柱(放大剖開)', 'Column (enlarged, cut open)'), zhEn('15 公分,塞滿 5 µm 的小顆粒', '15 cm, 5 µm particles'));
+label('lcDet', v3(X2 + 62, 15, 2), v3(X2 + 92, 24, 22), zhEn('偵測器', 'Detector'), zhEn('用紫外光看成分出來', 'sees components by UV light'));
 const LBL_KEYS = Object.keys(LBL);
 // 茨維特管柱旁邊、跟著色帶走的色素名字
 const TAGS = TSW_CPDS.map((c) => {
@@ -1068,30 +1087,30 @@ const CAMK = [
   [150.6, ...VIEW.all], [162, ...VIEW.all], [168, [60, 330, 1180], [40, 96, 0], 100],
 ];
 const CAPS = [
-  [6.0, 13.0, '01 · 茨維特的管子', '1906 年,植物學家茨維特把葉子的色素溶液倒進一支塞滿碳酸鈣粉的玻璃管,再從上面一直加溶劑往下沖。'],
-  [13.2, 21.6, '01 · 茨維特的管子', '原本混在一起的綠色,往下走時分成好幾條顏色不同的帶子。他把這個方法叫做 chromatography,意思是「用顏色寫」;中文叫層析。'],
-  [22.4, 29.0, '02 · 為什麼會分開', '管子裡有兩種東西:會流動的溶劑推著分子往下走(流動相),不會動的粉會把分子拉住一下(固定相)。'],
-  [29.2, 36.0, '02 · 為什麼會分開', '分子一直在兩邊進進出出。在流動相裡大家走得一樣快,差別只在每次被拉住多久:被拉住越久的,平均走得越慢。'],
-  [36.2, 43.6, '02 · 為什麼會分開', '在出口放一個偵測器,成分一出來就記下一支峰。從進樣到出峰的時間叫滯留時間;條件相同時,同一種分子每次都一樣。'],
-  [44.4, 50.6, '03 · 氣相層析 GC', '氣相層析用氦氣推著樣品走。管柱是一條 30 公尺長、內徑只有 0.25 毫米的細管,內壁塗了一層很薄的膜,盤在烘箱裡。'],
-  [50.8, 57.0, '03 · 氣相層析 GC', '樣品在進樣口加熱變成氣體。分子溶進那層膜就停住,回到氣體才往前走;沸點越高、越容易溶進膜裡的,走得越慢。'],
-  [57.2, 63.4, '03 · 氣相層析 GC', '烘箱固定在 100 °C:前面幾個成分 7 分鐘內就出來,石竹烯卻要等到 33 分鐘,峰又矮又寬。'],
-  [63.8, 70.2, '03 · 氣相層析 GC', '改成從 60 °C 開始,每分鐘升高 10 °C:溫度越高,分子越待不住,後面的成分被「趕」出來。'],
-  [70.4, 75.8, '03 · 氣相層析 GC', '13 分鐘就全部跑完,每支峰都又尖又高。先用低溫分開跑得快的,再升溫趕出難跑的,這叫升溫程式。'],
-  [76.4, 82.6, '04 · 液相層析 HPLC', '很多分子一加熱就壞掉,或根本變不成氣體,例如植物裡的酚類、色素、糖和蛋白質。這時候改用液體來推,就是液相層析。'],
-  [82.8, 89.0, '04 · 液相層析 HPLC', '管柱只有 15 公分,塞滿直徑 5 µm 的小顆粒,顆粒表面接了一層像油一樣的長碳鏈(C18)。液體要用幫浦加壓才推得過去。'],
-  [89.2, 95.4, '04 · 液相層析 HPLC', '流動相是水和甲醇。越「油」、越不溶於水的分子,越喜歡黏在 C18 上,走得越慢;甲醇越多,越容易把它們沖下來。'],
-  [95.6, 101.4, '04 · 液相層析 HPLC', '固定用 50% 甲醇:沒食子酸一下子就出來,幾乎沒被拉住;槲皮素卻拖到 25 分鐘,峰又矮又寬。'],
-  [101.8, 106.6, '04 · 液相層析 HPLC', '改成甲醇從 10% 慢慢加到 90%:一開始水多,容易跑的先分開;甲醇越來越多,黏得緊的也被沖下來。'],
-  [106.8, 111.6, '04 · 液相層析 HPLC', '這叫梯度沖提,作用和 GC 的升溫一樣:每個成分都在合適的時候出來,峰也比較窄。'],
-  [112.4, 118.4, '05 · 峰為什麼會變寬', '同一種分子不會同時到出口:有的繞過顆粒走了遠路,有的自己往前後擴散,有的在固定相多待了一下。所以一群分子越走越散開。'],
-  [118.6, 124.4, '05 · 峰為什麼會變寬', '顆粒做得越小,路徑差越小,峰越窄。從 5 µm 換成 1.7 µm,峰寬只剩大約六成。'],
-  [124.6, 129.8, '05 · 峰為什麼會變寬', '代價是阻力變大:要用同樣的流速推過去,壓力從大約 100 bar 升到 900 bar,要用耐超高壓的儀器。'],
-  [130.4, 136.6, '06 · 分得開嗎', '兩支峰分不分得開,看兩件事:峰頂離多遠、峰有多寬。兩者相除叫分離度 Rs;Rs 到 1.5,兩支峰中間就會回到基線。'],
-  [136.8, 142.4, '06 · 分得開嗎', '精油裡的檸檬烯和 1,8-桉葉油醇,在這支 GC 管柱上幾乎同時出來,Rs 只有 0.6 左右;怎麼調溫度都分不開。'],
-  [142.6, 147.8, '06 · 分得開嗎', '要分開,可以讓峰更窄,或換一支拉住分子的方式不一樣的管柱,讓兩者的時間差變大;GC-MS 則是靠質譜認出重疊的兩種分子。'],
-  [148.4, 155.0, '07 · GC 還是 HPLC', '能變成氣體、加熱不會壞的(精油、溶劑、脂肪酸甲酯),用 GC;不容易變成氣體或怕熱的(酚類、色素、糖、蛋白質),用 HPLC。'],
-  [155.2, 161.8, '07 · GC 還是 HPLC', '層析只負責分開;要知道分出來的是什麼,還要靠偵測器。GC 常接火焰離子化偵測器或質譜,HPLC 常接紫外光偵測器或質譜。'],
+  [6.0, 13.0, zhEn('01 · 茨維特的管子', "01 · Tsvet's tube"), zhEn('1906 年,植物學家茨維特把葉子的色素溶液倒進一支塞滿碳酸鈣粉的玻璃管,再從上面一直加溶劑往下沖。', 'In 1906 the botanist Mikhail Tsvet poured leaf pigments into a glass tube packed with calcium carbonate, then kept adding solvent on top.')],
+  [13.2, 21.6, zhEn('01 · 茨維特的管子', "01 · Tsvet's tube"), zhEn('原本混在一起的綠色,往下走時分成好幾條顏色不同的帶子。他把這個方法叫做 chromatography,意思是「用顏色寫」;中文叫層析。', 'The green mixture split into several bands of different colors as it moved down. He named the method chromatography, "color writing".')],
+  [22.4, 29.0, zhEn('02 · 為什麼會分開', '02 · Why they separate'), zhEn('管子裡有兩種東西:會流動的溶劑推著分子往下走(流動相),不會動的粉會把分子拉住一下(固定相)。', 'The tube holds two things: flowing solvent pushes molecules down (mobile phase); still powder holds them briefly (stationary phase).')],
+  [29.2, 36.0, zhEn('02 · 為什麼會分開', '02 · Why they separate'), zhEn('分子一直在兩邊進進出出。在流動相裡大家走得一樣快,差別只在每次被拉住多久:被拉住越久的,平均走得越慢。', 'Molecules hop between the two. In the mobile phase all move equally fast; the longer a kind is held, the slower its average speed.')],
+  [36.2, 43.6, zhEn('02 · 為什麼會分開', '02 · Why they separate'), zhEn('在出口放一個偵測器,成分一出來就記下一支峰。從進樣到出峰的時間叫滯留時間;條件相同時,同一種分子每次都一樣。', 'A detector at the exit records each component as a peak. The time from injection to peak is the retention time, constant under the same conditions.')],
+  [44.4, 50.6, zhEn('03 · 氣相層析 GC', '03 · Gas chromatography (GC)'), zhEn('氣相層析用氦氣推著樣品走。管柱是一條 30 公尺長、內徑只有 0.25 毫米的細管,內壁塗了一層很薄的膜,盤在烘箱裡。', 'Helium pushes the sample through the column: a 30 m tube, 0.25 mm wide inside, lined with a thin film and coiled in an oven.')],
+  [50.8, 57.0, zhEn('03 · 氣相層析 GC', '03 · Gas chromatography (GC)'), zhEn('樣品在進樣口加熱變成氣體。分子溶進那層膜就停住,回到氣體才往前走;沸點越高、越容易溶進膜裡的,走得越慢。', 'The injector vaporizes the sample. Molecules stop in the film, move in the gas; higher boiling ones dissolve more and lag.')],
+  [57.2, 63.4, zhEn('03 · 氣相層析 GC', '03 · Gas chromatography (GC)'), zhEn('烘箱固定在 100 °C:前面幾個成分 7 分鐘內就出來,石竹烯卻要等到 33 分鐘,峰又矮又寬。', 'At a fixed 100 °C, the first few are out within 7 minutes, but caryophyllene takes 33 minutes, with a low, wide peak.')],
+  [63.8, 70.2, zhEn('03 · 氣相層析 GC', '03 · Gas chromatography (GC)'), zhEn('改成從 60 °C 開始,每分鐘升高 10 °C:溫度越高,分子越待不住,後面的成分被「趕」出來。', 'Now start at 60 °C and add 10 °C per minute: the hotter it gets, the less molecules stay put, so late ones are "chased" out.')],
+  [70.4, 75.8, zhEn('03 · 氣相層析 GC', '03 · Gas chromatography (GC)'), zhEn('13 分鐘就全部跑完,每支峰都又尖又高。先用低溫分開跑得快的,再升溫趕出難跑的,這叫升溫程式。', 'All out in 13 minutes, peaks sharp and tall. Cool for the fast ones, hot for the slow: a temperature program.')],
+  [76.4, 82.6, zhEn('04 · 液相層析 HPLC', '04 · Liquid chromatography (HPLC)'), zhEn('很多分子一加熱就壞掉,或根本變不成氣體,例如植物裡的酚類、色素、糖和蛋白質。這時候改用液體來推,就是液相層析。', 'Many molecules break with heat or never become gas: plant phenolics, pigments, sugars, proteins. So a liquid pushes instead.')],
+  [82.8, 89.0, zhEn('04 · 液相層析 HPLC', '04 · Liquid chromatography (HPLC)'), zhEn('管柱只有 15 公分,塞滿直徑 5 µm 的小顆粒,顆粒表面接了一層像油一樣的長碳鏈(C18)。液體要用幫浦加壓才推得過去。', 'The 15 cm column is packed with 5 µm particles carrying long, oil-like carbon chains (C18). A pump forces the liquid through.')],
+  [89.2, 95.4, zhEn('04 · 液相層析 HPLC', '04 · Liquid chromatography (HPLC)'), zhEn('流動相是水和甲醇。越「油」、越不溶於水的分子,越喜歡黏在 C18 上,走得越慢;甲醇越多,越容易把它們沖下來。', 'Mobile phase: water and methanol. Oily, less water-soluble molecules cling to C18 and lag; more methanol washes them off.')],
+  [95.6, 101.4, zhEn('04 · 液相層析 HPLC', '04 · Liquid chromatography (HPLC)'), zhEn('固定用 50% 甲醇:沒食子酸一下子就出來,幾乎沒被拉住;槲皮素卻拖到 25 分鐘,峰又矮又寬。', 'Fixed 50% methanol: gallic acid is out at once, barely held; quercetin drags on to 25 minutes, with a low, wide peak.')],
+  [101.8, 106.6, zhEn('04 · 液相層析 HPLC', '04 · Liquid chromatography (HPLC)'), zhEn('改成甲醇從 10% 慢慢加到 90%:一開始水多,容易跑的先分開;甲醇越來越多,黏得緊的也被沖下來。', 'Methanol rises 10% to 90%: fast ones separate in the watery start; later sticky ones wash off.')],
+  [106.8, 111.6, zhEn('04 · 液相層析 HPLC', '04 · Liquid chromatography (HPLC)'), zhEn('這叫梯度沖提,作用和 GC 的升溫一樣:每個成分都在合適的時候出來,峰也比較窄。', 'This is gradient elution, like heating in GC: each comes out at a good time, with narrower peaks.')],
+  [112.4, 118.4, zhEn('05 · 峰為什麼會變寬', '05 · Why peaks widen'), zhEn('同一種分子不會同時到出口:有的繞過顆粒走了遠路,有的自己往前後擴散,有的在固定相多待了一下。所以一群分子越走越散開。', 'One kind of molecule spreads as it goes: some take detours, some diffuse, some linger in the stationary phase.')],
+  [118.6, 124.4, zhEn('05 · 峰為什麼會變寬', '05 · Why peaks widen'), zhEn('顆粒做得越小,路徑差越小,峰越窄。從 5 µm 換成 1.7 µm,峰寬只剩大約六成。', 'Smaller particles, less path difference, narrower peaks: 1.7 µm instead of 5 µm makes peaks about 60% as wide.')],
+  [124.6, 129.8, zhEn('05 · 峰為什麼會變寬', '05 · Why peaks widen'), zhEn('代價是阻力變大:要用同樣的流速推過去,壓力從大約 100 bar 升到 900 bar,要用耐超高壓的儀器。', 'The price is resistance: the same flow needs about 900 bar, not 100, so an ultra-high-pressure system.')],
+  [130.4, 136.6, zhEn('06 · 分得開嗎', '06 · Can they be separated?'), zhEn('兩支峰分不分得開,看兩件事:峰頂離多遠、峰有多寬。兩者相除叫分離度 Rs;Rs 到 1.5,兩支峰中間就會回到基線。', 'It depends on peak gap and peak width; gap ÷ width is the resolution, Rs. At 1.5 the trace returns to baseline between them.')],
+  [136.8, 142.4, zhEn('06 · 分得開嗎', '06 · Can they be separated?'), zhEn('精油裡的檸檬烯和 1,8-桉葉油醇,在這支 GC 管柱上幾乎同時出來,Rs 只有 0.6 左右;怎麼調溫度都分不開。', 'Limonene and 1,8-cineole from essential oils exit almost together here: Rs about 0.6, whatever the temperature.')],
+  [142.6, 147.8, zhEn('06 · 分得開嗎', '06 · Can they be separated?'), zhEn('要分開,可以讓峰更窄,或換一支拉住分子的方式不一樣的管柱,讓兩者的時間差變大;GC-MS 則是靠質譜認出重疊的兩種分子。', 'Split them with narrower peaks or a column that holds them differently; GC-MS tells them apart by mass.')],
+  [148.4, 155.0, zhEn('07 · GC 還是 HPLC', '07 · GC or HPLC?'), zhEn('能變成氣體、加熱不會壞的(精油、溶劑、脂肪酸甲酯),用 GC;不容易變成氣體或怕熱的(酚類、色素、糖、蛋白質),用 HPLC。', 'Vaporizes, takes heat (essential oils, solvents, fatty acid methyl esters): GC. If not (phenolics, pigments, sugars, proteins): HPLC.')],
+  [155.2, 161.8, zhEn('07 · GC 還是 HPLC', '07 · GC or HPLC?'), zhEn('層析只負責分開;要知道分出來的是什麼,還要靠偵測器。GC 常接火焰離子化偵測器或質譜,HPLC 常接紫外光偵測器或質譜。', 'Chromatography only separates; a detector says what came out. GC: flame ionization or mass spectrometry (MS). HPLC: UV light or MS.')],
 ];
 const LBL_WIN = [
   [8.6, 13.6, ['tswCol', 'tswSolv']], [46.6, 52.0, ['he', 'inlet', 'coil', 'oven', 'det']], [52.0, 75.4, ['oven']],
@@ -1190,10 +1209,11 @@ let skDrawnAt = -Infinity;
 function lt(c, s, x, y, o = {}) {
   c.font = `${o.w || 600} ${Math.round((o.size || 15) * 1.35)}px ${o.mono ? MONO : SANS}`; c.fillStyle = o.color || COL.ink2; c.textAlign = o.align || 'left'; c.textBaseline = o.base || 'middle'; c.fillText(s, x, y);
 }
+// sub 只有英文用:簡圖標題旁的短句(照中文寫成「流動相:… · 固定相:…」太長,放不下)
 const MICRO = {
-  tsw: { flow: '溶劑', stat: '碳酸鈣粉', kinds: [{ name: '胡蘿蔔素', k: 0.25, col: '#ff9d3a' }, { name: '葉綠素', k: 2.6, col: '#2fbf8f' }] },
-  gc: { flow: '氦氣', stat: '管壁上的薄膜', kinds: [{ name: '檸檬烯', k: 0.5, col: '#5dffb0' }, { name: '石竹烯', k: 3.0, col: '#bba6ff' }] },
-  lc: { flow: '水和甲醇', stat: '顆粒表面的 C18', kinds: [{ name: '沒食子酸', k: 0.3, col: '#5aa2ff' }, { name: '槲皮素', k: 2.8, col: '#ff8a6b' }] },
+  tsw: { flow: zhEn('溶劑', 'Solvent'), stat: zhEn('碳酸鈣粉', 'Calcium carbonate'), sub: 'Solvent flows, CaCO₃ holds', kinds: [{ name: zhEn('胡蘿蔔素', 'Carotene'), k: 0.25, col: '#ff9d3a' }, { name: zhEn('葉綠素', 'Chlorophyll'), k: 2.6, col: '#2fbf8f' }] },
+  gc: { flow: zhEn('氦氣', 'Helium'), stat: zhEn('管壁上的薄膜', 'Film on the wall'), sub: 'Helium flows, the film holds', kinds: [{ name: zhEn('檸檬烯', 'Limonene'), k: 0.5, col: '#5dffb0' }, { name: zhEn('石竹烯', 'Caryophyllene'), k: 3.0, col: '#bba6ff' }] },
+  lc: { flow: zhEn('水和甲醇', 'Water and methanol'), stat: zhEn('顆粒表面的 C18', 'C18 on the particles'), sub: 'Water + methanol flow, C18 holds', kinds: [{ name: zhEn('沒食子酸', 'Gallic acid'), k: 0.3, col: '#5aa2ff' }, { name: zhEn('槲皮素', 'Quercetin'), k: 2.8, col: '#ff8a6b' }] },
 };
 // 每個分子的時間表:「在流動相」與「被拉住」輪流,每一段的長短是亂數,但種子固定(同一個時間永遠同一個位置)
 const TF = 0.5, VFREE = 66, MSCH = {};
@@ -1246,8 +1266,8 @@ function drawMicro(c, inst, t) {
       c.fillStyle = '#26343d'; c.fillRect(0, top ? y0 : fy1 - 16, 600, 16);
       c.fillStyle = 'rgba(214,160,72,.42)'; c.fillRect(0, top ? fy0 : y0, 600, 18);
     }
-    lt(c, '管壁(玻璃)', 590, 22, { size: 11.5, color: COL.ink2, align: 'right', w: 600 });
-    lt(c, '薄膜(固定相)', 590, 40, { size: 11.5, color: '#ffd38a', align: 'right', w: 700 });
+    lt(c, zhEn('管壁(玻璃)', 'Tube wall (glass)'), 590, 22, { size: 11.5, color: COL.ink2, align: 'right', w: 600 });
+    lt(c, zhEn('薄膜(固定相)', 'Film (stationary phase)'), 590, 40, { size: 11.5, color: '#ffd38a', align: 'right', w: 700 });
   } else {
     for (let side = 0; side < 2; side++) GRAINS[side].forEach((g, j) => {
       c.beginPath();
@@ -1259,9 +1279,10 @@ function drawMicro(c, inst, t) {
         for (let k = 0; k < 40; k++) { const th = (k / 40) * TAU, x = g[0] + GRAIN_R * Math.cos(th), y = g[1] + GRAIN_R * Math.sin(th); if (y < -4 || y > 344) continue; c.beginPath(); c.moveTo(x, y); c.lineTo(x + 8 * Math.cos(th + 0.25 * Math.sin(k)), y + 8 * Math.sin(th + 0.25 * Math.sin(k))); c.stroke(); }
       }
     });
-    { const s = M.stat + '(固定相)'; c.font = `700 ${Math.round(12 * 1.35)}px ${SANS}`; const tw = c.measureText(s).width; c.fillStyle = 'rgba(10,15,19,.62)'; c.fillRect(586 - tw - 8, 14, tw + 12, 26); lt(c, s, 590 - 4, 27, { size: 12, color: inst === 'lc' ? '#ffd38a' : COL.ink, align: 'right', w: 700 }); }
+    { const s = zhEn(M.stat + '(固定相)', `${M.stat} (stationary phase)`); c.font = `700 ${Math.round(12 * 1.35)}px ${SANS}`; const tw = c.measureText(s).width; c.fillStyle = 'rgba(10,15,19,.62)'; c.fillRect(586 - tw - 8, 14, tw + 12, 26); lt(c, s, 590 - 4, 27, { size: 12, color: inst === 'lc' ? '#ffd38a' : COL.ink, align: 'right', w: 700 }); }
   }
-  { const s = M.flow + '往右流(流動相)→'; c.font = `600 ${Math.round(12.5 * 1.35)}px ${SANS}`; const tw = c.measureText(s).width; c.fillStyle = 'rgba(10,15,19,.62)'; c.fillRect(8, 116, tw + 12, 26); lt(c, s, 14, 129, { size: 12.5, color: COL.cyan, w: 600 }); }
+  // 英文:水和甲醇是兩樣,動詞不加 s
+  { const s = zhEn(M.flow + '往右流(流動相)→', `${M.flow} ${inst === 'lc' ? 'flow' : 'flows'} right (mobile phase) →`); c.font = `600 ${Math.round(12.5 * 1.35)}px ${SANS}`; const tw = c.measureText(s).width; c.fillStyle = 'rgba(10,15,19,.62)'; c.fillRect(8, 116, tw + 12, 26); lt(c, s, 14, 129, { size: 12.5, color: COL.cyan, w: 600 }); }
   // 分子
   const laneY = (j) => (inst === 'gc' ? 68 + (j % 12) * 12.6 : 84 + (j % 12) * 8.2);
   for (const m of mols) {
@@ -1278,11 +1299,12 @@ function drawMicro(c, inst, t) {
   M.kinds.forEach((K, i) => {
     const y = 270 + i * 44, free = 1 / (1 + K.k), x0 = 186, bw = 250;
     c.fillStyle = K.col; c.beginPath(); c.arc(16, y, 7, 0, TAU); c.fill();
-    lt(c, `${K.name} ${free > 0.5 ? '走得快' : '走得慢'}`, 30, y, { size: 13.5, color: K.col, w: 700 });
+    // 英文的名字比較長,這裡只寫名字,快慢改寫在長條右邊
+    lt(c, zhEn(`${K.name} ${free > 0.5 ? '走得快' : '走得慢'}`, K.name), 30, y, { size: 13.5, color: K.col, w: 700 });
     c.fillStyle = K.col; c.fillRect(x0, y - 11, bw * free, 22);
     c.fillStyle = 'rgba(255,255,255,.12)'; c.fillRect(x0 + bw * free, y - 11, bw * (1 - free), 22);
-    lt(c, `走 ${Math.round(free * 100)}%`, x0 + 6, y, { size: 11, color: '#0a1217', w: 700 });
-    lt(c, `停 ${Math.round((1 - free) * 100)}%`, x0 + bw + 8, y, { size: 11.5, color: COL.ink2, w: 600 });
+    lt(c, zhEn(`走 ${Math.round(free * 100)}%`, `go ${Math.round(free * 100)}%`), x0 + 6, y, { size: 11, color: '#0a1217', w: 700 });
+    lt(c, zhEn(`停 ${Math.round((1 - free) * 100)}%`, `stop ${Math.round((1 - free) * 100)}% · ${free > 0.5 ? 'fast' : 'slow'}`), x0 + bw + 8, y, { size: 11.5, color: COL.ink2, w: 600 });
   });
 }
 // ---------- 峰為什麼會變寬 ----------
@@ -1303,8 +1325,8 @@ function drawBroad(c, t, part) {
   c.strokeStyle = '#5dffb0'; c.lineWidth = 2.2; c.beginPath();
   for (let x = 0; x <= 376; x += 3) { const y = 238 - 26 * (6 / s) ** 0.5 * Math.exp(-0.5 * ((x - mx) / s) ** 2); x ? c.lineTo(x, y) : c.moveTo(x, y); }
   c.stroke(); c.strokeStyle = 'rgba(160,215,235,.25)'; c.lineWidth = 1; c.beginPath(); c.moveTo(0, 238.5); c.lineTo(376, 238.5); c.stroke();
-  lt(c, '一起出發', 8, 18, { size: 11.5, color: COL.muted, w: 500 });
-  lt(c, '越走越散開', 370, 18, { size: 11.5, color: COL.muted, w: 500, align: 'right' });
+  lt(c, zhEn('一起出發', 'Start together'), 8, 18, { size: 11.5, color: COL.muted, w: 500 });
+  lt(c, zhEn('越走越散開', 'Spreading as they go'), 370, 18, { size: 11.5, color: COL.muted, w: 500, align: 'right' });
   // 右邊:顆粒大小
   c.strokeStyle = 'rgba(160,215,235,.18)'; c.beginPath(); c.moveTo(392, 14); c.lineTo(392, 240); c.stroke();
   [[5, 30, 13, 100, 1], [1.7, 134, 4.6, 900, 0.58]].forEach(([p, y0, r, bar, wk]) => {
@@ -1318,12 +1340,12 @@ function drawBroad(c, t, part) {
     c.strokeStyle = on ? COL.cyan : COL.ink2; c.lineWidth = 2; c.beginPath();
     for (let x = cx - 52; x <= cx + 52; x += 2) { const y = y0 + 80 - (44 / wk) * 0.62 * Math.exp(-0.5 * ((x - cx) / (w * 0.5)) ** 2); x === cx - 52 ? c.moveTo(x, y) : c.lineTo(x, y); }
     c.stroke();
-    lt(c, `約 ${bar} bar`, 488, y0 + 94, { size: 11.5, color: on ? COL.amber : COL.muted, w: 600, align: 'left', mono: true });
+    lt(c, zhEn(`約 ${bar} bar`, `~${bar} bar`), 488, y0 + 94, { size: 11.5, color: on ? COL.amber : COL.muted, w: 600, align: 'left', mono: true });
     c.globalAlpha = 1;
   });
   c.fillStyle = 'rgba(10,15,19,.72)'; c.fillRect(0, 252, 600, 88);
-  lt(c, '峰寬:有的繞遠路、有的多待一下,所以散開', 12, 274, { size: 12.5, color: COL.ink, w: 600 });
-  lt(c, '顆粒越小 → 路徑差越小,峰越窄;但縫隙越小,越難推', 12, 312, { size: 12.5, color: COL.ink2, w: 500 });
+  lt(c, zhEn('峰寬:有的繞遠路、有的多待一下,所以散開', 'Peak width: some take detours, some linger, so they spread'), 12, 274, { size: 12.5, color: COL.ink, w: 600 });
+  lt(c, zhEn('顆粒越小 → 路徑差越小,峰越窄;但縫隙越小,越難推', 'Finer particles → paths differ less, narrower peaks; but harder to push'), 12, 312, { size: 12.5, color: COL.ink2, w: 500 });
 }
 // ---------- 分得開嗎 ----------
 function drawRs(c, P) {
@@ -1345,13 +1367,13 @@ function drawRs(c, P) {
   c.strokeStyle = COL.amber; c.fillStyle = COL.amber; c.lineWidth = 1.6;
   c.beginPath(); c.moveTo(xa, yT); c.lineTo(xb, yT); c.stroke();
   for (const [x, d] of [[xa, 1], [xb, -1]]) { c.beginPath(); c.moveTo(x, yT); c.lineTo(x + 7 * d, yT - 4); c.lineTo(x + 7 * d, yT + 4); c.closePath(); c.fill(); c.setLineDash([2, 3]); c.beginPath(); c.moveTo(x, yT); c.lineTo(x, Y0); c.stroke(); c.setLineDash([]); }
-  lt(c, '峰頂距離', (xa + xb) / 2, yT - 14, { size: 12, color: COL.amber, align: 'center', w: 700 });
+  lt(c, zhEn('峰頂距離', 'Peak gap'), (xa + xb) / 2, yT - 14, { size: 12, color: COL.amber, align: 'center', w: 700 });
   // 峰寬(底寬 = 4σ)
   [[a, 228], [b, 240]].forEach(([p, y]) => { const x0 = X(p.t - 2 * p.s), x1 = X(p.t + 2 * p.s); c.strokeStyle = p.col; c.lineWidth = 2; c.beginPath(); c.moveTo(x0, y - 5); c.lineTo(x0, y); c.lineTo(x1, y); c.lineTo(x1, y - 5); c.stroke(); });
-  lt(c, '峰寬', X(b.t + 2 * b.s) + 8, 240, { size: 11.5, color: COL.ink2, w: 600 });
+  lt(c, zhEn('峰寬', 'Peak width'), X(b.t + 2 * b.s) + 8, 240, { size: 11.5, color: COL.ink2, w: 600 });
   c.fillStyle = 'rgba(10,15,19,.72)'; c.fillRect(0, 252, 600, 88);
   const col = rs < 1 ? COL.rose : rs < 1.5 ? COL.amber : COL.mint;
-  lt(c, 'Rs = 峰頂距離 ÷ 平均峰寬 =', 14, 276, { size: 13.5, color: COL.ink, w: 600 });
+  lt(c, zhEn('Rs = 峰頂距離 ÷ 平均峰寬 =', 'Rs = peak gap ÷ average width ='), 14, 276, { size: 13.5, color: COL.ink, w: 600 });
   lt(c, rs.toFixed(rs < 10 ? 2 : 0), 370, 276, { size: 15, color: col, w: 700, mono: true });
   lt(c, rsWord(rs), 588, 276, { size: 15, color: col, w: 800, align: 'right' });
   c.fillStyle = a.col; c.beginPath(); c.arc(20, 314, 6, 0, TAU); c.fill(); lt(c, a.name, 32, 314, { size: 12.5, color: a.col, w: 700 });
@@ -1363,7 +1385,7 @@ function drawRs(c, P) {
 function rsFilmPair(t) {
   if (t < 136.8) {
     const u = clamp((t - 131.0) / 5.0, 0, 1), rs = u < 0.5 ? lerp(0.6, 1.0, ease(u * 2)) : lerp(1.0, 1.5, ease(u * 2 - 1));
-    return { a: { t: 0, s: 1, h: 1, name: '成分 A', col: COL.cyan }, b: { t: 4 * rs, s: 1, h: 0.8, name: '成分 B', col: COL.amber } };
+    return { a: { t: 0, s: 1, h: 1, name: zhEn('成分 A', 'Component A'), col: COL.cyan }, b: { t: 4 * rs, s: 1, h: 0.8, name: zhEn('成分 B', 'Component B'), col: COL.amber } };
   }
   return pairFromRun(runOf('gc', 'ramp'), 'lim', 'cin');
 }
@@ -1391,7 +1413,7 @@ function drawSketch(t) {
   if (W.sk === 'broad') drawBroad(c, W.skT, W.part);
   else if (W.sk === 'rs') {
     const P = film ? rsFilmPair(W.skT) : rsLivePair();
-    if (P) drawRs(c, P); else lt(c, '等兩支峰都出來,再量它們分不分得開', 300, 150, { size: 13.5, color: COL.muted, align: 'center', w: 500 });
+    if (P) drawRs(c, P); else lt(c, zhEn('等兩支峰都出來,再量它們分不分得開', 'Once two peaks are out, we can see if they separate'), 300, 150, { size: 13.5, color: COL.muted, align: 'center', w: 500 });
   } else drawMicro(c, W.inst, W.skT);
 }
 
@@ -1401,26 +1423,28 @@ function drawSketch(t) {
 function chipVals() {
   const inst = W.inst, r = W.run && W.run.inst === inst ? W.run : null;
   let m = '—', s = '—', rr = '—';
-  if (inst === 'tsw') { m = '石油醚'; s = '碳酸鈣粉'; }
-  else if (inst === 'gc') { m = `氦氣 · ${Math.round(W.ovenT)} °C`; s = '管壁上的薄膜'; }
-  else { const phi = r ? LC_CONDS[r.cond].phi(Math.max(0, W.rt)) : 0.5; m = `水+甲醇 ${Math.round(phi * 100)}%`; s = `C18 · ${W.part} µm`; }
-  if (r) { const w = worstRs(r, W.rt); rr = w ? `Rs ${w.rs < 10 ? w.rs.toFixed(1) : '> 10'} ${rsWord(w.rs)}` : '等出峰'; }
+  if (inst === 'tsw') { m = zhEn('石油醚', 'Petroleum ether'); s = zhEn('碳酸鈣粉', 'CaCO₃ powder'); }
+  else if (inst === 'gc') { m = zhEn(`氦氣 · ${Math.round(W.ovenT)} °C`, `Helium · ${Math.round(W.ovenT)} °C`); s = zhEn('管壁上的薄膜', 'Thin film'); }
+  else { const phi = r ? LC_CONDS[r.cond].phi(Math.max(0, W.rt)) : 0.5; m = zhEn(`水+甲醇 ${Math.round(phi * 100)}%`, `${Math.round(phi * 100)}% methanol`); s = `C18 · ${W.part} µm`; }
+  if (r) { const w = worstRs(r, W.rt); rr = w ? `Rs ${w.rs < 10 ? w.rs.toFixed(1) : '> 10'} ${rsWord(w.rs)}` : zhEn('等出峰', 'Waiting'); }
   return [m, s, rr];
 }
+// 英文:句子中間的成分名稱用小寫開頭(Limonene → limonene、1,8-Cineole → 1,8-cineole)
+const low = (s) => s.replace(/[A-Z]/, (m) => m.toLowerCase());
 // 簡圖下方的說明(互動模式)
 function skText() {
-  if (S.sk === 'broad') return '同一種分子也會越走越散開:有的繞遠路,有的往前後擴散,有的在固定相多待一下。顆粒越小,散開得越少,但要的壓力越大。';
+  if (S.sk === 'broad') return zhEn('同一種分子也會越走越散開:有的繞遠路,有的往前後擴散,有的在固定相多待一下。顆粒越小,散開得越少,但要的壓力越大。', 'Even one kind of molecule spreads out as it goes: some take detours, some diffuse forward and back, some linger in the stationary phase. Finer particles mean less spreading but need more pressure.');
   if (S.sk === 'rs') {
-    const P = rsLivePair(), gcPair = P && /檸檬烯/.test(P.a.name + P.b.name) && /桉葉油醇/.test(P.a.name + P.b.name);
-    return `Rs = 兩支峰頂的距離 ÷ 平均峰寬;到 1.5,兩支峰中間就回到基線。${P ? `這一次最難分的是${P.a.name}和${/^[A-Za-z0-9]/.test(P.b.name) ? ' ' : ''}${P.b.name}${gcPair ? ':在這支管柱上怎麼調溫度都分不開,要換管柱或靠質譜分辨。' : '。'}` : ''}`;
+    const P = rsLivePair(), gcPair = P && zhEn(/檸檬烯/, /Limonene/).test(P.a.name + P.b.name) && zhEn(/桉葉油醇/, /Cineole/).test(P.a.name + P.b.name);
+    return zhEn(`Rs = 兩支峰頂的距離 ÷ 平均峰寬;到 1.5,兩支峰中間就回到基線。${P ? `這一次最難分的是${P.a.name}和${/^[A-Za-z0-9]/.test(P.b.name) ? ' ' : ''}${P.b.name}${gcPair ? ':在這支管柱上怎麼調溫度都分不開,要換管柱或靠質譜分辨。' : '。'}` : ''}`, `Rs = gap between the two peak tops ÷ average peak width; at 1.5 the trace returns to baseline between them.${P ? ` This run, the hardest pair to separate is ${low(P.a.name)} and ${low(P.b.name)}${gcPair ? ': no temperature separates them on this column, so it takes another column or a mass spectrometer.' : '.'}` : ''}`);
   }
   return {
-    tsw: '橘色的胡蘿蔔素幾乎不被碳酸鈣粉拉住,一路往下跑;綠色的葉綠素常被拉住,留在管子上面。',
-    gc: '綠色的檸檬烯很少溶進管壁的薄膜,大部分時間都在往前走;紫色的石竹烯常被薄膜拉住,平均走得慢。溫度越高,大家越待不住。',
-    lc: '藍色的沒食子酸很溶於水,很少黏在 C18 上;橘色的槲皮素比較「油」,常被拉住。甲醇越多,越容易被沖下來。',
+    tsw: zhEn('橘色的胡蘿蔔素幾乎不被碳酸鈣粉拉住,一路往下跑;綠色的葉綠素常被拉住,留在管子上面。', 'Orange carotene is hardly held by the calcium carbonate and runs straight down; green chlorophyll is often held and stays near the top.'),
+    gc: zhEn('綠色的檸檬烯很少溶進管壁的薄膜,大部分時間都在往前走;紫色的石竹烯常被薄膜拉住,平均走得慢。溫度越高,大家越待不住。', 'Green limonene seldom dissolves in the wall film and spends most of its time moving; purple caryophyllene is often held by the film and is slower on average. The hotter it is, the less any of them stays.'),
+    lc: zhEn('藍色的沒食子酸很溶於水,很少黏在 C18 上;橘色的槲皮素比較「油」,常被拉住。甲醇越多,越容易被沖下來。', 'Blue gallic acid dissolves well in water and seldom sticks to the C18; orange quercetin is "oilier" and often held. The more methanol, the more easily it is washed off.'),
   }[S.inst];
 }
-const SKH = { micro: '管子裡面', broad: '峰為什麼會變寬', rs: '分得開嗎' };
+const SKH = { micro: zhEn('管子裡面', 'Inside the tube'), broad: zhEn('峰為什麼會變寬', 'Why peaks widen'), rs: zhEn('分得開嗎', 'Separated?') };
 let lastNote = '', lastCap = '', lastTitle = '', lastCmp = -1, lastChip = '', lastSk = '', lastCon = '';
 function updateDOM(t) {
   const film = FILM || tour.on;
@@ -1428,7 +1452,7 @@ function updateDOM(t) {
   if (ck !== lastChip) { lastChip = ck; el('cM').textContent = ch[0]; el('cS').textContent = ch[1]; el('cR').textContent = ch[2]; }
   // 簡圖
   const note = el('note'), so = film ? W.skOp : 1; note.style.opacity = so; note.style.visibility = so < 0.01 ? 'hidden' : 'visible';
-  const M = MICRO[W.inst], sub = W.sk === 'micro' ? `流動相:${M.flow} · 固定相:${M.stat}` : W.sk === 'broad' ? '同一種分子,一起出發' : film && W.skT < 136.8 ? '兩支峰的距離與寬度' : '檸檬烯與 1,8-桉葉油醇';
+  const M = MICRO[W.inst], sub = W.sk === 'micro' ? zhEn(`流動相:${M.flow} · 固定相:${M.stat}`, M.sub) : W.sk === 'broad' ? zhEn('同一種分子,一起出發', 'One kind, starting together') : film && W.skT < 136.8 ? zhEn('兩支峰的距離與寬度', 'Gap and width of two peaks') : zhEn('檸檬烯與 1,8-桉葉油醇', 'Limonene and 1,8-cineole');
   const sk = W.sk + '|' + sub;
   if (sk !== lastSk) { lastSk = sk; el('skTitle').textContent = SKH[W.sk]; el('skSub').textContent = sub; }
   drawSketch(t);
@@ -1439,8 +1463,8 @@ function updateDOM(t) {
   const L = W.labels || Object.fromEntries(STL[W.inst].map((k) => [k, 0.92]));
   for (const k of LBL_KEYS) labelOp(k, L[k] || 0);
   labelSub('oven', `${Math.round(W.ovenT)} °C`);
-  { const r = W.run && W.run.inst === 'lc' ? W.run : null, phi = r ? LC_CONDS[r.cond].phi(Math.max(0, W.rt)) : 0.5; labelSub('pump', `壓力約 ${LC_PART[W.part].bar} bar · 甲醇 ${Math.round(phi * 100)}%`); }
-  labelSub('lcCol', `15 公分,塞滿 ${W.part} µm 的小顆粒`);
+  { const r = W.run && W.run.inst === 'lc' ? W.run : null, phi = r ? LC_CONDS[r.cond].phi(Math.max(0, W.rt)) : 0.5; labelSub('pump', zhEn(`壓力約 ${LC_PART[W.part].bar} bar · 甲醇 ${Math.round(phi * 100)}%`, `about ${LC_PART[W.part].bar} bar · ${Math.round(phi * 100)}% methanol`)); }
+  labelSub('lcCol', zhEn(`15 公分,塞滿 ${W.part} µm 的小顆粒`, `15 cm, ${W.part} µm particles`));
   // 層析圖
   const con = el('console');
   con.style.opacity = W.conOp; con.style.visibility = W.conOp < 0.01 ? 'hidden' : 'visible';
@@ -1458,8 +1482,8 @@ function updateDOM(t) {
     if (tk !== lastTitle) {
       lastTitle = tk;
       const tx = tk === 't'
-        ? ['層析', '把混在一起的成分分開', '從茨維特的色素管柱,到氣相層析 GC 與液相層析 HPLC', '']
-        : ['層析-GC 與 HPLC 的原理', '推著走 · 拉住 · 分開', '茨維特的管柱 · 升溫程式 · 梯度沖提 · 峰寬與分離度', '層析原理的示意動畫;儀器與管柱經過縮放。GC 的滯留時間和 GC-MS 教材用同一個模型算出,HPLC 與茨維特管柱的數值是依常見規律設定的示意值。'];
+        ? zhEn(['層析', '把混在一起的成分分開', '從茨維特的色素管柱,到氣相層析 GC 與液相層析 HPLC', ''], ['Chromatography', 'Separating a mixture', "From Tsvet's pigment column to gas chromatography (GC) and liquid chromatography (HPLC)", ''])
+        : zhEn(['層析-GC 與 HPLC 的原理', '推著走 · 拉住 · 分開', '茨維特的管柱 · 升溫程式 · 梯度沖提 · 峰寬與分離度', '層析原理的示意動畫;儀器與管柱經過縮放。GC 的滯留時間和 GC-MS 教材用同一個模型算出,HPLC 與茨維特管柱的數值是依常見規律設定的示意值。'], ['Chromatography: GC and HPLC', 'Push · hold · separate', "Tsvet's column · temperature program · gradient elution · peak width and resolution", "Schematic animation; instruments and columns are scaled. GC retention times use the GC-MS lesson's model; HPLC and Tsvet column values are illustrative, set from common rules."]);
       ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => { el(id).textContent = tx[i]; });
       el('titlecard').classList.toggle('outro', tk === 'o');
     }
@@ -1468,7 +1492,7 @@ function updateDOM(t) {
   }
 }
 // 比較表(影片最後一段)
-el('cmp').innerHTML = `<table>
+el('cmp').innerHTML = zhEn(`<table>
 <tr><th></th><th>氣相層析 GC</th><th>液相層析 HPLC</th></tr>
 <tr><td>推著走的(流動相)</td><td>氦氣等氣體</td><td>水、甲醇等液體</td></tr>
 <tr><td>拉住分子的(固定相)</td><td>管壁上的薄膜</td><td>小顆粒表面的 C18</td></tr>
@@ -1476,15 +1500,23 @@ el('cmp').innerHTML = `<table>
 <tr><td>怎麼調整出峰</td><td>改溫度(升溫程式)</td><td>改溶劑比例(梯度沖提)</td></tr>
 <tr><td>適合的樣品</td><td>會氣化、耐熱</td><td>不易氣化、怕熱</td></tr>
 <tr><td>常接的偵測器</td><td>火焰離子化偵測器、質譜</td><td>紫外光偵測器、質譜</td></tr>
-</table>`;
+</table>`, `<table>
+<tr><th></th><th>Gas chromatography (GC)</th><th>Liquid chromatography (HPLC)</th></tr>
+<tr><td>Pushes along (mobile phase)</td><td>Gases such as helium</td><td>Liquids such as water, methanol</td></tr>
+<tr><td>Holds back (stationary phase)</td><td>Thin film on the wall</td><td>C18 on small particles</td></tr>
+<tr><td>Column</td><td><b>30 m × 0.25 mm</b></td><td><b>15 cm × 4.6 mm</b></td></tr>
+<tr><td>Adjusting peak times</td><td>Temperature (temperature program)</td><td>Solvent ratio (gradient elution)</td></tr>
+<tr><td>Suitable samples</td><td>Vaporize, take heat</td><td>Hard to vaporize, heat-sensitive</td></tr>
+<tr><td>Usual detectors</td><td>Flame ionization detector, MS</td><td>UV detector, MS</td></tr>
+</table>`);
 
 // ---------- 層析圖 ----------
 const plot = el('plot'), tip = el('tip');
 let plotDrawnAt = -Infinity;
 const CON = {
-  tsw: { title: '色帶與出口的訊號', sample: () => '葉子的色素 · 碳酸鈣粉 · 石油醚' },
-  gc: { title: '氣相層析圖', sample: (r) => `精油 · ${GC_CONDS[r.cond].label}` },
-  lc: { title: '液相層析圖', sample: (r) => `植物酚類 · ${LC_CONDS[r.cond].label} · 顆粒 ${r.part} µm` },
+  tsw: { title: zhEn('色帶與出口的訊號', 'Bands and exit signal'), sample: () => zhEn('葉子的色素 · 碳酸鈣粉 · 石油醚', 'Leaf pigments · CaCO₃ · petroleum ether') },
+  gc: { title: zhEn('氣相層析圖', 'Gas chromatogram'), sample: (r) => zhEn(`精油 · ${GC_CONDS[r.cond].label}`, `Essential oil · ${GC_CONDS[r.cond].label}`) },
+  lc: { title: zhEn('液相層析圖', 'Liquid chromatogram'), sample: (r) => zhEn(`植物酚類 · ${LC_CONDS[r.cond].label} · 顆粒 ${r.part} µm`, `Plant phenolics · ${LC_CONDS[r.cond].label} · ${r.part} µm`) },
 };
 const RGB_OF = { tsw: TSW_RGB, gc: GC_RGB, lc: LC_RGB };
 // 一次分析的訊號,每一個像素取一個值;峰頂落在哪一格就補上峰頂的值(很窄的峰才不會被跳過)
@@ -1502,9 +1534,9 @@ function drawPlot() {
   const hk = `${inst}|${r ? r.key : ''}|${g ? g.key : ''}`;
   // 標題與圖例在量畫布之前更新:手機版把譜收起來時畫布寬度是 0,收合列上的標題也要跟著換
   if (hk !== lastCon) {
-    lastCon = hk; el('conTitle').textContent = CON[inst].title; el('conSample').textContent = r ? CON[inst].sample(r) : '按「進樣」打一針';
-    const prog = !r || inst === 'tsw' ? '' : `<span><i style="border-top:2px dashed #ffc261"></i>${inst === 'gc' ? '溫度' : '甲醇比例'}</span>`;
-    el('legend').innerHTML = (g ? `<span><i style="border-top:2px solid #74e4ff"></i>這一次</span><span><i style="border-top:2px dashed #8a9ba5"></i>上一次:${(CONDS_OF[inst][g.cond] || {}).label || ''}${inst === 'lc' && g.part !== r.part ? ` ${g.part} µm` : ''}</span>` : '') + prog;
+    lastCon = hk; el('conTitle').textContent = CON[inst].title; el('conSample').textContent = r ? CON[inst].sample(r) : zhEn('按「進樣」打一針', 'Press Inject to run a sample');
+    const prog = !r || inst === 'tsw' ? '' : `<span><i style="border-top:2px dashed #ffc261"></i>${inst === 'gc' ? zhEn('溫度', 'Temperature') : zhEn('甲醇比例', 'Methanol %')}</span>`;
+    el('legend').innerHTML = (g ? `<span><i style="border-top:2px solid #74e4ff"></i>${zhEn('這一次', 'This run')}</span><span><i style="border-top:2px dashed #8a9ba5"></i>${zhEn('上一次:', 'Last run: ')}${(CONDS_OF[inst][g.cond] || {}).label || ''}${inst === 'lc' && g.part !== r.part ? ` ${g.part} µm` : ''}</span>` : '') + prog;
   }
   const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (plot.currentCSSZoom || uiScale()), w = plot.clientWidth, h = plot.clientHeight; // 面板放大時多畫幾倍像素
   if (!w) return;
@@ -1526,7 +1558,7 @@ function drawPlot() {
       }
     }
     c.font = `${fs}px ${SANS}`; c.fillStyle = COL.muted; c.textBaseline = 'top';
-    c.textAlign = 'left'; c.fillText('管柱頂端', Lp, y0 + sh + 3); c.textAlign = 'right'; c.fillText('出口 → 偵測器', Lp + pw, y0 + sh + 3);
+    c.textAlign = 'left'; c.fillText(zhEn('管柱頂端', 'Column top'), Lp, y0 + sh + 3); c.textAlign = 'right'; c.fillText(zhEn('出口 → 偵測器', 'Exit → detector'), Lp + pw, y0 + sh + 3);
     top = y0 + sh + fs + 14;
   }
   const ph = h - top - Bp, yb = top + ph, X = (tt) => Lp + (tt / tMax) * pw;
@@ -1535,14 +1567,16 @@ function drawPlot() {
   c.beginPath(); c.moveTo(Lp, yb + 0.5); c.lineTo(Lp + pw, yb + 0.5); c.stroke();
   const step = [0.5, 1, 2, 5, 10].find((s) => (s / tMax) * pw >= (FILM ? 58 : 44)) || 10;
   c.fillStyle = COL.muted; c.textAlign = 'center'; c.textBaseline = 'top';
-  for (let v = 0; v <= tMax + 1e-9; v += step) { const x = X(v); c.strokeStyle = 'rgba(160,215,235,.07)'; c.beginPath(); c.moveTo(Math.round(x) + 0.5, top); c.lineTo(Math.round(x) + 0.5, yb); c.stroke(); if (x < Lp + pw - (FILM ? 86 : 64)) c.fillText(String(v), x, yb + 6); }
-  c.textAlign = 'right'; c.font = `${fs}px ${SANS}`; c.fillText(inst === 'tsw' ? '分鐘(示意)' : '分鐘', Lp + pw, yb + 6);
+  // 英文的「min (illustrative)」比中文寬:茨維特那一台右邊多留一點,刻度的數字才不會壓到
+  for (let v = 0; v <= tMax + 1e-9; v += step) { const x = X(v); c.strokeStyle = 'rgba(160,215,235,.07)'; c.beginPath(); c.moveTo(Math.round(x) + 0.5, top); c.lineTo(Math.round(x) + 0.5, yb); c.stroke(); if (x < Lp + pw - zhEn(FILM ? 86 : 64, inst === 'tsw' ? (FILM ? 124 : 100) : (FILM ? 86 : 64))) c.fillText(String(v), x, yb + 6); }
+  c.textAlign = 'right'; c.font = `${fs}px ${SANS}`; c.fillText(inst === 'tsw' ? zhEn('分鐘(示意)', 'min (illustrative)') : zhEn('分鐘', 'min'), Lp + pw, yb + 6);
   // 溫度或甲醇比例(右邊的軸)
   if (r && inst !== 'tsw') {
     const gc = inst === 'gc', lo = gc ? 40 : 0, hi = gc ? 240 : 100, Yp = (v) => yb - ((v - lo) / (hi - lo)) * ph * 0.92;
     c.font = `${fs - 1}px ${MONO}`; c.fillStyle = 'rgba(255,194,97,.8)'; c.textAlign = 'left'; c.textBaseline = 'middle';
     for (const v of gc ? [50, 100, 150, 200] : [0, 50, 100]) c.fillText(String(v), Lp + pw + 6, Yp(v));
-    c.textBaseline = 'bottom'; c.fillText(gc ? '°C' : '甲醇%', Lp + pw + 6, top - 2);
+    // 英文的「Methanol %」比右邊的留白寬:改成從畫布右緣往左寫(在圖框上方,不壓到刻度)
+    c.textBaseline = 'bottom'; if (!gc) c.textAlign = zhEn('left', 'right'); c.fillText(gc ? '°C' : zhEn('甲醇%', 'Methanol %'), gc ? Lp + pw + 6 : zhEn(Lp + pw + 6, w - 2), top - 2);
     c.strokeStyle = 'rgba(255,194,97,.75)'; c.lineWidth = 1.4; c.setLineDash([5, 4]); c.beginPath();
     for (let i = 0; i <= 200; i++) { const tt = (i / 200) * tMax, v = gc ? GC_CONDS[r.cond].T(tt) : LC_CONDS[r.cond].phi(tt) * 100, x = X(tt), y = Yp(v); i ? c.lineTo(x, y) : c.moveTo(x, y); }
     c.stroke(); c.setLineDash([]);
@@ -1568,10 +1602,21 @@ function drawPlot() {
   for (const cp of out) { const x = X(cp.tR), G0 = groups[groups.length - 1]; if (G0 && x - G0.x < 9) { G0.cps.push(cp); G0.x = (G0.x + x) / 2; } else groups.push({ x, cps: [cp] }); }
   c.font = `700 ${fs}px ${SANS}`; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.lineJoin = 'round';
   let lastR = -Infinity, row = 0;
+  // 英文的名字比較長,常會壓到前面的名字:英文時記下畫過的名字,壓到的話往上、再往下找空的一行(中文照原本的位置)
+  const avoid = zhEn(false, true), placed = [];
+  const hit = (x, tw, y) => placed.some((b) => x - tw / 2 - 3 < b.x1 && x + tw / 2 + 3 > b.x0 && Math.abs(y - b.y) < fs + 2);
   for (const G of groups) {
     const s = G.cps.map((cp) => cp.c.name).join(' + '), tw = c.measureText(s).width, x = clamp(G.x, Lp + tw / 2, Lp + pw - tw / 2);
     row = x - tw / 2 < lastR + 4 ? row + 1 : 0; lastR = x + tw / 2;
-    const ya = Math.min(...G.cps.map((cp) => Y(sigAt(r, cp.tR, hM)))), y = Math.max(top + fs + 2, ya - 5 - row * (fs + 3));
+    const ya = Math.min(...G.cps.map((cp) => Y(sigAt(r, cp.tR, hM)))), y0 = Math.max(top + fs + 2, ya - 5 - row * (fs + 3));
+    let y = y0;
+    if (avoid && hit(x, tw, y)) {
+      const cand = [];
+      for (let k = 1; y0 - k * (fs + 3) >= top + fs + 2; k++) cand.push(y0 - k * (fs + 3));
+      for (let k = 1; y0 + k * (fs + 3) <= yb - 2; k++) cand.push(y0 + k * (fs + 3));
+      y = cand.find((v) => !hit(x, tw, v)) ?? y0;
+    }
+    placed.push({ x0: x - tw / 2, x1: x + tw / 2, y });
     c.strokeStyle = 'rgba(10,15,19,.9)'; c.lineWidth = 3.5; c.strokeText(s, x, y);
     c.fillStyle = G.cps.length > 1 ? '#ffffff' : G.cps[0].c.col; c.fillText(s, x, y);
   }
@@ -1586,7 +1631,7 @@ plot.addEventListener('pointermove', (e) => {
   const tt = ((px - m.Lp) / m.pw) * m.tMax; let near = '';
   if (m.r) for (const cp of m.r.cpds) if (Math.abs(cp.tR - tt) < Math.max(4 * cp.sig, (3 / m.pw) * m.tMax) && cp.tR <= W.rt) near += ` · ${cp.c.name} ${cp.tR.toFixed(2)}`;
   tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${(e.clientY - rc.top) / pz}px`;
-  tip.textContent = `${tt.toFixed(2)} 分鐘${near}`;
+  tip.textContent = zhEn(`${tt.toFixed(2)} 分鐘${near}`, `${tt.toFixed(2)} min${near}`);
 });
 plot.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
 
@@ -1597,7 +1642,7 @@ function buildCond() {
   el('grpCond').style.display = C ? '' : 'none';
   el('grpPart').style.display = S.inst === 'lc' ? '' : 'none';
   if (!C) return;
-  el('condName').textContent = S.inst === 'gc' ? '烘箱溫度' : '流動相';
+  el('condName').textContent = S.inst === 'gc' ? zhEn('烘箱溫度', 'Oven temperature') : zhEn('流動相', 'Mobile phase');
   el('segCond').innerHTML = Object.entries(C).map(([k, v]) => `<button data-v="${k}"${k === S.cond[S.inst] ? ' class="on"' : ''}>${v.label}</button>`).join('');
 }
 function flyToInst() { const v = IVIEW[S.inst]; const [p, q] = fitPortrait(v3(...v[0]), v3(...v[1]), S.inst === 'tsw' ? 1.5 : 2.4); nav.flyTo(p, q); }

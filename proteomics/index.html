@@ -2,9 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1111">
-<title>蛋白質質譜定序:從碎片讀出胺基酸</title>
+<title data-en="Protein sequencing by mass spectrometry: reading amino acids from fragments">蛋白質質譜定序:從碎片讀出胺基酸</title>
 <meta name="description" content="用動畫看蛋白質怎麼用質譜認出來:胰蛋白酶切成胜肽、液相層析與電灑游離、第一次質譜挑離子、撞碎成 b 與 y 離子、從相鄰峰的質量差讀出胺基酸,最後和資料庫比對。可以自己換蛋白質、挑胜肽、改質量的容許誤差。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="儀器原理">
@@ -22,36 +23,36 @@
 <link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
-<a class="skip-link" href="#main">跳到動畫</a>
-<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理"><a href="../">← 儀器入口</a><a href="../central-dogma/">中心法則</a><a href="../pcr/">PCR 與電泳</a><a href="../sequencing/">DNA 定序</a><a href="../dna-markers/">DNA 鑑定</a><a href="../cloning/">基因選殖</a><a href="../terpene-synthase/">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/">抗體檢測</a><a href="../flow-cytometry/">流式細胞儀</a><a href="./" aria-current="page">蛋白質定序</a></nav></div>
+<a class="skip-link" href="#main" data-en="Skip to the animation">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化原理" data-en-aria-label="Biochemistry"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../central-dogma/" data-en="Central dogma">中心法則</a><a href="../pcr/" data-en="PCR and gels">PCR 與電泳</a><a href="../sequencing/" data-en="DNA sequencing">DNA 定序</a><a href="../dna-markers/" data-en="DNA markers">DNA 鑑定</a><a href="../cloning/" data-en="Cloning">基因選殖</a><a href="../terpene-synthase/" data-en="Terpene synthases">萜類合成酶</a><a href="../crispr/">CRISPR</a><a href="../immunoassay/" data-en="Immunoassays">抗體檢測</a><a href="../flow-cytometry/" data-en="Flow cytometry">流式細胞儀</a><a href="./" aria-current="page" data-en="Protein sequencing">蛋白質定序</a></nav></div>
 <header class="top wrap">
-  <h1>蛋白質質譜定序 <span class="k">從碎片讀出胺基酸</span></h1>
-  <p class="lede">蛋白質先用胰蛋白酶切成胜肽,經過液相層析與電灑游離送進質譜儀;挑出一個胜肽撞碎,從碎片之間的質量差一個一個讀出胺基酸,再和資料庫比對,認出它來自哪一個蛋白質。</p>
+  <h1><span data-en="Protein sequencing by mass spectrometry">蛋白質質譜定序</span> <span class="k" data-en="Read the amino acids from the fragments">從碎片讀出胺基酸</span></h1>
+  <p class="lede" data-en="A protein is first cut into peptides with trypsin, which pass through liquid chromatography and electrospray ionization into the mass spectrometer. One peptide is picked and broken apart, its amino acids are read one by one from the mass differences between the fragments, and a database search tells which protein it came from.">蛋白質先用胰蛋白酶切成胜肽,經過液相層析與電灑游離送進質譜儀;挑出一個胜肽撞碎,從碎片之間的質量差一個一個讀出胺基酸,再和資料庫比對,認出它來自哪一個蛋白質。</p>
 </header>
 <main id="main" class="wrap lesson">
   <section class="player">
     <div class="screen">
-      <div class="stage-box"><canvas id="stage" role="img" aria-label="蛋白質質譜定序動畫"></canvas></div>
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="蛋白質質譜定序動畫" data-en-aria-label="Protein sequencing animation"></canvas></div>
       <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
     </div>
     <div class="bar">
-      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
-      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
-      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
-      <div id="prog" role="group" aria-label="章節進度"></div>
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章" data-en-aria-label="Previous chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" data-en-aria-label="Play" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl" data-en="Play">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章" data-en-aria-label="Next chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度" data-en-aria-label="Chapter progress"></div>
       <span id="chName"></span>
-      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" data-en-aria-label="Full screen" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
     </div>
   </section>
   <aside class="side">
-    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
-    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+    <section class="box" id="ops" aria-label="自己調整" data-en-aria-label="Try it yourself"><h2 data-en="Try it yourself">自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節" data-en-aria-label="Chapters"><h2 data-en="Chapters">章節</h2><ol id="chapters"></ol></section>
   </aside>
 </main>
-<section class="notes wrap" aria-label="重點整理與資料來源">
+<section class="notes wrap" aria-label="重點整理與資料來源" data-en-aria-label="Key points and sources">
   <div>
-    <h2>重點整理</h2>
-    <ul>
+    <h2 data-en="Key points">重點整理</h2>
+    <ul lang="zh-Hant">
       <li>蛋白質由胺基酸接成,每接一個就脫去一分子水,鏈上的單位叫「殘基」。20 種殘基的單同位素質量幾乎都不同(G 57.02、A 71.04 到 W 186.08),只有 I 與 L 完全一樣(113.08);K 與 Q 只差 0.036。</li>
       <li>先用胰蛋白酶把蛋白質切成胜肽:只在 K、R 後面切,後面接 P 時通常不切。胜肽在逆相管柱上依疏水性先後流出,經電灑游離帶上質子,常是 2 價(2+),出現在 (M + 2 × 1.00728) ÷ 2 的位置。</li>
       <li>第一次質譜(MS1)量出胜肽離子的 m/z,儀器挑訊號強的離子去撞氣體而碎裂(碰撞誘導解離 CID),主要斷在肽鍵:含 N 端的是 b 離子,含 C 端的是 y 離子。帶 1 個電荷時,b = 前 i 個殘基的質量和 + 1.00728,y = 後 i 個殘基的質量和 + 18.01056 + 1.00728。</li>
@@ -60,10 +61,19 @@
       <li>進階,定量:不標記是兩個樣品分開跑,比同一個胜肽的層析峰面積(或數譜圖),每一針的差異要靠標準化校正。SILAC 讓細胞吃重的 K(+8.014)、R(+10.008),樣品在最前面就混在一起,MS1 出現相差「重的質量 ÷ 電荷」的一對峰。TMT 的標籤總質量相同,碎裂後的報導離子(126、127……)給比例;挑母離子時混進來的離子把比例拉向 1 : 1(比例壓縮),MS3 可以去掉大部分干擾。</li>
       <li>進階,錯誤率:把序列反轉當誘餌和目標一起搜尋,錯配落在兩邊的機會一樣,所以門檻以上的 FDR ≈ 誘餌數 ÷ 目標數。q 值是讓那一筆被接受的最低 FDR,常用 1% 當門檻。</li>
     </ul>
+    <ul lang="en">
+      <li>A protein is a chain of amino acids; each one that joins loses a molecule of water, and the units in the chain are called residues. The monoisotopic masses of the 20 residues are almost all different (G 57.02, A 71.04, up to W 186.08); only I and L are exactly the same (113.08), and K and Q differ by just 0.036.</li>
+      <li>Trypsin first cuts the protein into peptides: it cuts only after K and R, and usually not when the next residue is P. The peptides leave a reversed-phase column in order of hydrophobicity, pick up protons in electrospray ionization, often two of them (2+), and appear at (M + 2 × 1.00728) ÷ 2.</li>
+      <li>The first mass spectrum (MS1) measures the m/z of the peptide ions. The instrument picks strong ions and breaks them by collisions with a gas (collision-induced dissociation, CID), mostly at peptide bonds: the piece with the N-terminus is a b ion and the piece with the C-terminus is a y ion. With one charge, b = sum of the first i residues + 1.00728 and y = sum of the last i residues + 18.01056 + 1.00728.</li>
+      <li>The mass difference between two neighboring peaks of one series is one residue: the b series is read from the left and the y series from the right, and both give the order from N-terminus to C-terminus. In practice a computer cuts and fragments every protein in a database "in theory" and compares the results with the measurement; the more precisely the precursor ion is measured, the fewer the candidates.</li>
+      <li>For how electrospray ionization, the ion trap and tandem mass spectrometry work inside the instrument, see <a href="../lcq/">Ion trap mass spectrometry</a>.</li>
+      <li>Advanced, quantification: label-free runs the two samples separately and compares the chromatographic peak areas of the same peptide (or counts spectra), and differences between runs have to be corrected by normalization. SILAC feeds cells heavy K (+8.014) and R (+10.008), so the samples are mixed at the very start, and MS1 shows pairs of peaks separated by "heavy mass ÷ charge". TMT tags all have the same total mass, and the reporter ions released on fragmentation (126, 127 and so on) give the ratio; ions that come along when the precursor is picked pull the ratio toward 1 : 1 (ratio compression), and MS3 removes most of this interference.</li>
+      <li>Advanced, error rate: reversed sequences are searched as decoys together with the real ones (targets). A wrong match is equally likely to land on either side, so above a threshold FDR ≈ decoys ÷ targets. The q-value is the lowest FDR at which a match would be accepted, and 1% is the usual cutoff.</li>
+    </ul>
   </div>
   <div class="src">
-    <h2>資料來源</h2>
-    <ul>
+    <h2 data-en="Sources">資料來源</h2>
+    <ul lang="zh-Hant">
       <li>OpenStax. Biology 2e, 3.4 Proteins:<a href="https://openstax.org/books/biology-2e/pages/3-4-proteins">Amino Acids</a>(蛋白質裡常見的胺基酸有 20 種,差在側鏈;一個的羧基和下一個的胺基接起來時放出一分子水;N 端與 C 端)</li>
       <li>Matrix Science(Mascot 說明):<a href="https://www.matrixscience.com/help/aa_help.html">Amino acid reference data</a>(殘基的單同位素質量)、<a href="https://www.matrixscience.com/help/fragmentation_help.html">Peptide fragmentation</a>(b、y 離子的定義與質量算法;低能量 CID 主要產生 b 與 y 離子)。質子質量取 CODATA 2022 的 1.0072765 u(<a href="https://physics.nist.gov/cgi-bin/cuu/Value?mpu">NIST</a>)。</li>
       <li>Zhang Y, et al. Protein analysis by shotgun/bottom-up proteomics. Chem Rev. 2013;113(4):2343–2394. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3751594/">PMC3751594</a>(胰蛋白酶在 K、R 之後切,後面是 P 不切;胜肽依疏水性分離後直接電灑;先做全掃描、挑訊號強的離子做 MS/MS;b、y 離子來自肽鍵斷裂;用資料庫算出的理論碎片比對;通常要兩個胜肽才算認出一個蛋白質)</li>
@@ -73,9 +83,19 @@
       <li>Elias JE, Gygi SP. Target-decoy search strategy for increased confidence in large-scale protein identifications by mass spectrometry. Nat Methods. 2007;4(3):207–214. <a href="https://doi.org/10.1038/nmeth1019">doi:10.1038/nmeth1019</a>(目標與誘餌合在一起搜尋比分開好);同作者 2010 年的方法說明 <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2922680/">PMC2922680</a>(反轉是最簡單、最常用的誘餌;兩邊一樣大時,錯的目標數 ≈ 誘餌數)。Käll L, et al. Assigning significance to peptides identified by tandem mass spectrometry using decoy databases. J Proteome Res. 2008;7(1):29–34. <a href="https://doi.org/10.1021/pr700600n">doi:10.1021/pr700600n</a>(FDR ≈ 門檻以上的誘餌數 ÷ 目標數;q 值的定義;分數分布的模擬設定)。Deutsch EW, et al. J Proteome Res. 2016;15(11):3961–3970. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5096969/">PMC5096969</a>(人類蛋白質體計畫的準則:蛋白質層級的 FDR 最多 1%)。</li>
       <li>動畫裡的三段蛋白質序列、層析時間與峰形(流出先後依 Browne 等 1982 的 <a href="https://web.expasy.org/protscale/pscale/HPLCTFA.html">TFA 滯留係數</a>加總排列)、離子強度、同位素峰的高度、碎片的強度,以及 2,000 條隨機產生的蛋白質資料庫(依 UniProtKB/Swiss-Prot 2026_03 的胺基酸組成)都是示意。質量數值是依上面的質量算出的,已用 Protein Prospector 的 MS-Product 與 Expasy 的 PeptideMass 核對。進階章節:兩個樣品的比例、第 2 針的進樣量與滯留時間偏移、共分離干擾的比例與「干擾在兩個通道一樣多」、MS3 畫成完全去掉干擾、挑選視窗旁邊的離子,以及誘餌那一章的 20,000 張譜圖(分數是常態分布的模擬,30% 有正確答案,固定亂數種子)都是示意;SILAC 與 TMT 的質量是依 Unimod 算的。</li>
     </ul>
+    <ul lang="en">
+      <li>OpenStax. Biology 2e, 3.4 Proteins: <a href="https://openstax.org/books/biology-2e/pages/3-4-proteins">Amino Acids</a> (proteins commonly contain 20 amino acids, which differ in their side chains; joining the carboxyl group of one to the amino group of the next releases a molecule of water; the N-terminus and C-terminus)</li>
+      <li>Matrix Science (Mascot help): <a href="https://www.matrixscience.com/help/aa_help.html">Amino acid reference data</a> (monoisotopic residue masses), <a href="https://www.matrixscience.com/help/fragmentation_help.html">Peptide fragmentation</a> (definitions of b and y ions and how their masses are calculated; low-energy CID mainly produces b and y ions). The proton mass is the CODATA 2022 value, 1.0072765 u (<a href="https://physics.nist.gov/cgi-bin/cuu/Value?mpu">NIST</a>).</li>
+      <li>Zhang Y, et al. Protein analysis by shotgun/bottom-up proteomics. Chem Rev. 2013;113(4):2343–2394. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3751594/">PMC3751594</a> (trypsin cuts after K and R, but not before P; peptides separated by hydrophobicity are electrosprayed directly; a full scan comes first, then strong ions are picked for MS/MS; b and y ions come from peptide-bond cleavage; matching against theoretical fragments calculated from a database; usually two peptides are needed to identify a protein)</li>
+      <li>Olsen JV, et al. Trypsin cleaves exclusively C-terminal to arginine and lysine residues. Mol Cell Proteomics. 2004;3(6):608–614. <a href="https://doi.org/10.1074/mcp.T400003-MCP200">doi:10.1074/mcp.T400003-MCP200</a> (cuts only after R and K; accurate masses greatly raise the confidence of identifications). For "usually not before P", see <a href="https://web.expasy.org/peptide_cutter/peptidecutter_enzymes.html">Expasy PeptideCutter</a>; in practice it still cuts there now and then (Rodriguez J, et al. J Proteome Res. 2008;7(1):300–305).</li>
+      <li>Medzihradszky KF, Chalkley RJ. Lessons in de novo peptide sequencing by tandem mass spectrometry. Mass Spectrom Rev. 2015;34(1):43–63. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4367481/">PMC4367481</a> (the mass difference between neighboring peaks is a residue; L and I cannot be told apart by CID; K and Q differ by 0.036; b1 is usually not detected; a y1 of 147 means K and 175 means R; fragments of 2+ peptides mostly carry one charge)</li>
+      <li>Ong SE, et al. Stable isotope labeling by amino acids in cell culture, SILAC, as a simple and accurate approach to expression proteomics. Mol Cell Proteomics. 2002;1(5):376–386. <a href="https://doi.org/10.1074/mcp.M200025-MCP200">doi:10.1074/mcp.M200025-MCP200</a> (cells take up labeled amino acids and are fully labeled after five doublings, and the two samples are mixed as soon as the cells are harvested; the original paper used deuterium-labeled leucine); for the mass differences of heavy lysine and arginine see Unimod <a href="https://www.unimod.org/modifications_view.php?editid1=259">#259</a> (+8.014199) and <a href="https://www.unimod.org/modifications_view.php?editid1=267">#267</a> (+10.008269); for the TMT6plex tag (+229.162932) and the reporter ions 126.12773 and 127.12476 see <a href="https://www.unimod.org/modifications_view.php?editid1=737">#737</a>. Thompson A, et al. Tandem mass tags. Anal Chem. 2003;75(8):1895–1904 (the same peptide with different tags moves together through every separation and is quantified by MS/MS). Ting L, et al. MS3 eliminates ratio distortion in isobaric multiplexed quantitative proteomics. Nat Methods. 2011;8(11):937–940. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3205343/">PMC3205343</a> (ions picked along with the target are fragmented too, and the median of a 10 : 1 ratio is compressed 3.2-fold; MS3 removes almost all of the interference but identifies 13% fewer peptides). For label-free versus SILAC, see section 4.1 of Zhang et al. 2013 above.</li>
+      <li>Elias JE, Gygi SP. Target-decoy search strategy for increased confidence in large-scale protein identifications by mass spectrometry. Nat Methods. 2007;4(3):207–214. <a href="https://doi.org/10.1038/nmeth1019">doi:10.1038/nmeth1019</a> (searching targets and decoys together works better than searching them separately); the same authors' 2010 methods chapter <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2922680/">PMC2922680</a> (reversal is the simplest and most common decoy; when both sides are the same size, wrong targets ≈ decoys). Käll L, et al. Assigning significance to peptides identified by tandem mass spectrometry using decoy databases. J Proteome Res. 2008;7(1):29–34. <a href="https://doi.org/10.1021/pr700600n">doi:10.1021/pr700600n</a> (FDR ≈ decoys ÷ targets above the threshold; the definition of the q-value; the settings for simulated score distributions). Deutsch EW, et al. J Proteome Res. 2016;15(11):3961–3970. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5096969/">PMC5096969</a> (guidelines of the Human Proteome Project: a protein-level FDR of at most 1%).</li>
+      <li>The three protein sequences in the animation, the retention times and peak shapes (the elution order follows the sums of the <a href="https://web.expasy.org/protscale/pscale/HPLCTFA.html">TFA retention coefficients</a> of Browne et al. 1982), the ion intensities, the heights of the isotope peaks, the fragment intensities and the database of 2,000 randomly generated proteins (with the amino acid composition of UniProtKB/Swiss-Prot 2026_03) are illustrative. The masses are calculated from the values above and were checked against MS-Product in Protein Prospector and PeptideMass at Expasy. Advanced chapters: the ratio of the two samples, the injection amount and retention-time shift of the second run, the fraction of co-isolated interference and the assumption that it is the same in both channels, MS3 drawn as removing the interference completely, the ions next to the isolation window, and the 20,000 spectra in the decoy chapter (scores simulated from normal distributions, 30% with a correct answer, a fixed random seed) are illustrative; the SILAC and TMT masses are calculated from Unimod.</li>
+    </ul>
   </div>
 </section>
-<footer class="site wrap">生化原理・<a href="../">回儀器入口</a></footer>
+<footer class="site wrap"><span lang="zh-Hant">生化原理・<a href="../">回儀器入口</a></span><span lang="en">Biochemistry · <a href="../">Back to all lessons</a></span></footer>
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, seg, ease, clamp, lerp, rng } from '../assets/bio-draw.js';
@@ -86,7 +106,7 @@ const RES = { G: 57.021464, A: 71.037114, S: 87.032028, P: 97.052764, V: 99.0684
 const PROTON = 1.007276; // 質子(CODATA 2022:1.0072764666 u)
 const H2O = 18.010565;   // 水:2 × 1.007825035 + 15.99491463(Unimod 的元素質量)
 const ISO = 1.003355;    // ¹³C 比 ¹²C 重的量(NIST:13.00335483507),同位素峰的間隔 = ISO ÷ 電荷
-const AA_NAME = { G: '甘胺酸', A: '丙胺酸', S: '絲胺酸', P: '脯胺酸', V: '纈胺酸', T: '蘇胺酸', C: '半胱胺酸', L: '白胺酸', I: '異白胺酸', N: '天門冬醯胺', D: '天門冬胺酸', Q: '麩醯胺酸', K: '離胺酸', E: '麩胺酸', M: '甲硫胺酸', H: '組胺酸', F: '苯丙胺酸', R: '精胺酸', Y: '酪胺酸', W: '色胺酸' };
+const AA_NAME = zhEn({ G: '甘胺酸', A: '丙胺酸', S: '絲胺酸', P: '脯胺酸', V: '纈胺酸', T: '蘇胺酸', C: '半胱胺酸', L: '白胺酸', I: '異白胺酸', N: '天門冬醯胺', D: '天門冬胺酸', Q: '麩醯胺酸', K: '離胺酸', E: '麩胺酸', M: '甲硫胺酸', H: '組胺酸', F: '苯丙胺酸', R: '精胺酸', Y: '酪胺酸', W: '色胺酸' }, { G: 'glycine', A: 'alanine', S: 'serine', P: 'proline', V: 'valine', T: 'threonine', C: 'cysteine', L: 'leucine', I: 'isoleucine', N: 'asparagine', D: 'aspartic acid', Q: 'glutamine', K: 'lysine', E: 'glutamic acid', M: 'methionine', H: 'histidine', F: 'phenylalanine', R: 'arginine', Y: 'tyrosine', W: 'tryptophan' });
 const resSum = (s) => { let a = 0; for (const c of s) a += RES[c]; return a; };
 const pepMass = (s) => resSum(s) + H2O;                      // 中性胜肽:殘基總和 + 水
 const mzOf = (M, z) => (M + z * PROTON) / z;                 // [M+zH]^z+
@@ -105,16 +125,16 @@ function aaFor(d) {
   return hit.includes('L') ? 'L/I' : hit[0] || '?';
 }
 const f2 = (v) => v.toFixed(2);
-const fint = (v) => v.toLocaleString('zh-TW');
+const fint = (v) => v.toLocaleString(zhEn('zh-TW', 'en-US'));
 function hashStr(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 
 // ================= 示意的三段蛋白質 =================
 // 刻意不放半胱胺酸 C 與甲硫胺酸 M(實驗上常被修飾,質量會變);每段切出 4 個 6 個胺基酸以上的胜肽,
 // 並各有一處 K 或 R 後面接 P(不切)。強度是示意值
 const PROTEINS = [
-  { name: '甲', seq: 'GKVNLQDAFGIKSEDYTGWNKARHDGTAKPVSFYRELPAFVLSR', inten: [1, 0.62, 0.8, 0.7] },
-  { name: '乙', seq: 'GSRVLEAFDTPYKRNIGTEAVSRPEKFYAGLLVDKSQDHWLR', inten: [0.85, 1, 0.66, 0.75] },
-  { name: '丙', seq: 'AGVKEYTDIAKPLSGRNFEQHGAVSKRGWLTEPYLDIKSAFVQDLR', inten: [0.72, 0.9, 1, 0.64] },
+  { name: zhEn('甲', 'I'), seq: 'GKVNLQDAFGIKSEDYTGWNKARHDGTAKPVSFYRELPAFVLSR', inten: [1, 0.62, 0.8, 0.7] },
+  { name: zhEn('乙', 'II'), seq: 'GSRVLEAFDTPYKRNIGTEAVSRPEKFYAGLLVDKSQDHWLR', inten: [0.85, 1, 0.66, 0.75] },
+  { name: zhEn('丙', 'III'), seq: 'AGVKEYTDIAKPLSGRNFEQHGAVSKRGWLTEPYLDIKSAFVQDLR', inten: [0.72, 0.9, 1, 0.64] },
 ];
 // 逆相層析的流出順序(示意):Browne 等 1982 的 TFA 滯留係數加總,越大越晚流出
 const RET = { A: 7.3, R: -3.6, N: -5.7, D: -2.9, C: -9.2, Q: -0.3, E: -7.1, G: -1.2, H: -2.1, I: 6.6, L: 20, K: -3.7, M: 5.6, F: 19.2, P: 5.1, S: -4.1, T: 0.8, W: 16.3, Y: 5.9, V: 3.5 };
@@ -133,7 +153,7 @@ for (const P of PROTEINS) {
     pc.rt = 10 + ([...pc.seq].reduce((a, c) => a + RET[c], 0) + 10) * 0.3; // 分鐘(示意)
     P.peps.push(pc);
   }
-  if (P.peps.length !== 4) throw new Error(`示意蛋白質${P.name}要切出 4 個胜肽`);
+  if (P.peps.length !== 4) throw new Error(`示意蛋白質${P.name}要切出 4 個胜肽`); // zh-only(給維護者看的錯誤)
 }
 const protOf = (S) => PROTEINS[S.prot] || PROTEINS[0];
 const pepOf = (S, v = S.pep) => protOf(S).peps[clamp(Math.round(v), 1, 4) - 1];
@@ -238,7 +258,7 @@ function rankCandidates(S) {
   candMemo = { key, list };
   return list;
 }
-const srcName = (src) => (src < 0 ? `示意蛋白質${PROTEINS[-1 - src].name}` : `隨機 #${src + 1}`);
+const srcName = (src) => (src < 0 ? zhEn(`示意蛋白質${PROTEINS[-1 - src].name}`, `Example protein ${PROTEINS[-1 - src].name}`) : zhEn(`隨機 #${src + 1}`, `Random #${src + 1}`));
 
 // ================= 進階:定量 =================
 // SILAC 的重胺基酸(Unimod):離胺酸 13C6 15N2 +8.014199(#259)、精胺酸 13C6 15N4 +10.008269(#267);胜肽裡每個 K、R 都換成重的
@@ -313,10 +333,10 @@ const TILES = Object.keys(RES).sort((a, b) => RES[a] - RES[b] || (a === 'L' ? -1
 
 const chapters = [
   {
-    key: 'intro', name: '為什麼用質譜認蛋白質', dur: 15,
-    cues: [[0, '蛋白質是胺基酸一個接一個串成的長鏈;常見的胺基酸有 20 種,差別在側鏈(接在主幹旁邊的那一小段)。'],
-      [5, '兩個胺基酸接起來時脫去一分子水,接處叫肽鍵;鏈上的每個單位叫「殘基」,比原本的胺基酸少一個水。'],
-      [10, '20 種殘基的質量幾乎都不一樣;只要質量量得夠準,就能推回是哪些胺基酸、排成什麼順序。']],
+    key: 'intro', name: zhEn('為什麼用質譜認蛋白質', 'Why identify proteins by mass'), dur: 15,
+    cues: [[0, zhEn('蛋白質是胺基酸一個接一個串成的長鏈;常見的胺基酸有 20 種,差別在側鏈(接在主幹旁邊的那一小段)。', 'A protein is a long chain of amino acids; the 20 common kinds differ in the side chain, a small group off the backbone.')],
+      [5, zhEn('兩個胺基酸接起來時脫去一分子水,接處叫肽鍵;鏈上的每個單位叫「殘基」,比原本的胺基酸少一個水。', 'Joining two amino acids releases a water and forms a peptide bond; each unit, a residue, is one water lighter.')],
+      [10, zhEn('20 種殘基的質量幾乎都不一樣;只要質量量得夠準,就能推回是哪些胺基酸、排成什麼順序。', 'Nearly all 20 residues differ in mass, so accurate masses reveal the amino acids and their order.')]],
     draw(g, t) {
       // 上:一段胺基酸鏈
       const sample = 'GKVNLQDAFGIKSEDY', n = 15, sp = 50, x0 = 480 - ((n - 1) * sp) / 2;
@@ -324,11 +344,11 @@ const chapters = [
       const P = []; for (let i = 0; i < n; i++) P.push([x0 + i * sp, 112 + 9 * Math.sin(i * 0.8 + t * 1.4)]);
       if (shown > 1) g.curve(P.slice(0, shown), 'rgba(213,221,217,.55)', 3);
       for (let i = 0; i < shown; i++) bead(g, P[i][0], P[i][1], sample[i], { alpha: ease(seg(t, 0.3 + (i / n) * 2.7, 0.6 + (i / n) * 2.7)) });
-      g.tag(480, 44, '蛋白質:胺基酸串成的長鏈', { size: 16, color: C.mint, alpha: ease(seg(t, 0.2, 1)) });
+      g.tag(480, 44, zhEn('蛋白質:胺基酸串成的長鏈', 'Protein: a long chain of amino acids'), { size: 16, color: C.mint, alpha: ease(seg(t, 0.2, 1)) });
       if (shown >= n) {
         const a = ease(seg(t, 3, 3.6));
-        g.text(x0 - 26, P[0][1], 'N 端', { size: 14, color: C.ink2, align: 'right', alpha: a });
-        g.text(x0 + (n - 1) * sp + 26, P[n - 1][1], 'C 端', { size: 14, color: C.ink2, alpha: a });
+        g.text(x0 - 26, P[0][1], zhEn('N 端', 'N-terminus'), { size: 14, color: C.ink2, align: 'right', alpha: a });
+        g.text(x0 + (n - 1) * sp + 26, P[n - 1][1], zhEn('C 端', 'C-terminus'), { size: 14, color: C.ink2, alpha: a });
       }
       // 中:兩個胺基酸接起來,放出一分子水(文字依實際字寬排,手機上字放大也不會疊在一起)
       const a2 = ease(seg(t, 5, 5.8));
@@ -358,12 +378,12 @@ const chapters = [
         const h0 = pre.n2 - wOf('H₂N') / 2 + wOf('H') / 2;
         g.text(lerp(pre.oh, wx + 14, k), lerp(y, wy, k), 'OH', { size: FS, weight: 700, mono: true, color: C.amber, align: 'center', alpha: gone });
         g.text(lerp(h0, wx - 18, k), lerp(y, wy, k), 'H', { size: FS, weight: 700, mono: true, color: C.amber, align: 'center', alpha: gone });
-        if (k > 0.85) g.tag(wx, wy, '+ H₂O(水)', { size: 15, color: C.amber, alpha: seg(k, 0.85, 1) });
+        if (k > 0.85) g.tag(wx, wy, zhEn('+ H₂O(水)', '+ H₂O (water)'), { size: 15, color: C.amber, alpha: seg(k, 0.85, 1) });
         if (k >= 1) {
           const a3 = ease(seg(t, 8.6, 9.2)), xa = post.co - 14, xb = post.n2 + 14;
           g.ctx.globalAlpha = a2 * a3;
           g.line(xa, y + 22, xb, y + 22, C.mint, 2); g.line(xa, y + 16, xa, y + 22, C.mint, 2); g.line(xb, y + 16, xb, y + 22, C.mint, 2);
-          g.text((xa + xb) / 2, y + 40, '肽鍵', { size: 15, weight: 700, color: C.mint, align: 'center' });
+          g.text((xa + xb) / 2, y + 40, zhEn('肽鍵', 'Peptide bond'), { size: 15, weight: 700, color: C.mint, align: 'center' });
         }
         g.ctx.restore();
       }
@@ -379,16 +399,16 @@ const chapters = [
         g.text(x + 40, y + 40, f2(RES[aa]), { size: 14, color: C.ink2, align: 'center', mono: true });
         g.ctx.restore();
       });
-      if (t > 12.3) g.tag(44 + 8 * 88, 318, 'I 與 L 一樣重', { size: 14, color: C.mint, alpha: ease(seg(t, 12.3, 12.8)) });
-      if (t > 13) g.tag(44 + 1.5 * 88 + 40, 474, 'Q 與 K 只差 0.036', { size: 14, color: C.amber, alpha: ease(seg(t, 13, 13.5)) });
-      if (t > 10) g.text(948, 506, '數字是殘基的單同位素質量(Da)', { size: 13, color: C.muted, align: 'right', alpha: ease(seg(t, 10.5, 11.5)) });
+      if (t > 12.3) g.tag(44 + 8 * 88, 318, zhEn('I 與 L 一樣重', 'I and L weigh the same'), { size: 14, color: C.mint, alpha: ease(seg(t, 12.3, 12.8)) });
+      if (t > 13) g.tag(44 + 1.5 * 88 + 40, 474, zhEn('Q 與 K 只差 0.036', 'Q and K differ by only 0.036'), { size: 14, color: C.amber, alpha: ease(seg(t, 13, 13.5)) });
+      if (t > 10) g.text(948, 506, zhEn('數字是殘基的單同位素質量(Da)', 'Numbers: monoisotopic residue masses (Da)'), { size: 13, color: C.muted, align: 'right', alpha: ease(seg(t, 10.5, 11.5)) });
     },
   },
   {
-    key: 'digest', name: '先切成胜肽', dur: 16,
-    cues: [[0, '整條蛋白質太長,先用胰蛋白酶(一種切蛋白質的酵素)切成小段的「胜肽」;胜肽比較容易分離、帶電和撞碎。'],
-      [4.5, '胰蛋白酶只在離胺酸 K 與精胺酸 R 的後面切;後面接的是脯胺酸 P 時,通常不切。'],
-      [10.5, '切出來的每一段尾巴都是 K 或 R。資料庫比對通常只考慮 6 到 50 個胺基酸左右的胜肽,太短的不拿來分析。右邊可以換一段蛋白質。']],
+    key: 'digest', name: zhEn('先切成胜肽', 'First, cut into peptides'), dur: 16,
+    cues: [[0, zhEn('整條蛋白質太長,先用胰蛋白酶(一種切蛋白質的酵素)切成小段的「胜肽」;胜肽比較容易分離、帶電和撞碎。', 'Proteins are too long, so trypsin (a protein-cutting enzyme) cuts them into peptides: easier to separate, charge and break.')],
+      [4.5, zhEn('胰蛋白酶只在離胺酸 K 與精胺酸 R 的後面切;後面接的是脯胺酸 P 時,通常不切。', 'Trypsin cuts only after lysine (K) and arginine (R), and usually not when proline (P) comes next.')],
+      [10.5, zhEn('切出來的每一段尾巴都是 K 或 R。資料庫比對通常只考慮 6 到 50 個胺基酸左右的胜肽,太短的不拿來分析。右邊可以換一段蛋白質。', 'Every piece ends in K or R. Database searches usually use peptides of about 6 to 50 amino acids and skip shorter ones. Try another protein on the right.')]],
     draw(g, t, S) {
       const P = protOf(S), seq = P.seq, L = seq.length, n1 = Math.ceil(L / 2), SP = 34, RB = 14, rowY = [116, 244], GAPW = 12;
       const cuts = [], noCut = [];
@@ -401,8 +421,8 @@ const chapters = [
       const x0r = [0, 1].map((r) => 480 - ((rowN[r] - 1) * SP + rowCuts[r] * GAPW) / 2);
       const pos = (i) => { const r = rowOf(i); let sh = 0; for (const j of cuts) if (j < i && rowOf(j) === r && j !== n1 - 1) sh += ck(j) * GAPW; return [x0r[r] + colOf(i) * SP + sh, rowY[r]]; };
       // 圖例
-      g.circle(48, 28, 7, C.amber); g.text(62, 28, 'K、R:在它們後面切', { size: 14, color: C.ink2 });
-      g.circle(330, 28, 7, '#cdbff7'); g.text(344, 28, 'P:接在 K、R 後面時通常不切', { size: 14, color: C.ink2 });
+      g.circle(48, 28, 7, C.amber); g.text(62, 28, zhEn('K、R:在它們後面切', 'K, R: cut after these'), { size: 14, color: C.ink2 });
+      g.circle(330, 28, 7, '#cdbff7'); g.text(344, 28, zhEn('P:接在 K、R 後面時通常不切', 'P: after K or R, usually no cut'), { size: 14, color: C.ink2 });
       // 換行的接續虛線
       const [ex, ey] = pos(n1 - 1), [sx, sy] = pos(n1);
       g.curve([[ex + 18, ey], [ex + 30, ey + 10], [ex + 30, 177], [sx - 30, 177], [sx - 30, sy - 10], [sx - 18, sy]], 'rgba(213,221,217,.22)', 2, { dash: [4, 6] });
@@ -426,7 +446,7 @@ const chapters = [
           g.ctx.save(); g.ctx.globalAlpha = a * (pc.no ? 1 : 0.6);
           g.line(xa, y, xb, y, col, 2.5); g.line(xa, y - 6, xa, y, col, 2.5); g.line(xb, y - 6, xb, y, col, 2.5);
           const mine = idx.length * 2 >= pc.seq.length;
-          if (pc.no && mine) g.tag((xa + xb) / 2, y + 17, `胜肽 ${pc.no}`, { size: 13, color: col });
+          if (pc.no && mine) g.tag((xa + xb) / 2, y + 17, zhEn(`胜肽 ${pc.no}`, `Peptide ${pc.no}`), { size: 13, color: col });
           g.ctx.restore();
         }
       }
@@ -447,23 +467,23 @@ const chapters = [
       for (const i of noCut) {
         const a = ease(seg(t, tc(i) + 0.3, tc(i) + 0.8)); if (!a) continue;
         const [x1, y1] = pos(i), x2 = rowOf(i) === rowOf(i + 1) ? pos(i + 1)[0] : x1;
-        g.tag((x1 + x2) / 2, y1 - 54, '後面是 P,不切', { size: 13, color: C.lav, alpha: a });
+        g.tag((x1 + x2) / 2, y1 - 54, zhEn('後面是 P,不切', 'Followed by P: no cut'), { size: 13, color: C.lav, alpha: a });
       }
       // 胰蛋白酶沿著鏈走
       if (t > 2.6 && t < 10.6) {
         const u = L * seg(t, 3, 10.2), i = clamp(Math.floor(u), 0, L - 1), fr = u - i;
         const [x, y] = pos(i), nx = i + 1 < L && rowOf(i + 1) === rowOf(i) ? pos(i + 1)[0] : x + SP;
-        g.blob(lerp(x, nx, fr), y - 30, 46, 17, C.lav, '胰蛋白酶', { size: 13, wobble: 1, t, alpha: Math.min(seg(t, 2.6, 3), 1 - seg(t, 10.2, 10.6)) });
+        g.blob(lerp(x, nx, fr), y - 30, 46, 17, C.lav, zhEn('胰蛋白酶', 'Trypsin'), { size: 13, wobble: 1, t, alpha: Math.min(seg(t, 2.6, 3), 1 - seg(t, 10.2, 10.6)) });
       }
       // 下:切出來的胜肽
       if (done) {
         const a0 = ease(seg(t, 10.3, 10.9));
         const hy = 312;
         g.ctx.save(); g.ctx.globalAlpha = a0;
-        g.text(70, hy, '編號', { size: 13, color: C.muted });
-        g.text(150, hy, '序列(N 端 → C 端)', { size: 13, color: C.muted });
-        g.text(500, hy, '胺基酸數', { size: 13, color: C.muted, align: 'center' });
-        g.text(690, hy, '質量 M(Da)', { size: 13, color: C.muted, align: 'right' });
+        g.text(70, hy, zhEn('編號', 'No.'), { size: 13, color: C.muted });
+        g.text(150, hy, zhEn('序列(N 端 → C 端)', 'Sequence (N → C)'), { size: 13, color: C.muted });
+        g.text(500, hy, zhEn('胺基酸數', 'Amino acids'), { size: 13, color: C.muted, align: 'center' });
+        g.text(690, hy, zhEn('質量 M(Da)', 'Mass M (Da)'), { size: 13, color: C.muted, align: 'right' });
         g.ctx.restore();
         P.pieces.forEach((pc, r) => {
           const a = ease(seg(t, 10.6 + r * 0.25, 11.1 + r * 0.25)); if (!a) return;
@@ -473,23 +493,23 @@ const chapters = [
           g.text(150, y, pc.seq, { size: 16, weight: 600, color: ok ? C.ink : C.muted, mono: true });
           g.text(500, y, `${pc.seq.length}`, { size: 14, color: C.ink2, align: 'center', mono: true });
           g.text(690, y, f2(pc.M), { size: 14, color: C.ink2, align: 'right', mono: true });
-          g.text(724, y, ok ? '拿去分析' : '太短', { size: 13, color: ok ? C.mint : C.muted });
+          g.text(724, y, ok ? zhEn('拿去分析', 'Analyzed') : zhEn('太短', 'Too short'), { size: 13, color: ok ? C.mint : C.muted });
           g.ctx.restore();
         });
-        g.text(948, 512, '質量 M = 殘基質量的總和 + 水(18.01)', { size: 13, color: C.muted, align: 'right', alpha: ease(seg(t, 12, 12.8)) });
+        g.text(948, 512, zhEn('質量 M = 殘基質量的總和 + 水(18.01)', 'Mass M = sum of residue masses + water (18.01)'), { size: 13, color: C.muted, align: 'right', alpha: ease(seg(t, 12, 12.8)) });
       }
     },
   },
   {
-    key: 'lc', name: '液相層析與電灑游離', dur: 15,
-    cues: [[0, '切好的胜肽混在一起,先流過液相層析管柱:管柱裡填料的表面很疏水,越疏水的胜肽被拉住越久。'],
-      [4.5, '沖提液裡的乙腈(一種有機溶劑)比例慢慢增加,胜肽依疏水性先後流出,下面的層析圖一支一支長出來。'],
-      [10, '管柱出口接著電灑噴針:液滴越縮越小,胜肽帶上質子變成離子,飛進質譜儀。噴灑的細節見「離子阱質譜」那份教材。']],
+    key: 'lc', name: zhEn('液相層析與電灑游離', 'Chromatography and electrospray'), dur: 15,
+    cues: [[0, zhEn('切好的胜肽混在一起,先流過液相層析管柱:管柱裡填料的表面很疏水,越疏水的胜肽被拉住越久。', 'First, liquid chromatography: the column packing is hydrophobic, so more hydrophobic peptides stay longer.')],
+      [4.5, zhEn('沖提液裡的乙腈(一種有機溶劑)比例慢慢增加,胜肽依疏水性先後流出,下面的層析圖一支一支長出來。', 'As the acetonitrile (an organic solvent) rises, peptides leave in order of hydrophobicity, one peak at a time below.')],
+      [10, zhEn('管柱出口接著電灑噴針:液滴越縮越小,胜肽帶上質子變成離子,飛進質譜儀。噴灑的細節見「離子阱質譜」那份教材。', 'At the outlet, electrospray shrinks droplets; peptides gain protons and fly into the mass spectrometer (see the ion trap lesson).')]],
     draw(g, t, S) {
       const P = protOf(S), tl = 40 * seg(t, 0.8, 13.2);
       // 沖提液的乙腈比例(示意)
       const pct = Math.round(5 + 40 * (tl / 40));
-      g.text(70, 40, `沖提液的乙腈比例:${pct}%(示意)`, { size: 14, color: C.ink2 });
+      g.text(70, 40, zhEn(`沖提液的乙腈比例:${pct}%(示意)`, `Acetonitrile in the solvent: ${pct}% (illustrative)`), { size: 14, color: C.ink2 });
       g.rrect(70, 56, 290, 9, 4, 'rgba(255,255,255,.08)');
       g.rrect(70, 56, 290 * (pct / 50), 9, 4, C.blue); // 長條的全長代表 50%
       // 管柱
@@ -507,13 +527,13 @@ const chapters = [
         g.text(x, cy + 0.5, `${p.no}`, { size: 14, weight: 800, color: '#0b1111', align: 'center' });
         g.ctx.restore();
       }
-      g.text(305, cy + 40, '逆相管柱(C18):填料表面很疏水', { size: 14, color: C.ink2, align: 'center' });
-      if (t > 3.8) g.tag(305, cy + 76, '越疏水,被拉得越久、越晚流出', { size: 14, color: C.mint, alpha: ease(seg(t, 3.8, 4.4)) });
+      g.text(305, cy + 40, zhEn('逆相管柱(C18):填料表面很疏水', 'Reversed-phase column (C18): hydrophobic packing'), { size: 14, color: C.ink2, align: 'center' });
+      if (t > 3.8) g.tag(305, cy + 76, zhEn('越疏水,被拉得越久、越晚流出', 'More hydrophobic: held longer, leaves later'), { size: 14, color: C.mint, alpha: ease(seg(t, 3.8, 4.4)) });
       // 電灑噴針
       g.line(cx1, cy, 600, cy, C.ink2, 3);
       g.ctx.beginPath(); g.ctx.moveTo(600, cy - 8); g.ctx.lineTo(646, cy - 2); g.ctx.lineTo(646, cy + 2); g.ctx.lineTo(600, cy + 8); g.ctx.closePath();
       g.ctx.fillStyle = '#9aa9a3'; g.ctx.fill();
-      g.text(640, 84, '電灑游離(ESI)', { size: 15, weight: 700, color: C.ink, align: 'center' });
+      g.text(640, 84, zhEn('電灑游離(ESI)', 'Electrospray ionization (ESI)'), { size: 15, weight: 700, color: C.ink, align: 'center' });
       // 正在流出的胜肽決定液滴的顏色
       let now = null, best = 0.12;
       for (const p of P.peps) { const v = p.inten * Math.exp(-((tl - p.rt) ** 2) / (2 * SIG * SIG)); if (v > best) { best = v; now = p; } }
@@ -526,37 +546,37 @@ const chapters = [
         else g.text(x, y, '+', { size: 14, weight: 800, color: now ? dcol : C.muted, align: 'center', alpha: 1 - seg(p, 0.92, 1) });
       }
       g.rrect(866, cy - 11, 56, 22, 4, '#1b2a26', C.ink2);
-      g.text(894, cy + 28, '質譜儀', { size: 13, color: C.ink2, align: 'center' });
+      g.text(894, cy + 28, zhEn('質譜儀', 'Mass spec'), { size: 13, color: C.ink2, align: 'center' });
       if (t > 10) {
         const a = ease(seg(t, 10, 10.6));
-        g.tag(760, 196, '胜肽接上質子(H⁺),帶正電', { size: 14, color: C.ink, alpha: a });
+        g.tag(760, 196, zhEn('胜肽接上質子(H⁺),帶正電', 'Peptides gain protons (H⁺): positive charge'), { size: 14, color: C.ink, alpha: a });
       }
       // 層析圖
-      const A = g.axes(100, 262, 790, 178, { xmin: 0, xmax: 40, ymin: 0, ymax: 1.2, xticks: [0, 10, 20, 30, 40], xlab: '時間(分鐘,示意)', ylab: '訊號' });
+      const A = g.axes(100, 262, 790, 178, { xmin: 0, xmax: 40, ymin: 0, ymax: 1.2, xticks: [0, 10, 20, 30, 40], xlab: zhEn('時間(分鐘,示意)', 'Time (min, illustrative)'), ylab: zhEn('訊號', 'Signal') });
       chromCurve(g, A, P, tl);
       for (const p of P.peps) if (tl > p.rt + 0.5) g.tag(A.X(p.rt), A.Y(p.inten) - 16, `${p.no}`, { size: 13, color: p.col, alpha: ease(seg(tl, p.rt + 0.5, p.rt + 1.5)) });
-      g.text(948, 512, '數字是胜肽的編號(上一章)', { size: 13, color: C.muted, align: 'right' });
+      g.text(948, 512, zhEn('數字是胜肽的編號(上一章)', 'Numbers are the peptide numbers (last chapter)'), { size: 13, color: C.muted, align: 'right' });
     },
   },
   {
-    key: 'ms1', name: '第一次質譜:挑出一個胜肽', dur: 16,
-    cues: [[0, '質譜儀一邊接收流出來的離子,一邊反覆掃描,量出所有離子的 m/z(質量除以電荷);這叫第一次質譜(MS1)。'],
-      [5.5, '胰蛋白酶切出的胜肽常帶 2 個質子,出現在 (M + 2 × 1.007) ÷ 2;放大看,同位素峰間隔 0.5,也看得出帶 2 個電荷。'],
-      [10.5, '儀器自動挑訊號最強的離子,只留下它去做下一步的串聯質譜;做完再挑下一個。右邊可以換要跟著看的胜肽。']],
+    key: 'ms1', name: zhEn('第一次質譜:挑出一個胜肽', 'First mass spectrum: pick a peptide'), dur: 16,
+    cues: [[0, zhEn('質譜儀一邊接收流出來的離子,一邊反覆掃描,量出所有離子的 m/z(質量除以電荷);這叫第一次質譜(MS1)。', 'The spectrometer scans again and again, measuring the m/z (mass divided by charge) of all ions: the first mass spectrum (MS1).')],
+      [5.5, zhEn('胰蛋白酶切出的胜肽常帶 2 個質子,出現在 (M + 2 × 1.007) ÷ 2;放大看,同位素峰間隔 0.5,也看得出帶 2 個電荷。', 'Trypsin peptides often carry 2 protons, appearing at (M + 2 × 1.007) ÷ 2; zoomed in, isotope peaks 0.5 apart confirm the 2 charges.')],
+      [10.5, zhEn('儀器自動挑訊號最強的離子,只留下它去做下一步的串聯質譜;做完再挑下一個。右邊可以換要跟著看的胜肽。', 'The instrument sends only the strongest ion on to tandem MS, then the next. Choose a peptide to follow on the right.')]],
     draw(g, t, S) {
       const P = protOf(S), pep = pepOf(S);
       // 上:層析圖與現在的位置
       const tc = lerp(1, pep.rt, ease(seg(t, 0.4, 5)));
       const A = { X: (v) => 100 + (v / 40) * 790, Y: (v) => 112 - (v / 1.2) * 64 };
-      g.text(100, 32, '層析圖(橫軸是分鐘)', { size: 13, color: C.muted });
+      g.text(100, 32, zhEn('層析圖(橫軸是分鐘)', 'Chromatogram (minutes across)'), { size: 13, color: C.muted });
       g.line(100, 112, 890, 112, C.ink2, 1.4);
       for (const v of [0, 10, 20, 30, 40]) g.text(A.X(v), 126, `${v}`, { size: 12, color: C.muted, align: 'center', mono: true });
       chromCurve(g, A, P, 40);
       g.line(A.X(tc), 44, A.X(tc), 112, C.mint, 2);
       for (const p of P.peps) g.tag(A.X(p.rt), A.Y(p.inten) - 12, `${p.no}`, { size: 13, color: p.col });
       // 中:這一刻的 MS1
-      const B = g.axes(100, 180, 540, 236, { xmin: 300, xmax: 1000, ymin: 0, ymax: 1.25, xticks: [300, 400, 500, 600, 700, 800, 900, 1000], xlab: 'm/z', ylab: '強度' });
-      g.text(110, 166, `第一次質譜(MS1):${f2(tc)} 分`, { size: 14, weight: 700, color: C.ink2 });
+      const B = g.axes(100, 180, 540, 236, { xmin: 300, xmax: 1000, ymin: 0, ymax: 1.25, xticks: [300, 400, 500, 600, 700, 800, 900, 1000], xlab: 'm/z', ylab: zhEn('強度', 'Intensity') });
+      g.text(110, 166, zhEn(`第一次質譜(MS1):${f2(tc)} 分`, `First mass spectrum (MS1): ${f2(tc)} min`), { size: 14, weight: 700, color: C.ink2 });
       const lab = labeler(g);
       for (const b of BG) {
         const h = b.h * Math.exp(-((tc - b.rt) ** 2) / (2 * b.w * b.w));
@@ -583,14 +603,14 @@ const chapters = [
         g.rrect(x - 16, B.Y(topH) - 44, 32, B.Y(0) - B.Y(topH) + 44, 6, 'rgba(165,243,205,.08)', C.mint, 2);
         g.ctx.restore();
         const rt = x > 470;
-        g.tag(rt ? x - 28 : x + 28, B.Y(topH) + 30, '訊號最強 → 挑出來', { size: 14, color: C.mint, align: rt ? 'right' : 'left', alpha: a });
-        if (t > 12.5) g.tag(370, 492, `只留下 m/z ${f2(top.mz)},送去串聯質譜(MS/MS)`, { size: 14, color: C.ink, alpha: ease(seg(t, 12.5, 13.1)) });
+        g.tag(rt ? x - 28 : x + 28, B.Y(topH) + 30, zhEn('訊號最強 → 挑出來', 'Strongest → picked'), { size: 14, color: C.mint, align: rt ? 'right' : 'left', alpha: a });
+        if (t > 12.5) g.tag(370, 492, zhEn(`只留下 m/z ${f2(top.mz)},送去串聯質譜(MS/MS)`, `Only m/z ${f2(top.mz)} goes on to tandem MS (MS/MS)`), { size: 14, color: C.ink, alpha: ease(seg(t, 12.5, 13.1)) });
       }
       // 右:放大這一根
       const a2 = ease(seg(t, 5.5, 6.3));
       if (a2 > 0 && top) {
         g.ctx.save(); g.ctx.globalAlpha = a2;
-        g.panel(680, 160, 260, 300, '放大這一根');
+        g.panel(680, 160, 260, 300, zhEn('放大這一根', 'Zoom on this peak'));
         const Z = { X: (v) => 712 + ((v - (top.mz - 0.6)) / 2.0) * 200, Y: (v) => 312 - v * 110 };
         g.line(704, 312, 920, 312, C.ink2, 1.4);
         const lam = top.M * 0.000536;
@@ -600,8 +620,8 @@ const chapters = [
         g.text(Z.X(top.mz), 328, f2(top.mz), { size: 13, color: C.muted, align: 'center', mono: true });
         const xa = Z.X(top.mz), xb = Z.X(top.mz + ISO / 2);
         g.line(xa, 190, xb, 190, C.amber, 2); g.line(xa, 184, xa, 196, C.amber, 2); g.line(xb, 184, xb, 196, C.amber, 2);
-        g.text((xa + xb) / 2 + 36, 188, '差 0.5', { size: 14, weight: 700, color: C.amber, align: 'left' });
-        g.text(700, 362, '→ 帶 2 個電荷(2+)', { size: 15, weight: 700, color: C.ink });
+        g.text((xa + xb) / 2 + 36, 188, zhEn('差 0.5', '0.5 apart'), { size: 14, weight: 700, color: C.amber, align: 'left' });
+        g.text(700, 362, zhEn('→ 帶 2 個電荷(2+)', '→ 2 charges (2+)'), { size: 15, weight: 700, color: C.ink });
         g.text(700, 396, `M = ${f2(top.M)}`, { size: 14, color: C.ink2, mono: true });
         g.text(700, 422, '(M + 2 × 1.007) ÷ 2', { size: 14, color: C.ink2, mono: true });
         g.text(700, 446, `= ${f2(top.mz)}`, { size: 14, weight: 700, color: top.col, mono: true });
@@ -610,11 +630,11 @@ const chapters = [
     },
   },
   {
-    key: 'msms', name: '串聯質譜:撞碎成 b 與 y', dur: 16,
+    key: 'msms', name: zhEn('串聯質譜:撞碎成 b 與 y', 'Tandem MS: breaking into b and y'), dur: 16,
     enter(S) { S.bond = null; },
-    cues: [[0, '挑出來的胜肽離子被加速去撞氣體分子(離子阱裡用氦氣);撞了很多次、能量累積夠了,肽鍵就斷開。這叫碰撞誘導解離(CID)。'],
-      [6, '斷開後分成兩段:含 N 端(開頭)的叫 b 離子,含 C 端(結尾)的叫 y 離子;數字是那一段有幾個胺基酸。'],
-      [11.5, '很多個相同的胜肽離子各斷在不同的肽鍵,量到一整組長短不同的碎片,這就是串聯質譜(MS/MS)。點兩顆珠子之間可以自己斷。']],
+    cues: [[0, zhEn('挑出來的胜肽離子被加速去撞氣體分子(離子阱裡用氦氣);撞了很多次、能量累積夠了,肽鍵就斷開。這叫碰撞誘導解離(CID)。', 'The chosen ions are sped into gas molecules (helium in an ion trap); after many hits a peptide bond breaks: collision-induced dissociation (CID).')],
+      [6, zhEn('斷開後分成兩段:含 N 端(開頭)的叫 b 離子,含 C 端(結尾)的叫 y 離子;數字是那一段有幾個胺基酸。', 'The start piece (with the N-terminus) is a b ion, the end piece (with the C-terminus) a y ion; the number counts its amino acids.')],
+      [11.5, zhEn('很多個相同的胜肽離子各斷在不同的肽鍵,量到一整組長短不同的碎片,這就是串聯質譜(MS/MS)。點兩顆珠子之間可以自己斷。', 'Many copies break at different bonds, giving fragments of every length: tandem mass spectrometry (MS/MS). Click between two beads to break one.')]],
     pointer(type, x, y, S) {
       if (type !== 'down') return false;
       const s = pepOf(S).seq, n = s.length, sp = Math.min(58, 640 / (n - 1)), x0 = 480 - ((n - 1) * sp) / 2;
@@ -626,7 +646,9 @@ const chapters = [
     },
     draw(g, t, S) {
       const s = pepOf(S).seq, n = s.length, sp = Math.min(58, 640 / (n - 1)), x0 = 480 - ((n - 1) * sp) / 2, cy = 166, rB = 17;
-      g.panel(30, 24, 900, 262, '碰撞室(示意)');
+      // 英文的標題比較長,左上角飄過的 He 會疊上去:英文改寫在框的左下角(畫字的次數與順序和中文一樣)
+      g.panel(30, 24, 900, 262, zhEn('碰撞室(示意)', ''));
+      if (zhEn(false, true)) g.text(44, 268, 'Collision cell (illustrative)', { size: 13, weight: 700, color: C.ink2 });
       // 右上角的小結構:–C(=O)–NH–,斷在 C 與 N 之間(在氣體分子之後才畫,不會被蓋住)
       const inset = () => {
       g.ctx.save(); g.ctx.globalAlpha = ease(seg(t, 6, 6.8));
@@ -640,7 +662,7 @@ const chapters = [
       g.line(858, 73, 858, 81, C.ink2, 1.6);
       g.text(858, 90, 'H', { size: 15, weight: 700, color: C.ink, align: 'center' });
       g.text(886, 64, '–', { size: 16, color: C.ink, align: 'center' });
-      g.text(752, 64, '斷在肽鍵', { size: 14, weight: 700, color: C.amber, align: 'right' });
+      g.text(752, 64, zhEn('斷在肽鍵', 'Breaks at the peptide bond'), { size: 14, weight: 700, color: C.amber, align: 'right' });
       g.ctx.restore();
       };
       // 哪一個鍵斷了:使用者點的,或依時間一個一個換
@@ -674,15 +696,15 @@ const chapters = [
         const xm = (x0 + (k - 0.5) * sp);
         g.circle(xm, cy, 9 * (1 - seg(ph, 0.1, 0.4)), 'rgba(255,209,102,.8)');
         g.text(xl, cy - 52, `b${k}`, { size: 17, weight: 800, color: B_COL, align: 'center', alpha: a });
-        g.text(xl, cy + 44, k === 1 ? '通常量不到' : `m/z ${f2(bIon(s, k))}`, { size: 14, color: B_COL, align: 'center', mono: k !== 1, alpha: a });
+        g.text(xl, cy + 44, k === 1 ? zhEn('通常量不到', 'Usually not detected') : `m/z ${f2(bIon(s, k))}`, { size: 14, color: B_COL, align: 'center', mono: k !== 1, alpha: a });
         g.text(xr, cy - 52, `y${n - k}`, { size: 17, weight: 800, color: Y_COL, align: 'center', alpha: a });
         g.text(xr, cy + 44, `m/z ${f2(yIon(s, n - k))}`, { size: 14, color: Y_COL, align: 'center', mono: true, alpha: a });
       }
       if (t > 6) inset();
-      if (t > 11.5 || S.bond) g.text(480, 268, '點兩顆珠子之間,看在那裡斷開', { size: 13, color: C.muted, align: 'center' });
+      if (t > 11.5 || S.bond) g.text(480, 268, zhEn('點兩顆珠子之間,看在那裡斷開', 'Click between two beads to break it there'), { size: 13, color: C.muted, align: 'center' });
       // 下:碎片的質譜(依序累積)
       const mzMax = Math.ceil((pepOf(S).M + PROTON + 40) / 100) * 100;
-      const B = g.axes(100, 318, 790, 150, { xmin: 0, xmax: mzMax, ymin: 0, ymax: 1.35, xticks: Array.from({ length: mzMax / 200 + 1 }, (_, i) => i * 200), xlab: 'm/z', ylab: '強度' });
+      const B = g.axes(100, 318, 790, 150, { xmin: 0, xmax: mzMax, ymin: 0, ymax: 1.35, xticks: Array.from({ length: mzMax / 200 + 1 }, (_, i) => i * 200), xlab: 'm/z', ylab: zhEn('強度', 'Intensity') });
       const fr = fragments(s), lab = labeler(g);
       const shownBond = (i) => (S.bond ? true : t >= T0 && (i < k || (i === k && ph > 0.45)));
       const vis = fr.filter((o) => shownBond(o.t === 'b' ? o.i : n - o.i));
@@ -696,15 +718,15 @@ const chapters = [
     },
   },
   {
-    key: 'read', name: '從碎片讀出序列', dur: 17,
-    cues: [[0, '這是一張 MS/MS 圖譜(示意):藍色是 b 離子,紅色是 y 離子。同一組裡相鄰兩根峰的質量差,剛好是一個胺基酸殘基。'],
-      [5, 'b 系列由左往右讀,y 系列由右往左讀,讀出來的都是 N 端到 C 端的順序。右邊可以換胜肽、換一組讀。'],
-      [10, '差 113.08 時只能寫「L 或 I」:兩者一樣重,這種碎裂分不出來。Q 與 K 只差 0.036,要量得夠準才分得開。'],
-      [13.5, 'b1 通常量不到,所以 b 系列開頭兩個只知道合起來的質量;y1 是 147.11 表示尾巴是 K,175.12 是 R。']],
+    key: 'read', name: zhEn('從碎片讀出序列', 'Reading the sequence from fragments'), dur: 17,
+    cues: [[0, zhEn('這是一張 MS/MS 圖譜(示意):藍色是 b 離子,紅色是 y 離子。同一組裡相鄰兩根峰的質量差,剛好是一個胺基酸殘基。', 'An MS/MS spectrum (illustrative): b ions are blue, y ions red. Two neighboring peaks in one series differ by exactly one residue.')],
+      [5, zhEn('b 系列由左往右讀,y 系列由右往左讀,讀出來的都是 N 端到 C 端的順序。右邊可以換胜肽、換一組讀。', 'Read b from the left, y from the right; both give the order from N- to C-terminus. Change peptide or series on the right.')],
+      [10, zhEn('差 113.08 時只能寫「L 或 I」:兩者一樣重,這種碎裂分不出來。Q 與 K 只差 0.036,要量得夠準才分得開。', 'A gap of 113.08 is just "L or I": same mass, which this fragmentation cannot split. Q and K differ by 0.036; that takes precise masses.')],
+      [13.5, zhEn('b1 通常量不到,所以 b 系列開頭兩個只知道合起來的質量;y1 是 147.11 表示尾巴是 K,175.12 是 R。', 'b1 is usually not seen, so the first two b residues are known only as a sum; a y1 of 147.11 means a K at the end, 175.12 an R.')]],
     draw(g, t, S) {
       const pep = pepOf(S), s = pep.seq, n = s.length, MH = pep.M + PROTON, ser = S.series === 'b' ? 'b' : 'y';
       const mzMax = Math.ceil((MH + 40) / 100) * 100;
-      const A = g.axes(90, 184, 810, 252, { xmin: 0, xmax: mzMax, ymin: 0, ymax: 1.4, xticks: Array.from({ length: mzMax / 200 + 1 }, (_, i) => i * 200), xlab: 'm/z', ylab: '強度(相對)' });
+      const A = g.axes(90, 184, 810, 252, { xmin: 0, xmax: mzMax, ymin: 0, ymax: 1.4, xticks: Array.from({ length: mzMax / 200 + 1 }, (_, i) => i * 200), xlab: 'm/z', ylab: zhEn('強度(相對)', 'Intensity (relative)') });
       const grow = ease(seg(t, 0.2, 1.6));
       const fr = fragments(s), lab = labeler(g);
       // 讀的順序:y 從右邊的 [M+H]⁺ 開始往左,b 從左邊的 H⁺ 開始往右(兩端是算出來的起點,不是量到的峰)
@@ -746,19 +768,19 @@ const chapters = [
         g.ctx.save(); g.ctx.globalAlpha = a;
         g.line(gp.x1, y, gp.x2, y, col, cur ? 2.6 : 1.8); g.line(gp.x1, y - 6, gp.x1, y + 6, col, 1.8); g.line(gp.x2, y - 6, gp.x2, y + 6, col, 1.8);
         if (cur) { g.line(gp.x1, y + 6, gp.x1, A.Y(0), 'rgba(165,243,205,.3)', 1, [3, 4]); g.line(gp.x2, y + 6, gp.x2, A.Y(0), 'rgba(165,243,205,.3)', 1, [3, 4]); }
-        g.text((gp.x1 + gp.x2) / 2, y - 13, gp.aa || '2 個', { size: 14, weight: 700, color: cur ? C.mint : C.ink2, align: 'center' });
+        g.text((gp.x1 + gp.x2) / 2, y - 13, gp.aa || zhEn('2 個', '2 residues'), { size: 14, weight: 700, color: cur ? C.mint : C.ink2, align: 'center' });
         g.ctx.restore();
       });
       // 現在這一步的說明
       if (kNow >= 0 && !fin) {
         const gp = gaps[kNow], a = ease(seg(t, T0 + kNow * step, T0 + kNow * step + 0.35));
-        const r = gp.res.length > 1 ? `前兩個合起來(b1 量不到)` : gp.aa === 'L/I' ? 'L 白胺酸或 I 異白胺酸' : gp.aa === 'Q' ? 'Q 麩醯胺酸(K 是 128.09)' : gp.aa === 'K' ? 'K 離胺酸(Q 是 128.06)' : `${gp.aa} ${AA_NAME[gp.aa] || ''}`;
-        g.tag(clamp((gp.x1 + gp.x2) / 2, 200, 760), 124, `相差 ${f2(gp.d)} → ${r}`, { size: 14, color: C.mint, alpha: a });
+        const r = gp.res.length > 1 ? zhEn(`前兩個合起來(b1 量不到)`, `first two together (no b1)`) : gp.aa === 'L/I' ? zhEn('L 白胺酸或 I 異白胺酸', 'L or I (leucine or isoleucine)') : gp.aa === 'Q' ? zhEn('Q 麩醯胺酸(K 是 128.09)', 'Q, glutamine (K is 128.09)') : gp.aa === 'K' ? zhEn('K 離胺酸(Q 是 128.06)', 'K, lysine (Q is 128.06)') : zhEn(`${gp.aa} ${AA_NAME[gp.aa] || ''}`, AA_NAME[gp.aa] ? `${gp.aa}, ${AA_NAME[gp.aa]}` : gp.aa);
+        g.tag(clamp((gp.x1 + gp.x2) / 2, 200, 760), 124, zhEn(`相差 ${f2(gp.d)} → ${r}`, `Gap ${f2(gp.d)} → ${r}`), { size: 14, color: C.mint, alpha: a });
       }
-      if (fin) g.tag(480, 124, ser === 'y' ? 'y 系列加上母離子,每一個都讀得出來' : 'b 系列:開頭兩個要靠 y 系列補上', { size: 14, color: C.amber, alpha: ease(seg(t, T1, T1 + 0.5)) });
+      if (fin) g.tag(480, 124, ser === 'y' ? zhEn('y 系列加上母離子,每一個都讀得出來', 'y series plus the precursor: every residue is read') : zhEn('b 系列:開頭兩個要靠 y 系列補上', 'b series: the first two need the y series'), { size: 14, color: C.amber, alpha: ease(seg(t, T1, T1 + 0.5)) });
       // 上:讀出來的序列
       const sw = Math.min(50, 640 / n), sx0 = 480 - (n * sw) / 2 + 40;
-      g.text(sx0 - 18, 64, ser === 'y' ? '由 y 讀出:' : '由 b 讀出:', { size: 15, weight: 700, color: ser === 'y' ? Y_COL : B_COL, align: 'right' });
+      g.text(sx0 - 18, 64, ser === 'y' ? zhEn('由 y 讀出:', 'Read from y:') : zhEn('由 b 讀出:', 'Read from b:'), { size: 15, weight: 700, color: ser === 'y' ? Y_COL : B_COL, align: 'right' });
       for (let i = 0; i < n; i++) {
         const x = sx0 + i * sw;
         g.rrect(x + 2, 42, sw - 4, 44, 6, 'rgba(21,32,30,.85)', C.line);
@@ -769,18 +791,18 @@ const chapters = [
         const txt = gp.res.length > 1 ? '?' : gp.aa === 'L/I' ? 'L/I' : gp.aa;
         g.text(x + sw / 2, 64, txt, { size: txt.length > 1 ? 15 : 19, weight: 800, color: gp.res.length > 1 ? C.amber : C.ink, align: 'center' });
       }
-      if (fin) g.text(sx0 - 18, 90, `實際:${s}`, { size: 13, color: C.muted, align: 'right', mono: true, alpha: ease(seg(t, T1, T1 + 0.5)) });
+      if (fin) g.text(sx0 - 18, 90, zhEn(`實際:${s}`, `Actual: ${s}`), { size: 13, color: C.muted, align: 'right', mono: true, alpha: ease(seg(t, T1, T1 + 0.5)) });
     },
   },
   {
-    key: 'db', name: '和資料庫比對', dur: 17,
-    cues: [[0, '實際上很少靠人一根一根讀:電腦把資料庫裡每一條蛋白質都「理論上切開」,算出每個胜肽的質量。'],
-      [5, '先挑質量和量到的差不多的胜肽當候選;量得越準,候選越少。右邊可以改容許的誤差。'],
-      [10.5, '再把每個候選「理論上碎開」,和量到的碎片比對,對上最多的就是答案;通常要兩個以上的胜肽對上,才算認出這個蛋白質。']],
+    key: 'db', name: zhEn('和資料庫比對', 'Matching against a database'), dur: 17,
+    cues: [[0, zhEn('實際上很少靠人一根一根讀:電腦把資料庫裡每一條蛋白質都「理論上切開」,算出每個胜肽的質量。', 'People rarely read peaks by hand: software "cuts" every database protein in theory and calculates each peptide mass.')],
+      [5, zhEn('先挑質量和量到的差不多的胜肽當候選;量得越準,候選越少。右邊可以改容許的誤差。', 'Candidates have about the measured mass; the more precise, the fewer. Set the tolerance on the right.')],
+      [10.5, zhEn('再把每個候選「理論上碎開」,和量到的碎片比對,對上最多的就是答案;通常要兩個以上的胜肽對上,才算認出這個蛋白質。', 'Each candidate is fragmented in theory and compared with the data; most matches wins. A protein usually needs two or more matched peptides.')]],
     draw(g, t, S) {
       const d = db(), pep = pepOf(S), M = pep.M;
       // 左上:資料庫
-      g.panel(30, 22, 440, 142, '資料庫(示意)');
+      g.panel(30, 22, 440, 142, zhEn('資料庫(示意)', 'Database (illustrative)'));
       const R = rng(17), cutA = seg(t, 1, 4.5);
       for (let i = 0; i < 9; i++) {
         const y = 52 + i * 8.5, w = 160 + R() * 210;
@@ -788,18 +810,18 @@ const chapters = [
         const nc = 3 + Math.floor(R() * 6);
         for (let c = 0; c < nc; c++) { const x = 52 + R() * w; if (x - 52 < cutA * 380) g.line(x, y - 4, x, y + 4, C.amber, 1.6); }
       }
-      g.text(50, 142, `${fint(d.nProt)} 條蛋白質 → 理論上切出 ${fint(d.seqs.length)} 個胜肽`, { size: 14, color: C.ink, alpha: ease(seg(t, 1, 2)) });
+      g.text(50, 142, zhEn(`${fint(d.nProt)} 條蛋白質 → 理論上切出 ${fint(d.seqs.length)} 個胜肽`, `${fint(d.nProt)} proteins → ${fint(d.seqs.length)} peptides (cut in theory)`), { size: 14, color: C.ink, alpha: ease(seg(t, 1, 2)) });
       // 右上:量到的
-      g.panel(490, 22, 440, 142, '量到的胜肽');
-      g.text(508, 66, `母離子 m/z ${f2(pep.mz)}(2+)`, { size: 15, weight: 700, color: C.ink, mono: false });
-      g.text(508, 98, `→ 質量 M = ${M.toFixed(3)} Da`, { size: 15, color: C.ink2 });
-      g.text(508, 130, `碎片 ${pep.seq.length * 2 - 3} 根(b2 起、y1 起)`, { size: 14, color: C.ink2 });
+      g.panel(490, 22, 440, 142, zhEn('量到的胜肽', 'Measured peptide'));
+      g.text(508, 66, zhEn(`母離子 m/z ${f2(pep.mz)}(2+)`, `Precursor m/z ${f2(pep.mz)} (2+)`), { size: 15, weight: 700, color: C.ink, mono: false });
+      g.text(508, 98, zhEn(`→ 質量 M = ${M.toFixed(3)} Da`, `→ mass M = ${M.toFixed(3)} Da`), { size: 15, color: C.ink2 });
+      g.text(508, 130, zhEn(`碎片 ${pep.seq.length * 2 - 3} 根(b2 起、y1 起)`, `${pep.seq.length * 2 - 3} fragments (b2 and up, y1 and up)`), { size: 14, color: C.ink2 });
       // 中:質量相近的候選
       const tolA = Math.exp(lerp(Math.log(1.5), Math.log(S.tol), ease(seg(t, 5, 8))));
       const X = (m) => 80 + ((m - (M - 1.5)) / 3) * 820, base = 322;
       const a1 = ease(seg(t, 2, 3.5));
       g.ctx.save(); g.ctx.globalAlpha = a1;
-      g.text(80, 196, '資料庫裡質量相近的胜肽(每一條細線是一個)', { size: 14, color: C.ink2 });
+      g.text(80, 196, zhEn('資料庫裡質量相近的胜肽(每一條細線是一個)', 'Database peptides near M (one thin line each)'), { size: 14, color: C.ink2 });
       if (t > 5) g.rrect(X(M - tolA), 214, Math.max(2, X(M + tolA) - X(M - tolA)), base - 214, 3, 'rgba(165,243,205,.13)', C.mint, 1.2);
       const near = inWindow(M, 1.5);
       let cnt = 0;
@@ -813,14 +835,14 @@ const chapters = [
       g.line(80, base, 900, base, C.ink2, 1.4);
       for (const k of [-1, 0, 1]) { g.line(X(M + k), base, X(M + k), base + 5, C.ink2, 1.4); g.text(X(M + k), base + 16, k ? `M ${k > 0 ? '+' : '−'} 1` : 'M', { size: 12, color: C.muted, align: 'center', mono: true }); }
       g.ctx.restore();
-      if (t > 5) g.text(900, 196, `在 ±${S.tol} Da 內:${cnt} 個候選`, { size: 15, weight: 700, color: C.mint, align: 'right', alpha: ease(seg(t, 5, 5.5)) });
+      if (t > 5) g.text(900, 196, zhEn(`在 ±${S.tol} Da 內:${cnt} 個候選`, `${cnt} candidate${cnt === 1 ? '' : 's'} within ±${S.tol} Da`), { size: 15, weight: 700, color: C.mint, align: 'right', alpha: ease(seg(t, 5, 5.5)) });
       // 下:碎片比對的分數
       if (t > 10.5) {
         const list = rankCandidates(S), show = list.slice(0, 5), a = ease(seg(t, 10.5, 11.1));
         g.ctx.save(); g.ctx.globalAlpha = a;
-        g.text(80, 360, '候選胜肽', { size: 13, color: C.muted });
-        g.text(380, 360, '來自', { size: 13, color: C.muted });
-        g.text(560, 360, '對上的碎片(容許 ±0.02)', { size: 13, color: C.muted });
+        g.text(80, 360, zhEn('候選胜肽', 'Candidate'), { size: 13, color: C.muted });
+        g.text(380, 360, zhEn('來自', 'From'), { size: 13, color: C.muted });
+        g.text(560, 360, zhEn('對上的碎片(容許 ±0.02)', 'Fragments matched (±0.02)'), { size: 13, color: C.muted });
         g.ctx.restore();
         show.forEach((c, r) => {
           const y = 386 + r * 26, ar = ease(seg(t, 10.8 + r * 0.25, 11.3 + r * 0.25));
@@ -835,87 +857,87 @@ const chapters = [
           g.text(912, y, `${Math.round(c.score * grow)} / ${c.of}`, { size: 14, color: win ? C.mint : C.ink2, align: 'right', mono: true });
           g.ctx.restore();
         });
-        if (list.length > 5) g.text(80, 516, `……還有 ${list.length - 5} 個候選,分數更低`, { size: 13, color: C.muted, alpha: ease(seg(t, 12.2, 12.8)) });
-        if (t > 13) g.tag(926, 516, `最符合 → 來自示意蛋白質${protOf(S).name}`, { size: 14, color: C.mint, align: 'right', alpha: ease(seg(t, 13, 13.6)) });
+        if (list.length > 5) g.text(80, 516, zhEn(`……還有 ${list.length - 5} 個候選,分數更低`, `… ${list.length - 5} more candidate${list.length === 6 ? '' : 's'}, lower scores`), { size: 13, color: C.muted, alpha: ease(seg(t, 12.2, 12.8)) });
+        if (t > 13) g.tag(926, 516, zhEn(`最符合 → 來自示意蛋白質${protOf(S).name}`, `Best match → example protein ${protOf(S).name}`), { size: 14, color: C.mint, align: 'right', alpha: ease(seg(t, 13, 13.6)) });
       }
     },
   },
   {
-    key: 'quant', name: '進階:定量(一)不標記與 SILAC', dur: 17,
-    cues: [[0, '比較兩個樣品裡同一個蛋白質的量。不標記:兩個樣品分開跑,比同一個胜肽的層析峰面積;也可以數鑑定到幾張譜圖。'],
-      [5, '分開跑會帶進每一針的差異(進樣量、噴灑效率),要用全部胜肽比例的中位數來標準化。右邊可以讓第 2 針多打一些。'],
-      [9.5, 'SILAC:讓樣品 B 的細胞吃重的離胺酸(+8.014)與精胺酸(+10.008),收細胞後就和 A 混在一起處理。'],
-      [13, '同一個胜肽在 MS1 成對出現,相差的是重的質量 ÷ 電荷;兩峰的面積比就是 B : A,進樣多少都不會改變。']],
+    key: 'quant', name: zhEn('進階:定量(一)不標記與 SILAC', 'Advanced: label-free and SILAC'), dur: 17,
+    cues: [[0, zhEn('比較兩個樣品裡同一個蛋白質的量。不標記:兩個樣品分開跑,比同一個胜肽的層析峰面積;也可以數鑑定到幾張譜圖。', 'Comparing a protein in two samples, label-free runs each separately and compares peak areas of the same peptide, or counts spectra.')],
+      [5, zhEn('分開跑會帶進每一針的差異(進樣量、噴灑效率),要用全部胜肽比例的中位數來標準化。右邊可以讓第 2 針多打一些。', 'Runs differ (injection, spray efficiency), so ratios are normalized by the all-peptide median. Inject more in run 2 on the right.')],
+      [9.5, zhEn('SILAC:讓樣品 B 的細胞吃重的離胺酸(+8.014)與精胺酸(+10.008),收細胞後就和 A 混在一起處理。', 'SILAC: sample B cells are fed heavy lysine (+8.014) and arginine (+10.008), then mixed with A at harvest and processed together.')],
+      [13, zhEn('同一個胜肽在 MS1 成對出現,相差的是重的質量 ÷ 電荷;兩峰的面積比就是 B : A,進樣多少都不會改變。', 'Each peptide appears in MS1 as a pair, apart by the heavy mass ÷ charge; the area ratio is B : A, however much is injected.')]],
     draw(g, t, S) {
       const P = protOf(S), pep = pepOf(S), s = pep.seq, R0 = S.ratio, inj = 1 + S.inject / 100;
       // ---- 左:不標記 ----
-      g.panel(24, 14, 448, 410, '不標記:兩個樣品分開跑');
+      g.panel(24, 14, 448, 410, zhEn('不標記:兩個樣品分開跑', 'Label-free: two samples, two runs'));
       const sa = ease(seg(t, 0.2, 1));
       g.ctx.save(); g.ctx.globalAlpha = sa;
-      vial(g, 52, 62, SA_COL, '樣品 A'); vial(g, 52, 100, SB_COL, '樣品 B');
+      vial(g, 52, 62, SA_COL, zhEn('樣品 A', 'Sample A')); vial(g, 52, 100, SB_COL, zhEn('樣品 B', 'Sample B'));
       g.arrow(130, 62, 174, 62, { color: C.muted, lw: 1.8, head: 7 }); g.arrow(130, 100, 174, 100, { color: C.muted, lw: 1.8, head: 7 });
-      g.text(184, 62, '第 1 針 LC-MS', { size: 14, color: C.ink2 });
-      g.text(184, 100, `第 2 針 LC-MS${S.inject ? `(進樣 ${S.inject > 0 ? '+' : '−'}${Math.abs(S.inject)}%)` : ''}`, { size: 14, color: S.inject ? C.amber : C.ink2 });
+      g.text(184, 62, zhEn('第 1 針 LC-MS', 'Run 1: LC-MS'), { size: 14, color: C.ink2 });
+      g.text(184, 100, zhEn(`第 2 針 LC-MS${S.inject ? `(進樣 ${S.inject > 0 ? '+' : '−'}${Math.abs(S.inject)}%)` : ''}`, `Run 2: LC-MS${S.inject ? ` (${S.inject > 0 ? '+' : '−'}${Math.abs(S.inject)}% injected)` : ''}`), { size: 14, color: S.inject ? C.amber : C.ink2 });
       g.ctx.restore();
       const X0 = pep.rt - 1.6, X1 = pep.rt + 1.6, gr = ease(seg(t, 0.6, 3.6));
       const hA = 1, hB = R0 * inj, top = Math.max(hA, hB) * 1.25;
-      const A = g.axes(84, 132, 368, 150, { xmin: X0, xmax: X1, ymin: 0, ymax: top, xticks: [pep.rt - 1, pep.rt, pep.rt + 1], fmtX: (v) => v.toFixed(1), xlab: '時間(分)', ylab: 'MS1 訊號' });
+      const A = g.axes(84, 132, 368, 150, { xmin: X0, xmax: X1, ymin: 0, ymax: top, xticks: [pep.rt - 1, pep.rt, pep.rt + 1], fmtX: (v) => v.toFixed(1), xlab: zhEn('時間(分)', 'Time (min)'), ylab: zhEn('MS1 訊號', 'MS1 signal') });
       const pk = (h, c0) => (x) => gr * h * Math.exp(-((x - c0) ** 2) / (2 * SIG * SIG));
       filledPeak(g, A, X0, X1, pk(hA, pep.rt), SA_COL); filledPeak(g, A, X0, X1, pk(hB, pep.rt + RET_SHIFT), SB_COL);
       if (gr > 0.9) {
         g.text(A.X(pep.rt) - 10, A.Y(hA) - 12, 'A', { size: 16, weight: 800, color: SA_COL, align: 'right' });
         g.text(A.X(pep.rt + RET_SHIFT) + 12, A.Y(hB) - 12, 'B', { size: 16, weight: 800, color: SB_COL });
       }
-      if (t > 3.6) g.text(40, 350, `面積比 B ÷ A = ${f2(R0 * inj)}`, { size: 17, weight: 700, color: S.inject ? C.amber : C.mint, alpha: ease(seg(t, 3.6, 4.3)) });
+      if (t > 3.6) g.text(40, 350, zhEn(`面積比 B ÷ A = ${f2(R0 * inj)}`, `Area ratio B ÷ A = ${f2(R0 * inj)}`), { size: 17, weight: 700, color: S.inject ? C.amber : C.mint, alpha: ease(seg(t, 3.6, 4.3)) });
       if (t > 7) {
         const a = ease(seg(t, 7, 7.8));
-        g.text(40, 380, `÷ 全部胜肽比例的中位數 ${f2(inj)} = ${f2(R0)}`, { size: 15, color: C.mint, alpha: a });
-        g.text(40, 406, '標準化的前提:大部分蛋白質沒有變', { size: 13, color: C.muted, alpha: a });
+        g.text(40, 380, zhEn(`÷ 全部胜肽比例的中位數 ${f2(inj)} = ${f2(R0)}`, `÷ median peptide ratio ${f2(inj)} = ${f2(R0)}`), { size: 15, color: C.mint, alpha: a });
+        g.text(40, 406, zhEn('標準化的前提:大部分蛋白質沒有變', 'This assumes most proteins do not change'), { size: 13, color: C.muted, alpha: a });
       }
       // ---- 右:SILAC ----
-      g.panel(488, 14, 448, 410, 'SILAC:先混在一起再跑');
+      g.panel(488, 14, 448, 410, zhEn('SILAC:先混在一起再跑', 'SILAC: mix first, then one run'));
       const ra = ease(seg(t, 9.5, 10.3)), dM = silacShift(s), mzL = pep.mz, mzH = mzL + dM / 2;
       if (ra > 0) {
         g.ctx.save(); g.ctx.globalAlpha = ra;
-        vial(g, 516, 62, SA_COL, 'A:一般的'); vial(g, 516, 100, SB_COL, 'B:重的 K、R');
+        vial(g, 516, 62, SA_COL, zhEn('A:一般的', 'A: normal')); vial(g, 516, 100, SB_COL, zhEn('B:重的 K、R', 'B: heavy K, R'));
         g.line(640, 62, 676, 81, C.muted, 1.8); g.line(640, 100, 676, 81, C.muted, 1.8);
         g.arrow(676, 81, 700, 81, { color: C.muted, lw: 1.8, head: 7 });
-        g.text(708, 81, '混合 → 一次 LC-MS', { size: 14, color: C.ink2 });
+        g.text(708, 81, zhEn('混合 → 一次 LC-MS', 'Mix → one LC-MS run'), { size: 14, color: C.ink2 });
         g.ctx.restore();
         const x0 = mzL - 0.8, x1 = mzH + 2.4, iso = isoPat(pep.M), hL = 1, hH = R0, ymx = Math.max(hL, hH) * iso[0] * 1.45, mg = ease(seg(t, 10.4, 12.4));
-        const B = g.axes(548, 132, 364, 150, { xmin: x0, xmax: x1, ymin: 0, ymax: ymx, xticks: [mzL, mzH], fmtX: (v) => f2(v), xlab: 'm/z', ylab: '強度' });
+        const B = g.axes(548, 132, 364, 150, { xmin: x0, xmax: x1, ymin: 0, ymax: ymx, xticks: [mzL, mzH], fmtX: (v) => f2(v), xlab: 'm/z', ylab: zhEn('強度', 'Intensity') });
         iso.forEach((v, k) => {
           const dx = (k * ISO) / 2;
           g.line(B.X(mzL + dx), B.Y(0), B.X(mzL + dx), B.Y(v * hL * mg), SA_COL, 3);
           g.line(B.X(mzH + dx), B.Y(0), B.X(mzH + dx), B.Y(v * hH * mg), SB_COL, 3);
         });
         if (mg > 0.9) {
-          g.text(B.X(mzL), B.Y(iso[0] * hL) - 14, '輕(A)', { size: 14, weight: 700, color: SA_COL, align: 'center' });
-          g.text(B.X(mzH), B.Y(iso[0] * hH) - 14, '重(B)', { size: 14, weight: 700, color: SB_COL, align: 'center' });
+          g.text(B.X(mzL), B.Y(iso[0] * hL) - 14, zhEn('輕(A)', 'Light (A)'), { size: 14, weight: 700, color: SA_COL, align: 'center' });
+          g.text(B.X(mzH), B.Y(iso[0] * hH) - 14, zhEn('重(B)', 'Heavy (B)'), { size: 14, weight: 700, color: SB_COL, align: 'center' });
         }
         if (t > 13) {
           const a = ease(seg(t, 13, 13.7)), yb = 146, nK = countAA(s, 'K'), nR = countAA(s, 'R');
           g.ctx.save(); g.ctx.globalAlpha = a;
           g.line(B.X(mzL), yb, B.X(mzH), yb, C.amber, 2); g.line(B.X(mzL), yb - 6, B.X(mzL), yb + 6, C.amber, 2); g.line(B.X(mzH), yb - 6, B.X(mzH), yb + 6, C.amber, 2);
-          g.text(B.X(mzL), yb - 15, `相差 ${dM.toFixed(3)} ÷ 2 = ${(dM / 2).toFixed(3)}`, { size: 14, weight: 700, color: C.amber, mono: true });
-          g.text(504, 350, `面積比 重 ÷ 輕 = ${f2(R0)}`, { size: 17, weight: 700, color: C.mint });
-          g.text(504, 380, `${nK} 個 K(+8.014)、${nR} 個 R(+10.008)`, { size: 15, color: C.ink2 });
-          g.text(504, 406, '進樣多少,兩根峰一起變大變小', { size: 13, color: C.muted });
+          g.text(B.X(mzL), yb - 15, zhEn(`相差 ${dM.toFixed(3)} ÷ 2 = ${(dM / 2).toFixed(3)}`, `Difference ${dM.toFixed(3)} ÷ 2 = ${(dM / 2).toFixed(3)}`), { size: 14, weight: 700, color: C.amber, mono: true });
+          g.text(504, 350, zhEn(`面積比 重 ÷ 輕 = ${f2(R0)}`, `Area ratio heavy ÷ light = ${f2(R0)}`), { size: 17, weight: 700, color: C.mint });
+          g.text(504, 380, zhEn(`${nK} 個 K(+8.014)、${nR} 個 R(+10.008)`, `${nK} K (+8.014), ${nR} R (+10.008)`), { size: 15, color: C.ink2 });
+          g.text(504, 406, zhEn('進樣多少,兩根峰一起變大變小', 'Whatever the injection, both peaks scale together'), { size: 13, color: C.muted });
           g.ctx.restore();
         }
       }
       // ---- 下:真的比例與跟著看的胜肽 ----
-      g.text(28, 458, `真的 B : A = ${R0} : 1`, { size: 18, weight: 700, color: C.ink });
-      g.text(28, 490, `跟著看的胜肽 ${s}(示意蛋白質${P.name},2+,m/z ${f2(pep.mz)})`, { size: 14, color: C.ink2 });
-      g.text(28, 516, '不標記也可以數每個蛋白質鑑定到幾張譜圖(spectral counting)', { size: 13, color: C.muted });
+      g.text(28, 458, zhEn(`真的 B : A = ${R0} : 1`, `True B : A = ${R0} : 1`), { size: 18, weight: 700, color: C.ink });
+      g.text(28, 490, zhEn(`跟著看的胜肽 ${s}(示意蛋白質${P.name},2+,m/z ${f2(pep.mz)})`, `Peptide followed: ${s} (example protein ${P.name}, 2+, m/z ${f2(pep.mz)})`), { size: 14, color: C.ink2 });
+      g.text(28, 516, zhEn('不標記也可以數每個蛋白質鑑定到幾張譜圖(spectral counting)', 'Label-free can also count the spectra identified per protein (spectral counting)'), { size: 13, color: C.muted });
     },
   },
   {
-    key: 'tmt', name: '進階:定量(二)TMT 與比例壓縮', dur: 17,
-    cues: [[0, 'TMT 是接在胜肽 N 端與離胺酸上的化學標籤;每個樣品一種,總質量都一樣,所以同一個胜肽在 MS1 疊成同一根峰。'],
-      [4.5, '碎裂時標籤斷開,放出 m/z 126、127 的報導離子,兩根的強度比就是 B : A;b、y 碎片照樣拿來鑑定胜肽。'],
-      [9.5, '可是挑母離子的視窗裡常混進別的胜肽,它們也帶標籤,報導離子一起加進來,比例被拉向 1 : 1,這叫比例壓縮。'],
-      [13.5, '再挑一根碎片做第三次質譜(MS3),可以去掉大部分干擾,代價是鑑定數少一些。右邊可以調干擾的比例。']],
+    key: 'tmt', name: zhEn('進階:定量(二)TMT 與比例壓縮', 'Advanced: TMT and ratio compression'), dur: 17,
+    cues: [[0, zhEn('TMT 是接在胜肽 N 端與離胺酸上的化學標籤;每個樣品一種,總質量都一樣,所以同一個胜肽在 MS1 疊成同一根峰。', 'TMT tags are chemical labels on the N-terminus and lysines of a peptide; one per sample, all of equal mass, so a peptide stays one peak in MS1.')],
+      [4.5, zhEn('碎裂時標籤斷開,放出 m/z 126、127 的報導離子,兩根的強度比就是 B : A;b、y 碎片照樣拿來鑑定胜肽。', 'Fragmentation releases reporter ions at m/z 126 and 127; their intensity ratio is B : A, while b and y fragments still identify the peptide.')],
+      [9.5, zhEn('可是挑母離子的視窗裡常混進別的胜肽,它們也帶標籤,報導離子一起加進來,比例被拉向 1 : 1,這叫比例壓縮。', 'But other tagged peptides often share the precursor window; their reporters pull the ratio toward 1 : 1 (ratio compression).')],
+      [13.5, zhEn('再挑一根碎片做第三次質譜(MS3),可以去掉大部分干擾,代價是鑑定數少一些。右邊可以調干擾的比例。', 'A third stage on one fragment (MS3) removes most interference but identifies fewer peptides. Adjust it on the right.')]],
     draw(g, t, S) {
       const pep = pepOf(S), s = pep.seq, R0 = S.ratio, M = tmtM(s), mz = mzOf(M, 2);
       const fI = t < 9.5 ? 0 : (S.interf / 100) * ease(seg(t, 9.5, 11)), I = S.ms3 ? 0 : tmtI(fI, 1, R0);
@@ -925,10 +947,10 @@ const chapters = [
       const brk = ease(seg(t, 4.5, 6.5)), RX = 120, BX0 = 172;
       [['A', SA_COL, '126'], ['B', SB_COL, '127']].forEach(([nm, col, rep], r) => {
         const y = 48 + r * 72, bw = 70;
-        g.text(40, y, `樣品 ${nm}`, { size: 15, weight: 700, color: col });
+        g.text(40, y, zhEn(`樣品 ${nm}`, `Sample\n${nm}`), { size: 15, weight: 700, color: col });
         const rx = RX - brk * 14;
         g.rrect(rx, y - 14, 46, 28, 6, col); g.text(rx + 23, y, rep, { size: 15, weight: 800, color: '#0b1111', align: 'center', mono: true });
-        g.rrect(BX0, y - 14, bw, 28, 6, 'rgba(255,255,255,.08)', C.ink2, 1.2); g.text(BX0 + bw / 2, y, '平衡', { size: 13, color: C.ink2, align: 'center' });
+        g.rrect(BX0, y - 14, bw, 28, 6, 'rgba(255,255,255,.08)', C.ink2, 1.2); g.text(BX0 + bw / 2, y, zhEn('平衡', 'Balance'), { size: 13, color: C.ink2, align: 'center' });
         if (brk < 0.2) g.line(RX + 46, y, BX0, y, C.ink2, 2);
         const px = BX0 + bw + 6;
         g.line(px, y, px + 14, y, C.ink2, 2);
@@ -937,27 +959,27 @@ const chapters = [
       });
       if (brk > 0) {
         g.line(RX + 49, 30, RX + 49, 138, C.amber, 1.8, [4, 4]);
-        g.text(RX + 58, 84, '碎裂時從這裡斷開,放出報導離子', { size: 13, color: C.amber, alpha: brk });
+        g.text(RX + 58, 84, zhEn('碎裂時從這裡斷開,放出報導離子', 'Breaks here, releasing the reporter ion'), { size: 13, color: C.amber, alpha: brk });
       }
-      g.text(600, 52, '報導 + 平衡 = 一樣重', { size: 16, weight: 700, color: C.ink });
-      g.text(600, 80, `每個標籤 +${TMT_TAG.toFixed(3)}(N 端與每個 K)`, { size: 14, color: C.ink2 });
-      g.text(600, 116, `標記後 M = ${M.toFixed(3)}`, { size: 14, color: C.ink2, mono: true });
-      g.text(600, 142, `→ 2+ 的 m/z ${f2(mz)},A、B 疊在同一根`, { size: 14, color: C.ink2 });
+      g.text(600, 52, zhEn('報導 + 平衡 = 一樣重', 'Reporter + balance = same mass'), { size: 16, weight: 700, color: C.ink });
+      g.text(600, 80, zhEn(`每個標籤 +${TMT_TAG.toFixed(3)}(N 端與每個 K)`, `Each tag +${TMT_TAG.toFixed(3)} (N-terminus, each K)`), { size: 14, color: C.ink2 });
+      g.text(600, 116, zhEn(`標記後 M = ${M.toFixed(3)}`, `Tagged M = ${M.toFixed(3)}`), { size: 14, color: C.ink2, mono: true });
+      g.text(600, 142, zhEn(`→ 2+ 的 m/z ${f2(mz)},A、B 疊在同一根`, `→ 2+ m/z ${f2(mz)}, A + B in one peak`), { size: 14, color: C.ink2 });
       // ---- 左中:MS1 的挑選視窗 ----
-      g.panel(24, 178, 440, 246, 'MS1:挑母離子');
+      g.panel(24, 178, 440, 246, zhEn('MS1:挑母離子', 'MS1: pick the precursor'));
       const x0 = mz - 2.6, x1 = mz + 2.6, iso = isoPat(M);
       const A = g.axes(76, 224, 368, 136, { xmin: x0, xmax: x1, ymin: 0, ymax: 1.3, xticks: [mz - 2, mz, mz + 2], fmtX: (v) => f2(v), xlab: 'm/z' });
       g.rrect(A.X(mz - 1), 224, A.X(mz + 1) - A.X(mz - 1), A.Y(0) - 224, 4, 'rgba(255,209,102,.08)', 'rgba(255,209,102,.5)', 1.2);
-      g.text(A.X(mz + 1), 210, '挑選視窗 2 m/z', { size: 13, color: C.amber, align: 'right' });
+      g.text(A.X(mz + 1), 210, zhEn('挑選視窗 2 m/z', 'Window 2 m/z'), { size: 13, color: C.amber, align: 'right' });
       iso.forEach((v, k) => { const x = A.X(mz + (k * ISO) / 2); g.line(x, A.Y(0), x, A.Y(v / iso[0]), C.ink, 3); });
       g.text(A.X(mz) + 6, A.Y(1.12), 'A + B', { size: 14, weight: 700, color: C.ink });
       if (fI > 0) { // 混進來的離子:高度依干擾比例畫(示意)
         const hI = Math.min(1.2, (fI / (1 - fI)) * 1.35);
         for (const [dx, k] of [[-0.62, 0.55], [0.47, 0.45]]) g.line(A.X(mz + dx), A.Y(0), A.X(mz + dx), A.Y(hI * k * 2), 'rgba(185,199,192,.85)', 3);
-        g.text(A.X(mz - 0.62) - 6, A.Y(hI * 1.1) - 4, '別的胜肽', { size: 13, color: C.ink2, align: 'right' });
+        g.text(A.X(mz - 0.62) - 6, A.Y(hI * 1.1) - 4, zhEn('別的胜肽', 'Other peptides'), { size: 13, color: C.ink2, align: 'right' });
       }
       // ---- 右中:報導離子 ----
-      g.panel(480, 178, 456, 246, S.ms3 ? 'MS3 的報導離子(只看一根碎片)' : 'MS2 的報導離子');
+      g.panel(480, 178, 456, 246, S.ms3 ? zhEn('MS3 的報導離子(只看一根碎片)', 'MS3 reporter ions (from one fragment)') : zhEn('MS2 的報導離子', 'MS2 reporter ions'));
       const ra = ease(seg(t, 5, 6.5));
       if (ra > 0) {
         const vA = 1 + I, vB = R0 + I, ymx = Math.max(vA, vB, 1) * 1.25;
@@ -971,27 +993,27 @@ const chapters = [
         };
         bar(TMT_REP[0], 1, SA_COL); bar(TMT_REP[1], R0, SB_COL);
         if (ra > 0.9) {
-          g.text(B.X(TMT_REP[0]), B.Y(vA) - 14, '126(A)', { size: 14, weight: 700, color: SA_COL, align: 'center' });
-          g.text(B.X(TMT_REP[1]), B.Y(vB) - 14, '127(B)', { size: 14, weight: 700, color: SB_COL, align: 'center' });
-          if (I > 0) g.text(B.X(TMT_REP[1]) + 24, B.Y(vB - I / 2), '灰:干擾', { size: 13, color: C.ink2 });
+          g.text(B.X(TMT_REP[0]), B.Y(vA) - 14, zhEn('126(A)', '126 (A)'), { size: 14, weight: 700, color: SA_COL, align: 'center' });
+          g.text(B.X(TMT_REP[1]), B.Y(vB) - 14, zhEn('127(B)', '127 (B)'), { size: 14, weight: 700, color: SB_COL, align: 'center' });
+          if (I > 0) g.text(B.X(TMT_REP[1]) + 24, B.Y(vB - I / 2), zhEn('灰:干擾', 'Gray:\ninterference'), { size: 13, color: C.ink2 });
         }
       }
       // ---- 下:讀值 ----
       const meas = (R0 + I) / (1 + I);
-      g.text(28, 456, `真的 B : A = ${R0} : 1`, { size: 16, weight: 700, color: C.ink });
+      g.text(28, 456, zhEn(`真的 B : A = ${R0} : 1`, `True B : A = ${R0} : 1`), { size: 16, weight: 700, color: C.ink });
       if (t > 6.5) {
-        g.text(28, 488, `量到 = (B + I) ÷ (A + I) = ${f2(meas)}`, { size: 19, weight: 700, color: I > 0.005 ? C.amber : C.mint, mono: false });
-        g.text(28, 516, S.ms3 ? 'MS3:別的胜肽的報導離子幾乎都去掉了(這裡畫成完全去掉)' : `干擾 ${Math.round(fI * 100)}%:每個通道多出 I = ${I.toFixed(2)}(A 的訊號當 1)`, { size: 13, color: C.muted });
+        g.text(28, 488, zhEn(`量到 = (B + I) ÷ (A + I) = ${f2(meas)}`, `Measured = (B + I) ÷ (A + I) = ${f2(meas)}`), { size: 19, weight: 700, color: I > 0.005 ? C.amber : C.mint, mono: false });
+        g.text(28, 516, S.ms3 ? zhEn('MS3:別的胜肽的報導離子幾乎都去掉了(這裡畫成完全去掉)', 'MS3: almost no reporter ions from other peptides (drawn here as none)') : zhEn(`干擾 ${Math.round(fI * 100)}%:每個通道多出 I = ${I.toFixed(2)}(A 的訊號當 1)`, `Interference ${Math.round(fI * 100)}%: each channel gains I = ${I.toFixed(2)} (with A = 1)`), { size: 13, color: C.muted });
       }
-      if (t > 13.5 && !S.ms3) g.tag(926, 488, '試試右邊的 MS3', { size: 13, color: C.ink2, align: 'right', alpha: ease(seg(t, 13.5, 14.1)) });
+      if (t > 13.5 && !S.ms3) g.tag(926, 488, zhEn('試試右邊的 MS3', 'Try MS3 on the right'), { size: 13, color: C.ink2, align: 'right', alpha: ease(seg(t, 13.5, 14.1)) });
     },
   },
   {
-    key: 'fdr', name: '進階:誘餌資料庫與錯誤率', dur: 18, drag: true,
-    cues: [[0, '資料庫比對一定有錯配:每張譜圖都會配到分數最高的胜肽,就算產生它的胜肽不在資料庫裡。門檻以上錯了多少?'],
-      [4.5, '把每條蛋白質序列反轉當誘餌,和真的(目標)一起搜尋。誘餌的胜肽不存在,配到一定是錯的;錯配落在兩邊的機會一樣。'],
-      [9.5, '所以門檻以上,錯的目標大約和誘餌一樣多:錯誤發現率 FDR ≈ 誘餌數 ÷ 目標數。門檻越低,鑑定越多,FDR 也越高。'],
-      [13.5, 'q 值是讓這一筆被接受的最低 FDR;常用 1% 當門檻。可以拖動門檻,或按右邊的「設在 FDR 1%」。']],
+    key: 'fdr', name: zhEn('進階:誘餌資料庫與錯誤率', 'Advanced: decoys and error rates'), dur: 18, drag: true,
+    cues: [[0, zhEn('資料庫比對一定有錯配:每張譜圖都會配到分數最高的胜肽,就算產生它的胜肽不在資料庫裡。門檻以上錯了多少?', 'Every spectrum gets a best match, even if its peptide is not in the database, so some are wrong. How many above the threshold?')],
+      [4.5, zhEn('把每條蛋白質序列反轉當誘餌,和真的(目標)一起搜尋。誘餌的胜肽不存在,配到一定是錯的;錯配落在兩邊的機會一樣。', 'Reversed sequences serve as decoys alongside the real targets. Decoy peptides do not exist, so decoy hits are wrong; errors split evenly.')],
+      [9.5, zhEn('所以門檻以上,錯的目標大約和誘餌一樣多:錯誤發現率 FDR ≈ 誘餌數 ÷ 目標數。門檻越低,鑑定越多,FDR 也越高。', 'So above the threshold, wrong targets ≈ decoys: false discovery rate FDR ≈ decoys ÷ targets. Lower thresholds give more hits and higher FDR.')],
+      [13.5, zhEn('q 值是讓這一筆被接受的最低 FDR;常用 1% 當門檻。可以拖動門檻,或按右邊的「設在 FDR 1%」。', 'The q-value is the lowest FDR that accepts a match; 1% is a common cutoff. Drag the threshold or press "Set to 1% FDR".')]],
     pointer(type, x, y, S) {
       if (type === 'up' || (type === 'move' && !fdrDrag)) { if (type === 'up') fdrDrag = false; return false; }
       if (type === 'down') { if (x < FDA.x - 10 || x > FDA.x + FDA.w + 10 || y < FDA.y - 10 || y > FDA.y + FDA.h + 10) return false; fdrDrag = true; }
@@ -1010,15 +1032,15 @@ const chapters = [
         for (let i = 0; i < 30; i++) g.text(176 + i * cw, y, seq[i], { size: 16, weight: 600, mono: true, color: seq[i] === 'K' || seq[i] === 'R' ? C.amber : C.ink, alpha: a });
         g.text(176 + 30 * cw + 4, y, '…', { size: 16, color: C.ink2, alpha: a });
       };
-      seqRow(44, '目標', P.seq, C.ink, 1);
+      seqRow(44, zhEn('目標', 'Target'), P.seq, C.ink, 1);
       const da = ease(seg(t, 4.5, 5.3));
       if (da > 0) {
-        seqRow(88, '誘餌(反轉)', [...P.seq].reverse().join(''), C.amber, da);
-        g.text(920, 66, '組成一樣,但不是真的蛋白質', { size: 13, color: C.ink2, align: 'right', alpha: da });
+        seqRow(88, zhEn('誘餌(反轉)', 'Decoy'), [...P.seq].reverse().join(''), C.amber, da);
+        g.text(920, 66, zhEn('組成一樣,但不是真的蛋白質', 'Reversed: same composition, not a real protein'), { size: 13, color: C.ink2, align: 'right', alpha: da });
       }
       // ---- 中:分數分布(目標在上、誘餌在下) ----
       const ym = Math.ceil(FD_BINS.max / 100) * 100;
-      const A = g.axes(FDA.x, FDA.y, FDA.w, FDA.h, { xmin: FD.lo, xmax: FD.hi, ymin: -ym, ymax: ym, xticks: [0, 1, 2, 3, 4, 5, 6], yticks: [-ym, 0, ym], fmtY: (v) => fint(Math.abs(v)), xlab: '比對分數(示意)', ylab: '譜圖數' });
+      const A = g.axes(FDA.x, FDA.y, FDA.w, FDA.h, { xmin: FD.lo, xmax: FD.hi, ymin: -ym, ymax: ym, xticks: [0, 1, 2, 3, 4, 5, 6], yticks: [-ym, 0, ym], fmtY: (v) => fint(Math.abs(v)), xlab: zhEn('比對分數(示意)', 'Match score (illustrative)'), ylab: zhEn('譜圖數', 'Spectra') });
       const ta = ease(seg(t, 0.3, 2.5)), dg = ease(seg(t, 5, 7.5)), truth = S.truth;
       for (let i = 0; i < FD_BINS.n; i++) {
         const xl = A.X(FD.lo + i * FD.bw) + 0.6, w = A.X(FD.lo + (i + 1) * FD.bw) - A.X(FD.lo + i * FD.bw) - 1.2;
@@ -1030,9 +1052,9 @@ const chapters = [
         if (dec > 0) { c.fillStyle = 'rgba(255,209,102,.75)'; c.fillRect(xl, A.Y(0), w, A.Y(-dec) - A.Y(0)); }
       }
       g.line(FDA.x, A.Y(0), FDA.x + FDA.w, A.Y(0), C.ink2, 1.4);
-      g.text(A.X(-0.9), A.Y(ym * 0.82), truth ? '目標(綠:對、紅:錯)' : '目標', { size: 14, weight: 700, color: truth ? C.mint : C.ink });
-      if (dg > 0) g.text(A.X(-0.9), A.Y(-ym * 0.82), '誘餌(一定是錯的)', { size: 14, weight: 700, color: C.amber, alpha: dg });
-      if (t < 9.5) g.tag(A.X(4.6), A.Y(ym * 0.55), '高分的有對有錯', { size: 14, color: C.ink2, alpha: ease(seg(t, 1.5, 2.3)) });
+      g.text(A.X(-0.9), A.Y(ym * 0.82), truth ? zhEn('目標(綠:對、紅:錯)', 'Targets (green: right, red: wrong)') : zhEn('目標', 'Targets'), { size: 14, weight: 700, color: truth ? C.mint : C.ink });
+      if (dg > 0) g.text(A.X(-0.9), A.Y(-ym * 0.82), zhEn('誘餌(一定是錯的)', 'Decoys (always wrong)'), { size: 14, weight: 700, color: C.amber, alpha: dg });
+      if (t < 9.5) g.tag(A.X(4.6), A.Y(ym * 0.55), zhEn('高分的有對有錯', 'High scores: right and wrong'), { size: 14, color: C.ink2, alpha: ease(seg(t, 1.5, 2.3)) });
       // ---- 門檻與讀值 ----
       const thA = ease(seg(t, 9.5, 10.3));
       const px = 708, r = atThr(S.thr);
@@ -1042,19 +1064,19 @@ const chapters = [
         c.fillStyle = 'rgba(165,243,205,.07)'; c.fillRect(xt, FDA.y, FDA.x + FDA.w - xt, FDA.h);
         g.line(xt, FDA.y - 6, xt, FDA.y + FDA.h, C.mint, 2.4);
         g.rrect(xt - 7, FDA.y - 16, 14, 16, 4, C.mint);
-        g.text(xt + 12, FDA.y - 8, '拖動', { size: 12, color: C.muted });
+        g.text(xt + 12, FDA.y - 8, zhEn('拖動', 'Drag'), { size: 12, color: C.muted });
         if (t > 13.5) { const x1 = A.X(FDR1); g.line(x1, A.Y(0) - 8, x1, A.Y(0) + 8, C.lav, 3); g.text(x1, A.Y(0) + 20, '1%', { size: 13, weight: 700, color: C.lav, align: 'center' }); }
-        g.text(px, 168, `門檻:分數 ≥ ${S.thr.toFixed(2)}`, { size: 17, weight: 700, color: C.ink });
-        g.text(px, 202, `目標 ${fint(r.T)}`, { size: 16, color: C.ink });
-        g.text(px, 230, `誘餌 ${fint(r.D)}`, { size: 16, color: C.amber });
+        g.text(px, 168, zhEn(`門檻:分數 ≥ ${S.thr.toFixed(2)}`, `Threshold: score ≥ ${S.thr.toFixed(2)}`), { size: 17, weight: 700, color: C.ink });
+        g.text(px, 202, zhEn(`目標 ${fint(r.T)}`, `Targets ${fint(r.T)}`), { size: 16, color: C.ink });
+        g.text(px, 230, zhEn(`誘餌 ${fint(r.D)}`, `Decoys ${fint(r.D)}`), { size: 16, color: C.amber });
         g.text(px, 268, `FDR ≈ ${fint(r.D)} ÷ ${fint(r.T)}`, { size: 15, color: C.ink2, mono: true });
         g.text(px, 298, `= ${pctS(r.fdr)}`, { size: 22, weight: 800, color: r.fdr <= 0.01 ? C.mint : C.amber, mono: true });
-        if (t > 13.5) g.text(px, 334, `最低一筆的 q 值 ${pctS(r.q)}`, { size: 15, color: C.lav });
-        if (truth) g.text(px, 366, `其實錯了 ${fint(r.F)}(${pctS(r.fdp)})`, { size: 15, color: C.red });
+        if (t > 13.5) g.text(px, 334, zhEn(`最低一筆的 q 值 ${pctS(r.q)}`, `Weakest match: q = ${pctS(r.q)}`), { size: 15, color: C.lav });
+        if (truth) g.text(px, 366, zhEn(`其實錯了 ${fint(r.F)}(${pctS(r.fdp)})`, `Truly wrong: ${fint(r.F)} (${pctS(r.fdp)})`), { size: 15, color: C.red });
         c.restore();
       }
-      if (t > 13.5) g.text(28, 516, `q ≤ 1% 的門檻:分數 ${FDR1.toFixed(2)},接受 ${fint(atThr(FDR1).T)} 個目標`, { size: 14, color: C.lav, alpha: ease(seg(t, 13.5, 14.2)) });
-      else g.text(28, 516, `模擬 ${fint(FD.n)} 張譜圖(固定亂數種子),目標與誘餌一起搜尋`, { size: 13, color: C.muted });
+      if (t > 13.5) g.text(28, 516, zhEn(`q ≤ 1% 的門檻:分數 ${FDR1.toFixed(2)},接受 ${fint(atThr(FDR1).T)} 個目標`, `Threshold for q ≤ 1%: score ${FDR1.toFixed(2)}, ${fint(atThr(FDR1).T)} targets accepted`), { size: 14, color: C.lav, alpha: ease(seg(t, 13.5, 14.2)) });
+      else g.text(28, 516, zhEn(`模擬 ${fint(FD.n)} 張譜圖(固定亂數種子),目標與誘餌一起搜尋`, `${fint(FD.n)} simulated spectra (fixed random seed), targets and decoys searched together`), { size: 13, color: C.muted });
     },
   },
 ];
@@ -1066,19 +1088,19 @@ const L = createLesson({
   state: { prot: 0, pep: 1, series: 'y', tol: 0.05, bond: null, ratio: 4, inject: 20, interf: 30, ms3: false, thr: 2.5, truth: false },
   controls: [
     // 換蛋白質時,「跟著看的胜肽」顯示的序列由播放器重新顯示(它的 format 讀 S.prot)
-    { id: 'prot', label: '蛋白質(示意序列)', type: 'seg', options: [{ v: 0, label: '甲' }, { v: 1, label: '乙' }, { v: 2, label: '丙' }], chapters: ['digest', 'lc', 'ms1', 'msms', 'read', 'db', 'quant', 'tmt'], restart: true,
+    { id: 'prot', label: zhEn('蛋白質(示意序列)', 'Protein (made-up sequence)'), type: 'seg', options: [{ v: 0, label: zhEn('甲', 'I') }, { v: 1, label: zhEn('乙', 'II') }, { v: 2, label: zhEn('丙', 'III') }], chapters: ['digest', 'lc', 'ms1', 'msms', 'read', 'db', 'quant', 'tmt'], restart: true,
       onChange: (v, S) => { S.bond = null; } },
-    { id: 'pep', label: '跟著看的胜肽', type: 'range', min: 1, max: 4, step: 1, format: (v, S) => `${v}:${pepOf(S, v).seq}`, chapters: ['ms1', 'msms', 'read', 'db', 'quant', 'tmt'], restart: true, onChange: (v, S) => { S.bond = null; } },
-    { id: 'series', label: '讀哪一組', type: 'seg', options: [{ v: 'y', label: 'y 系列(由右讀)' }, { v: 'b', label: 'b 系列(由左讀)' }], chapters: ['read'], restart: true },
-    { id: 'tol', label: '母離子質量的容許誤差(Da)', type: 'seg', options: [{ v: 0.5, label: '±0.5' }, { v: 0.05, label: '±0.05' }, { v: 0.005, label: '±0.005' }], chapters: ['db'], restart: false },
-    { id: 'ratio', label: '兩個樣品的真實比例 B : A', type: 'seg', options: [{ v: 1, label: '1 : 1' }, { v: 2, label: '2 : 1' }, { v: 4, label: '4 : 1' }, { v: 10, label: '10 : 1' }], chapters: ['quant', 'tmt'], restart: false },
-    { id: 'inject', label: '第 2 針的進樣量(示意)', type: 'range', min: -40, max: 40, step: 10, format: (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)}%`, chapters: ['quant'], restart: false },
-    { id: 'interf', label: '共分離的干擾', type: 'range', min: 0, max: 60, step: 5, unit: '%', chapters: ['tmt'], restart: false },
-    { id: 'ms3', label: '改用第三次質譜(MS3)', type: 'toggle', chapters: ['tmt'], restart: false },
-    { id: 'thr', label: '分數門檻', type: 'range', min: 0.5, max: 5.5, step: 0.05, format: (v) => v.toFixed(2), chapters: ['fdr'], restart: false },
-    { id: 'truth', label: '顯示答案(只有模擬才知道對錯)', type: 'toggle', chapters: ['fdr'], restart: false },
+    { id: 'pep', label: zhEn('跟著看的胜肽', 'Peptide to follow'), type: 'range', min: 1, max: 4, step: 1, format: (v, S) => zhEn(`${v}:${pepOf(S, v).seq}`, `${v}: ${pepOf(S, v).seq}`), chapters: ['ms1', 'msms', 'read', 'db', 'quant', 'tmt'], restart: true, onChange: (v, S) => { S.bond = null; } },
+    { id: 'series', label: zhEn('讀哪一組', 'Series to read'), type: 'seg', options: [{ v: 'y', label: zhEn('y 系列(由右讀)', 'y, from the right') }, { v: 'b', label: zhEn('b 系列(由左讀)', 'b, from the left') }], chapters: ['read'], restart: true },
+    { id: 'tol', label: zhEn('母離子質量的容許誤差(Da)', 'Precursor mass tolerance (Da)'), type: 'seg', options: [{ v: 0.5, label: '±0.5' }, { v: 0.05, label: '±0.05' }, { v: 0.005, label: '±0.005' }], chapters: ['db'], restart: false },
+    { id: 'ratio', label: zhEn('兩個樣品的真實比例 B : A', 'True ratio of the samples, B : A'), type: 'seg', options: [{ v: 1, label: '1 : 1' }, { v: 2, label: '2 : 1' }, { v: 4, label: '4 : 1' }, { v: 10, label: '10 : 1' }], chapters: ['quant', 'tmt'], restart: false },
+    { id: 'inject', label: zhEn('第 2 針的進樣量(示意)', 'Run 2 injection amount (illustrative)'), type: 'range', min: -40, max: 40, step: 10, format: (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)}%`, chapters: ['quant'], restart: false },
+    { id: 'interf', label: zhEn('共分離的干擾', 'Co-isolated interference'), type: 'range', min: 0, max: 60, step: 5, unit: '%', chapters: ['tmt'], restart: false },
+    { id: 'ms3', label: zhEn('改用第三次質譜(MS3)', 'Use a third stage (MS3)'), type: 'toggle', chapters: ['tmt'], restart: false },
+    { id: 'thr', label: zhEn('分數門檻', 'Score threshold'), type: 'range', min: 0.5, max: 5.5, step: 0.05, format: (v) => v.toFixed(2), chapters: ['fdr'], restart: false },
+    { id: 'truth', label: zhEn('顯示答案(只有模擬才知道對錯)', 'Show the answer (only a simulation knows)'), type: 'toggle', chapters: ['fdr'], restart: false },
     // 門檻設成 q ≤ 1% 的最低分數本身(滑桿只顯示到小數 2 位;之後再拖滑桿才會跳到 0.05 的倍數)
-    { id: 'fdr1', label: '設在 FDR 1%', type: 'button', onClick: (S) => { S.thr = FDR1; }, chapters: ['fdr'] },
+    { id: 'fdr1', label: zhEn('設在 FDR 1%', 'Set to 1% FDR'), type: 'button', onClick: (S) => { S.thr = FDR1; }, chapters: ['fdr'] },
   ],
 });
 // 資料庫在瀏覽器閒下來時先產生,到最後一章就不用等

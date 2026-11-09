@@ -52,6 +52,9 @@ export function uiScale() {
   return v > 1 ? v : 1;
 }
 
+// 中英切換(assets/i18n.js,2026-11-06);沒有載入 i18n.js 時(測試)一律中文
+const zhEn = globalThis.zhEn ?? ((zh) => zh);
+
 export function createQualityControls({ host, onChange }) {
   let saved;
   try { saved = localStorage.getItem('instrument-render-quality'); } catch { /* optional */ }
@@ -59,9 +62,9 @@ export function createQualityControls({ host, onChange }) {
   const pacer = new FramePacer();
   const label = document.createElement('label');
   label.className = 'quality-control';
-  const caption = document.createElement('span'); caption.textContent = '畫質';
-  const select = document.createElement('select'); select.setAttribute('aria-label', '3D 畫質');
-  for (const [value, text] of [['auto', '自動'], ['smooth', '流暢'], ['full', '完整']]) {
+  const caption = document.createElement('span'); caption.textContent = zhEn('畫質', 'Quality');
+  const select = document.createElement('select'); select.setAttribute('aria-label', zhEn('3D 畫質', '3D quality'));
+  for (const [value, text] of [['auto', zhEn('自動', 'Auto')], ['smooth', zhEn('流暢', 'Smooth')], ['full', zhEn('完整', 'Full')]]) {
     const option = document.createElement('option'); option.value = value; option.textContent = text; select.append(option);
   }
   select.value = budget.mode;
@@ -69,8 +72,8 @@ export function createQualityControls({ host, onChange }) {
   label.append(caption, select);
   document.querySelector(host).append(label);
   const sync = () => {
-    select.options[0].textContent = budget.level === 'smooth' && budget.mode === 'auto' ? '自動・流暢' : '自動';
-    label.title = '自動會依播放狀況降低特效；流暢優先保留旋轉與動畫；完整保留陰影與後製。';
+    select.options[0].textContent = budget.level === 'smooth' && budget.mode === 'auto' ? zhEn('自動・流暢', 'Auto · smooth') : zhEn('自動', 'Auto');
+    label.title = zhEn('自動會依播放狀況降低特效；流暢優先保留旋轉與動畫；完整保留陰影與後製。', 'Auto turns effects down when playback struggles; Smooth keeps rotation and motion fluid; Full keeps shadows and post-processing.');
   };
   select.addEventListener('change', () => {
     budget.setMode(select.value);

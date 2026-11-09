@@ -369,6 +369,14 @@ DPPH 與福林酚的吸收帶比 4 nm 寬很多，換波長寬度幾乎看不出
 - 桌機小螢幕（寬 981 到 1279 px，或寬 981 px 以上且高不到 900 px，例如 1024×768、1366×768）：CSS 收起導言 `.lede`、譜圖 `#plot` 改成 120 px 高；`render()` 在 `mp.applyView(camera)` 沒有接手時呼叫 `fv.apply(camera)`（`../assets/free-view.js`，`fv` 在 `render()` 前一行建立），把投影中心移到 `.hud`、`#ctl`、`#console`、`#help` 之間最大的空地，空地小時稍微拉遠（`camera.zoom` 最小 0.72），約 0.3 秒移到位；導覽與影片（`tour.on`、`FILM`）不作用。1280×900 以上（含 1080P 與放大後的 2K、4K）畫面和原本相同。
 - 修改時：新的面板要加進 zoom 那一行，會擋到 3D 的也加進 `createFreeView` 的 `panels`；`scripts/check-ui-scale.mjs` 會檢查 vw、vh 有沒有除以 `--ui`、`fv` 有沒有接上。改完在 1024×768、1920×1080、2560×1440、3840×2160 各看一次。
 
+## 英文版（2026-11-06）
+
+- 做法見 `docs/I18N.md`。這一頁是 3D 教材的範本：標題、導言、讀值卡、控制面板、說明框的標題用 `data-en`；說明框的清單與小字各是一組 `lang="zh-Hant"` 與 `lang="en"`；程式裡的字一律 `zhEn('中文', 'English')`，包括元件標籤（`label()` 的名稱與小字、`labelText()`）、牆上小螢幕的字、導覽字幕 `CAPS`、片頭與片尾字卡、說明框的句子、圖例、提示框與「掃描／停止」。
+- 樣品的資料多了 `inText`：英文說明框的句子要寫成「the DPPH solution」這種形式，中文和 `name` 相同。
+- 導覽的英文字幕不放慢，照每一句的時間窗寫，每秒不超過約 17 個字母；外殼的兩個選項英文寫 Closed／Open（Assembled／Exploded 太寬，1024×768 時控制面板會蓋到標題）。
+- 只有英文的樣式：標題 `.k` 一般 24 px、影片裡 28 px，`.big` 影片裡 46 px（`html[lang="en"]` 開頭的三行，放在 `html.film .hud .big` 後面；手機照原本的 `html.mp`）。光譜圖左上的「Absorbance」比左邊的留白寬，改成從左上角往右寫（`zhEn(Lp - 7, 2)`）。
+- 改完跑 `node scripts/check-i18n.mjs --list uv-vis/index.html` 與 `node scripts/check-i18n-film.mjs uv-vis`（影片每秒一格比對中英的字有沒有超出視窗、疊在一起、字幕太快，再看一般模式四種尺寸）。
+
 ## 修改後要檢查
 
 - 手機尺寸（390×844 與 844×390，觸控）：兩條細條有名稱與內容說明、預設收起、點了展開；按「掃描」光譜自動展開；說明框在標題下方；導覽中細條藏起來，結束後回到原本的狀態；詳見 `docs/VALIDATION.md` 的「手機版面板收合」。

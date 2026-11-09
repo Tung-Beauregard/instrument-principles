@@ -2,9 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1111">
-<title>族群遺傳與產地鑑定:從等位基因頻率追查木材產地</title>
+<title data-en="Population genetics and tracing origin: finding where timber came from">族群遺傳與產地鑑定:從等位基因頻率追查木材產地</title>
 <meta name="description" content="用動畫看等位基因頻率與期望異質度、哈溫平衡與近親係數 F、Fst 與基因流、STRUCTURE 分群與 ΔK,以及用指派檢定與排除檢定推回木材的產地。可以自己調取樣棵數、p 與 F、兩群的差異、每代移入數、K、木材樣品與位點數。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="儀器原理">
@@ -22,47 +23,55 @@
 <link rel="stylesheet" href="../assets/mobile-panels.css">
 </head>
 <body>
-<a class="skip-link" href="#main">跳到動畫</a>
-<div class="nav-wrap"><nav class="sitenav" aria-label="生化進階"><a href="../">← 儀器入口</a><a href="../transcriptomics/">轉錄體分析</a><a href="../terpenoid-precursors/">萜類前驅物</a><a href="../enzyme-kinetics/">酵素動力學</a><a href="./" aria-current="page">族群遺傳</a><a href="../phylogenetics/">演化樹</a><a href="../gene-function/">基因功能驗證</a></nav></div>
+<a class="skip-link" href="#main" data-en="Skip to the animation">跳到動畫</a>
+<div class="nav-wrap"><nav class="sitenav" aria-label="生化進階" data-en-aria-label="Advanced biochemistry"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../transcriptomics/" data-en="Transcriptomics">轉錄體分析</a><a href="../terpenoid-precursors/" data-en="Terpenoid precursors">萜類前驅物</a><a href="../enzyme-kinetics/" data-en="Enzyme kinetics">酵素動力學</a><a href="./" aria-current="page" data-en="Population genetics">族群遺傳</a><a href="../phylogenetics/" data-en="Phylogenetic trees">演化樹</a><a href="../gene-function/" data-en="Gene function">基因功能驗證</a></nav></div>
 <header class="top wrap">
-  <h1>族群遺傳與產地鑑定 <span class="k">從等位基因頻率追查木材產地</span></h1>
-  <p class="lede">一棵樹的基因型只說明它自己;把一群樹的等位基因頻率算出來,才看得出族群有沒有近親交配、族群之間差多少、彼此有沒有基因流,也才能回答查獲的木材在哪一個產區出現的機率最高,以及其他產區能不能排除。</p>
+  <h1><span data-en="Population genetics and tracing origin">族群遺傳與產地鑑定</span> <span class="k" data-en="Track timber from allele frequencies">從等位基因頻率追查木材產地</span></h1>
+  <p class="lede" data-en="The genotype of one tree says only what that tree is. Allele frequencies for a whole group of trees show whether the population is inbreeding, how far apart populations are and whether genes flow between them, and they are what lets you answer which region a seized piece of timber most likely came from, and which regions can be ruled out.">一棵樹的基因型只說明它自己;把一群樹的等位基因頻率算出來,才看得出族群有沒有近親交配、族群之間差多少、彼此有沒有基因流,也才能回答查獲的木材在哪一個產區出現的機率最高,以及其他產區能不能排除。</p>
 </header>
 <main id="main" class="wrap lesson">
   <section class="player">
     <div class="screen">
-      <div class="stage-box"><canvas id="stage" role="img" aria-label="族群遺傳動畫"></canvas></div>
+      <div class="stage-box"><canvas id="stage" role="img" aria-label="族群遺傳動畫" data-en-aria-label="Population genetics animation"></canvas></div>
       <div class="cap" id="cap" aria-live="polite"><div class="cap-h"><span class="cap-no"></span><span class="cap-ch"></span></div><span class="cap-tx"></span></div>
     </div>
     <div class="bar">
-      <button class="pb" id="btnPrev" type="button" aria-label="上一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
-      <button class="pb" id="btnPlay" type="button" aria-label="播放" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl">播放</span></button>
-      <button class="pb" id="btnNext" type="button" aria-label="下一章"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
-      <div id="prog" role="group" aria-label="章節進度"></div>
+      <button class="pb" id="btnPrev" type="button" aria-label="上一章" data-en-aria-label="Previous chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+      <button class="pb" id="btnPlay" type="button" aria-label="播放" data-en-aria-label="Play" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2l10 6-10 6z"/></svg><svg class="i-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg><span class="lbl" data-en="Play">播放</span></button>
+      <button class="pb" id="btnNext" type="button" aria-label="下一章" data-en-aria-label="Next chapter"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+      <div id="prog" role="group" aria-label="章節進度" data-en-aria-label="Chapter progress"></div>
       <span id="chName"></span>
-      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
+      <button class="pb" id="btnFs" type="button" aria-label="全螢幕" data-en-aria-label="Full screen" aria-pressed="false" hidden><svg class="i-in" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M2.5 10H6v3.5"/></svg></button>
     </div>
   </section>
   <aside class="side">
-    <section class="box" id="ops" aria-label="自己調整"><h2>自己調整</h2><div class="ops-body"></div></section>
-    <section class="box" aria-label="章節"><h2>章節</h2><ol id="chapters"></ol></section>
+    <section class="box" id="ops" aria-label="自己調整" data-en-aria-label="Try it yourself"><h2 data-en="Try it yourself">自己調整</h2><div class="ops-body"></div></section>
+    <section class="box" aria-label="章節" data-en-aria-label="Chapters"><h2 data-en="Chapters">章節</h2><ol id="chapters"></ol></section>
   </aside>
 </main>
-<section class="notes wrap" aria-label="重點整理與資料來源">
+<section class="notes wrap" aria-label="重點整理與資料來源" data-en-aria-label="Key points and sources">
   <div>
-    <h2>重點整理</h2>
-    <p class="pre">先看:<a href="../dna-markers/">DNA 鑑定</a>(SSR、基因型與 DNA 指紋)。</p>
-    <ul>
+    <h2 data-en="Key points">重點整理</h2>
+    <p class="pre" lang="zh-Hant">先看:<a href="../dna-markers/">DNA 鑑定</a>(SSR、基因型與 DNA 指紋)。</p>
+    <p class="pre" lang="en">First: <a href="../dna-markers/">DNA markers</a> (SSRs, genotypes and DNA fingerprints).</p>
+    <ul lang="zh-Hant">
       <li>等位基因頻率 p = 這個等位基因出現的次數 ÷ 2N;期望異質度 He = 1 − Σpᵢ²,樣本小時要乘 2N/(2N − 1)。每個族群取樣 25 到 30 個,頻率就估得夠準。</li>
       <li>哈溫平衡下三種基因型是 p²、2pq、q²;近親交配時異型合子變成 2pq(1 − F),近親係數 F = 1 − Ho/He。兩群混在一起算(Wahlund 效應)與無效等位基因也會讓 Ho 比 He 少:看是所有位點一起偏高,還是只有少數位點。</li>
       <li>Fst = (Ht − Hs)/Ht 是遺傳多樣性裡由族群間頻率差異造成的比例;實際資料常用 Weir 與 Cockerham 的 θ,把取樣誤差算進去。島嶼模型下 Fst ≈ 1/(4Nm + 1),但由 Fst 反推遷移數要先確認假設是否成立。</li>
       <li>STRUCTURE 假設有 K 群,每棵樹的長條是它來自各群的比例 q;K 用 ln P(D) 與 Evanno 的 ΔK 輔助判斷,ΔK 算不出 K = 1、常只抓到最上層,最後要選能說明主要結構的最小 K。</li>
       <li>指派檢定算多位點基因型在每個參考產區出現的機率(同型 p²、異型 2pq,取 log 相加);相對分數四區加起來一定是 100%,所以要再做排除檢定(模擬個體,p &lt; 0.01 就排除),確認木材的基因型在那一區並不罕見。</li>
     </ul>
+    <ul lang="en">
+      <li>An allele frequency is p = how often that allele turns up ÷ 2N; the expected heterozygosity is He = 1 − Σpᵢ², multiplied by 2N/(2N − 1) when the sample is small. Sampling 25 to 30 individuals per population estimates the frequencies well enough.</li>
+      <li>Under Hardy–Weinberg the three genotypes come in the proportions p², 2pq and q². With inbreeding, heterozygotes become 2pq(1 − F), where the inbreeding coefficient is F = 1 − Ho/He. Pooling two groups (the Wahlund effect) and null alleles also leave Ho below He: look at whether every locus is high or only a few are.</li>
+      <li>Fst = (Ht − Hs)/Ht is the share of the genetic diversity that comes from frequency differences between populations; real data usually use the θ of Weir and Cockerham, which allows for sampling error. Under the island model Fst ≈ 1/(4Nm + 1), but check the assumptions before turning an Fst into a number of migrants.</li>
+      <li>STRUCTURE assumes K groups, and the bar for each tree is the share q it draws from each group. K is judged with the help of ln P(D) and the ΔK of Evanno; ΔK cannot be worked out for K = 1 and often catches only the top level, so in the end pick the smallest K that explains the main structure.</li>
+      <li>An assignment test works out the probability of a multilocus genotype in each reference region (p² for a homozygote, 2pq for a heterozygote, added up as logarithms). The relative scores always add to 100% across the four regions, so an exclusion test has to follow (simulate individuals; exclude at p &lt; 0.01) to show that the genotype of the timber is not rare in that region.</li>
+    </ul>
   </div>
   <div class="src">
-    <h2>資料來源</h2>
-    <ul>
+    <h2 data-en="Sources">資料來源</h2>
+    <ul lang="zh-Hant">
       <li>Huang CJ, et al. SSR individual identification system construction and population genetics analysis for <i>Chamaecyparis formosensis</i>. Sci Rep. 2022;12:4126. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8904461/">PMC8904461</a>(紅檜 4 區 92 棵、36 個 SSR:各區 Fis 0.132 到 0.242、23 個位點偏離哈溫平衡;兩兩 Fst 0.035 到 0.074、Nm 3.141 到 6.832;STRUCTURE 以 ΔK 選 K = 3;GeneClass 自我指派 81/92 正確,GW 16/23);Huang CJ, et al. Sci Rep. 2020;10:22095. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7744516/">PMC7744516</a>(臺灣扁柏乾燥木材 22 件 7 件驗出)</li>
       <li>Holsinger KE, Weir BS. Genetics in geographically structured populations: defining, estimating and interpreting F<sub>ST</sub>. Nat Rev Genet. 2009;10:639–650. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4687486/">PMC4687486</a>;Holsinger KE. EEB 5348 Population Genetics 講義(<a href="https://darwin.eeb.uconn.edu/eeb348-notes/inbreeding.pdf">Inbreeding</a>、<a href="https://darwin.eeb.uconn.edu/eeb348-notes/genetic-structure.pdf">Genetic structure</a>)(p² + Fpq、2pq(1 − F)、F = 1 − Ho/He、自交平衡 F = s/(2 − s)、Wahlund 效應、Fst = (Ht − Hs)/Ht、樣本 He 乘 n/(n − 1)、θ 納入取樣誤差、島嶼模型 Fst ≈ 1/(4Nm + 1))</li>
       <li>Weir BS, Cockerham CC. Estimating F-statistics for the analysis of population structure. Evolution. 1984;38:1358–1370. <a href="https://doi.org/10.1111/j.1558-5646.1984.tb05657.x">doi:10.1111/j.1558-5646.1984.tb05657.x</a>;Whitlock MC, McCauley DE. Indirect measures of gene flow and migration: F<sub>ST</sub> ≠ 1/(4Nm+1). Heredity. 1999;82:117–125(島嶼模型的假設很少成立,不宜把 Fst 直接換成遷移數)</li>
@@ -72,9 +81,19 @@
       <li>Degen B, et al. Verifying the geographic origin of mahogany (<i>Swietenia macrophylla</i> King) with DNA-fingerprints. Forensic Sci Int Genet. 2013;7:55–62. <a href="https://doi.org/10.1016/j.fsigen.2012.06.003">doi:10.1016/j.fsigen.2012.06.003</a>(31 個林分、1,971 棵、6 個 SSR,遺傳與地理距離 r = 0.82,木材指派回正確國家);Dormontt EE, et al. Forensic timber identification: It's time to integrate disciplines to combat illegal logging. Biol Conserv. 2015;191:790–798. <a href="https://doi.org/10.1016/j.biocon.2015.06.038">doi:10.1016/j.biocon.2015.06.038</a>(木材解剖、化學、同位素與 DNA 方法要整合,並收集參考材料)</li>
       <li>動畫裡的族群(A 到 E 區)、等位基因頻率、樹的基因型、三件木材、近親與混群與無效等位基因的數值、島嶼模型的模擬、每個 K 的 ln P(D) 都是示意值,由固定種子的亂數與公式算出,不是任何實驗的結果;紅檜與桃花心木的數字取自上面的論文。</li>
     </ul>
+    <ul lang="en">
+      <li>Huang CJ, et al. SSR individual identification system construction and population genetics analysis for <i>Chamaecyparis formosensis</i>. Sci Rep. 2022;12:4126. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8904461/">PMC8904461</a> (Taiwan red cypress, 92 trees from 4 regions, 36 SSRs: Fis 0.132 to 0.242 by region, 23 loci departing from Hardy–Weinberg; pairwise Fst 0.035 to 0.074, Nm 3.141 to 6.832; STRUCTURE with ΔK choosing K = 3; GeneClass self-assignment correct for 81/92, GW 16/23); Huang CJ, et al. Sci Rep. 2020;10:22095. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7744516/">PMC7744516</a> (7 of 22 dried pieces of Taiwan hinoki timber typed)</li>
+      <li>Holsinger KE, Weir BS. Genetics in geographically structured populations: defining, estimating and interpreting F<sub>ST</sub>. Nat Rev Genet. 2009;10:639–650. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4687486/">PMC4687486</a>; Holsinger KE. EEB 5348 Population Genetics lecture notes (<a href="https://darwin.eeb.uconn.edu/eeb348-notes/inbreeding.pdf">Inbreeding</a>, <a href="https://darwin.eeb.uconn.edu/eeb348-notes/genetic-structure.pdf">Genetic structure</a>) (p² + Fpq, 2pq(1 − F), F = 1 − Ho/He, the equilibrium F = s/(2 − s) under partial selfing, the Wahlund effect, Fst = (Ht − Hs)/Ht, sample He multiplied by n/(n − 1), θ allowing for sampling error, the island model Fst ≈ 1/(4Nm + 1))</li>
+      <li>Weir BS, Cockerham CC. Estimating F-statistics for the analysis of population structure. Evolution. 1984;38:1358–1370. <a href="https://doi.org/10.1111/j.1558-5646.1984.tb05657.x">doi:10.1111/j.1558-5646.1984.tb05657.x</a>; Whitlock MC, McCauley DE. Indirect measures of gene flow and migration: F<sub>ST</sub> ≠ 1/(4Nm+1). Heredity. 1999;82:117–125 (the assumptions of the island model rarely hold, so an Fst should not be turned straight into a number of migrants)</li>
+      <li>Pritchard JK, et al. Inference of population structure using multilocus genotype data. Genetics. 2000;155:945–959. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1461096/">PMC1461096</a>; <a href="https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/structure_doc.pdf">STRUCTURE 2.3 documentation</a> (Hardy–Weinberg and linkage equilibrium within groups, q as the share from each group, estimates of K are only approximate, pick the smallest K that explains the main structure, inbreeding and null alleles push K up); Evanno G, et al. Mol Ecol. 2005;14:2611–2620 (ΔK); Janes JK, et al. Mol Ecol. 2017;26:3594–3602 (54% of studies using ΔK picked K = 2)</li>
+      <li>Rannala B, Mountain JL. Detecting immigration by using multilocus genotypes. PNAS. 1997;94:9197–9201. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC23111/">PMC23111</a> (the Dirichlet(1/k) prior, equation 9 for the genotype probability, loci multiplied together); Cornuet JM, et al. Genetics. 1999;153:1989–2000 (exclusion tests; about 10 loci, 30 to 50 individuals per region and an Fst near 0.1 can get almost every assignment right); Piry S, et al. J Hered. 2004;95:536–539 (GeneClass2: 1,000 simulated individuals and α = 0.01 by default)</li>
+      <li>Chapuis MP, Estoup A. Mol Biol Evol. 2007;24:621–631 (null alleles come from mutations where the primer binds); Van Oosterhout C, et al. Mol Ecol Notes. 2006;6:255–256 (Fis across several loci separates null alleles from inbreeding); Hale ML, et al. PLoS ONE. 2012;7:e45170. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3440332/">PMC3440332</a> (25 to 30 individuals per population)</li>
+      <li>Degen B, et al. Verifying the geographic origin of mahogany (<i>Swietenia macrophylla</i> King) with DNA-fingerprints. Forensic Sci Int Genet. 2013;7:55–62. <a href="https://doi.org/10.1016/j.fsigen.2012.06.003">doi:10.1016/j.fsigen.2012.06.003</a> (31 stands, 1,971 trees, 6 SSRs; genetic and geographic distance r = 0.82; the timber was assigned back to the right country); Dormontt EE, et al. Forensic timber identification: It is time to integrate disciplines to combat illegal logging. Biol Conserv. 2015;191:790–798. <a href="https://doi.org/10.1016/j.biocon.2015.06.038">doi:10.1016/j.biocon.2015.06.038</a> (wood anatomy, chemistry, isotopes and DNA methods should be combined, and reference material collected)</li>
+      <li>The populations in the animation (regions A to E), the allele frequencies, the genotypes of the trees, the three pieces of timber, the values for inbreeding, pooling and null alleles, the island-model simulation and the ln P(D) for each K are all illustrative, produced by formulas and random numbers from fixed seeds, not the result of any experiment; the numbers for red cypress and mahogany come from the papers above.</li>
+    </ul>
   </div>
 </section>
-<footer class="site wrap">生化進階・<a href="../">回儀器入口</a></footer>
+<footer class="site wrap"><span lang="zh-Hant">生化進階・<a href="../">回儀器入口</a></span><span lang="en">Advanced biochemistry · <a href="../">Back to all lessons</a></span></footer>
 <script type="module">
 import { createLesson } from '../assets/bio-lesson.js';
 import { C, seg, ease, clamp, lerp, rng } from '../assets/bio-draw.js';
@@ -107,7 +126,7 @@ function timber(g, x, y, s = 1) {
   c.restore();
 }
 // 產區的小標籤:色塊上寫「A 區」(左緣對齊 x,傳回寬度)
-function chip(g, x, y, k, { size = 14, label = `${k} 區` } = {}) {
+function chip(g, x, y, k, { size = 14, label = zhEn(`${k} 區`, `Region ${k}`) } = {}) {
   g.font(size, 700);
   const w = g.ctx.measureText(label).width + 16, h = size * g.boost + 10;
   g.rrect(x, y - h / 2, w, h, h / 2, POPCOL[k]);
@@ -210,7 +229,7 @@ const DEFICIT = {
 const PBAR = [0.3, 0.25, 0.2, 0.15, 0.1], DELTA = [0.28, -0.2, 0.12, -0.12, -0.08], BP4 = [152, 156, 160, 164, 168];
 const twoPops = (d) => [PBAR.map((p, i) => p + d * DELTA[i]), PBAR.map((p, i) => p - d * DELTA[i])];
 // 紅檜 4 區兩兩的 Fst(Huang 2022 的 Table 5)
-const HUANG_AREAS = [['MM', '西南'], ['HV', '西北'], ['GW', '西北'], ['SY', '東部']];
+const HUANG_AREAS = [['MM', zhEn('西南', 'SW')], ['HV', zhEn('西北', 'NW')], ['GW', zhEn('西北', 'NW')], ['SY', zhEn('東部', 'E')]];
 const HUANG_FST = { 'MM-HV': 0.074, 'MM-GW': 0.059, 'MM-SY': 0.062, 'HV-GW': 0.035, 'HV-SY': 0.065, 'GW-SY': 0.056 };
 
 // ---------- 第 5 章:島嶼模型。8 個族群、每個 25 棵,每代每個族群有 m 比例的個體從移入池(全部族群的平均)來,再隨機漂變 ----------
@@ -330,23 +349,23 @@ function simOf(k) {
 }
 function pOf(k, nl, obs) { const cum = simOf(k); let c = 0; for (let i = 0; i < NSIM; i++) if (cum[i * (NL + 1) + nl] <= obs + 1e-9) c++; return c / NSIM; }
 // 查獲的三件木材(示意):1 來自 A、2 來自 C(和 B 很像)、3 來自沒有取樣的 E
-const WOODS = [{ name: '木材 1', src: 'A', seed: 31 }, { name: '木材 2', src: 'C', seed: 34 }, { name: '木材 3', src: 'E', seed: 638 }].map((w) => ({ ...w, g: genoOf(srng(w.seed), POP[w.src]) }));
+const WOODS = [{ name: zhEn('木材 1', 'Timber 1'), src: 'A', seed: 31 }, { name: zhEn('木材 2', 'Timber 2'), src: 'C', seed: 34 }, { name: zhEn('木材 3', 'Timber 3'), src: 'E', seed: 638 }].map((w) => ({ ...w, g: genoOf(srng(w.seed), POP[w.src]) }));
 
 // ---------- 第 8 章:紅檜 4 區的自我指派(Huang 2022 的 Table 6:正確棵數 / 取樣棵數) ----------
-const HUANG_ASSIGN = [['MM', '西南', 19, 20], ['HV', '西北', 22, 25], ['GW', '西北', 16, 23], ['SY', '東部', 24, 24]];
+const HUANG_ASSIGN = [['MM', zhEn('西南', 'SW'), 19, 20], ['HV', zhEn('西北', 'NW'), 22, 25], ['GW', zhEn('西北', 'NW'), 16, 23], ['SY', zhEn('東部', 'E'), 24, 24]];
 
 let touchedF = false, touchedLoci = false; // 這一章動過控制項後,改用控制項的值(不再跑開場的動畫)
 
 const chapters = [
   {
-    key: 'frequency', name: '從一棵棵樹到等位基因頻率', dur: 15,
-    cues: [[0, '一個林分裡每棵樹在一個 SSR 位點有兩個等位基因,N 棵樹一共 2N 個;族群遺傳就從數這些等位基因開始。'],
-      [4.5, '某個長度出現的次數除以 2N 就是它的頻率 p;期望異質度 He = 1 − Σp²,是隨機抽兩個等位基因不一樣的機率。'],
-      [9.5, '樣本越小,頻率的誤差棒越長,He 也偏低,要乘 2N/(2N − 1) 修正;一般建議每個族群取樣 25 到 30 個。']],
+    key: 'frequency', name: zhEn('從一棵棵樹到等位基因頻率', 'From single trees to allele frequencies'), dur: 15,
+    cues: [[0, zhEn('一個林分裡每棵樹在一個 SSR 位點有兩個等位基因,N 棵樹一共 2N 個;族群遺傳就從數這些等位基因開始。', 'Each tree in a stand has two alleles at an SSR locus, so N trees have 2N. Population genetics starts by counting them.')],
+      [4.5, zhEn('某個長度出現的次數除以 2N 就是它的頻率 p;期望異質度 He = 1 − Σp²,是隨機抽兩個等位基因不一樣的機率。', 'How often a length turns up ÷ 2N is its frequency p. Expected heterozygosity He = 1 − Σp² is the chance two random alleles differ.')],
+      [9.5, zhEn('樣本越小,頻率的誤差棒越長,He 也偏低,要乘 2N/(2N − 1) 修正;一般建議每個族群取樣 25 到 30 個。', 'Smaller samples give longer error bars and an He that runs low, so multiply by 2N/(2N − 1). Aim for 25 to 30 trees per population.')]],
     draw(g, t, S) {
       const N = S.n, tr = TREES.slice(0, N), k = KA[TL];
       // 左:林分
-      fade(g, ease(seg(t, 0, 0.6)), () => g.text(34, 32, `A 區的 ${N} 棵樹(示意)`, { size: 17, weight: 700, color: C.ink2 }));
+      fade(g, ease(seg(t, 0, 0.6)), () => g.text(34, 32, zhEn(`A 區的 ${N} 棵樹(示意)`, `${N} trees in region A (illustrative)`), { size: 17, weight: 700, color: C.ink2 }));
       const cols = N <= 10 ? 5 : N <= 30 ? 6 : 10, rows = Math.ceil(N / cols);
       const x0 = 34, y0 = 60, W = 410, H = 450, cw = W / cols, rh = N <= 10 ? Math.min(H / rows, 170) : H / rows;
       const counted = t >= 8.5 ? N : Math.floor(seg(t, 4.5, 8.5) * N + 1e-9);
@@ -370,14 +389,14 @@ const chapters = [
       tr.forEach(([a, b], i) => { full[a]++; full[b]++; if (i < counted) { cnt[a]++; cnt[b]++; } });
       const ph = full.map((c) => c / (2 * N)), tru = POP.A[TL];
       fade(g, ease(seg(t, 3.2, 4.4)), () => {
-        const A = g.axes(540, 52, 380, 230, { xmin: 0, xmax: k, ymin: 0, ymax: 0.8, yticks: [0, 0.2, 0.4, 0.6, 0.8], fmtY: (v) => v.toFixed(1), ylab: '頻率 p' });
+        const A = g.axes(540, 52, 380, 230, { xmin: 0, xmax: k, ymin: 0, ymax: 0.8, yticks: [0, 0.2, 0.4, 0.6, 0.8], fmtY: (v) => v.toFixed(1), ylab: zhEn('頻率 p', 'Frequency p') });
         const bw = (380 / k) * 0.56;
         for (let a = 0; a < k; a++) {
           const xc = A.X(a + 0.5), v = cnt[a] / (2 * N);
           if (v > 0) g.rrect(xc - bw / 2, A.Y(v), bw, A.Y(0) - A.Y(v), 3, ALC[a]);
           g.text(xc, A.Y(0) + 17, String(bpOf(TL, a)), { size: 14, color: C.ink2, align: 'center', mono: true });
         }
-        g.text(730, A.Y(0) + 40, '等位基因的長度(bp)', { size: 13, color: C.ink2, align: 'center' });
+        g.text(730, A.Y(0) + 40, zhEn('等位基因的長度(bp)', 'Allele length (bp)'), { size: 13, color: C.ink2, align: 'center' });
         const ea = ease(seg(t, 9.6, 10.6));
         if (ea > 0) fade(g, ea, () => {
           for (let a = 0; a < k; a++) {
@@ -385,28 +404,28 @@ const chapters = [
             g.line(xc, A.Y(lo), xc, A.Y(hi), C.ink, 2); g.line(xc - 7, A.Y(lo), xc + 7, A.Y(lo), C.ink, 2); g.line(xc - 7, A.Y(hi), xc + 7, A.Y(hi), C.ink, 2);
             g.line(xc - bw / 2 - 6, A.Y(tru[a]), xc + bw / 2 + 6, A.Y(tru[a]), C.red, 2.4, [5, 4]);
           }
-          g.text(918, 38, '誤差棒:95% 範圍  紅虛線:族群真值', { size: 13, color: C.ink2, align: 'right' });
+          g.text(918, 38, zhEn('誤差棒:95% 範圍  紅虛線:族群真值', 'Error bars: 95% range  Red dashes: true value'), { size: 13, color: C.ink2, align: 'right' });
         });
       });
       // 右下:數字
       const he = het(ph), hu = (he * 2 * N) / (2 * N - 1);
       fade(g, ease(seg(t, 4.6, 5.4)), () => {
         g.panel(500, 352, 430, 168, '');
-        g.text(520, 382, `2N = ${2 * N} 個等位基因;p = 次數 ÷ 2N`, { size: 15, color: C.ink2 });
+        g.text(520, 382, zhEn(`2N = ${2 * N} 個等位基因;p = 次數 ÷ 2N`, `2N = ${2 * N} alleles; p = count ÷ 2N`), { size: 15, color: C.ink2 });
         fade(g, ease(seg(t, 6.5, 7.3)), () => g.text(520, 418, `He = 1 − Σp² = ${fx(he)}`, { size: 19, weight: 700, color: C.mint, mono: true }));
         fade(g, ease(seg(t, 10.6, 11.4)), () => {
           g.text(520, 456, `× 2N/(2N − 1) = ${fx(hu)}`, { size: 17, weight: 700, color: C.amber, mono: true });
-          g.text(520, 490, `族群真值 ${fx(het(tru))}(取樣越多越接近)`, { size: 15, color: C.ink2 });
+          g.text(520, 490, zhEn(`族群真值 ${fx(het(tru))}(取樣越多越接近)`, `True value ${fx(het(tru))} (closer with more trees)`), { size: 15, color: C.ink2 });
         });
       });
     },
   },
   {
-    key: 'hardy-weinberg', name: '哈溫平衡與近親係數 F', dur: 16,
-    cues: [[0, '隨機交配時,一棵樹的兩個等位基因就像從族群裡各抽一次:抽到 A 的機率是 p,抽到 a 的是 q = 1 − p。'],
-      [4.5, '所以三種基因型的比例是 p²、2pq、q²(哈溫平衡);期望的異型合子比例 He = 2pq,p = 0.5 時最大。'],
-      [9, '近親交配(包括自交)時,兩個等位基因來自同一個祖先的機會變大:異型合子變成 2pq(1 − F),兩種同型合子各多 Fpq。'],
-      [13, '反過來,量到的異型合子比例 Ho 比 He 少多少,就是近親係數 F = 1 − Ho/He。右邊可以調 p 與 F。']],
+    key: 'hardy-weinberg', name: zhEn('哈溫平衡與近親係數 F', 'Hardy–Weinberg and the inbreeding coefficient F'), dur: 16,
+    cues: [[0, zhEn('隨機交配時,一棵樹的兩個等位基因就像從族群裡各抽一次:抽到 A 的機率是 p,抽到 a 的是 q = 1 − p。', 'With random mating, the two alleles of a tree are like two draws from the population: A with probability p, a with q = 1 − p.')],
+      [4.5, zhEn('所以三種基因型的比例是 p²、2pq、q²(哈溫平衡);期望的異型合子比例 He = 2pq,p = 0.5 時最大。', 'So the three genotypes come in the proportions p², 2pq and q²: Hardy–Weinberg. Expected heterozygotes He = 2pq peak at p = 0.5.')],
+      [9, zhEn('近親交配(包括自交)時,兩個等位基因來自同一個祖先的機會變大:異型合子變成 2pq(1 − F),兩種同型合子各多 Fpq。', 'Inbreeding, selfing included, makes shared ancestry likelier: heterozygotes drop to 2pq(1 − F), each homozygote gains Fpq.')],
+      [13, zhEn('反過來,量到的異型合子比例 Ho 比 He 少多少,就是近親係數 F = 1 − Ho/He。右邊可以調 p 與 F。', 'Turned around, how far the observed Ho falls below He gives the inbreeding coefficient F = 1 − Ho/He. Try p and F at right.')]],
     enter() { touchedF = false; },
     draw(g, t, S) {
       const p = S.p, q = 1 - p, F = touchedF ? S.f : S.f * ease(seg(t, 9, 11));
@@ -414,7 +433,7 @@ const chapters = [
       const GC = ['rgba(165,243,205,.55)', 'rgba(255,209,102,.5)', 'rgba(184,164,244,.6)'], GCS = [C.mint, C.amber, C.lav];
       // 左上:配子組合的方塊
       const sx = 92, sy = 80, sz = 214, a1 = ease(seg(t, 0.3, 2.6));
-      g.text(34, 32, '兩個等位基因各抽一次', { size: 17, weight: 700, color: C.ink2 });
+      g.text(34, 32, zhEn('兩個等位基因各抽一次', 'Two alleles, one draw each'), { size: 17, weight: 700, color: C.ink2 });
       fade(g, a1, () => {
         const P = sz * p;
         g.rrect(sx, sy, P, P, 2, GC[0]); g.rrect(sx + P, sy, sz - P, P, 2, GC[1]); g.rrect(sx, sy + P, P, sz - P, 2, GC[1]); g.rrect(sx + P, sy + P, sz - P, sz - P, 2, GC[2]);
@@ -425,7 +444,7 @@ const chapters = [
         g.text(sx - 14, sy + P + (sz - P) / 2, 'a', { size: 16, weight: 700, color: C.ink, align: 'right' });
         const lab = (x, y, w, h, s) => { if (w > 46 && h > 30) g.text(x + w / 2, y + h / 2, s, { size: 15, weight: 700, color: C.ink, align: 'center' }); };
         lab(sx, sy, P, P, 'AA'); lab(sx + P, sy, sz - P, P, 'Aa'); lab(sx, sy + P, P, sz - P, 'Aa'); lab(sx + P, sy + P, sz - P, sz - P, 'aa');
-        g.text(sx + sz / 2, sy + sz + 20, `p = ${fx(p)},q = ${fx(q)}`, { size: 15, color: C.ink2, align: 'center', mono: true });
+        g.text(sx + sz / 2, sy + sz + 20, zhEn(`p = ${fx(p)},q = ${fx(q)}`, `p = ${fx(p)}, q = ${fx(q)}`), { size: 15, color: C.ink2, align: 'center', mono: true });
       });
       // 左下:三種基因型的比例(框是哈溫平衡、實心是有近親交配時)
       fade(g, ease(seg(t, 4.6, 5.6)), () => {
@@ -437,10 +456,10 @@ const chapters = [
           g.text(x + 28, by + 16, names[i], { size: 15, weight: 700, color: C.ink2, align: 'center' });
           g.text(x + 28, by - Math.max(wf[i], hw[i]) * bh - 14, fx(wf[i]), { size: 14, color: C.ink, align: 'center', mono: true });
         }
-        g.text(34, 352, F > 0.004 ? `虛線框:哈溫平衡;實心:F = ${fx(F)}` : '三種基因型的比例', { size: 13, color: C.ink2 });
+        g.text(34, 352, F > 0.004 ? zhEn(`虛線框:哈溫平衡;實心:F = ${fx(F)}`, `Dashed: Hardy–Weinberg; solid: F = ${fx(F)}`) : zhEn('三種基因型的比例', 'The three genotype shares'), { size: 13, color: C.ink2 });
       });
       // 右上:基因型比例對 p
-      const A = g.axes(440, 54, 460, 236, { xmin: 0, xmax: 1, ymin: 0, ymax: 1, xticks: [0, 0.25, 0.5, 0.75, 1], yticks: [0, 0.5, 1], xlab: '等位基因 A 的頻率 p', ylab: '基因型的比例', fmtX: (v) => String(v), fmtY: (v) => v.toFixed(1) });
+      const A = g.axes(440, 54, 460, 236, { xmin: 0, xmax: 1, ymin: 0, ymax: 1, xticks: [0, 0.25, 0.5, 0.75, 1], yticks: [0, 0.5, 1], xlab: zhEn('等位基因 A 的頻率 p', 'Frequency p of allele A'), ylab: zhEn('基因型的比例', 'Genotype share'), fmtX: (v) => String(v), fmtY: (v) => v.toFixed(1) });
       const sweep = ease(seg(t, 4.5, 7.5));
       const curves = [[(x) => x * x, (x) => x * x + F * x * (1 - x), 'p²'], [(x) => 2 * x * (1 - x), (x) => 2 * x * (1 - x) * (1 - F), '2pq'], [(x) => (1 - x) ** 2, (x) => (1 - x) ** 2 + F * x * (1 - x), 'q²']];
       curves.forEach(([f0, f1, nm], i) => {
@@ -460,23 +479,23 @@ const chapters = [
         g.text(460, 400, `He = 2pq = ${fx(hw[1], 3)}`, { size: 19, weight: 700, color: C.amber, mono: true });
         fade(g, ease(seg(t, 9.2, 10)), () => g.text(460, 440, `Ho = 2pq(1 − F) = ${fx(wf[1], 3)}`, { size: 19, weight: 700, color: C.ink, mono: true }));
         fade(g, ease(seg(t, 13.2, 14)), () => g.text(460, 480, `F = 1 − Ho/He = ${fx(1 - wf[1] / hw[1])}`, { size: 19, weight: 700, color: C.mint, mono: true }));
-        g.text(912, 508, '多個等位基因時 He = 1 − Σpᵢ²', { size: 13, color: C.muted, align: 'right' });
+        g.text(912, 508, zhEn('多個等位基因時 He = 1 − Σpᵢ²', 'With more alleles, He = 1 − Σpᵢ²'), { size: 13, color: C.muted, align: 'right' });
       });
     },
   },
   {
-    key: 'deficit', name: 'Ho 比 He 少:三種原因', dur: 16,
-    cues: [[0, '實際資料常常 Ho 比 He 少:紅檜 4 個地區的 F 在 0.13 到 0.24,36 個位點有 23 個偏離哈溫平衡。'],
-      [4, '原因一是近親交配(例如部分自交):這是整棵樹的交配方式造成的,每個位點的 F 都差不多。'],
-      [8, '原因二是把頻率不同的兩群混在一起算(Wahlund 效應):兩群差得多的位點少得多,分開各算就消失。'],
-      [12, '原因三是無效等位基因:引子黏合處有突變、擴增不出來,只有少數位點的 F 特別高;它也會讓分群軟體多分出幾群。']],
+    key: 'deficit', name: zhEn('Ho 比 He 少:三種原因', 'Three reasons Ho falls below He'), dur: 16,
+    cues: [[0, zhEn('實際資料常常 Ho 比 He 少:紅檜 4 個地區的 F 在 0.13 到 0.24,36 個位點有 23 個偏離哈溫平衡。', 'Real data often have Ho below He: in 4 regions of Taiwan red cypress F runs 0.13 to 0.24, and 23 of 36 loci depart from Hardy–Weinberg.')],
+      [4, zhEn('原因一是近親交配(例如部分自交):這是整棵樹的交配方式造成的,每個位點的 F 都差不多。', 'One is inbreeding, such as selfing: it is how the tree mates, so F is similar at every locus.')],
+      [8, zhEn('原因二是把頻率不同的兩群混在一起算(Wahlund 效應):兩群差得多的位點少得多,分開各算就消失。', 'Another is pooling two groups of unlike frequencies (Wahlund effect): worst where they differ most, gone once split.')],
+      [12, zhEn('原因三是無效等位基因:引子黏合處有突變、擴增不出來,只有少數位點的 F 特別高;它也會讓分群軟體多分出幾群。', 'Third, null alleles: a mutation at the primer site blocks that allele, so few loci show high F; it also adds groups in clustering.')]],
     draw(g, t) {
       fade(g, ease(seg(t, 0.2, 1)), () => {
         g.panel(30, 14, 900, 78, '');
-        g.text(50, 40, '實例:紅檜 4 個地區(Huang 2022)', { size: 14, color: C.ink2 });
-        g.text(50, 70, 'F = 0.13 到 0.24;36 個位點有 23 個偏離哈溫平衡', { size: 18, weight: 700, color: C.amber });
+        g.text(50, 40, zhEn('實例:紅檜 4 個地區(Huang 2022)', 'Example: red cypress, 4 regions (Huang 2022)'), { size: 14, color: C.ink2 });
+        g.text(50, 70, zhEn('F = 0.13 到 0.24;36 個位點有 23 個偏離哈溫平衡', 'F = 0.13 to 0.24; 23 of 36 loci depart from Hardy–Weinberg'), { size: 18, weight: 700, color: C.amber });
       });
-      const panels = [['inbreed', '近親交配', 4, '每個位點都差不多'], ['wahlund', '兩群混在一起算', 8, '差得多的位點才高'], ['null', '無效等位基因', 12, '只有少數位點特別高']];
+      const panels = [['inbreed', zhEn('近親交配', 'Inbreeding'), 4, zhEn('每個位點都差不多', 'Much the same at every locus')], ['wahlund', zhEn('兩群混在一起算', 'Two groups pooled'), 8, zhEn('差得多的位點才高', 'High where the groups differ')], ['null', zhEn('無效等位基因', 'Null alleles'), 12, zhEn('只有少數位點特別高', 'High at only a few loci')]];
       panels.forEach(([key, title, at, verdict], i) => {
         const x = 30 + i * 305, y = 104, w = 290, h = 354;
         const a = ease(seg(t, at - 0.3, at + 0.5)), on = t >= at && (i === 2 || t < panels[i + 1][2]);
@@ -489,24 +508,24 @@ const chapters = [
             conifer(g, x + 44, iy, 0.45);
             const c = g.ctx; c.save(); c.strokeStyle = C.amber; c.lineWidth = 2; c.beginPath(); c.arc(x + 44, iy - 4, 27, -2.3, 0.9); c.stroke(); c.restore();
             g.arrow(x + 44 + 27 * Math.cos(0.6), iy - 4 + 27 * Math.sin(0.6), x + 44 + 27 * Math.cos(0.95), iy - 4 + 27 * Math.sin(0.95), { color: C.amber, lw: 2, head: 8 });
-            g.text(x + 86, iy - 12, '自交比例 s = 1/3', { size: 14, color: C.ink2 });
-            g.text(x + 86, iy + 14, `F = s/(2 − s) = ${fx(F_SELF, 1)}`, { size: 14, color: C.ink2 });
+            g.text(x + 86, iy - 12, zhEn('自交比例 s = 1/3', 'Selfing rate s = 1/3'), { size: 14, color: C.ink2 });
+            g.text(x + 86, iy + 14, zhEn(`F = s/(2 − s) = ${fx(F_SELF, 1)}`, `F = s/(2 − s) = ${fx(F_SELF, 1)}`), { size: 14, color: C.ink2 });
           } else if (key === 'wahlund') {
             pie(g, x + 38, iy, 19, 0.7, C.mint); g.text(x + 68, iy, '+', { size: 18, weight: 700, color: C.ink2, align: 'center' });
             pie(g, x + 98, iy, 19, 0.25, C.lav); g.text(x + 128, iy, '=', { size: 18, weight: 700, color: C.ink2, align: 'center' });
             pie(g, x + 162, iy, 23, 0.475, C.amber);
-            g.text(x + 196, iy - 11, 'A、D', { size: 14, color: C.ink2 });
-            g.text(x + 196, iy + 13, '各半', { size: 14, color: C.ink2 });
+            g.text(x + 196, iy - 11, zhEn('A、D', 'A and D'), { size: 14, color: C.ink2 });
+            g.text(x + 196, iy + 13, zhEn('各半', 'half each'), { size: 14, color: C.ink2 });
           } else {
             g.line(x + 24, iy + 10, x + 200, iy + 10, C.backbone, 4);
             g.arrow(x + 40, iy - 8, x + 96, iy - 8, { color: C.amber, lw: 4, head: 9 });
             g.text(x + 68, iy - 30, '×', { size: 22, weight: 800, color: C.red, align: 'center' });
-            g.text(x + 112, iy - 8, '黏不上', { size: 14, color: C.red });
-            g.text(x + 24, iy + 32, '位點 3、6:r = 0.15、0.25', { size: 14, color: C.ink2 });
+            g.text(x + 112, iy - 8, zhEn('黏不上', 'Cannot bind'), { size: 14, color: C.red });
+            g.text(x + 24, iy + 32, zhEn('位點 3、6:r = 0.15、0.25', 'Loci 3 and 6: r = 0.15, 0.25'), { size: 14, color: C.ink2 });
           }
           // 8 個位點的 F
           const bx = x + 52, by = y + 282, bw = 22, gap = 7, hp = 136, vmax = 0.45, grow = ease(seg(t, at, at + 1.2));
-          g.text(x + 16, y + 136, '8 個位點的 F', { size: 14, color: C.ink2 });
+          g.text(x + 16, y + 136, zhEn('8 個位點的 F', 'F at 8 loci'), { size: 14, color: C.ink2 });
           g.line(bx - 8, by, bx + 8 * (bw + gap), by, C.ink2, 1.4);
           for (const v of [0, 0.2, 0.4]) { g.text(bx - 14, by - (v / vmax) * hp, v.toFixed(1), { size: 12, color: C.muted, align: 'right', mono: true }); g.line(bx - 8, by - (v / vmax) * hp, bx + 8 * (bw + gap), by - (v / vmax) * hp, 'rgba(255,255,255,.06)', 1); }
           DEFICIT[key].forEach((f, l) => {
@@ -517,20 +536,20 @@ const chapters = [
           fade(g, ease(seg(t, at + 1.2, at + 2)), () => g.text(x + w / 2, y + h - 22, verdict, { size: 16, weight: 700, color: on ? C.mint : C.ink2, align: 'center' }));
         });
       });
-      fade(g, ease(seg(t, 13.5, 14.3)), () => g.text(480, 504, '判讀:全部位點一起高,是近親或混群;只有少數位點,先懷疑無效等位基因', { size: 15, color: C.ink, align: 'center' }));
+      fade(g, ease(seg(t, 13.5, 14.3)), () => g.text(480, 504, zhEn('判讀:全部位點一起高,是近親或混群;只有少數位點,先懷疑無效等位基因', 'All loci high: inbreeding or pooling. Only a few: suspect null alleles first'), { size: 15, color: C.ink, align: 'center' }));
     },
   },
   {
-    key: 'fst', name: 'Fst:族群之間差多少', dur: 16,
-    cues: [[0, '比較兩個族群:各自算期望異質度再平均,得到 Hs;把兩群的頻率平均以後再算一次,得到 Ht。'],
-      [4.5, '兩群頻率不同時 Ht 比 Hs 大;Fst = (Ht − Hs)/Ht,是全部遺傳多樣性裡由族群之間差異造成的比例。'],
-      [9, 'Fst 是 0 表示頻率完全一樣,越大越分化;紅檜 4 個地區兩兩之間在 0.035 到 0.074。'],
-      [12.5, '實際資料是抽樣來的,常用 Weir 與 Cockerham 的 θ 校正取樣誤差;不同算法的數字不能直接比。右邊可以調兩群的差異。']],
+    key: 'fst', name: zhEn('Fst:族群之間差多少', 'Fst: how far apart populations are'), dur: 16,
+    cues: [[0, zhEn('比較兩個族群:各自算期望異質度再平均,得到 Hs;把兩群的頻率平均以後再算一次,得到 Ht。', 'For two populations: average their He to get Hs; average the frequencies first, then redo it for Ht.')],
+      [4.5, zhEn('兩群頻率不同時 Ht 比 Hs 大;Fst = (Ht − Hs)/Ht,是全部遺傳多樣性裡由族群之間差異造成的比例。', 'When frequencies differ, Ht tops Hs. Fst = (Ht − Hs)/Ht is the share of all diversity coming from differences between populations.')],
+      [9, zhEn('Fst 是 0 表示頻率完全一樣,越大越分化;紅檜 4 個地區兩兩之間在 0.035 到 0.074。', 'Fst 0 means identical frequencies, larger means more divergence; across 4 red cypress regions it is 0.035 to 0.074.')],
+      [12.5, zhEn('實際資料是抽樣來的,常用 Weir 與 Cockerham 的 θ 校正取樣誤差;不同算法的數字不能直接比。右邊可以調兩群的差異。', 'Real data are a sample, so the θ of Weir and Cockerham is usual, allowing for sampling error; methods do not compare directly. Try it at right.')]],
     draw(g, t, S) {
       const [p1, p2] = twoPops(S.d), pb = PBAR, h1 = het(p1), h2 = het(p2), hs = (h1 + h2) / 2, ht = het(pb), fst = (ht - hs) / ht;
       // 左上:兩群的頻率
-      g.text(34, 32, '同一個位點,兩個族群的頻率(示意)', { size: 17, weight: 700, color: C.ink2 });
-      const A = g.axes(76, 60, 384, 170, { xmin: 0, xmax: 5, ymin: 0, ymax: 0.6, yticks: [0, 0.2, 0.4, 0.6], fmtY: (v) => v.toFixed(1), ylab: '頻率' });
+      g.text(34, 32, zhEn('同一個位點,兩個族群的頻率(示意)', 'One locus, two populations (illustrative)'), { size: 17, weight: 700, color: C.ink2 });
+      const A = g.axes(76, 60, 384, 170, { xmin: 0, xmax: 5, ymin: 0, ymax: 0.6, yticks: [0, 0.2, 0.4, 0.6], fmtY: (v) => v.toFixed(1), ylab: zhEn('頻率', 'Frequency') });
       const ga = ease(seg(t, 0.3, 2));
       for (let a = 0; a < 5; a++) {
         const xc = A.X(a + 0.5);
@@ -540,29 +559,29 @@ const chapters = [
         g.text(xc, A.Y(0) + 17, String(BP4[a]), { size: 14, color: C.ink2, align: 'center', mono: true });
       }
       fade(g, ease(seg(t, 1.5, 2.5)), () => {
-        g.rrect(76, 264, 14, 14, 3, C.mint); g.text(98, 271, `族群 1:He = ${fx(h1, 3)}`, { size: 15, color: C.ink });
-        g.rrect(76, 290, 14, 14, 3, C.amber); g.text(98, 297, `族群 2:He = ${fx(h2, 3)}`, { size: 15, color: C.ink });
+        g.rrect(76, 264, 14, 14, 3, C.mint); g.text(98, 271, zhEn(`族群 1:He = ${fx(h1, 3)}`, `Population 1: He = ${fx(h1, 3)}`), { size: 15, color: C.ink });
+        g.rrect(76, 290, 14, 14, 3, C.amber); g.text(98, 297, zhEn(`族群 2:He = ${fx(h2, 3)}`, `Population 2: He = ${fx(h2, 3)}`), { size: 15, color: C.ink });
       });
-      if (t > 4.5) fade(g, ease(seg(t, 4.5, 5.3)), () => { g.line(76, 323, 104, 323, C.ink, 2.2, [5, 4]); g.text(112, 323, '虛線:兩群平均的頻率,用來算 Ht', { size: 14, color: C.ink2 }); });
+      if (t > 4.5) fade(g, ease(seg(t, 4.5, 5.3)), () => { g.line(76, 323, 104, 323, C.ink, 2.2, [5, 4]); g.text(112, 323, zhEn('虛線:兩群平均的頻率,用來算 Ht', 'Dashed: average frequency, used for Ht'), { size: 14, color: C.ink2 }); });
       // 右上:算式
       fade(g, ease(seg(t, 2.2, 3)), () => {
         g.panel(500, 54, 430, 290, '');
-        g.text(520, 86, `Hs = (He₁ + He₂) ÷ 2 = ${fx(hs, 3)}`, { size: 17, color: C.ink, mono: true });
+        g.text(520, 86, zhEn(`Hs = (He₁ + He₂) ÷ 2 = ${fx(hs, 3)}`, `Hs = (He₁ + He₂) ÷ 2 = ${fx(hs, 3)}`), { size: 17, color: C.ink, mono: true });
         fade(g, ease(seg(t, 4.6, 5.4)), () => {
           g.text(520, 122, `Ht = 1 − Σp̄² = ${fx(ht, 3)}`, { size: 17, color: C.ink, mono: true });
           g.text(520, 166, `Fst = (Ht − Hs) ÷ Ht = ${fx(fst, 3)}`, { size: 20, weight: 700, color: C.mint, mono: true });
           // Ht 拆成兩段
           const bx = 520, by = 206, bw = 390, hsw = (hs / ht) * bw;
           g.rrect(bx, by, hsw, 34, 4, 'rgba(165,243,205,.35)'); g.rrect(bx + hsw, by, bw - hsw, 34, 4, C.amber);
-          g.text(bx + 10, by + 17, '族群之內(Hs)', { size: 14, color: C.ink });
-          g.text(bx, by + 56, '整條 = Ht', { size: 14, color: C.ink2 });
-          g.text(bx + bw, by + 56, `族群之間 = Ht − Hs(${Math.round(fst * 1000) / 10}%)`, { size: 14, color: C.amber, align: 'right' });
-          g.text(520, 312, `兩群的差異 ${Math.round(S.d * 100)}%(右邊可以調)`, { size: 13, color: C.muted });
+          g.text(bx + 10, by + 17, zhEn('族群之內(Hs)', 'Within populations (Hs)'), { size: 14, color: C.ink });
+          g.text(bx, by + 56, zhEn('整條 = Ht', 'Whole bar = Ht'), { size: 14, color: C.ink2 });
+          g.text(bx + bw, by + 56, zhEn(`族群之間 = Ht − Hs(${Math.round(fst * 1000) / 10}%)`, `Between = Ht − Hs (${Math.round(fst * 1000) / 10}%)`), { size: 14, color: C.amber, align: 'right' });
+          g.text(520, 312, zhEn(`兩群的差異 ${Math.round(S.d * 100)}%(右邊可以調)`, `Difference ${Math.round(S.d * 100)}% (try it at right)`), { size: 13, color: C.muted });
         });
       });
       // 下:紅檜的兩兩 Fst 與估計方法
       fade(g, ease(seg(t, 9, 9.8)), () => {
-        g.text(34, 366, '實例:紅檜 4 區兩兩的 Fst(Huang 2022)', { size: 15, weight: 700, color: C.ink2 });
+        g.text(34, 366, zhEn('實例:紅檜 4 區兩兩的 Fst(Huang 2022)', 'Example: red cypress pairwise Fst (Huang 2022)'), { size: 15, weight: 700, color: C.ink2 });
         // 下三角:列是 HV、GW、SY,欄是 MM、HV、GW
         const mx = 150, my = 396, cw = 100, ch = 34;
         HUANG_AREAS.slice(0, 3).forEach(([code, reg], j) => g.text(mx + cw * j + cw / 2, my, `${reg} ${code}`, { size: 13, color: C.ink2, align: 'center' }));
@@ -579,26 +598,26 @@ const chapters = [
       });
       fade(g, ease(seg(t, 12.6, 13.4)), () => {
         g.panel(500, 380, 430, 140, '');
-        g.text(520, 410, '實際資料要估計:', { size: 15, color: C.ink2 });
-        g.text(520, 442, 'Weir 與 Cockerham 的 θ', { size: 18, weight: 700, color: C.mint });
-        g.text(520, 474, '把取樣棵數與族群數的誤差算進去', { size: 15, color: C.ink });
-        g.text(520, 502, '不同算法的數字不能直接比', { size: 15, color: C.amber });
+        g.text(520, 410, zhEn('實際資料要估計:', 'Real data have to be estimated:'), { size: 15, color: C.ink2 });
+        g.text(520, 442, zhEn('Weir 與 Cockerham 的 θ', 'the θ of Weir and Cockerham'), { size: 18, weight: 700, color: C.mint });
+        g.text(520, 474, zhEn('把取樣棵數與族群數的誤差算進去', 'Allows for the trees and populations sampled'), { size: 15, color: C.ink });
+        g.text(520, 502, zhEn('不同算法的數字不能直接比', 'Different methods do not compare'), { size: 15, color: C.amber });
       });
     },
   },
   {
-    key: 'gene-flow', name: '基因流把族群拉近', dur: 17,
-    cues: [[0, '族群之間靠花粉與種子交換等位基因(基因流);沒有交換時,各族群隨機漂變,頻率越差越遠。'],
-      [4.5, '島嶼模型:每代每個族群移入 Nm 個個體(N 是族群大小、m 是移入比例),Fst 最後會停在約 1/(4Nm + 1)。'],
-      [9.5, '反過來可以用 Fst 推 Nm = (1/Fst − 1) ÷ 4;紅檜論文的 Nm(3.1 到 6.8)就和這樣換算的相符。'],
-      [13.5, '但這要假設族群一樣大、彼此等量交換、已經平衡,實際很少成立;距離越遠交換越少(距離隔離)。右邊可以改 Nm。']],
+    key: 'gene-flow', name: zhEn('基因流把族群拉近', 'Gene flow pulls populations together'), dur: 17,
+    cues: [[0, zhEn('族群之間靠花粉與種子交換等位基因(基因流);沒有交換時,各族群隨機漂變,頻率越差越遠。', 'Pollen and seed carry alleles between populations: gene flow. Without it they drift apart.')],
+      [4.5, zhEn('島嶼模型:每代每個族群移入 Nm 個個體(N 是族群大小、m 是移入比例),Fst 最後會停在約 1/(4Nm + 1)。', 'In the island model each population takes in Nm migrants per generation (N its size, m the migrant share), and Fst settles near 1/(4Nm + 1).')],
+      [9.5, zhEn('反過來可以用 Fst 推 Nm = (1/Fst − 1) ÷ 4;紅檜論文的 Nm(3.1 到 6.8)就和這樣換算的相符。', 'Turned around, Nm = (1/Fst − 1) ÷ 4. The red cypress paper gives Nm of 3.1 to 6.8, which matches this conversion.')],
+      [13.5, zhEn('但這要假設族群一樣大、彼此等量交換、已經平衡,實際很少成立;距離越遠交換越少(距離隔離)。右邊可以改 Nm。', 'Equal sizes, equal exchange, equilibrium: rarely true. Exchange also drops with distance (isolation by distance). Try Nm at right.')]],
     draw(g, t, S) {
       const nm = S.nm, sim = islandOf(nm), G = ISL.G, gen = Math.round(G * seg(t, 1.2, 12.5)), eq = 1 / (4 * nm + 1);
       // 左:8 個族群與移入池
       const cx = 200, cy = 262, R0 = 150, fr = sim.track[gen], bar = sum(fr) / fr.length;
-      g.text(34, 32, `第 ${gen} 代`, { size: 20, weight: 700, color: C.ink });
-      g.text(196, 32, `Fst = ${fx(sim.fst[gen], 3)}`, { size: 20, weight: 700, color: C.mint, mono: true });
-      g.text(34, 62, '8 個族群(示意),圓餅是某個等位基因的頻率', { size: 13, color: C.ink2 });
+      g.text(34, 32, zhEn(`第 ${gen} 代`, `Generation ${gen}`), { size: 20, weight: 700, color: C.ink });
+      g.text(zhEn(196, 240), 32, `Fst = ${fx(sim.fst[gen], 3)}`, { size: 20, weight: 700, color: C.mint, mono: true });
+      g.text(34, 62, zhEn('8 個族群(示意),圓餅是某個等位基因的頻率', '8 populations (illustrative); each pie is one allele frequency'), { size: 13, color: C.ink2 });
       const nDots = { 0.1: 1, 1: 3, 4: 6, 10: 10 }[nm] || 3;
       for (let i = 0; i < ISL.D; i++) {
         const an = -Math.PI / 2 + (i / ISL.D) * Math.PI * 2, x = cx + R0 * Math.cos(an), y = cy + R0 * Math.sin(an);
@@ -611,9 +630,9 @@ const chapters = [
         pie(g, x, y, 34, fr[i], C.mint);
       }
       pie(g, cx, cy, 26, bar, 'rgba(165,243,205,.55)');
-      g.text(cx, cy + 42, '移入池', { size: 13, color: C.ink2, align: 'center' });
+      g.text(cx, cy + 42, zhEn('移入池', 'Migrant pool'), { size: 13, color: C.ink2, align: 'center' });
       // 右上:Fst 對世代
-      const A = g.axes(520, 60, 390, 230, { xmin: 0, xmax: G, ymin: 0, ymax: 0.8, xticks: [0, 50, 100, 150], yticks: [0, 0.2, 0.4, 0.6, 0.8], fmtY: (v) => v.toFixed(1), xlab: '世代', ylab: 'Fst' });
+      const A = g.axes(520, 60, 390, 230, { xmin: 0, xmax: G, ymin: 0, ymax: 0.8, xticks: [0, 50, 100, 150], yticks: [0, 0.2, 0.4, 0.6, 0.8], fmtY: (v) => v.toFixed(1), xlab: zhEn('世代', 'Generation'), ylab: 'Fst' });
       for (const v of NMS) {
         if (v === nm) continue;
         const o = islandOf(v), pts = o.fst.map((f, k) => [A.X(k), A.Y(Math.min(f, 0.8))]);
@@ -626,30 +645,30 @@ const chapters = [
         g.line(A.X(0), A.Y(eq), A.X(G), A.Y(eq), C.amber, 1.8, [7, 6]);
         g.tag(A.X(G) - 4, A.Y(eq) + (eq > 0.6 ? 20 : -18), `1/(4Nm + 1) = ${fx(eq, 3)}`, { size: 14, color: C.amber, align: 'right' });
       });
-      g.text(908, 40, `Nm = ${nm};灰線是其他 Nm`, { size: 14, color: C.ink2, align: 'right' });
+      g.text(908, 40, zhEn(`Nm = ${nm};灰線是其他 Nm`, `Nm = ${nm}; gray lines are other Nm`), { size: 14, color: C.ink2, align: 'right' });
       // 右下:由 Fst 反推 Nm
       fade(g, ease(seg(t, 9.6, 10.4)), () => {
         g.panel(500, 374, 430, 146, '');
-        g.text(520, 404, '反推:Nm = (1/Fst − 1) ÷ 4', { size: 17, weight: 700, color: C.ink, mono: true });
+        g.text(520, 404, zhEn('反推:Nm = (1/Fst − 1) ÷ 4', 'Reverse: Nm = (1/Fst − 1) ÷ 4'), { size: 17, weight: 700, color: C.ink, mono: true });
         // 紅檜論文的 Fst 只到小數 3 位,換算出的 Nm 和論文的值只差在四捨五入
-        g.text(520, 438, `紅檜 MM–HV:0.074 → ${fx((1 / 0.074 - 1) / 4)}(論文 3.141)`, { size: 15, color: C.ink2 });
-        g.text(520, 466, `紅檜 HV–GW:0.035 → ${fx((1 / 0.035 - 1) / 4)}(論文 6.832)`, { size: 15, color: C.ink2 });
-        fade(g, ease(seg(t, 13.6, 14.4)), () => g.text(520, 500, '假設很少成立:只拿 Fst 比較分化', { size: 15, color: C.amber }));
+        g.text(520, 438, zhEn(`紅檜 MM–HV:0.074 → ${fx((1 / 0.074 - 1) / 4)}(論文 3.141)`, `Cypress MM–HV: 0.074 → ${fx((1 / 0.074 - 1) / 4)} (paper 3.141)`), { size: 15, color: C.ink2 });
+        g.text(520, 466, zhEn(`紅檜 HV–GW:0.035 → ${fx((1 / 0.035 - 1) / 4)}(論文 6.832)`, `Cypress HV–GW: 0.035 → ${fx((1 / 0.035 - 1) / 4)} (paper 6.832)`), { size: 15, color: C.ink2 });
+        fade(g, ease(seg(t, 13.6, 14.4)), () => g.text(520, 500, zhEn('假設很少成立:只拿 Fst 比較分化', 'Assumptions rarely hold: just compare Fst'), { size: 15, color: C.amber }));
       });
     },
   },
   {
-    key: 'structure', name: 'STRUCTURE:不知道有幾群時', dur: 18,
-    cues: [[0, '不知道該分幾群時,STRUCTURE 假設有 K 群,各有一套等位基因頻率,並假設群內符合哈溫平衡、位點之間互不連鎖。'],
-      [4.5, '每棵樹一條長條、分成 K 段,是它的基因組來自各群的比例 q;D 區裡整條是 A 色的是移入的,兩色各半的是混血。'],
-      [9.5, '每個 K 跑很多次:ln P(D) 先陡升後持平;Evanno 的 ΔK 是它的二階變化除以標準差,峰值常是最上層的分群。'],
-      [14, 'ΔK 算不出 K = 1,也常只抓到最上層,所以要選能說明主要結構、生物學上合理的最小 K。右邊可以換 K。']],
+    key: 'structure', name: zhEn('STRUCTURE:不知道有幾群時', 'STRUCTURE: when the groups are unknown'), dur: 18,
+    cues: [[0, zhEn('不知道該分幾群時,STRUCTURE 假設有 K 群,各有一套等位基因頻率,並假設群內符合哈溫平衡、位點之間互不連鎖。', 'With the number unknown, STRUCTURE assumes K groups, each with its own allele frequencies, in Hardy–Weinberg and linkage equilibrium.')],
+      [4.5, zhEn('每棵樹一條長條、分成 K 段,是它的基因組來自各群的比例 q;D 區裡整條是 A 色的是移入的,兩色各半的是混血。', 'Each tree is a bar in K parts, the shares q from each group. In D, the all-A bar is a migrant, the half-and-half one a hybrid.')],
+      [9.5, zhEn('每個 K 跑很多次:ln P(D) 先陡升後持平;Evanno 的 ΔK 是它的二階變化除以標準差,峰值常是最上層的分群。', 'Run each K often: ln P(D) climbs, then flattens. Evanno ΔK is its second difference over the standard deviation, peaking at the top level.')],
+      [14, zhEn('ΔK 算不出 K = 1,也常只抓到最上層,所以要選能說明主要結構、生物學上合理的最小 K。右邊可以換 K。', 'ΔK gives nothing for K = 1 and often finds only the top level: pick the smallest K that explains the structure. Try K at right.')]],
     draw(g, t, S) {
       const K = S.k, st = structureOf(K);
       // 上:長條圖
       const x0 = 60, x1 = 920, y0 = 58, hh = 150, bw = (x1 - x0) / NIND;
-      g.text(34, 30, `K = ${K}:每棵樹一條,顏色是來自各群的比例 q`, { size: 16, weight: 700, color: C.ink2 });
-      g.text(60, y0 + hh + 46, '示意資料,用 EM 算混合模型', { size: 13, color: C.muted });
+      g.text(34, 30, zhEn(`K = ${K}:每棵樹一條,顏色是來自各群的比例 q`, `K = ${K}: one bar per tree, colored by the shares q`), { size: 16, weight: 700, color: C.ink2 });
+      g.text(60, y0 + hh + 46, zhEn('示意資料,用 EM 算混合模型', 'Illustrative data, admixture model fitted by EM'), { size: 13, color: C.muted });
       const reveal = seg(t, 0.4, 4);
       const c = g.ctx;
       for (let j = 0; j < NIND; j++) {
@@ -662,16 +681,16 @@ const chapters = [
         const xa = x0 + gi * NREF * bw, xb = xa + NREF * bw;
         if (gi > 0) g.line(xa, y0 - 4, xa, y0 + hh + 4, C.bg, 3);
         // 取樣地點只寫字,不用顏色(長條的顏色是推出來的群,不是取樣地點)
-        g.text((xa + xb) / 2, y0 + hh + 20, `${k} 區`, { size: 16, weight: 700, color: C.ink, align: 'center' });
+        g.text((xa + xb) / 2, y0 + hh + 20, zhEn(`${k} 區`, `Region ${k}`), { size: 16, weight: 700, color: C.ink, align: 'center' });
       });
       g.ctx.save(); g.ctx.strokeStyle = C.line; g.ctx.lineWidth = 1.5; g.ctx.strokeRect(x0, y0, x1 - x0, hh); g.ctx.restore();
       // 移入與混血(D 區最後兩棵)
       fade(g, ease(seg(t, 5.5, 6.3)), () => {
         const xm = x0 + (NIND - 2 + 0.5) * bw, xh = x0 + (NIND - 1 + 0.5) * bw;
         g.arrow(xm - 40, y0 + hh + 58, xm, y0 + hh + 6, { color: C.ink, lw: 2, head: 8 });
-        g.tag(xm - 46, y0 + hh + 66, '從 A 移入', { size: 13, color: C.ink, align: 'right' });
+        g.tag(xm - 46, y0 + hh + 66, zhEn('從 A 移入', 'Migrant from A'), { size: 13, color: C.ink, align: 'right' });
         g.arrow(xh + 2, y0 + hh + 34, xh, y0 + hh + 6, { color: C.ink, lw: 2, head: 8 });
-        g.tag(xh + 6, y0 + hh + 46, '混血', { size: 13, color: C.ink, align: 'right' });
+        g.tag(xh + 6, y0 + hh + 46, zhEn('混血', 'Hybrid'), { size: 13, color: C.ink, align: 'right' });
       });
       // 下左:ln P(D)
       const lp = ease(seg(t, 9.4, 10.4));
@@ -680,7 +699,7 @@ const chapters = [
         const means = LNPD.map(meanOf);
         g.curve(means.map((m, i) => [A.X(i + 1), A.Y(m)]), C.ink2, 1.8);
         LNPD.forEach((runs, i) => runs.forEach((v, r) => g.circle(A.X(i + 1) + (r - 4.5) * 2.2, A.Y(clamp(v, -2980, -2440)), 2.6, C.mint)));
-        g.text(146, 300, '每個 K 跑 10 次(示意值)', { size: 13, color: C.ink2 });
+        g.text(146, 300, zhEn('每個 K 跑 10 次(示意值)', 'Each K run 10 times (illustrative)'), { size: 13, color: C.ink2 });
       });
       // 下右:ΔK
       fade(g, ease(seg(t, 11, 12)), () => {
@@ -690,38 +709,38 @@ const chapters = [
         DELTAK.forEach((v, i) => { if (v !== null) pts.push([B.X(i + 1), B.Y(v)]); });
         g.curve(pts, C.amber, 2.4);
         DELTAK.forEach((v, i) => { if (v !== null) { g.circle(B.X(i + 1), B.Y(v), i === pk ? 7 : 4.5, i === pk ? C.amber : C.ink2); g.text(B.X(i + 1) + 10, B.Y(v) - 12, fx(v, 1), { size: 13, color: C.ink2, mono: true }); } });
-        g.text(626, 300, `ΔK 最大:K = ${pk + 1}`, { size: 15, weight: 700, color: C.amber });
+        g.text(626, 300, zhEn(`ΔK 最大:K = ${pk + 1}`, `Largest ΔK: K = ${pk + 1}`), { size: 15, weight: 700, color: C.amber });
       });
-      fade(g, ease(seg(t, 14.2, 15)), () => g.text(934, 30, '紅檜 4 區:ΔK 選 K = 3', { size: 14, color: C.amber, align: 'right' }));
+      fade(g, ease(seg(t, 14.2, 15)), () => g.text(934, 30, zhEn('紅檜 4 區:ΔK 選 K = 3', 'Red cypress, 4 regions: ΔK picks K = 3'), { size: 14, color: C.amber, align: 'right' }));
     },
   },
   {
-    key: 'assignment', name: '指派檢定與排除檢定', dur: 18,
-    cues: [[0, '查獲的木材驗同一組位點;指派檢定要算的是:這個基因型在每一個參考產區出現的機率。'],
-      [4.5, '每個位點同型是 p²、異型是 2pq,位點之間相乘(取 log₁₀ 就是相加);樣本沒出現的等位基因用先驗補一點,不會變 0。'],
-      [9.5, '機率最高的那一區就是指派的結果;換成百分比的相對分數,四區加起來一定是 100%,即使真正的產區沒有取樣。'],
-      [13.5, '所以還要排除檢定:用每區頻率模擬 1,000 個個體,木材的機率比其中 99% 還低(p < 0.01)就排除。右邊可換木材與位點數。']],
+    key: 'assignment', name: zhEn('指派檢定與排除檢定', 'Assignment and exclusion tests'), dur: 18,
+    cues: [[0, zhEn('查獲的木材驗同一組位點;指派檢定要算的是:這個基因型在每一個參考產區出現的機率。', 'Seized timber is typed at the same loci: how likely is this genotype in each region?')],
+      [4.5, zhEn('每個位點同型是 p²、異型是 2pq,位點之間相乘(取 log₁₀ 就是相加);樣本沒出現的等位基因用先驗補一點,不會變 0。', 'Each locus gives p² if homozygous, 2pq if not, multiplied across loci (added as log₁₀); a prior keeps unseen alleles above zero.')],
+      [9.5, zhEn('機率最高的那一區就是指派的結果;換成百分比的相對分數,四區加起來一定是 100%,即使真正的產區沒有取樣。', 'The highest probability wins. As percentages the four always add to 100%, even if the true region was never sampled.')],
+      [13.5, zhEn('所以還要排除檢定:用每區頻率模擬 1,000 個個體,木材的機率比其中 99% 還低(p < 0.01)就排除。右邊可換木材與位點數。', 'So an exclusion test follows: simulate 1,000 individuals per region and exclude it if the timber scores below 99% of them (p < 0.01). Try it at right.')]],
     enter() { touchedLoci = false; },
     draw(g, t, S) {
       const w = WOODS[S.wood], nl = touchedLoci ? S.loci : Math.max(1, Math.round(lerp(1, S.loci, ease(seg(t, 3.5, 8.5)))));
       const r = scores(w.g, nl);
       // 左:木材與基因型
-      g.text(34, 32, `${w.name}(示意)`, { size: 18, weight: 700, color: C.ink });
+      g.text(34, 32, zhEn(`${w.name}(示意)`, `${w.name} (illustrative)`), { size: 18, weight: 700, color: C.ink });
       timber(g, 150, 78, 0.78);
       for (let l = 0; l < NL; l++) {
         const y = 136 + l * 31, on = l < nl, a = ease(seg(t, 0.3 + l * 0.15, 0.9 + l * 0.15));
         fade(g, a * (on ? 1 : 0.3), () => {
-          g.text(40, y, `位點 ${l + 1}`, { size: 14, color: on ? C.ink2 : C.muted });
+          g.text(40, y, zhEn(`位點 ${l + 1}`, `Locus ${l + 1}`), { size: 14, color: on ? C.ink2 : C.muted });
           const [x1, x2] = [bpOf(l, Math.min(...w.g[l])), bpOf(l, Math.max(...w.g[l]))];
           g.text(122, y, `${x1}/${x2}`, { size: 16, weight: 700, color: on ? C.ink : C.muted, mono: true });
         });
       }
-      g.text(40, 514, `用前 ${nl} 個位點`, { size: 15, weight: 700, color: C.mint });
+      g.text(40, 514, zhEn(`用前 ${nl} 個位點`, `Using the first ${nl} loci`), { size: 15, weight: 700, color: C.mint });
       // 右上:每區的 log₁₀ 概似值與相對分數
       fade(g, ease(seg(t, 2.6, 3.4)), () => {
-        g.text(330, 32, '產區', { size: 14, color: C.ink2 });
-        g.text(560, 32, 'log₁₀ 概似值', { size: 14, color: C.ink2, align: 'right' });
-        fade(g, ease(seg(t, 9.5, 10.3)), () => g.text(600, 32, '相對分數(四區加起來 100%)', { size: 14, color: C.ink2 }));
+        g.text(330, 32, zhEn('產區', 'Region'), { size: 14, color: C.ink2 });
+        g.text(560, 32, zhEn('log₁₀ 概似值', 'log₁₀ likelihood'), { size: 14, color: C.ink2, align: 'right' });
+        fade(g, ease(seg(t, 9.5, 10.3)), () => g.text(600, 32, zhEn('相對分數(四區加起來 100%)', 'Relative score (the four add to 100%)'), { size: 14, color: C.ink2 }));
         REFS.forEach((k, i) => {
           const y = 70 + i * 46, best = i === r.best;
           if (best) g.rrect(320, y - 20, 610, 40, 8, 'rgba(165,243,205,.08)', C.mint);
@@ -733,7 +752,7 @@ const chapters = [
             g.text(840, y, `${(r.sc[i] * 100).toFixed(1)}%`, { size: 15, color: C.ink, mono: true });
           });
         });
-        g.text(330, 262, '每個位點:同型 p²、異型 2pq;log₁₀ 相加', { size: 14, color: C.muted });
+        g.text(330, 262, zhEn('每個位點:同型 p²、異型 2pq;log₁₀ 相加', 'Per locus: p² if homozygous, 2pq if not; log₁₀ added'), { size: 14, color: C.muted });
       });
       // 下:排除檢定(每區模擬 1,000 個個體的 log₁₀ 概似值)
       const ea = ease(seg(t, 13.6, 14.6));
@@ -753,55 +772,55 @@ const chapters = [
           const ox = x + ((obs - lo) / (hi - lo)) * w2, ex = ps[i] < ALPHA;
           g.line(ox, y + 26, ox, y + 22 + h2, ex ? C.red : C.mint, 2.6);
           g.text(x + w2 / 2, y + h2 + 40, ps[i] === 0 ? 'p < 0.001' : `p = ${ps[i].toFixed(3)}`, { size: 14, color: ex ? C.red : C.mint, align: 'center', mono: true });
-          g.text(x + w2 / 2, y + h2 + 64, ex ? '排除' : '不能排除', { size: 15, weight: 700, color: ex ? C.red : C.mint, align: 'center' });
+          g.text(x + w2 / 2, y + h2 + 64, ex ? zhEn('排除', 'Excluded') : zhEn('不能排除', 'Not excluded'), { size: 15, weight: 700, color: ex ? C.red : C.mint, align: 'center' });
         });
         const keep = REFS.filter((_, i) => ps[i] >= ALPHA), bestK = REFS[r.best];
-        const msg = keep.length === 0 ? ['四區都排除:來源不在參考資料裡', C.red]
-          : keep.length === 1 && keep[0] === bestK ? [`${bestK} 區機率最高,其他區都排除`, C.mint]
-            : keep.includes(bestK) ? [`${bestK} 區機率最高,但 ${keep.filter((k) => k !== bestK).join('、')} 區也不能排除`, C.amber]
-              : [`分數最高的 ${bestK} 區被排除,只剩 ${keep.join('、')} 區`, C.amber];
+        const msg = keep.length === 0 ? [zhEn('四區都排除:來源不在參考資料裡', 'All four excluded: the source is not in the reference data'), C.red]
+          : keep.length === 1 && keep[0] === bestK ? [zhEn(`${bestK} 區機率最高,其他區都排除`, `Region ${bestK} scores highest, the others are excluded`), C.mint]
+            : keep.includes(bestK) ? [zhEn(`${bestK} 區機率最高,但 ${keep.filter((k) => k !== bestK).join('、')} 區也不能排除`, `Region ${bestK} scores highest, but ${keep.filter((k) => k !== bestK).join(' and ')} cannot be excluded`), C.amber]
+              : [zhEn(`分數最高的 ${bestK} 區被排除,只剩 ${keep.join('、')} 區`, `Top-scoring region ${bestK} is excluded; only ${keep.join(' and ')} remain`), C.amber];
         g.text(630, 514, msg[0], { size: 17, weight: 700, color: msg[1], align: 'center' });
       });
     },
   },
   {
-    key: 'forensics', name: '產地鑑定的實務與限制', dur: 16,
-    cues: [[0, '產地鑑定要先建參考資料庫:每個候選產區都要取樣,每區 25 到 30 棵就能把頻率估得夠準。'],
-      [4, '紅檜 4 區 92 棵、36 個位點的自我指派有 88% 正確;夾在 HV 與 MM 之間的 GW 只有 70%。'],
-      [8.5, '相鄰族群差異小就需要更多位點;木材的 DNA 少又斷裂,能驗的位點比葉片少,乾燥的臺灣扁柏木材 22 件只驗出 7 件。'],
-      [12.5, '結論寫成「機率最高、而且沒被排除的產區」,再配合木材解剖、同位素等方法;桃花心木 31 個林分的資料庫就把木材指派回正確國家。']],
+    key: 'forensics', name: zhEn('產地鑑定的實務與限制', 'Tracing origin in practice, and its limits'), dur: 16,
+    cues: [[0, zhEn('產地鑑定要先建參考資料庫:每個候選產區都要取樣,每區 25 到 30 棵就能把頻率估得夠準。', 'Tracing origin starts with a reference database: sample every candidate region, 25 to 30 trees each.')],
+      [4, zhEn('紅檜 4 區 92 棵、36 個位點的自我指派有 88% 正確;夾在 HV 與 MM 之間的 GW 只有 70%。', 'For 92 red cypress trees from 4 regions at 36 loci, self-assignment was 88% correct; GW, which lies between HV and MM, only 70%.')],
+      [8.5, zhEn('相鄰族群差異小就需要更多位點;木材的 DNA 少又斷裂,能驗的位點比葉片少,乾燥的臺灣扁柏木材 22 件只驗出 7 件。', 'Close neighbors need more loci. Timber holds little DNA, broken at that, so fewer loci work: 7 of 22 dried hinoki pieces typed.')],
+      [12.5, zhEn('結論寫成「機率最高、而且沒被排除的產區」,再配合木材解剖、同位素等方法;桃花心木 31 個林分的資料庫就把木材指派回正確國家。', 'Report the region scoring highest and not excluded, backed by wood anatomy or isotopes. A mahogany database of 31 stands found the right country.')]],
     draw(g, t) {
       // 左:紅檜的自我指派
       fade(g, ease(seg(t, 3.8, 4.6)), () => {
-        g.text(34, 32, '紅檜 4 區的自我指派(Huang 2022)', { size: 16, weight: 700, color: C.ink2 });
+        g.text(34, 32, zhEn('紅檜 4 區的自我指派(Huang 2022)', 'Red cypress self-assignment, 4 regions (Huang 2022)'), { size: 16, weight: 700, color: C.ink2 });
         let ok = 0, all = 0;
         HUANG_ASSIGN.forEach(([code, reg, c, n], i) => {
           const y = 76 + i * 56, frac = c / n, grow = ease(seg(t, 4.2 + i * 0.3, 5.2 + i * 0.3));
           ok += c; all += n;
           g.text(34, y, `${reg} ${code}`, { size: 16, weight: 700, color: C.ink });
-          g.text(34, y + 20, `${n} 棵`, { size: 13, color: C.muted });
+          g.text(34, y + 20, zhEn(`${n} 棵`, `${n} trees`), { size: 13, color: C.muted });
           g.rrect(126, y - 10, 170, 22, 5, 'rgba(255,255,255,.07)');
           g.rrect(126, y - 10, 170 * frac * grow, 22, 5, code === 'GW' ? C.amber : C.mint);
           g.text(306, y + 1, `${c}/${n} ${Math.round(frac * 1000) / 10}%`, { size: 15, color: code === 'GW' ? C.amber : C.ink, mono: true });
         });
-        g.text(34, 304, `全部 ${ok}/${all} = ${(ok / all * 100).toFixed(1)}%`, { size: 16, weight: 700, color: C.ink });
-        g.text(34, 330, 'GW 有 4 棵被判到 HV、3 棵被判到 MM', { size: 14, color: C.amber });
+        g.text(34, 304, zhEn(`全部 ${ok}/${all} = ${(ok / all * 100).toFixed(1)}%`, `All: ${ok}/${all} = ${(ok / all * 100).toFixed(1)}%`), { size: 16, weight: 700, color: C.ink });
+        g.text(34, 330, zhEn('GW 有 4 棵被判到 HV、3 棵被判到 MM', 'GW: 4 trees assigned to HV, 3 to MM'), { size: 14, color: C.amber });
       });
       // 左下:桃花心木
       fade(g, ease(seg(t, 12.6, 13.4)), () => {
         g.panel(30, 360, 420, 160, '');
-        g.text(48, 388, '桃花心木(Degen 2013)', { size: 15, weight: 700, color: C.ink2 });
+        g.text(48, 388, zhEn('桃花心木(Degen 2013)', 'Mahogany (Degen 2013)'), { size: 15, weight: 700, color: C.ink2 });
         timber(g, 384, 388, 0.42);
-        g.text(48, 420, '31 個林分、1,971 棵、6 個 SSR', { size: 16, color: C.ink });
-        g.text(48, 450, '遺傳距離與地理距離 r = 0.82', { size: 16, color: C.ink });
-        g.text(48, 480, '兩批木材都指派回正確的國家', { size: 16, weight: 700, color: C.mint });
+        g.text(48, 420, zhEn('31 個林分、1,971 棵、6 個 SSR', '31 stands, 1,971 trees, 6 SSRs'), { size: 16, color: C.ink });
+        g.text(48, 450, zhEn('遺傳距離與地理距離 r = 0.82', 'Genetic vs geographic distance: r = 0.82'), { size: 16, color: C.ink });
+        g.text(48, 480, zhEn('兩批木材都指派回正確的國家', 'Both lots traced to the right country'), { size: 16, weight: 700, color: C.mint });
       });
       // 右:檢查清單
       const items = [
-        [0.3, '1', '參考族群', '每個候選產區都取樣,每區 25 到 30 棵'],
-        [8.6, '2', '位點數', '相鄰族群 Fst 小時要更多位點'],
-        [10, '3', '木材 DNA', '乾燥木材 22 件驗出 7 件(臺灣扁柏)'],
-        [12.6, '4', '結論的寫法', '機率最高、而且沒被排除;再用別的方法交叉驗證'],
+        [0.3, '1', zhEn('參考族群', 'Reference populations'), zhEn('每個候選產區都取樣,每區 25 到 30 棵', 'Sample every candidate region, 25 to 30 trees each')],
+        [8.6, '2', zhEn('位點數', 'Number of loci'), zhEn('相鄰族群 Fst 小時要更多位點', 'Neighbors with a low Fst need more loci')],
+        [10, '3', zhEn('木材 DNA', 'DNA from timber'), zhEn('乾燥木材 22 件驗出 7 件(臺灣扁柏)', '7 of 22 dried pieces typed (Taiwan hinoki)')],
+        [12.6, '4', zhEn('結論的寫法', 'Wording the result'), zhEn('機率最高、而且沒被排除;再用別的方法交叉驗證', 'Highest score and not excluded; cross-check with other methods')],
       ];
       items.forEach(([at, no, head, body], i) => {
         const y = 40 + i * 120;
@@ -821,14 +840,14 @@ createLesson({
   chapters,
   state: { n: 30, p: 0.6, f: 0.2, d: 0.6, nm: 1, k: 3, wood: 0, loci: 12 },
   controls: [
-    { id: 'n', label: '取樣棵數 N', type: 'seg', options: [5, 10, 30, 100].map((v) => ({ v, label: `${v} 棵` })), chapters: ['frequency'], restart: false },
-    { id: 'p', label: '等位基因 A 的頻率 p', type: 'range', min: 0.05, max: 0.95, step: 0.05, format: (v) => v.toFixed(2), chapters: ['hardy-weinberg'], restart: false },
-    { id: 'f', label: '近親係數 F', type: 'range', min: 0, max: 1, step: 0.05, format: (v) => v.toFixed(2), chapters: ['hardy-weinberg'], restart: false, onChange: () => { touchedF = true; } },
-    { id: 'd', label: '兩群的差異', type: 'range', min: 0, max: 1, step: 0.05, format: (v) => `${Math.round(v * 100)}%`, chapters: ['fst'], restart: false },
-    { id: 'nm', label: '每代移入數 Nm', type: 'seg', options: NMS.map((v) => ({ v, label: String(v) })), chapters: ['gene-flow'], restart: false },
-    { id: 'k', label: '群數 K', type: 'seg', options: KS.map((v) => ({ v, label: `K = ${v}` })), chapters: ['structure'], restart: false },
-    { id: 'wood', label: '查獲的木材', type: 'seg', options: WOODS.map((w, i) => ({ v: i, label: w.name })), chapters: ['assignment'], restart: false },
-    { id: 'loci', label: '使用的位點數', type: 'range', min: 1, max: 12, step: 1, unit: ' 個', chapters: ['assignment'], restart: false, onChange: () => { touchedLoci = true; } },
+    { id: 'n', label: zhEn('取樣棵數 N', 'Trees sampled, N'), type: 'seg', options: [5, 10, 30, 100].map((v) => ({ v, label: zhEn(`${v} 棵`, String(v)) })), chapters: ['frequency'], restart: false },
+    { id: 'p', label: zhEn('等位基因 A 的頻率 p', 'Frequency p of allele A'), type: 'range', min: 0.05, max: 0.95, step: 0.05, format: (v) => v.toFixed(2), chapters: ['hardy-weinberg'], restart: false },
+    { id: 'f', label: zhEn('近親係數 F', 'Inbreeding coefficient F'), type: 'range', min: 0, max: 1, step: 0.05, format: (v) => v.toFixed(2), chapters: ['hardy-weinberg'], restart: false, onChange: () => { touchedF = true; } },
+    { id: 'd', label: zhEn('兩群的差異', 'Difference between the groups'), type: 'range', min: 0, max: 1, step: 0.05, format: (v) => `${Math.round(v * 100)}%`, chapters: ['fst'], restart: false },
+    { id: 'nm', label: zhEn('每代移入數 Nm', 'Migrants per generation, Nm'), type: 'seg', options: NMS.map((v) => ({ v, label: String(v) })), chapters: ['gene-flow'], restart: false },
+    { id: 'k', label: zhEn('群數 K', 'Number of groups K'), type: 'seg', options: KS.map((v) => ({ v, label: `K = ${v}` })), chapters: ['structure'], restart: false },
+    { id: 'wood', label: zhEn('查獲的木材', 'Seized timber'), type: 'seg', options: WOODS.map((w, i) => ({ v: i, label: w.name })), chapters: ['assignment'], restart: false },
+    { id: 'loci', label: zhEn('使用的位點數', 'Loci used'), type: 'range', min: 1, max: 12, step: 1, unit: zhEn(' 個', ''), chapters: ['assignment'], restart: false, onChange: () => { touchedLoci = true; } },
   ],
 });
 

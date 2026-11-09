@@ -2,8 +2,9 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>GC-MS 拆開來看</title>
+<title data-en="GC-MS: take it apart">GC-MS 拆開來看</title>
 <meta name="description" content="用 3D 模型把 GC-MS 拆開來看:跟著一針精油樣品,看成分怎麼在管柱裡分開、在質譜裡怎麼帶電、碎裂、被篩選。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="儀器原理">
@@ -373,6 +374,15 @@ html.mp .console > .mp-tab + .mp-tab{border-top:1px solid var(--line)}
 /* 大螢幕(2K、4K)的放大(2026-11-06,見 ../assets/ui-scale.css):面板格線、3D 標籤、放大鏡按鈕、提示框與說明視窗依 --ui 放大,
    3D 畫布不放大。標籤、按鈕與提示框是 JS 用螢幕像素擺的,擺放時除以 currentCSSZoom;放大的元素裡寫的 vw、vh 都已除以 var(--ui) */
 .hud,.tag,.lens-btn,.tip,.modal,.load{zoom:var(--ui,1)}
+/* 英文(2026-11-06,../assets/i18n.js):質譜面板的「Spectrum / Quadrupole」比中文寬,按鈕左右留白收一點,標題列才排得進一行 */
+html[lang="en"] .seg.seg-sm button{padding:2px 7px}
+/* 英文的按鈕字較寬,控制面板最寬 620 px(和中文差不多,圖示那一排換到下一行),右上的 ALS、進樣口標籤才不會被面板蓋住;1180 px 以下是「設定」面板,不受影響 */
+@media (min-width:1181px){html[lang="en"] .ctl{max-width:620px}}
+/* 英文的圖例比較長:圖例先在標題列裡縮窄、自己折成兩行,不把按鈕擠到第二行(打開的成分表從標題列下方 40 px 起,第二行的「成分表」按鈕會被蓋住);
+   基本寬度 300 px:1024 寬、有抽出離子的按鈕時,「成分表」仍在第一行 */
+html[lang="en"]:not(.mp) .cs-chrom .legend{flex:999 1 300px}
+/* 讀值卡的英文小標字距收一點(和手機版一樣 .08em),1024 寬時三張卡才排得進一列 */
+html[lang="en"] .chip-k{letter-spacing:.08em}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"}}
@@ -383,194 +393,208 @@ html.mp .console > .mp-tab + .mp-tab{border-top:1px solid var(--line)}
 </head>
 <body>
 <div class="app" id="app">
-  <canvas id="gl" tabindex="-1" aria-label="ALS 自動進樣器、氣相層析儀與質譜儀的 3D 模型,可拖曳旋轉"></canvas>
+  <canvas id="gl" tabindex="-1" aria-label="ALS 自動進樣器、氣相層析儀與質譜儀的 3D 模型,可拖曳旋轉" data-en-aria-label="3D model of the ALS autosampler, gas chromatograph and mass spectrometer; drag to rotate"></canvas>
   <div class="tags" id="tags" aria-hidden="true"></div>
-  <button class="lens-btn" id="lensBtn" type="button" hidden><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.8" cy="6.8" r="4.6"/><path d="M10.3 10.3l4 4"/></svg><span>放大鏡</span></button>
-  <div class="load" id="load"><i></i><span>3D 模型載入中</span></div>
+  <button class="lens-btn" id="lensBtn" type="button" hidden><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.8" cy="6.8" r="4.6"/><path d="M10.3 10.3l4 4"/></svg><span data-en="Magnifier">放大鏡</span></button>
+  <div class="load" id="load"><i></i><span data-en="Loading the 3D model">3D 模型載入中</span></div>
 
   <div class="hud" id="hud">
     <header class="brief">
-      <nav class="sitenav" aria-label="儀器原理"><a href="../">← 儀器入口</a><a href="../lcq/">離子阱質譜</a><a href="./" aria-current="page">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/">質譜儀-不同分析器比較</a><a href="../spectroscopy/">光與分子</a><a href="../chromatography/">層析</a><a href="../plot/">數據畫圖</a></nav>
-      <h1 class="ttl"><span class="ttl-a">GC-MS</span><span class="ttl-b">拆開來看</span></h1>
-      <p class="lede">GC 先在 30&nbsp;m 長的細管(管柱)裡把成分分開,MS(質譜)再量出它們的質量。同一針樣品的成分一起出發,出來時卻相隔好幾分鐘,在層析圖上排成一支支峰。按「導覽」,鏡頭會跟著一個成分的分子走一趟。</p>
+      <nav class="sitenav" aria-label="儀器原理" data-en-aria-label="Instrument Principles"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../lcq/" data-en="Ion trap MS">離子阱質譜</a><a href="./" aria-current="page">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/" data-en="Mass analyzers">質譜儀-不同分析器比較</a><a href="../spectroscopy/" data-en="Light and molecules">光與分子</a><a href="../chromatography/" data-en="Chromatography">層析</a><a href="../plot/" data-en="Data plotting">數據畫圖</a></nav>
+      <h1 class="ttl"><span class="ttl-a">GC-MS</span><span class="ttl-b" data-en="Take it apart">拆開來看</span></h1>
+      <p class="lede" data-en="GC separates the components in a thin tube 30&nbsp;m long (the column); MS (mass spectrometry) then measures their mass. Injected together, they come out minutes apart as a row of peaks on the chromatogram. Press Tour to follow one component's molecules.">GC 先在 30&nbsp;m 長的細管(管柱)裡把成分分開,MS(質譜)再量出它們的質量。同一針樣品的成分一起出發,出來時卻相隔好幾分鐘,在層析圖上排成一支支峰。按「導覽」,鏡頭會跟著一個成分的分子走一趟。</p>
       <div class="chips">
-        <div class="chip lead"><span class="chip-k">時間</span><span class="chip-v" id="chipT">0.00 min</span></div>
-        <div class="chip"><span class="chip-k">管柱溫度</span><span class="chip-v" id="chipOven">60.0 °C</span></div>
-        <div class="chip"><span class="chip-k" id="chipKk">停留倍數 k</span><span class="chip-v" id="chipK">4.60</span></div>
+        <div class="chip lead"><span class="chip-k" data-en="Time">時間</span><span class="chip-v" id="chipT">0.00 min</span></div>
+        <div class="chip"><span class="chip-k" data-en="Oven temp">管柱溫度</span><span class="chip-v" id="chipOven">60.0 °C</span></div>
+        <div class="chip"><span class="chip-k" id="chipKk" data-en="Retention factor k">停留倍數 k</span><span class="chip-v" id="chipK">4.60</span></div>
       </div>
       <p class="story" id="story" aria-live="polite"></p>
       <div class="tourbar" id="tourbar" hidden>
-        <span class="tour-step" id="tourStep">導覽</span>
+        <span class="tour-step" id="tourStep" data-en="Tour">導覽</span>
         <span class="tour-dots" id="tourDots" aria-hidden="true"></span>
         <span class="cs-sp"></span>
-        <button class="mini" id="tourNext" type="button">下一步</button>
-        <button class="mini" id="tourEnd" type="button">結束導覽</button>
+        <button class="mini" id="tourNext" type="button" data-en="Next">下一步</button>
+        <button class="mini" id="tourEnd" type="button" data-en="End tour">結束導覽</button>
       </div>
     </header>
 
-    <section class="panel ctl" id="ctl" aria-label="控制">
-      <button class="ico ctl-x" id="btnSheetX" type="button" aria-label="關閉設定"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+    <section class="panel ctl" id="ctl" aria-label="控制" data-en-aria-label="Controls">
+      <button class="ico ctl-x" id="btnSheetX" type="button" aria-label="關閉設定" data-en-aria-label="Close settings"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
       <div class="ctl-row">
         <div class="ctl-g">
-          <span class="ctl-k">追蹤成分</span>
-          <div class="seg" id="segTrack" role="group" aria-label="追蹤成分">
-            <button type="button" data-track="auto" aria-pressed="true">自動</button>
+          <span class="ctl-k" data-en="Follow compound">追蹤成分</span>
+          <div class="seg" id="segTrack" role="group" aria-label="追蹤成分" data-en-aria-label="Follow compound">
+            <button type="button" data-track="auto" aria-pressed="true" data-en="Auto">自動</button>
             <button type="button" data-track="apin" aria-pressed="false">α-Pinene</button>
             <button type="button" data-track="lim" aria-pressed="false">Limonene</button>
             <button type="button" data-track="caryo" aria-pressed="false">Caryophyllene</button>
           </div>
         </div>
         <div class="ctl-g grow">
-          <label class="ctl-k" for="tSlider"><span>時間</span><span class="num" id="tSliderV">0.00 min</span></label>
+          <label class="ctl-k" for="tSlider"><span data-en="Time">時間</span><span class="num" id="tSliderV">0.00 min</span></label>
           <input type="range" id="tSlider" min="0" max="56.33" step="0.01" value="0">
         </div>
       </div>
       <div class="ctl-row">
         <div class="ctl-g">
-          <span class="ctl-k">升溫速率</span>
-          <div class="seg" id="segRate" role="group" aria-label="升溫速率">
-            <button type="button" data-rate="3" aria-pressed="true">3 °C/min<small>共 56 min</small></button>
-            <button type="button" data-rate="5" aria-pressed="false">5 °C/min<small>共 35 min</small></button>
-            <button type="button" data-rate="10" aria-pressed="false">10 °C/min<small>共 19 min</small></button>
+          <span class="ctl-k" data-en="Heating rate">升溫速率</span>
+          <div class="seg" id="segRate" role="group" aria-label="升溫速率" data-en-aria-label="Heating rate">
+            <button type="button" data-rate="3" aria-pressed="true">3 °C/min<small data-en="56 min">共 56 min</small></button>
+            <button type="button" data-rate="5" aria-pressed="false">5 °C/min<small data-en="35 min">共 35 min</small></button>
+            <button type="button" data-rate="10" aria-pressed="false">10 °C/min<small data-en="19 min">共 19 min</small></button>
           </div>
         </div>
         <div class="ctl-g">
-          <span class="ctl-k">儀器</span>
-          <div class="seg" id="segX" role="group" aria-label="儀器">
-            <button type="button" data-x="0" aria-pressed="true">組裝</button>
-            <button type="button" data-x="1" aria-pressed="false">拆開</button>
+          <span class="ctl-k" data-en="Instrument">儀器</span>
+          <div class="seg" id="segX" role="group" aria-label="儀器" data-en-aria-label="Instrument">
+            <button type="button" data-x="0" aria-pressed="true" data-en="Closed">組裝</button>
+            <button type="button" data-x="1" aria-pressed="false" data-en="Open">拆開</button>
           </div>
         </div>
         <div class="ico-row">
-          <button class="ico" id="btnInj" type="button" title="重新進樣 (I)" aria-label="重新進樣"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v3M6 4.5h4M7 4.5v6.5l1 2.5 1-2.5V4.5"/><path d="M5.2 8h1.8M5.2 10h1.8"/></svg></button>
-          <button class="ico ico-txt" id="btnTour" type="button" title="導覽:鏡頭跟著一個成分的分子走一趟 (C)" aria-pressed="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="3.5" cy="12.5" r="1.7"/><circle cx="12.5" cy="3.5" r="1.7"/><path d="M5.3 12.5h4.4a2.4 2.4 0 0 0 0-4.8H6.3a2.4 2.4 0 0 1 0-4.8h4.4"/></svg>導覽</button>
-          <button class="ico ico-txt" id="btnXp" type="button" title="動畫說明:走走停停、保留指數、電子撞擊游離、四極桿"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="1.8" y="2.8" width="12.4" height="10.4" rx="2"/><path d="M6.6 5.8v4.4L10.4 8z" fill="currentColor"/></svg>動畫</button>
-          <button class="ico" id="btnHelp" type="button" title="原理說明 (H)" aria-label="原理說明"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5.8 5.8a2.3 2.3 0 1 1 3.2 2.1c-.6.3-1 .8-1 1.5v.4"/><circle cx="8" cy="12.6" r=".5" fill="currentColor"/></svg></button>
+          <button class="ico" id="btnInj" type="button" title="重新進樣 (I)" aria-label="重新進樣" data-en-title="Inject again (I)" data-en-aria-label="Inject again"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v3M6 4.5h4M7 4.5v6.5l1 2.5 1-2.5V4.5"/><path d="M5.2 8h1.8M5.2 10h1.8"/></svg></button>
+          <button class="ico ico-txt" id="btnTour" type="button" title="導覽:鏡頭跟著一個成分的分子走一趟 (C)" data-en-title="Tour: the camera follows one component's molecules (C)" aria-pressed="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="3.5" cy="12.5" r="1.7"/><circle cx="12.5" cy="3.5" r="1.7"/><path d="M5.3 12.5h4.4a2.4 2.4 0 0 0 0-4.8H6.3a2.4 2.4 0 0 1 0-4.8h4.4"/></svg><span data-en="Tour">導覽</span></button>
+          <button class="ico ico-txt" id="btnXp" type="button" title="動畫說明:走走停停、保留指數、電子撞擊游離、四極桿" data-en-title="Animations: stop and go, retention index, electron ionization, quadrupole"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="1.8" y="2.8" width="12.4" height="10.4" rx="2"/><path d="M6.6 5.8v4.4L10.4 8z" fill="currentColor"/></svg><span data-en="Animations">動畫</span></button>
+          <button class="ico" id="btnHelp" type="button" title="原理說明 (H)" aria-label="原理說明" data-en-title="How it works (H)" data-en-aria-label="How it works"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5.8 5.8a2.3 2.3 0 1 1 3.2 2.1c-.6.3-1 .8-1 1.5v.4"/><circle cx="8" cy="12.6" r=".5" fill="currentColor"/></svg></button>
         </div>
       </div>
     </section>
 
     <div class="hole" id="hole"></div>
 
-    <section class="panel console" id="console" aria-label="主控台" data-tab="chrom">
+    <section class="panel console" id="console" aria-label="主控台" data-en-aria-label="Console" data-tab="chrom">
       <div class="cs cs-oven">
-        <div class="cs-h"><span class="cs-t">管柱烘箱</span></div>
+        <div class="cs-h"><span class="cs-t" data-en="Column oven">管柱烘箱</span></div>
         <div class="oven-T"><span id="ovenT">60.0</span><small>°C</small></div>
-        <div class="oven-p" id="ovenP">60 → 220 °C · 3 °C/min<br>保持 3 min</div>
-        <canvas class="cv" id="cvOven" aria-label="升溫程式"></canvas>
+        <div class="oven-p" id="ovenP">60 → 220 °C · 3 °C/min<br><span lang="zh-Hant">保持 3 min</span><span lang="en">hold 3 min</span></div>
+        <canvas class="cv" id="cvOven" aria-label="升溫程式" data-en-aria-label="Temperature program"></canvas>
       </div>
       <div class="cs cs-chrom">
         <div class="cs-h">
-          <div class="seg tabs" id="segTab" role="group" aria-label="切換圖表"><button type="button" data-tab="chrom" aria-pressed="true">層析圖</button><button type="button" data-tab="ms" aria-pressed="false">質譜</button></div>
-          <span class="cs-t no-m">層析圖:每一刻的離子總數</span>
+          <div class="seg tabs" id="segTab" role="group" aria-label="切換圖表" data-en-aria-label="Switch chart"><button type="button" data-tab="chrom" aria-pressed="true" data-en="Chromatogram">層析圖</button><button type="button" data-tab="ms" aria-pressed="false" data-en="MS">質譜</button></div>
+          <span class="cs-t no-m" data-en="Chromatogram">層析圖:每一刻的離子總數</span>
           <div class="legend" id="legend"></div>
           <span class="cs-sp"></span>
           <button class="mini eic" id="btnEic" type="button" hidden></button>
-          <button class="mini no-m" id="btnTable" type="button" aria-pressed="false">成分表</button>
+          <button class="mini no-m" id="btnTable" type="button" aria-pressed="false" data-en="Peak table">成分表</button>
           <button class="mini play" id="btnPlay" type="button"></button>
-          <select class="mini sel" id="speedSel" aria-label="播放速度" title="播放速度:0.1×、0.5× 是慢動作,3× 只加快時間軸"><option value="0.1">0.1×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="3">3×</option></select>
-          <button class="mini btn-sheet" id="btnSheet" type="button" aria-haspopup="true">設定</button>
+          <select class="mini sel" id="speedSel" aria-label="播放速度" title="播放速度:0.1×、0.5× 是慢動作,3× 只加快時間軸" data-en-aria-label="Playback speed" data-en-title="Playback speed: 0.1× and 0.5× are slow motion; 3× speeds up only the timeline"><option value="0.1">0.1×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="3">3×</option></select>
+          <button class="mini btn-sheet" id="btnSheet" type="button" aria-haspopup="true" data-en="Settings">設定</button>
         </div>
-        <canvas class="cv" id="cvChrom" aria-label="總離子層析圖,拖曳可前後捲動時間,點峰可追蹤該成分"></canvas>
-        <canvas class="cv cv-over" id="cvOver" aria-label="整次分析的層析圖總覽,點選或拖曳可跳到該時間"></canvas>
+        <canvas class="cv" id="cvChrom" aria-label="總離子層析圖,拖曳可前後捲動時間,點峰可追蹤該成分" data-en-aria-label="Total ion chromatogram; drag to scroll in time, click a peak to follow that component"></canvas>
+        <canvas class="cv cv-over" id="cvOver" aria-label="整次分析的層析圖總覽,點選或拖曳可跳到該時間" data-en-aria-label="Overview of the whole run; click or drag to jump to that time"></canvas>
         <div class="ptable" id="ptable" hidden></div>
       </div>
       <div class="cs cs-ms">
         <div class="cs-h">
-          <div class="seg tabs" role="group" aria-label="切換圖表"><button type="button" data-tab="chrom" aria-pressed="false">層析圖</button><button type="button" data-tab="ms" aria-pressed="true">質譜</button></div>
-          <span class="cs-t no-m">質譜</span><span class="cs-sub" id="msTime">0.00 min</span>
+          <div class="seg tabs" role="group" aria-label="切換圖表" data-en-aria-label="Switch chart"><button type="button" data-tab="chrom" aria-pressed="false" data-en="Chromatogram">層析圖</button><button type="button" data-tab="ms" aria-pressed="true" data-en="MS">質譜</button></div>
+          <span class="cs-t no-m" data-en="MS">質譜</span><span class="cs-sub" id="msTime">0.00 min</span>
           <span class="cs-sp"></span>
-          <div class="seg seg-sm" id="segMsView" role="group" aria-label="質譜面板"><button type="button" data-v="spec" aria-pressed="true">譜圖</button><button type="button" data-v="quad" aria-pressed="false">四極桿</button></div>
+          <div class="seg seg-sm" id="segMsView" role="group" aria-label="質譜面板" data-en-aria-label="Mass spectrum panel"><button type="button" data-v="spec" aria-pressed="true" data-en="Spectrum">譜圖</button><button type="button" data-v="quad" aria-pressed="false" data-en="Quadrupole">四極桿</button></div>
         </div>
         <div class="ms-hit" id="msHit"></div>
-        <canvas class="cv" id="cvMS" aria-label="目前時間的質譜,點一根質譜線可抽出該離子的層析圖"></canvas>
-        <div class="foot" id="msFoot">點一根質譜線,層析圖下方會多一條只看這種離子的曲線;暫停在峰上可看碎片怎麼來</div>
+        <canvas class="cv" id="cvMS" aria-label="目前時間的質譜,點一根質譜線可抽出該離子的層析圖" data-en-aria-label="Mass spectrum at the current time; click a line to extract that ion's chromatogram"></canvas>
+        <div class="foot" id="msFoot" data-en="Click a line for a chromatogram of just that ion; pause on a peak to see how fragments form">點一根質譜線,層析圖下方會多一條只看這種離子的曲線;暫停在峰上可看碎片怎麼來</div>
         <div class="qctl" id="qctl" hidden>
-          <label for="qSlider">固定 m/z</label>
+          <label for="qSlider" data-en="Fix m/z">固定 m/z</label>
           <input type="range" id="qSlider" min="40" max="230" step="1" value="93">
-          <span class="num" id="qVal">掃描中</span>
-          <button class="mini" id="btnScan" type="button" aria-pressed="true">自動掃描</button>
-          <button class="mini" id="btnQuadXp" type="button" title="翻轉馬鞍的動畫:為什麼一次只放行一種 m/z">電場動畫</button>
+          <span class="num" id="qVal" data-en="Scanning">掃描中</span>
+          <button class="mini" id="btnScan" type="button" aria-pressed="true" data-en="Auto scan">自動掃描</button>
+          <button class="mini" id="btnQuadXp" type="button" title="翻轉馬鞍的動畫:為什麼一次只放行一種 m/z" data-en-title="Flipping-saddle animation: why only one m/z passes at a time" data-en="Animation">電場動畫</button>
         </div>
       </div>
     </section>
-    <p class="credit"><span>GC-MS 原理,</span><span>以 Agilent 6850 GC(含 ALS 自動進樣器)與 5973N MSD 為例</span></p>
+    <p class="credit"><span data-en="GC-MS principles,&nbsp;">GC-MS 原理,</span><span data-en="using the Agilent 6850 GC (with ALS autosampler) and 5973N MSD as the example">以 Agilent 6850 GC(含 ALS 自動進樣器)與 5973N MSD 為例</span></p>
   </div>
 
   <div class="tip" id="tip" hidden></div>
 
   <div class="modal" id="help" hidden>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
-      <button class="ico x" id="helpX" type="button" aria-label="關閉說明"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
-      <h2 id="helpTitle">一支峰是怎麼來的</h2>
-      <p>這個頁面把一針精油從進樣到出圖譜的過程拆開來看。GC(氣相層析儀)先用細長的管柱把成分分開,MS(質譜儀)再讓分子帶電、量出質量。管柱裡的色帶(每個成分一條)、底下的層析圖(一個成分流出來就是一支峰)和質譜,都是同一個模型即時算出來的,所以拖動時間、改升溫速率,三者會一起變。精油的成分大多是萜類:單萜以 10 個碳為骨架,倍半萜是 15 個碳;圖例裡的「烯」只含碳和氫,「含氧」的多了氧原子。</p>
+      <button class="ico x" id="helpX" type="button" aria-label="關閉說明" data-en-aria-label="Close help"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+      <h2 id="helpTitle" data-en="Where a peak comes from">一支峰是怎麼來的</h2>
+      <p lang="zh-Hant">這個頁面把一針精油從進樣到出圖譜的過程拆開來看。GC(氣相層析儀)先用細長的管柱把成分分開,MS(質譜儀)再讓分子帶電、量出質量。管柱裡的色帶(每個成分一條)、底下的層析圖(一個成分流出來就是一支峰)和質譜,都是同一個模型即時算出來的,所以拖動時間、改升溫速率,三者會一起變。精油的成分大多是萜類:單萜以 10 個碳為骨架,倍半萜是 15 個碳;圖例裡的「烯」只含碳和氫,「含氧」的多了氧原子。</p>
+      <p lang="en">This page takes apart what happens to one injection of essential oil, from injection to the finished chromatogram. The GC (gas chromatograph) first separates the components in a long, thin column; the MS (mass spectrometer) then gives the molecules a charge and measures their mass. The colored bands in the column (one per component), the chromatogram below (each component that comes out makes a peak) and the mass spectrum are all computed live from the same model, so when you drag the time or change the heating rate, all three change together. Most essential oil components are terpenes: monoterpenes are built on 10 carbons, sesquiterpenes on 15. In the legend, the plain monoterpenes and sesquiterpenes contain only carbon and hydrogen; the "oxygenated" ones also contain oxygen.</p>
 
-      <h3>進樣:自動進樣器與進樣口</h3>
-      <p>自動進樣器(ALS)先用溶劑洗針,再從樣品瓶抽 <b>1 μL</b>,刺穿橡膠隔墊打進 <b>250 °C</b> 的玻璃襯管。液體瞬間氣化,體積脹大兩三百倍。這裡用「分流」:大部分蒸氣從分流出口排掉,只有一小部分被載氣(推著樣品前進的氦氣 He)帶進管柱。進樣器在推下活塞的同一刻送出開始訊號,GC 從這一刻開始計時。</p>
+      <h3 data-en="Injection: autosampler and inlet">進樣:自動進樣器與進樣口</h3>
+      <p lang="zh-Hant">自動進樣器(ALS)先用溶劑洗針,再從樣品瓶抽 <b>1 μL</b>,刺穿橡膠隔墊打進 <b>250 °C</b> 的玻璃襯管。液體瞬間氣化,體積脹大兩三百倍。這裡用「分流」:大部分蒸氣從分流出口排掉,只有一小部分被載氣(推著樣品前進的氦氣 He)帶進管柱。進樣器在推下活塞的同一刻送出開始訊號,GC 從這一刻開始計時。</p>
+      <p lang="en">The autosampler (ALS) first rinses the needle with solvent, then draws <b>1 μL</b> from the sample vial, pierces the rubber septum and injects it into the <b>250 °C</b> glass liner. The liquid vaporizes at once and swells two to three hundred times in volume. This setup uses a split: most of the vapor leaves through the split vent, and only a small part is carried into the column by the carrier gas (helium, He, which pushes the sample along). The autosampler sends a start signal the moment it pushes the plunger down, and the GC starts timing from that moment.</p>
 
-      <h3>分開的原理:液膜與載氣</h3>
-      <p>管柱(HP-5MS)內壁塗了一層 <b>0.25 μm</b> 厚的液膜,是一種耐高溫、像矽油的高分子(5% 苯基聚矽氧烷)。分子不停在載氣和液膜之間進出:溶在液膜裡的時候停住不動,回到載氣裡才往前走。<b>k 值</b>就是「在液膜裡的量 ÷ 在載氣裡的量」,也就是停住的時間是前進時間的幾倍,所以一個成分的前進速度是載氣的 <b>1/(1+k)</b>。k 越大,出來得越晚。按角落的「放大鏡」打開來看,畫的就是這件事:分子停在金色液膜裡的比例就是 k/(1+k)。</p>
-      <button class="mini xp-open" type="button" data-xp="part">▶ 看動畫:走走停停</button>
+      <h3 data-en="How separation works: the film and the gas">分開的原理:液膜與載氣</h3>
+      <p lang="zh-Hant">管柱(HP-5MS)內壁塗了一層 <b>0.25 μm</b> 厚的液膜,是一種耐高溫、像矽油的高分子(5% 苯基聚矽氧烷)。分子不停在載氣和液膜之間進出:溶在液膜裡的時候停住不動,回到載氣裡才往前走。<b>k 值</b>就是「在液膜裡的量 ÷ 在載氣裡的量」,也就是停住的時間是前進時間的幾倍,所以一個成分的前進速度是載氣的 <b>1/(1+k)</b>。k 越大,出來得越晚。按角落的「放大鏡」打開來看,畫的就是這件事:分子停在金色液膜裡的比例就是 k/(1+k)。</p>
+      <p lang="en">The inner wall of the column (HP-5MS) is coated with a liquid film <b>0.25 μm</b> thick, a heat-resistant polymer much like silicone oil (5% phenyl polysiloxane). Molecules keep moving between the carrier gas and the film: while dissolved in the film they stand still, and only back in the gas do they move on. The <b>k value</b> (retention factor) is "amount in the film ÷ amount in the gas", that is, how many times longer a molecule stands still than it moves, so a component travels at <b>1/(1+k)</b> of the carrier gas speed. The larger k is, the later it comes out. Press Magnifier in the corner to see exactly this: the share of molecules sitting in the gold film is k/(1+k).</p>
+      <button class="mini xp-open" type="button" data-xp="part" data-en="▶ Watch: stop and go">▶ 看動畫:走走停停</button>
 
-      <h3>升溫程式:邊分析邊加熱</h3>
-      <p>k 會隨溫度急速下降。60 °C 時 (E)-Caryophyllene 的 k 將近 300,幾乎黏在管柱入口不動;升到 130 °C 左右 k 降到 4 上下,它才真正開始跑。升溫讓每個成分在各自合適的溫度離開,前面的峰不會擠成一團,後面的峰也不會拖成又寬又矮的小丘。</p>
-      <p>升溫越快,分析越短,但相鄰成分之間的距離縮得比峰寬還快。Limonene 和 1,8-Cineole 在 3 °C/min 時分離度 Rs 約 0.9(1.5 以上才算完全分開),看得到兩支峰中間的凹谷;10 °C/min 時只剩 0.7,幾乎併成一支。</p>
+      <h3 data-en="Temperature program: heating during the run">升溫程式:邊分析邊加熱</h3>
+      <p lang="zh-Hant">k 會隨溫度急速下降。60 °C 時 (E)-Caryophyllene 的 k 將近 300,幾乎黏在管柱入口不動;升到 130 °C 左右 k 降到 4 上下,它才真正開始跑。升溫讓每個成分在各自合適的溫度離開,前面的峰不會擠成一團,後面的峰也不會拖成又寬又矮的小丘。</p>
+      <p lang="en">k falls steeply as the temperature rises. At 60 °C, (E)-Caryophyllene has k close to 300 and barely moves from the column inlet; only around 130 °C, with k down to about 4, does it really get going. Heating lets each component leave at a temperature that suits it, so the early peaks do not crowd together and the late ones do not drag out into wide, low humps.</p>
+      <p lang="zh-Hant">升溫越快,分析越短,但相鄰成分之間的距離縮得比峰寬還快。Limonene 和 1,8-Cineole 在 3 °C/min 時分離度 Rs 約 0.9(1.5 以上才算完全分開),看得到兩支峰中間的凹谷;10 °C/min 時只剩 0.7,幾乎併成一支。</p>
+      <p lang="en">Faster heating gives a shorter run, but the gap between neighboring components shrinks faster than the peaks narrow. At 3 °C/min, Limonene and 1,8-Cineole have a resolution Rs of about 0.9 (1.5 or more counts as fully separated), and you can see a dip between the two peaks; at 10 °C/min it is only 0.7, and they nearly merge into one.</p>
 
-      <h3>質譜:為什麼量得到質量</h3>
-      <p>分子不帶電,電場推不動它,所以第一步是讓它帶電。管柱出口經過 250 °C 的傳輸線(加熱的套管),直接伸進真空中的離子源(讓分子帶電的地方)。燈絲放出的電子被加速到 <b>70 eV</b>,撞上分子,把分子的一個電子撞掉,分子就變成帶一個正電的<b>分子離子 M⁺•</b>(⁺ 代表正電,• 代表留下一個落單的電子)。電子的質量只有質子的 1/1836,少一個電子幾乎不影響質量,電荷又是 +1,所以 M⁺• 的 m/z(質量除以電荷)就等於分子量。</p>
-      <p>帶電之後,推斥極和透鏡用電場把離子推進<b>四極桿</b>,它的作用像篩子。四根金屬桿兩兩相對,加上直流電壓 U 和快速正負交替的射頻電壓 V。離子一邊前進一邊被來回推拉,能不能穩定穿過只看 m/z:太輕的離子跟著射頻擺動,擺幅越來越大,撞上桿子;太重的離子跟不上射頻,被直流慢慢拉向桿子。U 和 V 依固定比例一起調高,能通過的 m/z 就從 40 一路掃到 400。質譜面板切到「四極桿」,可以看到每個離子在穩定圖(由 Mathieu 方程式算出)上的位置:越重越靠左,只有落進頂端窄窄窗口的那一個能通過。</p>
-      <button class="mini xp-open" type="button" data-xp="quad">▶ 看動畫:翻轉的馬鞍</button>
-      <p>穿過四極桿的離子撞上<b>高能倍增極</b>,轉成電子,再經電子倍增器放大十萬倍以上,變成量得到的電流。記下每個 m/z 收到多少離子就是質譜;同一次掃描的離子全部加起來,就是層析圖上的一個點(所以這張圖又叫總離子層析圖,TIC)。整個過程在高真空裡進行,離子才不會在半路撞上空氣分子;中性的分子電場推不動,直接被渦輪分子泵(高速旋轉的真空泵)抽走。</p>
+      <h3 data-en="Mass spectrometry: how mass is measured">質譜:為什麼量得到質量</h3>
+      <p lang="zh-Hant">分子不帶電,電場推不動它,所以第一步是讓它帶電。管柱出口經過 250 °C 的傳輸線(加熱的套管),直接伸進真空中的離子源(讓分子帶電的地方)。燈絲放出的電子被加速到 <b>70 eV</b>,撞上分子,把分子的一個電子撞掉,分子就變成帶一個正電的<b>分子離子 M⁺•</b>(⁺ 代表正電,• 代表留下一個落單的電子)。電子的質量只有質子的 1/1836,少一個電子幾乎不影響質量,電荷又是 +1,所以 M⁺• 的 m/z(質量除以電荷)就等於分子量。</p>
+      <p lang="en">A molecule with no charge cannot be pushed by an electric field, so the first step is to give it a charge. The column outlet runs through the 250 °C transfer line (a heated sleeve) straight into the ion source (where molecules get charged), inside a vacuum. Electrons from a filament are accelerated to <b>70 eV</b> and hit the molecules, knocking one electron off, which turns a molecule into the singly positive <b>molecular ion M⁺•</b> (⁺ means a positive charge, • means one unpaired electron is left). An electron has only 1/1836 the mass of a proton, so losing one barely changes the mass, and the charge is +1, so the m/z (mass divided by charge) of M⁺• equals the molecular weight.</p>
+      <p lang="zh-Hant">帶電之後,推斥極和透鏡用電場把離子推進<b>四極桿</b>,它的作用像篩子。四根金屬桿兩兩相對,加上直流電壓 U 和快速正負交替的射頻電壓 V。離子一邊前進一邊被來回推拉,能不能穩定穿過只看 m/z:太輕的離子跟著射頻擺動,擺幅越來越大,撞上桿子;太重的離子跟不上射頻,被直流慢慢拉向桿子。U 和 V 依固定比例一起調高,能通過的 m/z 就從 40 一路掃到 400。質譜面板切到「四極桿」,可以看到每個離子在穩定圖(由 Mathieu 方程式算出)上的位置:越重越靠左,只有落進頂端窄窄窗口的那一個能通過。</p>
+      <p lang="en">Once charged, the ions are pushed into the <b>quadrupole</b> by the electric fields of the repeller and the lenses; it works like a sieve. Four metal rods face each other in pairs and carry a DC voltage U and a radio-frequency (RF) voltage V that swaps between plus and minus very fast. The ions are pushed and pulled back and forth as they travel, and whether one gets through steadily depends only on its m/z: an ion that is too light follows the RF, swings wider and wider and hits a rod; one that is too heavy cannot keep up with the RF and is slowly pulled to a rod by the DC. Raising U and V together at a fixed ratio sweeps the m/z that passes from 40 all the way to 400. Switch the mass spectrum panel to Quadrupole to see where each ion sits on the stability plot (computed from the Mathieu equation): heavier ions sit further left, and only the one in the narrow window at the top gets through.</p>
+      <button class="mini xp-open" type="button" data-xp="quad" data-en="▶ Watch: the flipping saddle">▶ 看動畫:翻轉的馬鞍</button>
+      <p lang="zh-Hant">穿過四極桿的離子撞上<b>高能倍增極</b>,轉成電子,再經電子倍增器放大十萬倍以上,變成量得到的電流。記下每個 m/z 收到多少離子就是質譜;同一次掃描的離子全部加起來,就是層析圖上的一個點(所以這張圖又叫總離子層析圖,TIC)。整個過程在高真空裡進行,離子才不會在半路撞上空氣分子;中性的分子電場推不動,直接被渦輪分子泵(高速旋轉的真空泵)抽走。</p>
+      <p lang="en">Ions that make it through the quadrupole hit the <b>high-energy dynode</b> and turn into electrons, which an electron multiplier amplifies more than 100,000 times into a current that can be measured. Recording how many ions arrive at each m/z gives the mass spectrum; adding up all the ions of one scan gives one point of the chromatogram (which is why it is also called the total ion chromatogram, TIC). It all happens in a high vacuum so that the ions do not hit air molecules on the way; neutral molecules cannot be pushed by the field and are simply pumped away by the turbomolecular pump (a vacuum pump that spins very fast).</p>
 
-      <h3>為什麼會有碎片</h3>
-      <p>把分子的電子撞掉只需要大約 8 到 10 eV,70 eV 的電子帶來的能量多得多,多出來的部分留在 M⁺• 裡,讓它劇烈振動,比較弱的鍵就斷了。斷開時一邊帶著正電,另一邊是中性的自由基(帶落單電子的碎片)或小分子。只有帶電的那一邊會被電場推進四極桿;中性的那一邊推不動,被真空泵抽走,所以在質譜上看不到它。</p>
-      <button class="mini xp-open" type="button" data-xp="ei">▶ 看動畫:電子撞擊游離</button>
-      <p>因此質譜上的每一根線都是「帶電的那一塊」,兩根線的差就是失去的中性碎片。α-Pinene 的 136 → 121 差 15,是失去甲基 CH₃•;136 → 93 差 43,是失去異丙基 C₃H₇•。醇類容易失去水(差 18),乙酸酯會失去乙酸(差 60)。有些分子離子不穩定到幾乎看不到,例如 Linalool 的 154 只剩約 1%,這時要靠碎片和 KI 判斷。</p>
-      <p>同一個分子在 70 eV 下的斷法很固定,碎片分布可以當指紋,拿去和美國 NIST 等機構整理的質譜資料庫比對;大家都用 70 eV,不同儀器的質譜才能互相比較。暫停在任一支峰上,再打開角落的放大鏡,會看到離子源裡一步一步示範這個成分的分子怎麼帶電、怎麼斷開,譜圖上也會圈出正在示範的那一根。</p>
+      <h3 data-en="Why there are fragments">為什麼會有碎片</h3>
+      <p lang="zh-Hant">把分子的電子撞掉只需要大約 8 到 10 eV,70 eV 的電子帶來的能量多得多,多出來的部分留在 M⁺• 裡,讓它劇烈振動,比較弱的鍵就斷了。斷開時一邊帶著正電,另一邊是中性的自由基(帶落單電子的碎片)或小分子。只有帶電的那一邊會被電場推進四極桿;中性的那一邊推不動,被真空泵抽走,所以在質譜上看不到它。</p>
+      <p lang="en">Knocking an electron off a molecule takes only about 8 to 10 eV; a 70 eV electron brings much more energy, and the extra stays in M⁺•, making it vibrate hard until a weaker bond breaks. One side keeps the positive charge; the other is a neutral radical (a fragment with an unpaired electron) or a small molecule. Only the charged side is pushed into the quadrupole by the field; the neutral side cannot be pushed and is pumped away, so it never shows up in the mass spectrum.</p>
+      <button class="mini xp-open" type="button" data-xp="ei" data-en="▶ Watch: electron ionization">▶ 看動畫:電子撞擊游離</button>
+      <p lang="zh-Hant">因此質譜上的每一根線都是「帶電的那一塊」,兩根線的差就是失去的中性碎片。α-Pinene 的 136 → 121 差 15,是失去甲基 CH₃•;136 → 93 差 43,是失去異丙基 C₃H₇•。醇類容易失去水(差 18),乙酸酯會失去乙酸(差 60)。有些分子離子不穩定到幾乎看不到,例如 Linalool 的 154 只剩約 1%,這時要靠碎片和 KI 判斷。</p>
+      <p lang="en">So every line in a mass spectrum is a charged piece, and the difference between two lines is the neutral piece that was lost. For α-Pinene, 136 → 121 is a difference of 15, the loss of a methyl group CH₃•; 136 → 93 is 43, the loss of an isopropyl group C₃H₇•. Alcohols easily lose water (a difference of 18), and acetates lose acetic acid (60). Some molecular ions are so unstable they are barely visible; Linalool's 154, for example, is only about 1%, and then the fragments and the KI have to do the identifying.</p>
+      <p lang="zh-Hant">同一個分子在 70 eV 下的斷法很固定,碎片分布可以當指紋,拿去和美國 NIST 等機構整理的質譜資料庫比對;大家都用 70 eV,不同儀器的質譜才能互相比較。暫停在任一支峰上,再打開角落的放大鏡,會看到離子源裡一步一步示範這個成分的分子怎麼帶電、怎麼斷開,譜圖上也會圈出正在示範的那一根。</p>
+      <p lang="en">At 70 eV a given molecule breaks in a very consistent way, so its fragment pattern works like a fingerprint and can be matched against mass spectral libraries such as the one compiled by NIST in the United States; because everyone uses 70 eV, spectra from different instruments can be compared. Pause on any peak and open the magnifier in the corner: the ion source then shows, step by step, how that component's molecules get charged and break apart, and the spectrum circles the line being shown.</p>
 
-      <h3>Limonene 和 1,8-Cineole</h3>
-      <p>兩者的 KI 只差 2,在 HP-5MS 管柱上常疊成一支峰。可是碎片完全不同:Limonene 最強的一根(基峰)是 m/z 68,1,8-Cineole 是 m/z 43、81、108。在質譜上點 m/z 68,層析圖下方會多畫一條只看這種離子的曲線(EIC),只剩 Limonene 那一支。峰正中間的質譜和資料庫比對的相似度會偏低,也是因為兩者的碎片混在一起。</p>
+      <h3 data-en="Limonene and 1,8-Cineole">Limonene 和 1,8-Cineole</h3>
+      <p lang="zh-Hant">兩者的 KI 只差 2,在 HP-5MS 管柱上常疊成一支峰。可是碎片完全不同:Limonene 最強的一根(基峰)是 m/z 68,1,8-Cineole 是 m/z 43、81、108。在質譜上點 m/z 68,層析圖下方會多畫一條只看這種離子的曲線(EIC),只剩 Limonene 那一支。峰正中間的質譜和資料庫比對的相似度會偏低,也是因為兩者的碎片混在一起。</p>
+      <p lang="en">Their KI differ by only 2, and on an HP-5MS column they often overlap as one peak. Their fragments are completely different, though: Limonene's tallest line (base peak) is m/z 68, while 1,8-Cineole shows m/z 43, 81 and 108. Click m/z 68 in the mass spectrum and a curve for just that ion (an extracted ion chromatogram, EIC) is drawn below the chromatogram, showing only the Limonene peak. The library match in the middle of the peak scores lower for the same reason: the fragments of the two are mixed together.</p>
 
-      <h3>KI 為什麼比流出時間可靠</h3>
-      <p>改升溫速率,所有峰的流出時間(滯留時間)都會跟著變。KI(保留指數)改用直鏈烷類(正烷烴)當尺:7 個碳的烷類記 700、8 個碳的記 800,依此類推,成分夾在哪兩支烷類之間、離哪一支多近,就換算成多少。這樣算出的 KI 換了升溫速率也只差一兩個單位。成分表裡的 KI 就是用同一個模型跑一組 C7 到 C18 直鏈烷類換算出來的,可以切換升溫速率比較看看。</p>
-      <button class="mini xp-open" type="button" data-xp="ki">▶ 看動畫:用烷類當尺</button>
+      <h3 data-en="Why KI is more reliable than elution time">KI 為什麼比流出時間可靠</h3>
+      <p lang="zh-Hant">改升溫速率,所有峰的流出時間(滯留時間)都會跟著變。KI(保留指數)改用直鏈烷類(正烷烴)當尺:7 個碳的烷類記 700、8 個碳的記 800,依此類推,成分夾在哪兩支烷類之間、離哪一支多近,就換算成多少。這樣算出的 KI 換了升溫速率也只差一兩個單位。成分表裡的 KI 就是用同一個模型跑一組 C7 到 C18 直鏈烷類換算出來的,可以切換升溫速率比較看看。</p>
+      <p lang="en">Change the heating rate and the elution time (retention time) of every peak changes too. The KI (retention index) uses straight-chain alkanes (n-alkanes) as a ruler instead: the 7-carbon alkane counts as 700, the 8-carbon one as 800, and so on, and a component gets its value from which two alkanes it falls between and how close it is to each. A KI found this way changes by only one or two units when the heating rate changes. The KI values in the peak table come from running a set of C7 to C18 n-alkanes through the same model; switch the heating rate to compare.</p>
+      <button class="mini xp-open" type="button" data-xp="ki" data-en="▶ Watch: alkanes as a ruler">▶ 看動畫:用烷類當尺</button>
 
-      <h3>操作</h3>
+      <h3 data-en="Controls">操作</h3>
       <div class="keys">
-        <span class="kbd">空白鍵</span><span>播放或暫停,有成分流出時會自動放慢</span>
-        <span class="kbd">, .</span><span>播放速度變慢或變快。0.1× 和 0.5× 是慢動作:時間軸和進樣、分子、碎裂、離子這些動畫一起放慢;3× 只加快時間軸</span>
-        <span class="kbd">[ ]</span><span>時間往前或往後 0.1 min,按住 Shift 為 1 min</span>
-        <span class="kbd">0 1 2 3</span><span>自動追蹤,或追蹤 α-Pinene、Limonene、Caryophyllene</span>
-        <span class="kbd">F</span><span>切換升溫速率</span>
-        <span class="kbd">X</span><span>組裝或拆開儀器</span>
-        <span class="kbd">I</span><span>重新進樣</span>
-        <span class="kbd">C</span><span>導覽:鏡頭跟著一個成分的分子走完全程(用「追蹤成分」先選要跟哪一個);N 跳到下一站,Esc 結束</span>
-        <span class="kbd">Q</span><span>質譜面板切換譜圖與四極桿穩定圖</span>
-        <span class="kbd">方向鍵 W A S D</span><span>移動視角:左右平移、上下前後;按住 Shift 加快</span>
-        <span class="kbd">+ −</span><span>縮放</span>
-        <span class="kbd">R</span><span>重設視角</span>
-        <span class="kbd">/</span><span>隱藏介面</span>
-        <span class="kbd">滑鼠</span><span>拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;點一下儀器的部件或它的標籤,鏡頭會飛過去放大那一區;牆上的說明圖點一下會播動畫;放大鏡平常收起,按角落的「放大鏡」打開、按 × 收起,打開後可以拖到別的地方,雙擊回到原位;在層析圖上拖曳可捲動時間,點峰可追蹤該成分</span>
-        <span class="kbd">觸控板</span><span>雙指滑動平移,兩指捏合縮放;觸控螢幕:單指旋轉,雙指平移與縮放</span>
+        <span class="kbd" data-en="Space">空白鍵</span><span data-en="Play or pause; it slows down by itself while a component comes out">播放或暫停,有成分流出時會自動放慢</span>
+        <span class="kbd">, .</span><span data-en="Slower or faster playback. 0.1× and 0.5× are slow motion: the timeline slows down together with the injection, molecule, fragmentation and ion animations; 3× speeds up only the timeline">播放速度變慢或變快。0.1× 和 0.5× 是慢動作:時間軸和進樣、分子、碎裂、離子這些動畫一起放慢;3× 只加快時間軸</span>
+        <span class="kbd">[ ]</span><span data-en="Time back or forward 0.1 min; with Shift, 1 min">時間往前或往後 0.1 min,按住 Shift 為 1 min</span>
+        <span class="kbd">0 1 2 3</span><span data-en="Follow automatically, or follow α-Pinene, Limonene or Caryophyllene">自動追蹤,或追蹤 α-Pinene、Limonene、Caryophyllene</span>
+        <span class="kbd">F</span><span data-en="Change the heating rate">切換升溫速率</span>
+        <span class="kbd">X</span><span data-en="Close or open up the instrument">組裝或拆開儀器</span>
+        <span class="kbd">I</span><span data-en="Inject again">重新進樣</span>
+        <span class="kbd">C</span><span data-en="Tour: the camera follows one component's molecules all the way (choose which under Follow compound first); N skips to the next stop, Esc ends it">導覽:鏡頭跟著一個成分的分子走完全程(用「追蹤成分」先選要跟哪一個);N 跳到下一站,Esc 結束</span>
+        <span class="kbd">Q</span><span data-en="Switch the mass spectrum panel between the spectrum and the quadrupole stability plot">質譜面板切換譜圖與四極桿穩定圖</span>
+        <span class="kbd" data-en="Arrows W A S D">方向鍵 W A S D</span><span data-en="Move the view: sideways, up and down, forward and back; hold Shift to go faster">移動視角:左右平移、上下前後;按住 Shift 加快</span>
+        <span class="kbd">+ −</span><span data-en="Zoom">縮放</span>
+        <span class="kbd">R</span><span data-en="Reset the view">重設視角</span>
+        <span class="kbd">/</span><span data-en="Hide the interface">隱藏介面</span>
+        <span class="kbd" data-en="Mouse">滑鼠</span><span data-en="Drag to rotate the view; right-drag or Shift-drag to pan; scroll to zoom; click a part of the instrument or its label and the camera flies in to zoom on it; click a poster on the wall to play its animation; the magnifier is closed at first: press Magnifier in the corner to open it and × to close it; once open you can drag it elsewhere, and a double-click puts it back; drag on the chromatogram to scroll in time, click a peak to follow that component">拖曳旋轉,右鍵或按住 Shift 拖曳平移,滾輪縮放;點一下儀器的部件或它的標籤,鏡頭會飛過去放大那一區;牆上的說明圖點一下會播動畫;放大鏡平常收起,按角落的「放大鏡」打開、按 × 收起,打開後可以拖到別的地方,雙擊回到原位;在層析圖上拖曳可捲動時間,點峰可追蹤該成分</span>
+        <span class="kbd" data-en="Trackpad">觸控板</span><span data-en="Swipe with two fingers to pan, pinch to zoom; touch screen: one finger rotates, two fingers pan and zoom">雙指滑動平移,兩指捏合縮放;觸控螢幕:單指旋轉,雙指平移與縮放</span>
       </div>
 
-      <h3>數字從哪來</h3>
-      <p>管柱 HP-5MS 30 m × 0.25 mm × 0.25 μm,He 定流 1.0 mL/min(死時間約 1.4 min),柱溫 60 °C 起以 3、5 或 10 °C/min 升到 220 °C 後保持 3 min,溶劑延遲 3 min;進樣口與傳輸線 250 °C、離子源 230 °C。各成分的滯留由 KI 值換算(簡化的熱力學模型),峰寬以約 7 萬理論板數估算。樣品是虛構的示範組成;質譜只取主要離子,強度為概略值,只供說明,不可拿來鑑定。</p>
+      <h3 data-en="Where the numbers come from">數字從哪來</h3>
+      <p lang="zh-Hant">管柱 HP-5MS 30 m × 0.25 mm × 0.25 μm,He 定流 1.0 mL/min(死時間約 1.4 min),柱溫 60 °C 起以 3、5 或 10 °C/min 升到 220 °C 後保持 3 min,溶劑延遲 3 min;進樣口與傳輸線 250 °C、離子源 230 °C。各成分的滯留由 KI 值換算(簡化的熱力學模型),峰寬以約 7 萬理論板數估算。樣品是虛構的示範組成;質譜只取主要離子,強度為概略值,只供說明,不可拿來鑑定。</p>
+      <p lang="en">Column HP-5MS 30 m × 0.25 mm × 0.25 μm, He at a constant 1.0 mL/min (dead time about 1.4 min); the oven starts at 60 °C, heats at 3, 5 or 10 °C/min to 220 °C and holds for 3 min; solvent delay 3 min; inlet and transfer line 250 °C, ion source 230 °C. Each component's retention is converted from its KI (a simplified thermodynamic model), and peak widths are estimated from about 70,000 theoretical plates. The sample is a made-up example mixture; the mass spectra include only the main ions, with approximate intensities, for explanation only and not for identification.</p>
     </div>
   </div>
 
   <div class="modal" id="xp" hidden>
     <div class="modal-card xp-card" role="dialog" aria-modal="true" aria-labelledby="xpTitle">
-      <button class="ico x" id="xpX" type="button" aria-label="關閉動畫"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
-      <div class="xp-tabs" id="xpTabs" role="tablist" aria-label="動畫說明"><button type="button" role="tab" data-k="part">走走停停</button><button type="button" role="tab" data-k="ki">保留指數 KI</button><button type="button" role="tab" data-k="ei">電子撞擊游離</button><button type="button" role="tab" data-k="quad">四極桿</button></div>
+      <button class="ico x" id="xpX" type="button" aria-label="關閉動畫" data-en-aria-label="Close animation"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+      <div class="xp-tabs" id="xpTabs" role="tablist" aria-label="動畫說明" data-en-aria-label="Animations"><button type="button" role="tab" data-k="part" data-en="Stop and go">走走停停</button><button type="button" role="tab" data-k="ki" data-en="Retention index KI">保留指數 KI</button><button type="button" role="tab" data-k="ei" data-en="Electron ionization">電子撞擊游離</button><button type="button" role="tab" data-k="quad" data-en="Quadrupole">四極桿</button></div>
       <h2 id="xpTitle"></h2>
       <canvas id="xpCv" role="img"></canvas>
       <p class="xp-cap" id="xpCap" aria-live="polite"></p>
       <div class="xp-bar">
-        <button class="mini" id="xpPrev" type="button" aria-label="上一段">‹ 上一段</button>
-        <button class="mini" id="xpPlay" type="button">暫停</button>
-        <button class="mini" id="xpNext" type="button" aria-label="下一段">下一段 ›</button>
-        <div class="xp-prog" id="xpProg" title="點一下跳到那裡"><i></i></div>
+        <button class="mini" id="xpPrev" type="button" aria-label="上一段" data-en-aria-label="Previous part" data-en="‹ Previous">‹ 上一段</button>
+        <button class="mini" id="xpPlay" type="button" data-en="Pause">暫停</button>
+        <button class="mini" id="xpNext" type="button" aria-label="下一段" data-en-aria-label="Next part" data-en="Next ›">下一段 ›</button>
+        <div class="xp-prog" id="xpProg" title="點一下跳到那裡" data-en-title="Click to jump there"><i></i></div>
       </div>
     </div>
   </div>
@@ -599,11 +623,11 @@ const f1 = v => v.toFixed(1);
 /* ---------- 成分類別與示範樣品 ---------- */
 // glow 是 3D 色帶的發光色(sRGB 0–1);圖表用 CSS 變數裡驗證過的顏色
 const CLS = {
-  mh: { name: '單萜烯', v: '--c-mh', glow: [0.33, 0.62, 1.0] },
-  om: { name: '含氧單萜', v: '--c-om', glow: [1.0, 0.45, 0.2] },
-  sh: { name: '倍半萜烯', v: '--c-sh', glow: [0.66, 0.58, 1.0] },
-  os: { name: '含氧倍半萜', v: '--c-os', glow: [1.0, 0.72, 0.12] },
-  sv: { name: '溶劑', v: '--c-solv', glow: [0.78, 0.84, 0.95] },
+  mh: { name: zhEn('單萜烯', 'Monoterpenes'), v: '--c-mh', glow: [0.33, 0.62, 1.0] },
+  om: { name: zhEn('含氧單萜', 'Oxygenated monoterpenes'), v: '--c-om', glow: [1.0, 0.45, 0.2] },
+  sh: { name: zhEn('倍半萜烯', 'Sesquiterpenes'), v: '--c-sh', glow: [0.66, 0.58, 1.0] },
+  os: { name: zhEn('含氧倍半萜', 'Oxygenated sesquiterpenes'), v: '--c-os', glow: [1.0, 0.72, 0.12] },
+  sv: { name: zhEn('溶劑', 'Solvent'), v: '--c-solv', glow: [0.78, 0.84, 0.95] },
 };
 // KI 取自實驗室 GC 工具內建的萜類 KI 表(非極性管柱);amt 是虛構的示範組成(面積 %)
 // ms 是 70 eV EI 質譜的主要離子(m/z: 相對強度),只取 m/z 40 以上,強度為概略值
@@ -639,7 +663,7 @@ const CPDS = [
   { id: 'cox', name: 'Caryophyllene oxide', short: 'Caryo. oxide', ki: 1582, amt: 3, cls: 'os', mw: 220,
     ms: { 41: 95, 43: 100, 69: 70, 79: 85, 91: 75, 93: 80, 95: 55, 107: 45, 109: 60, 121: 45, 161: 35, 177: 20, 187: 15, 205: 8, 220: 2 } },
 ];
-const SOLV = { id: 'solv', name: '溶劑', ki: 600, amt: 0, cls: 'sv', solvent: true };
+const SOLV = { id: 'solv', name: zhEn('溶劑', 'Solvent'), ki: 600, amt: 0, cls: 'sv', solvent: true };
 const BYID = new Map([...CPDS, SOLV].map(c => [c.id, c]));
 
 const MZ0 = 40, MZ1 = 230, MZN = MZ1 - MZ0 + 1;
@@ -661,64 +685,64 @@ function unitVec(a) { let s = 0; for (const v of a) s += v * v; s = Math.sqrt(s)
 const FRAG = {
   apin: { f: 'C10H16', ch: [
     { mz: 136 },
-    { mz: 121, ion: 'C9H13', loss: 'CH3', note: '失去一個甲基' },
-    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '四員環打開後失去異丙基,剩下的 C₇H₉⁺ 很穩定,是最強的一根(基峰)' }] },
+    { mz: 121, ion: 'C9H13', loss: 'CH3', note: zhEn('失去一個甲基', 'loses a methyl group') },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: zhEn('四員環打開後失去異丙基,剩下的 C₇H₉⁺ 很穩定,是最強的一根(基峰)', 'the four-membered ring opens and loses an isopropyl group; the C₇H₉⁺ left is very stable and is the tallest line (base peak)') }] },
   camph: { f: 'C10H16', ch: [
     { mz: 136 },
-    { mz: 121, ion: 'C9H13', loss: 'CH3', note: '失去一個甲基,在 Camphene 特別明顯' },
-    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '失去 C₃H₇• 之後的 C₇H₉⁺' }] },
+    { mz: 121, ion: 'C9H13', loss: 'CH3', note: zhEn('失去一個甲基,在 Camphene 特別明顯', 'loses a methyl group, especially strong in Camphene') },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: zhEn('失去 C₃H₇• 之後的 C₇H₉⁺', 'the C₇H₉⁺ left after losing C₃H₇•') }] },
   bpin: { f: 'C10H16', ch: [
     { mz: 136 },
-    { mz: 121, ion: 'C9H13', loss: 'CH3', note: '失去一個甲基' },
-    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '和 α-Pinene 一樣是四員環打開後失去異丙基;兩者碎片很像,要靠 KI 分辨' }] },
+    { mz: 121, ion: 'C9H13', loss: 'CH3', note: zhEn('失去一個甲基', 'loses a methyl group') },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: zhEn('和 α-Pinene 一樣是四員環打開後失去異丙基;兩者碎片很像,要靠 KI 分辨', 'as in α-Pinene, the four-membered ring opens and loses an isopropyl group; their fragments look alike, so KI tells them apart') }] },
   myrc: { f: 'C10H16', ch: [
-    { mz: 136, note: '鏈狀,分子離子很弱' },
-    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '失去 C₃H₇•' },
-    { mz: 69, ion: 'C5H9', loss: 'C5H7', note: '離雙鍵隔一個碳的鍵斷開(烯丙位斷裂),得到很穩定的異戊烯基離子 C₅H₉⁺' }] },
+    { mz: 136, note: zhEn('鏈狀,分子離子很弱', 'a chain molecule, so the molecular ion is weak') },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: zhEn('失去 C₃H₇•', 'loses C₃H₇•') },
+    { mz: 69, ion: 'C5H9', loss: 'C5H7', note: zhEn('離雙鍵隔一個碳的鍵斷開(烯丙位斷裂),得到很穩定的異戊烯基離子 C₅H₉⁺', 'the bond one carbon away from a double bond breaks (allylic cleavage), giving the very stable isopentenyl ion C₅H₉⁺') }] },
   cym: { f: 'C10H14', ch: [
-    { mz: 134, note: '苯環讓分子離子比較穩定,看得到不少' },
-    { mz: 119, ion: 'C9H11', loss: 'CH3', note: '緊鄰苯環的碳斷掉一個甲基(苯甲位斷裂),留下很穩定的離子,是最強的一根(基峰)' },
-    { mz: 91, ion: 'C7H7', loss: 'C3H7', lossTxt: 'CH₃• + C₂H₄', note: '再失去 C₂H₄,重排成很穩定的七員環離子 C₇H₇⁺(卓鎓離子)' }] },
+    { mz: 134, note: zhEn('苯環讓分子離子比較穩定,看得到不少', 'the benzene ring makes the molecular ion fairly stable, so plenty of it shows') },
+    { mz: 119, ion: 'C9H11', loss: 'CH3', note: zhEn('緊鄰苯環的碳斷掉一個甲基(苯甲位斷裂),留下很穩定的離子,是最強的一根(基峰)', 'the carbon next to the benzene ring loses a methyl (benzylic cleavage), leaving a very stable ion, the tallest line (base peak)') },
+    { mz: 91, ion: 'C7H7', loss: 'C3H7', lossTxt: 'CH₃• + C₂H₄', note: zhEn('再失去 C₂H₄,重排成很穩定的七員環離子 C₇H₇⁺(卓鎓離子)', 'then loses C₂H₄ and rearranges into the very stable seven-membered ring ion C₇H₇⁺ (tropylium ion)') }] },
   lim: { f: 'C10H16', ch: [
     { mz: 136 },
-    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: '失去 C₃H₇•' },
-    { mz: 68, ion: 'C5H8', ionRad: true, loss: 'C5H8', lossMol: true, note: '六員環從中間一分為二(逆 Diels-Alder 反應):帶電的一半是 m/z 68,另一半是中性的異戊二烯;這是 Limonene 最強的一根(基峰)' }] },
+    { mz: 93, ion: 'C7H9', loss: 'C3H7', note: zhEn('失去 C₃H₇•', 'loses C₃H₇•') },
+    { mz: 68, ion: 'C5H8', ionRad: true, loss: 'C5H8', lossMol: true, note: zhEn('六員環從中間一分為二(逆 Diels-Alder 反應):帶電的一半是 m/z 68,另一半是中性的異戊二烯;這是 Limonene 最強的一根(基峰)', "the six-membered ring splits in two (retro-Diels-Alder reaction): the charged half is m/z 68, the other half is neutral isoprene; this is Limonene's tallest line (base peak)") }] },
   cin: { f: 'C10H18O', ch: [
-    { mz: 154, note: '醚類,分子離子看得到' },
-    { mz: 139, ion: 'C9H15O', loss: 'CH3', note: '失去一個甲基' },
-    { mz: 43, ion: 'C3H7', loss: 'C7H11O', note: '很小的碎片離子;只看整數的話,質量 43 也可能是 C₂H₃O⁺,要用量到小數點後好幾位的高解析質譜才分得出來' }] },
+    { mz: 154, note: zhEn('醚類,分子離子看得到', 'an ether; the molecular ion is visible') },
+    { mz: 139, ion: 'C9H15O', loss: 'CH3', note: zhEn('失去一個甲基', 'loses a methyl group') },
+    { mz: 43, ion: 'C3H7', loss: 'C7H11O', note: zhEn('很小的碎片離子;只看整數的話,質量 43 也可能是 C₂H₃O⁺,要用量到小數點後好幾位的高解析質譜才分得出來', 'a very small fragment ion; going by whole numbers, mass 43 could also be C₂H₃O⁺, and only high-resolution MS, which measures to several decimal places, can tell them apart') }] },
   lin: { f: 'C10H18O', ch: [
-    { mz: 154, note: '只剩約 1%:醇類的分子離子很容易斷' },
-    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: '失去一分子水,醇類的特徵' },
-    { mz: 71, ion: 'C4H7O', loss: 'C6H11', note: '接著 OH 的那個碳,旁邊的鍵斷開(α 斷裂),帶走 C₆H₁₁•,留下含氧的 C₄H₇O⁺,是最強的一根(基峰)' }] },
+    { mz: 154, note: zhEn('只剩約 1%:醇類的分子離子很容易斷', 'only about 1% is left: the molecular ions of alcohols break easily') },
+    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: zhEn('失去一分子水,醇類的特徵', 'loses one water molecule, typical of alcohols') },
+    { mz: 71, ion: 'C4H7O', loss: 'C6H11', note: zhEn('接著 OH 的那個碳,旁邊的鍵斷開(α 斷裂),帶走 C₆H₁₁•,留下含氧的 C₄H₇O⁺,是最強的一根(基峰)', 'a bond next to the carbon that carries the OH breaks (α-cleavage), taking away C₆H₁₁• and leaving the oxygen-containing C₄H₇O⁺, the tallest line (base peak)') }] },
   camphor: { f: 'C10H16O', ch: [
-    { mz: 152, note: '酮類,分子離子看得到約三成' },
-    { mz: 108, ion: 'C8H12', ionRad: true, loss: 'C2H4O', lossMol: true, note: '原子先挪了位置(重排),再失去 C₂H₄O' },
-    { mz: 95, ion: 'C7H11', loss: 'C3H5O', note: '環斷開、經過幾步之後失去含氧的 C₃H₅O,留下 C₇H₁₁⁺;Camphor 和 Borneol 最強的一根(基峰)都是它' }] },
+    { mz: 152, note: zhEn('酮類,分子離子看得到約三成', 'a ketone; the molecular ion shows at about 30%') },
+    { mz: 108, ion: 'C8H12', ionRad: true, loss: 'C2H4O', lossMol: true, note: zhEn('原子先挪了位置(重排),再失去 C₂H₄O', 'atoms first shift position (rearrangement), then C₂H₄O is lost') },
+    { mz: 95, ion: 'C7H11', loss: 'C3H5O', note: zhEn('環斷開、經過幾步之後失去含氧的 C₃H₅O,留下 C₇H₁₁⁺;Camphor 和 Borneol 最強的一根(基峰)都是它', 'the ring opens and, after a few steps, loses the oxygen-containing C₃H₅O, leaving C₇H₁₁⁺; it is the tallest line (base peak) of both Camphor and Borneol') }] },
   born: { f: 'C10H18O', ch: [
-    { mz: 154, note: '醇類,分子離子很弱' },
-    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: '失去一分子水' },
-    { mz: 95, ion: 'C7H11', loss: 'C3H7O', lossTxt: 'H₂O + C₃H₅•', note: '失去水之後再失去 C₃H₅•,和 Camphor 一樣得到 C₇H₁₁⁺' }] },
+    { mz: 154, note: zhEn('醇類,分子離子很弱', 'an alcohol; the molecular ion is weak') },
+    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: zhEn('失去一分子水', 'loses one water molecule') },
+    { mz: 95, ion: 'C7H11', loss: 'C3H7O', lossTxt: 'H₂O + C₃H₅•', note: zhEn('失去水之後再失去 C₃H₅•,和 Camphor 一樣得到 C₇H₁₁⁺', 'loses water, then C₃H₅•, giving C₇H₁₁⁺ as Camphor does') }] },
   terp: { f: 'C10H18O', ch: [
-    { mz: 154, note: '醇類,分子離子很弱' },
-    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: '失去一分子水' },
-    { mz: 59, ion: 'C3H7O', loss: 'C7H11', note: 'α 斷裂:帶 OH 的異丙基整段斷下來,(CH₃)₂C=OH⁺ 就是 m/z 59,α-Terpineol 的招牌碎片' }] },
+    { mz: 154, note: zhEn('醇類,分子離子很弱', 'an alcohol; the molecular ion is weak') },
+    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'H2O', lossMol: true, note: zhEn('失去一分子水', 'loses one water molecule') },
+    { mz: 59, ion: 'C3H7O', loss: 'C7H11', note: zhEn('α 斷裂:帶 OH 的異丙基整段斷下來,(CH₃)₂C=OH⁺ 就是 m/z 59,α-Terpineol 的招牌碎片', 'α-cleavage: the isopropyl group carrying the OH breaks off whole; (CH₃)₂C=OH⁺ is m/z 59, the signature fragment of α-Terpineol') }] },
   bac: { f: 'C12H20O2', ch: [
-    { mz: 196, note: '乙酸酯,分子離子很弱' },
-    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'C2H4O2', lossMol: true, note: '失去一分子乙酸(60),乙酸酯常見的斷法' },
-    { mz: 43, ion: 'C2H3O', loss: 'C10H17O', note: '乙醯離子 CH₃CO⁺,乙酸酯幾乎都看得到' }] },
+    { mz: 196, note: zhEn('乙酸酯,分子離子很弱', 'an acetate; the molecular ion is weak') },
+    { mz: 136, ion: 'C10H16', ionRad: true, loss: 'C2H4O2', lossMol: true, note: zhEn('失去一分子乙酸(60),乙酸酯常見的斷法', 'loses one acetic acid molecule (60), a common break for acetates') },
+    { mz: 43, ion: 'C2H3O', loss: 'C10H17O', note: zhEn('乙醯離子 CH₃CO⁺,乙酸酯幾乎都看得到', 'the acetyl ion CH₃CO⁺, seen in almost every acetate') }] },
   caryo: { f: 'C15H24', ch: [
-    { mz: 204, note: '倍半萜 C₁₅H₂₄,分子量 204' },
-    { mz: 161, ion: 'C12H17', loss: 'C3H7', note: '失去 C₃H₇•' },
-    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: '分子裂成大小兩塊,小的那塊 C₇H₉⁺ 帶電,是最強的一根(基峰)' }] },
+    { mz: 204, note: zhEn('倍半萜 C₁₅H₂₄,分子量 204', 'a sesquiterpene, C₁₅H₂₄, molecular weight 204') },
+    { mz: 161, ion: 'C12H17', loss: 'C3H7', note: zhEn('失去 C₃H₇•', 'loses C₃H₇•') },
+    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: zhEn('分子裂成大小兩塊,小的那塊 C₇H₉⁺ 帶電,是最強的一根(基峰)', 'the molecule splits into a big and a small piece; the small C₇H₉⁺ keeps the charge and is the tallest line (base peak)') }] },
   hum: { f: 'C15H24', ch: [
     { mz: 204 },
-    { mz: 147, ion: 'C11H15', loss: 'C4H9', note: '失去 C₄H₉•' },
-    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: '小的那塊 C₇H₉⁺ 帶電,是最強的一根(基峰)' }] },
+    { mz: 147, ion: 'C11H15', loss: 'C4H9', note: zhEn('失去 C₄H₉•', 'loses C₄H₉•') },
+    { mz: 93, ion: 'C7H9', loss: 'C8H15', note: zhEn('小的那塊 C₇H₉⁺ 帶電,是最強的一根(基峰)', 'the small piece C₇H₉⁺ keeps the charge and is the tallest line (base peak)') }] },
   cox: { f: 'C15H24O', ch: [
-    { mz: 220, note: '環氧化物,分子離子很弱' },
-    { mz: 205, ion: 'C14H21O', loss: 'CH3', note: '失去一個甲基' },
-    { mz: 177, ion: 'C12H17O', loss: 'C3H7', note: '失去 C₃H₇•' }] },
+    { mz: 220, note: zhEn('環氧化物,分子離子很弱', 'an epoxide; the molecular ion is weak') },
+    { mz: 205, ion: 'C14H21O', loss: 'CH3', note: zhEn('失去一個甲基', 'loses a methyl group') },
+    { mz: 177, ion: 'C12H17O', loss: 'C3H7', note: zhEn('失去 C₃H₇•', 'loses C₃H₇•') }] },
 };
 const SUBS = '₀₁₂₃₄₅₆₇₈₉';
 const fmtF = (f, tail = '') => f.replace(/\d/g, d => SUBS[+d]) + tail;
@@ -839,13 +863,13 @@ const RUNS = new Map();
 function getRun(rate) { if (!RUNS.has(rate)) RUNS.set(rate, simulate(rate)); return RUNS.get(rate); }
 
 const INJ_STEPS = [
-  { k: 'turn1', d: 1.0, txt: '自動進樣器轉動樣品盤,把樣品瓶轉到注射針正下方。' },
-  { k: 'dip', d: 0.7, txt: '注射針往下插進樣品瓶。' },
-  { k: 'draw', d: 1.5, txt: '活塞上下抽動幾次排掉氣泡,再抽進 <span class="hl">1 μL</span> 樣品。' },
-  { k: 'lift', d: 0.6, txt: '針頭退出樣品瓶。' },
-  { k: 'turn2', d: 0.8, txt: '樣品盤轉開,讓出通往進樣口的空位。' },
-  { k: 'down', d: 0.7, txt: '注射針刺穿橡膠隔墊,伸進 <span class="hl">250 °C</span> 的玻璃襯管。' },
-  { k: 'push', d: 0.35, txt: '活塞一推到底,樣品瞬間氣化;儀器從這一刻開始計時。' },
+  { k: 'turn1', d: 1.0, txt: zhEn('自動進樣器轉動樣品盤,把樣品瓶轉到注射針正下方。', 'The tray turns the vial under the needle.') },
+  { k: 'dip', d: 0.7, txt: zhEn('注射針往下插進樣品瓶。', 'The needle dips into the vial.') },
+  { k: 'draw', d: 1.5, txt: zhEn('活塞上下抽動幾次排掉氣泡,再抽進 <span class="hl">1 μL</span> 樣品。', 'The plunger clears bubbles, then draws <span class="hl">1 μL</span>.') },
+  { k: 'lift', d: 0.6, txt: zhEn('針頭退出樣品瓶。', 'The needle leaves the vial.') },
+  { k: 'turn2', d: 0.8, txt: zhEn('樣品盤轉開,讓出通往進樣口的空位。', 'The tray turns aside to clear the inlet.') },
+  { k: 'down', d: 0.7, txt: zhEn('注射針刺穿橡膠隔墊,伸進 <span class="hl">250 °C</span> 的玻璃襯管。', 'The needle pierces the septum into the <span class="hl">250 °C</span> liner.') },
+  { k: 'push', d: 0.35, txt: zhEn('活塞一推到底,樣品瞬間氣化;儀器從這一刻開始計時。', 'Plunger down: the sample vaporizes and the clock starts.') },
   { k: 'up', d: 0.8, txt: '' },
 ];
 const INJ_TOTAL = INJ_STEPS.reduce((a, s) => a + s.d, 0);
@@ -893,39 +917,44 @@ function selectiveIon(c, o) {
 const elutingWin = p => 2.5 * p.sig + 2 * p.tau;
 function columnText(c, p, t, T) {
   const z = zAt(p, t), k = kOf(c, T), pct = Math.round(z * 100), fs = k / (1 + k), v = 100 / (1 + k);
-  if (k > 40) return `${dot(c)} 幾乎整個溶在液膜裡(k ≈ <span class="num">${Math.round(k)}</span>,${(fs * 100).toFixed(1)}% 的時間不動),還停在管柱的 <span class="num">${pct}%</span> 處。等溫度升上來、k 變小,它才開始跑;預計 <span class="num">${f2(p.tR)} min</span> 流出。`;
-  return `${dot(c)} 走到管柱的 <span class="num">${pct}%</span>。在 <span class="num">${f1(T)} °C</span> 下 k = <span class="num">${f2(k)}</span>:它有 ${Math.round(fs * 100)}% 的時間溶在液膜裡,只用載氣 ${v < 10 ? v.toFixed(1) : Math.round(v)}% 的速度前進,預計 <span class="num">${f2(p.tR)} min</span> 流出。`;
+  if (k > 40) return zhEn(`${dot(c)} 幾乎整個溶在液膜裡(k ≈ <span class="num">${Math.round(k)}</span>,${(fs * 100).toFixed(1)}% 的時間不動),還停在管柱的 <span class="num">${pct}%</span> 處。等溫度升上來、k 變小,它才開始跑;預計 <span class="num">${f2(p.tR)} min</span> 流出。`,
+    `${dot(c)} sits almost entirely in the film (k ≈ <span class="num">${Math.round(k)}</span>, still ${(fs * 100).toFixed(1)}% of the time) at <span class="num">${pct}%</span> of the column. It moves only once heating lowers k; out at <span class="num">${f2(p.tR)} min</span>.`);
+  return zhEn(`${dot(c)} 走到管柱的 <span class="num">${pct}%</span>。在 <span class="num">${f1(T)} °C</span> 下 k = <span class="num">${f2(k)}</span>:它有 ${Math.round(fs * 100)}% 的時間溶在液膜裡,只用載氣 ${v < 10 ? v.toFixed(1) : Math.round(v)}% 的速度前進,預計 <span class="num">${f2(p.tR)} min</span> 流出。`,
+    `${dot(c)} is <span class="num">${pct}%</span> along the column. At <span class="num">${f1(T)} °C</span>, k = <span class="num">${f2(k)}</span>: in the film ${Math.round(fs * 100)}% of the time, at ${v < 10 ? v.toFixed(1) : Math.round(v)}% of gas speed; out at <span class="num">${f2(p.tR)} min</span>.`);
 }
 function coeluteText(c) {
   const pr = partner(c); if (!pr) return '';
   const ion = selectiveIon(c, pr.o);
-  return ` 它和 ${dot(pr.o)} 只差 <span class="num">${(pr.dt * 60).toFixed(1)}</span> 秒(分離度 <span class="num">${f2(pr.rs)}</span>),在層析圖上疊成一支;在質譜上點 m/z <span class="num">${ion}</span> 可以把 ${c.label} 單獨抽出來。`;
+  return zhEn(` 它和 ${dot(pr.o)} 只差 <span class="num">${(pr.dt * 60).toFixed(1)}</span> 秒(分離度 <span class="num">${f2(pr.rs)}</span>),在層析圖上疊成一支;在質譜上點 m/z <span class="num">${ion}</span> 可以把 ${c.label} 單獨抽出來。`,
+    ` It comes only <span class="num">${(pr.dt * 60).toFixed(1)}</span> s from ${dot(pr.o)} (resolution <span class="num">${f2(pr.rs)}</span>), so the two merge into one peak on the chromatogram; click m/z <span class="num">${ion}</span> in the mass spectrum to pull out ${c.label} on its own.`);
 }
 function msStory(c) {
-  const F = FRAG[c.id], list = F.ch.map(h => h.mz).join('、');
-  return `${dot(c)}(${fmtF(F.f)},分子量 <span class="num">${c.mw}</span>)在離子源被 70 eV 的電子撞掉一個電子,變成帶正電的分子離子 M⁺•。多出來的能量讓鍵斷開:帶正電的那一塊被電場推往四極桿,中性的那一塊推不動,被真空泵抽走。所以質譜上看到的是 m/z(質量 ÷ 電荷)<span class="num">${list}</span> 這些帶電的碎片,兩根之間的差就是失去的中性碎片。`;
+  const F = FRAG[c.id], list = F.ch.map(h => h.mz).join(zhEn('、', ', '));
+  return zhEn(`${dot(c)}(${fmtF(F.f)},分子量 <span class="num">${c.mw}</span>)在離子源被 70 eV 的電子撞掉一個電子,變成帶正電的分子離子 M⁺•。多出來的能量讓鍵斷開:帶正電的那一塊被電場推往四極桿,中性的那一塊推不動,被真空泵抽走。所以質譜上看到的是 m/z(質量 ÷ 電荷)<span class="num">${list}</span> 這些帶電的碎片,兩根之間的差就是失去的中性碎片。`,
+    `In the ion source a 70 eV electron knocks an electron off ${dot(c)} (${fmtF(F.f)}, mass <span class="num">${c.mw}</span>): the molecular ion M⁺•. Extra energy breaks bonds; positive pieces go to the quadrupole, neutral ones are pumped away. Spectrum: m/z (mass ÷ charge) <span class="num">${list}</span>; gaps are neutral losses.`);
 }
 function storyHTML() {
   if (S.tour && S.tour.on) return tourStory();
   if (S.inj && (!S.injected || S.t < 0.25)) { const st = injStepAt(S.inj.el); if (st && INJ_STEPS[st.i].txt) return INJ_STEPS[st.i].txt; return INJ_STEPS[6].txt; }
-  if (!S.injected) return '按下播放,自動進樣器會先抽 1 μL 樣品打進進樣口,儀器才開始計時。或按「導覽」,跟著一個成分的分子一站一站走。';
+  if (!S.injected) return zhEn('按下播放,自動進樣器會先抽 1 μL 樣品打進進樣口,儀器才開始計時。或按「導覽」,跟著一個成分的分子一站一站走。', "Press Play: the autosampler first draws 1 μL of sample and injects it into the inlet, and only then does the run clock start. Or press Tour to follow one component's molecules stop by stop.");
   const run = S.run, t = S.t, T = ovenT(t, run.rate);
   const id = S.trackId;
-  if (t < 0.06) return '樣品在 250 °C 的襯管裡氣化,載氣(氦氣)把蒸氣推進管柱;所有成分這時都擠在管柱入口。';
+  if (t < 0.06) return zhEn('樣品在 250 °C 的襯管裡氣化,載氣(氦氣)把蒸氣推進管柱;所有成分這時都擠在管柱入口。', 'The sample vaporizes in the 250 °C liner, and the carrier gas (helium) pushes the vapor into the column; for now all components are crowded at the column inlet.');
   if (!id) {
-    if (S.track === 'auto') return `所有成分都已流出。管柱溫度升到 <span class="num">220 °C</span> 再保持 3 min,把殘留的重成分烤出管柱,準備下一針。`;
+    if (S.track === 'auto') return zhEn(`所有成分都已流出。管柱溫度升到 <span class="num">220 °C</span> 再保持 3 min,把殘留的重成分烤出管柱,準備下一針。`, `All components are out. The column is heated to <span class="num">220 °C</span> and held for 3 min to bake any heavy leftovers out of it, ready for the next injection.`);
     return '';
   }
   const c = BYID.get(id), p = run.sp.get(id), z = zAt(p, t), k = kOf(c, T);
   if (c.solvent) {
-    if (z < 1) return `溶劑跑在最前面:它幾乎不溶進管壁的液膜(k ≈ <span class="num">${f2(k)}</span>),跟著載氣(氦氣)衝過 30 m。這時質譜還在<span class="hl">溶劑延遲</span>:燈絲先關著,免得大量溶劑燒壞燈絲。`;
-    return `溶劑已在 <span class="num">${f2(p.tR)} min</span> 流出;質譜要到 <span class="num">${f1(PROG.delay)} min</span> 才打開燈絲。`;
+    if (z < 1) return zhEn(`溶劑跑在最前面:它幾乎不溶進管壁的液膜(k ≈ <span class="num">${f2(k)}</span>),跟著載氣(氦氣)衝過 30 m。這時質譜還在<span class="hl">溶劑延遲</span>:燈絲先關著,免得大量溶劑燒壞燈絲。`, `The solvent runs first: it barely dissolves in the film on the wall (k ≈ <span class="num">${f2(k)}</span>) and rushes through the 30 m with the carrier gas (helium). The MS is still in its <span class="hl">solvent delay</span>: the filament stays off so the flood of solvent does not burn it out.`);
+    return zhEn(`溶劑已在 <span class="num">${f2(p.tR)} min</span> 流出;質譜要到 <span class="num">${f1(PROG.delay)} min</span> 才打開燈絲。`, `The solvent came out at <span class="num">${f2(p.tR)} min</span>; the MS turns its filament on only at <span class="num">${f1(PROG.delay)} min</span>.`);
   }
   if (S.msFocus === id) return msStory(c) + coeluteText(c);
   const d = t - p.tR;
   if (z < 1 && d < -2.5 * p.sig) return columnText(c, p, t, T);
-  if (Math.abs(d) <= elutingWin(p)) return `${dot(c)} 正在離開管柱(<span class="num">${f2(p.tR)} min</span>,<span class="num">${f1(p.Te)} °C</span>,烷類刻度 KI <span class="num">${Math.round(p.kiCalc)}</span>)。${S.lensOpen ? '暫停在這支峰上,放大鏡會切到離子源,示範它的分子怎麼帶電、怎麼斷成碎片。' : '暫停在這支峰上,再按角落的「放大鏡」,可以看它的分子怎麼帶電、怎麼斷成碎片。'}` + coeluteText(c);
-  return `${dot(c)} 已在 <span class="num">${f2(p.tR)} min</span> 流出(<span class="num">${f1(p.Te)} °C</span>,KI <span class="num">${Math.round(p.kiCalc)}</span>)。`;
+  if (Math.abs(d) <= elutingWin(p)) return zhEn(`${dot(c)} 正在離開管柱(<span class="num">${f2(p.tR)} min</span>,<span class="num">${f1(p.Te)} °C</span>,烷類刻度 KI <span class="num">${Math.round(p.kiCalc)}</span>)。${S.lensOpen ? '暫停在這支峰上,放大鏡會切到離子源,示範它的分子怎麼帶電、怎麼斷成碎片。' : '暫停在這支峰上,再按角落的「放大鏡」,可以看它的分子怎麼帶電、怎麼斷成碎片。'}`,
+    `${dot(c)} is leaving the column (<span class="num">${f2(p.tR)} min</span>, <span class="num">${f1(p.Te)} °C</span>, KI <span class="num">${Math.round(p.kiCalc)}</span> on the alkane scale). ${S.lensOpen ? 'Pause on this peak and the magnifier switches to the ion source to show how its molecules get charged and break into fragments.' : 'Pause on this peak, then press Magnifier in the corner to see how its molecules get charged and break into fragments.'}`) + coeluteText(c);
+  return zhEn(`${dot(c)} 已在 <span class="num">${f2(p.tR)} min</span> 流出(<span class="num">${f1(p.Te)} °C</span>,KI <span class="num">${Math.round(p.kiCalc)}</span>)。`, `${dot(c)} came out at <span class="num">${f2(p.tR)} min</span> (<span class="num">${f1(p.Te)} °C</span>, KI <span class="num">${Math.round(p.kiCalc)}</span>).`);
 }
 // 質譜放大鏡要示範哪個成分:暫停在出峰上,或指定追蹤的成分已經流出
 function msFocusNow() {
@@ -940,8 +969,8 @@ function msFocusNow() {
 
 /* ---------- 導覽:鏡頭跟著一個成分的分子走一趟 ---------- */
 const TOUR = [
-  { k: 'als', name: '進樣' }, { k: 'inlet', name: '進樣口' }, { k: 'column', name: '管柱' }, { k: 'xfer', name: '傳輸線' },
-  { k: 'source', name: '離子源' }, { k: 'quad', name: '四極桿' }, { k: 'det', name: '偵測器' }, { k: 'done', name: '完成' },
+  { k: 'als', name: zhEn('進樣', 'Injection') }, { k: 'inlet', name: zhEn('進樣口', 'Inlet') }, { k: 'column', name: zhEn('管柱', 'Column') }, { k: 'xfer', name: zhEn('傳輸線', 'Transfer line') },
+  { k: 'source', name: zhEn('離子源', 'Ion source') }, { k: 'quad', name: zhEn('四極桿', 'Quadrupole') }, { k: 'det', name: zhEn('偵測器', 'Detector') }, { k: 'done', name: zhEn('完成', 'Done') },
 ];
 const tourOn = () => !!(S.tour && S.tour.on);
 function setTour(on, byUser) {
@@ -974,7 +1003,7 @@ function tourEnter(i) {
 function tourNext() { if (!tourOn()) return; if (S.tour.i >= TOUR.length - 1) setTour(false); else tourEnter(S.tour.i + 1); }
 function updateTourBar() {
   const T = S.tour; if (!T) return;
-  E.tourStep.textContent = `導覽 ${T.i + 1}/${TOUR.length} · ${TOUR[T.i].name}`;
+  E.tourStep.textContent = zhEn(`導覽 ${T.i + 1}/${TOUR.length} · ${TOUR[T.i].name}`, `Tour ${T.i + 1}/${TOUR.length} · ${TOUR[T.i].name}`);
   E.tourDots.innerHTML = TOUR.map((s, j) => `<i class="${j < T.i ? 'done' : j === T.i ? 'on' : ''}"></i>`).join('');
   E.tourNext.hidden = T.i >= TOUR.length - 1;
 }
@@ -998,14 +1027,17 @@ function tourTick(dt) {
 function tourStory() {
   const T = S.tour, c = BYID.get(T.cid), p = S.run.sp.get(T.cid), k = TOUR[T.i].k;
   switch (k) {
-    case 'als': { const st = S.inj && injStepAt(S.inj.el); const txt = st && INJ_STEPS[st.i].txt; return `跟著 ${dot(c)} 的分子走一趟。` + (txt || INJ_STEPS[6].txt); }
-    case 'inlet': return `1 μL 在 250 °C 的玻璃襯管裡瞬間氣化,脹成幾百倍體積的蒸氣。大部分從旁邊的出口排掉(這叫分流),只有一小部分被載氣(氦氣)推進管柱,${dot(c)} 的分子也在裡面。`;
-    case 'column': return columnText(c, p, S.t, ovenT(S.t, S.run.rate)) + ' 放大鏡裡:分子溶進管壁上的金色液膜時停住,回到載氣才往前走。';
-    case 'xfer': return `${dot(c)} 走到管柱末端。管柱穿過 250 °C 的加熱管(傳輸線)伸進質譜的真空裡,出口就在離子源旁邊。`;
+    case 'als': { const st = S.inj && injStepAt(S.inj.el); const txt = st && INJ_STEPS[st.i].txt; return zhEn(`跟著 ${dot(c)} 的分子走一趟。`, `Follow the ${dot(c)} molecules all the way. `) + (txt || INJ_STEPS[6].txt); }
+    case 'inlet': return zhEn(`1 μL 在 250 °C 的玻璃襯管裡瞬間氣化,脹成幾百倍體積的蒸氣。大部分從旁邊的出口排掉(這叫分流),只有一小部分被載氣(氦氣)推進管柱,${dot(c)} 的分子也在裡面。`, `1 μL vaporizes at 250 °C; most is vented (split), a little enters the column.`);
+    case 'column': return columnText(c, p, S.t, ovenT(S.t, S.run.rate)) + zhEn(' 放大鏡裡:分子溶進管壁上的金色液膜時停住,回到載氣才往前走。', ' Magnifier: stopped in the gold film, moving in the gas.');
+    case 'xfer': return zhEn(`${dot(c)} 走到管柱末端。管柱穿過 250 °C 的加熱管(傳輸線)伸進質譜的真空裡,出口就在離子源旁邊。`, `${dot(c)} enters the 250 °C transfer line to the MS.`);
     case 'source': return msStory(c);
-    case 'quad': return `帶正電的離子被推進四極桿,它像篩子:四根金屬桿加上直流電壓 U 和快速正負交替的射頻電壓 V,離子一邊前進一邊被來回推拉。太輕的被射頻甩出去,太重的被直流拉向桿子,只有一種 m/z 能穩定穿過。底下的質譜面板換成穩定圖:${c.label} 的每個碎片是斜線上的一個點,U、V 一起調高,點就往右滑,落進頂端窗口的那一個才通過。`;
-    case 'det': return `穿過四極桿的離子撞上高能倍增極,轉成電子,電子倍增器再放大十萬倍以上,變成量得到的電流。四極桿每掃一次,就記下每個 m/z 收到多少離子:這就是 ${dot(c)} 的質譜,沒斷的分子離子在 m/z <span class="num">${c.mw}</span>,最強的是 m/z <span class="num">${c.baseMz}</span>;同一次掃描全部加起來,就是層析圖上的一個點。`;
-    default: return `導覽結束。${dot(c)} 在 <span class="num">${f2(p.tR)} min</span> 被偵測到,烷類刻度 KI <span class="num">${Math.round(p.kiCalc)}</span>。按播放繼續看其他成分,或在「追蹤成分」換一個再按一次導覽。`;
+    case 'quad': return zhEn(`帶正電的離子被推進四極桿,它像篩子:四根金屬桿加上直流電壓 U 和快速正負交替的射頻電壓 V,離子一邊前進一邊被來回推拉。太輕的被射頻甩出去,太重的被直流拉向桿子,只有一種 m/z 能穩定穿過。底下的質譜面板換成穩定圖:${c.label} 的每個碎片是斜線上的一個點,U、V 一起調高,點就往右滑,落進頂端窗口的那一個才通過。`,
+      `The quadrupole is a sieve: four rods carry DC (U) and fast-flipping RF (V); too light or too heavy hits a rod. Below, ${c.label} fragments are dots sliding right as U and V rise; one in the top window passes.`);
+    case 'det': return zhEn(`穿過四極桿的離子撞上高能倍增極,轉成電子,電子倍增器再放大十萬倍以上,變成量得到的電流。四極桿每掃一次,就記下每個 m/z 收到多少離子:這就是 ${dot(c)} 的質譜,沒斷的分子離子在 m/z <span class="num">${c.mw}</span>,最強的是 m/z <span class="num">${c.baseMz}</span>;同一次掃描全部加起來,就是層析圖上的一個點。`,
+      `Ions hit the dynode; the signal is boosted over 100,000 times. Each scan is the ${dot(c)} spectrum (M⁺• <span class="num">${c.mw}</span>, tallest <span class="num">${c.baseMz}</span>); its sum is one chromatogram point.`);
+    default: return zhEn(`導覽結束。${dot(c)} 在 <span class="num">${f2(p.tR)} min</span> 被偵測到,烷類刻度 KI <span class="num">${Math.round(p.kiCalc)}</span>。按播放繼續看其他成分,或在「追蹤成分」換一個再按一次導覽。`,
+      `Tour over. ${dot(c)} was detected at <span class="num">${f2(p.tR)} min</span>, KI <span class="num">${Math.round(p.kiCalc)}</span> on the alkane scale. Press Play to see other components, or pick another under Follow compound and tour again.`);
   }
 }
 
@@ -1118,8 +1150,8 @@ function drawChrom() {
     const cx = (Math.max(xa, pl) + Math.min(xb, w - pr)) / 2;
     if (label && Math.min(xb, w - pr) - Math.max(xa, pl) > 70) { ctx.fillStyle = COLORS.muted; ctx.font = FONT_LB; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, cx, pt + ph * .45); }
   };
-  shade(Math.max(t0, -1), PROG.delay, '溶劑延遲');
-  if (t1 > run.tEnd) shade(run.tEnd, t1 + 1, '分析結束');
+  shade(Math.max(t0, -1), PROG.delay, zhEn('溶劑延遲', 'Solvent delay'));
+  if (t1 > run.tEnd) shade(run.tEnd, t1 + 1, zhEn('分析結束', 'End of run'));
 
   if (S.injected && ser.n > 1) {
     const xs = new Float32Array(ser.n); for (let k = 0; k < ser.n; k++) xs[k] = X((ser.j0 + k) * SCAN);
@@ -1160,7 +1192,7 @@ function drawChrom() {
   if (hasE) {
     ctx.strokeStyle = COLORS.axis; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pl, pt + phT + .5); ctx.lineTo(w - pr, pt + phT + .5); ctx.stroke();
     ctx.font = FONT_LB; ctx.fillStyle = COLORS.ink2; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-    ctx.fillText(`只看 m/z ${S.eic}`, pl + 6, eTop + 11);
+    ctx.fillText(zhEn(`只看 m/z ${S.eic}`, `m/z ${S.eic} only`), pl + 6, eTop + 11);
   }
 
   // 峰名(依峰高排序,撞到就往上一層,再撞到就不標)
@@ -1200,7 +1232,7 @@ function drawChrom() {
   ctx.fillStyle = COLORS.accent; rrect(ctx, lx, 2, lw, 16, 5); ctx.fill();
   ctx.fillStyle = COLORS.accentInk; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(lab, lx + lw / 2, 10.5);
 
-  if (!S.injected) { ctx.fillStyle = COLORS.ink2; ctx.font = FONT_LB; ctx.textAlign = 'center'; ctx.fillText('等待進樣', pl + pw / 2, pt + ph / 2); }
+  if (!S.injected) { ctx.fillStyle = COLORS.ink2; ctx.font = FONT_LB; ctx.textAlign = 'center'; ctx.fillText(zhEn('等待進樣', 'Waiting for injection'), pl + pw / 2, pt + ph / 2); }
 
   // 滑鼠十字線
   if (S.hoverChrom && !S.dragChrom) {
@@ -1215,10 +1247,10 @@ function chromTip(x, y) {
   const t = chromTimeAtX(x), run = S.run;
   if (t < 0 || t > run.tEnd) return null;
   let html = `<span class="num">${f2(t)} min · ${f1(ovenT(t, run.rate))} °C</span>`;
-  if (t < PROG.delay) return html + '<br>溶劑延遲,質譜還沒開始收訊號';
+  if (t < PROG.delay) return html + zhEn('<br>溶劑延遲,質譜還沒開始收訊號', '<br>Solvent delay: the MS is not recording yet');
   const tot = ticClean(run, t);
-  html += `<br>離子總數 <span class="num">${(tot / 1e6).toFixed(3)}×10⁶</span>`;
-  if (S.eic) { let e = 0; for (const c of CPDS) { const p = run.sp.get(c.id); e += p.A * shape(p, t) * c.frac[S.eic - MZ0]; } html += `<br>m/z ${S.eic} 離子 <span class="num">${(e / 1e6).toFixed(3)}×10⁶</span>`; }
+  html += zhEn(`<br>離子總數 <span class="num">${(tot / 1e6).toFixed(3)}×10⁶</span>`, `<br>Total ions <span class="num">${(tot / 1e6).toFixed(3)}×10⁶</span>`);
+  if (S.eic) { let e = 0; for (const c of CPDS) { const p = run.sp.get(c.id); e += p.A * shape(p, t) * c.frac[S.eic - MZ0]; } html += zhEn(`<br>m/z ${S.eic} 離子 <span class="num">${(e / 1e6).toFixed(3)}×10⁶</span>`, `<br>m/z ${S.eic} ions <span class="num">${(e / 1e6).toFixed(3)}×10⁶</span>`); }
   const parts = [];
   for (const c of CPDS) { const p = run.sp.get(c.id); const v = p.A * shape(p, t); if (v > tot * 0.04 && v > 2e4) parts.push([c, v]); }
   parts.sort((a, b) => b[1] - a[1]);
@@ -1317,7 +1349,7 @@ function drawMS() {
   const sp = S.spec;
   if (!sp) {
     ctx.fillStyle = COLORS.ink2; ctx.font = FONT_LB; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    const msg = !S.injected ? '等待進樣' : S.t < PROG.delay ? '溶劑延遲中,燈絲還沒打開' : '分析已結束';
+    const msg = !S.injected ? zhEn('等待進樣', 'Waiting for injection') : S.t < PROG.delay ? zhEn('溶劑延遲中,燈絲還沒打開', 'Solvent delay: filament still off') : zhEn('分析已結束', 'The run has ended');
     ctx.fillText(msg, pl + pw / 2, pt + ph / 2); return;
   }
   // 四極桿正在掃的 m/z
@@ -1370,20 +1402,20 @@ function msAtX(x) { const r = SIZES.get(E.cvMS), pw = r.width - MS.pl - MS.pr; r
 function msTip(m) {
   const sp = S.spec; if (!sp) return null;
   const i = m - MZ0, v = sp.out[i] / sp.mx;
-  let html = `m/z <span class="num">${m}</span> · 相對強度 <span class="num">${(v * 100).toFixed(1)}%</span>`;
+  let html = zhEn(`m/z <span class="num">${m}</span> · 相對強度 <span class="num">${(v * 100).toFixed(1)}%</span>`, `m/z <span class="num">${m}</span> · relative intensity <span class="num">${(v * 100).toFixed(1)}%</span>`);
   const parts = [];
   for (const [c, a] of sp.contrib) { const x = a * c.frac[i]; if (x > sp.out[i] * 0.05) parts.push([c, x]); }
   for (const [c, x] of parts.slice(0, 3)) html += `<br><i style="background:${COLORS[c.cls]}"></i>${c.name} <span class="num">${Math.round(x / sp.out[i] * 100)}%</span>`;
-  if (!parts.length && v > 0.004) html += '<br>背景離子(空氣、液膜受熱分解)';
+  if (!parts.length && v > 0.004) html += zhEn('<br>背景離子(空氣、液膜受熱分解)', '<br>Background ions (air; the film breaking down in the heat)');
   // 這一根是怎麼來的
   const fc = msFocusCpd(sp);
   if (fc) {
     const ch = FRAG[fc.id].ch.find(h => h.mz === m);
-    if (ch && !ch.ion) html += `<br><b>M⁺•</b>:${fc.label} 撞掉一個電子後沒有斷,m/z ${m} 就是分子量${ch.note ? ';' + ch.note : ''}`;
-    else if (ch) html += `<br><b>${ionTxt(ch)}</b>:M⁺• 失去 ${lossTxt(ch)}(質量 ${nominal(ch.loss)})後留下的帶電碎片;${ch.note}。中性的 ${lossTxt(ch)} 電場推不動,所以譜上看不到它`;
-    else if (m === fc.mw) html += `<br><b>M⁺•</b>:分子離子,m/z 就是分子量`;
+    if (ch && !ch.ion) html += zhEn(`<br><b>M⁺•</b>:${fc.label} 撞掉一個電子後沒有斷,m/z ${m} 就是分子量${ch.note ? ';' + ch.note : ''}`, `<br><b>M⁺•</b>: ${fc.label} lost one electron and did not break, so m/z ${m} is the molecular weight${ch.note ? '; ' + ch.note : ''}`);
+    else if (ch) html += zhEn(`<br><b>${ionTxt(ch)}</b>:M⁺• 失去 ${lossTxt(ch)}(質量 ${nominal(ch.loss)})後留下的帶電碎片;${ch.note}。中性的 ${lossTxt(ch)} 電場推不動,所以譜上看不到它`, `<br><b>${ionTxt(ch)}</b>: the charged piece left when M⁺• loses ${lossTxt(ch)} (mass ${nominal(ch.loss)}); ${ch.note}. The neutral ${lossTxt(ch)} is not moved by the field, so the spectrum never shows it`);
+    else if (m === fc.mw) html += zhEn(`<br><b>M⁺•</b>:分子離子,m/z 就是分子量`, `<br><b>M⁺•</b>: the molecular ion; its m/z is the molecular weight`);
   }
-  html += `<br><span style="color:var(--muted)">點一下,另畫只看 m/z ${m} 的層析圖</span>`;
+  html += zhEn(`<br><span style="color:var(--muted)">點一下,另畫只看 m/z ${m} 的層析圖</span>`, `<br><span style="color:var(--muted)">Click to draw a chromatogram of m/z ${m} alone</span>`);
   return html;
 }
 
@@ -1428,14 +1460,14 @@ function drawQuad() {
   ctx.lineTo(X(0.908), Y(0)); ctx.closePath();
   ctx.fillStyle = 'rgba(127,227,255,.12)'; ctx.fill(); ctx.strokeStyle = 'rgba(127,227,255,.5)'; ctx.stroke();
   ctx.font = FONT_LB; ctx.fillStyle = COLORS.muted; ctx.textAlign = 'center';
-  ctx.fillText('穩定區', X(0.6), Y(0.05));
+  ctx.fillText(zhEn('穩定區', 'Stable region'), X(0.6), Y(0.05));
   // 掃描線與窗口
   const qEnd = Math.min(QZ.qMax, QZ.aMax / QZ.lam);
   ctx.strokeStyle = COLORS.ink2; ctx.globalAlpha = .5; ctx.beginPath(); ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(qEnd), Y(QZ.lam * qEnd)); ctx.stroke(); ctx.globalAlpha = 1;
   ctx.strokeStyle = COLORS.accent; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(X(QZ.q1), Y(QZ.lam * QZ.q1)); ctx.lineTo(X(QZ.q2), Y(QZ.lam * QZ.q2)); ctx.stroke();
   ctx.font = FONT_LB; ctx.textAlign = 'left'; ctx.fillStyle = COLORS.ink2;
-  ctx.fillText('← 較重的離子', X(0.03), Y(0.31));
-  ctx.textAlign = 'right'; ctx.fillText('較輕的離子 →', X(QZ.qMax), Y(0.15));
+  ctx.fillText(zhEn('← 較重的離子', '← heavier ions'), X(0.03), Y(0.31));
+  ctx.textAlign = 'right'; ctx.fillText(zhEn('較輕的離子 →', 'lighter ions →'), X(QZ.qMax), Y(0.15));
   // 離子
   const set = S.sweep, ions = quadIons().map(o => ({ ...o, ...quadState(o.mz, set) })).sort((a, b) => a.v - b.v);
   const placed = [];
@@ -1447,7 +1479,7 @@ function drawQuad() {
     if (o.pass) { ctx.strokeStyle = COLORS.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, y, r + 2.5, 0, Math.PI * 2); ctx.stroke(); }
     ctx.globalAlpha = 1;
     if (off) continue;
-    const lab = o.pass ? `m/z ${o.mz} 通過` : o.mz + '';
+    const lab = o.pass ? zhEn(`m/z ${o.mz} 通過`, `m/z ${o.mz} passes`) : o.mz + '';
     ctx.font = o.pass ? '600 11px "IBM Plex Mono", monospace' : FONT_SM; ctx.textAlign = 'center';
     const lw = ctx.measureText(lab).width, ly = o.pass ? y - r - 7 : y + r + 11;
     if (!o.pass && placed.some(b => Math.abs(b.x - x) < (b.w + lw) / 2 + 3 && Math.abs(b.y - ly) < 11)) continue;
@@ -1455,7 +1487,7 @@ function drawQuad() {
     ctx.fillStyle = o.pass ? COLORS.ink : COLORS.muted; ctx.fillText(lab, clamp(x, pl + lw / 2, w - pr - lw / 2), ly);
   }
   const nOff = ions.filter(o => o.q > QZ.qMax).length;
-  if (nOff) { ctx.font = FONT_SM; ctx.fillStyle = COLORS.muted; ctx.textAlign = 'right'; ctx.fillText(`還有 ${nOff} 個更輕的 →`, w - pr, Y(QZ.lam * QZ.qMax) - 10); }
+  if (nOff) { ctx.font = FONT_SM; ctx.fillStyle = COLORS.muted; ctx.textAlign = 'right'; ctx.fillText(zhEn(`還有 ${nOff} 個更輕的 →`, `${nOff} more, lighter →`), w - pr, Y(QZ.lam * QZ.qMax) - 10); }
 }
 function quadTip(x, y) {
   const r = SIZES.get(E.cvMS); if (!r) return null;
@@ -1466,11 +1498,11 @@ function quadTip(x, y) {
     const px = QP.pl + q / QZ.qMax * pw, py = QP.pt + ph - Math.min(QZ.lam * q, QZ.aMax) / QZ.aMax * ph;
     const d = Math.hypot(px - x, py - y); if (d < 12 && (!best || d < best.d)) best = { o, s, d };
   }
-  if (!best) return `四極桿設定在 m/z <span class="num">${Math.round(set)}</span>。每個點是一種離子,越重越靠左;兩種電壓 U、V 一起調高,所有點一起往右滑,滑進頂端窗口的那一個才能通過。`;
+  if (!best) return zhEn(`四極桿設定在 m/z <span class="num">${Math.round(set)}</span>。每個點是一種離子,越重越靠左;兩種電壓 U、V 一起調高,所有點一起往右滑,滑進頂端窗口的那一個才能通過。`, `The quadrupole is set to m/z <span class="num">${Math.round(set)}</span>. Each dot is one kind of ion, heavier ones further left; raising both voltages U and V slides all the dots to the right, and only the one that slides into the top window gets through.`);
   const { o, s } = best;
-  if (s.pass) return `m/z <span class="num">${o.mz}</span> 在穩定區內:在桿子之間來回擺動但擺幅有限,可以一路穿過四極桿打到偵測器。`;
-  if (s.heavy) return `m/z <span class="num">${o.mz}</span> 對目前的設定太重(q 太小,位在穩定區左上方):快速交替的射頻電壓推不太動它,直流電壓把它慢慢拉向負極的桿子,撞上去就不見了。`;
-  return `m/z <span class="num">${o.mz}</span> 對目前的設定太輕(q 太大):它跟著快速交替的射頻電壓劇烈擺動,擺幅越來越大,撞上桿子。`;
+  if (s.pass) return zhEn(`m/z <span class="num">${o.mz}</span> 在穩定區內:在桿子之間來回擺動但擺幅有限,可以一路穿過四極桿打到偵測器。`, `m/z <span class="num">${o.mz}</span> is in the stable region: it swings between the rods, but only so far, so it travels all the way through the quadrupole to the detector.`);
+  if (s.heavy) return zhEn(`m/z <span class="num">${o.mz}</span> 對目前的設定太重(q 太小,位在穩定區左上方):快速交替的射頻電壓推不太動它,直流電壓把它慢慢拉向負極的桿子,撞上去就不見了。`, `m/z <span class="num">${o.mz}</span> is too heavy for this setting (q too small, up and to the left of the stable region): the fast-alternating RF voltage hardly moves it, and the DC voltage slowly pulls it toward the negative rods until it hits one and is lost.`);
+  return zhEn(`m/z <span class="num">${o.mz}</span> 對目前的設定太輕(q 太大):它跟著快速交替的射頻電壓劇烈擺動,擺幅越來越大,撞上桿子。`, `m/z <span class="num">${o.mz}</span> is too light for this setting (q too large): it swings hard with the fast-alternating RF voltage, wider and wider, until it hits a rod.`);
 }
 
 /* ---------- 升溫程式小圖 ---------- */
@@ -1497,7 +1529,7 @@ function buildTable() {
     const p = run.sp.get(c.id);
     return `<tr data-id="${c.id}"><td class="n">${i + 1}</td><td><i style="background:${COLORS[c.cls]}"></i>${c.name}</td><td class="n">${f2(p.tR)}</td><td class="n">${Math.round(p.kiCalc)}</td><td class="n">${c.ki}</td><td class="n">${(c.amt / total * 100).toFixed(1)}</td><td>${CLS[c.cls].name}</td></tr>`;
   }).join('');
-  E.ptable.innerHTML = `<table><thead><tr><th class="n">#</th><th>成分</th><th class="n">流出時間 (min)</th><th class="n">KI(本次)</th><th class="n">KI(資料庫)</th><th class="n">峰面積 %</th><th>類別</th></tr></thead><tbody>${rows}</tbody></table>`;
+  E.ptable.innerHTML = `<table><thead>${zhEn('<tr><th class="n">#</th><th>成分</th><th class="n">流出時間 (min)</th><th class="n">KI(本次)</th><th class="n">KI(資料庫)</th><th class="n">峰面積 %</th><th>類別</th></tr>', '<tr><th class="n">#</th><th>Compound</th><th class="n">Elution time (min)</th><th class="n">KI (this run)</th><th class="n">KI (database)</th><th class="n">Peak area %</th><th>Class</th></tr>')}</thead><tbody>${rows}</tbody></table>`;
   syncTable();
 }
 function syncTable() { if (E.ptable.hidden) return; for (const tr of E.ptable.querySelectorAll('tbody tr')) tr.classList.toggle('on', tr.dataset.id === S.trackId); }
@@ -1523,7 +1555,7 @@ function setRate(r) {
   }
   S.rate = r; S.run = nu; S.t = clamp(tn, 0, nu.tEnd); S.chromY = 0;
   E.tSlider.max = nu.tEnd.toFixed(2);
-  E.ovenP.innerHTML = `${PROG.T0} → ${PROG.Tf} °C · ${r} °C/min<br>保持 ${PROG.hold} min`;
+  E.ovenP.innerHTML = zhEn(`${PROG.T0} → ${PROG.Tf} °C · ${r} °C/min<br>保持 ${PROG.hold} min`, `${PROG.T0} → ${PROG.Tf} °C · ${r} °C/min<br>hold ${PROG.hold} min`);
   setPressed(E.segRate, 'rate', r); buildTable(); markDirty();
 }
 function setTrack(v) { userTakesOver(); S.track = v; setPressed(E.segTrack, 'track', v); markDirty(); }
@@ -1540,10 +1572,10 @@ function syncMsView() {
   setPressed(E.segMsView, 'v', S.msView);
   const quad = S.msView === 'quad';
   E.qctl.hidden = !quad; E.msFoot.hidden = quad;
-  E.cvMS.setAttribute('aria-label', quad ? '四極桿穩定圖:每個點是一種離子,落進頂端窗口的才能通過' : '目前時間的質譜,點一根質譜線可抽出該離子的層析圖');
+  E.cvMS.setAttribute('aria-label', quad ? zhEn('四極桿穩定圖:每個點是一種離子,落進頂端窗口的才能通過', 'Quadrupole stability plot: each dot is one kind of ion; only the one in the top window passes') : zhEn('目前時間的質譜,點一根質譜線可抽出該離子的層析圖', "Mass spectrum at the current time; click a line to extract that ion's chromatogram"));
   E.btnScan.setAttribute('aria-pressed', String(S.simMz == null));
   if (S.simMz != null) E.qSlider.value = S.simMz;
-  E.qVal.textContent = S.simMz == null ? '掃描中' : 'm/z ' + S.simMz;
+  E.qVal.textContent = S.simMz == null ? zhEn('掃描中', 'Scanning') : 'm/z ' + S.simMz;
   E.qSlider.style.setProperty('--p', ((+E.qSlider.value - MZ0) / (MZ1 - MZ0) * 100).toFixed(1) + '%');
   markDirty();
 }
@@ -1560,8 +1592,8 @@ let lastPlayState = '';
 function syncPlayBtn() {
   const st = tourOn() ? (S.tour.paused ? 'tplay' : 'tpause') : S.inj ? 'inj' : S.playing ? 'pause' : 'play';
   if (st === lastPlayState) return; lastPlayState = st;
-  E.btnPlay.innerHTML = st === 'pause' || st === 'tpause' ? PAUSE_SVG + '暫停' : st === 'tplay' ? PLAY_SVG + '繼續' : st === 'inj' ? PLAY_SVG + '進樣中' : PLAY_SVG + (S.injected ? '播放' : '進樣');
-  E.btnPlay.setAttribute('aria-label', st === 'tpause' ? '暫停導覽' : st === 'tplay' ? '繼續導覽' : st === 'pause' ? '暫停' : '播放');
+  E.btnPlay.innerHTML = st === 'pause' || st === 'tpause' ? PAUSE_SVG + zhEn('暫停', 'Pause') : st === 'tplay' ? PLAY_SVG + zhEn('繼續', 'Resume') : st === 'inj' ? PLAY_SVG + zhEn('進樣中', 'Injecting') : PLAY_SVG + (S.injected ? zhEn('播放', 'Play') : zhEn('進樣', 'Inject'));
+  E.btnPlay.setAttribute('aria-label', st === 'tpause' ? zhEn('暫停導覽', 'Pause tour') : st === 'tplay' ? zhEn('繼續導覽', 'Resume tour') : st === 'pause' ? zhEn('暫停', 'Pause') : zhEn('播放', 'Play'));
 }
 function showTip(html, x, y) {
   if (!html) { E.tip.hidden = true; return; }
@@ -1802,26 +1834,26 @@ function tick(dt, now) {
       E.tSlider.value = S.t.toFixed(2);
       E.tSlider.style.setProperty('--p', (S.t / run.tEnd * 100).toFixed(2) + '%');
       const c = S.trackId ? BYID.get(S.trackId) : null;
-      E.chipKk.innerHTML = c ? `k<span class="kname"> · ${c.solvent ? '溶劑' : c.label}</span>` : '停留倍數 k';
-      E.chipK.textContent = c ? (() => { const k = kOf(c, T); return k >= 100 ? Math.round(k) + '' : k >= 10 ? f1(k) : f2(k); })() : '無';
+      E.chipKk.innerHTML = c ? `k<span class="kname"> · ${c.solvent ? zhEn('溶劑', 'solvent') : c.label}</span>` : zhEn('停留倍數 k', '<span class="kname">Retention factor </span>k');
+      E.chipK.textContent = c ? (() => { const k = kOf(c, T); return k >= 100 ? Math.round(k) + '' : k >= 10 ? f1(k) : f2(k); })() : zhEn('無', 'none');
       syncTable();
     }
     const st = storyHTML();
     if (st !== lastStory) { lastStory = st; E.story.innerHTML = st; }
     const sp = S.spec, L = S.lensCh;
     let hit;
-    if (S.msView === 'quad') hit = S.simMz != null ? `固定在 m/z <b>${S.simMz}</b>:只有這個 m/z 穿得過四極桿` : `掃描中,現在只放行 m/z <span class="num">${Math.round(S.sweep)}</span>;點一個離子可以固定`;
+    if (S.msView === 'quad') hit = S.simMz != null ? zhEn(`固定在 m/z <b>${S.simMz}</b>:只有這個 m/z 穿得過四極桿`, `Fixed at m/z <b>${S.simMz}</b>: only this m/z gets through`) : zhEn(`掃描中,現在只放行 m/z <span class="num">${Math.round(S.sweep)}</span>;點一個離子可以固定`, `Scanning, now passing m/z <span class="num">${Math.round(S.sweep)}</span>; click an ion to fix it`);
     else if (S.msFocus && L && L.cid === S.msFocus) {
       const ch = FRAG[L.cid].ch[L.i];
-      hit = ch.ion ? `放大鏡:m/z <b>${ch.mz}</b> 是 ${ionTxt(ch)},M⁺• 失去 ${lossTxt(ch)}(質量 ${nominal(ch.loss)})` : `放大鏡:M⁺• 沒有斷,m/z <b>${ch.mz}</b> 就是分子量`;
+      hit = ch.ion ? zhEn(`放大鏡:m/z <b>${ch.mz}</b> 是 ${ionTxt(ch)},M⁺• 失去 ${lossTxt(ch)}(質量 ${nominal(ch.loss)})`, `Magnifier: m/z <b>${ch.mz}</b> = ${ionTxt(ch)}, M⁺• − ${lossTxt(ch)} (mass ${nominal(ch.loss)})`) : zhEn(`放大鏡:M⁺• 沒有斷,m/z <b>${ch.mz}</b> 就是分子量`, `Magnifier: M⁺• intact, m/z <b>${ch.mz}</b> = molecular weight`);
     }
-    else if (!sp) hit = S.injected && S.t >= S.run.tEnd ? '分析結束' : '質譜尚未收訊號';
-    else if (sp.total < 5e4) hit = '只有背景離子(空氣、液膜受熱分解),沒有可比對的成分';
-    else hit = `最佳比對 <b>${sp.hit.c.name}</b> · 相似度 <span class="num">${Math.min(99, Math.floor(sp.hit.s * 100))}</span>`;
+    else if (!sp) hit = S.injected && S.t >= S.run.tEnd ? zhEn('分析結束', 'End of run') : zhEn('質譜尚未收訊號', 'No MS signal yet');
+    else if (sp.total < 5e4) hit = zhEn('只有背景離子(空氣、液膜受熱分解),沒有可比對的成分', 'Background ions only (air, heated film); no match');
+    else hit = zhEn(`最佳比對 <b>${sp.hit.c.name}</b> · 相似度 <span class="num">${Math.min(99, Math.floor(sp.hit.s * 100))}</span>`, `Best match <b>${sp.hit.c.name}</b> · similarity <span class="num">${Math.min(99, Math.floor(sp.hit.s * 100))}</span>`);
     if (E.msHit.innerHTML !== hit) E.msHit.innerHTML = hit;
-    const eicTxt = S.eic ? `只看 m/z <b>${S.eic}</b> ✕` : '';
+    const eicTxt = S.eic ? zhEn(`只看 m/z <b>${S.eic}</b> ✕`, `m/z <b>${S.eic}</b> only ✕`) : '';
     if (E.btnEic.hidden !== !S.eic) E.btnEic.hidden = !S.eic;
-    if (S.eic && E.btnEic.innerHTML !== eicTxt) { E.btnEic.innerHTML = eicTxt; E.btnEic.setAttribute('aria-label', `清除 m/z ${S.eic} 的抽取離子層析圖`); }
+    if (S.eic && E.btnEic.innerHTML !== eicTxt) { E.btnEic.innerHTML = eicTxt; E.btnEic.setAttribute('aria-label', zhEn(`清除 m/z ${S.eic} 的抽取離子層析圖`, `Clear the m/z ${S.eic} extracted ion chromatogram`)); }
   }
 }
 
@@ -2070,17 +2102,18 @@ function buildRoom() {
   });
 }
 async function drawPosters() {
-  try { await Promise.race([Promise.all(['900 64px "Noto Sans TC"', '500 30px "Noto Sans TC"', '600 30px "IBM Plex Mono"'].map(f => document.fonts.load(f, '分配保留指數電子撞擊游離前進速度載氣液膜換升溫率幾乎不變碎片質譜指紋四極桿直流加上快速翻轉的交讓一種穿過點一下看動畫電場像個來去馬鞍太輕被甩出重拉走只有留得住'))), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* 字型載不到就用系統字 */ }
+  try { await Promise.race([Promise.all(['900 64px "Noto Sans TC"', '500 30px "Noto Sans TC"', '600 30px "IBM Plex Mono"'].map(f => document.fonts.load(f, zhEn('分配保留指數電子撞擊游離前進速度載氣液膜換升溫率幾乎不變碎片質譜指紋四極桿直流加上快速翻轉的交讓一種穿過點一下看動畫電場像個來去馬鞍太輕被甩出重拉走只有留得住', 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789')))), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* 字型載不到就用系統字 */ }
   for (const P of G.posters) {
     const g = P.g, W = 1024, H = 680;
     g.fillStyle = '#0b1322'; g.fillRect(0, 0, W, H);
     g.strokeStyle = '#1f3452'; g.lineWidth = 6; g.strokeRect(14, 14, W - 28, H - 28);
     g.strokeStyle = '#7fe3ff'; g.lineWidth = 4;
     for (const [x, y, dx, dy] of [[30, 30, 1, 1], [W - 30, 30, -1, 1], [30, H - 30, 1, -1], [W - 30, H - 30, -1, -1]]) { g.beginPath(); g.moveTo(x, y + dy * 34); g.lineTo(x, y); g.lineTo(x + dx * 34, y); g.stroke(); }
-    const title = (t, s) => { g.fillStyle = '#eaf5ff'; g.font = '900 66px "Noto Sans TC", sans-serif'; g.fillText(t, 64, 122); g.fillStyle = '#8fb3d6'; g.font = '500 30px "Noto Sans TC", sans-serif'; g.fillText(s, 66, 172); };
+    // 英文的標題比中文寬,字小一點,才不會碰到右上角的「點一下看動畫」
+    const title = (t, s) => { g.fillStyle = '#eaf5ff'; g.font = `900 ${zhEn(66, 60)}px "Noto Sans TC", sans-serif`; g.fillText(t, 64, 122); g.fillStyle = '#8fb3d6'; g.font = '500 30px "Noto Sans TC", sans-serif'; g.fillText(s, 66, 172); };
     g.textBaseline = 'alphabetic'; g.textAlign = 'left';
     if (P.kind === 'part') {
-      title('走走停停', 'k = 溶在液膜的量 ÷ 在載氣中的量');
+      title(zhEn('走走停停', 'Stop and go'), zhEn('k = 溶在液膜的量 ÷ 在載氣中的量', 'k = amount in the film ÷ amount in the gas'));
       const y0 = 250, y1 = 470;
       g.fillStyle = 'rgba(255,181,71,.28)'; g.fillRect(70, y0, 884, 30); g.fillRect(70, y1 - 30, 884, 30);
       g.strokeStyle = '#5c7da3'; g.lineWidth = 5; g.beginPath(); g.moveTo(70, y0); g.lineTo(954, y0); g.moveTo(70, y1); g.lineTo(954, y1); g.stroke();
@@ -2092,10 +2125,10 @@ async function drawPosters() {
         g.strokeStyle = 'rgba(127,227,255,.6)'; g.lineWidth = 3; g.beginPath(); g.moveTo(x + 18, y); g.lineTo(x + 70, y); g.stroke();
         g.beginPath(); g.moveTo(x + 70, y); g.lineTo(x + 60, y - 7); g.lineTo(x + 60, y + 7); g.closePath(); g.fillStyle = 'rgba(127,227,255,.6)'; g.fill();
       }
-      g.fillStyle = '#cfe6ff'; g.font = '600 34px "Noto Sans TC", sans-serif'; g.fillText('前進速度 = 載氣速度 × 1 / (1 + k)', 64, 560);
-      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('金色是管壁上的液膜,藍色是正在載氣裡前進的分子', 64, 612);
+      g.fillStyle = '#cfe6ff'; g.font = '600 34px "Noto Sans TC", sans-serif'; g.fillText(zhEn('前進速度 = 載氣速度 × 1 / (1 + k)', 'Speed = gas speed × 1 / (1 + k)'), 64, 560);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText(zhEn('金色是管壁上的液膜,藍色是正在載氣裡前進的分子', 'Gold: the film on the wall; blue: molecules moving in the gas'), 64, 612);
     } else if (P.kind === 'ki') {
-      title('保留指數 KI', '用前後兩支直鏈烷類當尺,把流出時間換成刻度');
+      title(zhEn('保留指數 KI', 'Retention index KI'), zhEn('用前後兩支直鏈烷類當尺,把流出時間換成刻度', 'The alkanes on either side are a ruler for elution time'));
       const base = 470, X = t => 90 + t * 820;
       g.strokeStyle = '#5c7da3'; g.lineWidth = 3; g.beginPath(); g.moveTo(70, base); g.lineTo(954, base); g.stroke();
       const pk = (t, hgt, col, lab) => {
@@ -2105,16 +2138,16 @@ async function drawPosters() {
       };
       pk(0.1, 150, '#8fa3bd', 'C10'); pk(0.9, 140, '#8fa3bd', 'C11'); pk(0.42, 190, '#7fe3ff', 'x');
       g.fillStyle = '#cfe6ff'; g.font = '600 32px "IBM Plex Mono", monospace'; g.fillText('KI = 100 × [ n + (tx − tn) / (tn+1 − tn) ]', 64, 560);
-      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('換升溫速率,流出時間會變,KI 幾乎不變', 64, 612);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText(zhEn('換升溫速率,流出時間會變,KI 幾乎不變', 'New heating rate: elution times shift, KI barely moves'), 64, 612);
     } else if (P.kind === 'quad') {
-      title('四極桿', '直流加上快速翻轉的交流,只讓一種 m/z 穿過');
+      title(zhEn('四極桿', 'Quadrupole'), zhEn('直流加上快速翻轉的交流,只讓一種 m/z 穿過', 'DC plus fast-flipping AC lets only one m/z through'));
       const d = createFieldDemo('quad', { font: '"Noto Sans TC", sans-serif' }); d.seek(13.3);   // 太輕的正要被甩出去、太重的往旁邊滑、要的那種留在中間
       g.save(); g.translate(150, 170); g.scale(1.22, 1.22); d.draw(g, { bare: true }); g.restore();
       g.textBaseline = 'alphabetic'; g.textAlign = 'left';
-      g.fillStyle = '#cfe6ff'; g.font = '600 34px "Noto Sans TC", sans-serif'; g.fillText('電場像一個翻來翻去的馬鞍', 64, 560);
-      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('太輕的被甩出去,太重的被拉走,只有一種留得住', 64, 612);
+      g.fillStyle = '#cfe6ff'; g.font = '600 34px "Noto Sans TC", sans-serif'; g.fillText(zhEn('電場像一個翻來翻去的馬鞍', 'The field is like a flipping saddle'), 64, 560);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText(zhEn('太輕的被甩出去,太重的被拉走,只有一種留得住', 'Too light: flung out; too heavy: pulled away; one stays'), 64, 612);
     } else {
-      title('電子撞擊游離', '70 eV 電子撞掉一個電子,分子帶正電後斷成碎片');
+      title(zhEn('電子撞擊游離', 'Electron ionization'), zhEn('70 eV 電子撞掉一個電子,分子帶正電後斷成碎片', 'A 70 eV electron knocks one off; the ion then breaks up'));
       const cx = 230, cy = 360;
       g.fillStyle = '#5aa2ff'; for (const [dx, dy] of [[0, 0], [38, -22], [38, 22], [-38, -22], [-38, 22], [0, 44], [0, -44]]) { g.beginPath(); g.arc(cx + dx, cy + dy, 22, 0, 7); g.fill(); }
       g.strokeStyle = '#ffe28a'; g.lineWidth = 4; g.setLineDash([12, 10]); g.beginPath(); g.moveTo(70, 250); g.lineTo(cx - 30, cy - 20); g.stroke(); g.setLineDash([]);
@@ -2123,14 +2156,14 @@ async function drawPosters() {
       g.beginPath(); g.moveTo(450, cy); g.lineTo(434, cy - 10); g.lineTo(434, cy + 10); g.closePath(); g.fillStyle = '#7fe3ff'; g.fill();
       const frag = (x, y, r, lab) => { g.fillStyle = '#ff8a4c'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.fillStyle = '#cfe6ff'; g.font = '500 26px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText(lab, x, y + r + 34); g.textAlign = 'left'; };
       frag(540, 330, 36, 'm/z 136'); frag(680, 300, 28, '121'); frag(800, 360, 30, '93'); frag(905, 300, 22, '77');
-      g.fillStyle = '#cfe6ff'; g.font = '600 32px "Noto Sans TC", sans-serif'; g.fillText('M + e⁻ → M⁺• + 2e⁻ → 碎片離子', 64, 560);
-      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText('碎片的 m/z 分布就是質譜,也是比對用的指紋', 64, 612);
+      g.fillStyle = '#cfe6ff'; g.font = '600 32px "Noto Sans TC", sans-serif'; g.fillText(zhEn('M + e⁻ → M⁺• + 2e⁻ → 碎片離子', 'M + e⁻ → M⁺• + 2e⁻ → fragment ions'), 64, 560);
+      g.fillStyle = '#8fb3d6'; g.font = '500 28px "Noto Sans TC", sans-serif'; g.fillText(zhEn('碎片的 m/z 分布就是質譜,也是比對用的指紋', 'The fragments by m/z: the spectrum, a fingerprint to match'), 64, 612);
     }
     // 右上角:點一下看動畫
     g.fillStyle = 'rgba(127,227,255,.14)'; g.strokeStyle = '#7fe3ff'; g.lineWidth = 3;
     g.beginPath(); if (g.roundRect) g.roundRect(706, 46, 270, 64, 32); else g.rect(706, 46, 270, 64); g.fill(); g.stroke();
     g.fillStyle = '#7fe3ff'; g.beginPath(); g.moveTo(738, 62); g.lineTo(738, 94); g.lineTo(764, 78); g.closePath(); g.fill();
-    g.font = '700 30px "Noto Sans TC", sans-serif'; g.textBaseline = 'middle'; g.fillText('點一下看動畫', 780, 79); g.textBaseline = 'alphabetic';
+    g.font = '700 30px "Noto Sans TC", sans-serif'; g.textBaseline = 'middle'; g.fillText(zhEn('點一下看動畫', 'Click to play'), 780, 79); g.textBaseline = 'alphabetic';
     P.t.needsUpdate = true;
   }
 }
@@ -2509,13 +2542,13 @@ function updateLensMS(dt) {
     Lb.ion.copy(lay.ionC).add(new THREE.Vector3(bx + ionDx, by + 2.6, 0));
     Lb.loss.copy(lay.losC).add(losD).add(new THREE.Vector3(bx, by + 2.4, 0));
   } else Lb.ion.set(bx + (phase === 'split' ? ionDx : 0), lay.top + by + 2.4, 0);
-  if (phase === 'mol') { Lb.ionTxt = `${fmtF(F.f)} 分子`; Lb.ionSub = `中性 · 質量 ${c.mw}`; }
-  else if (phase === 'ion') { Lb.ionTxt = 'M⁺•'; Lb.ionSub = `少一個電子 · m/z ${c.mw}`; }
-  else if (!lay.hasLoss) { Lb.ionTxt = 'M⁺• 沒有斷'; Lb.ionSub = `m/z ${c.mw} = 分子量`; }
-  else { Lb.ionTxt = ionTxt(ch); Lb.ionSub = `m/z ${ch.mz} · 帶電,推往四極桿`; Lb.lossTxt = lossTxt(ch); Lb.lossSub = `${nominal(ch.loss)} · 中性,偵測不到`; }
+  if (phase === 'mol') { Lb.ionTxt = zhEn(`${fmtF(F.f)} 分子`, `${fmtF(F.f)} molecule`); Lb.ionSub = zhEn(`中性 · 質量 ${c.mw}`, `neutral · mass ${c.mw}`); }
+  else if (phase === 'ion') { Lb.ionTxt = 'M⁺•'; Lb.ionSub = zhEn(`少一個電子 · m/z ${c.mw}`, `one electron short · m/z ${c.mw}`); }
+  else if (!lay.hasLoss) { Lb.ionTxt = zhEn('M⁺• 沒有斷', 'M⁺• unbroken'); Lb.ionSub = zhEn(`m/z ${c.mw} = 分子量`, `m/z ${c.mw} = molecular weight`); }
+  else { Lb.ionTxt = ionTxt(ch); Lb.ionSub = zhEn(`m/z ${ch.mz} · 帶電,推往四極桿`, `m/z ${ch.mz} · charged, to the quadrupole`); Lb.lossTxt = lossTxt(ch); Lb.lossSub = zhEn(`${nominal(ch.loss)} · 中性,偵測不到`, `${nominal(ch.loss)} · neutral, not detected`); }
   Lb.ionVis = phase !== 'split' || ionFade > 0.3;
   Lb.lossVis = phase === 'split' && lay.hasLoss && losFade > 0.25;
-  Lb.title = `${c.label} · 斷法 ${A.i + 1}/${F.ch.length}`;
+  Lb.title = zhEn(`${c.label} · 斷法 ${A.i + 1}/${F.ch.length}`, `${c.label} · break ${A.i + 1}/${F.ch.length}`);
 }
 
 /* ---------- 氦氣鋼瓶與管線 ---------- */
@@ -2586,57 +2619,57 @@ function buildTags() {
   // obj() 的偏移量照原本(未鏡像)的寫法,x 取負號後經過鏡像,標籤仍落在物件右側
   const obj = (o, x, y, z) => { const v = new THREE.Vector3(); return () => o.localToWorld(v.set(-x, y, z)); };
   const ex = () => S.explode > 0.5, always = () => true, m = L.mag;
-  tag('ALS 自動進樣器', () => S.inj ? '進樣中' : '待命', obj(G.als, 5.6, 104, 2.6));
-  tag('進樣口', () => '250 °C,少量進管柱', obj(G.inlet, 4.2, 6, 2.5));
-  tag('管柱烘箱', () => f1(ovenT(S.injected ? S.t : 0, S.run.rate)) + ' °C', W(47, 47.5, 29));
-  tag('管柱(分離用細管)', () => '30 m × 0.25 mm', () => G.coilGrp.localToWorld(new THREE.Vector3(-55, 14.5, 13)));
-  tag('傳輸線', () => '250 °C', W(12, 27.4, 1.5));
-  tag('質譜儀', () => S.msOn ? '70 eV 電子 · 掃描中' : '燈絲關閉', () => G.msd.localToWorld(new THREE.Vector3(46, 47, 26)), '', always, Infinity, 150);
-  tag('離子源', () => S.msOn ? '70 eV 電子 · 230 °C' : '燈絲關閉', obj(G.src, 0, 5.6, 0), '', always, 150);
-  tag('四極桿', () => S.simMz != null ? '固定 m/z ' + S.simMz : S.msOn ? 'm/z ' + Math.round(S.sweep) : 'm/z 40–400', obj(G.quad, 0, 4.2, 0), '', always, 150);
-  tag('偵測器', () => '數有多少離子', obj(G.det, 0, 8.8, 0), '', always, 150);
-  tag('載氣 He', () => '1.0 mL/min', () => G.heAnchor);
+  tag(zhEn('ALS 自動進樣器', 'ALS autosampler'), () => S.inj ? zhEn('進樣中', 'injecting') : zhEn('待命', 'idle'), obj(G.als, 5.6, 104, 2.6));
+  tag(zhEn('進樣口', 'Inlet'), () => zhEn('250 °C,少量進管柱', '250 °C, split'), obj(G.inlet, 4.2, 6, 2.5));
+  tag(zhEn('管柱烘箱', 'Column oven'), () => f1(ovenT(S.injected ? S.t : 0, S.run.rate)) + ' °C', W(47, 47.5, 29));
+  tag(zhEn('管柱(分離用細管)', 'Column (thin tube)'), () => '30 m × 0.25 mm', () => G.coilGrp.localToWorld(new THREE.Vector3(-55, 14.5, 13)));
+  tag(zhEn('傳輸線', 'Transfer line'), () => '250 °C', W(12, 27.4, 1.5));
+  tag(zhEn('質譜儀', 'Mass spectrometer'), () => S.msOn ? zhEn('70 eV 電子 · 掃描中', '70 eV · scanning') : zhEn('燈絲關閉', 'filament off'), () => G.msd.localToWorld(new THREE.Vector3(46, 47, 26)), '', always, Infinity, 150);
+  tag(zhEn('離子源', 'Ion source'), () => S.msOn ? zhEn('70 eV 電子 · 230 °C', '70 eV · 230 °C') : zhEn('燈絲關閉', 'filament off'), obj(G.src, 0, 5.6, 0), '', always, 150);
+  tag(zhEn('四極桿', 'Quadrupole'), () => S.simMz != null ? zhEn('固定 m/z ', 'fixed m/z ') + S.simMz : S.msOn ? 'm/z ' + Math.round(S.sweep) : 'm/z 40–400', obj(G.quad, 0, 4.2, 0), '', always, 150);
+  tag(zhEn('偵測器', 'Detector'), () => zhEn('數有多少離子', 'counts the ions'), obj(G.det, 0, 8.8, 0), '', always, 150);
+  tag(zhEn('載氣 He', 'Carrier gas He'), () => '1.0 mL/min', () => G.heAnchor);
   const lens = (x, y, z) => { const v = new THREE.Vector3(); return () => G.mag.visible ? G.mag.localToWorld(v.set(x, y, z)) : null; };
   const lensAt = fn => { const v = new THREE.Vector3(); return () => { const q = G.mag.visible ? fn() : null; return q ? G.lensMS.localToWorld(v.copy(q)) : null; }; };
   const lensMSAt = (x, y, z) => { const v = new THREE.Vector3(); return () => G.mag.visible ? G.lensMS.localToWorld(v.set(x, y, z)) : null; };
   const isGC = () => G.lensMode !== 'ms', isMS = () => G.lensMode === 'ms' && !!G.lensLab;
   const nLens0 = TAGS.length;
-  G.magTag = tag(() => G.lensMode === 'ms' ? '放大:離子源' : '放大:管柱內部', () => (G.lensMode === 'ms' ? G.lensLab && G.lensLab.title : G.magSub) || '',
+  G.magTag = tag(() => G.lensMode === 'ms' ? zhEn('放大:離子源', 'In the ion source') : zhEn('放大:管柱內部', 'Inside the column'), () => (G.lensMode === 'ms' ? G.lensLab && G.lensLab.title : G.magSub) || '',
     () => G.mag.visible ? G.mag.localToWorld(new THREE.Vector3(-m.len / 2 + 1, G.lensMode === 'ms' ? 11.6 : m.R + 2.6, 0)) : null);
-  tag('液膜 0.25 μm', null, lens(-m.len / 2 + 1, -m.R - 1.4, 0), 'part', isGC);
-  tag('載氣', null, lens(m.len / 2 - 8, -m.R - 1.4, 0), 'part', isGC);
+  tag(zhEn('液膜 0.25 μm', 'Liquid film 0.25 μm'), null, lens(-m.len / 2 + 1, -m.R - 1.4, 0), 'part', isGC);
+  tag(zhEn('載氣', 'Carrier gas'), null, lens(m.len / 2 - 8, -m.R - 1.4, 0), 'part', isGC);
   tag(() => G.lensLab ? G.lensLab.ionTxt : '', () => G.lensLab ? G.lensLab.ionSub : '', lensAt(() => G.lensLab && G.lensLab.ionVis ? G.lensLab.ion : null), 'band keep', isMS);
   tag(() => G.lensLab && G.lensLab.lossTxt || '', () => G.lensLab && G.lensLab.lossSub || '', lensAt(() => G.lensLab && G.lensLab.lossVis ? G.lensLab.loss : null), 'neutral keep', isMS);
-  tag('燈絲 · 70 eV 電子', null, lensMSAt(-2.4, 8.8, 0), 'part', isMS);
-  tag('← 往四極桿', null, lensMSAt(21, -7.6, 0), 'part', isMS);
+  tag(zhEn('燈絲 · 70 eV 電子', 'Filament · 70 eV electrons'), null, lensMSAt(-2.4, 8.8, 0), 'part', isMS);
+  tag(zhEn('← 往四極桿', '← to the quadrupole'), null, lensMSAt(21, -7.6, 0), 'part', isMS);
   for (let i = nLens0; i < TAGS.length; i++) TAGS[i].lens = true;   // 放大鏡上的標籤
   G.bandTag = tag('', () => G.bandSub || '', () => G.bandPos, 'band', () => !!G.bandPos);
-  tag('橡膠隔墊', null, obj(G.septum, 2, 10, 1), 'part', ex);
-  tag('玻璃襯管', null, obj(G.liner, 1.4, 6, 1.2), 'part', ex);
-  tag('注射針 10 μL', null, obj(G.syringe, 1.6, 15, 0.8), 'part', ex);
-  tag('樣品盤', null, obj(G.turret, 8.8, 1.5, 3), 'part', ex);
-  tag('推斥極', null, obj(G.src, -2.6, -2.8, 2), 'part', ex, 170);
-  tag('燈絲', null, obj(G.src, 1.2, 3.4, 1), 'part', ex, 170);
-  tag('離子透鏡', null, obj(G.lens, 3.7, -2.9, 2), 'part', ex, 170);
-  tag('高能倍增極', null, obj(G.det, 1.4, 5.8, 1), 'part', ex, 170);
-  tag('渦輪真空泵', null, W(-23.5, 12, 6), 'part', ex);
-  tag('加熱圈與風扇', null, () => G.gc.localToWorld(new THREE.Vector3(-55, 14, -20)), 'part', ex);
+  tag(zhEn('橡膠隔墊', 'Rubber septum'), null, obj(G.septum, 2, 10, 1), 'part', ex);
+  tag(zhEn('玻璃襯管', 'Glass liner'), null, obj(G.liner, 1.4, 6, 1.2), 'part', ex);
+  tag(zhEn('注射針 10 μL', 'Syringe 10 μL'), null, obj(G.syringe, 1.6, 15, 0.8), 'part', ex);
+  tag(zhEn('樣品盤', 'Sample tray'), null, obj(G.turret, 8.8, 1.5, 3), 'part', ex);
+  tag(zhEn('推斥極', 'Repeller'), null, obj(G.src, -2.6, -2.8, 2), 'part', ex, 170);
+  tag(zhEn('燈絲', 'Filament'), null, obj(G.src, 1.2, 3.4, 1), 'part', ex, 170);
+  tag(zhEn('離子透鏡', 'Ion lenses'), null, obj(G.lens, 3.7, -2.9, 2), 'part', ex, 170);
+  tag(zhEn('高能倍增極', 'High-energy dynode'), null, obj(G.det, 1.4, 5.8, 1), 'part', ex, 170);
+  tag(zhEn('渦輪真空泵', 'Turbo vacuum pump'), null, W(-23.5, 12, 6), 'part', ex);
+  tag(zhEn('加熱圈與風扇', 'Heater coil and fan'), null, () => G.gc.localToWorld(new THREE.Vector3(-55, 14, -20)), 'part', ex);
   // 點部件或它的標籤時的取景(世界座標;質譜裡的零件從正面窗口看進去)
   const V = (x, y, z) => new THREE.Vector3(x, y, z), wp = o => o.getWorldPosition(new THREE.Vector3());
   const view = (tgt, off) => ({ tgt, pos: tgt.clone().add(off) });
   const ZOOM = {
-    'ALS 自動進樣器': () => viewFor(SHOTS[1]),
-    '進樣口': () => ({ pos: V(50, 77, 52), tgt: V(74, 58, 6) }),
-    '管柱烘箱': () => view(V(65, 26, 2), V(-12, 30, 120)),
-    '管柱(分離用細管)': () => view(V(66, 25, 4), V(-10, 22, 95)),
-    '加熱圈與風扇': () => view(V(66, 25, 4), V(-10, 22, 95)),
-    '傳輸線': () => view(V(27, 24, 0), V(-6, 20, 70)),
-    '質譜儀': () => view(V(-19, 22, 0), V(4, 34, 125)),
-    '離子源': () => view(wp(G.src), V(4, 12, 46)), '推斥極': () => view(wp(G.src), V(4, 12, 46)), '燈絲': () => view(wp(G.src), V(4, 12, 46)), '離子透鏡': () => view(wp(G.src), V(4, 12, 46)),
-    '四極桿': () => view(wp(G.quad), V(-4, 14, 52)),
-    '偵測器': () => { const d = wp(G.det); d.y -= 2; return view(d, V(10, 14, 52)); }, '高能倍增極': () => { const d = wp(G.det); d.y -= 2; return view(d, V(10, 14, 52)); },
-    '渦輪真空泵': () => view(V(-17, 12, 0), V(0, 16, 62)),
-    '載氣 He': () => view(G.heAnchor.clone(), V(-10, 14, 80)),
+    [zhEn('ALS 自動進樣器', 'ALS autosampler')]: () => viewFor(SHOTS[1]),
+    [zhEn('進樣口', 'Inlet')]: () => ({ pos: V(50, 77, 52), tgt: V(74, 58, 6) }),
+    [zhEn('管柱烘箱', 'Column oven')]: () => view(V(65, 26, 2), V(-12, 30, 120)),
+    [zhEn('管柱(分離用細管)', 'Column (thin tube)')]: () => view(V(66, 25, 4), V(-10, 22, 95)),
+    [zhEn('加熱圈與風扇', 'Heater coil and fan')]: () => view(V(66, 25, 4), V(-10, 22, 95)),
+    [zhEn('傳輸線', 'Transfer line')]: () => view(V(27, 24, 0), V(-6, 20, 70)),
+    [zhEn('質譜儀', 'Mass spectrometer')]: () => view(V(-19, 22, 0), V(4, 34, 125)),
+    [zhEn('離子源', 'Ion source')]: () => view(wp(G.src), V(4, 12, 46)), [zhEn('推斥極', 'Repeller')]: () => view(wp(G.src), V(4, 12, 46)), [zhEn('燈絲', 'Filament')]: () => view(wp(G.src), V(4, 12, 46)), [zhEn('離子透鏡', 'Ion lenses')]: () => view(wp(G.src), V(4, 12, 46)),
+    [zhEn('四極桿', 'Quadrupole')]: () => view(wp(G.quad), V(-4, 14, 52)),
+    [zhEn('偵測器', 'Detector')]: () => { const d = wp(G.det); d.y -= 2; return view(d, V(10, 14, 52)); }, [zhEn('高能倍增極', 'High-energy dynode')]: () => { const d = wp(G.det); d.y -= 2; return view(d, V(10, 14, 52)); },
+    [zhEn('渦輪真空泵', 'Turbo vacuum pump')]: () => view(V(-17, 12, 0), V(0, 16, 62)),
+    [zhEn('載氣 He', 'Carrier gas He')]: () => view(G.heAnchor.clone(), V(-10, 14, 80)),
   };
   G.ZOOM = ZOOM;
   for (const t of TAGS) {
@@ -2644,7 +2677,7 @@ function buildTags() {
     const name = t.lastTxt;
     t.zoom = ZOOM[name] || (t.el.classList.contains('part') ? () => { const q = t.pos(); return q ? view(q.clone(), V(-6, 12, 40)) : viewFor(null); } : null);
     if (!t.zoom) continue;
-    t.el.classList.add('zoomable'); t.el.title = '點一下放大這一區';
+    t.el.classList.add('zoomable'); t.el.title = zhEn('點一下放大這一區', 'Click to zoom in here');
     t.el.addEventListener('click', () => zoomTo(t.zoom()));
   }
 }
@@ -2731,9 +2764,9 @@ function placeLensBtn(mode, want, open) {
   const st = open ? 'x' : mode;
   if (b.dataset.st !== st) {
     b.dataset.st = st; b.classList.toggle('x', open);
-    const name = mode === 'ms' ? '放大鏡:離子源' : '放大鏡:管柱內部';
+    const name = mode === 'ms' ? zhEn('放大鏡:離子源', 'Magnifier: ion source') : zhEn('放大鏡:管柱內部', 'Magnifier: inside the column');
     b.querySelector('span').textContent = name;
-    b.setAttribute('aria-label', open ? '收起放大鏡' : '打開' + name); b.title = open ? '收起放大鏡' : '打開' + name;
+    b.setAttribute('aria-label', open ? zhEn('收起放大鏡', 'Close the magnifier') : zhEn('打開' + name, 'Open ' + name)); b.title = open ? zhEn('收起放大鏡', 'Close the magnifier') : zhEn('打開' + name, 'Open ' + name);
     b.style.transform = ''; b._w = b.offsetWidth; b._h = b.offsetHeight;
   }
   // b._w、b._h 是放大前的大小;按鈕有放大(ui-scale.css)時換成螢幕上的大小來排,位移再除回去
@@ -2810,7 +2843,7 @@ function zoomAt(x, y) {
   if (best && bd < 28) { zoomTo(best.zoom()); return; }
   // 點到外殼或從窗口點到裡面的牆:放大整台儀器
   for (let q = hit.object; q; q = q.parent) {
-    const name = q === G.msd ? '質譜儀' : q === G.gc ? '管柱烘箱' : q === G.als ? 'ALS 自動進樣器' : null;
+    const name = q === G.msd ? zhEn('質譜儀', 'Mass spectrometer') : q === G.gc ? zhEn('管柱烘箱', 'Column oven') : q === G.als ? zhEn('ALS 自動進樣器', 'ALS autosampler') : null;
     if (name && G.ZOOM && G.ZOOM[name]) { zoomTo(G.ZOOM[name]()); return; }
   }
   const dir = G.camera.position.clone().sub(G.controls.target).normalize(), dist = clamp(G.camera.position.distanceTo(G.controls.target) * 0.5, 45, 160);
@@ -3081,8 +3114,8 @@ function updateMagnifier(dt, T, sStar, tc) {
     }
     let inFilm = 0, n = 0;
     for (const o of G.mol) if (o.id) { n++; if (o.film) inFilm++; }
-    if (sStar === null) G.magSub = tc && !tc.solvent && S.injected ? `${tc.label} 已離開管柱` : '沒有追蹤的成分';
-    else G.magSub = `${Math.round(sStar * 100)}% 處 · 液膜裡 ${n ? Math.round(inFilm / n * 100) : 0}%`;
+    if (sStar === null) G.magSub = tc && !tc.solvent && S.injected ? zhEn(`${tc.label} 已離開管柱`, `${tc.label} has left the column`) : zhEn('沒有追蹤的成分', 'no component followed');
+    else G.magSub = zhEn(`${Math.round(sStar * 100)}% 處 · 液膜裡 ${n ? Math.round(inFilm / n * 100) : 0}%`, `at ${Math.round(sStar * 100)}% · ${n ? Math.round(inFilm / n * 100) : 0}% in the film`);
   }
   const mm = _m4.m, q = _m4.q, sc = _m4.s, p = _m4.p, col = _m4.c;
   q.identity();
@@ -3324,13 +3357,13 @@ XP.part = (() => {
   const CURVE = sets.map((s) => { const a = []; for (let tt = T0; tt <= DUR + 1e-6; tt += 0.1) a.push([tt, dens(s, tt)]); return a; });
   const dmax = Math.max(1, ...CURVE.flat().map(([, v]) => v));
   return {
-    title: '走走停停:管柱怎麼把成分分開', dur: DUR,
+    title: zhEn('走走停停:管柱怎麼把成分分開', 'Stop and go: how the column separates components'), dur: DUR,
     cues: [
-      [0, '管柱是一條很細、很長的管子,內壁塗著一層薄薄的液膜(金色)。載氣(氦氣)一直從左往右吹。'],
-      [5, '分子一下子溶進液膜、停在原地,一下子又跑回載氣、被吹著往前走。'],
-      [11, 'k 是「停在液膜的時間 ÷ 在載氣裡跑的時間」。藍色 k = 1:一半的時間在跑,速度是載氣的 1/2;橙色 k = 3:只有四分之一的時間在跑,速度是 1/4。'],
-      [19, '一起打進去的兩種分子,走同樣長的管子,到出口時已經分開:先到的先出峰,層析圖上就是兩支峰。'],
-      [27, '溫度升高,分子比較不愛待在液膜裡,k 變小,大家都跑快一點。所以 GC 會一邊分析一邊升溫。'],
+      [0, zhEn('管柱是一條很細、很長的管子,內壁塗著一層薄薄的液膜(金色)。載氣(氦氣)一直從左往右吹。', 'The column is a very thin, very long tube, its inner wall coated with a thin liquid film (gold). Carrier gas (helium) blows steadily from left to right.')],
+      [5, zhEn('分子一下子溶進液膜、停在原地,一下子又跑回載氣、被吹著往前走。', 'Molecules keep dissolving into the film and stopping, then going back into the gas and being blown along.')],
+      [11, zhEn('k 是「停在液膜的時間 ÷ 在載氣裡跑的時間」。藍色 k = 1:一半的時間在跑,速度是載氣的 1/2;橙色 k = 3:只有四分之一的時間在跑,速度是 1/4。', 'k is "time stopped in the film ÷ time moving in the gas". Blue, k = 1: moving half the time, at 1/2 the gas speed; orange, k = 3: moving only a quarter of the time, at 1/4.')],
+      [19, zhEn('一起打進去的兩種分子,走同樣長的管子,到出口時已經分開:先到的先出峰,層析圖上就是兩支峰。', 'Two kinds of molecules injected together travel the same tube, yet are apart by the exit: the first to arrive peaks first, so the chromatogram shows two peaks.')],
+      [27, zhEn('溫度升高,分子比較不愛待在液膜裡,k 變小,大家都跑快一點。所以 GC 會一邊分析一邊升溫。', 'When it is hotter, molecules like the film less, k gets smaller and everything moves faster. That is why GC heats up during the run.')],
     ],
     draw(c, t) {
       // 管壁、液膜、偵測器
@@ -3341,15 +3374,15 @@ XP.part = (() => {
       c.beginPath(); c.moveTo(X0 - 30, YT + FT); c.lineTo(X1, YT + FT); c.moveTo(X0 - 30, YB - FT); c.lineTo(X1, YB - FT); c.stroke();
       c.fillStyle = 'rgba(142,162,174,.25)'; c.strokeStyle = XC.metal; c.lineWidth = 1.5;
       c.fillRect(X1 + 2, YT - 3, 46, YB - YT + 6); c.strokeRect(X1 + 2, YT - 3, 46, YB - YT + 6);
-      xText(c, '偵測器', X1 + 25, YB + 18, { align: 'center', size: 13 });
-      xText(c, '金色:管壁上的液膜', X0 - 30, YT - 16, { color: XC.gold, size: 13, w: 600 });
+      xText(c, zhEn('偵測器', 'Detector'), X1 + 25, YB + 18, { align: 'center', size: 13 });
+      xText(c, zhEn('金色:管壁上的液膜', 'Gold: the liquid film on the wall'), X0 - 30, YT - 16, { color: XC.gold, size: 13, w: 600 });
       // 載氣的流動
       c.strokeStyle = 'rgba(185,196,216,.22)'; c.lineWidth = 1.6;
       for (let i = 0; i < 16; i++) {
         const span = X1 - X0 + 30, x = X0 - 30 + ((t * V * 1.15 + i * 41) % span), y = 88 + ((i * 23) % 64);
         c.beginPath(); c.moveTo(x, y); c.lineTo(Math.min(X1, x + 16), y); c.stroke();
       }
-      xText(c, '載氣 →', X0 - 26, (YT + YB) / 2, { color: XC.muted, size: 12.5 });
+      xText(c, zhEn('載氣 →', 'Gas →'), X0 - 26, (YT + YB) / 2, { color: XC.muted, size: 12.5 });
       // 分子
       if (t >= T0) {
         const tau = t - T0, sums = sets.map(() => [0, 0]);
@@ -3365,14 +3398,14 @@ XP.part = (() => {
           if (!sums[k][1]) return;
           const x = clamp(sums[k][0] / sums[k][1], X0 + 40, X1 - 60);
           c.globalAlpha = smooth01((t - 11) / 0.8);
-          xText(c, `k = ${s.k}:速度 1/${1 + s.k}`, x, k ? YB + 18 : YT - 34, { color: s.col, size: 13.5, w: 700, align: 'center' });
+          xText(c, zhEn(`k = ${s.k}:速度 1/${1 + s.k}`, `k = ${s.k}: speed 1/${1 + s.k}`), x, k ? YB + 18 : YT - 34, { color: s.col, size: 13.5, w: 700, align: 'center' });
           c.globalAlpha = 1;
         });
-      } else xText(c, '分子從這裡打進來', X0 - 26, YB + 18, { color: XC.muted, size: 12.5 });
+      } else xText(c, zhEn('分子從這裡打進來', 'Molecules enter here'), X0 - 26, YB + 18, { color: XC.muted, size: 12.5 });
       // 層析圖
-      xText(c, '層析圖:偵測器收到的量', CX0, CY - CH - 14, { color: XC.ink2, size: 13, w: 600 });
+      xText(c, zhEn('層析圖:偵測器收到的量', 'Chromatogram: amount reaching the detector'), CX0, CY - CH - 14, { color: XC.ink2, size: 13, w: 600 });
       c.strokeStyle = XC.muted; c.lineWidth = 1.2; c.beginPath(); c.moveTo(CX0, CY); c.lineTo(CX1, CY); c.stroke();
-      xText(c, '時間 →', CX1, CY + 14, { color: XC.muted, size: 12, align: 'right' });
+      xText(c, zhEn('時間 →', 'Time →'), CX1, CY + 14, { color: XC.muted, size: 12, align: 'right' });
       sets.forEach((s, k) => {
         c.beginPath(); c.moveTo(CX0, CY);
         for (const [tt, v] of CURVE[k]) { if (tt > t) break; c.lineTo(xOfT(tt), CY - CH * v / dmax); }
@@ -3383,7 +3416,7 @@ XP.part = (() => {
       if (t > T0) { c.strokeStyle = 'rgba(127,227,255,.5)'; c.lineWidth = 1; c.beginPath(); c.moveTo(xOfT(t), CY - CH - 4); c.lineTo(xOfT(t), CY); c.stroke(); }
       if (t >= 27) {
         c.globalAlpha = smooth01((t - 27) / 0.8);
-        xText(c, '升溫 → k 變小 → 每個成分都跑快一點', 586, 22, { color: XC.warn, size: 14, w: 700, align: 'right' });
+        xText(c, zhEn('升溫 → k 變小 → 每個成分都跑快一點', 'Heat → k drops → every component speeds up'), 586, 22, { color: XC.warn, size: 14, w: 700, align: 'right' });
         c.globalAlpha = 1;
       }
     },
@@ -3404,14 +3437,14 @@ XP.ki = (() => {
     c.stroke();
   };
   return {
-    title: '保留指數 KI:用烷類當尺', dur: 30,
+    title: zhEn('保留指數 KI:用烷類當尺', 'Retention index KI: alkanes as a ruler'), dur: 30,
     get cues() {
       const d = data(), f = Math.round(d.k3 - 900);
       return [
-        [0, '同一個成分什麼時候流出來(滯留時間),會隨條件改變:管柱長短、載氣快慢、升溫快慢都有影響。'],
-        [7, '所以拿一組直鏈烷類一起跑,當作一把尺:8 個碳的記 800、9 個碳的記 900、10 個碳的記 1000,依此類推。'],
-        [14, `α-Pinene 落在 9 碳和 10 碳之間,走了這一格的 ${f}%:900 再加 ${f},KI 就是 ${Math.round(d.k3)}。`],
-        [21, `升溫改成每分鐘 10 °C:所有的峰都提早出來,α-Pinene 從 ${f2(d.t3)} 分變成 ${f2(d.t10)} 分。可是尺也跟著一起縮,它還是落在差不多的位置,KI 是 ${Math.round(d.k10)},幾乎不變。`],
+        [0, zhEn('同一個成分什麼時候流出來(滯留時間),會隨條件改變:管柱長短、載氣快慢、升溫快慢都有影響。', 'When a component comes out (its retention time) depends on the conditions: column length, gas flow and heating rate all play a part.')],
+        [7, zhEn('所以拿一組直鏈烷類一起跑,當作一把尺:8 個碳的記 800、9 個碳的記 900、10 個碳的記 1000,依此類推。', 'So a set of straight-chain alkanes is run as a ruler: the 8-carbon one counts as 800, 9 carbons as 900, 10 carbons as 1000, and so on.')],
+        [14, zhEn(`α-Pinene 落在 9 碳和 10 碳之間,走了這一格的 ${f}%:900 再加 ${f},KI 就是 ${Math.round(d.k3)}。`, `α-Pinene falls between the 9- and 10-carbon alkanes, ${f}% of the way across: 900 plus ${f} gives a KI of ${Math.round(d.k3)}.`)],
+        [21, zhEn(`升溫改成每分鐘 10 °C:所有的峰都提早出來,α-Pinene 從 ${f2(d.t3)} 分變成 ${f2(d.t10)} 分。可是尺也跟著一起縮,它還是落在差不多的位置,KI 是 ${Math.round(d.k10)},幾乎不變。`, `Heat at 10 °C per minute and every peak comes out earlier: α-Pinene moves from ${f2(d.t3)} to ${f2(d.t10)} min. But the ruler shrinks too, so it lands in about the same place: KI ${Math.round(d.k10)}, almost unchanged.`)],
       ];
     },
     draw(c, t) {
@@ -3421,14 +3454,14 @@ XP.ki = (() => {
       // 時間軸
       c.strokeStyle = XC.muted; c.lineWidth = 1.2; c.beginPath(); c.moveTo(X0, BASE); c.lineTo(X1, BASE); c.stroke();
       for (let mm = 0; mm <= 12; mm += 2) { const x = xOf(mm); c.beginPath(); c.moveTo(x, BASE); c.lineTo(x, BASE + 5); c.stroke(); xText(c, String(mm), x, BASE + 15, { color: XC.muted, size: 12, mono: true, align: 'center' }); }
-      xText(c, '流出時間(分)', X1, BASE + 34, { color: XC.muted, size: 12, align: 'right' });
-      xText(c, m < 0.5 ? '升溫:每分鐘 3 °C' : '升溫:每分鐘 10 °C', 20, 22, { color: m < 0.5 ? XC.accent : XC.warn, size: 15, w: 800 });
+      xText(c, zhEn('流出時間(分)', 'Elution time (min)'), X1, BASE + 34, { color: XC.muted, size: 12, align: 'right' });
+      xText(c, m < 0.5 ? zhEn('升溫:每分鐘 3 °C', 'Heating: 3 °C per minute') : zhEn('升溫:每分鐘 10 °C', 'Heating: 10 °C per minute'), 20, 22, { color: m < 0.5 ? XC.accent : XC.warn, size: 15, w: 800 });
       // 峰
       c.save(); c.beginPath(); c.rect(0, 0, xOf(tc), 340); c.clip();
       for (const n of N) { const x = xOf(tAlk(n)); peak(c, x, 92, '#8fa3bd'); xText(c, `C${n}`, x, BASE - 106, { color: '#8fa3bd', size: 13, mono: true, w: 600, align: 'center' }); }
       const xa = xOf(tA); peak(c, xa, 128, XC.accent, 2.6);
       xText(c, 'α-Pinene', xa, BASE - 142, { color: XC.accent, size: 13.5, w: 700, align: 'center' });
-      if (m < 0.05) xText(c, `${f2(tA)} 分`, xa + 12, BASE - 70, { color: XC.accent, size: 11.5, mono: true });
+      if (m < 0.05) xText(c, zhEn(`${f2(tA)} 分`, `${f2(tA)} min`), xa + 12, BASE - 70, { color: XC.accent, size: 11.5, mono: true });
       c.restore();
       if (t < 6) { c.strokeStyle = 'rgba(127,227,255,.6)'; c.beginPath(); c.moveTo(xOf(tc), 40); c.lineTo(xOf(tc), BASE); c.stroke(); }
       // 尺
@@ -3460,8 +3493,8 @@ XP.ki = (() => {
       }
       if (t >= 21) {
         c.globalAlpha = smooth01((t - 21) / 0.8);
-        xText(c, `每分鐘 3 °C:${f2(d.t3)} 分,KI ${Math.round(d.k3)}`, X0, 322, { color: XC.accent, size: 13, mono: true });
-        xText(c, `每分鐘 10 °C:${f2(d.t10)} 分,KI ${Math.round(d.k10)}`, X1, 322, { color: XC.warn, size: 13, mono: true, align: 'right' });
+        xText(c, zhEn(`每分鐘 3 °C:${f2(d.t3)} 分,KI ${Math.round(d.k3)}`, `3 °C/min: ${f2(d.t3)} min, KI ${Math.round(d.k3)}`), X0, 322, { color: XC.accent, size: 13, mono: true });
+        xText(c, zhEn(`每分鐘 10 °C:${f2(d.t10)} 分,KI ${Math.round(d.k10)}`, `10 °C/min: ${f2(d.t10)} min, KI ${Math.round(d.k10)}`), X1, 322, { color: XC.warn, size: 13, mono: true, align: 'right' });
         c.globalAlpha = 1;
       }
     },
@@ -3520,22 +3553,22 @@ XP.ei = (() => {
     // 標籤(第一顆分子才標)
     const lx = xIn + dA;
     if (t >= tIon && !broken && fadeA > 0.3) xText(c, 'M⁺•  m/z 136', lx + 42, y - 46, { color: XC.accent, size: 14, mono: true, w: 700 });
-    if (!charged) xText(c, 'α-Pinene(中性)', lx + 34, y + 30, { color: XC.ink2, size: 13 });
+    if (!charged) xText(c, zhEn('α-Pinene(中性)', 'α-Pinene (neutral)'), lx + 34, y + 30, { color: XC.ink2, size: 13 });
     if (broken) {
-      if (fadeA > 0.3) { xText(c, 'C₇H₉⁺  m/z 93,帶正電', 296, 100, { color: XC.accent, size: 13, w: 700 }); xText(c, '被電場推往四極桿', 296, 119, { color: XC.accent, size: 12.5 }); }
-      if (fadeB > 0.3) xText(c, 'C₃H₇•(43):中性,電場推不動', 134, 240, { color: XC.muted, size: 12.5 });
+      if (fadeA > 0.3) { xText(c, zhEn('C₇H₉⁺  m/z 93,帶正電', 'C₇H₉⁺  m/z 93, positive'), 296, 100, { color: XC.accent, size: 13, w: 700 }); xText(c, zhEn('被電場推往四極桿', 'off to the quadrupole'), 296, 119, { color: XC.accent, size: 12.5 }); }
+      if (fadeB > 0.3) xText(c, zhEn('C₃H₇•(43):中性,電場推不動', 'C₃H₇• (43): neutral, the field cannot push it'), 134, 240, { color: XC.muted, size: 12.5 });
     }
   }
   const MAIN = { t0: 0.6, v: 40, tIon: 7.4, tVib: 13, tBrk: 15.6, out: 93, s: 1.15, y: 182, label: true };
   const SEQ = [93, 136, 93, 121, 93, 93, 121, 93];
   const STREAM = SEQ.map((out, i) => { const t0 = 21 + i * 1.3, v = 140; return { t0, v, acc: 220, tIon: t0 + (BEAM - 40) / v - 0.05, tVib: t0 + (BEAM - 40) / v + 0.12, tBrk: t0 + (BEAM - 40) / v + 0.45, out, s: 0.7, y: 184 + (hash1(i) - 0.5) * 22 }; });
   return {
-    title: '電子撞擊游離:分子怎麼帶電、怎麼斷', dur: 32,
+    title: zhEn('電子撞擊游離:分子怎麼帶電、怎麼斷', 'Electron ionization: how molecules get charged and break'), dur: 32,
     cues: [
-      [0, '離子源裡,燒熱的燈絲放出電子,電子被加速到 70 eV,由上往下飛過。從管柱出來的分子從左邊飄進來。'],
-      [6, '電子擦過分子,把分子的一個電子撞出去。分子少了一個電子、帶一個正電,叫分子離子 M⁺•;電子很輕,質量幾乎不變,所以 m/z 就是分子量 136。'],
-      [13, '多出來的能量讓分子劇烈振動,比較弱的鍵就斷了:帶正電的那一塊(m/z 93)被電場推往四極桿;不帶電的那一塊(43)電場推不動,被真空泵抽走。'],
-      [21, '每顆分子斷的方式不一定一樣:有的沒斷(136)、有的掉一個甲基(121)、有的掉一塊 C₃H₇(93)。同一種分子各種碎片的比例固定,依 m/z 排起來就是質譜,可以拿去和資料庫比對,像指紋一樣。'],
+      [0, zhEn('離子源裡,燒熱的燈絲放出電子,電子被加速到 70 eV,由上往下飛過。從管柱出來的分子從左邊飄進來。', 'In the ion source a hot filament gives off electrons, accelerated to 70 eV, that fly past from top to bottom. Molecules from the column drift in from the left.')],
+      [6, zhEn('電子擦過分子,把分子的一個電子撞出去。分子少了一個電子、帶一個正電,叫分子離子 M⁺•;電子很輕,質量幾乎不變,所以 m/z 就是分子量 136。', 'An electron brushes past a molecule and knocks one of its electrons out. One electron short, the molecule carries one positive charge: the molecular ion M⁺•. Electrons are very light, so the mass barely changes and m/z is the molecular weight, 136.')],
+      [13, zhEn('多出來的能量讓分子劇烈振動,比較弱的鍵就斷了:帶正電的那一塊(m/z 93)被電場推往四極桿;不帶電的那一塊(43)電場推不動,被真空泵抽走。', 'The extra energy makes the molecule shake hard, and a weaker bond breaks: the positive piece (m/z 93) is pushed by the field toward the quadrupole; the uncharged piece (43) cannot be pushed and is pumped away.')],
+      [21, zhEn('每顆分子斷的方式不一定一樣:有的沒斷(136)、有的掉一個甲基(121)、有的掉一塊 C₃H₇(93)。同一種分子各種碎片的比例固定,依 m/z 排起來就是質譜,可以拿去和資料庫比對,像指紋一樣。', 'Not every molecule breaks the same way: some stay whole (136), some lose a methyl (121), some lose a C₃H₇ piece (93). For one kind of molecule the fragment ratios are fixed; sorted by m/z they make the mass spectrum, which can be matched against a library like a fingerprint.')],
     ],
     draw(c, t) {
       // 離子源的腔體、燈絲、推斥極、出口
@@ -3546,24 +3579,24 @@ XP.ei = (() => {
       c.strokeStyle = `rgba(255,150,70,${0.75 + 0.25 * glow})`; c.lineWidth = 2.2; c.beginPath();
       for (let i = 0; i <= 60; i++) { const x = fx - 26 + i * 52 / 60, y = 50 + 5 * Math.sin(i / 60 * Math.PI * 12); i ? c.lineTo(x, y) : c.moveTo(x, y); }
       c.stroke();
-      xText(c, '燈絲(燒熱放出電子)', fx + 34, 50, { color: '#ffb27a', size: 12.5 });
+      xText(c, zhEn('燈絲(燒熱放出電子)', 'Filament (hot, gives off electrons)'), fx + 34, 50, { color: '#ffb27a', size: 12.5 });
       for (let i = 0; i < 26; i++) {
         const k = ((t * 1.1 + i / 26) % 1), y = 58 + k * (CH.y1 - 58), x = fx + (hash1(i) - 0.5) * 16;
         xDot(c, x, y, 2.3, XC.elec, 0.85 * Math.min(1, (1 - k) * 4), 0.35);
       }
-      xText(c, '電子 70 eV ↓', fx - 34, 92, { color: XC.elec, size: 12, align: 'right' });
+      xText(c, zhEn('電子 70 eV ↓', 'Electrons 70 eV ↓'), fx - zhEn(34, 30), zhEn(92, 102), { color: XC.elec, size: 12, align: 'right' });
       c.fillStyle = 'rgba(142,162,174,.7)'; c.fillRect(fx - 22, CH.y1 - 2, 44, 5);
       // 推斥極(左)與出口透鏡(右)
       c.fillStyle = 'rgba(255,138,107,.75)'; c.fillRect(CH.x0 + 10, 96, 6, 58);
-      xText(c, '推斥極 +', CH.x0 + 13, 84, { color: '#ff8a6b', size: 12, align: 'center' });
+      xText(c, zhEn('推斥極 +', 'Repeller +'), CH.x0 + 13, 84, { color: '#ff8a6b', size: 12, align: 'center' });
       c.fillStyle = 'rgba(142,162,174,.8)'; c.fillRect(EXIT[0] - 3, CH.y0, 6, EXIT[1] - 18 - CH.y0); c.fillRect(EXIT[0] - 3, EXIT[1] + 18, 6, CH.y1 - EXIT[1] - 18);
       xArrow(c, EXIT[0] + 14, EXIT[1], EXIT[0] + 66, EXIT[1], XC.accent, 2.2);
-      xText(c, '往四極桿', EXIT[0] + 40, EXIT[1] + 18, { color: XC.accent, size: 12.5, align: 'center' });
+      xText(c, zhEn('往四極桿', 'To quadrupole'), EXIT[0] + zhEn(40, 52), EXIT[1] + 18, { color: XC.accent, size: 12.5, align: 'center' });
       // 入口與真空泵
       c.fillStyle = 'rgba(217,164,65,.35)'; c.fillRect(20, 178, CH.x0 - 20, 12);
-      xText(c, '從管柱來', 22, 206, { color: XC.muted, size: 12 });
+      xText(c, zhEn('從管柱來', 'From column'), 22, 206, { color: XC.muted, size: 12 });
       xArrow(c, 160, CH.y1 + 6, 132, CH.y1 + 44, XC.muted, 1.6);
-      xText(c, '真空泵抽走中性的碎片', 120, CH.y1 + 58, { color: XC.muted, size: 12, align: 'center' });
+      xText(c, zhEn('真空泵抽走中性的碎片', 'The pump removes neutral pieces'), 120, CH.y1 + 58, { color: XC.muted, size: 12, align: 'center' });
       // 分子
       mol(c, t, MAIN);
       for (const ev of STREAM) mol(c, t, ev);
@@ -3572,7 +3605,7 @@ XP.ei = (() => {
       if (k > 0) {
         const X0 = 470, X1 = 590, Y0 = 318, HH = 70, xm = (m) => X0 + (m - 40) / 100 * (X1 - X0);
         c.globalAlpha = Math.min(1, k * 3);
-        xText(c, '質譜(α-Pinene)', X1, Y0 - HH - 16, { color: XC.ink2, size: 12.5, w: 700, align: 'right' });
+        xText(c, zhEn('質譜(α-Pinene)', 'Spectrum (α-Pinene)'), X1, Y0 - HH - 16, { color: XC.ink2, size: 12.5, w: 700, align: 'right' });
         c.strokeStyle = XC.muted; c.lineWidth = 1; c.beginPath(); c.moveTo(X0, Y0); c.lineTo(X1, Y0); c.stroke();
         for (const [m, v] of SPEC) { const h = HH * v / 100 * k; c.fillStyle = m === 93 || m === 136 || m === 121 ? XC.accent : '#5d7894'; c.fillRect(xm(m) - 1.6, Y0 - h, 3.2, h); }
         for (const m of [93, 136]) xText(c, String(m), xm(m), Y0 + 12, { color: XC.accent, size: 11, mono: true, align: 'center' });
@@ -3590,14 +3623,14 @@ XP.quad = (() => {
   const get = () => demo || (demo = createFieldDemo('quad', {
     font: XF,
     cues: [
-      [0, '四極桿是四根平行的金屬桿,中間的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。不動的話,離子(球)一定會滾下去。'],
-      [5, '桿子上加了快速正負交替的電壓,馬鞍跟著翻來翻去。翻得夠快,球還沒滾遠就被推回來,離子就能沿著中間一路往前走。'],
-      [11, '再加上一個不變的直流電壓,馬鞍往一邊偏。這時只有一種 m/z 留得住:α-Pinene 的碎片裡,77 太輕,跟著翻轉越擺越大,被甩出去;136 太重,反應太慢,被直流慢慢拉走;只有 93 穿得過去。'],
-      [22, '把兩種電壓按固定比例一起調高,留得住的 m/z 就往上換:77、93、136 輪流通過。這台每秒從 m/z 40 掃到 400 三、四次,每掃一次就是一張質譜。'],
+      [0, zhEn('四極桿是四根平行的金屬桿,中間的電場像一個馬鞍:一個方向往中間推,另一個方向往外拉。不動的話,離子(球)一定會滾下去。', 'A quadrupole is four parallel metal rods, and the field between them is like a saddle: it pushes inward one way and pulls outward the other. If it stays still, the ion (the ball) always rolls off.')],
+      [5, zhEn('桿子上加了快速正負交替的電壓,馬鞍跟著翻來翻去。翻得夠快,球還沒滾遠就被推回來,離子就能沿著中間一路往前走。', 'The rods carry a voltage that swaps quickly between plus and minus, so the saddle flips back and forth. Fast enough, and the ball is pushed back before it gets far, so the ion travels on down the middle.')],
+      [11, zhEn('再加上一個不變的直流電壓,馬鞍往一邊偏。這時只有一種 m/z 留得住:α-Pinene 的碎片裡,77 太輕,跟著翻轉越擺越大,被甩出去;136 太重,反應太慢,被直流慢慢拉走;只有 93 穿得過去。', 'Add a steady DC voltage and the saddle tilts to one side. Now only one m/z stays: of the α-Pinene fragments, 77 is too light, swings wider with each flip and is thrown out; 136 is too heavy, responds too slowly and is slowly dragged away by the DC; only 93 gets through.')],
+      [22, zhEn('把兩種電壓按固定比例一起調高,留得住的 m/z 就往上換:77、93、136 輪流通過。這台每秒從 m/z 40 掃到 400 三、四次,每掃一次就是一張質譜。', 'Raise both voltages at a fixed ratio and the m/z that stays moves up: 77, 93 and 136 pass in turn. This instrument sweeps from m/z 40 to 400 three or four times a second; each sweep is one mass spectrum.')],
     ],
   }));
   return {
-    title: '四極桿:為什麼一次只放行一種 m/z',
+    title: zhEn('四極桿:為什麼一次只放行一種 m/z', 'Quadrupole: why only one m/z passes at a time'),
     get dur() { return get().dur; }, get cues() { return get().cues; },
     draw(c, t) { const d = get(); d.seek(t); d.draw(c); },
   };
@@ -3634,7 +3667,7 @@ function setXPTopic(k) {
   E.xpTitle.textContent = T.title;
   for (const b of E.xpTabs.querySelectorAll('button')) b.setAttribute('aria-selected', String(b.dataset.k === k));
   E.xpProg.innerHTML = '<i></i>' + xp.cues.slice(1).map(([at]) => `<b style="left:${(at / T.dur * 100).toFixed(2)}%"></b>`).join('');
-  E.xpCv.setAttribute('aria-label', T.title + '的動畫');
+  E.xpCv.setAttribute('aria-label', zhEn(T.title + '的動畫', 'Animation: ' + T.title));
   if (REDUCED) xp.t = xp.cues[0][0];
   xpDraw();
 }
@@ -3668,7 +3701,7 @@ function xpDraw() {
   const ci = xpCueIndex(xp.t);
   if (ci !== xp.cue) { xp.cue = ci; E.xpCap.textContent = xp.cues[ci][1]; }
   E.xpProg.firstChild.style.width = `${(xp.t / T.dur * 100).toFixed(2)}%`;
-  const lab = xp.playing ? '暫停' : xp.t >= T.dur - 1e-3 ? '重播' : '播放';
+  const lab = xp.playing ? zhEn('暫停', 'Pause') : xp.t >= T.dur - 1e-3 ? zhEn('重播', 'Replay') : zhEn('播放', 'Play');
   if (E.xpPlay.textContent !== lab) E.xpPlay.textContent = lab;
 }
 
@@ -3685,9 +3718,9 @@ createMobilePanels({
   top: '.brief', rotateHint: true,
   suspended: () => tourOn(),
   panels: [
-    { el: '#story', place: 'before', dir: 'down', icon: 'text', label: '說明', items: () => (storyOpen ? '' : E.story.textContent), onToggle: (open) => { storyOpen = open; } },
-    { el: '#console', icon: 'adjust', label: '調整', items: '追蹤成分、時間、升溫速率、組裝或拆開、重新進樣、導覽、動畫、原理說明、畫質', action: () => E.btnSheet.click() },
-    { el: '#console', icon: 'chart', label: '層析圖・質譜', items: () => `示範精油 · HP-5MS · 升溫 ${S.rate} °C/min`, keep: ['#btnPlay'] },
+    { el: '#story', place: 'before', dir: 'down', icon: 'text', label: zhEn('說明', 'Info'), items: () => (storyOpen ? '' : E.story.textContent), onToggle: (open) => { storyOpen = open; } },
+    { el: '#console', icon: 'adjust', label: zhEn('調整', 'Adjust'), items: zhEn('追蹤成分、時間、升溫速率、組裝或拆開、重新進樣、導覽、動畫、原理說明、畫質', 'follow compound, time, heating rate, closed or open, inject again, tour, animations, how it works, quality'), action: () => E.btnSheet.click() },
+    { el: '#console', icon: 'chart', label: zhEn('層析圖・質譜', 'Chromatogram · spectrum'), items: () => zhEn(`示範精油 · HP-5MS · 升溫 ${S.rate} °C/min`, `example essential oil · HP-5MS · ${S.rate} °C/min`), keep: ['#btnPlay'] },
   ],
 });
 let kicked = false;
@@ -3697,10 +3730,10 @@ function kickoff() {
   else startInjection();
 }
 function show3DError(err) {
-  console.warn('3D 模型載入失敗', err);
+  console.warn('3D 模型載入失敗', err); // zh-only
   E.load.classList.add('gone');
   const n = document.createElement('div'); n.className = 'note3d';
-  n.textContent = '3D 模型沒有載入(這台電腦可能擋了 cdn.jsdelivr.net,或瀏覽器沒有開啟 WebGL)。底下的層析圖、質譜和所有控制仍然可以操作。';
+  n.textContent = zhEn('3D 模型沒有載入(這台電腦可能擋了 cdn.jsdelivr.net,或瀏覽器沒有開啟 WebGL)。底下的層析圖、質譜和所有控制仍然可以操作。', 'The 3D model did not load (this computer may block cdn.jsdelivr.net, or WebGL is turned off in the browser). The chromatogram, mass spectrum and all the controls below still work.');
   E.hud.appendChild(n);
 }
 init3D().then(() => { E.load.classList.add('gone'); setTimeout(kickoff, 500); }).catch(err => { show3DError(err); kickoff(); });

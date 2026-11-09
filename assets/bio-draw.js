@@ -24,18 +24,32 @@ export function makeG(ctx, W, H) {
   // boost:畫面縮得很小時(手機),播放器把字放大一點(最多 1.3 倍),版面要留得下
   const g = { ctx, W, H, boost: 1 };
   g.font = (size, weight = 500, mono = false) => { ctx.font = `${weight} ${size * g.boost}px ${mono ? MONO : FONT}`; };
+  // 字串裡有換行(\n)時分成幾行畫,行距是字級的 LH 倍;base 決定整塊怎麼對齊 y(middle 時整塊置中)。
+  // 2026-11-06 起給英文太長的標籤用;中文的字串沒有換行,畫法和以前一樣
+  const LH = 1.25;
+  const lineY = (y, i, n, base, size) => {
+    const lh = size * LH * g.boost;
+    return base === 'top' || base === 'hanging' ? y + i * lh : base === 'middle' ? y + (i - (n - 1) / 2) * lh : y + (i - (n - 1)) * lh;
+  };
   g.text = (x, y, s, { size = 16, weight = 500, color = C.ink, align = 'left', base = 'middle', mono = false, alpha = 1, max } = {}) => {
     ctx.save(); ctx.globalAlpha *= alpha; g.font(size, weight, mono); ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = base;
-    if (max) ctx.fillText(s, x, y, max); else ctx.fillText(s, x, y);
+    const lines = typeof s === 'string' && s.includes('\n') ? s.split('\n') : null;
+    // ctx.__ml:分成幾行的同一段字標同一個號碼,scripts/check-i18n-layout.mjs 把它們併成一段再和中文逐段比對
+    if (lines) { ctx.__ml = g.mlId = (g.mlId || 0) + 1; lines.forEach((ln, i) => { const ly = lineY(y, i, lines.length, base, size); if (max) ctx.fillText(ln, x, ly, max); else ctx.fillText(ln, x, ly); }); ctx.__ml = 0; }
+    else if (max) ctx.fillText(s, x, y, max); else ctx.fillText(s, x, y);
     ctx.restore();
   };
-  // 帶底色的小標籤
+  // 帶底色的小標籤(也可以有換行)
   g.tag = (x, y, s, { size = 14, color = C.ink, bg = 'rgba(15,23,22,.88)', border = C.line, align = 'center', alpha = 1, pad = 7 } = {}) => {
     ctx.save(); ctx.globalAlpha *= alpha; g.font(size, 600);
-    const w = ctx.measureText(s).width + pad * 2, h = size * g.boost + pad * 1.2;
+    const lines = typeof s === 'string' && s.includes('\n') ? s.split('\n') : [s];
+    const w = Math.max(...lines.map((ln) => ctx.measureText(ln).width)) + pad * 2, h = size * g.boost * (1 + (lines.length - 1) * LH) + pad * 1.2;
     const x0 = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
-    g.rrect(x0, y - h / 2, w, h, h / 2, bg, border);
-    ctx.fillStyle = color; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(s, x0 + pad, y + 0.5);
+    g.rrect(x0, y - h / 2, w, h, lines.length > 1 ? Math.min(h / 2, 10) : h / 2, bg, border);
+    ctx.fillStyle = color; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    if (lines.length > 1) ctx.__ml = g.mlId = (g.mlId || 0) + 1;
+    lines.forEach((ln, i) => ctx.fillText(ln, x0 + pad, lineY(y, i, lines.length, 'middle', size) + 0.5));
+    ctx.__ml = 0;
     ctx.restore();
     return w;
   };
