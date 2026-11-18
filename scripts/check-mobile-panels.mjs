@@ -21,6 +21,10 @@ assert.ok(/(^|\})\s*\.mp-tab\{display:none\}/.test(css), '桌機要藏起細條(
 
 const LESSONS = {
   'uv-vis': { run: '#btnScan' },
+  ftir: { run: '#btnScan' },
+  fluorescence: { run: '#btnScan' },
+  xrd: { run: '#btnScan' },
+  epr: { run: '#btnScan' },
   nmr: { run: 'btnRun' },
   'mass-analyzers': { run: 'btnRun' },
   spectroscopy: { run: 'btnScan' },

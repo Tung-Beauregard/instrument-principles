@@ -1,0 +1,1396 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en="Fluorescence spectrometer: absorb, then glow">螢光光譜儀 吸光再發光</title>
+<meta name="description" content="用 3D 模型拆開一台螢光光譜儀,看氙燈的光經過激發單色器照到樣品,樣品放出波長比較長的螢光,在側面 90 度經過發射單色器進到光電倍增管。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="螢光光譜儀 吸光再發光">
+<meta property="og:description" content="用 3D 模型拆開一台螢光光譜儀,看氙燈的光經過激發單色器照到樣品,樣品放出波長比較長的螢光,在側面 90 度經過發射單色器進到光電倍增管。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/fluorescence/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/fluorescence.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="螢光光譜儀教材的畫面:展開的兩組單色器、發光的比色管與螢光光譜">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/ui-scale.css">
+<style>
+:root{
+  --bg:#0a0f13;
+  --panel:rgba(12,18,23,.80);
+  --line:rgba(160,215,235,.14);
+  --line-2:rgba(160,215,235,.30);
+  --ink:#eaf3f6; --ink-2:#a8bcc6; --muted:#71858f;
+  --cyan:#74e4ff; --amber:#ffc261; --violet:#bba6ff; --glow:#9dffb0;
+  --btn:rgba(255,255,255,.05); --btn-on:#eef6f8; --btn-on-ink:#0c1318;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --sans:'Noto Sans TC','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;touch-action:none}
+.labels{position:fixed;inset:0;pointer-events:none;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+/* 左上:標題、數值、能階圖、說明 */
+.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw / var(--ui,1) - 48px));pointer-events:none}
+.hud::before{content:'';position:absolute;left:-80px;top:-60px;width:620px;height:300px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 25% 35%,rgba(10,15,19,.72),rgba(10,15,19,0) 70%)}
+.hud .k{display:block;font-weight:900;font-size:28px;letter-spacing:.02em;line-height:1.1}
+.hud .big{display:block;font-weight:900;font-size:44px;line-height:1.12;color:var(--cyan);text-shadow:0 0 22px rgba(116,228,255,.35)}
+.lede{margin:10px 0 12px;font-size:13.5px;line-height:1.7;color:var(--ink-2)}
+.chips{display:flex;gap:8px;margin-bottom:10px}
+.chip{padding:7px 12px 8px;min-width:100px}
+.chip small{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.12em}
+.chip b{font-family:var(--mono);font-weight:600;font-size:18px;color:var(--cyan);white-space:nowrap}
+.jab{padding:8px 10px 6px;margin-bottom:10px}
+.jab h6{margin:0 0 2px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em}
+#jab{width:100%;height:118px;display:block}
+.note{padding:11px 14px;font-size:13px;line-height:1.75}
+.note em{font-style:normal;font-weight:700}
+.c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)} .g{color:var(--glow)}
+
+/* 網站分頁 */
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw / var(--ui,1) - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
+.sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
+.sitenav a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* 3D 載入中 */
+.load{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:13px;pointer-events:none;transition:opacity .5s}
+.load i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--cyan);animation:spin 1s linear infinite}
+.load.done{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.load i{animation:none}}
+
+/* 右上:控制面板 */
+.ctl{position:fixed;right:20px;top:18px;z-index:6;padding:13px 15px 14px;display:grid;grid-template-columns:auto auto;gap:12px 20px}
+.grp h6{margin:0 0 7px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em;display:flex;justify-content:space-between;gap:8px}
+.grp h6 span{font-family:var(--mono);color:var(--ink-2);letter-spacing:0}
+.grp h6 span[lang]{font-family:inherit;color:inherit;letter-spacing:inherit}
+.seg{display:flex;gap:2px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px}
+.seg button,.btn{font:500 12.5px var(--sans);color:var(--ink-2);background:transparent;border:0;border-radius:7px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.seg button:hover,.btn:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.seg button.on{background:var(--btn-on);color:var(--btn-on-ink)}
+.seg.mono button{font-family:var(--mono);padding:6px 9px}
+.row{display:flex;gap:6px;align-items:center}
+.btn{background:var(--btn);border:1px solid var(--line);padding:6px 11px}
+.btn.on{background:var(--cyan);color:#062028;border-color:transparent}
+.btn.sq{width:32px;padding:6px 0;text-align:center;font-family:var(--mono)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:200px;height:26px;background:transparent;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(90deg,#8a63ff 0%,#5a7dff 26%,#3fd0ff 38%,#5dff8a 48%,#ffe45c 58%,#ff8a3d 68%,#e33 80%,#7a1a2a 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#fff;margin-top:-6px;box-shadow:0 0 0 3px rgba(116,228,255,.25),0 0 12px rgba(116,228,255,.6)}
+input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:linear-gradient(90deg,#8a63ff 0%,#5a7dff 26%,#3fd0ff 38%,#5dff8a 48%,#ffe45c 58%,#ff8a3d 68%,#e33 80%,#7a1a2a 100%)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(116,228,255,.25),0 0 12px rgba(116,228,255,.6)}
+
+.help{position:fixed;right:20px;top:372px;z-index:7;width:350px;max-height:calc(100vh / var(--ui,1) - 386px);overflow:auto;padding:14px 16px;font-size:12.5px;line-height:1.7;display:none}
+.help.show{display:block}
+.help b{font-size:13px}
+.help ul{margin:6px 0 8px;padding-left:18px}
+.help .fine{color:var(--muted);font-size:11.5px;margin:0}
+
+/* 底部:螢光光譜 */
+.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw / var(--ui,1) - 32px));padding:11px 14px 9px}
+.con-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:12.5px;margin-bottom:4px;white-space:nowrap}
+.con-head b{font-weight:700}
+.con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.legend{margin-left:auto;display:flex;gap:14px;color:var(--ink-2);font-size:11.5px}
+.legend i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:6px}
+.con-body{display:grid;grid-template-columns:1fr 168px;gap:14px;align-items:stretch}
+.plotwrap{position:relative}
+#plot{width:100%;height:170px;display:block;cursor:crosshair}
+.meters{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.m .t{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.m .t b{font-family:var(--mono);font-weight:500;color:var(--ink-2)}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;width:50%;border-radius:3px;background:var(--cyan)}
+.m.big .t{margin-bottom:0}
+.m.big b.n{display:block;font-family:var(--mono);font-size:24px;font-weight:600;color:var(--cyan);line-height:1.2}
+.tip{position:absolute;pointer-events:none;padding:4px 8px;border-radius:6px;background:#0d151a;border:1px solid var(--line-2);font:500 11.5px var(--mono);color:var(--ink);white-space:nowrap;display:none;transform:translate(-50%,-120%)}
+
+.foot{position:fixed;left:24px;bottom:14px;z-index:4;max-width:250px;font-size:11px;line-height:1.55;color:var(--muted)}
+
+/* 元件標籤 */
+.lw{pointer-events:none}
+.lbl{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:3px 8px 3px 7px;border-radius:6px;background:rgba(9,14,18,.84);border:1px solid rgba(116,228,255,.32);font-size:11.5px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.lbl i{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);flex:none}
+.lbl b{font-weight:700;color:#fff}
+.lbl span{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+
+/* 導覽與影片 */
+.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw / var(--ui,1) - 40px));text-align:center;padding:13px 26px 15px}
+.cap .chap{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.16em;margin-bottom:5px}
+.cap .txt{font-size:18px;line-height:1.6;font-weight:500}
+.titlecard{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,15,19,.66) 0%,rgba(10,15,19,.4) 40%,rgba(10,15,19,0) 70%)}
+.titlecard .t1{font-weight:900;font-size:42px;letter-spacing:.04em}
+.titlecard .t2{font-weight:900;font-size:72px;color:var(--cyan);text-shadow:0 0 30px rgba(116,228,255,.4);line-height:1.15}
+.titlecard .t3{font-size:20px;color:var(--ink-2);margin-top:14px}
+.titlecard .t4{font-size:14px;color:var(--muted);margin-top:22px}
+#tourExit{position:fixed;right:20px;top:18px;z-index:9;display:none}
+html.touring .ctl,html.touring .help,html.touring .lede,html.touring .note,html.touring .foot{display:none}
+/* 導覽時分頁列只到「結束導覽」的左邊 */
+html.touring .sitenav{max-width:calc(100vw / var(--ui,1) - 48px - 120px)}
+html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
+html.touring .titlecard{display:flex}
+html.touring .cap.withcon{bottom:250px}
+
+html.film .ctl,html.film .help,html.film .lede,html.film .note,html.film .foot,html.film #tourExit,html.film .sitenav,html.film .load{display:none}
+html.film .cap{display:block;bottom:56px;max-width:1440px;padding:18px 40px 20px}
+html.film .cap .chap{font-size:16px;margin-bottom:8px}
+html.film .cap .txt{font-size:31px}
+html.film .titlecard{display:flex}
+html.film .titlecard .t1{font-size:56px}
+html.film .titlecard .t2{font-size:104px}
+html.film .titlecard .t3{font-size:28px}
+html.film .titlecard .t4{font-size:19px}
+html.film .hud{left:52px;top:44px;width:560px}
+html.film .hud::before{width:900px;height:420px}
+html.film .hud .k{font-size:34px}
+html.film .hud .big{font-size:54px}
+html.film #jab{height:170px}
+html.film .jab h6{font-size:14px}
+html[lang="en"]:not(.mp):not(.film) .hud .k{font-size:24px}
+html[lang="en"]:not(.mp):not(.film) .hud .big{font-size:34px}
+html[lang="en"].film .hud .k{font-size:28px}
+html[lang="en"].film .hud .big{font-size:46px}
+html.film .chips{margin-top:16px;gap:12px}
+html.film .chip{min-width:150px;padding:10px 16px 11px}
+html.film .chip small{font-size:14px}
+html.film .chip b{font-size:26px}
+html.film .console{left:auto;right:52px;top:48px;bottom:auto;transform:none;width:720px;padding:16px 20px 14px}
+html.film .con-head{font-size:17px;margin-bottom:8px}
+html.film .legend{font-size:15px}
+html.film #plot{height:250px}
+html.film .con-body{grid-template-columns:1fr 200px}
+html.film .m .t{font-size:14px}
+html.film .m.big b.n{font-size:32px}
+html.film .lbl{font-size:17px;padding:5px 12px 5px 10px;border-radius:8px;gap:8px}
+html.film .lbl span{font-size:14px}
+html.film .lbl i{width:8px;height:8px}
+html.rec *{transition:none!important;animation:none!important}
+
+@media (max-width:980px){
+  .lede,.foot{display:none}
+  .ctl{left:12px;right:12px;top:auto;bottom:258px;grid-template-columns:1fr;gap:8px;padding:10px 12px}
+  .hud{left:12px;top:12px}
+  .note{display:none}
+  .help{left:12px;right:12px;width:auto;top:120px}
+  input[type=range]{width:100%}
+}
+@media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}}
+/* 手機版(html.mp,由 ../assets/mobile-panels.js 加上) */
+html.mp .hud{left:12px;top:10px;width:min(380px,calc(100vw - 24px))}
+html.mp .hud .k{font-size:16px}
+html.mp .hud .big{font-size:26px;text-shadow:0 0 16px rgba(116,228,255,.3)}
+html.mp .sitenav{margin-bottom:8px;max-width:100%}
+html.mp .chips{gap:6px;margin:6px 0 0}
+html.mp .chip{flex:1 1 0;min-width:0;padding:5px 9px 6px}
+html.mp .chip small{font-size:10px;letter-spacing:.06em}
+html.mp .chip b{display:block;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+html.mp .lede,html.mp .note,html.mp .foot,html.mp .jab{display:none}
+html.mp input[type=range]{width:100%}
+html.mp .con-head > b,html.mp .con-head > .s{display:none}
+html.mp .legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px}
+html.mp #plot{height:150px}
+html.mp .help{left:12px;right:auto;top:var(--mp-free-top,120px);width:min(380px,calc(100vw - 24px - var(--mp-rail-w, 0px)));max-height:calc(100vh - var(--mp-free-top,120px) - 12px);max-height:calc(100dvh - var(--mp-free-top,120px) - 12px);overflow:auto;overscroll-behavior:contain}
+html.mp.touring .cap.withcon{bottom:calc(var(--mp-dock-h,230px) + 20px)}
+@media (orientation:landscape){
+  html.mp .help{top:10px;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .cap,html.mp.touring .cap.withcon{left:12px;right:auto;bottom:12px;transform:none;max-width:calc(100vw - min(380px,46vw) - 36px)}
+}
+html.mp .ctl{grid-template-columns:1fr;gap:8px}
+/* 手機上元件標籤只留名稱 */
+html.mp .lbl span{display:none}
+html.mp .con-body{grid-template-columns:minmax(0,1fr);gap:8px}
+html.mp .meters{flex-direction:row;align-items:flex-end;gap:12px}
+html.mp .meters .m{flex:1;min-width:0}
+html.mp .m.big b.n{font-size:20px}
+@media (orientation:landscape){
+  html.mp .hud{top:8px}
+  html.mp .sitenav{margin-bottom:6px}
+  html.mp .hud .k,html.mp .hud .big{display:inline;white-space:nowrap}
+  html.mp .hud .k{font-size:14px;margin-right:8px}
+  html.mp .hud .big{font-size:19px}
+  html.mp .chips{margin-top:4px}
+  html.mp .chip{padding:3px 8px 4px}
+  html.mp .chip b{font-size:13px}
+}
+/* 手機導覽(2026-11-09):分頁列藏起來,「結束導覽」放在它的位置;橫拿時標題欄只到停靠區的左邊;片頭片尾字卡縮小 */
+html.mp.touring .sitenav{visibility:hidden}
+html.mp.touring #tourExit{left:12px;right:auto;top:10px}
+@media (orientation:landscape){
+  html.mp.touring #tourExit{top:8px}
+  html.mp.touring .hud{width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .hud .k,html.mp.touring .hud .big{white-space:normal}
+}
+html.mp .titlecard{padding:0 16px}
+html.mp .titlecard .t1{font-size:24px}
+html.mp .titlecard .t2{font-size:40px}
+html.mp .titlecard .t3{font-size:14px;margin-top:8px}
+html.mp .titlecard .t4{font-size:11px;margin-top:10px}
+@media (orientation:landscape) and (max-height:340px){
+  html.mp.touring .cap{padding:8px 14px 9px}
+  html.mp.touring .cap .chap{font-size:11px;margin-bottom:3px}
+  html.mp.touring .cap .txt{font-size:15px;line-height:1.5}
+}
+/* 桌機小螢幕(1024×768、1366×768 這類):導言與能階圖收起來、譜圖矮一點;3D 主角移到面板之間的空地(../assets/free-view.js) */
+@media (min-width:981px) and (max-width:1279px),(min-width:981px) and (max-height:899px){
+  .lede{display:none}
+  #jab{height:80px}
+  .lbl span{display:none}
+  #plot{height:120px}
+}
+/* 桌機小螢幕時頁尾的小字會被譜圖面板蓋住,收起來(說明框與片尾字卡都有寫示意) */
+@media (min-width:981px) and (max-width:1359px){.foot{display:none}}
+/* 大螢幕(2K、4K)的放大(見 ../assets/ui-scale.css) */
+.hud,.load,.ctl,.help,.console,.foot,.cap,.titlecard,#tourExit,.lbl{zoom:var(--ui,1)}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+}}
+</script>
+<link rel="stylesheet" href="../assets/render-quality.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<div id="stage"></div>
+<div class="load" id="load"><i></i><span data-en="Loading the 3D model">3D 模型載入中</span></div>
+
+<header class="hud">
+  <nav class="sitenav" aria-label="儀器原理" data-en-aria-label="Instrument Principles"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../lcq/" data-en="Ion trap MS">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../ftir/">FTIR</a><a href="./" aria-current="page" data-en="Fluorescence">螢光</a><a href="../xrd/">XRD</a><a href="../epr/">EPR</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/" data-en="Mass analyzers">質譜儀-不同分析器比較</a><a href="../spectroscopy/" data-en="Light and molecules">光與分子</a><a href="../chromatography/" data-en="Chromatography">層析</a><a href="../plot/" data-en="Data plotting">數據畫圖</a></nav>
+  <span class="k" data-en="Fluorescence spectrometer">螢光光譜儀</span>
+  <span class="big" data-en="Absorb, then glow">吸光再發光</span>
+  <p class="lede" data-en="Some molecules absorb light, lose a little of the energy as vibration (heat), then give off light of a longer wavelength: that is fluorescence. A fluorescence spectrometer has two monochromators: one picks the wavelength that excites the sample, the other, at the side at 90°, picks the wavelength of the light it gives off. Because it looks at light coming out of a dark background, it is far more sensitive than an absorbance measurement.">有些分子吸收光以後,先把一點能量變成振動(熱),再放出波長比較長的光,這就是螢光。螢光光譜儀有兩組單色器:一組挑激發的波長照樣品,另一組在側面 90 度挑出要看的螢光波長。因為是在黑暗的背景上看發出來的光,比吸收光譜靈敏得多。</p>
+  <div class="chips">
+    <div class="chip panel"><small data-en="Excitation">激發</small><b id="cX">350 nm</b></div>
+    <div class="chip panel"><small data-en="Emission">發射</small><b id="cM">450 nm</b></div>
+    <div class="chip panel"><small data-en="Signal">訊號</small><b id="cS">0</b></div>
+  </div>
+  <div class="jab panel"><h6 data-en="Energy levels (simplified)">能階圖(簡化)</h6><canvas id="jab"></canvas></div>
+  <div class="note panel" id="note"></div>
+</header>
+
+<aside class="ctl panel" id="ctl">
+  <div class="grp"><h6 data-en="Sample">樣品</h6>
+    <div class="seg" id="segSample">
+      <button data-v="qs" class="on" data-en="Quinine">奎寧</button><button data-v="trp" data-en="Tryptophan">色胺酸</button><button data-v="chl" data-en="Chlorophyll">葉綠素</button><button data-v="van" data-en="Vanillin">香草醛</button>
+    </div>
+  </div>
+  <div class="grp"><h6 data-en="Scan">掃描哪一邊</h6>
+    <div class="seg" id="segMode"><button data-v="em" class="on" data-en="Emission">發射光譜</button><button data-v="ex" data-en="Excitation">激發光譜</button></div>
+  </div>
+  <div class="grp"><h6><span lang="zh-Hant">激發波長</span><span lang="en">Excitation</span> <span id="xv">350 nm</span></h6>
+    <input type="range" id="lex" min="220" max="650" step="1" value="350" aria-label="激發波長" data-en-aria-label="Excitation wavelength">
+  </div>
+  <div class="grp"><h6><span lang="zh-Hant">發射波長</span><span lang="en">Emission</span> <span id="mv">450 nm</span></h6>
+    <input type="range" id="lem" min="250" max="800" step="1" value="450" aria-label="發射波長" data-en-aria-label="Emission wavelength">
+  </div>
+  <div class="grp"><h6 data-en="Slit (nm)">狹縫(nm)</h6>
+    <div class="seg mono" id="segBp"><button data-v="2.5">2.5</button><button data-v="5" class="on">5</button><button data-v="10">10</button></div>
+  </div>
+  <div class="grp"><h6 data-en="Concentration">濃度</h6>
+    <div class="seg" id="segConc"><button data-v="1" class="on" data-en="Dilute">稀</button><button data-v="200" data-en="Strong">濃</button></div>
+  </div>
+  <div class="grp" style="grid-column:1 / -1"><h6 data-en="Case">外殼</h6>
+    <div class="row">
+      <div class="seg" id="segShell"><button data-v="0" data-en="Closed">組裝</button><button data-v="1" class="on" data-en="Open">展開</button></div>
+      <button class="btn" id="btnScan" data-en="Scan">掃描</button>
+      <button class="btn" id="btnTour" data-en="Tour">導覽</button>
+      <button class="btn sq" id="btnHelp" aria-label="說明" data-en-aria-label="Help">?</button>
+    </div>
+  </div>
+</aside>
+
+<div class="help panel" id="help">
+  <b data-en="Controls">操作</b>
+  <ul lang="zh-Hant">
+    <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
+    <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
+    <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
+    <li>拖曳兩片光柵,或用兩根滑桿,改激發波長與發射波長</li>
+    <li>「掃描」:發射光譜是固定激發、轉發射那一邊的光柵;激發光譜是固定發射、轉激發那一邊;換狹縫或濃度再掃一次,上一條會留著比較</li>
+    <li>譜圖畫的是光電倍增管的訊號除以參考偵測器,扣掉燈在各波長的強弱;吸光度超過約 0.05,訊號就不再和濃度成正比</li>
+    <li>「導覽」:自動播一遍,內容和影片相同;按 Esc 結束</li>
+  </ul>
+  <ul lang="en">
+    <li>Mouse: drag to rotate the view; right-drag or Shift-drag to pan; scroll to zoom</li>
+    <li>Trackpad: swipe with two fingers to pan, pinch to zoom; touch screen: one finger rotates, two fingers pan and zoom</li>
+    <li>Keyboard: arrow keys or W A S D to move, Q E to turn, + − to zoom, hold Shift to go faster; R resets the view</li>
+    <li>Drag either grating, or use the two sliders, to set the excitation and emission wavelengths</li>
+    <li>"Scan": an emission spectrum keeps the excitation fixed and turns the emission grating; an excitation spectrum keeps the emission fixed and turns the excitation grating; scan again with another slit or concentration and the previous curve stays for comparison</li>
+    <li>The plot shows the photomultiplier signal divided by the reference detector, which removes the lamp's own brightness at each wavelength; above an absorbance of about 0.05 the signal stops rising in step with concentration</li>
+    <li>"Tour": plays through automatically, the same as the video; press Esc to end it</li>
+  </ul>
+  <p class="fine" lang="zh-Hant">示意圖。元件的位置、角度與數量都是示意;燈、單色器與光電倍增管以常見的掃描式螢光光譜儀為例。光譜依文獻的激發與發射峰位置模擬,強度是任意單位,不是實測數據。很多儀器在發射那一邊用濾光片擋掉二級光,這裡沒有擋,方便看到它。</p>
+  <p class="fine" lang="en">Schematic. Positions, angles and the number of parts are illustrative; the lamp, monochromators and photomultiplier follow a common scanning spectrofluorometer. Spectra are simulated from literature excitation and emission peaks, in arbitrary units; they are not measured data. Many instruments block the second order with a filter on the emission side; it is left in here so you can see it.</p>
+</div>
+
+<section class="console panel" id="console">
+  <div class="con-head"><b data-en="Fluorescence spectrum">螢光光譜</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
+  <div class="con-body">
+    <div class="plotwrap"><canvas id="plot"></canvas><div class="tip" id="tip"></div></div>
+    <div class="meters">
+      <div class="m"><div class="t"><span lang="zh-Hant">參考偵測器</span><span lang="en">Reference</span><b id="vR">100%</b></div><div class="bar"><i id="mR"></i></div></div>
+      <div class="m"><div class="t"><span lang="zh-Hant">光電倍增管</span><span lang="en">Photomultiplier</span><b id="vP">0</b></div><div class="bar"><i id="mP"></i></div></div>
+      <div class="m big"><div class="t" data-en="Signal ÷ reference">訊號 ÷ 參考</div><b class="n" id="vS">0</b></div>
+    </div>
+  </div>
+</section>
+
+<div class="foot" data-en="Schematic; internal positions and spectra are illustrative.">示意圖;機內元件位置與光譜為示意。</div>
+
+<div class="cap panel" id="cap"><div class="chap" id="chap"></div><div class="txt" id="capTxt"></div></div>
+<div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
+<button class="btn" id="tourExit" data-en="End tour">結束導覽</button>
+
+<script type="module">
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
+import { createMobilePanels } from '../assets/mobile-panels.js';
+import { createFreeView } from '../assets/free-view.js';
+const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const $ = s => document.querySelector(s);
+const Q = new URLSearchParams(location.search);
+const FILM = Q.has('film'), REC = Q.has('rec');
+const root = document.documentElement;
+if (FILM) root.classList.add('film');
+if (REC) root.classList.add('rec');
+// 手機版:控制面板與譜預設收成把手,放在畫面右緣;直拿時建議轉成橫式(../assets/mobile-panels.js)
+const mp = createMobilePanels({
+  dock: true, top: '.hud', rotateHint: true,
+  suspended: () => FILM || root.classList.contains('touring'),
+  panels: [
+    { el: '#ctl', icon: 'adjust', label: zhEn('調整', 'Adjust'), items: zhEn('樣品、掃描哪一邊、激發與發射波長、狹縫、濃度、外殼、掃描、導覽、說明、畫質', 'sample, scan mode, wavelengths, slit, concentration, case, scan, tour, help, quality'), onToggle: (open) => { if (!open) document.getElementById('help').classList.remove('show'); } },
+    { el: '#console', icon: 'chart', label: zhEn('螢光光譜', 'Fluorescence spectrum'), items: () => $('#conSample').textContent },
+  ],
+});
+$('#btnScan').addEventListener('click', () => mp.open('#console'));
+window.__err = null;
+addEventListener('error', e => { window.__err = String(e.message || e); });
+
+// ================= 小工具 =================
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = t => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const gauss = n => Math.sqrt(-2 * Math.log(Math.max(1e-6, hash(n)))) * Math.cos(6.2831853 * hash(n + 17.77));
+const MONO = "'IBM Plex Mono',Consolas,monospace";
+const fmtSig = v => Math.abs(v) < .05 ? '0' : v >= 1000 ? Math.round(v).toLocaleString(zhEn('zh-TW', 'en-US')) : v >= 10 ? v.toFixed(0) : v.toFixed(1);
+
+// ================= 光譜模型 =================
+// 每個樣品:吸收帶(決定激發光譜)[中心 nm, 相對吸光度, σ nm]、發射帶(螢光的形狀)[中心, 相對高度, σ]、量子產率 qy(示意的相對亮度)、
+// a1:「稀」的時候激發峰的吸光度(1 cm);color:溶液在燈光下的顏色;glow:放出的螢光畫成什麼顏色(看不見的紫外光用淡紫)
+const SAMPLES = {
+  qs: { name: zhEn('奎寧', 'Quinine'), full: zhEn('硫酸奎寧(稀硫酸溶液,標準品)', 'Quinine sulfate in dilute sulfuric acid (standard)'), inText: zhEn('奎寧', 'quinine'),
+        ex: 350, em: 450, abs: [[347, 1, 17], [318, .55, 12], [250, 1.6, 12]], emb: [[451, 1, 32], [500, .2, 34]], qy: .55, a1: .03, color: 0xf4f4f6 },
+  trp: { name: zhEn('色胺酸', 'Tryptophan'), full: zhEn('色胺酸水溶液(蛋白質自己的螢光來自它)', 'Tryptophan in water (the source of protein fluorescence)'), inText: zhEn('色胺酸', 'tryptophan'),
+        ex: 280, em: 355, abs: [[278, 1, 11], [288, .45, 4], [220, 5, 10]], emb: [[355, 1, 28]], qy: .12, a1: .03, color: 0xf6f6f8 },
+  chl: { name: zhEn('葉綠素', 'Chlorophyll'), full: zhEn('葉綠素 a(乙醚溶液)', 'Chlorophyll a in ether'), inText: zhEn('葉綠素', 'chlorophyll'),
+        ex: 428, em: 666, abs: [[428, 1, 11], [410, .5, 12], [660, .76, 8], [614, .12, 10], [578, .06, 10]], emb: [[666, 1, 9.8], [720, .2, 16]], qy: .32, a1: .03, color: 0x4f9e48, raman: 0 },
+  van: { name: zhEn('香草醛', 'Vanillin'), full: zhEn('香草醛水溶液(弱鹼性;螢光很弱)', 'Vanillin in weakly basic water (weak fluorescence)'), inText: zhEn('香草醛', 'vanillin'),
+        ex: 330, em: 405, abs: [[348, 1, 20], [250, .9, 14]], emb: [[405, 1, 26]], qy: .012, a1: .03, color: 0xf5f1d8 },
+};
+const SKEYS = Object.keys(SAMPLES);
+const band = (list, l, s2 = 0) => { let v = 0; for (const [c, a, w] of list) { const se = Math.sqrt(w * w + s2); v += a * (w / se) * Math.exp(-.5 * ((l - c) / se) ** 2); } return v; };
+// 氙燈的相對強度(示意:250 nm 以下弱、可見光平坦,450 到 480 nm 附近有一點起伏)
+const lampXe = l => clamp(sstep(200, 300, l) * (.75 + .25 * sstep(300, 420, l)) * (1 + .15 * Math.exp(-(((l - 470) / 18) ** 2))) * (1 - .25 * sstep(700, 900, l)), 0, 1.2);
+// 光電倍增管的靈敏度(示意:紫外到可見好、700 nm 以後變差)
+const pmtR = l => clamp(sstep(200, 260, l) * (1 - .85 * sstep(620, 850, l)), .02, 1);
+// 水的拉曼峰:比激發光少 3400 cm⁻¹ 的能量
+const ramanNm = lx => 1 / (1 / lx - 3400e-7);
+// 一個點的訊號:激發波長 lx、發射波長 lm、狹縫 bp(兩邊一樣)、濃度倍數 c
+// 內濾效應:只看比色管中間 2 mm,激發光先被前面 4 mm 吸收,螢光出來時又被吸收半格(示意)
+function signalAt(sm, lx, lm, bp, c) {
+  const s2 = (bp / 2.355) ** 2;
+  const A = sm.a1 * c * band(sm.abs, lx, s2);                 // 激發波長的吸光度(1 cm)
+  const absorbed = 10 ** (-A * .4) - 10 ** (-A * .6);         // 中間 2 mm 吸收的比例
+  const Aem = sm.a1 * c * band(sm.abs, lm, s2);
+  const em = band(sm.emb, lm, s2) * 10 ** (-Aem * .5);
+  const k = lampXe(lx) * pmtR(lm) * (bp / 5) ** 2;           // 狹縫開兩倍,光大約四倍
+  let F = 2.6e5 * sm.qy * absorbed * em * k;
+  // 散射光(不是螢光):激發光的瑞利散射、水的拉曼峰、光柵的二級光
+  const g = (x0, w) => Math.exp(-.5 * ((lm - x0) / Math.max(1.2, w)) ** 2);
+  const w = bp / 2.355 * 1.2;
+  F += k * (2000 * g(lx, w) + 60 * (sm.raman ?? 1) * g(ramanNm(lx), w * 1.6) + 140 * g(2 * lx, w * 1.4));
+  return F;
+}
+// 掃描的範圍:發射光譜從激發波長前一點掃到兩倍激發波長之後;激發光譜從 220 nm 掃到發射波長前一點
+function rangeOf(sm, mode, lx, lm) {
+  if (mode === 'em') return [Math.max(250, lx - 20), Math.min(820, Math.max(lx + 160, 2 * lx + 40))];
+  return [220, Math.max(240, lm - 10)];
+}
+// 譜圖畫的是光電倍增管的訊號除以參考偵測器(扣掉燈在各波長的強弱;乘 0.85 讓數字和 350 nm 激發時的光電倍增管讀值差不多)
+const refK = lx => .85 / Math.max(.05, lampXe(lx));
+const noiseOf = (F, seed) => .35 * Math.sqrt(Math.max(F, 0) + 25) * gauss(seed);   // 光子計數的雜訊 ∝ √訊號(係數讓香草醛這種弱螢光仍看得出來,示意)
+function traceOf(sc) {
+  const sm = SAMPLES[sc.sample], st = .5, [a, b] = sc.range, to = clamp(sc.to, a, b), n = Math.floor((to - a) / st + 1e-6), out = new Float32Array((n + 1) * 2);
+  for (let i = 0; i <= n; i++) {
+    const l = a + i * st, lx = sc.mode === 'em' ? sc.lx : l, lm = sc.mode === 'em' ? l : sc.lm;
+    const F = signalAt(sm, lx, lm, sc.bp, sc.conc);
+    out[i * 2] = l; out[i * 2 + 1] = (F + noiseOf(F, l * 13.37 + sc.seed)) * refK(lx);
+  }
+  return out;
+}
+const traceCache = new Map();
+function traceCached(sc) {
+  const k = `${sc.sample}|${sc.mode}|${sc.lx}|${sc.lm}|${sc.bp}|${sc.conc}|${sc.to.toFixed(2)}|${sc.seed}`;
+  let v = traceCache.get(k);
+  if (!v) { v = traceOf(sc); if (traceCache.size > 40) traceCache.clear(); traceCache.set(k, v); }
+  return v;
+}
+// 光柵方程(示意:1200 條/mm,夾角 40°),只用來決定光柵轉多少
+const theta = l => Math.asin(Math.min(.98, l * 1e-6 * 1200 / (2 * Math.cos(20 * Math.PI / 180))));
+const TH0 = theta(450);
+// 波長 → 顯示用顏色;紫外與近紅外看不見,分別用淡紫與暗紅代表(和 UV-Vis 頁同一套)
+function wlColor(l) {
+  let r, g, b;
+  if (l < 380) { r = .62; g = .38; b = 1; }
+  else if (l < 440) { r = -(l - 440) / 60 * .8 + .1; g = 0; b = 1; }
+  else if (l < 490) { r = 0; g = (l - 440) / 50; b = 1; }
+  else if (l < 510) { r = 0; g = 1; b = -(l - 510) / 20; }
+  else if (l < 580) { r = (l - 510) / 70; g = 1; b = 0; }
+  else if (l < 645) { r = 1; g = -(l - 645) / 65; b = 0; }
+  else if (l <= 780) { r = 1; g = 0; b = 0; }
+  else { const t = clamp((l - 780) / 320, 0, 1); r = .78 - .3 * t; g = .05; b = .14 + .08 * t; }
+  return [clamp(r, 0, 1), clamp(g, 0, 1), clamp(b, 0, 1)];
+}
+const lin = rgb => new THREE.Color().setRGB(rgb[0], rgb[1], rgb[2], THREE.SRGBColorSpace);
+const css = (rgb, a = 1) => `rgba(${rgb.map(v => Math.round(v * 255)).join(',')},${a})`;
+const C_XE = lin([.92, .93, 1]);
+
+// ================= 場景 =================
+let DPR = REC ? 1 : quality.pixelRatio(innerWidth, innerHeight, 1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: REC, powerPreference: 'high-performance' });
+renderer.setPixelRatio(DPR);
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+$('#stage').appendChild(renderer.domElement);
+window.__gl = (() => { try { const gl = renderer.getContext(), x = gl.getExtension('WEBGL_debug_renderer_info'); return x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { return '?'; } })();
+
+const labelR = new CSS2DRenderer();
+labelR.setSize(innerWidth, innerHeight);
+labelR.domElement.className = 'labels';
+document.body.appendChild(labelR.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a1015);
+scene.fog = new THREE.Fog(0x0a1015, 260, 600);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .5;
+
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 1, 1500);
+camera.position.set(56, 70, 90);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(-1, 5, -2);
+controls.enableDamping = true; controls.dampingFactor = .08;
+controls.minDistance = 20; controls.maxDistance = 240; controls.maxPolarAngle = 1.47;
+controls.update();
+
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), .75, .5, 1.25);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.HemisphereLight(0xcfe6ff, 0x1b1712, .45));
+const key = new THREE.DirectionalLight(0xffffff, 1.65);
+key.position.set(55, 110, 75); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 20, far: 320 });
+key.shadow.bias = -.0004; key.shadow.normalBias = .03;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0x74e4ff, .28); rim.position.set(-90, 50, -100); scene.add(rim);
+
+// ---------- 桌面與牆 ----------
+function canvasTex(w, h, draw, repeat) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+  return t;
+}
+const benchTop = new THREE.Mesh(new THREE.BoxGeometry(200, 4, 112), new THREE.MeshStandardMaterial({ color: 0x141b20, roughness: .58, metalness: .1 }));
+benchTop.position.set(0, -2, 4); benchTop.receiveShadow = true; scene.add(benchTop);
+const strip = new THREE.Mesh(new THREE.BoxGeometry(200, .45, .5), new THREE.MeshBasicMaterial({ color: new THREE.Color(.45, 1.1, .6) }));
+strip.position.set(0, -.35, 60.1); scene.add(strip);
+const wallTex = canvasTex(1024, 512, (c, w, h) => {
+  c.fillStyle = '#121a20'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 3;
+  for (let x = 0; x <= w; x += 128) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+  c.beginPath(); c.moveTo(0, 340); c.lineTo(w, 340); c.stroke();
+}, [3, 1]);
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(760, 300), new THREE.MeshStandardMaterial({ map: wallTex, roughness: .95 }));
+wall.position.set(0, 70, -160); scene.add(wall);
+// 牆上三塊說明螢幕:吸收與放出、90 度、光電倍增管
+function screenTex(kind) {
+  return canvasTex(640, 360, (c, w, h) => {
+    c.fillStyle = 'rgba(16,48,62,.9)'; c.fillRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(116,228,255,.6)'; c.lineWidth = 3; c.strokeRect(6, 6, w - 12, h - 12);
+    c.strokeStyle = c.fillStyle = 'rgba(200,244,255,.95)'; c.lineWidth = 4; c.lineCap = 'round';
+    c.font = `600 30px ${MONO}`; c.textAlign = 'center';
+    const arrow = (x0, y0, x1, y1, col, lw = 5) => { c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); const a = Math.atan2(y1 - y0, x1 - x0); c.beginPath(); c.moveTo(x1, y1); c.lineTo(x1 - 16 * Math.cos(a - .45), y1 - 16 * Math.sin(a - .45)); c.moveTo(x1, y1); c.lineTo(x1 - 16 * Math.cos(a + .45), y1 - 16 * Math.sin(a + .45)); c.stroke(); };
+    if (kind === 0) {
+      c.lineWidth = 4; for (const y of [250, 90]) { c.beginPath(); c.moveTo(150, y); c.lineTo(490, y); c.stroke(); }
+      c.lineWidth = 2; for (const y of [76, 62, 236, 222]) { c.beginPath(); c.moveTo(150, y); c.lineTo(490, y); c.stroke(); }
+      arrow(230, 250, 230, 64, '#a98cff'); arrow(410, 90, 410, 250, '#5dff8a');
+      c.strokeStyle = '#ffc261'; c.lineWidth = 3; c.beginPath(); for (let y = 64; y <= 90; y += 2) { const x = 290 + 7 * Math.sin(y * .7); y === 64 ? c.moveTo(x, y) : c.lineTo(x, y); } c.stroke();
+      c.fillStyle = 'rgba(200,244,255,.95)'; c.fillText(zhEn('吸收短的,放出長的', 'absorb short, emit long'), w / 2, 318);
+    } else if (kind === 1) {
+      arrow(80, 180, 300, 180, '#a98cff', 7); c.strokeStyle = 'rgba(200,244,255,.95)'; c.lineWidth = 4; c.strokeRect(300, 140, 80, 80);
+      arrow(380, 180, 560, 180, 'rgba(169,140,255,.5)', 4); arrow(340, 140, 340, 50, '#5dff8a', 6);
+      c.fillStyle = 'rgba(200,244,255,.95)'; c.fillText(zhEn('側面 90 度收螢光', 'collect at 90°'), w / 2, 300);
+    } else {
+      c.lineWidth = 3; for (let i = 0; i < 6; i++) { const x = 120 + i * 75, y = i % 2 ? 140 : 210; c.strokeRect(x, y, 46, 12); }
+      c.strokeStyle = '#5dff8a'; c.lineWidth = 2; c.beginPath(); c.moveTo(80, 120); c.lineTo(143, 206); c.stroke();
+      c.strokeStyle = '#74e4ff'; for (let i = 0; i < 5; i++) { const x0 = 143 + i * 75, y0 = i % 2 ? 152 : 206, x1 = 143 + (i + 1) * 75, y1 = (i + 1) % 2 ? 152 : 206; for (let k = 0; k < 1 + i; k++) { c.beginPath(); c.moveTo(x0, y0 + (k - i / 2) * 3); c.lineTo(x1, y1 + (k - i / 2) * 3); c.stroke(); } }
+      c.fillStyle = 'rgba(200,244,255,.95)'; c.fillText(zhEn('一個光子 → 一大群電子', 'one photon → many electrons'), w / 2, 300);
+    }
+  });
+}
+[-110, 0, 110].forEach((x, i) => {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(76, 42.75), new THREE.MeshBasicMaterial({ map: screenTex(i), toneMapped: false, transparent: true, opacity: .9 }));
+  m.position.set(x, 64, -158); scene.add(m);
+});
+
+// ---------- 儀器 ----------
+const BY = 10;
+const V3 = THREE.Vector3, UP = new V3(0, 1, 0);
+const inst = new THREE.Group(); scene.add(inst);
+const optics = new THREE.Group(); inst.add(optics);
+const MAT = {
+  shell: new THREE.MeshPhysicalMaterial({ color: 0xe6e9ec, roughness: .45, clearcoat: .35, clearcoatRoughness: .35, transparent: true }),
+  lid: new THREE.MeshPhysicalMaterial({ color: 0x2d7d55, roughness: .3, clearcoat: 1, clearcoatRoughness: .1, transparent: true }),
+  vent: new THREE.MeshStandardMaterial({ color: 0x2a3035, roughness: .7, transparent: true }),
+  edge: new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: 0, depthWrite: false }),
+  plinth: new THREE.MeshStandardMaterial({ color: 0x2b3237, roughness: .6, metalness: .2 }),
+  bench: new THREE.MeshStandardMaterial({ roughness: .7, metalness: .3, map: canvasTex(128, 128, (c, w, h) => {
+    c.fillStyle = '#2b343a'; c.fillRect(0, 0, w, h); c.fillStyle = '#151b1f';
+    for (const [x, y] of [[32, 32], [96, 32], [32, 96], [96, 96]]) { c.beginPath(); c.arc(x, y, 6, 0, 7); c.fill(); }
+  }, [61 / 5, 63 / 5]) }),
+  black: new THREE.MeshStandardMaterial({ color: 0x14191d, roughness: .45, metalness: .6 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x2a3238, roughness: .5, metalness: .5 }),
+  metal: new THREE.MeshStandardMaterial({ color: 0xaab4ba, roughness: .45, metalness: .85 }),
+  anod: new THREE.MeshStandardMaterial({ color: 0x3a4650, roughness: .35, metalness: .7 }),
+  mirror: new THREE.MeshStandardMaterial({ color: 0xdfe6ea, roughness: .14, metalness: 1, side: THREE.DoubleSide }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0xd6f2ff, roughness: .04, transparent: true, opacity: .3, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  quartz: new THREE.MeshPhysicalMaterial({ color: 0xeaf8ff, roughness: .03, transparent: true, opacity: .14, clearcoat: 1, depthWrite: false }),
+  bs: new THREE.MeshPhysicalMaterial({ color: 0xa8e4ff, roughness: .02, metalness: .4, transparent: true, opacity: .45, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  grating: new THREE.MeshPhysicalMaterial({ color: 0xd9dee4, metalness: 1, roughness: .28, iridescence: 1, iridescenceIOR: 1.8, iridescenceThicknessRange: [150, 900] }),
+  ceramic: new THREE.MeshStandardMaterial({ color: 0xe8e4da, roughness: .8 }),
+  pcb: new THREE.MeshStandardMaterial({ color: 0x1f4a35, roughness: .6, metalness: .2 }),
+  pmtGlass: new THREE.MeshPhysicalMaterial({ color: 0xcfe8ff, roughness: .05, transparent: true, opacity: .28, clearcoat: 1, depthWrite: false }),
+  dynode: new THREE.MeshStandardMaterial({ color: 0xc89a5a, roughness: .35, metalness: .9 }),
+  liq: new THREE.MeshPhysicalMaterial({ color: 0xf4f4f6, roughness: .3, transparent: true, opacity: .55, depthWrite: false, emissive: 0x000000 }),
+};
+function mesh(geo, mat, pos, parent = optics, shadow = true) {
+  const m = new THREE.Mesh(geo, mat); if (pos) m.position.set(pos[0], pos[1], pos[2]);
+  m.castShadow = shadow; m.receiveShadow = true; parent.add(m); return m;
+}
+function post(x, z, top, r = .42) {
+  const h = top - 3.6; if (h <= .05) return;
+  mesh(new THREE.CylinderGeometry(r, r, h, 20), MAT.metal, [x, 3.6 + h / 2, z]);
+  mesh(new THREE.CylinderGeometry(r * 2.3, r * 2.5, .5, 24), MAT.black, [x, 3.85, z]);
+}
+mesh(new RoundedBoxGeometry(62.4, 3, 64.4, 3, .8), MAT.plinth, [0, 1.5, -2], inst);
+mesh(new THREE.BoxGeometry(61, .6, 63), MAT.bench, [0, 3.3, -2], inst, false);
+
+// 外殼:後面蓋激發單色器、右邊蓋發射單色器與光電倍增管、中間是樣品室的上蓋(綠色)
+const shellParts = [];
+function shellPart(move, rot = 0) { const g = new THREE.Group(); inst.add(g); shellParts.push({ g, move, rot }); return g; }
+function shellBox(g, size, pos, mat, radius) {
+  const m = mesh(new RoundedBoxGeometry(size[0], size[1], size[2], 4, radius), mat, pos, g);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(...size)), MAT.edge);
+  e.position.copy(m.position); g.add(e); return m;
+}
+const rear = shellPart([0, 44, -26]);
+shellBox(rear, [63, 21, 27], [0, 13.5, -20], MAT.shell, 1.6);
+for (let i = 0; i < 12; i++) mesh(new THREE.BoxGeometry(18, .06, .55), MAT.vent, [-16, 24.02, -31 + i * 1.6], rear, false);
+const right = shellPart([30, 30, 18]);
+shellBox(right, [33, 17, 36], [15.5, 11.5, 11.5], MAT.shell, 1.6);
+const lid = shellPart([-26, 36, 14], -.2);
+shellBox(lid, [30, 13.5, 36], [-16.5, 9.75, 11.5], MAT.shell, 1.4);
+shellBox(lid, [17, 5, 16], [-6, 18.6, 6], MAT.lid, 2.0);
+mesh(new THREE.SphereGeometry(.32, 16, 10), new THREE.MeshBasicMaterial({ color: new THREE.Color(.3, 2.2, .7) }), [28, 6, 29.55], right, false);
+
+// 元件位置(俯視 x, z)
+const P = {
+  LAMP: [-26, -24], S1: [-17, -24], GX: [2, -27.5], S2: [-4, -14],
+  BS: [-4, -7], REF: [-12, -7], CU: [-4, 6], STOP: [-4, 17],
+  L2: [3, 6], S3: [8, 6], GM: [26, 2], S4: [20, 16], PMT: [17.8, 21.2],
+};
+const O = {};
+function node(key, y = BY) { const g = new THREE.Group(); g.position.set(P[key][0], y, P[key][1]); optics.add(g); O[key] = { g }; return g; }
+const face = (g, n) => { g.rotation.y = Math.atan2(n[0], n[1]); };
+const dirTo = (a, b) => { const dx = P[b][0] - P[a][0], dz = P[b][1] - P[a][1], L = Math.hypot(dx, dz); return [dx / L, dz / L]; };
+const bis = (u, v) => { const x = u[0] + v[0], z = u[1] + v[1], L = Math.hypot(x, z); return [x / L, z / L]; };
+
+// 氙燈:燈泡放在橢圓反射罩裡,兩端是電極
+{
+  const g = node('LAMP'); face(g, [1, 0]);
+  const pts = []; for (let i = 0; i <= 12; i++) { const r = .3 + i * .19; pts.push(new THREE.Vector2(r, r * r / 6 - 1.1)); }
+  const refl = mesh(new THREE.LatheGeometry(pts, 40), MAT.mirror, [0, 0, 0], g); refl.rotation.x = Math.PI / 2;
+  mesh(new THREE.SphereGeometry(.55, 20, 14), new THREE.MeshPhysicalMaterial({ color: 0xf4f6ff, emissive: 0xdfe6ff, emissiveIntensity: .5, transparent: true, opacity: .6 }), [0, 0, -.3], g, false);
+  O.LAMP.arc = mesh(new THREE.SphereGeometry(.16, 12, 10), new THREE.MeshBasicMaterial({ color: new THREE.Color(4.2, 4.4, 5.2) }), [0, 0, -.3], g, false);
+  for (const s of [-1, 1]) mesh(new THREE.CylinderGeometry(.16, .16, 1.6, 10), MAT.metal, [0, s * 1.15, -.3], g);
+  mesh(new THREE.BoxGeometry(6, 6, 1.4), MAT.black, [0, 0, -2.1], g);
+  for (let i = 0; i < 6; i++) mesh(new THREE.BoxGeometry(6, .12, 1.6), MAT.anod, [0, -2.6 + i * 1.04, -3.4], g);
+  post(P.LAMP[0], P.LAMP[1], BY - 3);
+}
+// 狹縫:兩片刀口,縫寬隨狹縫(帶通)變
+const bladeGeo = new THREE.BoxGeometry(1, 6, .22);
+function slit(key, inDir, halfW, gap) {
+  const g = node(key); face(g, [-inDir[0], -inDir[1]]);
+  const L = mesh(bladeGeo, MAT.black, [0, 0, 0], g), R = mesh(bladeGeo, MAT.black, [0, 0, 0], g);
+  mesh(new THREE.BoxGeometry(halfW * 2 + .8, .45, .5), MAT.anod, [0, 3.2, 0], g);
+  mesh(new THREE.BoxGeometry(halfW * 2 + .8, .6, 1.3), MAT.anod, [0, -3.3, 0], g);
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(.4, 6.9, .5), MAT.anod, [s * (halfW + .2), 0, 0], g);
+  Object.assign(O[key], { L, R, halfW });
+  setGap(O[key], gap);
+  post(P[key][0], P[key][1], BY - 3.6);
+}
+function setGap(o, gap) {
+  const bw = o.halfW - gap / 2;
+  o.L.scale.x = o.R.scale.x = bw;
+  o.L.position.x = -(gap / 2 + bw / 2); o.R.position.x = gap / 2 + bw / 2; o.gap = gap;
+}
+const slitGap = bp => .06 + .055 * bp;
+slit('S1', dirTo('LAMP', 'S1'), 2.6, slitGap(5));
+slit('S2', dirTo('GX', 'S2'), 3.4, slitGap(5));
+slit('S3', dirTo('L2', 'S3'), 2.6, slitGap(5));
+slit('S4', dirTo('GM', 'S4'), 3.4, slitGap(5));
+// 出口狹縫板上的光譜(散開的光打在板上;只有縫口那一段穿過去)
+const FAN = [-60, -40, -20, 0, 20, 40, 60], DISP = .045;
+function addStrip(o, disp) {
+  const cv = document.createElement('canvas'); cv.width = 512; cv.height = 32;
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+  const m = mesh(new THREE.PlaneGeometry(o.halfW * 2, 1.8), new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [0, 0, .14], o.g, false);
+  m.material.color.setScalar(1.7);
+  o.strip = { ctx: cv.getContext('2d'), tex, disp, key: '' };
+}
+addStrip(O.S2, DISP); addStrip(O.S4, DISP);
+// spec(l):這個波長有多亮(0 到 1);激發那一邊是燈,發射那一邊是樣品的螢光(加散射光)
+function drawStrip(o, l, spec, key) {
+  const s = o.strip, k = `${l.toFixed(2)}|${o.gap.toFixed(3)}|${key}`;
+  if (k === s.key) return; s.key = k;
+  const img = s.ctx.createImageData(512, 32), d = img.data;
+  for (let px = 0; px < 512; px++) {
+    const u = (px / 511 * 2 - 1) * o.halfW, lk = l + u / s.disp;
+    let r = 0, g = 0, b = 0;
+    if (Math.abs(u) > o.gap / 2 && lk >= 200 && lk <= 900) { const c = wlColor(lk), e = spec(lk); r = c[0] * e; g = c[1] * e; b = c[2] * e; }
+    for (let py = 0; py < 32; py++) {
+      const kk = Math.exp(-(((py - 15.5) / 7.5) ** 2)) * 255, i = (py * 512 + px) * 4;
+      d[i] = r * kk; d[i + 1] = g * kk; d[i + 2] = b * kk; d[i + 3] = 255;
+    }
+  }
+  s.ctx.putImageData(img, 0, 0); s.tex.needsUpdate = true;
+}
+// 光柵:隨波長轉動
+function grating(key, a, b) {
+  const g = node(key); const n = bis(dirTo(key, a), dirTo(key, b));
+  O[key].base = Math.atan2(n[0], n[1]); g.rotation.y = O[key].base;
+  const sub = mesh(new THREE.BoxGeometry(5.2, 3.9, .9), MAT.black, [0, 0, -.1], g);
+  const surf = mesh(new THREE.BoxGeometry(4.8, 3.5, .08), MAT.grating, [0, 0, .38], g);
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(.4, 4.3, 1.4), MAT.anod, [s * 2.85, 0, -.2], g);
+  mesh(new THREE.CylinderGeometry(2.4, 2.4, .7, 40), MAT.anod, [0, -2.55, 0], g);
+  mesh(new THREE.CylinderGeometry(1.3, 1.3, 2.4, 24), MAT.dark, [P[key][0], BY - 4.1, P[key][1]]);
+  mesh(new THREE.BoxGeometry(3.4, 1, 3.4), MAT.black, [P[key][0], 4.1, P[key][1]]);
+  O[key].hit = [surf, sub];
+}
+grating('GX', 'S1', 'S2');
+grating('GM', 'S3', 'S4');
+// 分光鏡與參考偵測器:分一點點激發光去量燈的強弱
+{
+  const g = node('BS'); face(g, bis(dirTo('BS', 'S2'), dirTo('BS', 'REF')));
+  mesh(new THREE.BoxGeometry(2.2, 2.2, .1), MAT.bs, [0, 0, 0], g, false);
+  for (const [w, h, x, y] of [[2.6, .22, 0, 1.2], [2.6, .22, 0, -1.2], [.22, 2.6, 1.2, 0], [.22, 2.6, -1.2, 0]]) mesh(new THREE.BoxGeometry(w, h, .3), MAT.black, [x, y, 0], g);
+  post(P.BS[0], P.BS[1], BY - 1.3);
+  const r = node('REF'); face(r, [1, 0]);
+  mesh(new THREE.BoxGeometry(2, 2.4, 1.6), MAT.anod, [0, 0, -.5], r);
+  O.REF.diode = mesh(new THREE.PlaneGeometry(.9, .9), new THREE.MeshBasicMaterial({ color: 0x0b1830, toneMapped: false }), [0, 0, .32], r, false);
+  post(P.REF[0], P.REF[1], BY - 1.2);
+}
+// 樣品室:四面透光的石英比色管;後面的擋光板接住直直穿過的激發光
+{
+  const g = node('CU');
+  mesh(new THREE.BoxGeometry(3.4, 2.2, 3.4), MAT.black, [0, -2.95, 0], g);
+  for (const [x, z] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) mesh(new THREE.BoxGeometry(.3, 3.2, .3), MAT.anod, [x * 1.3, -.4, z * 1.3], g);
+  mesh(new THREE.BoxGeometry(1.25, 4.5, 1.25), MAT.quartz, [0, .25, 0], g, false);
+  O.CU.liq = mesh(new THREE.BoxGeometry(1.02, 3, 1.02), MAT.liq, [0, -.45, 0], g, false);
+  O.CU.glow = mesh(new THREE.SphereGeometry(.9, 20, 14), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [0, 0, 0], g, false);
+  O.CU.glow.scale.set(.7, 1.3, .7); O.CU.glow.renderOrder = 2;
+  mesh(new THREE.BoxGeometry(1.36, .55, 1.36), new THREE.MeshStandardMaterial({ color: 0xf1f1ee, roughness: .6 }), [0, 2.75, 0], g);
+  post(P.CU[0], P.CU[1], BY - 4.05);
+  const st = node('STOP'); face(st, [0, -1]);
+  O.STOP.face = mesh(new THREE.BoxGeometry(3, 3, .5), MAT.black, [0, 0, 0], st);
+  O.STOP.spot = mesh(new THREE.CircleGeometry(.5, 20), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [0, 0, -.27], st, false);
+  O.STOP.spot.rotation.y = Math.PI;
+  post(P.STOP[0], P.STOP[1], BY - 1.6);
+  // 收光的透鏡
+  const l2 = node('L2'); face(l2, [1, 0]);
+  const lens = mesh(new THREE.SphereGeometry(1.4, 28, 14), MAT.glass, [0, 0, 0], l2, false); lens.scale.set(1, 1, .28);
+  mesh(new THREE.TorusGeometry(1.46, .16, 10, 36), MAT.black, [0, 0, 0], l2);
+  post(P.L2[0], P.L2[1], BY - 1.6);
+}
+// 光電倍增管:玻璃管裡一排打拿極,電子一級一級變多
+{
+  const g = node('PMT'); face(g, [-dirTo('GM', 'S4')[0], -dirTo('GM', 'S4')[1]]);
+  const tube = mesh(new THREE.CylinderGeometry(1.3, 1.3, 4.6, 28), MAT.pmtGlass, [0, 0, -2.3], g, false); tube.rotation.x = Math.PI / 2;
+  O.PMT.dyn = [];
+  for (let i = 0; i < 9; i++) { const d = mesh(new THREE.BoxGeometry(.8, .2, .42), MAT.dynode.clone(), [i % 2 ? .42 : -.42, 0, -.62 - i * .42], g, false); d.rotation.y = i % 2 ? .6 : -.6; O.PMT.dyn.push(d); }
+  O.PMT.win = mesh(new THREE.CircleGeometry(1.1, 24), new THREE.MeshBasicMaterial({ color: 0x0b1830, toneMapped: false }), [0, 0, .02], g, false);
+  mesh(new THREE.CylinderGeometry(1.6, 1.6, 1.4, 28), MAT.black, [0, 0, -5.2], g).rotation.x = Math.PI / 2;
+  post(P.PMT[0], P.PMT[1], BY - 1.6);
+}
+// 電路板
+mesh(new THREE.BoxGeometry(12, .22, 10), MAT.pcb, [24, 3.72, 24], optics, false);
+for (const [x, z, w, d] of [[20, 21, 2.6, 2.6], [24.5, 22, 3.2, 2], [27.5, 26, 2.2, 3], [21, 27, 3, 1.6]]) mesh(new THREE.BoxGeometry(w, .5, d), MAT.black, [x, 4.05, z]);
+
+optics.updateMatrixWorld(true);
+for (const k in O) if (O[k].g) O[k].p = O[k].g.getWorldPosition(new V3());
+for (const k of ['S2', 'S4']) O[k].t = new V3(1, 0, 0).applyQuaternion(O[k].g.quaternion);
+const ARC = O.LAMP.arc.getWorldPosition(new V3());
+const xl = new THREE.PointLight(0xdfe6ff, 14, 18, 2); xl.position.copy(ARC); scene.add(xl);
+const cl = new THREE.PointLight(0x5dff8a, 0, 14, 2); cl.position.copy(O.CU.p); scene.add(cl);
+
+// ================= 光線 =================
+const RMAX = 6000;
+const rPos = new Float32Array(RMAX * 3), rCol = new Float32Array(RMAX * 3), rD = new Float32Array(RMAX);
+const rayGeo = new THREE.BufferGeometry();
+rayGeo.setAttribute('position', new THREE.BufferAttribute(rPos, 3));
+rayGeo.setAttribute('aC', new THREE.BufferAttribute(rCol, 3));
+rayGeo.setAttribute('aD', new THREE.BufferAttribute(rD, 1));
+const rayMat = new THREE.ShaderMaterial({
+  uniforms: { uT: { value: 0 } },
+  vertexShader: `attribute vec3 aC; attribute float aD; varying vec3 vC; varying float vD;
+    void main(){ vC=aC; vD=aD; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: `uniform float uT; varying vec3 vC; varying float vD;
+    void main(){ float p=fract(vD*0.11-uT*0.85); float pulse=smoothstep(0.0,0.06,p)*(1.0-smoothstep(0.06,0.45,p));
+      gl_FragColor=vec4(vC*(0.5+1.5*pulse),1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const rays = new THREE.LineSegments(rayGeo, rayMat); rays.frustumCulled = false; scene.add(rays);
+let rn = 0, raysKey = '';
+function seg(a, b, c, k, d0) {
+  if (rn + 2 > RMAX) return d0;
+  const i = rn * 3, L = a.distanceTo(b);
+  rPos[i] = a.x; rPos[i + 1] = a.y; rPos[i + 2] = a.z; rPos[i + 3] = b.x; rPos[i + 4] = b.y; rPos[i + 5] = b.z;
+  rCol[i] = rCol[i + 3] = c.r * k; rCol[i + 1] = rCol[i + 4] = c.g * k; rCol[i + 2] = rCol[i + 5] = c.b * k;
+  rD[rn] = d0; rD[rn + 1] = d0 + L; rn += 2; return d0 + L;
+}
+const add = (p, x, y, z) => new V3(p.x + x, p.y + y, p.z + z);
+function facePts(key, us, vs) {
+  const out = [];
+  for (const v of vs) for (const u of us) out.push(O[key].g.localToWorld(new V3(u * 2.0, v * 1.3, .45)));
+  return out;
+}
+function buildRays(W) {
+  const key = `${W.lx}|${W.lm}|${W.bp}|${W.F.toFixed(1)}|${W.sample}|${W.conc}`;
+  if (key === raysKey) return;
+  raysKey = key; rn = 0;
+  const K = 2.3, lx = W.lx, lm = W.lm, cx = lin(wlColor(lx)), cm = lin(wlColor(lm));
+  const kX = K * (.4 + .6 * lampXe(lx)) * clamp(Math.sqrt(W.bp / 5), .6, 1.4);
+  // 1. 燈 → 入口狹縫 → 光柵(白光)
+  let d = 0;
+  for (const dy of [-.5, 0, .5]) d = seg(add(ARC, 0, dy * .3, 0), O.S1.p, C_XE, K * .9, 0);
+  for (const p of facePts('GX', [-1, -.5, 0, .5, 1], [-1, 0, 1])) seg(O.S1.p, p, C_XE, K * .65, d);
+  const dG = d + O.S1.p.distanceTo(O.GX.p);
+  // 2. 光柵 → 出口狹縫:依波長散開
+  const gp = facePts('GX', [-1, 0, 1], [0]);
+  for (const D of FAN) {
+    const lk = lx + D; if (lk < 200 || lk > 900) continue;
+    const F = O.S2.p.clone().addScaledVector(O.S2.t, D * DISP), c = lin(wlColor(lk));
+    for (const p of gp) seg(p, F, c, K * (.4 + .6 * lampXe(lk)) * (D === 0 ? 1.1 : .7), dG);
+  }
+  // 3. 出口狹縫 → 分光鏡 → 比色管 → 擋光板;分一點去參考偵測器
+  const Aex = SAMPLES[W.sample].a1 * W.conc * band(SAMPLES[W.sample].abs, lx, 0), Tx = 10 ** -Aex;
+  let e = dG + O.GX.p.distanceTo(O.S2.p);
+  for (const dy of [-.3, 0, .3]) {
+    let f = seg(add(O.S2.p, 0, dy, 0), add(O.BS.p, 0, dy, 0), cx, kX, e);
+    seg(add(O.BS.p, 0, dy * .6, 0), add(O.REF.p, 0, dy * .3, 0), cx, kX * .35, f);
+    f = seg(add(O.BS.p, 0, dy, 0), add(O.CU.p, 0, dy, -.7), cx, kX, f);
+    seg(add(O.CU.p, 0, dy, .7), add(O.STOP.p, 0, dy, -.3), cx, kX * Math.max(.04, Tx), f);
+  }
+  // 4. 螢光:從比色管往四面八方,側面那一束經透鏡、狹縫到發射那一邊的光柵,再散開,只有縫口那一段到光電倍增管
+  const fl = clamp(W.glow, 0, 1.4), cg = lin(wlColor(SAMPLES[W.sample].em));
+  for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2 + .3; if (Math.abs(Math.cos(a)) > .85 && Math.sin(a) < .3) continue; seg(O.CU.p, add(O.CU.p, Math.cos(a) * 4.5, (hash(i) - .5) * 1.6, Math.sin(a) * 4.5), cg, K * .5 * fl, 0); }
+  let h = 0;
+  for (const dy of [-.5, 0, .5]) { h = seg(add(O.CU.p, .7, dy * .5, 0), add(O.L2.p, 0, dy, 0), cg, K * .8 * fl, 0); seg(add(O.L2.p, 0, dy, 0), O.S3.p, cg, K * .8 * fl, h); }
+  const dM = h + O.L2.p.distanceTo(O.S3.p);
+  for (const p of facePts('GM', [-1, -.5, 0, .5, 1], [-1, 0, 1])) seg(O.S3.p, p, cg, K * .55 * fl, dM);
+  const dM2 = dM + O.S3.p.distanceTo(O.GM.p), mp2 = facePts('GM', [-1, 0, 1], [0]);
+  for (const D of FAN) {
+    const lk = lm + D, s = clamp(W.specAt(lk), 0, 1.4); if (s < .01) continue;
+    const F = O.S4.p.clone().addScaledVector(O.S4.t, D * DISP);
+    for (const p of mp2) seg(p, F, lin(wlColor(lk)), K * .9 * s, dM2);
+  }
+  const kP = K * clamp(W.specAt(lm), 0, 1.4);
+  for (const dy of [-.3, 0, .3]) seg(add(O.S4.p, 0, dy, 0), add(O.PMT.p, 0, dy * .4, 0), cm, kP, dM2 + 12);
+  rayGeo.setDrawRange(0, rn);
+  for (const a of ['position', 'aC', 'aD']) rayGeo.attributes[a].needsUpdate = true;
+}
+// 沿光路流動的光點
+const PN = 420;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3), pSz = new Float32Array(PN);
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('aC', new THREE.BufferAttribute(pCol, 3));
+pGeo.setAttribute('aS', new THREE.BufferAttribute(pSz, 1));
+const pMat = new THREE.ShaderMaterial({
+  uniforms: { uScale: { value: 500 } },
+  vertexShader: `attribute vec3 aC; attribute float aS; uniform float uScale; varying vec3 vC;
+    void main(){ vC=aC; vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=aS*uScale/-mv.z; gl_Position=projectionMatrix*mv; }`,
+  fragmentShader: `varying vec3 vC; void main(){ float d=length(gl_PointCoord-0.5); float a=smoothstep(0.5,0.0,d); gl_FragColor=vec4(vC*a*a,1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const photons = new THREE.Points(pGeo, pMat); photons.frustumCulled = false; scene.add(photons);
+let pn = 0;
+function flow(pts, c, k, size, t, salt = 0, keep = 1) {
+  const cum = [0]; for (let i = 0; i < pts.length - 1; i++) cum.push(cum[i] + pts[i].distanceTo(pts[i + 1]));
+  const L = cum[cum.length - 1], sp = 3.2, N = Math.floor(L / sp);
+  for (let i = 0; i < N && pn < PN; i++) {
+    if (keep < 1 && hash(i * 7.13 + salt) > keep) continue;
+    const s = (i * sp + t * 9) % L;
+    let j = 0; while (j < cum.length - 2 && s > cum[j + 1]) j++;
+    const u = (s - cum[j]) / (cum[j + 1] - cum[j]), a = pts[j], b = pts[j + 1];
+    pPos[pn * 3] = lerp(a.x, b.x, u); pPos[pn * 3 + 1] = lerp(a.y, b.y, u); pPos[pn * 3 + 2] = lerp(a.z, b.z, u);
+    pCol[pn * 3] = c.r * k; pCol[pn * 3 + 1] = c.g * k; pCol[pn * 3 + 2] = c.b * k; pSz[pn] = size; pn++;
+  }
+}
+function buildPhotons(W, t) {
+  pn = 0;
+  const cx = lin(wlColor(W.lx)), cm = lin(wlColor(W.lm));
+  flow([ARC, O.S1.p, O.GX.p], C_XE, 2.4, .55, t);
+  flow([O.GX.p, O.S2.p, O.BS.p, O.CU.p], cx, 2.8 * (.4 + .6 * lampXe(W.lx)), .55, t);
+  const s = clamp(W.specAt(W.lm), 0, 1);
+  if (s > .02) flow([O.CU.p, O.L2.p, O.S3.p, O.GM.p, O.S4.p, O.PMT.p], cm, 2.8 * Math.max(.35, s), .55, t, 3, Math.max(.15, s));
+  pGeo.setDrawRange(0, pn);
+  for (const a of ['position', 'aC', 'aS']) pGeo.attributes[a].needsUpdate = true;
+}
+
+// ================= 標籤 =================
+const LBL = {};
+function label(key, comp, anchor, title, sub) {
+  const outer = document.createElement('div'); outer.className = 'lw';
+  outer.innerHTML = `<div class="lbl"><i></i><b>${title}</b>${sub != null ? `<span>${sub}</span>` : ''}</div>`;
+  const o = new CSS2DObject(outer); o.position.set(...anchor); o.center.set(.5, 1); scene.add(o);
+  const lm = new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: .5, depthWrite: false });
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(...comp), new V3(...anchor)]), lm);
+  scene.add(line);
+  LBL[key] = { outer, line, lm, span: outer.querySelector('span'), op: -1, text: sub };
+}
+function labelOp(key, a) {
+  const L = LBL[key]; if (Math.abs(L.op - a) < .002) return; L.op = a;
+  L.outer.style.opacity = a; L.outer.style.visibility = a < .01 ? 'hidden' : 'visible';
+  L.lm.opacity = .5 * a; L.line.visible = a > .01;
+}
+function labelText(key, s) { const L = LBL[key]; if (L.text !== s) { L.text = s; L.span.textContent = s; } }
+label('LAMP', [-26, BY + 3, -24], [-28, BY + 7.5, -21], zhEn('氙燈', 'Xenon lamp'), zhEn('紫外到可見光', 'UV to visible'));
+label('GX', [2, BY + 2, -27.5], [3, BY + 7.5, -27.5], zhEn('激發單色器', 'Excitation mono'), zhEn('拖曳旋轉', 'drag to turn'));
+label('S2', [-4, BY + 3.4, -14], [-7, BY + 7, -15], zhEn('出口狹縫', 'Exit slit'), '350 nm');
+label('REF', [-12, BY + 1.4, -7], [-12, BY + 5.5, -7.5], zhEn('參考偵測器', 'Reference'), zhEn('量燈的強弱', 'tracks the lamp'));
+label('CU', [-4, BY + 3, 6], [-9, BY + 7.5, 8], zhEn('樣品', 'Sample'), zhEn('奎寧', 'Quinine'));
+label('STOP', [-4, BY + 1.6, 17], [-7, BY + 5.5, 19], zhEn('擋光板', 'Beam stop'), zhEn('接住穿過的激發光', 'catches the beam'));
+label('GM', [26, BY + 2, 2], [24.5, BY + 7.5, .5], zhEn('發射單色器', 'Emission mono'), zhEn('拖曳旋轉', 'drag to turn'));
+label('PMT', [17.8, BY + 1.6, 21.2], [21, BY + 6.5, 23], zhEn('光電倍增管', 'Photomultiplier'), zhEn('一個光子變很多電子', 'one photon, many electrons'));
+const LBL_KEYS = Object.keys(LBL);
+
+// ================= 影片腳本(導覽與錄影共用) =================
+const FILM_DUR = 94;
+const CAMK = [
+  [0, [92, 72, 118], [0, 8, -2]], [5.5, [80, 64, 102], [0, 8, -2]],
+  [10, [58, 72, 84], [-1, 6, -2]], [12.6, [55, 69, 80], [-1, 6, -2]],
+  [15, [-2, 34, -2], [-24, 9, -22]], [19.6, [0, 33, -4], [-24, 9, -22]],
+  [22, [13, 39, 1], [-9, 9, -21]], [25.4, [11, 37, -1], [-9, 9, -21]],
+  [27, [5, 31, 7], [-11, 11, -9]], [30, [4, 30, 6], [-11, 11, -9]],
+  [32.2, [-22, 30, 26], [-4, 10, 4]], [41.2, [-19, 28, 23], [-4, 10, 4]],
+  [43.6, [-8, 42, 40], [2, 9, 8]], [49.6, [-6, 40, 37], [2, 9, 8]],
+  [52, [44, 40, 34], [18, 9, 10]], [58.4, [41, 38, 31], [18, 9, 10]],
+  [61, [40, 76, 92], [-1, 3, -2]], [74.4, [36, 72, 88], [-1, 3, -2]],
+  [76.6, [44, 78, 94], [-1, 3, -2]], [88, [40, 74, 90], [-1, 3, -2]],
+  [90.4, [92, 72, 118], [0, 8, -2]], [94, [94, 73, 120], [0, 8, -2]],
+];
+const CAPS = [
+  [5.8, 12.6, zhEn('01 · 展開', '01 · Opening up'), zhEn('螢光光譜儀:一盞燈、兩組單色器,中間是樣品,兩組單色器擺成 90 度。', 'A lamp, two monochromators at 90° to each other, and the sample between them.')],
+  [13.2, 19.8, zhEn('02 · 氙燈', '02 · Xenon lamp'), zhEn('氙燈發出從紫外到可見光的連續光,什麼顏色都有。', 'A xenon lamp gives a continuous spread of light, from ultraviolet to visible.')],
+  [20.2, 26, zhEn('03 · 激發單色器', '03 · Excitation monochromator'), zhEn('光柵把光依波長散開,狹縫只放一段過去:奎寧用 350 nm 的紫外光照。', 'A grating spreads the light and a slit passes one band: 350 nm UV for quinine.')],
+  [26.2, 30.6, zhEn('03 · 參考偵測器', '03 · Reference'), zhEn('分一點光到參考偵測器,燈忽亮忽暗時拿來校正。', 'A little light goes to a reference detector to correct for lamp drift.')],
+  [31, 36.4, zhEn('04 · 吸光再發光', '04 · Absorb, then glow'), zhEn('分子吸收一份光跳上高能階,先把一點能量變成振動(熱)掉下一小階。', 'A molecule absorbs light, jumps up, then loses a little energy as vibration (heat).')],
+  [36.6, 42.4, zhEn('04 · 斯托克斯位移', '04 · Stokes shift'), zhEn('再放出一份能量小一點的光:奎寧吸收 350 nm,放出約 450 nm 的藍光。', 'It then gives off light with less energy: quinine absorbs 350 nm and glows near 450 nm.')],
+  [42.8, 49.6, zhEn('05 · 90 度', '05 · At 90°'), zhEn('螢光往四面八方跑;在側面收,避開直直穿過的燈光,背景才是黑的。', 'Fluorescence goes every way; collecting it at the side avoids the lamp beam, so the background stays dark.')],
+  [50, 55.4, zhEn('06 · 發射單色器', '06 · Emission monochromator'), zhEn('第二組光柵挑出要看的螢光波長,轉動它就能掃過整段發射光譜。', 'A second grating picks the emission wavelength; turning it scans the emission spectrum.')],
+  [55.6, 60.8, zhEn('06 · 光電倍增管', '06 · Photomultiplier'), zhEn('光子打出一個電子,光電倍增管把它放大成約一千萬個,微弱的螢光也量得到。', 'A photon frees one electron, which the photomultiplier multiplies about ten million times.')],
+  [61, 67.6, zhEn('07 · 發射光譜', '07 · Emission spectrum'), zhEn('固定激發 350 nm、轉發射那一邊:奎寧的螢光在 450 nm 附近。', 'Fix the excitation at 350 nm and scan the emission: quinine glows near 450 nm.')],
+  [67.8, 75, zhEn('07 · 激發光譜', '07 · Excitation spectrum'), zhEn('換過來,固定看 450 nm、轉激發那一邊:得到的激發光譜和吸收光譜很像。', 'Swap: watch 450 nm and scan the excitation; this excitation spectrum looks like the absorption spectrum.')],
+  [75.2, 81.6, zhEn('08 · 不是螢光的峰', '08 · Peaks that are not fluorescence'), zhEn('激發波長本身的散射、水的拉曼峰、兩倍波長的二級光,都不是樣品的螢光。', 'Not fluorescence: scattered excitation light, the Raman peak of water, and the second order of the grating.')],
+  [81.8, 88.4, zhEn('08 · 太濃反而暗', '08 · Too strong gets dimmer'), zhEn('濃度太高,光在比色管前段就被吸光,中間收光的地方反而暗:內濾效應。', 'Too strong, and light is absorbed before the middle of the cell; the signal drops: the inner filter effect.')],
+];
+const LBL_WIN = [[13, 20, ['LAMP']], [20, 31, ['GX', 'S2', 'REF']], [31, 50, ['CU', 'STOP']], [50, 61, ['GM', 'PMT']]];
+function track(t, segs, v0) {
+  let v = v0;
+  for (const [a, b, x, y, mode] of segs) {
+    if (t < a) break;
+    if (t >= b) { v = y; continue; }
+    const u = (t - a) / (b - a); v = lerp(x, y, mode === 'lin' ? u : ease(u)); break;
+  }
+  return v;
+}
+const lerp3 = (a, b, u) => new V3(lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u));
+function camAt(t) {
+  const K = CAMK;
+  if (t <= K[0][0]) return [new V3(...K[0][1]), new V3(...K[0][2])];
+  for (let i = 0; i < K.length - 1; i++) {
+    const [ta, pa, qa] = K[i], [tb, pb, qb] = K[i + 1];
+    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [lerp3(pa, pb, u), lerp3(qa, qb, u)]; }
+  }
+  const L = K[K.length - 1]; return [new V3(...L[1]), new V3(...L[2])];
+}
+const win = (t, a, b, f = .4) => sstep(a, a + f, t) * (1 - sstep(b - f, b, t));
+// 導覽裡的波長:03 章激發從 350 轉到 470(奎寧不吸收)再轉回 350;06 章發射從 450 掃到 520 再回來;07 章兩種掃描;08 章濃度
+const LXK = [[20.6, 22.8, 350, 470], [22.8, 25.2, 470, 350]];
+const LMK = [[52, 54.6, 450, 520], [54.6, 56.4, 520, 450]];
+
+// ================= 狀態 =================
+// scan:{ sample, mode, lx, lm, bp, conc, range, from, to, seed, done };mode 'em' 是發射光譜(掃 lm),'ex' 是激發光譜(掃 lx)
+const S = { sample: 'qs', mode: 'em', lx: 350, lm: 450, bp: 5, conc: 1, explode: 1, scan: null, ghost: null, scanning: false, scanT0: 0, seed: 1 };
+const W = { sample: 'qs', mode: 'em', lx: 350, lm: 450, bp: 5, conc: 1, explode: 1, F: 0, R: 1, glow: 0, scan: null, ghost: null, labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, jabK: 0, specAt: () => 0 };
+const SCAN_T = 6;   // 互動時一條光譜約 6 秒掃完
+
+function film(t) {
+  W.sample = 'qs'; W.bp = 5;
+  W.conc = t < 81.6 ? 1 : 200;
+  W.mode = 'em';
+  W.lx = track(t, LXK, 350); W.lm = track(t, LMK, 450);
+  W.explode = sstep(6.2, 9.6, t) * (1 - sstep(89, 92, t));
+  W.scan = W.ghost = null;
+  // 07 章:發射光譜(350 nm 激發)與激發光譜(看 450 nm);08 章:散射峰(擴大範圍)、濃度
+  const em = (to, seed, extra) => ({ sample: 'qs', mode: 'em', lx: 350, lm: 450, bp: 5, conc: 1, range: rangeOf(SAMPLES.qs, 'em', 350, 450), to, seed, ...extra });
+  const ex = (to, seed) => ({ sample: 'qs', mode: 'ex', lx: 350, lm: 450, bp: 5, conc: 1, range: rangeOf(SAMPLES.qs, 'ex', 350, 450), to, seed });
+  if (t >= 61.6 && t < 67.8) { const r = rangeOf(SAMPLES.qs, 'em', 350, 450), u = clamp((t - 61.8) / 5, 0, 1); W.scan = em(lerp(r[0], r[1], u), 11); W.lm = W.scan.to; W.lx = 350; }
+  else if (t >= 67.8 && t < 75.4) { const r = rangeOf(SAMPLES.qs, 'ex', 350, 450), u = clamp((t - 68.2) / 5.4, 0, 1); W.mode = 'ex'; W.ghost = null; W.scan = ex(lerp(r[0], r[1], u), 23); W.lx = W.scan.to; W.lm = 450; }
+  else if (t >= 75.4 && t < 81.6) { W.scan = em(rangeOf(SAMPLES.qs, 'em', 350, 450)[1], 11); W.lx = 350; W.lm = lerp(330, 700, sstep(75.6, 80.8, t)); }
+  else if (t >= 81.6 && t < 90) {
+    W.ghost = em(rangeOf(SAMPLES.qs, 'em', 350, 450)[1], 11);
+    const r = rangeOf(SAMPLES.qs, 'em', 350, 450), u = clamp((t - 82) / 4.6, 0, 1);
+    W.scan = em(lerp(r[0], r[1], u), 31, { conc: 200 }); W.lx = 350; W.lm = W.scan.to;
+  } else if (t >= 30 && t < 61.6) W.lx = 350;
+  const [cp, ct] = camAt(t); camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct);
+  W.labels = {}; for (const [a, b, keys] of LBL_WIN) for (const k of keys) W.labels[k] = Math.max(W.labels[k] || 0, win(t, a, b, .5));
+  W.conOp = win(t, 60.6, 89.4, .8);
+  W.jabK = win(t, 30.8, 43, .6);
+  W.cap = null; for (const c of CAPS) if (t >= c[0] && t < c[1]) W.cap = { chap: c[2], txt: c[3], op: win(t, c[0], c[1], .35) };
+  W.title = win(t, .2, 5.6, .9); W.outro = sstep(90, 91, t); W.chips = win(t, 5.6, 90.2, .8);
+}
+
+let lastNote = '', lastLegend = '', lastCap = '', lastTitle = '';
+function frameCommon(t) {
+  const sm = SAMPLES[W.sample];
+  W.F = signalAt(sm, W.lx, W.lm, W.bp, W.conc);
+  W.R = lampXe(W.lx);
+  // 發射那一邊打在出口狹縫板上的亮度(相對於這個激發波長下最亮的螢光)
+  const peak = Math.max(1, signalAt(sm, W.lx, sm.em, W.bp, W.conc));
+  W.specAt = l => signalAt(sm, W.lx, l, W.bp, W.conc) / peak;
+  // 比色管裡吸收激發光以後的發光
+  const s2 = (W.bp / 2.355) ** 2, A = sm.a1 * W.conc * band(sm.abs, W.lx, s2), absorbed = 1 - 10 ** -A;
+  W.glow = clamp(Math.sqrt(absorbed / .07) * Math.sqrt(sm.qy / .55), 0, 1.4) * (.4 + .6 * lampXe(W.lx));
+  // 光柵轉動、狹縫開合
+  const dx = theta(clamp(W.lx, 200, 900)) - TH0, dm = theta(clamp(W.lm, 200, 900)) - TH0;
+  O.GX.g.rotation.y = O.GX.base + dx; O.GM.g.rotation.y = O.GM.base + dm;
+  O.GX.g.updateMatrixWorld(true); O.GM.g.updateMatrixWorld(true);
+  for (const k of ['S1', 'S2', 'S3', 'S4']) setGap(O[k], slitGap(W.bp));
+  drawStrip(O.S2, W.lx, l => .35 + .65 * lampXe(l), 'x');
+  drawStrip(O.S4, W.lm, l => clamp(W.specAt(l), 0, 1.2), `${W.sample}|${W.lx}|${W.conc}|${W.bp}`);
+  buildRays(W); buildPhotons(W, t);
+  rayMat.uniforms.uT.value = t;
+  // 溶液、發光、擋光板、偵測器
+  MAT.liq.color.setHex(sm.color);
+  const gc = lin(wlColor(sm.em)), gk = W.glow * (W.conc > 5 ? .45 : 1);
+  O.CU.glow.material.color.copy(gc).multiplyScalar(3.2 * gk);
+  MAT.liq.emissive.copy(gc).multiplyScalar(1.6 * gk);
+  cl.color.copy(gc); cl.intensity = 18 * gk;
+  // 濃溶液:激發光一進比色管就被吸光,只有靠入射那一面在發光(內濾效應)
+  const thick = W.conc > 5;
+  O.CU.glow.position.z = thick ? -.4 : 0; O.CU.glow.scale.set(.7, 1.3, thick ? .25 : .7);
+  const Tx = 10 ** -(sm.a1 * W.conc * band(sm.abs, W.lx, 0));
+  O.STOP.spot.material.color.copy(lin(wlColor(W.lx))).multiplyScalar(1.6 * Tx * (.4 + .6 * lampXe(W.lx)));
+  O.REF.diode.material.color.setRGB(.04, .09, .19).add(lin(wlColor(W.lx)).multiplyScalar(1.2 * W.R));
+  const ps = clamp(W.specAt(W.lm), 0, 1);
+  O.PMT.win.material.color.setRGB(.04, .09, .19).add(lin(wlColor(W.lm)).multiplyScalar(2 * ps));
+  O.PMT.dyn.forEach((d, i) => d.material.emissive.setRGB(0, .35 * ps * (i + 1) / 9, .55 * ps * (i + 1) / 9));
+  // 外殼
+  const k = ease(W.explode), o = 1 - sstep(0, .5, k);
+  for (const p of shellParts) {
+    p.g.position.set(p.move[0] * k, p.move[1] * k, p.move[2] * k); p.g.rotation.x = p.rot * k;
+    for (const c of p.g.children) if (c.isMesh) { c.visible = o > .01; c.castShadow = o > .5; }
+  }
+  for (const m of [MAT.shell, MAT.lid, MAT.vent]) { m.opacity = o; m.depthWrite = o > .5; }
+  MAT.edge.opacity = .55 * Math.sin(Math.PI * k);
+  bloom.strength = .32 + .43 * k;
+  // 標籤
+  for (const key of LBL_KEYS) labelOp(key, W.labels ? (W.labels[key] || 0) : sstep(.55, .9, W.explode));
+  labelText('S2', `${Math.round(W.lx)} nm`);
+  labelText('CU', sm.name);
+  updateDOM();
+}
+
+// ================= 介面 =================
+const el = id => document.getElementById(id);
+const lexIn = el('lex'), lemIn = el('lem');
+function noteHTML() {
+  const sm = SAMPLES[W.sample], lx = Math.round(W.lx), lm = Math.round(W.lm);
+  let s = zhEn(`用 <em class="v">${lx} nm</em> 的光照${sm.name},在側面看 <em class="g">${lm} nm</em> 的光。`, `Light at <em class="v">${lx} nm</em> shines on ${sm.inText}; the side looks at <em class="g">${lm} nm</em>.`);
+  if (Math.abs(W.lm - W.lx) < W.bp * 1.5) s += zhEn(' 兩邊的波長一樣:看到的是被散射的激發光(瑞立散射),不是螢光。', ' Both wavelengths match: this is scattered excitation light (Rayleigh scatter), not fluorescence.');
+  else if (sm.raman !== 0 && Math.abs(W.lm - ramanNm(W.lx)) < W.bp * 1.2) s += zhEn(` 這裡是水的拉曼峰:比激發光少一份固定的能量(約 3400 cm⁻¹),換激發波長它會跟著移動,螢光不會。`, ` This is the Raman peak of water: a fixed amount of energy (about 3400 cm⁻¹) less than the excitation, so it moves when the excitation moves; fluorescence does not.`);
+  else if (Math.abs(W.lm - 2 * W.lx) < W.bp * 2) s += zhEn(' 發射剛好是激發的兩倍:光柵的二級光,不是螢光。', ' The emission is twice the excitation: the grating second order, not fluorescence.');
+  else if (W.lm < W.lx) s += zhEn(' 發射比激發短:一般的螢光放不出比激發光能量更大的光。', ' Emission shorter than excitation: normal fluorescence cannot give more energy than it absorbed.');
+  else s += zhEn(` ${sm.name}的螢光最亮在約 <em class="g">${sm.em} nm</em>,常用 <em class="v">${sm.ex} nm</em> 激發。`, ` ${sm.name} glows brightest near <em class="g">${sm.em} nm</em> and is usually excited at <em class="v">${sm.ex} nm</em>.`);
+  if (W.sample === 'van') s += zhEn(` 香草醛的螢光很弱(在乙醇裡吸收 100 個光子只放出約 1 個),水的拉曼峰(約 ${Math.round(ramanNm(W.lx))} nm)和它差不多大;酸鹼值不同,發的光也不同。`, ` Vanillin glows only weakly (in ethanol about 1 photon out for every 100 absorbed), so the water Raman peak near ${Math.round(ramanNm(W.lx))} nm is about as large; its light also changes with pH.`);
+  if (W.conc > 5) { const A = (sm.a1 * W.conc * band(sm.abs, W.lx, 0)).toFixed(1); s += zhEn(` 現在是濃溶液(這個波長的吸光度約 ${A}):光在比色管前段就被吸光,中間反而暗(內濾效應)。`, ` This is a strong solution (absorbance about ${A} here): light is absorbed before the middle of the cell, so it looks dimmer (inner filter effect).`); }
+  return s;
+}
+function updateDOM() {
+  el('cX').textContent = `${Math.round(W.lx)} nm`; el('cM').textContent = `${Math.round(W.lm)} nm`; el('cS').textContent = fmtSig(W.F);
+  if (!FILM && !tour.on) { const n = noteHTML(); if (n !== lastNote) { lastNote = n; el('note').innerHTML = n; } }
+  el('vR').textContent = `${Math.round(W.R * 100)}%`; el('mR').style.width = `${clamp(W.R, 0, 1) * 100}%`; el('mR').style.background = css(wlColor(W.lx));
+  const pp = clamp(Math.log10(1 + W.F) / 5, 0, 1);
+  el('vP').textContent = fmtSig(W.F); el('mP').style.width = `${pp * 100}%`; el('mP').style.background = css(wlColor(W.lm));
+  el('vS').textContent = fmtSig(W.F * refK(W.lx));
+  const sm = SAMPLES[W.sample];
+  el('conSample').textContent = sm.full + (W.conc > 5 ? zhEn('(濃)', ' (strong)') : '');
+  let lg = '';
+  const tag = sc => sc.mode === 'em' ? zhEn(`發射,激發 ${sc.lx} nm`, `emission, excited at ${sc.lx} nm`) : zhEn(`激發,看 ${sc.lm} nm`, `excitation, watching ${sc.lm} nm`);
+  if (W.scan) lg += `<span><i style="border-top:2px solid var(--cyan)"></i>${tag(W.scan)}</span>`;
+  if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>${zhEn('上一次', 'previous')}</span>`;
+  if (!W.scan && !W.ghost) lg = `<span><i style="border-top:1px dashed var(--ink-2)"></i>${zhEn('預覽;按「掃描」量整條光譜', 'preview; press Scan for the full spectrum')}</span>`;
+  if (lg !== lastLegend) { lastLegend = lg; el('legend').innerHTML = lg; }
+  const con = el('console');
+  con.style.opacity = W.conOp; con.style.visibility = W.conOp < .01 ? 'hidden' : 'visible';
+  if (W.conOp > .01) drawPlot();
+  drawJab();
+  if (FILM || tour.on) {
+    const cap = el('cap'), c = W.cap;
+    cap.style.opacity = c ? c.op : 0;
+    const ck = c ? c.chap + c.txt : '';
+    if (ck !== lastCap && c) { lastCap = ck; el('chap').textContent = c.chap; el('capTxt').textContent = c.txt; }
+    cap.classList.toggle('withcon', W.conOp > .01);
+    const tc = el('titlecard'), op = Math.max(W.title, W.outro);
+    tc.style.opacity = op; tc.style.visibility = op < .01 ? 'hidden' : 'visible';
+    const tk = W.outro > W.title ? 'o' : 't';
+    if (tk !== lastTitle) {
+      lastTitle = tk;
+      const tx = tk === 't'
+        ? zhEn(['螢光光譜儀', '吸光再發光', '照一種顏色,看它放出另一種顏色', ''], ['Fluorescence spectrometer', 'Absorb, then glow', 'Shine one color in, watch another come out', ''])
+        : zhEn(['螢光光譜儀', '兩組單色器 · 90 度', '氙燈 · 激發與發射單色器 · 光電倍增管 · 斯托克斯位移', '示意動畫;元件位置與光譜曲線為示意,強度是任意單位。'], ['Fluorescence spectrometer', 'Two monochromators at 90°', 'Xenon lamp · excitation and emission monochromators · photomultiplier · Stokes shift', 'Schematic animation; internal positions and spectra are illustrative, in arbitrary units.']);
+      ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => el(id).textContent = tx[i]);
+    }
+    document.querySelector('.hud').style.opacity = W.chips;
+    // 第 04 章講能階時,能階圖的框亮起來
+    document.querySelector('.jab').style.boxShadow = W.jabK > .01 ? `0 0 0 ${(1.5 * W.jabK).toFixed(2)}px rgba(116,228,255,${(.6 * W.jabK).toFixed(2)})` : '';
+  }
+}
+
+// ---------- 能階圖(簡化的賈布朗斯基圖):吸收往上、振動弛緩往下一小階、放出螢光往下 ----------
+const jab = el('jab');
+let jabKey = '';
+function drawJab() {
+  const key = `${Math.round(W.lx)}|${Math.round(W.lm)}|${W.sample}|${(W.jabK * 20 | 0)}|${jab.clientWidth}`;
+  if (key === jabKey && !REC) return; jabKey = key;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (jab.currentCSSZoom || uiScale()), w = jab.clientWidth, h = jab.clientHeight;
+  if (!w) return;
+  if (jab.width !== Math.round(w * dpr) || jab.height !== Math.round(h * dpr)) { jab.width = Math.round(w * dpr); jab.height = Math.round(h * dpr); }
+  const c = jab.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const sm = SAMPLES[W.sample], fs = FILM ? 14 : 11;
+  // 能量 ∝ 1/波長:地面 S0、激發態 S1 的底在螢光峰的能量,激發光的能量是頂
+  const eOf = l => 1e7 / l;   // cm⁻¹
+  const e1 = eOf(Math.min(W.lx, 900)), eS1 = eOf(sm.em);
+  const top = Math.max(e1, eS1 * 1.15), Y = e => h - 14 - (e / top) * (h - 26);
+  const x0 = 56, x1 = w - 12;
+  c.font = `${fs}px ${MONO}`; c.textBaseline = 'middle'; c.fillStyle = '#71858f'; c.textAlign = 'left';
+  // 能階線
+  c.strokeStyle = 'rgba(234,243,246,.7)'; c.lineWidth = 1.6;
+  const yS0 = Y(0) - 2;
+  c.beginPath(); c.moveTo(x0, yS0); c.lineTo(x1, yS0); c.stroke();
+  c.beginPath(); c.moveTo(x0, Y(eS1)); c.lineTo(x1, Y(eS1)); c.stroke();
+  c.strokeStyle = 'rgba(234,243,246,.22)'; c.lineWidth = 1;
+  for (let i = 1; i <= 3; i++) { const y = Y(eS1 * (1 + .05 * i)); c.beginPath(); c.moveTo(x0, y); c.lineTo(x1, y); c.stroke(); }
+  c.fillText(zhEn('激發態', 'excited'), 2, Y(eS1));
+  c.fillText(zhEn('基態', 'ground'), 2, yS0);
+  // 吸收(激發光的顏色)、振動弛緩(波浪)、螢光(螢光的顏色)
+  const xa = x0 + (x1 - x0) * .25, xb = x0 + (x1 - x0) * .48, xc = x0 + (x1 - x0) * .7;
+  const arrow = (x, ya, yb, col, lw = 2.4) => { c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); c.moveTo(x, ya); c.lineTo(x, yb); c.stroke(); const d = yb < ya ? 1 : -1; c.beginPath(); c.moveTo(x, yb); c.lineTo(x - 5, yb + 8 * d); c.moveTo(x, yb); c.lineTo(x + 5, yb + 8 * d); c.stroke(); };
+  const ya = Y(e1), cx = css(wlColor(W.lx)), cm = css(wlColor(sm.em));
+  const absorbs = W.lx > 200 && band(sm.abs, W.lx, 0) > .05;
+  arrow(xa, yS0, ya, absorbs ? cx : 'rgba(168,188,198,.35)');
+  c.fillStyle = absorbs ? cx : '#71858f'; c.textAlign = 'center'; c.fillText(`${Math.round(W.lx)} nm`, xa, Math.max(8, ya - 9));
+  if (absorbs) {
+    c.strokeStyle = '#ffc261'; c.lineWidth = 1.8; c.beginPath();
+    for (let y = ya; y <= Y(eS1); y += 1) { const x = xb + 4 * Math.sin((y - ya) * .55); y === ya ? c.moveTo(x, y) : c.lineTo(x, y); }
+    c.stroke();
+    c.fillStyle = '#ffc261'; c.fillText(zhEn('熱', 'heat'), xb + 14, (ya + Y(eS1)) / 2);
+    arrow(xc, Y(eS1), yS0, cm);
+    c.fillStyle = cm; c.fillText(`${sm.em} nm`, xc + 30, (Y(eS1) + yS0) / 2);
+  } else { c.fillStyle = '#71858f'; c.textAlign = 'left'; c.fillText(zhEn('這個波長吸收很少', 'little absorption here'), xb - 10, (yS0 + Y(eS1)) / 2); }
+}
+
+// ---------- 光譜圖 ----------
+const plot = el('plot'), tip = el('tip');
+let hoverL = null, previewKey = '', previewValues = [], plotDrawnAt = -Infinity;
+function curRange() { return W.scan ? W.scan.range : rangeOf(SAMPLES[W.sample], W.mode, W.lx, W.lm); }
+function drawPlot() {
+  const now = performance.now();
+  if (!REC && now - plotDrawnAt < 1000 / 30) return;
+  plotDrawnAt = now;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (plot.currentCSSZoom || uiScale()), w = plot.clientWidth, h = plot.clientHeight;
+  if (!w) return;
+  if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
+  const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const sm = SAMPLES[W.sample], [x0, x1] = curRange();
+  const fs = FILM ? 14 : 11, Lp = FILM ? 58 : 46, Rp = FILM ? 22 : 16, Tp = FILM ? 26 : 20, Bp = FILM ? 30 : 22;
+  const pw = w - Lp - Rp, ph = h - Tp - Bp;
+  const mode = W.scan ? W.scan.mode : W.mode, lx = W.scan ? W.scan.lx : W.lx, lm = W.scan ? W.scan.lm : W.lm, bp = W.scan ? W.scan.bp : W.bp, conc = W.scan ? W.scan.conc : W.conc;
+  const val = l => { const a = mode === 'em' ? lx : l; return signalAt(sm, a, mode === 'em' ? l : lm, bp, conc) * refK(a); };
+  // 縱軸:螢光峰的高度(散射峰比它高的部分截掉,圖上標出來)
+  let ym = 0;
+  for (let l = x0; l <= x1; l += 1) { const lxx = mode === 'em' ? lx : l, lmm = mode === 'em' ? l : lm; if (Math.abs(lmm - lxx) > bp * 2.5 && Math.abs(lmm - 2 * lxx) > bp * 3) ym = Math.max(ym, val(l)); }
+  if (W.ghost && W.ghost.sample === W.sample && W.ghost.mode === mode) for (let l = x0; l <= x1; l += 2) { const g = W.ghost; ym = Math.max(ym, Math.abs(l - g.lx) > bp * 2.5 && Math.abs(l - 2 * g.lx) > bp * 3 ? signalAt(sm, g.mode === 'em' ? g.lx : l, g.mode === 'em' ? l : g.lm, g.bp, g.conc) * refK(g.mode === 'em' ? g.lx : l) : 0); }
+  ym = Math.max(ym * 1.25, 50);
+  const mag = 10 ** Math.floor(Math.log10(ym)), nice = [1, 1.2, 1.6, 2, 2.5, 3, 4, 5, 6, 8, 10].map(k => k * mag).find(v => v >= ym) || ym;
+  ym = nice;
+  const X = l => Lp + (l - x0) / (x1 - x0) * pw, Y = v => Tp + (1 - v / ym) * ph;
+  c.font = `${fs}px ${MONO}`; c.lineWidth = 1;
+  c.textAlign = 'right'; c.textBaseline = 'middle';
+  for (let i = 0; i <= 4; i++) {
+    const v = ym * i / 4, y = Math.round(Y(v)) + .5;
+    c.strokeStyle = i === 0 ? 'rgba(160,215,235,.25)' : 'rgba(160,215,235,.08)';
+    c.beginPath(); c.moveTo(Lp, y); c.lineTo(Lp + pw, y); c.stroke();
+    c.fillStyle = '#71858f'; c.fillText(fmtSig(v), Lp - 6, y);
+  }
+  const xStep = (x1 - x0) > 300 ? 100 : 50;
+  c.textAlign = 'center'; c.textBaseline = 'top';
+  for (let l = Math.ceil(x0 / xStep) * xStep; l <= x1; l += xStep) {
+    const x = Math.round(X(l)) + .5;
+    c.strokeStyle = 'rgba(160,215,235,.08)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+    c.fillStyle = '#71858f'; c.fillText(l, x, Tp + ph + 6);
+  }
+  c.textAlign = 'left'; c.fillStyle = '#71858f'; c.fillText('nm', 2, Tp + ph + 6);
+  c.textAlign = zhEn('right', 'left'); c.textBaseline = 'top';
+  c.fillText(mode === 'em' ? zhEn(`發射強度(激發 ${lx} nm)`, `Emission (excited at ${lx} nm)`) : zhEn(`激發光譜(看 ${lm} nm)`, `Excitation (watching ${lm} nm)`), zhEn(Lp + pw, 2), 2);
+  c.save(); c.beginPath(); c.rect(Lp, Tp - 2, pw, ph + 4); c.clip();
+  // 散射峰的位置(發射光譜時)
+  if (mode === 'em') {
+    const marks = [[lx, zhEn('散射', 'scatter')], [2 * lx, zhEn('二級光', '2nd order')]];
+    if (sm.raman !== 0) marks.splice(1, 0, [ramanNm(lx), zhEn('水的拉曼', 'water Raman')]);
+    // 標字:太靠右就寫在線的左邊;和前一個字疊到就往下一行(手機上散射與水的拉曼只差三十幾個像素)
+    let lastEnd = -Infinity, row = 0;
+    for (const [l, name] of marks) if (l > x0 && l < x1) {
+      const x = X(l), tw = c.measureText(name).width;
+      c.setLineDash([2, 3]); c.strokeStyle = 'rgba(255,194,97,.45)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke(); c.setLineDash([]);
+      const tx = x + 3 + tw > Lp + pw ? x - 3 - tw : x + 3;
+      row = tx < lastEnd + 4 ? row + 1 : 0; lastEnd = tx + tw;
+      c.fillStyle = 'rgba(255,194,97,.85)'; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText(name, tx, Tp + 1 + row * (fs + 2));
+    }
+  }
+  if (!W.scan && !W.ghost) {
+    c.setLineDash([2, 4]); c.strokeStyle = 'rgba(168,188,198,.55)'; c.beginPath();
+    const key = `${W.sample}|${mode}|${lx}|${lm}|${bp}|${conc}|${pw}|${x0}|${x1}`;
+    if (key !== previewKey) { previewKey = key; previewValues = []; for (let i = 0; i <= pw; i++) previewValues.push(val(x0 + i / pw * (x1 - x0))); }
+    for (let i = 0; i < previewValues.length; i++) { const y = Y(Math.min(previewValues[i], ym * 1.05)); i ? c.lineTo(Lp + i, y) : c.moveTo(Lp + i, y); }
+    c.stroke(); c.setLineDash([]);
+  }
+  const drawTrace = (sc, style, lw, dash) => {
+    if (!sc || sc.sample !== W.sample) return;
+    const tr = traceCached(sc); if (tr.length < 4) return;
+    c.setLineDash(dash || []); c.strokeStyle = style; c.lineWidth = lw; c.lineJoin = 'round'; c.beginPath();
+    for (let i = 0; i < tr.length; i += 2) { const x = X(tr[i]), y = Y(Math.min(tr[i + 1], ym * 1.05)); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.stroke(); c.setLineDash([]); c.lineWidth = 1;
+  };
+  if (W.ghost && W.ghost.mode === mode) drawTrace(W.ghost, 'rgba(255,194,97,.95)', FILM ? 2 : 1.5, [5, 3]);
+  drawTrace(W.scan, '#74e4ff', FILM ? 2.5 : 2);
+  // 目前掃到的位置
+  const cur = mode === 'em' ? W.lm : W.lx;
+  if (cur >= x0 && cur <= x1) {
+    const x = X(cur), col = wlColor(mode === 'em' ? W.lm : W.lx);
+    c.strokeStyle = css(col, .7); c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+  }
+  if (hoverL != null) { const x = X(hoverL); c.setLineDash([3, 3]); c.strokeStyle = 'rgba(234,243,246,.5)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke(); c.setLineDash([]); }
+  c.restore();
+  plot._map = { X, x0, x1, Lp, pw, val };
+}
+plot.addEventListener('pointermove', e => {
+  const m = plot._map; if (!m) return;
+  const r = plot.getBoundingClientRect(), pz = plot.currentCSSZoom || uiScale(), px = (e.clientX - r.left) / pz;
+  if (px < m.Lp || px > m.Lp + m.pw) { hoverL = null; tip.style.display = 'none'; return; }
+  hoverL = m.x0 + (px - m.Lp) / m.pw * (m.x1 - m.x0);
+  tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${(e.clientY - r.top) / pz}px`;
+  tip.textContent = zhEn(`${hoverL.toFixed(1)} nm · 強度 ${fmtSig(m.val(hoverL))}`, `${hoverL.toFixed(1)} nm · intensity ${fmtSig(m.val(hoverL))}`);
+});
+plot.addEventListener('pointerleave', () => { hoverL = null; tip.style.display = 'none'; });
+
+// ---------- 控制 ----------
+function segOn(id, v) { for (const b of el(id).querySelectorAll('button')) b.classList.toggle('on', b.dataset.v === String(v)); }
+function stopScan() { if (S.scanning) { S.scanning = false; if (S.scan) S.scan.done = true; } el('btnScan').classList.remove('on'); el('btnScan').textContent = zhEn('掃描', 'Scan'); }
+function setLx(v) { S.lx = clamp(v, 220, 650); lexIn.value = Math.round(S.lx); el('xv').textContent = `${Math.round(S.lx)} nm`; }
+function setLm(v) { S.lm = clamp(v, 250, 800); lemIn.value = Math.round(S.lm); el('mv').textContent = `${Math.round(S.lm)} nm`; }
+function keepGhost() { if (S.scan && S.scan.done) { S.ghost = S.scan; S.scan = null; } }
+el('segSample').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  stopScan(); S.sample = b.dataset.v; S.scan = S.ghost = null; segOn('segSample', S.sample);
+  setLx(SAMPLES[S.sample].ex); setLm(SAMPLES[S.sample].em);
+});
+el('segMode').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; stopScan(); keepGhost(); S.mode = b.dataset.v; segOn('segMode', S.mode); });
+el('segBp').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const v = +b.dataset.v; if (v === S.bp) return; stopScan(); keepGhost(); S.bp = v; segOn('segBp', b.dataset.v); });
+el('segConc').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const v = +b.dataset.v; if (v === S.conc) return; stopScan(); keepGhost(); S.conc = v; segOn('segConc', b.dataset.v); });
+el('segShell').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.explode = +b.dataset.v; segOn('segShell', b.dataset.v); });
+lexIn.addEventListener('input', () => { stopScan(); setLx(+lexIn.value); });
+lemIn.addEventListener('input', () => { stopScan(); setLm(+lemIn.value); });
+el('btnScan').addEventListener('click', () => {
+  if (S.scanning) { stopScan(); return; }
+  keepGhost();
+  const r = rangeOf(SAMPLES[S.sample], S.mode, S.lx, S.lm);
+  S.seed++; S.scan = { sample: S.sample, mode: S.mode, lx: Math.round(S.lx), lm: Math.round(S.lm), bp: S.bp, conc: S.conc, range: r, to: r[0], seed: S.seed * 7.7, done: false };
+  S.scanning = true; S.scanT0 = performance.now() / 1000; S.explode = 1; segOn('segShell', 1);
+  el('btnScan').classList.add('on'); el('btnScan').textContent = zhEn('停止', 'Stop');
+});
+el('btnHelp').addEventListener('click', () => el('help').classList.toggle('show'));
+
+// 拖曳光柵改波長(激發那一片改激發、發射那一片改發射)
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let drag = null;
+function pick(e) {
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  if (ray.intersectObjects(O.GX.hit, false).length) return 'x';
+  if (ray.intersectObjects(O.GM.hit, false).length) return 'm';
+  return null;
+}
+renderer.domElement.addEventListener('pointerdown', e => {
+  if (tour.on || FILM || e.button !== 0) return;
+  const which = pick(e); if (!which) return;
+  stopScan(); drag = { which, x: e.clientX, v: which === 'x' ? S.lx : S.lm }; controls.enabled = false;
+  renderer.domElement.setPointerCapture(e.pointerId); renderer.domElement.style.cursor = 'grabbing';
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  if (drag) { const v = drag.v + (e.clientX - drag.x) * 1.1; drag.which === 'x' ? setLx(v) : setLm(v); return; }
+  if (!tour.on && !FILM && e.buttons === 0) renderer.domElement.style.cursor = pick(e) ? 'grab' : '';
+});
+const endDrag = () => { if (!drag) return; drag = null; controls.enabled = true; renderer.domElement.style.cursor = ''; };
+renderer.domElement.addEventListener('pointerup', endDrag);
+renderer.domElement.addEventListener('pointercancel', endDrag);
+
+// ---------- 導覽 ----------
+const tour = { on: false, t0: 0, saved: null };
+function startTour() {
+  stopScan(); el('help').classList.remove('show');
+  tour.saved = { sample: S.sample, mode: S.mode, lx: S.lx, lm: S.lm, bp: S.bp, conc: S.conc, explode: S.explode, scan: S.scan, ghost: S.ghost, cp: camera.position.clone(), ct: controls.target.clone() };
+  tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false; nav.cancel();
+}
+function endTour() {
+  if (!tour.on) return;
+  tour.on = false; root.classList.remove('touring'); controls.enabled = true;
+  const s = tour.saved; Object.assign(S, { sample: s.sample, mode: s.mode, bp: s.bp, conc: s.conc, explode: s.explode, scan: s.scan, ghost: s.ghost });
+  setLx(s.lx); setLm(s.lm); camera.position.copy(s.cp); controls.target.copy(s.ct); controls.update();
+  Object.assign(W, { lx: S.lx, lm: S.lm, labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1 });
+  el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; document.querySelector('.hud').style.opacity = 1; document.querySelector('.jab').style.boxShadow = ''; lastNote = '';
+}
+el('btnTour').addEventListener('click', startTour);
+el('tourExit').addEventListener('click', endTour);
+addEventListener('keydown', e => { if (e.key === 'Escape') endTour(); });
+
+// ---------- 視角操作 ----------
+const nav = createCameraNav({ camera, controls, active: () => !FILM && !tour.on, radius: 120 });
+
+// ================= 迴圈 =================
+function interactive(dt, now) {
+  if (S.scanning) {
+    const sc = S.scan, sp = (sc.range[1] - sc.range[0]) / SCAN_T;
+    let l = sc.range[0] + (now - S.scanT0) * sp;
+    if (l >= sc.range[1]) { l = sc.range[1]; sc.to = l; stopScan(); }
+    sc.to = l;
+    if (sc.mode === 'em') { setLm(l); W.lm = l; W.lx += (S.lx - W.lx) * Math.min(1, dt * 9); }
+    else { setLx(l); W.lx = l; W.lm += (S.lm - W.lm) * Math.min(1, dt * 9); }
+  } else if (drag) { W.lx = S.lx; W.lm = S.lm; }
+  else { W.lx += (S.lx - W.lx) * Math.min(1, dt * 9); W.lm += (S.lm - W.lm) * Math.min(1, dt * 9); }
+  W.bp = S.bp; W.conc = S.conc; W.mode = S.mode;
+  W.explode += (S.explode - W.explode) * Math.min(1, dt * 2.4);
+  W.sample = S.sample; W.scan = S.scan; W.ghost = S.ghost;
+  W.labels = null; W.conOp = 1; W.cap = null; W.title = W.outro = 0; W.jabK = 0;
+}
+const fv = createFreeView({ panels: ['.hud', '#ctl', '#console', '#help'], active: () => !FILM && !tour.on });
+function render() { if (!mp.applyView(camera)) fv.apply(camera); composer.render(); labelR.render(scene, camera); }
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);
+  quality.configure(renderer, composer, bloom, { recording: REC });
+  renderer.setPixelRatio(DPR);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h); composer.setPixelRatio(DPR); composer.setSize(w, h); bloom.setSize(w * DPR, h * DPR); labelR.setSize(w, h);
+  pMat.uniforms.uScale.value = h * DPR / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+  jabKey = '';
+}
+addEventListener('resize', resize);
+resize();
+
+await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 3000))]);
+setLx(S.lx); setLm(S.lm);
+
+if (REC) {
+  window.__dur = FILM_DUR;
+  window.__seek = async t => { film(t); frameCommon(t); render(); await Promise.race([new Promise(r => requestAnimationFrame(() => r())), new Promise(r => setTimeout(r, 300))]); return true; };
+  await window.__seek(+Q.get('t') || 0);
+  window.__ready = true;
+} else {
+  let last = performance.now() / 1000;
+  let filmStart = last - (+Q.get('t') || 0), hiddenAt = null;
+  document.addEventListener('visibilitychange', () => {
+    const now = performance.now() / 1000;
+    if (document.hidden) hiddenAt = now;
+    else if (hiddenAt !== null) {
+      const gap = now - hiddenAt; filmStart += gap;
+      if (tour.on) tour.t0 += gap;
+      if (S.scanning) S.scanT0 += gap;
+      last = now; hiddenAt = null;
+    }
+  });
+  const loop = () => {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    if (!quality.shouldRender(performance.now())) return;
+    quality.observe(performance.now());
+    const now = performance.now() / 1000, dt = Math.min(.05, now - last); last = now;
+    if (FILM) film((now - filmStart) % FILM_DUR);
+    else if (tour.on) { const t = now - tour.t0; if (t >= FILM_DUR) endTour(); else film(t); }
+    if (!FILM && !tour.on) { interactive(dt, now); nav.step(dt); controls.update(); }
+    frameCommon(FILM ? (now - filmStart) % FILM_DUR : tour.on ? now - tour.t0 : now);
+    render();
+  };
+  loop();
+  el('load').classList.add('done');
+  window.__ready = true;
+}
+</script>
+</body>
+</html>

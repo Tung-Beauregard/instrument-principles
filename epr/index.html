@@ -1,0 +1,1482 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en="EPR spectrometer: find unpaired electrons">EPR 電子順磁共振儀 找出不成對的電子</title>
+<meta name="description" content="用 3D 模型拆開一台電子順磁共振(EPR)儀:電磁鐵、微波橋、波導管與共振腔,看落單的電子在磁場裡吸收微波翻面,以及譜線為什麼畫成一上一下的一次微分。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="EPR 電子順磁共振儀 找出不成對的電子">
+<meta property="og:description" content="用 3D 模型拆開一台電子順磁共振(EPR)儀:電磁鐵、微波橋、波導管與共振腔,看落單的電子在磁場裡吸收微波翻面,以及譜線為什麼畫成一上一下的一次微分。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/epr/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/epr.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="EPR 教材的畫面:展開的電磁鐵、共振腔與微波橋,以及一次微分的 EPR 譜">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/ui-scale.css">
+<style>
+:root{
+  --bg:#0a0f13;
+  --panel:rgba(12,18,23,.80);
+  --line:rgba(160,215,235,.14);
+  --line-2:rgba(160,215,235,.30);
+  --ink:#eaf3f6; --ink-2:#a8bcc6; --muted:#71858f;
+  --cyan:#74e4ff; --amber:#ffc261; --violet:#bba6ff; --mw:#5ef2c6;
+  --btn:rgba(255,255,255,.05); --btn-on:#eef6f8; --btn-on-ink:#0c1318;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --sans:'Noto Sans TC','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;touch-action:none}
+.labels{position:fixed;inset:0;pointer-events:none;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+/* 左上:標題、數值、說明 */
+.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw / var(--ui,1) - 48px));pointer-events:none}
+.hud::before{content:'';position:absolute;left:-80px;top:-60px;width:620px;height:300px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 25% 35%,rgba(10,15,19,.72),rgba(10,15,19,0) 70%)}
+.hud .k{display:block;font-weight:900;font-size:28px;letter-spacing:.02em;line-height:1.1}
+.hud .big{display:block;font-weight:900;font-size:44px;line-height:1.12;color:var(--cyan);text-shadow:0 0 22px rgba(116,228,255,.35)}
+.lede{margin:10px 0 12px;font-size:13.5px;line-height:1.7;color:var(--ink-2)}
+.chips{display:flex;gap:8px;margin-bottom:10px}
+.chip{padding:7px 12px 8px;min-width:100px}
+.chip small{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.12em}
+.chip b{font-family:var(--mono);font-weight:600;font-size:18px;color:var(--cyan);white-space:nowrap}
+.note{padding:11px 14px;font-size:13px;line-height:1.75}
+.note em{font-style:normal;font-weight:700}
+.c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)} .w{color:var(--mw)}
+
+/* 網站分頁 */
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw / var(--ui,1) - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
+.sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
+.sitenav a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* 3D 載入中 */
+.load{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:13px;pointer-events:none;transition:opacity .5s}
+.load i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--cyan);animation:spin 1s linear infinite}
+.load.done{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.load i{animation:none}}
+
+/* 右上:控制面板 */
+.ctl{position:fixed;right:20px;top:18px;z-index:6;padding:13px 15px 14px;display:grid;grid-template-columns:auto auto;gap:12px 20px}
+.grp h6{margin:0 0 7px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em;display:flex;justify-content:space-between;gap:8px}
+.grp h6 span{font-family:var(--mono);color:var(--ink-2);letter-spacing:0}
+.grp h6 span[lang]{font-family:inherit;color:inherit;letter-spacing:inherit}
+.seg{display:flex;gap:2px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px}
+.seg button,.btn{font:500 12.5px var(--sans);color:var(--ink-2);background:transparent;border:0;border-radius:7px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.seg button:hover,.btn:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.seg button.on{background:var(--btn-on);color:var(--btn-on-ink)}
+.seg.mono button{font-family:var(--mono);padding:6px 9px}
+.row{display:flex;gap:6px;align-items:center}
+.btn{background:var(--btn);border:1px solid var(--line);padding:6px 11px}
+.btn.on{background:var(--cyan);color:#062028;border-color:transparent}
+.btn.sq{width:32px;padding:6px 0;text-align:center;font-family:var(--mono)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:200px;height:26px;background:transparent;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(90deg,rgba(116,228,255,.3),#74e4ff 50%,rgba(116,228,255,.3))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#fff;margin-top:-6px;box-shadow:0 0 0 3px rgba(116,228,255,.25),0 0 12px rgba(116,228,255,.6)}
+input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:linear-gradient(90deg,rgba(116,228,255,.3),#74e4ff 50%,rgba(116,228,255,.3))}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(116,228,255,.25),0 0 12px rgba(116,228,255,.6)}
+
+.help{position:fixed;right:20px;top:262px;z-index:7;width:350px;max-height:calc(100vh / var(--ui,1) - 276px);overflow:auto;padding:14px 16px;font-size:12.5px;line-height:1.7;display:none}
+.help.show{display:block}
+.help b{font-size:13px}
+.help ul{margin:6px 0 8px;padding-left:18px}
+.help .fine{color:var(--muted);font-size:11.5px;margin:0}
+
+/* 底部:EPR 譜與能量圖 */
+.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(820px,calc(100vw / var(--ui,1) - 32px));padding:11px 14px 9px}
+.con-head{display:flex;align-items:baseline;gap:10px;font-size:12.5px;margin-bottom:4px;white-space:nowrap}
+.con-head b{font-weight:700}
+.con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.legend{margin-left:auto;display:flex;gap:14px;color:var(--ink-2);font-size:11.5px}
+.legend i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:6px}
+.con-body{display:grid;grid-template-columns:1fr 172px;gap:14px;align-items:stretch}
+.plotwrap{position:relative}
+#plot{width:100%;height:170px;display:block;cursor:crosshair}
+#zee{width:100%;height:92px;display:block}
+.meters{display:flex;flex-direction:column;gap:7px;justify-content:center}
+.m .t{display:flex;justify-content:space-between;gap:6px;font-size:11px;color:var(--muted);margin-bottom:4px}
+.m .t b{font-family:var(--mono);font-weight:500;color:var(--ink-2)}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--cyan)}
+.bar.ctr{position:relative;overflow:visible}
+.bar.ctr::after{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line-2)}
+.bar.ctr i{position:absolute;top:0;left:50%;background:var(--cyan)}
+.tip{position:absolute;pointer-events:none;padding:4px 8px;border-radius:6px;background:#0d151a;border:1px solid var(--line-2);font:500 11.5px var(--mono);color:var(--ink);white-space:nowrap;display:none;transform:translate(-50%,-120%)}
+
+.foot{position:fixed;left:24px;bottom:14px;z-index:4;max-width:250px;font-size:11px;line-height:1.55;color:var(--muted)}
+
+/* 元件標籤 */
+.lw{pointer-events:none}
+.lbl{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:3px 8px 3px 7px;border-radius:6px;background:rgba(9,14,18,.84);border:1px solid rgba(116,228,255,.32);font-size:11.5px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.lbl i{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);flex:none}
+.lbl b{font-weight:700;color:#fff}
+.lbl span{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+
+/* 導覽與影片 */
+.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw / var(--ui,1) - 40px));text-align:center;padding:13px 26px 15px}
+.cap .chap{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.16em;margin-bottom:5px}
+.cap .txt{font-size:18px;line-height:1.6;font-weight:500}
+.titlecard{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,15,19,.66) 0%,rgba(10,15,19,.4) 40%,rgba(10,15,19,0) 70%)}
+.titlecard .t1{font-weight:900;font-size:42px;letter-spacing:.04em}
+.titlecard .t2{font-weight:900;font-size:72px;color:var(--cyan);text-shadow:0 0 30px rgba(116,228,255,.4);line-height:1.15}
+.titlecard .t3{font-size:20px;color:var(--ink-2);margin-top:14px}
+.titlecard .t4{font-size:14px;color:var(--muted);margin-top:22px}
+#tourExit{position:fixed;right:20px;top:18px;z-index:9;display:none}
+html.touring .ctl,html.touring .help,html.touring .lede,html.touring .note,html.touring .foot{display:none}
+html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
+html.touring .titlecard{display:flex}
+html.touring .cap.withcon{bottom:254px}
+/* 導覽中「結束導覽」在右上角:分頁列讓出它的位置(分頁列可以橫向捲動) */
+html.touring:not(.mp) .sitenav{max-width:calc(100vw / var(--ui,1) - 150px)}
+
+html.film .ctl,html.film .help,html.film .lede,html.film .note,html.film .foot,html.film #tourExit,html.film .sitenav,html.film .load{display:none}
+html.film .cap{display:block;bottom:56px;max-width:1440px;padding:18px 40px 20px}
+html.film .cap .chap{font-size:16px;margin-bottom:8px}
+html.film .cap .txt{font-size:31px}
+html.film .titlecard{display:flex}
+html.film .titlecard .t1{font-size:56px}
+html.film .titlecard .t2{font-size:104px}
+html.film .titlecard .t3{font-size:28px}
+html.film .titlecard .t4{font-size:19px}
+html.film .hud{left:52px;top:44px;width:560px}
+html.film .hud::before{width:900px;height:420px}
+html.film .hud .k{font-size:34px}
+html.film .hud .big{font-size:54px}
+/* 英文:標題比中文寬,字小一點;手機照原本的 html.mp */
+html[lang="en"]:not(.mp):not(.film) .hud .k{font-size:24px}
+html[lang="en"]:not(.mp):not(.film) .hud .big{font-size:30px}
+html[lang="en"].film .hud .k{font-size:28px}
+html[lang="en"].film .hud .big{font-size:44px}
+html.film .chips{margin-top:16px;gap:12px}
+html.film .chip{min-width:150px;padding:10px 16px 11px}
+html.film .chip small{font-size:14px}
+html.film .chip b{font-size:26px}
+html.film .console{left:auto;right:52px;top:48px;bottom:auto;transform:none;width:760px;padding:16px 20px 14px}
+html.film .con-head{font-size:17px;margin-bottom:8px}
+html.film .legend{font-size:15px}
+html.film #plot{height:236px}
+html.film #zee{height:132px}
+html.film .con-body{grid-template-columns:1fr 216px}
+html.film .m .t{font-size:14px}
+html.film .lbl{font-size:17px;padding:5px 12px 5px 10px;border-radius:8px;gap:8px}
+html.film .lbl span{font-size:14px}
+html.film .lbl i{width:8px;height:8px}
+html.rec *{transition:none!important;animation:none!important}
+
+@media (max-width:980px){
+  .lede,.foot{display:none}
+  .ctl{left:12px;right:12px;top:auto;bottom:228px;grid-template-columns:1fr;gap:8px;padding:10px 12px}
+  .hud{left:12px;top:12px}
+  .note{display:none}
+  .help{left:12px;right:12px;width:auto;top:120px}
+  input[type=range]{width:100%}
+}
+@media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}}
+/* 手機版(html.mp,由 ../assets/mobile-panels.js 加上):標題與讀值縮小,控制面板與譜收在停靠區 */
+html.mp .hud{left:12px;top:10px;width:min(380px,calc(100vw - 24px))}
+html.mp .hud .k{font-size:16px}
+html.mp .hud .big{font-size:26px;text-shadow:0 0 16px rgba(116,228,255,.3)}
+html.mp .sitenav{margin-bottom:8px;max-width:100%}
+html.mp .chips{gap:6px;margin:6px 0 0}
+html.mp .chip{flex:1 1 0;min-width:0;padding:5px 9px 6px}
+html.mp .chip small{font-size:10px;letter-spacing:.06em}
+html.mp .chip b{display:block;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+html.mp .lede,html.mp .note,html.mp .foot{display:none}
+html.mp input[type=range]{width:100%}
+html.mp .con-head > b,html.mp .con-head > .s{display:none}
+html.mp .legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px}
+html.mp #plot{height:130px}
+html.mp #zee{height:56px}
+/* 說明框:放在標題下方,太長就捲動;橫拿時蓋在標題上,不擋右側的停靠區 */
+html.mp .help{left:12px;right:auto;top:var(--mp-free-top,120px);width:min(380px,calc(100vw - 24px - var(--mp-rail-w, 0px)));max-height:calc(100vh - var(--mp-free-top,120px) - 12px);max-height:calc(100dvh - var(--mp-free-top,120px) - 12px);overflow:auto;overscroll-behavior:contain}
+/* 導覽中:字幕放在停靠區上方 */
+html.mp.touring .cap.withcon{bottom:calc(var(--mp-dock-h,230px) + 20px)}
+@media (orientation:landscape){
+  html.mp .help{top:10px;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .cap,html.mp.touring .cap.withcon{left:12px;right:auto;bottom:12px;transform:none;max-width:calc(100vw - min(380px,46vw) - 36px)}
+}
+html.mp .ctl{grid-template-columns:1fr;gap:8px}
+html.mp .con-body{grid-template-columns:minmax(0,1fr);gap:8px}
+html.mp .meters{flex-direction:row;align-items:flex-end;gap:12px}
+html.mp .meters .m{flex:1;min-width:0}
+html.mp .m .t{font-size:10px}
+/* 手機上元件標籤只留名稱(小字太擠,數值看左上的讀值卡) */
+html.mp .lbl span{display:none}
+/* 橫拿(高度常常只剩 300 px 左右):標題排成一行、讀值卡變矮,停靠區在右上角(見 mobile-panels.css) */
+@media (orientation:landscape){
+  html.mp .hud{top:8px}
+  html.mp .sitenav{margin-bottom:6px}
+  html.mp .hud .k,html.mp .hud .big{display:inline;white-space:nowrap}
+  html.mp .hud .k{font-size:14px;margin-right:8px}
+  html.mp .hud .big{font-size:19px}
+  html.mp .chips{margin-top:4px}
+  html.mp .chip{padding:3px 8px 4px}
+  html.mp .chip b{font-size:13px}
+}
+/* 手機導覽(2026-11-09):分頁列藏起來,「結束導覽」放在它的位置;橫拿時標題欄只到停靠區的左邊;片頭片尾字卡縮小 */
+html.mp.touring .sitenav{visibility:hidden}
+html.mp.touring #tourExit{left:12px;right:auto;top:10px}
+@media (orientation:landscape){
+  html.mp.touring #tourExit{top:8px}
+  html.mp.touring .hud{width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .hud .k,html.mp.touring .hud .big{white-space:normal}
+}
+html.mp .titlecard{padding:0 16px}
+html.mp .titlecard .t1{font-size:24px}
+html.mp .titlecard .t2{font-size:40px}
+html.mp .titlecard .t3{font-size:14px;margin-top:8px}
+html.mp .titlecard .t4{font-size:11px;margin-top:10px}
+@media (orientation:landscape) and (max-height:340px){
+  html.mp.touring .cap{padding:8px 14px 9px}
+  html.mp.touring .cap .chap{font-size:11px;margin-bottom:3px}
+  html.mp.touring .cap .txt{font-size:15px;line-height:1.5}
+}
+/* 桌機小螢幕(1024×768、1366×768 這類):導言收起來、圖矮一點,面板讓出空間給 3D;3D 主角移到面板之間的空地(../assets/free-view.js) */
+@media (min-width:981px) and (max-width:1279px),(min-width:981px) and (max-height:899px){
+  .lede{display:none}
+  #plot{height:120px}
+  #zee{height:66px}
+  .meters{gap:5px}
+  html.touring .cap.withcon{bottom:214px}
+}
+/* 桌機小螢幕時頁尾的小字會被譜圖面板蓋住,收起來(說明框與片尾字卡都有寫示意) */
+@media (min-width:981px) and (max-width:1359px){.foot{display:none}}
+/* 大螢幕(2K、4K)的放大(見 ../assets/ui-scale.css):面板、字幕、片頭字卡與元件標籤依 --ui 放大;3D 畫布與 CSS2D 的定位層不放大 */
+.hud,.load,.ctl,.help,.console,.foot,.cap,.titlecard,#tourExit,.lbl{zoom:var(--ui,1)}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+}}
+</script>
+<link rel="stylesheet" href="../assets/render-quality.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<div id="stage"></div>
+<div class="load" id="load"><i></i><span data-en="Loading the 3D model">3D 模型載入中</span></div>
+
+<header class="hud">
+  <nav class="sitenav" aria-label="儀器原理" data-en-aria-label="Instrument Principles"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../lcq/" data-en="Ion trap MS">離子阱質譜</a><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../ftir/">FTIR</a><a href="../fluorescence/" data-en="Fluorescence">螢光</a><a href="../xrd/">XRD</a><a href="./" aria-current="page">EPR</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/" data-en="Mass analyzers">質譜儀-不同分析器比較</a><a href="../spectroscopy/" data-en="Light and molecules">光與分子</a><a href="../chromatography/" data-en="Chromatography">層析</a><a href="../plot/" data-en="Data plotting">數據畫圖</a></nav>
+  <span class="k" data-en="EPR spectrometer">EPR 電子順磁共振儀</span>
+  <span class="big" data-en="Find unpaired electrons">找出不成對的電子</span>
+  <p class="lede" data-en="Most electrons in a molecule come in pairs whose magnetism cancels; free radicals and some metal ions have an unpaired electron that acts like a tiny magnet. In a magnetic field it can only point with or against the field, and the energy gap between the two grows with the field. The microwave frequency stays fixed while the field is raised slowly; when the gap equals the energy of one microwave, the electron absorbs it and flips. It is the same idea as NMR, but for electrons instead of nuclei. Drag the magnet or the field slider to try it.">大部分分子的電子兩兩成對,磁性互相抵消;自由基和某些金屬離子有落單(不成對)的電子,像一根小磁鐵。放進磁場,它只能順著或逆著磁場,兩種狀態的能量差跟著磁場變大。微波頻率固定、慢慢加大磁場,能量差剛好等於一份微波的能量時,電子吸收微波翻面。和 NMR 是同一個道理,只是看電子,不是原子核。拖曳電磁鐵或磁場滑桿試試。</p>
+  <div class="chips">
+    <div class="chip panel"><small data-en="Field B">磁場 B</small><b id="cB">338.77 mT</b></div>
+    <div class="chip panel"><small data-en="Microwave">微波頻率</small><b id="cF">9.50 GHz</b></div>
+    <div class="chip panel"><small data-en="g value">g 值</small><b id="cG">2.0036</b></div>
+  </div>
+  <div class="note panel" id="note"></div>
+</header>
+
+<aside class="ctl panel" id="ctl">
+  <div class="grp"><h6 data-en="Sample">樣品</h6>
+    <div class="seg" id="segSample">
+      <button data-v="dpph" class="on">DPPH</button><button data-v="tempol">TEMPOL</button><button data-v="dmpo">DMPO-OH</button><button data-v="lignin" data-en="Lignin">木質素</button>
+    </div>
+  </div>
+  <div class="grp"><h6><span lang="zh-Hant">磁場</span><span lang="en">Field</span> <span id="bv">338.77 mT</span></h6>
+    <input type="range" id="fld" min="336" max="342" step="0.01" value="338.77" aria-label="磁場" data-en-aria-label="Magnetic field">
+  </div>
+  <div class="grp"><h6 data-en="Modulation (mT)">調變幅度(mT)</h6>
+    <div class="seg mono" id="segMod">
+      <button data-v="0.02">0.02</button><button data-v="0.1" class="on">0.1</button><button data-v="0.5">0.5</button><button data-v="2">2</button>
+    </div>
+  </div>
+  <div class="grp"><h6 data-en="Show">顯示</h6>
+    <div class="seg" id="segView"><button data-v="d" class="on" data-en="Derivative">一次微分</button><button data-v="a" data-en="Absorption">吸收</button></div>
+  </div>
+  <div class="grp"><h6 data-en="Case">外殼</h6>
+    <div class="row">
+      <div class="seg" id="segShell"><button data-v="0" data-en="Closed">組裝</button><button data-v="1" class="on" data-en="Open">展開</button></div>
+      <button class="btn" id="btnScan" data-en="Scan">掃描</button>
+      <button class="btn" id="btnTour" data-en="Tour">導覽</button>
+      <button class="btn sq" id="btnHelp" aria-label="說明" data-en-aria-label="Help">?</button>
+    </div>
+  </div>
+</aside>
+
+<div class="help panel" id="help">
+  <b data-en="Controls">操作</b>
+  <ul lang="zh-Hant">
+    <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
+    <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
+    <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
+    <li>改磁場:用磁場滑桿,或在 3D 裡左右拖曳電磁鐵(細調),或在譜圖上點一下;1 mT = 10 G(高斯)</li>
+    <li>「掃描」:微波頻率固定,磁場約 6 秒由低掃到高,把每個磁場的訊號連成譜;換調變幅度或樣品再掃一次,上一條會留著比較</li>
+    <li>「調變幅度」:磁場小抖動的大小。比線寬小很多(一成以下)時線形最真,但訊號弱、雜訊明顯;和線寬差不多時訊號最好;太大(過調變)線會被拉寬、變形,靠得近的線會黏在一起</li>
+    <li>「顯示」:一次微分是儀器直接畫出來的;吸收是把它積分回去。電子多少要比吸收曲線下的面積(積分兩次),不能比高度</li>
+    <li>「導覽」:自動播一遍,內容和影片相同;按 Esc 結束</li>
+  </ul>
+  <ul lang="en">
+    <li>Mouse: drag to rotate the view; right-drag or Shift-drag to pan; scroll to zoom</li>
+    <li>Trackpad: swipe with two fingers to pan, pinch to zoom; touch screen: one finger rotates, two fingers pan and zoom</li>
+    <li>Keyboard: arrow keys or W A S D to move, Q E to turn, + − to zoom, hold Shift to go faster; R resets the view</li>
+    <li>Change the field with the slider, by dragging the electromagnet left or right in 3D (fine steps), or by clicking the spectrum; 1 mT = 10 G (gauss)</li>
+    <li>"Scan": with the microwave frequency fixed, the field sweeps from low to high in about 6 s and the signal at every field joins into a spectrum; scan again with another modulation or sample and the previous curve stays for comparison</li>
+    <li>"Modulation": the size of the field's small wiggle. Much smaller than the linewidth (under a tenth) gives the truest shape but a weak, noisy signal; about the linewidth gives the best signal; too large (overmodulation) widens and distorts the line, and close lines merge</li>
+    <li>"Show": the first derivative is what the instrument draws; absorption is that curve integrated back. To compare amounts of electrons, compare the area under the absorption (a double integral), not the height</li>
+    <li>"Tour": plays through automatically, the same as the video; press Esc to end it</li>
+  </ul>
+  <p class="fine" lang="zh-Hant">示意圖。數字取自幾台代表性的 X 頻帶(約 9.5 GHz)連續波 EPR 儀與文獻;磁鐵、共振腔與微波橋的大小和位置是示意,霍爾探針的位置是假設的。微波看不見:往共振腔的畫成藍綠色,反射回來的畫成橘色(頻率相同,只是方便分辨),反射的強弱放大畫。箭頭是電子的小磁鐵;室溫下順著磁場的其實只比逆著的多約萬分之八,畫面誇大了。g 值與分裂取自文獻:DPPH 固體 g 2.0036;TEMPOL 水溶液 g 2.0056、氮的分裂 1.66 mT;DMPO-OH 四條線 1:2:2:1、間距 1.49 mT(g 值沒有查到可靠的數字,中心位置是示意);木質素粉末 g 2.0040 到 2.0043、線寬約 0.7 mT。TEMPOL 與 DMPO-OH 的線寬、各樣品的訊號大小(假設電子一樣多)與雜訊是示意。水會大量吸收微波(像微波爐加熱食物),所以水溶液放在扁平樣品槽裡。</p>
+  <p class="fine" lang="en">Schematic. Numbers come from several representative X-band (about 9.5 GHz) continuous-wave EPR instruments and the literature; the sizes and positions of the magnet, cavity and bridge are illustrative, and the Hall probe's position is assumed. Microwaves are invisible: those going to the cavity are drawn blue-green and the reflected ones orange (same frequency, colored only to tell them apart), and the reflection is exaggerated. The arrows are the electrons' tiny magnets; at room temperature only about 8 in 10,000 more point with the field than against it, so the picture exaggerates. g values and splittings are from the literature: solid DPPH g 2.0036; TEMPOL in water g 2.0056 with a nitrogen splitting of 1.66 mT; DMPO-OH four lines 1:2:2:1, 1.49 mT apart (no reliable g value was found, so its center position is illustrative); lignin powder g 2.0040 to 2.0043, linewidth about 0.7 mT. The linewidths of TEMPOL and DMPO-OH, the signal size of each sample (assuming equal numbers of electrons) and the noise are illustrative. Water absorbs microwaves strongly (as in a microwave oven), so water solutions go in a flat cell.</p>
+</div>
+
+<section class="console panel" id="console">
+  <div class="con-head"><b data-en="EPR spectrum">EPR 譜</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
+  <div class="con-body">
+    <div class="plotwrap"><canvas id="plot"></canvas><div class="tip" id="tip"></div></div>
+    <div class="meters">
+      <div class="m"><div class="t"><span lang="zh-Hant">兩種能量的差與微波</span><span lang="en">Energy gap vs microwave</span></div><canvas id="zee"></canvas></div>
+      <div class="m"><div class="t"><span lang="zh-Hant">反射回來的微波</span><span lang="en">Reflected</span><b id="vR">0%</b></div><div class="bar"><i id="mR"></i></div></div>
+      <div class="m"><div class="t"><span lang="zh-Hant">鎖相放大器輸出</span><span lang="en">Lock-in output</span><b id="vL">0.00</b></div><div class="bar ctr"><i id="mL"></i></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="foot" data-en="Schematic; values from representative X-band instruments and the literature; internal positions and linewidths are illustrative.">示意圖;數值取自代表性的 X 頻帶儀器與文獻,機內元件位置與譜線寬度為示意。</div>
+
+<div class="cap panel" id="cap"><div class="chap" id="chap"></div><div class="txt" id="capTxt"></div></div>
+<div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
+<button class="btn" id="tourExit" data-en="End tour">結束導覽</button>
+
+<script type="module">
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
+import { createMobilePanels } from '../assets/mobile-panels.js';
+import { createFreeView } from '../assets/free-view.js';
+const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const $ = s => document.querySelector(s);
+const Q = new URLSearchParams(location.search);
+const FILM = Q.has('film'), REC = Q.has('rec');
+const root = document.documentElement;
+if (FILM) root.classList.add('film');
+if (REC) root.classList.add('rec');
+// 手機版:控制面板與譜預設收成把手,放在畫面右緣;直拿時建議轉成橫式(../assets/mobile-panels.js)
+const mp = createMobilePanels({
+  dock: true, top: '.hud', rotateHint: true,
+  suspended: () => FILM || root.classList.contains('touring'),
+  panels: [
+    { el: '#ctl', icon: 'adjust', label: zhEn('調整', 'Adjust'), items: zhEn('樣品、磁場、調變幅度、顯示、外殼、掃描、導覽、說明、畫質', 'sample, field, modulation, show, case, scan, tour, help, quality'), onToggle: (open) => { if (!open) document.getElementById('help').classList.remove('show'); } },
+    { el: '#console', icon: 'chart', label: zhEn('EPR 譜', 'EPR spectrum'), items: () => $('#conSample').textContent },
+  ],
+});
+$('#btnScan').addEventListener('click', () => mp.open('#console'));
+window.__err = null;
+addEventListener('error', e => { window.__err = String(e.message || e); });
+
+// ================= 小工具 =================
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = t => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const gauss = n => Math.sqrt(-2 * Math.log(Math.max(1e-6, hash(n)))) * Math.cos(6.2831853 * hash(n + 17.77));
+const MONO = "'IBM Plex Mono',Consolas,monospace";
+const fmtB = B => `${B.toFixed(2)} mT`;
+
+// ================= 物理與譜線模型 =================
+// 共振條件 hν = g μB B。h = 6.62607015e-34 J/Hz(定義值)、μB = 9.2740100657e-24 J/T(CODATA 2022),
+// h/μB = 71.4477 mT/GHz:B(mT) = 71.4477 × ν(GHz) ÷ g
+const H_MUB = 6.62607015e-34 / 9.2740100657e-24 * 1e12;
+const NU = 9.5;          // 微波頻率 GHz,固定(X 頻帶的代表值)
+const GE = 2.0023;       // 自由電子的 g 值(取到小數第 4 位)
+const bRes = g => H_MUB * NU / g;
+const gOf = B => H_MUB * NU / B;
+const MOD_OPTS = [.02, .1, .5, 2];   // 調變幅度(峰對峰,mT)
+const NOISE = .004;      // 雜訊的標準差(和譜線同一個任意單位,示意)
+const STEP = .005;       // 掃描的點距(mT)
+const SCAN_S = 6;        // 一次掃描約幾秒(示意)
+// 樣品:g 值、超精細分裂 a(mT)與強度比 pattern、一次微分的峰對峰線寬 dBpp(mT)、線形(L 勞倫茲、G 高斯)、
+// 掃描範圍 win(mT)、樣品容器(tube 石英管、flat 扁平樣品槽);每個樣品的吸收面積都是 1(假設電子一樣多,示意)
+const SAMPLES = {
+  dpph: { name: 'DPPH', full: zhEn('DPPH 固體粉末(自由基)', 'DPPH, solid powder (a free radical)'), inText: 'DPPH', g: 2.0036, dBpp: .15, shape: 'L', win: [336, 342], cell: 'tube', fill: 0x3b1460,
+    hint: zhEn('DPPH 的線在 338.77 mT(g 2.0036);拖曳磁場或按「掃描」。', 'The DPPH line is at 338.77 mT (g 2.0036); drag the field or press Scan.') },
+  tempol: { name: 'TEMPOL', full: zhEn('TEMPOL 水溶液(4-羥基-TEMPO)', 'TEMPOL in water (4-hydroxy-TEMPO)'), inText: 'TEMPOL', g: 2.0056, a: 1.66, pattern: [1, 1, 1], dBpp: .15, shape: 'L', win: [334, 343], cell: 'flat', fill: 0xf0a860,
+    hint: zhEn('TEMPOL 的三條線在 336.77、338.43、340.09 mT。', 'The three TEMPOL lines are at 336.77, 338.43 and 340.09 mT.') },
+  dmpo: { name: 'DMPO-OH', full: zhEn('DMPO-OH 水溶液(被捉住的羥基自由基)', 'DMPO-OH in water (a trapped hydroxyl radical)'), inText: 'DMPO-OH', g: null, center: 338.99, a: 1.49, pattern: [1, 2, 2, 1], dBpp: .15, shape: 'L', win: [335, 343], cell: 'flat', fill: 0xbfe3f2,
+    hint: zhEn('DMPO-OH 的四條線相距 1.49 mT(中心位置是示意)。', 'The four DMPO-OH lines are 1.49 mT apart (the center position is illustrative).') },
+  lignin: { name: zhEn('木質素', 'Lignin'), full: zhEn('木質素粉末', 'Lignin powder'), inText: zhEn('木質素', 'lignin'), g: 2.0042, dBpp: .70, shape: 'G', win: [335, 342], cell: 'tube', fill: 0x8a5a30,
+    hint: zhEn('木質素是 338.67 mT 附近一條寬線(g 約 2.004)。', 'Lignin gives one broad line near 338.67 mT (g about 2.004).') },
+};
+// 勞倫茲線加上場調變的一次諧波(解析解):z = x − iγ,S = (2 / π hm) × (−Im[z / √(z − hm)√(z + hm)]),hm = 調變幅度的一半;
+// hm 很小時就是 hm × 吸收曲線的斜率。高斯線用 64 點的 Gauss-Chebyshev 數值積分
+function csqrt(re, im) { const r = Math.hypot(re, im), a = Math.sqrt((r + re) / 2); let b = Math.sqrt(Math.max(0, (r - re) / 2)); if (im < 0) b = -b; return [a, b]; }
+function lorS(x, g, hm) {
+  const [ar, ai] = csqrt(x - hm, -g), [br, bi] = csqrt(x + hm, -g);
+  const wr = ar * br - ai * bi, wi = ar * bi + ai * br, d = wr * wr + wi * wi;
+  return 2 * (g * wr + x * wi) / d / (Math.PI * hm);
+}
+const GN = 64, GCOS = Array.from({ length: GN }, (_, k) => Math.cos((k + .5) * Math.PI / GN));
+function gauS(x, s, hm) { let t = 0; for (const c of GCOS) { const u = x + hm * c; t += Math.exp(-u * u / (2 * s * s)) * c; } return 2 / GN * t / (s * Math.sqrt(2 * Math.PI)); }
+function absorbAt(sm, B) {
+  let A = 0;
+  for (const [b0, w] of sm.lines) { const x = B - b0; A += w * (sm.shape === 'L' ? sm.gam / Math.PI / (x * x + sm.gam * sm.gam) : Math.exp(-x * x / (2 * sm.sig * sm.sig)) / (sm.sig * Math.sqrt(2 * Math.PI))); }
+  return A;
+}
+function signalAt(sm, B, mod) {
+  let S = 0;
+  for (const [b0, w] of sm.lines) S += w * (sm.shape === 'L' ? lorS(B - b0, sm.gam, mod / 2) : gauS(B - b0, sm.sig, mod / 2));
+  return S;
+}
+for (const k in SAMPLES) {
+  const sm = SAMPLES[k], pat = sm.pattern || [1], tot = pat.reduce((a, b) => a + b, 0), n = pat.length;
+  sm.key = k;
+  sm.B0 = sm.g ? bRes(sm.g) : sm.center;
+  sm.lines = pat.map((w, i) => [sm.B0 + (i - (n - 1) / 2) * (sm.a || 0), w / tot]);
+  sm.gam = Math.sqrt(3) / 2 * sm.dBpp;   // 勞倫茲:半高半寬 = √3 / 2 × ΔBpp
+  sm.sig = sm.dBpp / 2;                  // 高斯:σ = ΔBpp / 2
+  // 選這個樣品時磁場先停在最強的那條線;一樣強時取最靠近中心的(TEMPOL 停在中間那條)
+  sm.peak = sm.lines.reduce((a, b) => (b[1] > a[1] + 1e-9 || (Math.abs(b[1] - a[1]) < 1e-9 && Math.abs(b[0] - sm.B0) < Math.abs(a[0] - sm.B0) - 1e-9) ? b : a))[0];
+  let mx = 0; for (let B = sm.win[0]; B <= sm.win[1]; B += .002) mx = Math.max(mx, absorbAt(sm, B));
+  sm.Amax = mx;
+}
+const resOf = (sm, B) => absorbAt(sm, B) / sm.Amax;   // 0 到 1:這個磁場下吸收微波的程度(共振)
+// 曲線快取:掃描的整條曲線(含雜訊)與理論曲線(預覽、縱軸範圍),view 'a' 時是一次微分積分回去的吸收
+const curves = new Map();
+function cached(key, fn) { let v = curves.get(key); if (!v) { v = fn(); if (curves.size > 60) curves.clear(); curves.set(key, v); } return v; }
+function scanTrace(sc, view) {
+  return cached(`s|${sc.sample}|${sc.mod}|${sc.from}|${sc.end}|${sc.seed}|${view}`, () => {
+    const sm = SAMPLES[sc.sample], n = Math.round((sc.end - sc.from) / STEP), out = new Float32Array((n + 1) * 2);
+    let acc = 0;
+    for (let i = 0; i <= n; i++) {
+      const B = sc.from + i * STEP, v = signalAt(sm, B, sc.mod) + NOISE * gauss(B * 7.31 + sc.seed);
+      acc += v * STEP; out[i * 2] = B; out[i * 2 + 1] = view === 'a' ? acc : v;
+    }
+    return out;
+  });
+}
+function theory(sample, mod, view) {
+  return cached(`t|${sample}|${mod}|${view}`, () => {
+    const sm = SAMPLES[sample], [b0, b1] = sm.win, st = .01, n = Math.round((b1 - b0) / st), out = new Float32Array((n + 1) * 2);
+    let acc = 0, mx = 0;
+    for (let i = 0; i <= n; i++) {
+      const B = b0 + i * st, v = signalAt(sm, B, mod); acc += v * st;
+      out[i * 2] = B; out[i * 2 + 1] = view === 'a' ? acc : v; mx = Math.max(mx, Math.abs(out[i * 2 + 1]));
+    }
+    return { pts: out, max: mx, st };
+  });
+}
+const theoryAt = (th, B) => { const p = th.pts, i = clamp((B - p[0]) / th.st, 0, p.length / 2 - 1.001), k = Math.floor(i); return lerp(p[k * 2 + 1], p[k * 2 + 3], i - k); };
+
+// ================= 場景 =================
+let DPR = REC ? 1 : quality.pixelRatio(innerWidth, innerHeight, 1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: REC, powerPreference: 'high-performance' });
+renderer.setPixelRatio(DPR);
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+$('#stage').appendChild(renderer.domElement);
+window.__gl = (() => { try { const gl = renderer.getContext(), x = gl.getExtension('WEBGL_debug_renderer_info'); return x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { return '?'; } })();
+
+const labelR = new CSS2DRenderer();
+labelR.setSize(innerWidth, innerHeight);
+labelR.domElement.className = 'labels';
+document.body.appendChild(labelR.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a1015);
+scene.fog = new THREE.Fog(0x0a1015, 380, 860);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .5;
+
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 1, 2400);
+camera.position.set(58, 122, 118);
+// 直拿的手機:畫面窄,先拉遠、對著兩極之間(互動的預設視角,也是 R 回到的視角)
+if (innerWidth < innerHeight * .9) camera.position.set(44, 150, 196);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(4, 27, -22);
+if (innerWidth < innerHeight * .9) controls.target.set(0, 30, -14);
+controls.enableDamping = true; controls.dampingFactor = .08;
+controls.minDistance = 18; controls.maxDistance = 380; controls.maxPolarAngle = 1.47;
+controls.update();
+
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), .75, .5, 1.25);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.HemisphereLight(0xcfe6ff, 0x1b1712, .45));
+const key = new THREE.DirectionalLight(0xffffff, 1.65);
+key.position.set(90, 170, 120); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -115, right: 115, top: 115, bottom: -115, near: 40, far: 480 });
+key.shadow.bias = -.0004; key.shadow.normalBias = .03;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0x74e4ff, .28); rim.position.set(-140, 80, -160); scene.add(rim);
+
+// ---------- 桌面與牆 ----------
+function canvasTex(w, h, draw, repeat) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+  return t;
+}
+const benchTop = new THREE.Mesh(new THREE.BoxGeometry(280, 4, 180), new THREE.MeshStandardMaterial({ color: 0x141b20, roughness: .58, metalness: .1 }));
+benchTop.position.set(14, -2, -22); benchTop.receiveShadow = true; scene.add(benchTop);
+const strip = new THREE.Mesh(new THREE.BoxGeometry(280, .45, .5), new THREE.MeshBasicMaterial({ color: new THREE.Color(.25, 1.1, .85) }));
+strip.position.set(14, -.35, 68.1); scene.add(strip);
+const wallTex = canvasTex(1024, 512, (c, w, h) => {
+  c.fillStyle = '#121a20'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 3;
+  for (let x = 0; x <= w; x += 128) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+  c.beginPath(); c.moveTo(0, 340); c.lineTo(w, 340); c.stroke();
+}, [3, 1]);
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(900, 360), new THREE.MeshStandardMaterial({ map: wallTex, roughness: .95 }));
+wall.position.set(14, 100, -232); scene.add(wall);
+// 牆上三塊說明螢幕:能階分裂、共振條件、吸收與一次微分
+function screenTex(kind) {
+  return canvasTex(640, 360, (c, w, h) => {
+    c.fillStyle = 'rgba(16,48,62,.9)'; c.fillRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(116,228,255,.6)'; c.lineWidth = 3; c.strokeRect(6, 6, w - 12, h - 12);
+    c.strokeStyle = c.fillStyle = 'rgba(200,244,255,.95)'; c.lineWidth = 4; c.lineCap = 'round';
+    c.font = `600 34px ${MONO}`; c.textAlign = 'center';
+    if (kind === 0) {
+      c.beginPath(); c.moveTo(80, 170); c.lineTo(560, 70); c.moveTo(80, 170); c.lineTo(560, 270); c.stroke();
+      c.lineWidth = 2; c.setLineDash([8, 8]); c.beginPath(); c.moveTo(80, 170); c.lineTo(560, 170); c.stroke(); c.setLineDash([]);
+      c.lineWidth = 4; c.beginPath(); c.moveTo(430, 103); c.lineTo(430, 237); c.stroke();
+      c.fillText('ΔE = g μB B', w / 2, 330);
+      c.font = `600 26px ${MONO}`; c.fillText('B = 0', 80, 215);
+    } else if (kind === 1) {
+      c.lineWidth = 3; c.beginPath();
+      for (let x = 60; x <= 300; x += 2) { const y = 120 + 38 * Math.sin((x - 60) / 240 * 6 * Math.PI); x === 60 ? c.moveTo(x, y) : c.lineTo(x, y); }
+      c.stroke();
+      c.lineWidth = 4; c.beginPath(); c.moveTo(330, 120); c.lineTo(390, 120); c.lineTo(378, 110); c.moveTo(390, 120); c.lineTo(378, 130); c.stroke();
+      c.beginPath(); c.moveTo(450, 180); c.lineTo(450, 70); c.lineTo(438, 84); c.moveTo(450, 70); c.lineTo(462, 84); c.stroke();
+      c.beginPath(); c.moveTo(520, 70); c.lineTo(520, 180); c.lineTo(508, 166); c.moveTo(520, 180); c.lineTo(532, 166); c.stroke();
+      c.fillText('hν = g μB B', w / 2, 290);
+    } else {
+      c.lineWidth = 4; c.beginPath();
+      for (let x = 60; x <= 290; x += 2) { const u = (x - 175) / 38, y = 200 - 110 / (1 + u * u); x === 60 ? c.moveTo(x, y) : c.lineTo(x, y); }
+      c.stroke(); c.beginPath();
+      for (let x = 350; x <= 580; x += 2) { const u = (x - 465) / 34, y = 150 + 190 * u / (1 + u * u) ** 2; x === 350 ? c.moveTo(x, y) : c.lineTo(x, y); }
+      c.stroke();
+      c.font = `600 28px ${MONO}`;
+      c.fillText(zhEn('吸收', 'absorption'), 175, 250); c.fillText(zhEn('一次微分', 'derivative'), 465, 250);
+      c.font = `600 34px ${MONO}`; c.fillText('→', 320, 160);
+    }
+  });
+}
+[-130, 0, 130].forEach((x, i) => {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(84, 47.25), new THREE.MeshBasicMaterial({ map: screenTex(i), toneMapped: false, transparent: true, opacity: .9 }));
+  m.position.set(x + 14, 104, -230); scene.add(m);
+});
+
+// ---------- 儀器 ----------
+// 一個單位約 1 cm;y 朝上,桌面頂面 y = 0;磁極的軸沿 x(磁場由左往右),波導管沿 z 往後接到微波橋
+const YA = 34;            // 磁極軸心、共振腔中心與微波橋裡微波走的高度
+const GAP = 3;            // 極面在 x = ±3(間隙 6 cm,代表值)
+const BR_FRONT = -33.8;   // 微波橋前面板的 z
+const V3 = THREE.Vector3, UP = new V3(0, 1, 0);
+const inst = new THREE.Group(); scene.add(inst);
+const MAT = {
+  shell: new THREE.MeshPhysicalMaterial({ color: 0xd9dde0, roughness: .42, clearcoat: .4, clearcoatRoughness: .3, transparent: true }),
+  lid: new THREE.MeshPhysicalMaterial({ color: 0x46607a, roughness: .35, clearcoat: .8, clearcoatRoughness: .2, transparent: true }),
+  edge: new THREE.LineBasicMaterial({ color: 0x5ef2c6, transparent: true, opacity: 0, depthWrite: false }),
+  plinth: new THREE.MeshStandardMaterial({ color: 0x2b3237, roughness: .6, metalness: .2 }),
+  bench: new THREE.MeshStandardMaterial({ roughness: .7, metalness: .3, map: canvasTex(128, 128, (c, w, h) => {
+    c.fillStyle = '#2b343a'; c.fillRect(0, 0, w, h); c.fillStyle = '#151b1f';
+    for (const [x, y] of [[32, 32], [96, 32], [32, 96], [96, 96]]) { c.beginPath(); c.arc(x, y, 6, 0, 7); c.fill(); }
+  }, [48 / 5, 36 / 5]) }),
+  black: new THREE.MeshStandardMaterial({ color: 0x14191d, roughness: .45, metalness: .6 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x2a3238, roughness: .5, metalness: .5 }),
+  metal: new THREE.MeshStandardMaterial({ color: 0xaab4ba, roughness: .45, metalness: .85 }),
+  anod: new THREE.MeshStandardMaterial({ color: 0x3a4650, roughness: .35, metalness: .7 }),
+  iron: new THREE.MeshStandardMaterial({ color: 0x3c444b, roughness: .48, metalness: .75 }),
+  pole: new THREE.MeshStandardMaterial({ color: 0xb4bcc2, roughness: .22, metalness: 1 }),
+  copper: new THREE.MeshStandardMaterial({ color: 0xd2d2d2, roughness: .55, metalness: .85, map: canvasTex(64, 512, (c, w, h) => {
+    for (let y = 0; y < h; y += 8) { const gr = c.createLinearGradient(0, y, 0, y + 8); gr.addColorStop(0, '#5a2d12'); gr.addColorStop(.5, '#e8a670'); gr.addColorStop(1, '#5a2d12'); c.fillStyle = gr; c.fillRect(0, y, w, 8); }
+  }) }),
+  copperEnd: new THREE.MeshStandardMaterial({ color: 0x9a5a2c, roughness: .5, metalness: .8, side: THREE.DoubleSide }),
+  modCoil: new THREE.MeshStandardMaterial({ color: 0xc8813f, roughness: .35, metalness: .85, emissive: 0x5ef2c6, emissiveIntensity: 0 }),
+  cavity: new THREE.MeshStandardMaterial({ color: 0xcfd6dc, roughness: .22, metalness: 1, transparent: true }),
+  wg: new THREE.MeshStandardMaterial({ color: 0xd2ad62, roughness: .3, metalness: 1, transparent: true }),
+  brass: new THREE.MeshStandardMaterial({ color: 0xc9a45a, roughness: .35, metalness: 1 }),
+  quartz: new THREE.MeshPhysicalMaterial({ color: 0xeaf8ff, roughness: .03, transparent: true, opacity: .22, clearcoat: 1, depthWrite: false }),
+  capM: new THREE.MeshStandardMaterial({ color: 0xe14a3a, roughness: .5 }),
+  fill: new THREE.MeshStandardMaterial({ color: 0x3b1460, roughness: .7 }),
+  hall: new THREE.MeshStandardMaterial({ color: 0xe8d9a8, roughness: .5, emissive: 0x403418, emissiveIntensity: .4 }),
+  pcb: new THREE.MeshStandardMaterial({ color: 0x1f4a35, roughness: .6, metalness: .2 }),
+  cable: new THREE.MeshStandardMaterial({ color: 0x1c2328, roughness: .75 }),
+  liaBox: new THREE.MeshPhysicalMaterial({ color: 0x232b31, roughness: .45, metalness: .3, clearcoat: .4 }),
+  ferrite: new THREE.MeshStandardMaterial({ color: 0x55585e, roughness: .6, metalness: .3 }),
+};
+function mesh(geo, mat, pos, parent = inst, shadow = true) {
+  const m = new THREE.Mesh(geo, mat); if (pos) m.position.set(pos[0], pos[1], pos[2]);
+  m.castShadow = shadow; m.receiveShadow = true; parent.add(m); return m;
+}
+// 沿 x 軸放的圓柱(CylinderGeometry 預設沿 y):s = 1 時上底朝 −x
+const alongX = (m, s = 1) => { m.rotation.z = s * Math.PI / 2; return m; };
+
+// 外殼(展開時往外飛並淡出)
+const shellParts = [];
+function shellPart(move, rot = 0) { const g = new THREE.Group(); inst.add(g); shellParts.push({ g, move, rot }); return g; }
+
+// ---------- 電磁鐵 ----------
+const magnetHit = [];
+for (const s of [-1, 1]) {
+  // 鐵軛:兩側立板 + 底下的橫樑(U 形,上方空出來讓樣品管插進去)
+  magnetHit.push(mesh(new RoundedBoxGeometry(6, 47, 22, 3, 1.2), MAT.iron, [s * 34, 27.5, 0]));
+  // 鐵心與錐形的磁極頭,極面在 x = ±3
+  magnetHit.push(alongX(mesh(new THREE.CylinderGeometry(8.5, 8.5, 22, 48), MAT.iron, [s * 20, YA, 0])));
+  alongX(mesh(new THREE.CylinderGeometry(7.5, 8.5, 6, 48), MAT.iron, [s * 6, YA, 0]), s);
+  const face = mesh(new THREE.CircleGeometry(7.5, 48), MAT.pole, [s * (GAP - .03), YA, 0], inst, false); face.rotation.y = -s * Math.PI / 2;
+  // 銅線圈(通水冷卻;這裡只畫外形)
+  const coil = new THREE.Group(); coil.position.set(s * 19, YA, 0); coil.rotation.z = Math.PI / 2; inst.add(coil);
+  magnetHit.push(mesh(new THREE.CylinderGeometry(16, 16, 15, 72, 1, true), MAT.copper, [0, 0, 0], coil));
+  mesh(new THREE.CylinderGeometry(9, 9, 15, 48, 1, true), MAT.copperEnd, [0, 0, 0], coil);
+  for (const e of [-1, 1]) mesh(new THREE.RingGeometry(9, 16, 72), MAT.copperEnd, [0, e * 7.5, 0], coil).rotation.x = -e * Math.PI / 2;
+  for (const sz of [-8, 8]) mesh(new THREE.CylinderGeometry(2.2, 2.6, 4, 20), MAT.black, [s * 27, 2, sz]);
+  // 線圈外罩(外殼的一部分)
+  const cov = shellPart([s * 10, 12, 0]);
+  const cg = new THREE.Group(); cg.position.set(s * 19, YA, 0); cg.rotation.z = Math.PI / 2; cov.add(cg);
+  magnetHit.push(mesh(new THREE.CylinderGeometry(17.2, 17.2, 16.4, 72, 1, true), MAT.shell, [0, 0, 0], cg));
+  for (const e of [-1, 1]) { const r = mesh(new THREE.RingGeometry(9.2, 17.2, 72), MAT.shell, [0, e * 8.2, 0], cg); r.rotation.x = -e * Math.PI / 2; magnetHit.push(r); }
+}
+magnetHit.push(mesh(new RoundedBoxGeometry(74, 7, 22, 3, 1.2), MAT.iron, [0, 7.5, 0]));
+
+// ---------- 共振腔、調變線圈、樣品 ----------
+const cavG = new THREE.Group(); cavG.position.set(0, YA, 0); inst.add(cavG);
+mesh(new RoundedBoxGeometry(2.6, 4.6, 5.6, 2, .22), MAT.cavity, [0, 0, 0], cavG);
+mesh(new THREE.CylinderGeometry(.62, .7, 2.2, 24), MAT.metal, [0, 3.4, 0], cavG);
+for (const s of [-1, 1]) mesh(new THREE.TorusGeometry(1.45, .36, 12, 40), MAT.modCoil, [s * 1.7, 0, 0], cavG).rotation.y = Math.PI / 2;
+// 腔裡的駐波:微波磁場(B1)在 y-z 平面繞成兩個圈,中間(樣品的位置)磁場最強、朝上下
+const loopMat = new THREE.LineBasicMaterial({ color: new THREE.Color(.3, 1.5, 1.15), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+for (const zc of [-1.12, 1.12]) for (const [ry, rz] of [[1.85, .95], [1.3, .66], [.72, .36]]) {
+  const pts = []; for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2; pts.push(new V3(0, ry * Math.sin(a), zc + rz * Math.cos(a))); }
+  cavG.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), loopMat));
+}
+// 樣品:粉末用 4 mm 石英管,水溶液用扁平樣品槽(扁的那面放在腔裡微波電場最弱的平面上)
+const holder = new THREE.Group(); holder.position.set(0, YA, 0); inst.add(holder);
+const tubeG = new THREE.Group(), flatG = new THREE.Group(); holder.add(tubeG, flatG);
+mesh(new THREE.CylinderGeometry(.2, .2, 26, 20, 1, true), MAT.quartz, [0, 11, 0], tubeG, false);
+mesh(new THREE.CylinderGeometry(.17, .17, 3, 16), MAT.fill, [0, 0, 0], tubeG, false);
+mesh(new THREE.BoxGeometry(.74, 5, .14), MAT.quartz, [0, 0, 0], flatG, false);
+mesh(new THREE.BoxGeometry(.6, 4.2, .05), MAT.fill, [0, 0, 0], flatG, false);
+mesh(new THREE.CylinderGeometry(.2, .2, 21.5, 16, 1, true), MAT.quartz, [0, 13.25, 0], flatG, false);
+mesh(new THREE.CylinderGeometry(.27, .27, 1.2, 16), MAT.capM, [0, 24.5, 0], holder);
+// 霍爾探針:貼在左邊極面的上方量磁場(位置是假設的)
+mesh(new THREE.BoxGeometry(.12, 1.3, .9), MAT.hall, [-2.55, YA + 4.6, 3.2]);
+mesh(new THREE.CylinderGeometry(.14, .14, 11, 10), MAT.black, [-2.55, YA + 10.8, 3.2]);
+mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2), MAT.dark, [-2.55, YA + 16.8, 3.2]);
+
+// ---------- 波導管 ----------
+// 長方形的空心金屬管,寬的一面直立;接共振腔的那一端有調耦合的螺絲
+const WG_LEN = BR_FRONT + 2.8;
+mesh(new THREE.BoxGeometry(1.3, 2.6, -WG_LEN), MAT.wg, [0, YA, (BR_FRONT - 2.8) / 2]);
+for (const z of [-3.05, BR_FRONT + .25]) mesh(new THREE.BoxGeometry(2.6, 3.9, .5), MAT.brass, [0, YA, z]);
+mesh(new THREE.CylinderGeometry(.18, .18, 1.6, 12), MAT.metal, [0, YA + 2.1, -3.9]);
+mesh(new THREE.CylinderGeometry(.5, .5, .5, 20), MAT.black, [0, YA + 3.1, -3.9]);
+
+// ---------- 微波橋 ----------
+mesh(new RoundedBoxGeometry(44, 26, 32, 3, 1), MAT.plinth, [0, 13, -52]);
+mesh(new THREE.BoxGeometry(48, 1, 36), MAT.bench, [0, 26.5, -52], inst, false);
+const O = {};
+function node(k, x, z, y = YA) { const g = new THREE.Group(); g.position.set(x, y, z); inst.add(g); O[k] = { g, p: new V3(x, y, z) }; return g; }
+function post(x, z, top, r = .4) { const h = top - 27; if (h > .05) mesh(new THREE.CylinderGeometry(r, r, h, 14), MAT.metal, [x, 27 + h / 2, z]); }
+// 一段波導(寬面直立),從 a 到 b(俯視 x, z)
+function wgSeg(a, b, mat = MAT.wg) {
+  const dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz);
+  const m = mesh(new THREE.BoxGeometry(1.3, 2.6, L), mat, [(a[0] + b[0]) / 2, YA, (a[1] + b[1]) / 2]);
+  m.rotation.y = Math.atan2(dx, dz); return m;
+}
+const C_ARM = 5, CIRC = [0, -49];
+const armEnd = deg => [CIRC[0] + C_ARM * Math.cos(deg * Math.PI / 180), CIRC[1] + C_ARM * Math.sin(deg * Math.PI / 180)];
+const ARM1 = armEnd(210), ARM2 = armEnd(90), ARM3 = armEnd(330), DET = [8.66, -54];
+// 微波源(耿恩二極體振盪器)
+{
+  const g = node('SRC', -17, -62);
+  mesh(new THREE.BoxGeometry(5, 4.4, 4.4), MAT.anod, [0, 0, 0], g);
+  for (let i = 0; i < 6; i++) mesh(new THREE.BoxGeometry(4.6, .9, .16), MAT.metal, [0, 2.65, -1.8 + i * .72], g);
+  alongX(mesh(new THREE.CylinderGeometry(.55, .55, 1.4, 16), MAT.brass, [3.1, 0, 0], g));
+  post(-17, -62, YA - 2.2);
+}
+// 方向耦合器(分一小部分到參考臂)、衰減器、循環器、偵測二極體
+wgSeg([-13.8, -62], [-8.6, -62]);
+{ const g = node('CPL', -11, -62); mesh(new THREE.BoxGeometry(3.4, 3, 1.8), MAT.anod, [0, 0, 0], g); mesh(new THREE.BoxGeometry(1.3, 2.6, 2.2), MAT.wg, [0, 0, -1.8], g); }
+wgSeg([-8.6, -62], ARM1);
+{
+  const a = [-8.6, -62], g = node('ATT', (a[0] + ARM1[0]) / 2, (a[1] + ARM1[1]) / 2);
+  g.rotation.y = Math.atan2(ARM1[0] - a[0], ARM1[1] - a[1]);
+  mesh(new THREE.BoxGeometry(2.6, 3.4, 4.2), MAT.anod, [0, 0, 0], g);
+  mesh(new THREE.CylinderGeometry(.9, .9, .7, 24), MAT.black, [0, 2.05, 0], g);
+  mesh(new THREE.BoxGeometry(.15, .2, .8), MAT.metal, [0, 2.45, .3], g);
+}
+{
+  const g = node('CIR', CIRC[0], CIRC[1]);
+  mesh(new THREE.CylinderGeometry(2.3, 2.3, 2.8, 6), MAT.anod, [0, 0, 0], g);
+  mesh(new THREE.CylinderGeometry(1.5, 1.5, .7, 32), MAT.ferrite, [0, 1.75, 0], g);
+  post(CIRC[0], CIRC[1], YA - 1.4, .7);
+}
+for (const e of [ARM1, ARM2, ARM3]) wgSeg(CIRC, e);
+wgSeg(ARM2, [0, BR_FRONT]);
+wgSeg(ARM3, [7.2, -53.2]);
+{
+  const g = node('DET', DET[0], DET[1]);
+  g.rotation.y = Math.atan2(DET[0] - ARM3[0], DET[1] - ARM3[1]);
+  mesh(new THREE.BoxGeometry(2.6, 3, 2.6), MAT.anod, [0, 0, 0], g);
+  mesh(new THREE.CylinderGeometry(.5, .5, 2, 16), MAT.metal, [0, 0, 2.1], g).rotation.x = Math.PI / 2;
+  O.DET.diode = mesh(new THREE.SphereGeometry(.42, 16, 12), new THREE.MeshBasicMaterial({ color: new THREE.Color(.2, .2, .2), toneMapped: false }), [0, 1.65, 0], g, false);
+  post(DET[0], DET[1], YA - 1.5);
+}
+// 參考臂:一小部分微波繞過共振腔直接到偵測器,讓它有穩定的工作電流;中間有開關與移相器
+const REF_PTS = [[-11, -63.4], [-11, -67], [8.66, -67], [8.66, -55.6]];
+{
+  const curve = new THREE.CurvePath();
+  for (let i = 0; i < REF_PTS.length - 1; i++) curve.add(new THREE.LineCurve3(new V3(REF_PTS[i][0], YA, REF_PTS[i][1]), new V3(REF_PTS[i + 1][0], YA, REF_PTS[i + 1][1])));
+  mesh(new THREE.TubeGeometry(curve, 60, .36, 10, false), MAT.wg);
+  for (const [x, w] of [[-2, 2.6], [4, 1.8]]) { mesh(new THREE.BoxGeometry(w, 2.2, 2), MAT.anod, [x, YA, -67]); mesh(new THREE.CylinderGeometry(.5, .5, .6, 18), MAT.black, [x, YA + 1.4, -67]); }
+}
+mesh(new THREE.BoxGeometry(12, .2, 9), MAT.pcb, [16, 27.2, -62], inst, false);
+for (const [x, z, w, d] of [[13, -60, 2, 2], [18, -64, 3, 1.6], [19, -59, 1.6, 1.6], [14, -65, 1.4, 2.4]]) mesh(new THREE.BoxGeometry(w, .5, d), MAT.black, [x, 27.55, z]);
+// 微波橋的蓋子(外殼)
+const brCov = shellPart([0, 34, -6], -.12);
+{
+  const m = mesh(new RoundedBoxGeometry(48.5, 15.6, 36.5, 4, 1.2), MAT.lid, [0, 35.4, -52], brCov);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(48.5, 15.6, 36.5)), MAT.edge); e.position.copy(m.position); brCov.add(e);
+  for (let i = 0; i < 10; i++) mesh(new THREE.BoxGeometry(16, .06, .5), MAT.dark, [12, 43.22, -64 + i * 1.5], brCov, false);
+}
+
+// ---------- 鎖相放大器(主控台) ----------
+const liaTex = canvasTex(512, 256, (c, w, h) => {
+  c.fillStyle = '#0b2a26'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(94,242,198,.35)'; c.lineWidth = 2; c.strokeRect(4, 4, w - 8, h - 8);
+  c.strokeStyle = 'rgba(160,255,225,.95)'; c.lineWidth = 4; c.beginPath();
+  for (let x = 30; x <= 482; x += 2) { const u = (x - 256) / 46, y = 120 + 92 * u / (1 + u * u) ** 2; x === 30 ? c.moveTo(x, y) : c.lineTo(x, y); }
+  c.stroke(); c.fillStyle = 'rgba(160,255,225,.9)'; c.font = `600 30px ${MONO}`; c.textAlign = 'left'; c.fillText('100 kHz', 26, 230);
+});
+{
+  const g = new THREE.Group(); g.position.set(52, 0, -32); inst.add(g); O.LIA = { g, p: new V3(52, 6, -32) };
+  mesh(new RoundedBoxGeometry(26, 13, 22, 3, .8), MAT.liaBox, [0, 6.5, 0], g);
+  mesh(new THREE.PlaneGeometry(12, 6), new THREE.MeshBasicMaterial({ map: liaTex, toneMapped: false }), [-4.5, 7.6, 11.02], g, false);
+  for (const [x, y] of [[4, 9.2], [7.5, 9.2], [4, 5.2], [7.5, 5.2]]) mesh(new THREE.CylinderGeometry(.9, .9, .8, 24), MAT.black, [x, y, 11.3], g).rotation.x = Math.PI / 2;
+  mesh(new THREE.SphereGeometry(.3, 12, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(.2, 1.2, .75) }), [10.2, 11, 11.05], g, false);
+}
+// 電纜:鎖相放大器 → 調變線圈、偵測器 → 鎖相放大器
+function cable(pts, r = .35) { mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new V3(...p))), 80, r, 8, false), MAT.cable); }
+cable([[39.5, 9, -30], [30, 4, -22], [14, 4, -16], [7, 30, -13], [5, 43, -9], [2.2, 39, -2.4], [1.9, YA + 1.9, 0]]);
+cable([[DET[0] + 1.2, YA - 1.6, DET[1]], [20, 30, -55], [30, 20, -46], [39.5, 9, -38]]);
+
+// ---------- 樣品裡的電子(放大) ----------
+// 箭頭是電子的小磁鐵;沒有磁場時亂指,有磁場時只能順著(+x,藍)或逆著(−x,橘);共振時吸收微波翻面
+const SPB = new THREE.Group(); SPB.position.set(-7, 53, 13); scene.add(SPB);
+const rimMat = (col, k) => new THREE.ShaderMaterial({
+  uniforms: { uC: { value: new THREE.Color(col) }, uK: { value: k } },
+  vertexShader: `varying vec3 vN; varying vec3 vV; void main(){ vec4 mv=modelViewMatrix*vec4(position,1.0); vN=normalize(normalMatrix*normal); vV=normalize(-mv.xyz); gl_Position=projectionMatrix*mv; }`,
+  fragmentShader: `uniform vec3 uC; uniform float uK; varying vec3 vN; varying vec3 vV; void main(){ float f=1.0-abs(dot(normalize(vN),normalize(vV))); gl_FragColor=vec4(uC*uK*pow(f,2.5),1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const bubbleRim = new THREE.Mesh(new THREE.SphereGeometry(5.4, 48, 32), rimMat(0x5ef2c6, .9)); SPB.add(bubbleRim);
+SPB.add(new THREE.Mesh(new THREE.SphereGeometry(5.36, 40, 24), new THREE.MeshBasicMaterial({ color: 0x03080b, transparent: true, opacity: .62, side: THREE.BackSide, depthWrite: false })));
+{
+  const a = mesh(new THREE.CylinderGeometry(.06, .06, 7.4, 8), new THREE.MeshBasicMaterial({ color: 0x9cc8ff, transparent: true, opacity: .45 }), [0, -4.6, 0], SPB, false); alongX(a, -1);
+  const h = mesh(new THREE.ConeGeometry(.3, .9, 12), new THREE.MeshBasicMaterial({ color: 0x9cc8ff, transparent: true, opacity: .6 }), [4.1, -4.6, 0], SPB, false); alongX(h, -1);
+}
+const SP = [];
+{
+  const shaft = new THREE.CylinderGeometry(.085, .085, 1.1, 10); shaft.translate(0, -.25, 0);
+  const head = new THREE.ConeGeometry(.25, .56, 14); head.translate(0, .58, 0);
+  const pts = [new V3(0, 0, 0)];
+  for (const [r, n] of [[1.75, 8], [3.5, 18]]) for (let i = 0; i < n; i++) {
+    const y = 1 - 2 * (i + .5) / n, rr = Math.sqrt(1 - y * y), ph = i * 2.39996 + r;
+    pts.push(new V3(r * rr * Math.cos(ph), r * y, r * rr * Math.sin(ph)));
+  }
+  pts.forEach((p, i) => {
+    const g = new THREE.Group(); g.position.copy(p); SPB.add(g);
+    const mat = new THREE.MeshStandardMaterial({ color: 0x74e4ff, roughness: .35, metalness: .2, emissive: 0x74e4ff, emissiveIntensity: .3 });
+    g.add(new THREE.Mesh(shaft, mat), new THREE.Mesh(head, mat));
+    const u = hash(i * 3.7) * 2 - 1, th = hash(i * 5.3) * Math.PI * 2, rr = Math.sqrt(1 - u * u);
+    SP.push({ i, g, mat, rand: new V3(rr * Math.cos(th), u, rr * Math.sin(th)), sign: hash(i * 7.9 + .3) < .7 ? 1 : -1, T: 1.5 + 1.3 * hash(i * 3.1), off: 9 * hash(i * 5.7), wob: 1.4 + hash(i * 2.2) * 1.6 });
+  });
+}
+const spinLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(-.3, YA + 1.2, .3), new V3(-5.4, 48.8, 10)]), new THREE.LineDashedMaterial({ color: 0x5ef2c6, dashSize: .6, gapSize: .5, transparent: true, opacity: .55, depthWrite: false }));
+spinLine.computeLineDistances(); scene.add(spinLine);
+const C_PAR = new THREE.Color(0x74e4ff), C_ANTI = new THREE.Color(0xffc261), _d = new V3(), _q = new THREE.Quaternion(), _c = new THREE.Color();
+function updateSpins(t, B, R) {
+  const al = sstep(15, 240, B);   // 沒有磁場時亂指,磁場一來就排好
+  for (const s of SP) {
+    // 每個箭頭有自己的週期;共振的程度 R 越大,越多箭頭在這一輪吸收微波翻面,過一會兒再翻回來(示意)
+    const ph = (t + s.off) / s.T, k = Math.floor(ph), u = ph - k;
+    const h = .12 + .8 * hash(s.i * 9.13 + k * 1.37);
+    const f = sstep(h - .1, h + .1, R * .6) * sstep(0, .14, u) * (1 - sstep(.5, .72, u));
+    const a = Math.PI * f, w = .2 * (1 - f) * al;
+    _d.set(s.sign * Math.cos(a), Math.sin(a) + w * Math.cos(t * s.wob + s.i), w * Math.sin(t * s.wob + s.i)).normalize();
+    _d.lerp(s.rand, 1 - al).normalize();
+    _q.setFromUnitVectors(UP, _d); s.g.quaternion.copy(_q);
+    _c.copy(C_PAR).lerp(C_ANTI, (1 - _d.x) / 2);
+    s.mat.color.copy(_c); s.mat.emissive.copy(_c); s.mat.emissiveIntensity = .3 + 2.4 * Math.sin(a);
+  }
+}
+
+// ---------- 兩極之間的磁力線 ----------
+const FL_GEO = new THREE.BufferGeometry();
+{
+  const pos = [], s = [];
+  for (const [r, n] of [[2.9, 9], [4.3, 12], [5.7, 15], [6.9, 17]]) for (let i = 0; i < n; i++) {
+    const a = (i + (r * 3 % 1)) / n * Math.PI * 2, y = YA + r * Math.sin(a), z = r * Math.cos(a);
+    for (let x = -GAP + .05; x < GAP - .1; x += .12) { pos.push(x, y, z, x + .12, y, z); s.push(x + 3, x + 3.12); }
+  }
+  FL_GEO.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  FL_GEO.setAttribute('aS', new THREE.Float32BufferAttribute(s, 1));
+}
+const flMat = new THREE.ShaderMaterial({
+  uniforms: { uT: { value: 0 }, uK: { value: 0 } },
+  vertexShader: `attribute float aS; varying float vS; void main(){ vS=aS; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: `uniform float uT; uniform float uK; varying float vS; void main(){ float p=fract(vS*0.55-uT*0.7); float d=smoothstep(0.0,0.12,p)*(1.0-smoothstep(0.35,0.6,p)); gl_FragColor=vec4(vec3(0.55,0.75,1.0)*uK*(0.25+0.9*d),1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const fieldLines = new THREE.LineSegments(FL_GEO, flMat); fieldLines.frustumCulled = false; scene.add(fieldLines);
+
+// ================= 微波 =================
+// 路徑(俯視 x, z;高度 YA):往共振腔(fwd)、反射回偵測器(refl)、參考臂(ref)。在波導管裡兩路左右錯開一點
+const PATHS = {
+  fwd: [[-14.2, -62], [-8.6, -62], ARM1, CIRC, ARM2, [-.25, -42], [-.25, BR_FRONT], [-.25, -2.7]],
+  refl: [[.25, -2.7], [.25, BR_FRONT], [.25, -42], ARM2, CIRC, ARM3, DET],
+  ref: REF_PTS,
+};
+const LAMG = 4.36;   // 波導裡的波長(cm):9.5 GHz 在 22.86 mm 寬的波導,λg = 43.6 mm(計算值)
+function waveGeo(pts) {
+  const P = pts.map(([x, z]) => new V3(x, YA, z)), pos = [], s = [];
+  let d = 0;
+  for (let i = 0; i < P.length - 1; i++) {
+    const a = P[i], b = P[i + 1], L = a.distanceTo(b), n = Math.max(1, Math.ceil(L / .12));
+    for (let k = 0; k < n; k++) {
+      const p0 = a.clone().lerp(b, k / n), p1 = a.clone().lerp(b, (k + 1) / n);
+      pos.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z); s.push(d + L * k / n, d + L * (k + 1) / n);
+    }
+    d += L;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('aS', new THREE.Float32BufferAttribute(s, 1));
+  return { g, P, len: d };
+}
+const waveMat = (col) => new THREE.ShaderMaterial({
+  uniforms: { uT: { value: 0 }, uAmp: { value: .5 }, uK: { value: 1 }, uC: { value: new THREE.Color(col) } },
+  vertexShader: `attribute float aS; uniform float uT; uniform float uAmp; varying float vS;
+    void main(){ vS=aS; vec3 p=position; p.y+=uAmp*sin(6.2831853*(aS-uT*7.0)/${LAMG.toFixed(2)}); gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0); }`,
+  fragmentShader: `uniform float uT; uniform float uK; uniform vec3 uC; varying float vS;
+    void main(){ float p=fract(vS*0.07-uT*0.5); float pulse=smoothstep(0.0,0.06,p)*(1.0-smoothstep(0.06,0.45,p)); gl_FragColor=vec4(uC*uK*(0.45+1.4*pulse),1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const WAVES = {};
+for (const [k, col] of [['fwd', 0x3df5c0], ['refl', 0xffa94a], ['ref', 0x2fbf9a]]) {
+  const w = waveGeo(PATHS[k]), m = waveMat(col), obj = new THREE.LineSegments(w.g, m);
+  obj.frustumCulled = false; scene.add(obj); WAVES[k] = { ...w, m, obj };
+}
+const C_MW = new THREE.Color(0x3df5c0), C_RF = new THREE.Color(0xffa94a);
+// 沿路徑流動的光點
+const PN = 360;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3), pSz = new Float32Array(PN);
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('aC', new THREE.BufferAttribute(pCol, 3));
+pGeo.setAttribute('aS', new THREE.BufferAttribute(pSz, 1));
+const pMat = new THREE.ShaderMaterial({
+  uniforms: { uScale: { value: 500 } },
+  vertexShader: `attribute vec3 aC; attribute float aS; uniform float uScale; varying vec3 vC;
+    void main(){ vC=aC; vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=aS*uScale/-mv.z; gl_Position=projectionMatrix*mv; }`,
+  fragmentShader: `varying vec3 vC; void main(){ float d=length(gl_PointCoord-0.5); float a=smoothstep(0.5,0.0,d); gl_FragColor=vec4(vC*a*a,1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const photons = new THREE.Points(pGeo, pMat); photons.frustumCulled = false; scene.add(photons);
+let pn = 0;
+function flow(P, c, k, size, t, salt, keep = 1, sp = 2.6) {
+  const cum = [0]; for (let i = 0; i < P.length - 1; i++) cum.push(cum[i] + P[i].distanceTo(P[i + 1]));
+  const L = cum[cum.length - 1], N = Math.floor(L / sp);
+  for (let i = 0; i < N && pn < PN; i++) {
+    const raw = i * sp + t * 7, s = raw % L, cyc = Math.floor(raw / L);
+    if (keep < 1 && hash(i * 7.13 + cyc * 3.71 + salt) > keep) continue;
+    let j = 0; while (j < cum.length - 2 && s > cum[j + 1]) j++;
+    const u = (s - cum[j]) / (cum[j + 1] - cum[j]), a = P[j], b = P[j + 1];
+    pPos[pn * 3] = lerp(a.x, b.x, u); pPos[pn * 3 + 1] = lerp(a.y, b.y, u); pPos[pn * 3 + 2] = lerp(a.z, b.z, u);
+    pCol[pn * 3] = c.r * k; pCol[pn * 3 + 1] = c.g * k; pCol[pn * 3 + 2] = c.b * k; pSz[pn] = size; pn++;
+  }
+}
+function buildPhotons(t, R) {
+  pn = 0;
+  flow(WAVES.fwd.P, C_MW, 2.4, .5, t, 1);
+  flow(WAVES.ref.P, C_MW, 1.1, .36, t, 2);
+  if (R > .01) flow(WAVES.refl.P, C_RF, 2.8, .55, t, 3, Math.min(1, R * 1.1));
+  pGeo.setDrawRange(0, pn);
+  for (const a of ['position', 'aC', 'aS']) pGeo.attributes[a].needsUpdate = true;
+}
+
+// ================= 標籤 =================
+const LBL = {};
+function label(key, comp, anchor, title, sub, prio = 1) {
+  const outer = document.createElement('div'); outer.className = 'lw';
+  outer.innerHTML = `<div class="lbl"><i></i><b>${title}</b>${sub != null ? `<span>${sub}</span>` : ''}</div>`;
+  const o = new CSS2DObject(outer); o.position.set(...anchor); o.center.set(.5, 1); scene.add(o);
+  const lm = new THREE.LineBasicMaterial({ color: 0x5ef2c6, transparent: true, opacity: .5, depthWrite: false });
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(...comp), new V3(...anchor)]), lm);
+  scene.add(line);
+  LBL[key] = { outer, box: outer.firstChild, line, lm, b: outer.querySelector('b'), span: outer.querySelector('span'), op: -1, a: 0, dec: 0, decT: 0, text: sub, title, prio };
+}
+function labelOp(key, a) { LBL[key].a = a; }
+function applyLabel(L) {
+  const v = L.a * L.dec; if (Math.abs(L.op - v) < .002) return; L.op = v;
+  L.outer.style.opacity = v; L.outer.style.visibility = v < .01 ? 'hidden' : 'visible';
+  L.lm.opacity = .5 * v; L.line.visible = v > .01;
+}
+function labelText(key, s) { const L = LBL[key]; if (L.text !== s) { L.text = s; L.span.textContent = s; } }
+function labelTitle(key, s) { const L = LBL[key]; if (L.title !== s) { L.title = s; L.b.textContent = s; } }
+label('MAG', [19, YA + 15.5, 4], [22, YA + 22, 8], zhEn('電磁鐵', 'Electromagnet'), zhEn('拖曳調磁場', 'drag to set field'), 9);
+label('POLE', [-4.5, YA + 5.5, 4.5], [-14, YA + 8, 15], zhEn('磁極', 'Pole'), '0.339 T', 4);
+label('HALL', [-2.55, YA + 17.4, 3.2], [-8, YA + 21, 6], zhEn('霍爾探針', 'Hall probe'), zhEn('量磁場', 'measures B'), 3);
+label('CAV', [1.3, YA + 2.3, 2.8], [7, YA + 6.5, 7], zhEn('共振腔', 'Cavity'), zhEn('微波駐波', 'standing wave'), 8);
+label('TUBE', [.2, YA + 9, 0], [6, YA + 12.5, 4], zhEn('樣品管', 'Sample tube'), 'DPPH', 7);
+label('SP', [-7, 58.4, 13], [-7, 61.5, 14], zhEn('樣品裡的電子', 'Electrons in sample'), zhEn('放大畫', 'magnified'), 6);
+label('MOD', [-1.7, YA + 1, 1.2], [-6.5, YA + 4.5, 6], zhEn('調變線圈', 'Modulation coils'), '100 kHz', 5);
+label('WG', [0, YA + 1.3, -22], [0, YA + 9, -26], zhEn('波導管', 'Waveguide'), zhEn('空心金屬管', 'hollow metal pipe'), 6);
+label('BR', [-20, 43.2, -60], [-21, 49.5, -60], zhEn('微波橋', 'Microwave bridge'), '9.5 GHz', 8);
+label('SRC', [-17, YA + 3.1, -62], [-19, YA + 8.5, -63], zhEn('微波源', 'Microwave source'), zhEn('耿恩二極體', 'Gunn diode'), 4);
+label('ATT', [-6.4, YA + 2.4, -56.7], [-6.4, YA + 8.5, -55], zhEn('衰減器', 'Attenuator'), zhEn('0 到 60 dB', '0 to 60 dB'), 3);
+label('CIR', [0, YA + 2.1, -49], [3, YA + 13, -47], zhEn('循環器', 'Circulator'), zhEn('分開去與回', 'routes out and back'), 3);
+label('DET', [DET[0], YA + 2.1, DET[1]], [4, YA + 7.5, -44], zhEn('偵測二極體', 'Detector diode'), zhEn('量反射的微波', 'reads reflection'), 4);
+label('LIA', [52, 13, -26], [52, 19.5, -22], zhEn('鎖相放大器', 'Lock-in amplifier'), zhEn('只抓 100 kHz', '100 kHz only'), 6);
+const LBL_KEYS = Object.keys(LBL);
+// 標籤不疊在一起、不蓋到左上的標題欄與右上的面板:每 0.1 秒量一次,重要的先放,和別的標籤或面板重疊的藏起來
+const OBST = ['.sitenav', '.hud', '#ctl', '#console', '#help', '#cap', '#tourExit', '.mp-dock', '.mp-rail'];
+let declAt = -1e9;
+function declutter() {
+  const now = performance.now(), instant = REC || FILM || tour.on;
+  if (instant || now - declAt > 100) {
+    declAt = now;
+    const obs = [], vw = innerWidth, vh = innerHeight;
+    for (const sel of OBST) for (const el of document.querySelectorAll(sel)) {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < .05) continue;
+      const r = el.getBoundingClientRect(); if (r.width > 1 && r.height > 1) obs.push(r);
+    }
+    const hit = (r, o, m) => r.left < o.right + m && r.right > o.left - m && r.top < o.bottom + m && r.bottom > o.top - m;
+    const keys = LBL_KEYS.filter(k => LBL[k].a > .01 && LBL[k].outer.style.display !== 'none').sort((a, b) => LBL[b].prio - LBL[a].prio);
+    const placed = [];
+    for (const k of LBL_KEYS) LBL[k].decT = 0;
+    for (const k of keys) {
+      const L = LBL[k], r = L.box.getBoundingClientRect();
+      let ok = r.width > 0 && r.left >= 2 && r.top >= 2 && r.right <= vw - 2 && r.bottom <= vh - 2;
+      if (ok) ok = !obs.some(o => hit(r, o, 4)) && !placed.some(o => hit(r, o, 3));
+      L.decT = ok ? 1 : 0; if (ok) placed.push(r);
+    }
+  }
+  const k = instant ? 1 : Math.min(1, (now - (declutter.last || now)) / 1000 * 10);
+  declutter.last = now;
+  for (const key of LBL_KEYS) { const L = LBL[key]; L.dec += (L.decT - L.dec) * k; applyLabel(L); }
+}
+
+// ================= 影片腳本(導覽與錄影共用) =================
+const FILM_DUR = 100;
+const CAMK = [
+  [0, [150, 112, 172], [6, 26, -20]], [5.5, [140, 106, 160], [6, 26, -20]],
+  [9.6, [112, 88, 126], [6, 27, -18]], [11.4, [108, 85, 121], [6, 27, -18]],
+  // 02 電磁鐵:正面看兩極與共振腔,上方放大的電子跟著磁場排好
+  [13, [-4, 60, 84], [-3, 38, 2]], [16.8, [-3, 58, 80], [-3, 38, 2]],
+  // 02 季曼分裂:放大的電子與樣品
+  [18.4, [6, 84, 46], [-4, 44, 7]], [22.8, [5, 82, 44], [-4, 44, 7]],
+  // 03 微波橋:由上往下看
+  [24.4, [-4, 104, -16], [-4, 30, -60]], [28.8, [-2, 102, -18], [-4, 30, -60]],
+  // 03 波導管接到共振腔
+  [30.4, [2, 100, 30], [0, 34, -8]], [34.8, [1, 98, 27], [0, 34, -8]],
+  // 03 和 NMR 比:放大的電子
+  [36.4, [-2, 64, 52], [-6, 50, 10]], [40.8, [-4, 63, 50], [-6, 50, 10]],
+  // 04 共振:共振腔與電子
+  [42.4, [3, 91, 40], [-3, 42, 6]], [47.4, [4, 89, 38], [-3, 42, 6]],
+  // 04 反射的微波沿波導管回到偵測二極體
+  [49, [-18, 108, 12], [2, 30, -40]], [53.6, [-16, 106, 10], [2, 30, -40]],
+  // 05 調變線圈
+  [55.2, [6, 44, 30], [0, 34, 0]], [59.8, [5, 43, 28], [0, 34, 0]],
+  // 05 鎖相放大器
+  [61.4, [88, 44, 6], [46, 12, -30]], [66.2, [85, 42, 4], [46, 12, -30]],
+  // 06 到 08:樣品與放大的電子,鏡頭慢慢移動
+  [67.6, [3, 91, 40], [-3, 42, 6]], [82, [-2, 96, 34], [-3, 41, 5]], [96, [-9, 90, 42], [-3, 41, 5]],
+  [98.4, [150, 112, 172], [6, 26, -20]], [100, [154, 114, 176], [6, 26, -20]],
+];
+// 磁場(mT):12.6 秒起通電;第 04 章慢慢加到 DPPH 的共振;四次掃描('lin' 等速)
+const BK = [
+  [12.6, 16.4, 0, 337.6], [42, 45.4, 337.6, 338.77],
+  [59.9, 60.4, 338.77, 336], [60.4, 65.4, 336, 342, 'lin'], [65.6, 66.4, 342, 338.77],
+  [72.3, 72.8, 338.77, 334], [72.8, 77.8, 334, 343, 'lin'],
+  [78.3, 78.9, 343, 335], [78.9, 83.5, 335, 343, 'lin'],
+  [84.1, 84.6, 343, 335], [84.6, 89.6, 335, 342, 'lin'], [89.8, 90.8, 342, 338.67],
+];
+const CAPS = [
+  [5.8, 11.4, zhEn('01 · 展開', '01 · Opening up'), zhEn('電子多半兩兩成對、磁性抵消;EPR 只看落單(不成對)的電子,原理和 NMR 一樣是共振。', 'Most electrons pair up and cancel; EPR sees only unpaired ones, by resonance, as NMR does.')],
+  [11.6, 16.8, zhEn('02 · 電磁鐵', '02 · The magnet'), zhEn('兩極之間約 0.34 T;霍爾探針隨時量磁場,好調整線圈的電流。', 'About 0.34 T between the poles; a Hall probe measures it to steer the coil current.')],
+  [17, 22.8, zhEn('02 · 季曼分裂', '02 · Zeeman splitting'), zhEn('落單的電子像小磁鐵,只能順著或逆著磁場,兩種能量不同(季曼分裂)。', 'The electron, a tiny magnet, points with or against the field: two energies (Zeeman splitting).')],
+  [23, 28.8, zhEn('03 · 微波', '03 · Microwaves'), zhEn('耿恩二極體發出 9.5 GHz 的微波;衰減器把它調弱,循環器把它往前送。', 'A Gunn diode makes 9.5 GHz microwaves; an attenuator dims them and a circulator passes them on.')],
+  [29, 34.8, zhEn('03 · 微波', '03 · Microwaves'), zhEn('波導管是空心的金屬管,把微波送進共振腔;微波在腔裡來回,成為駐波。', 'A hollow metal pipe, the waveguide, carries them to the cavity, where they form a standing wave.')],
+  [35, 40.8, zhEn('03 · 和 NMR 比', '03 · Versus NMR'), zhEn('電子這個小磁鐵約是氫原子核的 658 倍;同樣的磁場,氫核只要 14 MHz。', 'An electron is a 658 times stronger magnet than a proton; protons here need only 14 MHz.')],
+  [41, 47.4, zhEn('04 · 共振', '04 · Resonance'), zhEn('頻率固定、慢慢加大磁場;能量差等於一份微波的能量(hν = g μB B)時,電子吸收微波翻面。', 'Field rising, frequency fixed: when the gap fits one microwave (hν = g μB B), electrons absorb and flip.')],
+  [47.6, 53.6, zhEn('04 · 共振', '04 · Resonance'), zhEn('共振腔平常調到幾乎不反射;樣品一吸收,就有微波反射回去,被偵測二極體量到。', 'The cavity is tuned to reflect almost nothing; when the sample absorbs, some returns to the detector.')],
+  [53.8, 59.8, zhEn('05 · 偵測', '05 · Detection'), zhEn('調變線圈讓磁場每秒抖十萬次(100 kHz);鎖相放大器只挑出跟著抖的訊號。', 'Coils wiggle the field 100,000 times a second; a lock-in amplifier keeps only what wiggles along.')],
+  [60, 66.2, zhEn('05 · 一次微分', '05 · First derivative'), zhEn('所以畫出的是吸收曲線的斜率(一次微分):一上一下是同一條線,中心在穿過零的地方。', 'So it draws the slope of the absorption (first derivative): up and down are one line, centered at zero.')],
+  [66.4, 72.2, zhEn('06 · g 值', '06 · The g value'), zhEn('固體 DPPH 只有一條線,g = 2.0036;它就是 UV-Vis 頁量抗氧化用的紫色自由基。', 'Solid DPPH gives one line, g = 2.0036; it is the purple radical of the UV-Vis antioxidant test.')],
+  [72.4, 78.4, zhEn('07 · 超精細分裂', '07 · Hyperfine splitting'), zhEn('附近原子核的小磁鐵會把線分開:TEMPOL 的電子靠著一個氮,分成等高的三條。', "Nearby nuclei split the line too: TEMPOL's electron sits by one nitrogen, giving three equal lines.")],
+  [78.6, 84.2, zhEn('07 · 自旋捕捉', '07 · Spin trapping'), zhEn('羥基自由基一下就消失;用 DMPO 捉住它(自旋捕捉),得到 1:2:2:1 的四條線。', 'Hydroxyl radicals vanish fast; DMPO traps them (spin trapping), giving four lines, 1:2:2:1.')],
+  [84.4, 90.4, zhEn('08 · 木質素', '08 · Lignin'), zhEn('木質素粉末有穩定的自由基:一條寬線,g 約 2.004;木材照光或加熱後會變多。', 'Lignin powder holds stable radicals: one broad line, g about 2.004; light or heat makes more in wood.')],
+  [90.6, 96.4, zhEn('08 · 比面積', '08 · Compare areas'), zhEn('假設電子一樣多,寬的線矮很多;比多少要比面積(積分兩次),不能比高度。', 'With equal electrons a broad line is much shorter; compare areas (double integral), not heights.')],
+];
+const LBL_WIN = [
+  [9.6, 11.4, ['MAG', 'BR', 'LIA']], [11.6, 16.8, ['MAG', 'POLE', 'HALL']], [17, 22.8, ['SP', 'TUBE']],
+  [23, 28.8, ['SRC', 'ATT', 'CIR']], [29, 34.8, ['WG', 'CAV']], [41, 47.4, ['CAV']], [47.6, 53.6, ['DET', 'WG']],
+  [53.8, 59.8, ['MOD']], [60, 66.2, ['LIA']], [66.4, 96.4, ['TUBE']],
+];
+function track(t, segs, v0) {
+  let v = v0;
+  for (const [a, b, x, y, mode] of segs) {
+    if (t < a) break;
+    if (t >= b) { v = y; continue; }
+    const u = (t - a) / (b - a); v = lerp(x, y, mode === 'lin' ? u : ease(u)); break;
+  }
+  return v;
+}
+const lerp3 = (a, b, u) => new V3(lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u));
+function camAt(t) {
+  const K = CAMK;
+  if (t <= K[0][0]) return [new V3(...K[0][1]), new V3(...K[0][2])];
+  for (let i = 0; i < K.length - 1; i++) {
+    const [ta, pa, qa] = K[i], [tb, pb, qb] = K[i + 1];
+    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [lerp3(pa, pb, u), lerp3(qa, qb, u)]; }
+  }
+  const L = K[K.length - 1]; return [new V3(...L[1]), new V3(...L[2])];
+}
+const win = (t, a, b, f = .4) => sstep(a, a + f, t) * (1 - sstep(b - f, b, t));
+
+// ================= 狀態 =================
+const S = { sample: 'dpph', B: SAMPLES.dpph.peak, mod: .1, view: 'd', explode: 1, scan: null, ghost: null, scanning: false, scanT0: 0, seed: 1 };
+const W = { sample: 'dpph', B: S.B, mod: .1, view: 'd', explode: 1, scan: null, ghost: null, R: 0, labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1 };
+const DP_SCAN = { sample: 'dpph', mod: .1, from: 336, end: 342, seed: 11 };
+
+function film(t) {
+  W.sample = t < 72.25 ? 'dpph' : t < 78.25 ? 'tempol' : t < 84.05 ? 'dmpo' : 'lignin';
+  W.B = track(t, BK, 0);
+  W.mod = .1;
+  W.view = t >= 93 && t < 96.6 ? 'a' : 'd';
+  W.explode = sstep(6.2, 9.6, t) * (1 - sstep(96.4, 99.2, t));
+  W.scan = W.ghost = null;
+  if (t >= 60.4 && t < 72.25) W.scan = { ...DP_SCAN, to: Math.min(342, W.B) };
+  else if (t >= 72.8 && t < 78.25) W.scan = { sample: 'tempol', mod: .1, from: 334, end: 343, seed: 23, to: t < 77.8 ? W.B : 343 };
+  else if (t >= 78.9 && t < 84.05) W.scan = { sample: 'dmpo', mod: .1, from: 335, end: 343, seed: 37, to: t < 83.5 ? W.B : 343 };
+  else if (t >= 84.6) { W.scan = { sample: 'lignin', mod: .1, from: 335, end: 342, seed: 41, to: t < 89.6 ? W.B : 342 }; W.ghost = { ...DP_SCAN, to: 342 }; }
+  const [cp, ct] = camAt(t); camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct);
+  W.labels = {}; for (const [a, b, keys] of LBL_WIN) for (const k of keys) W.labels[k] = Math.max(W.labels[k] || 0, win(t, a, b, .5));
+  W.conOp = win(t, 11.6, 97, .8);
+  W.cap = null; for (const c of CAPS) if (t >= c[0] && t < c[1]) W.cap = { chap: c[2], txt: c[3], op: win(t, c[0], c[1], .35) };
+  W.title = win(t, .2, 5.6, .9); W.outro = sstep(96.8, 97.8, t); W.chips = win(t, 5.6, 97.2, .8);
+}
+
+let lastNote = '', lastLegend = '', lastCap = '', lastTitle = '', lastSample = '';
+function frameCommon(t) {
+  const sm = SAMPLES[W.sample];
+  W.R = W.B > 300 ? resOf(sm, W.B) : 0;
+  // 磁場、電子、微波
+  flMat.uniforms.uT.value = t; flMat.uniforms.uK.value = .95 * clamp(W.B / 340, 0, 1.1);
+  updateSpins(t, W.B, W.R);
+  const on = sstep(5, 60, W.B);
+  MAT.modCoil.emissiveIntensity = on * (.18 + .55 * (.5 + .5 * Math.sin(t * 2 * Math.PI * 2.2)));
+  for (const k in WAVES) WAVES[k].m.uniforms.uT.value = t;
+  WAVES.refl.m.uniforms.uAmp.value = .55 * W.R; WAVES.refl.m.uniforms.uK.value = .15 + 1.1 * W.R;
+  WAVES.ref.m.uniforms.uAmp.value = .3; WAVES.ref.m.uniforms.uK.value = .55;
+  buildPhotons(t, W.R);
+  O.DET.diode.material.color.setRGB(.25 + 2.4 * W.R, .2 + 1.5 * W.R, .1 + .4 * W.R);
+  loopMat.opacity = (.25 + .75 * Math.sin(t * 2.4) ** 2) * sstep(.25, .8, W.explode);
+  // 樣品容器與顏色
+  if (W.sample !== lastSample) {
+    lastSample = W.sample;
+    tubeG.visible = sm.cell === 'tube'; flatG.visible = sm.cell === 'flat';
+    MAT.fill.color.setHex(sm.fill);
+  }
+  // 外殼:線圈外罩與微波橋的蓋子飛開淡出;共振腔與波導管變半透明,看得到裡面
+  const k = ease(W.explode), o = 1 - sstep(0, .5, k);
+  for (const p of shellParts) {
+    p.g.position.set(p.move[0] * k, p.move[1] * k, p.move[2] * k); p.g.rotation.x = p.rot * k;
+    for (const c of p.g.children) c.traverse(m => { if (m.isMesh) { m.visible = o > .01; m.castShadow = o > .5; } });
+  }
+  for (const m of [MAT.shell, MAT.lid]) { m.opacity = o; m.depthWrite = o > .5; }
+  MAT.cavity.opacity = 1 - .74 * k; MAT.cavity.depthWrite = k < .1;
+  MAT.wg.opacity = 1 - .6 * k; MAT.wg.depthWrite = k < .1;
+  MAT.edge.opacity = .55 * Math.sin(Math.PI * k);
+  bloom.strength = .32 + .43 * k;
+  // 標籤
+  for (const key of LBL_KEYS) labelOp(key, W.labels ? (W.labels[key] || 0) : sstep(.55, .9, W.explode));
+  labelText('POLE', `${(W.B / 1000).toFixed(3)} T`);
+  labelTitle('TUBE', sm.cell === 'flat' ? zhEn('扁平樣品槽', 'Flat cell') : zhEn('樣品管', 'Sample tube'));
+  labelText('TUBE', sm.name);
+  updateDOM();
+}
+
+// ================= 介面 =================
+const el = id => document.getElementById(id);
+const cB = el('cB'), cG = el('cG'), fld = el('fld'), bv = el('bv');
+function noteHTML() {
+  const sm = SAMPLES[W.sample], B = fmtB(W.B);
+  let s = W.R > .25
+    ? zhEn(`<em class="w">共振</em>:磁場 <em class="c">${B}</em> 時,兩種狀態的能量差剛好等於一份 9.5 GHz 微波的能量,${sm.inText}${/[A-Za-z]$/.test(sm.inText) ? ' ' : ''}的電子吸收微波翻面,反射回偵測器的微波變多。`,`<em class="w">Resonance</em>: at <em class="c">${B}</em> the energy gap equals one 9.5 GHz microwave, so electrons in ${sm.inText} absorb and flip, and more microwave reflects back to the detector.`)
+    : zhEn(`磁場 <em class="c">${B}</em>:能量差和一份微波的能量對不上,電子不吸收。${sm.hint}`, `At <em class="c">${B}</em> the energy gap does not match one microwave, so nothing is absorbed. ${sm.hint}`);
+  if (W.mod > sm.dBpp * 1.5) s += zhEn(` 調變幅度 ${W.mod} mT 比這條線的寬度大,線會被拉寬、變形(過調變)。`, ` The ${W.mod} mT modulation is wider than this line, so the line is widened and distorted (overmodulation).`);
+  return s;
+}
+function updateDOM() {
+  const sm = SAMPLES[W.sample];
+  cB.textContent = fmtB(W.B);
+  cG.textContent = !sm.g || W.B < 50 ? '–' : gOf(W.B).toFixed(4);   // DMPO-OH 沒有可靠的 g 值、磁鐵沒通電時不顯示
+  if (!FILM && !tour.on) { const n = noteHTML(); if (n !== lastNote) { lastNote = n; el('note').innerHTML = n; } }
+  el('conSample').textContent = sm.full;
+  // 讀值:反射回來的微波(共振的程度,放大畫)、鎖相放大器輸出(目前磁場的一次微分,依這個樣品的最大值換算)
+  el('mR').style.width = `${Math.round(W.R * 100)}%`; el('vR').textContent = `${Math.round(W.R * 100)}%`;
+  const th = theory(W.sample, W.mod, 'd'), L = W.B > 300 ? clamp(theoryAt(th, W.B) / th.max, -1, 1) : 0, mL = el('mL');
+  mL.style.width = `${Math.abs(L) * 50}%`; mL.style.left = `${L < 0 ? 50 + L * 50 : 50}%`; el('vL').textContent = (L >= 0 ? '+' : '−') + Math.abs(L).toFixed(2);
+  let lg = '';
+  const nm = sc => SAMPLES[sc.sample].name;
+  if (W.scan) lg += `<span><i style="border-top:2px solid var(--mw)"></i>${zhEn(`掃描 調變 ${W.scan.mod} mT`, `scan, ${W.scan.mod} mT`)}</span>`;
+  if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>${zhEn(`上一次 ${nm(W.ghost)} ${W.ghost.mod} mT`, `previous: ${nm(W.ghost)}, ${W.ghost.mod} mT`)}</span>`;
+  if (!W.scan && !W.ghost) lg = `<span><i style="border-top:1px dashed var(--ink-2)"></i>${zhEn('預覽;按「掃描」量整條譜', 'preview; press Scan for the full spectrum')}</span>`;
+  if (lg !== lastLegend) { lastLegend = lg; el('legend').innerHTML = lg; }
+  const con = el('console');
+  con.style.opacity = W.conOp; con.style.visibility = W.conOp < .01 ? 'hidden' : 'visible';
+  if (W.conOp > .01) drawPlot();
+  // 字幕與片頭
+  if (FILM || tour.on) {
+    const cap = el('cap'), c = W.cap;
+    cap.style.opacity = c ? c.op : 0;
+    const ck = c ? c.chap + c.txt : '';
+    if (ck !== lastCap && c) { lastCap = ck; el('chap').textContent = c.chap; el('capTxt').textContent = c.txt; }
+    cap.classList.toggle('withcon', W.conOp > .01);
+    const tc = el('titlecard'), op = Math.max(W.title, W.outro);
+    tc.style.opacity = op; tc.style.visibility = op < .01 ? 'hidden' : 'visible';
+    const tk = W.outro > W.title ? 'o' : 't';
+    if (tk !== lastTitle) {
+      lastTitle = tk;
+      const tx = tk === 't'
+        ? zhEn(['EPR 電子順磁共振儀', '找出不成對的電子', '電子的小磁鐵,在磁場裡吸收微波', ''], ['EPR spectrometer', 'Find unpaired electrons', 'Tiny electron magnets absorbing microwaves in a magnetic field', ''])
+        : zhEn(['EPR 電子順磁共振儀', '磁鐵 · 微波 · 共振腔', 'X 頻帶微波約 9.5 GHz · 磁場約 0.34 T · 自由電子 g = 2.0023 · 磁場調變 100 kHz', '示意動畫;數值取自代表性的 X 頻帶儀器與文獻,機內元件位置、線寬與訊號大小為示意。'], ['EPR spectrometer', 'Magnet · microwaves · cavity', 'X-band microwaves about 9.5 GHz · field about 0.34 T · free electron g = 2.0023 · 100 kHz field modulation', 'Schematic animation; values from representative X-band instruments and the literature; internal positions, linewidths and signal sizes are illustrative.']);
+      ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => el(id).textContent = tx[i]);
+    }
+    document.querySelector('.hud').style.opacity = W.chips;
+  }
+}
+
+// ---------- 譜圖與能量圖 ----------
+const plot = el('plot'), tip = el('tip'), zee = el('zee');
+let hoverB = null, plotDrawnAt = -Infinity;
+function fitCanvas(cv) {
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (cv.currentCSSZoom || uiScale()), w = cv.clientWidth, h = cv.clientHeight; // 面板放大時多畫幾倍像素
+  if (!w) return null;
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  return { c, w, h };
+}
+function drawPlot() {
+  const now = performance.now();
+  if (!REC && now - plotDrawnAt < 1000 / 30) return;
+  plotDrawnAt = now;
+  drawZee();
+  const F = fitCanvas(plot); if (!F) return;
+  const { c, w, h } = F, sm = SAMPLES[W.sample], [x0, x1] = sm.win, view = W.view;
+  const fs = FILM ? 14 : 11, Lp = FILM ? 40 : 30, Rp = FILM ? 18 : 14, Tp = FILM ? 30 : 22, Bp = FILM ? 30 : 22;
+  const pw = w - Lp - Rp, ph = h - Tp - Bp;
+  let ym = 0;
+  for (const sc of [W.scan, W.ghost]) if (sc) ym = Math.max(ym, theory(sc.sample, sc.mod, view).max);
+  if (!ym) ym = theory(W.sample, W.mod, view).max;
+  ym *= 1.12;
+  const lo = view === 'a' ? -.1 * ym : -ym;
+  const X = B => Lp + (B - x0) / (x1 - x0) * pw, Y = v => Tp + (1 - (v - lo) / (ym - lo)) * ph;
+  c.font = `${fs}px ${MONO}`; c.lineWidth = 1;
+  // 橫軸:每 1 mT 一格
+  c.textAlign = 'center'; c.textBaseline = 'top';
+  for (let B = Math.ceil(x0); B <= x1; B += 1) {
+    const x = Math.round(X(B)) + .5;
+    c.strokeStyle = 'rgba(160,215,235,.08)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+    c.fillStyle = '#71858f'; c.fillText(B, x, Tp + ph + 6);
+  }
+  const y0 = Math.round(Y(0)) + .5;
+  c.strokeStyle = 'rgba(160,215,235,.25)'; c.beginPath(); c.moveTo(Lp, y0); c.lineTo(Lp + pw, y0); c.stroke();
+  c.strokeStyle = 'rgba(160,215,235,.18)'; c.strokeRect(Lp + .5, Tp + .5, pw - 1, ph - 1);
+  c.fillStyle = '#71858f'; c.textAlign = 'left'; c.fillText('mT', 2, Tp + ph + 6);
+  // 上緣:g 值刻度(g 越大,磁場越低);DMPO-OH 沒有可靠的 g 值,不畫
+  c.textBaseline = 'bottom';
+  if (sm.g) {
+    const gA = gOf(x1), gB = gOf(x0);
+    const stp = [.001, .002, .005, .01].find(s => pw * s / (gB - gA) >= (FILM ? 64 : 48)) || .01;
+    c.textAlign = 'center';
+    for (let g = Math.ceil(gA / stp) * stp; g <= gB + 1e-9; g += stp) {
+      const x = Math.round(X(bRes(g))) + .5; if (x < Lp + 16 || x > Lp + pw - 16) continue;
+      c.strokeStyle = 'rgba(94,242,198,.35)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp - 4); c.stroke();
+      c.fillStyle = 'rgba(94,242,198,.75)'; c.fillText(g.toFixed(3), x, Tp - 5);
+    }
+    c.textAlign = 'left'; c.fillText('g', 2, Tp - 5);
+  } else { c.textAlign = 'left'; c.fillStyle = 'rgba(255,194,97,.85)'; c.fillText(zhEn('中心位置為示意', 'center position illustrative'), Lp, Tp - 5); }
+  c.textAlign = 'left'; c.textBaseline = 'top'; c.fillStyle = '#71858f';
+  c.fillText(view === 'a' ? zhEn('吸收(把一次微分積分回去)', 'absorption (derivative integrated)') : zhEn('訊號(任意單位)', 'signal (arbitrary units)'), Lp + 6, Tp + 4);
+  c.save(); c.beginPath(); c.rect(Lp, Tp, pw, ph); c.clip();
+  const line = (pts, n, style, lw, dash) => {
+    c.setLineDash(dash || []); c.strokeStyle = style; c.lineWidth = lw; c.lineJoin = 'round'; c.beginPath();
+    for (let i = 0; i < n; i++) { const x = X(pts[i * 2]), y = Y(pts[i * 2 + 1]); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.stroke(); c.setLineDash([]); c.lineWidth = 1;
+  };
+  if (!W.scan && !W.ghost) { const th = theory(W.sample, W.mod, view); line(th.pts, th.pts.length / 2, 'rgba(168,188,198,.6)', 1.2, [2, 4]); }
+  const drawTrace = (sc, style, lw, dash) => {
+    if (!sc) return;
+    const tr = scanTrace(sc, view), n = Math.min(tr.length / 2, Math.floor((sc.to - sc.from) / STEP + 1e-6) + 1);
+    if (n >= 2) line(tr, n, style, lw, dash);
+  };
+  drawTrace(W.ghost, 'rgba(255,194,97,.95)', FILM ? 2 : 1.5, [5, 3]);
+  drawTrace(W.scan, '#5ef2c6', FILM ? 2.5 : 1.8);
+  if (W.B >= x0 && W.B <= x1) {
+    const x = X(W.B), y = Y(theoryAt(theory(W.sample, W.mod, view), W.B));
+    c.strokeStyle = 'rgba(94,242,198,.6)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+    c.fillStyle = '#5ef2c6'; c.strokeStyle = '#0c1318'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, FILM ? 6 : 4.5, 0, 7); c.fill(); c.stroke(); c.lineWidth = 1;
+  }
+  if (hoverB != null) {
+    const x = X(hoverB); c.setLineDash([3, 3]); c.strokeStyle = 'rgba(234,243,246,.5)';
+    c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke(); c.setLineDash([]);
+  }
+  c.restore();
+  plot._map = { X, x0, x1, Lp, pw };
+}
+// 能量圖:兩種狀態的能量 ±½ g μB B 隨磁場分開;箭頭的長度固定是一份微波的能量 hν,剛好接上兩條線時就是共振
+function drawZee() {
+  const F = fitCanvas(zee); if (!F) return;
+  const { c, w, h } = F, sm = SAMPLES[W.sample], BM = 420, Br = bRes(sm.g || GE);
+  const fs = FILM ? 13 : 10, L = 6, R = w - 6, cy = h * .5, Qh = h * .62;   // Qh:hν 的長度(像素)
+  const X = B => L + B / BM * (R - L), Yu = B => cy - .5 * Qh * B / Br, Yd = B => cy + .5 * Qh * B / Br;
+  c.lineWidth = FILM ? 2 : 1.5;
+  c.strokeStyle = 'rgba(255,194,97,.9)'; c.beginPath(); c.moveTo(X(0), cy); c.lineTo(X(BM), Yu(BM)); c.stroke();
+  c.strokeStyle = 'rgba(116,228,255,.9)'; c.beginPath(); c.moveTo(X(0), cy); c.lineTo(X(BM), Yd(BM)); c.stroke();
+  c.font = `${fs}px ${MONO}`; c.textBaseline = 'middle'; c.textAlign = 'center';
+  const B = clamp(W.B, 0, BM), x = X(B);
+  // 兩條線的名稱放在 hν 箭頭左邊,不和「hν」疊在一起;畫布太窄時只寫一個字
+  const narrow = w < 150, lab = (txt, col, yOf, s) => {
+    const tw = c.measureText(txt).width, xc = Math.max(L + tw / 2 + 2, Math.min(X(170), x - 24 - tw / 2)), Bx = (xc - L) / (R - L) * BM;
+    c.fillStyle = col; c.fillText(txt, xc, yOf(Bx) + s * fs * .9);
+  };
+  lab(narrow ? zhEn('逆', 'against') : zhEn('逆著磁場', 'against B'), 'rgba(255,194,97,.9)', Yu, -1);
+  lab(narrow ? zhEn('順', 'with') : zhEn('順著磁場', 'with B'), 'rgba(116,228,255,.9)', Yd, 1);
+  c.setLineDash([2, 3]); c.strokeStyle = 'rgba(234,243,246,.35)'; c.lineWidth = 1; c.beginPath(); c.moveTo(x, 2); c.lineTo(x, h - 2); c.stroke(); c.setLineDash([]);
+  // 微波的能量 hν:從下面那條線往上畫一段固定長度的箭頭
+  const yb = Yd(B), yt = yb - Qh, glow = W.R;
+  c.strokeStyle = glow > .2 ? `rgba(94,242,198,${.55 + .45 * glow})` : 'rgba(94,242,198,.5)'; c.lineWidth = FILM ? 3 : 2 + glow;
+  c.beginPath(); c.moveTo(x, yb); c.lineTo(x, yt); c.moveTo(x - 4, yt + 5); c.lineTo(x, yt); c.lineTo(x + 4, yt + 5); c.stroke();
+  c.fillStyle = 'rgba(94,242,198,.95)'; c.textAlign = B > BM * .72 ? 'right' : 'left'; c.fillText('hν', x + (B > BM * .72 ? -6 : 6), yt + 6);
+  c.fillStyle = '#71858f'; c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText(`${Math.round(BM)} mT`, R, h);
+  c.textAlign = 'left'; c.fillText('0', L, h);
+}
+function valueAt(B) {
+  for (const sc of [W.scan, W.ghost]) {
+    if (!sc || B < sc.from || B > sc.to) continue;
+    const tr = scanTrace(sc, W.view), i = Math.round((B - sc.from) / STEP);
+    if (i * 2 + 1 < tr.length) return { v: tr[i * 2 + 1], tag: sc === W.scan ? zhEn('掃描', 'scan') : zhEn('上一次', 'previous') };
+  }
+  return { v: theoryAt(theory(W.sample, W.mod, W.view), B), tag: zhEn('預覽', 'preview') };
+}
+const plotB = e => { const m = plot._map; if (!m) return null; const r = plot.getBoundingClientRect(), pz = plot.currentCSSZoom || uiScale(), px = (e.clientX - r.left) / pz; return { px, py: (e.clientY - r.top) / pz, B: m.x0 + (px - m.Lp) / m.pw * (m.x1 - m.x0), inside: px >= m.Lp && px <= m.Lp + m.pw }; };
+let plotDrag = false;
+plot.addEventListener('pointermove', e => {
+  const p = plotB(e); if (!p) return;
+  if (plotDrag) { setField(p.B); W.B = S.B; }
+  if (!p.inside) { hoverB = null; tip.style.display = 'none'; return; }
+  hoverB = p.B;
+  const sm = SAMPLES[W.sample], v = valueAt(hoverB);
+  tip.style.display = 'block'; tip.style.left = `${p.px}px`; tip.style.top = `${p.py}px`;
+  tip.textContent = `${hoverB.toFixed(2)} mT${sm.g ? ` · g ${gOf(hoverB).toFixed(4)}` : ''} · ${v.v.toFixed(3)} · ${v.tag}`;
+});
+plot.addEventListener('pointerleave', () => { hoverB = null; tip.style.display = 'none'; });
+plot.addEventListener('pointerdown', e => {
+  if (tour.on || FILM || e.button !== 0) return;
+  const p = plotB(e); if (!p || !p.inside) return;
+  stopScan(); plotDrag = true; plot.setPointerCapture(e.pointerId); setField(p.B); W.B = S.B;
+});
+const endPlotDrag = () => { plotDrag = false; };
+plot.addEventListener('pointerup', endPlotDrag);
+plot.addEventListener('pointercancel', endPlotDrag);
+
+// ---------- 控制 ----------
+function segOn(id, v) { for (const b of el(id).querySelectorAll('button')) b.classList.toggle('on', b.dataset.v === String(v)); }
+function stopScan() { if (S.scanning) { S.scanning = false; if (S.scan) S.scan.done = true; } el('btnScan').classList.remove('on'); el('btnScan').textContent = zhEn('掃描', 'Scan'); }
+function setField(v) { const sm = SAMPLES[S.sample]; S.B = clamp(v, sm.win[0], sm.win[1]); fld.value = S.B.toFixed(2); bv.textContent = fmtB(S.B); }
+function keepAsGhost() { if (S.scan && S.scan.done) { S.ghost = S.scan; S.scan = null; } }
+el('segSample').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.dataset.v === S.sample) return;
+  stopScan(); keepAsGhost(); S.scan = null;
+  S.sample = b.dataset.v; segOn('segSample', S.sample);
+  const sm = SAMPLES[S.sample]; fld.min = sm.win[0]; fld.max = sm.win[1];
+  setField(sm.peak);
+});
+el('segMod').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const v = +b.dataset.v; if (v === S.mod) return;
+  stopScan(); keepAsGhost(); S.mod = v; segOn('segMod', b.dataset.v);
+});
+el('segView').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.view = b.dataset.v; segOn('segView', S.view); });
+el('segShell').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.explode = +b.dataset.v; segOn('segShell', b.dataset.v); });
+fld.addEventListener('input', () => { stopScan(); setField(+fld.value); });
+el('btnScan').addEventListener('click', () => {
+  if (S.scanning) { stopScan(); return; }
+  const sm = SAMPLES[S.sample];
+  if (S.scan && S.scan.done) S.ghost = S.scan;
+  S.seed++; S.scan = { sample: S.sample, mod: S.mod, from: sm.win[0], end: sm.win[1], to: sm.win[0], seed: S.seed * 7.7, done: false };
+  S.scanning = true; S.scanT0 = performance.now() / 1000; S.explode = 1; segOn('segShell', 1);
+  el('btnScan').classList.add('on'); el('btnScan').textContent = zhEn('停止', 'Stop');
+});
+el('btnHelp').addEventListener('click', () => el('help').classList.toggle('show'));
+
+// 拖曳電磁鐵細調磁場(往右拖加大,每像素 0.005 mT)
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let drag = null;
+function pick(e) {
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, camera); return ray.intersectObjects(magnetHit.filter(m => m.visible), false).length > 0;
+}
+renderer.domElement.addEventListener('pointerdown', e => {
+  if (tour.on || FILM || e.button !== 0 || !pick(e)) return;
+  stopScan(); drag = { x: e.clientX, B: S.B }; controls.enabled = false;
+  renderer.domElement.setPointerCapture(e.pointerId); renderer.domElement.style.cursor = 'grabbing';
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  if (drag) { setField(drag.B + (e.clientX - drag.x) * .005); return; }
+  if (!tour.on && !FILM && e.buttons === 0) renderer.domElement.style.cursor = pick(e) ? 'grab' : '';
+});
+const endDrag = () => { if (!drag) return; drag = null; controls.enabled = true; renderer.domElement.style.cursor = ''; };
+renderer.domElement.addEventListener('pointerup', endDrag);
+renderer.domElement.addEventListener('pointercancel', endDrag);
+
+// ---------- 導覽 ----------
+const tour = { on: false, t0: 0, saved: null };
+function startTour() {
+  stopScan(); el('help').classList.remove('show');
+  tour.saved = { sample: S.sample, B: S.B, mod: S.mod, view: S.view, explode: S.explode, scan: S.scan, ghost: S.ghost, cp: camera.position.clone(), ct: controls.target.clone() };
+  tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false; nav.cancel();
+}
+function endTour() {
+  if (!tour.on) return;
+  tour.on = false; root.classList.remove('touring'); controls.enabled = true;
+  const s = tour.saved; Object.assign(S, { sample: s.sample, mod: s.mod, view: s.view, explode: s.explode, scan: s.scan, ghost: s.ghost });
+  const sm = SAMPLES[S.sample]; fld.min = sm.win[0]; fld.max = sm.win[1];
+  setField(s.B); camera.position.copy(s.cp); controls.target.copy(s.ct); controls.update();
+  Object.assign(W, { sample: S.sample, B: S.B, mod: S.mod, view: S.view, labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1 });
+  el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; document.querySelector('.hud').style.opacity = 1; lastNote = '';
+}
+el('btnTour').addEventListener('click', startTour);
+el('tourExit').addEventListener('click', endTour);
+addEventListener('keydown', e => { if (e.key === 'Escape') endTour(); });
+
+// ---------- 視角操作 ----------
+// 共用的 ../assets/camera-nav.js:滑鼠滾輪縮放,觸控板雙指平移、捏合縮放,方向鍵或 WASD 移動、Q/E 轉向、+/− 縮放、R 回到預設視角
+const nav = createCameraNav({ camera, controls, active: () => !FILM && !tour.on, radius: 160 });
+
+// ================= 迴圈 =================
+function interactive(dt, now) {
+  if (S.scanning) {
+    const sm = SAMPLES[S.sample], sp = (sm.win[1] - sm.win[0]) / SCAN_S;
+    let B = S.scan.from + (now - S.scanT0) * sp;
+    if (B >= S.scan.end) { B = S.scan.end; S.scan.to = B; stopScan(); }
+    S.scan.to = B; setField(B); W.B = B;
+  } else if (drag || plotDrag) W.B = S.B;
+  else W.B += (S.B - W.B) * Math.min(1, dt * 9);
+  W.explode += (S.explode - W.explode) * Math.min(1, dt * 2.4);
+  W.sample = S.sample; W.mod = S.mod; W.view = S.view; W.scan = S.scan; W.ghost = S.ghost;
+  W.labels = null; W.conOp = 1; W.cap = null; W.title = W.outro = 0;
+}
+// 手機版:3D 的投影中心移到標題與停靠區之外的空地(mp.applyView,導覽與影片時不作用)
+// 桌機小螢幕(1024×768 這類):3D 的投影中心移到面板之間最大的空地(../assets/free-view.js);手機、導覽與影片不作用
+const fv = createFreeView({ panels: ['.hud', '#ctl', '#console', '#help'], active: () => !FILM && !tour.on });
+// 導覽(不是影片)時:投影中心移到標題欄與字幕之間的空帶,空帶矮時稍微拉遠,1024×768 這類比例也看得到主角;影片與手機不作用
+const tv = { set: false, at: -1e9, last: 0, cy: 0, z: 1, tcy: 0, tz: 1 };
+function tourView() {
+  const now = performance.now(), w = innerWidth, h = innerHeight, dt = tv.last ? Math.min(.1, (now - tv.last) / 1000) : 0; tv.last = now;
+  if (!tour.on || FILM || mp.active()) { if (tv.set) { camera.clearViewOffset(); camera.zoom = 1; camera.updateProjectionMatrix(); tv.set = false; } return; }
+  if (now - tv.at > 400) {
+    tv.at = now;
+    const top = $('.hud').getBoundingClientRect().bottom + 8, cap = el('cap').getBoundingClientRect(), bot = Math.max(top + 120, cap.bottom - 84);
+    tv.tcy = (top + bot) / 2; tv.tz = clamp(Math.sqrt((bot - top) / h) / .7, .72, 1);
+  }
+  const k = tv.set ? 1 - Math.exp(-5 * dt) : 1;
+  tv.cy += (tv.tcy - tv.cy) * k; tv.z += (tv.tz - tv.z) * k;
+  camera.zoom = tv.z; camera.setViewOffset(w, h, 0, h / 2 - tv.cy, w, h); tv.set = true;
+}
+function render() { if (!mp.applyView(camera)) fv.apply(camera); tourView(); composer.render(); labelR.render(scene, camera); declutter(); }
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);
+  quality.configure(renderer, composer, bloom, { recording: REC });
+  renderer.setPixelRatio(DPR);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h); composer.setPixelRatio(DPR); composer.setSize(w, h); bloom.setSize(w * DPR, h * DPR); labelR.setSize(w, h);
+  pMat.uniforms.uScale.value = h * DPR / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+}
+addEventListener('resize', resize);
+resize();
+// 給測試與除錯用(主控台裡看得到狀態與譜線模型)
+window.EPR = { S, W, SAMPLES, signalAt, absorbAt, bRes, gOf, resOf, theory, camera, render, tour, startTour };
+
+// 字型載入後再畫(畫布上的字要用到)
+await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 3000))]);
+setField(S.B);
+
+if (REC) {
+  window.__dur = FILM_DUR;
+  // 等一個畫格讓 DOM 標籤也更新;背景分頁的 rAF 可能停住,所以最多只等 300 ms
+  window.__seek = async t => { film(t); frameCommon(t); render(); await Promise.race([new Promise(r => requestAnimationFrame(() => r())), new Promise(r => setTimeout(r, 300))]); return true; };
+  await window.__seek(+Q.get('t') || 0);
+  window.__ready = true;
+} else {
+  let last = performance.now() / 1000;
+  let filmStart = last - (+Q.get('t') || 0), hiddenAt = null;
+  document.addEventListener('visibilitychange', () => {
+    const now = performance.now() / 1000;
+    if (document.hidden) hiddenAt = now;
+    else if (hiddenAt !== null) {
+      const gap = now - hiddenAt; filmStart += gap;
+      if (tour.on) tour.t0 += gap;
+      if (S.scanning) S.scanT0 += gap;
+      last = now; hiddenAt = null;
+    }
+  });
+  const loop = () => {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    if (!quality.shouldRender(performance.now())) return;
+    quality.observe(performance.now());
+    const now = performance.now() / 1000, dt = Math.min(.05, now - last); last = now;
+    if (FILM) film((now - filmStart) % FILM_DUR);
+    else if (tour.on) { const t = now - tour.t0; if (t >= FILM_DUR) endTour(); else film(t); }
+    if (!FILM && !tour.on) { interactive(dt, now); nav.step(dt); controls.update(); }
+    frameCommon(FILM ? (now - filmStart) % FILM_DUR : tour.on ? now - tour.t0 : now);
+    render();
+  };
+  loop();
+  el('load').classList.add('done');
+  window.__ready = true;
+}
+</script>
+</body>
+</html>

@@ -24,7 +24,7 @@ assert.equal(at(3440, 1310), 1.3333, '超寬螢幕(3440×1440 放到最大的瀏
 assert.equal(at(1920, 950), 1, '1080P 螢幕上放到最大的瀏覽器視窗是基準');
 
 // 2. 每一頁都接上:3D 教材只放大面板與標籤;2D 教材、入口與數據畫圖整頁放大
-const LESSONS3D = ['lcq', 'lcq-3d', 'gc-ms', 'uv-vis', 'nmr', 'mass-analyzers', 'spectroscopy', 'chromatography'];
+const LESSONS3D = ['lcq', 'lcq-3d', 'gc-ms', 'uv-vis', 'nmr', 'mass-analyzers', 'spectroscopy', 'chromatography', 'ftir', 'fluorescence', 'xrd', 'epr'];
 const mainStyle = (html) => html.slice(html.indexOf('<style>'), html.indexOf('</style>'));
 for (const l of LESSONS3D) {
   const html = read(`${l}/index.html`), st = mainStyle(html);
@@ -59,7 +59,7 @@ const F = largestFreeRect(panels, W, H);
 for (const p of panels) assert.ok(F.x >= p.right + 10 - 1e-9 || F.x + F.w <= p.left - 10 + 1e-9 || F.y >= p.bottom + 10 - 1e-9 || F.y + F.h <= p.top - 10 + 1e-9, '空地不能碰到面板(含 10 px 邊距)');
 assert.ok(F.w * F.h >= 600 * 330, `空地要是右邊那一大塊(得到 ${Math.round(F.w)}×${Math.round(F.h)})`);
 assert.deepEqual(largestFreeRect([], W, H), { x: 0, y: 0, w: W, h: H, cx: W / 2, cy: H / 2 }, '沒有面板時是整個畫面');
-const FV = ['uv-vis', 'nmr', 'mass-analyzers', 'spectroscopy', 'chromatography', 'lcq-3d'];
+const FV = ['uv-vis', 'nmr', 'mass-analyzers', 'spectroscopy', 'chromatography', 'lcq-3d', 'ftir', 'fluorescence', 'xrd', 'epr'];
 for (const l of FV) {
   const html = read(`${l}/index.html`);
   assert.ok(html.includes("import { createFreeView } from '../assets/free-view.js';"), `${l}: 要載入 free-view.js`);

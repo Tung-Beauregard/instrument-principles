@@ -249,6 +249,339 @@ KI 對照(Babushok 等 2011 的 5% 苯基二甲基矽氧烷相統計;平均 / �
 
 只在搜尋摘要看到、沒有讀到原文的:2020 年 4 月版的技術資料(沒有找到;labwrench 上有 2010 年的規格表,沒有讀);DPPH 517 nm、福林酚 765 nm(ISO 14502-1 的流程、AOAC 的驗證)、丙酮中葉綠素的 430 nm 峰;UC Davis 的福林酚流程頁擋自動讀取,沒有繞過。
 
+## FTIR 紅外光譜儀
+
+網頁:https://tung-beauregard.github.io/instrument-principles/ftir/
+
+把一台傅立葉轉換紅外光譜儀(FTIR)拆開來看:光源、準直鏡、邁克生干涉儀(分光鏡、固定鏡、活動鏡)、當尺用的雷射、鑽石 ATR(衰減全反射)與偵測器。干涉圖和光譜之間的傅立葉轉換是頁面上真的算出來的。
+
+- 「導覽」自動播一遍,附中文字幕,共 8 章,96 秒
+- 拖曳活動鏡或光程差滑桿,看偵測器的訊號怎麼起伏;光程差 0 時所有波數同時加強(中心峰)
+- 樣品可選香草醛、濾紙(幾乎是純纖維素)、針葉樹木粉與空氣(背景);解析度 16、8、4、2 cm⁻¹;平均 1、4、16、64 次;可切換吸光度與單光束
+- 「掃描」記錄整張干涉圖、做傅立葉轉換、再除以背景;換解析度或平均次數再掃一次,上一條留著比較
+- 可切換組裝與展開兩種外觀
+
+### 數值與示意
+
+研究室有一台 Agilent Cary 630(鑽石 ATR);頁面不寫型號,元件的種類以常見的桌上型 FTIR 為例。和 Cary 630 對得上的:單次反射的鑽石 ATR、入射角 45°、最高解析度 2 cm⁻¹、DTGS 偵測器(Cary 630 是熱電致冷的 DTGS)(Agilent 使用手冊 2024 第 23、63 頁;2011 技術概覽第 4 頁)。對不上或沒有公開的:Cary 630 的參考雷射是固態雷射二極體,波長沒有公開,頁面用常見的氦氖雷射 632.8 nm 算條紋;Cary 630 的光源是繞線式加熱元件,溫度沒有公開,頁面用 1300 K 的黑體當光源的光譜(示意,1300 K 是一支 Globar 的例子)。機內元件的位置、活動鏡的移動(放大 20 倍)、鑽石的大小(真的取樣面直徑約 1 mm)都是示意。光譜依文獻吸收峰的位置組合,干涉圖由光譜算出、再加雜訊與切趾、做 FFT 算回光譜,不是實測數據。
+
+公式與推算(程式裡的位置見 ftir/MAINTENANCE.md「光譜模型」;數字 2026-11-16 用頁面量出):
+
+- 光程差 = 2 × 活動鏡移動的距離;解析度 R(cm⁻¹)要的最大光程差 = 1/R cm(Thermo TN52535)。4 cm⁻¹ 要 2.5 mm(鏡子走 1.25 mm,Shimadzu 的表也是 4 cm⁻¹ 配光程差 0.25 cm),2 cm⁻¹ 要 5 mm。
+- 單一波數 σ 的訊號隨光程差 δ 以 cos(2πσδ) 起伏:1000 cm⁻¹ 每 10 µm 光程差(鏡子 5 µm)重複一次。光程差 0 時所有波數同時最亮,就是中心峰。
+- 取樣:每經過一個雷射條紋取一點,間隔是 632.8 nm 的光程差,所以最高到 1 / (2 × 0.6328 µm) ≈ 7901 cm⁻¹(632.8 nm 本身是 15803 cm⁻¹;Shimadzu 網頁把 7901 寫成 632.8 nm 換算的波數,是錯的)。點數 2J + 1:16 cm⁻¹ 1977、8 cm⁻¹ 3951、4 cm⁻¹ 7903、2 cm⁻¹ 15803;FFT 16384 點,光譜點距約 0.964 cm⁻¹。4 cm⁻¹ 時單邊 3951 條條紋。
+- 切趾:Happ-Genzel,權重 0.54 + 0.46 cos(πj/J)。切趾去掉尖峰旁的漣漪,代價是峰變寬(Thermo TN52535)。
+- 吸光度 A = −log₁₀(樣品 ÷ 背景)(Bruker 表:T = 10% 時 A = 1)。背景與樣品都乘同一層空氣,相除以後二氧化碳與水氣抵消。
+- 平均:雜訊 ∝ 1/√次數(JASCO)。頁面量到(1900 到 2700 cm⁻¹ 的均方根,含鑽石自己吸收、光比較少的那一段):4 cm⁻¹ 掃 1 次約 0.006、16 次約 0.0016、64 次約 0.0007;16 次時 16 cm⁻¹ 約 0.0007、2 cm⁻¹ 約 0.0022(解析度越高,每一點分到的光越少)。
+- ATR 穿透深度 dp = λ / [2π n₁ √(sin²θ − (n₂/n₁)²)](PIKE AN 0402,電場振幅降到 1/e 的深度):鑽石 n₁ = 2.4、45°、樣品 n₂ = 1.5 時 4000 cm⁻¹ 0.50 µm、1700 cm⁻¹ 1.18 µm、1000 cm⁻¹ 2.01 µm;字幕寫「約 0.5 到 2 微米」。Cary 630 的兩份文件在 1700 cm⁻¹ 分別寫約 2 µm(2024 使用手冊)與 1.2 µm(2011 技術概覽),公式算出來的是 1.2。
+- 空氣:二氧化碳 2349 與 667 cm⁻¹(NIST CCCBDB,引 Herzberg 1945);水氣的基頻 3657、1595、3756 cm⁻¹(NIST WebBook,Shimanouchi 1972)。頁面在 3480 到 3960、1340 到 1920 cm⁻¹ 放一群細線,位置是示意。
+- 鑽石本身在約 2300 到 1900 cm⁻¹ 有吸收(Coombs;Harrick 的說法只見於摘要),頁面在 2600 到 1900 cm⁻¹ 放兩個高斯(示意)。
+
+| 畫面上的內容 | 出現的地方 | 狀態 | 依據 |
+| --- | --- | --- | --- |
+| 光程差 = 2 × 鏡子移動;4 cm⁻¹ 要光程差 2.5 mm、鏡子 1.25 mm | 第 03、08 章字幕、牆上說明、說明 | 文獻、計算 | Thermo TN52535、Shimadzu Tips for FTIR |
+| 雷射 632.8 nm 當尺、數條紋 | 第 05 章字幕、說明框小字、條紋數 | 常見設計 | 氦氖雷射(JASCO、Bruker);Cary 630 用固態雷射,波長沒有公開 |
+| 光源通電加熱、1300 K 黑體 | 第 02 章字幕、單光束的形狀 | 原理、示意(溫度) | Thermo、JASCO;1300 K 是 arXiv:2409.01875 裡一支 Globar 的例子(摘要) |
+| 分光鏡一半穿過、一半反射 | 第 03 章字幕 | 原理 | Thermo;中紅外常用鍍鍺的溴化鉀(JASCO) |
+| 鑽石 ATR、單次反射、入射 45° | 3D、第 06 章 | Cary 630 規格 | Agilent 2011 技術概覽第 4 頁 |
+| 光鑽進樣品約 0.5 到 2 微米 | 第 06 章字幕 | 計算 | PIKE AN 0402 的公式;Specac 表 1 在 1000 cm⁻¹ 是 2.01 µm |
+| DTGS 偵測器 | 偵測器標籤 | Cary 630 規格 | 使用手冊第 63 頁 |
+| 香草醛的峰(3190、3013、2858、1663、1596、1510、1463、1430、1300、1265、1200、1172、1155、1123、1028、857、815、732) | 光譜曲線 | 文獻(位置) | Oliveira 2014 表 1(KBr)、Huang 2024、Ibrahim 2024;1430、1300 只在 NIST 2529 圖上看到 |
+| 濾紙(纖維素)的峰(3333、2898、1638、1428、1365、1335、1315、1205、1160、1107、1055、1030、985、897、662) | 光譜曲線 | 文獻(位置) | Somogyi Škoc 2024、Bloss 2025 |
+| 木粉的峰與相對高度 | 光譜曲線 | 文獻(位置與相對高度) | Traoré 2018(Cary 630 鑽石 ATR 量的松木)表 2 與圖 2a 目視(1025 cm⁻¹ = 1);心材抽出物的 1690 cm⁻¹ 不放 |
+| 香草醛與濾紙的峰高、所有峰的寬度 | 光譜曲線 | 示意 | 沒有找到可靠的強度與寬度 |
+| 雜訊大小 | 讀值、光譜 | 示意(`NOISE` 常數);隨次數變小是算出來的 | |
+| 元件位置、活動鏡放大 20 倍、鑽石放大、漸逝波的厚度 | 3D | 示意 | 說明框小字、片尾字卡 |
+
+### 技術
+
+單一 HTML 檔(ftir/index.html),用 three.js 0.183.2 繪圖(零件標籤用 CSS2DRenderer),不需要建置。傅立葉轉換是頁面上的基 2 FFT(16384 點),載入時每個樣品算一次干涉圖。程式分區、光譜模型與影片時間軸見 ftir/MAINTENANCE.md。
+
+### 來源連結
+
+讀到內容的(2026-11-16):
+
+- Agilent, Cary 630 FTIR Spectrometer User's Guide, G8043-90001, Edition 6(2024):https://chemistry.unt.edu/cary_630_users_guide.pdf
+- Agilent, Cary 630 FTIR 取樣附件技術概覽(2011,日文版 5990-8526JAJP):https://www.chem-agilent.com/appnote/pdf/low_5990-8526JAJP.pdf
+- Thermo Nicolet, Introduction to Fourier Transform Infrared Spectrometry(2001):https://www.chem.uci.edu/~dmitryf/manuals/Fundamentals/FTIR%20principles.pdf
+- Thermo Fisher, A tutorial on spectral resolution for the Nicolet iS5 FTIR Spectrometer(TN52535):https://labrulez.com/pdf/TN_52535_E_0913_M_Spectral_Res_H_f2f80acd72.pdf
+- Bruker Optics, Guide for Infrared Spectroscopy(2011):https://shaker.umh.es/Investigacion/OPUS_script/GuideIFS.pdf
+- PIKE Technologies, ATR Theory and Applications(AN 0402):https://mmrc.caltech.edu/FTIR/Literature/ATR/ATR%20Pike%20App%20NOte%20402.pdf
+- Specac, Depth of penetration for ATR measurements:https://specac.com/application-note/depth-of-penetration-for-atr-measurements/
+- JASCO, Fundamentals of FTIR spectroscopy:https://jascoinc.com/learning-center/theory/spectroscopy/fundamentals-ftir-spectroscopy/
+- Shimadzu, Tips for FTIR 1. What Is Resolution?:https://www.ssi.shimadzu.com/service-support/technical-support/analysis-basics/tips-ftir/tech.html
+- Coombs, The use of Diamond as an ATR material(IJVS 2(2)):https://www.irdg.org/ijvs/ijvs-volume-2-edition-2/the-use-of-diamond-as-an-atr-material
+- NIST CCCBDB,二氧化碳的振動頻率:https://cccbdb.nist.gov/exp2x.asp?casno=124389
+- NIST Chemistry WebBook,水的振動能階:https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185&Mask=800
+- Oliveira et al. 2014, Molecules 19:5898(香草醛,表 1):https://doi.org/10.3390/molecules19055898
+- Somogyi Škoc et al. 2024, Molecules 29:3541(棉):https://doi.org/10.3390/molecules29153541
+- Bloss et al. 2025, Polymers 17:2934(棉短絨紙與磨木漿紙):https://doi.org/10.3390/polym17212934
+- Traoré et al. 2018, Wood Sci Technol 52:487(松木,Cary 630 鑽石 ATR):https://doi.org/10.1007/s00226-017-0967-9
+
+只在搜尋摘要看到、沒有讀到原文的:Cary 630 規格表 5990-8571EN(干涉儀 25 mm、45°、撓性機構,波數準確度 0.05 cm⁻¹);Globar 1300 K 的例子(arXiv:2409.01875);Schwanninger 2004(球磨對木材與纖維素紅外光譜的影響,只有摘要);Pandey 1999、Faix 1991 沒有讀。
+
+## 螢光光譜儀
+
+網頁:https://tung-beauregard.github.io/instrument-principles/fluorescence/
+
+把一台掃描式螢光光譜儀拆開來看:氙燈、激發單色器、分光鏡與參考偵測器、樣品室(石英比色管、擋光板、收光透鏡)、在側面 90 度的發射單色器與光電倍增管。左上的能階圖跟著目前的激發波長畫出吸收、變成熱、放出螢光。
+
+- 「導覽」自動播一遍,附中文字幕,共 8 章,94 秒
+- 拖曳兩片光柵或兩根滑桿改激發波長(220 到 650 nm)與發射波長(250 到 800 nm)
+- 樣品可選硫酸奎寧、色胺酸、葉綠素 a 與香草醛;狹縫(帶通)2.5、5、10 nm;濃度稀、濃
+- 「掃描」:發射光譜(固定激發、轉發射光柵)或激發光譜(固定發射、轉激發光柵);換條件再掃一次,上一條留著比較
+- 發射光譜上標出不是螢光的峰:激發波長的散射、水的拉曼峰、二級光
+- 可切換組裝與展開兩種外觀
+
+### 數值與示意
+
+頁面不寫型號;元件以常見的掃描式螢光光譜儀為例:150 W 連續氙燈(Hitachi F-7100、HORIBA FluoroMax-4、Shimadzu RF-6000 都是;Cary Eclipse 用閃光氙燈)、每公釐 1200 條光柵的 Czerny-Turner 單色器(FluoroMax、Cary Eclipse)、帶通 2.5、5、10 nm(Hitachi F-7100 與 Cary Eclipse 都有這三格)、參考偵測器(FluoroMax 用矽光二極體、Cary Eclipse 用另一支 R928)、R928 光電倍增管(9 級打拿極)。機內元件的位置、角度與數量是示意;光譜依文獻的激發與發射峰位置組合,強度是任意單位,雜訊是示意,不是實測數據。
+
+公式與推算(程式裡的位置見 fluorescence/MAINTENANCE.md「光譜模型」;數字 2026-11-16 用頁面與 Node 算出):
+
+- 斯托克斯位移:奎寧(0.5 M 硫酸)吸收 347 nm、放出 451 nm(Brouwer 2011 表 1)→ 28818 − 22173 = 6645 cm⁻¹;光子能量 3.57 → 2.75 eV,約 23% 變成熱。頁面的預設激發 350 nm、字幕寫「放出約 450 nm」。
+- 水的拉曼峰:λ = 10⁷ / (10⁷/λ激發 − 3400)(Ocean Optics Web Book;USP <1853> 用 3382 cm⁻¹,差不到 0.3 nm):激發 350 nm → 397.3 nm(HORIBA TN20 的靈敏度測試就是看 397 nm)、280 → 309.5、330 → 371.7。乙醚裡的葉綠素沒有這個峰。
+- 二級光:光柵設在 λ 時也讓 λ/2 以二級繞射通過,所以激發光在 2 × λ激發 再出現一次(USP <1853>;Edinburgh Instruments 的例子)。很多儀器在發射那一邊用長波通濾光片擋掉;頁面沒有擋,說明框小字有寫。
+- 激發光譜像吸收光譜:只對一種螢光物質、稀溶液、做過燈的校正才成立(Thermo Fisher Molecular Probes Handbook;USP <1853>)。頁面把光電倍增管的訊號除以參考偵測器(燈在各波長的強弱)再畫,所以奎寧 250 nm 的峰比 347 nm 高,和吸收光譜一樣。
+- 內濾效應:吸光度超過約 0.05(1 cm 比色管)螢光就不再和濃度成正比(Thermo Fisher;USP);Shimadzu A615 的檢量線在吸光度 0.025 附近開始彎。頁面只看比色管中間 2 mm:吸收的比例 = 10^(−0.4A) − 10^(−0.6A),稀(A = 0.03)0.0134、濃(A ≈ 6)0.0037,所以濃的比稀的暗(幾何是示意;真實的曲線在 A 約 1 附近最高,要很濃才會比稀溶液暗)。
+- 量子產率(頁面用來決定相對亮度):奎寧 0.546(0.5 M 硫酸,Melhuish 1961,Brouwer 2011),頁面用 0.55;色胺酸 0.12(水,Brouwer 2011 表 3);葉綠素 a 0.32(乙醚,PhotochemCAD;Latimer 1956 是 0.33);香草醛 0.012(乙醇,Bazyl' 2020;水裡的值沒有找到)。
+- 光電倍增管:R928 在 1000 V 時一個光電子放大約 1.0 × 10⁷ 倍(Hamamatsu 資料表),字幕寫「約一千萬個」。
+- 靈敏度:Shimadzu A615 用同一個樣品(玫瑰紅 B)比較,螢光的偵測極限比吸收低 400 倍以上;導言只寫「靈敏得多」。
+
+| 畫面上的內容 | 出現的地方 | 狀態 | 依據 |
+| --- | --- | --- | --- |
+| 氙燈發出紫外到可見的連續光 | 第 02 章字幕、燈的標籤 | 常見設計 | USP <1853>;Hitachi、HORIBA、Shimadzu 的規格 |
+| 光柵每公釐 1200 條、入射與繞射夾 40° | 3D(只決定轉角) | 刻線密度是常見規格、夾角是示意 | HORIBA FluoroMax、Agilent Cary Eclipse |
+| 狹縫 2.5、5、10 nm | 按鈕 | 常見規格 | Hitachi F-7100(經銷商頁)、Cary Eclipse |
+| 參考偵測器拿來校正燈 | 第 03 章字幕、譜圖 | 原理 | HORIBA FluoroMax、Cary Eclipse、USP <1853> |
+| 側面 90 度收光,背景幾乎是黑的 | 第 05 章字幕、牆上說明 | 原理 | USP <1853> |
+| 9 級打拿極、放大約一千萬倍 | 3D、第 06 章字幕 | 典型值(R928) | Hamamatsu R928 資料表(1997) |
+| 奎寧 350 nm 激發、約 450 nm 發光 | 第 03、04、07 章字幕 | 文獻 | Brouwer 2011:347 與 451 nm |
+| 色胺酸 278、355 nm;葉綠素 a 428、660、666、720 nm;香草醛約 405 nm | 樣品、光譜曲線 | 文獻 | Brouwer 2011;PhotochemCAD(OMLC);Bazyl' 2020、Vusovich 2015(摘要) |
+| 水的拉曼峰(約 3400 cm⁻¹) | 譜圖標記、說明 | 文獻、計算 | Ocean Optics Web Book;USP <1853> 3382 cm⁻¹ |
+| 太濃反而暗 | 第 08 章字幕、說明 | 原理(方向)、示意(倍數) | Thermo Fisher;USP <1853>;Shimadzu A615 |
+| 吸收帶的相對高度、寬度、小肩 | 光譜曲線 | 示意(葉綠素 660 / 428 照莫耳吸光係數 85300 / 111700) | PhotochemCAD |
+| 燈與光電倍增管的光譜響應、散射與二級光的大小 | 光譜曲線 | 示意 | |
+| 強度數字 | 讀值卡、譜圖 | 任意單位 | 真的儀器也是任意單位或計數(USP、HORIBA) |
+| 元件位置與大小 | 3D | 示意 | 說明框小字、片尾字卡 |
+
+### 技術
+
+單一 HTML 檔(fluorescence/index.html),用 three.js 0.183.2 繪圖(零件標籤用 CSS2DRenderer),不需要建置。程式分區、光譜模型與影片時間軸見 fluorescence/MAINTENANCE.md。
+
+### 來源連結
+
+讀到內容的(2026-11-16):
+
+- Brouwer AM, Standards for photoluminescence quantum yield measurements in solution(IUPAC Technical Report, Pure Appl Chem 2011;83:2213):https://pure.uva.nl/ws/files/1189483/104485_354696.pdf
+- PhotochemCAD 光譜(OMLC,奎寧、色胺酸、葉綠素 a):https://omlc.org/spectra/PhotochemCAD/
+- USP <1853> Fluorescence Spectroscopy, Theory and Practice:https://www.drugfuture.com/Pharmacopoeia/usp38/data/v38332/usp38nf33s2_c1853.html
+- Thermo Fisher, Molecular Probes Handbook: Introduction to fluorescence techniques:https://www.thermofisher.com/us/en/home/references/molecular-probes-the-handbook/introduction-to-fluorescence-techniques
+- Evident, Fluorescence Excitation and Emission Fundamentals:https://evidentscientific.com/en/microscope-resource/knowledge-hub/techniques/confocal/fluoroexciteemit
+- HORIBA, FluoroMax-4 Series brochure:https://cbst.unistra.fr/websites/pharmacie/UMR7199/NPI/Autres_Documents/FluoroMax_Series.pdf
+- HORIBA TN20, Determining Signal to Noise Ratio of a Spectrofluorometer:https://static.horiba.com/fileadmin/Horiba/Technology/Measurement_Techniques/Molecular_Spectroscopy/Steady_State_and_Time_Resolved_Fluorescence/Calculating_Signal_to_Noise_with_a_spectrofluorometer.pdf
+- Varian, Cary Eclipse Guaranteed Specifications:https://cos.unt.edu/chemistry/system/files/varian_cary_eclipse_fluorescence_specifications.pdf
+- Shimadzu RF-6000 規格:https://ssi.shimadzu.com/products/fluorescence/fluorescence-spectroscopy/rf-6000/spec.html
+- Shimadzu Application News A615(螢光與吸收的定量範圍):https://www.shimadzu.com/an/apl/13128/index.html
+- Hamamatsu R928 資料表(1997):https://www.cfd.rit.edu/products/manuals/Acton/old/MANUAL/PMT_P2.pdf
+- Mobley, Raman scattering(Ocean Optics Web Book):https://oceanopticsbook.info/view/scattering/level-2/raman-scattering
+- Edinburgh Instruments, Second Order Diffraction Through a Monochromator:https://www.edinst.com/?p=5376
+- Edinburgh Instruments, Raman Scattering in Fluorescence Emission Spectra:https://www.edinst.com/?p=5379
+- Bazyl' et al. 2020, Opt Spectrosc 128:473(香草醛等取代苯甲醛的螢光):https://elib.bsu.by/bitstream/123456789/342014/1/S0030400X20040037.pdf
+
+只在摘要或搜尋結果看到的:Hitachi F-7100 規格(原廠頁擋自動讀取,讀的是經銷商的頁面);Vusovich 2015(水裡香草醛陰離子約 405 nm 的螢光);Nawara & Waluk 2019(0.1 M 過氯酸的奎寧 0.60);奎寧螢光生命期(約 20 ns 與 2018 年一篇的 2.3 ns 互相矛盾,頁面不寫)。
+
+## XRD X 射線繞射儀
+
+網頁:https://tung-beauregard.github.io/instrument-principles/xrd/
+
+把一台粉末 X 射線繞射儀拆開來看:輻射防護櫃裡直立的測角儀,左臂的 X 射線管(燈絲、銅靶、鈹窗)、發散狹縫與索勒狹縫,中間水平放的粉末樣品,右臂的索勒狹縫、鎳濾片、接收狹縫與閃爍計數器。X 射線管與偵測器一起轉(θ–θ),只有在符合布拉格定律的角度,偵測器才收到很強的繞射光。
+
+- 「導覽」自動播一遍,附中文字幕,共 8 章,96 秒
+- 拖曳 X 射線管或偵測器,或用滑桿,改變繞射角 2θ(5 到 80°);讀值卡顯示 2θ、由布拉格定律算的晶面間距 d 與偵測器的計數,說明寫出對到哪一組晶面
+- 樣品可選食鹽(NaCl)、矽粉標準品、微晶纖維素與球磨纖維素(非晶);鎳濾片可以拿掉(多出 Kβ 的峰);晶粒大小可選大、小(峰寬依謝樂公式)
+- 「掃描」約 6 秒畫出整張繞射圖;換濾片或晶粒大小再掃一次,上一張留著比較;纖維素掃完顯示 Segal 結晶度指數
+- 第 04 章樣品上方浮出一小塊食鹽晶格,畫出兩層原子反射的波與多走的路程 2d sinθ;第 05 章畫出繞射錐(德拜-謝樂環)
+- 可切換組裝與展開兩種外觀;展開只是為了看裡面,說明框寫明真的儀器開門 X 射線就關掉
+
+### 數值與示意
+
+頁面不對應特定型號,也不寫型號。以常見的 Bragg-Brentano 粉末繞射儀為例:θ–θ 測角儀(樣品水平不動,X 射線管與偵測器各轉 θ;Bruker D8 ADVANCE ECO 是這種,D8 ADVANCE 兩種都有,Rigaku MiniFlex 與 NIST 的儀器是 θ-2θ)[S3 §2;S9 p.16, p.70;S7 p.10]、銅靶、線焦點、閃爍計數器加鎳濾片。繞射圖是模擬的:峰的位置用布拉格定律與晶格常數算,相對強度用文獻值,峰寬用謝樂公式加上示意的儀器峰寬,再加泊松雜訊;計數的大小、背景與非晶隆起的寬度是示意。數字 2026-11-16 用 Node 執行頁面 module 的「小工具」與「繞射模型」兩區算出,讀值卡另在無頭 Edge 核對。
+
+公式與推算(程式裡的位置見 xrd/MAINTENANCE.md「繞射模型」):
+
+- 布拉格定律 nλ = 2d sinθ,頁面用 n = 1:2θ = 2 asin(λ ÷ 2d)。食鹽 (200):d = a ÷ 2 = 0.28201 nm(a = 0.56402 nm [S4 p.41-42]),2θ = 31.703°(計算);矽 (111):d = 0.31357 nm,2θ = 28.441°,和 NIST SRM 640f 表 1 的 28.441° 相同 [S1 Table 1]。讀值卡反過來算 d = λ ÷ (2 sinθ):5° 時 1.7659 nm、80° 時 0.1198 nm。
+- 銅的特性 X 射線 [S2]:Kα1 0.15405929 nm、Kα2 0.15444274 nm、Kβ 0.1392234 nm;字幕寫「Kα,波長 0.154 nm」。Kα2 的強度是 Kα1 的一半 [S3 §3]。兩者分開的角度(計算,和查證筆記相同):20° 0.050°、30° 0.076°、50° 0.133°、80° 0.240°。
+- 鎳濾片(20 µm,計算):Kα 剩 42%、Kβ 剩 0.69%(NIST 質量衰減係數 48.7 與 279 cm²/g、密度 8.902 g/cm³ [S5])。沒有濾片時 Kβ 約是 Kα 的 16%(Bruker [S9 p.21];同一份投影片寫 0.02 mm 鎳濾片後剩 0.5%,頁面的計算值是 0.26%)。頁面以「有濾片時的 Kα1」為 1:有濾片 [Kα1, Kα2, Kβ] = [1, 0.5, 0.0039],沒有濾片 [2.381, 1.190, 0.571];拿掉濾片時峰高變 2.38 倍,強峰左邊多一個約 24% 高的 Kβ 峰,例如食鹽 (200) 的 Kβ 在 28.58°、(220) 的在 40.86°,矽 (111) 的在 25.65°(和查證筆記一致;Bruker 的剛玉圖譜也看得到這種峰 [S9 p.33-34])。說明框寫「Kα 也只剩約四成」(計算 42%;Bruker 寫濾片損失 40 到 60% [S9 p.24, p.26])。
+- 謝樂公式 D = Kλ ÷ (β cosθ),K = 0.9、λ = 0.15406 nm,β 是半高寬(弧度)[S23;S27]。頁面的峰寬 = √(儀器 0.06² + 謝樂寬度²)(°)。儀器 0.06° 是示意(Rigaku 的實驗室儀器量矽粉 0.053° 與 0.058° [S8 Fig. 2])。晶粒大小的選項:食鹽與矽 0.4 µm(SRM 640f 的晶域約 0.4 µm [S1 p.1])與 10 nm(示意);纖維素 5.3 nm 與 3.2 nm。計算:5.3 nm 在 22.98° 的半高寬 1.53°(查證筆記:Nam 等人模擬對照組棉花用 1.54° [S18],反算 5.3 nm);3.2 nm 是 2.53°(挪威雲杉的纖維素晶粒厚 3.2 ± 0.1 nm [S20]);10 nm 在 31.70° 是 0.83°;0.4 µm 合起來 0.064°。晶粒變小時面積不變,所以峰變矮:食鹽、矽 10 nm 的峰高約剩 11%。
+- 相對強度:食鹽 (111) 13、(200) 100、(220) 55、(311) 2、(222) 15、(400) 6、(331) 1、(420) 11;矽 (111) 100、(220) 60、(311) 35、(400) 8、(331) 13(都是 1953 年 NBS 標準圖譜量的峰高 [S4 p.7-8, p.41-42],頁面把它們當「晶粒大」時的峰高)。纖維素 Iβ(法式記法 [S15],d 與積分強度取自查證筆記由 COD 4114994 [S22] 的結構算的值,未用 Mercury 核對):(1-10) 0.5959 nm 33、(110) 0.5314 nm 27、(012) 0.4377 nm 3、(102) 0.4309 nm 9、(200) 0.3867 nm 100,34.5° 附近 (023)、(031)、(004)、(1-31) 6、4、4、5(頁面合稱「34.5° 複合峰」,French 指出 (004) 不是主要的那一個 [S15])。
+- 纖維素的模擬圖(沒有雜訊,晶粒 5.3 nm):最高點 14.93°、16.68°、20.55°(肩)、22.99°、34.35°;查證筆記半高寬 1.5° 的計算是 14.84、16.65、20.54、23.00、34.46°。3.2 nm 時 (1-10) 與 (110) 併成 15.83° 一個峰(筆記 2.5° 時 15.3°)。
+- 背景與非晶(示意):背景 = bg × (0.6 + 0.4 e^(−(2θ − 5)/8)),bg 食鹽 40、矽 30、纖維素與非晶 100 個計數。非晶隆起是高斯,最高點 20.5°(球磨微晶纖維素 [S14]),半高寬 9°(示意,文獻沒找到);微晶纖維素的隆起高 250 計數,占總散射面積約 34%(示意;文獻說 Avicel 的非晶比例依方法是 8 到 40% [S14]);非晶樣品的隆起 740 計數(總面積和微晶纖維素相同)。
+- 計數的大小(示意):有濾片、晶粒大時最高的結晶峰,食鹽 6000、矽 8000、纖維素 1500 個計數;加上背景,食鹽 (200) 的讀值是 6,032。雜訊是泊松雜訊的常態近似(標準差 √N);食鹽一整張(3751 點)雜訊除以 √N 的平均 −0.002、標準差 1.008。
+- Segal 結晶度指數 CrI = (I200 − Iam) ÷ I200 × 100,I200 是主峰高度(頁面取 21 到 24.5° 的最大值),Iam 是 18° 的高度(頁面取 17.9 到 18.1° 的平均),沒有扣背景 [S17;S14]。模擬(沒有雜訊):晶粒 5.3 nm 81.8%、3.2 nm 66.4%;導覽的兩次掃描 82.6%(種子 23)與 67.9%(種子 31)。對照:Avicel PH-101 用 Segal 法沒扣背景 81.0%、扣背景 91.7% [S14 Table 2]。晶粒小時 18° 的高度被峰的尾巴墊高,CrI 變低,即使非晶的量一樣 [S16];頁面的兩個數字示範這一點。說明框寫明只是一種估法。
+- 照到的範圍(示意):光束張開 1°,從焦點往下 θ ± 0.5° 的兩條光打到樣品表面的位置;2θ = 10° 時長 4.05、31.7° 時 1.28、80° 時 0.54 個單位,最多畫到樣品座的 ±2.5。實際上發散狹縫太寬時光會超出樣品,所以低角度要用小的狹縫 [S8 §4.2b]。
+- 繞射錐:半頂角 2θ,軸是入射光的方向 [S30,經 S23、S26];偵測器的接收狹縫在測角儀半徑上,剛好在錐的邊緣時就是那一組晶面的峰。
+- 晶格放大(第 04 章):畫面上層距 2、波長 1.0926(λ ÷ d = 0.5463,和食鹽 (200) 相同),所以 2θ = 31.70° 時路程差 2d sinθ 正好 1 個波長(互相加強);48.37° 時 1.5 個波長(互相抵消)。
+
+規格與數值的狀態:
+
+| 畫面上的內容 | 出現的地方 | 狀態 | 依據 |
+| --- | --- | --- | --- |
+| 銅 Kα 0.154 nm(Kα1、Kα2、Kβ 的波長) | 字幕 02、說明框、片尾、計算 | 文獻 | NIST [S2] |
+| X 射線的波長和原子間的距離差不多(約 0.15 nm) | 導言、字幕 02 | 文獻 | [S2];Cu Kα 適合晶格常數 0.1 到 1 nm 的材料 [S8 §2b] |
+| 燈絲、高電壓、銅靶、鈹窗、水冷 | 字幕 02、3D | 文獻(構造)、示意(形狀) | [S24;S12 p.4, p.8] |
+| X 射線管的管軸和光束垂直、線焦點 | 3D | 文獻(方向)、示意(尺寸) | 線焦點 0.4 × 12 mm,從 6° 看成 12 × 0.04 mm 的線 [S8 §2c;S3 §3] |
+| 發散狹縫限制照到的範圍、低角度拉長 | 字幕 03、3D | 文獻、示意(1°) | [S8 §4.2b, Fig. 5] |
+| 索勒狹縫擋掉偏離平面的光,峰不拖尾巴 | 字幕 03、3D | 文獻 | 軸向發散造成低角度的不對稱拖尾 [S8 §4.2a, §4.2g] |
+| θ–θ:樣品不動、管子與偵測器各轉 θ | 3D、說明框 | 文獻 | [S3 §2;S9 p.16, p.70] |
+| 樣品自轉 | 3D、說明框 | 文獻(功能)、示意(速度) | spinner 減少晶粒朝向不均 [S7 p.6] |
+| 閃爍計數器、鎳濾片 | 3D、說明框 | 文獻 | 閃爍計數器分不出 Kβ 的能量 [S9 p.29];鎳濾片 [S8 §4.2f;S9 p.21] |
+| 測角儀半徑約 20 cm | 說明框 | 示意 | 桌上型約 150 mm、落地型約 300 mm [S8 §4.2];NIST 217.5 mm [S3 §2] |
+| 輻射防護櫃、開門就關掉 X 射線 | 說明框 | 文獻 | 門的安全連鎖 [S7 p.10;S9 p.73] |
+| 食鹽 (200) 在 31.7°、晶面間距 0.282 nm | 字幕 06、讀值 | 計算 | a = 0.56402 nm [S4];布拉格定律 |
+| 食鹽、矽的峰位置與相對峰高 | 繞射圖 | 計算(位置)、實測(1953 年峰高) | [S4;S1] |
+| 纖維素的峰位置與相對強度 | 繞射圖 | 計算(研究代理由晶體結構算) | [S22;S15];未用 Mercury 核對 |
+| 非晶隆起在 20.5° | 繞射圖 | 文獻(位置)、示意(寬度與高度) | [S14] |
+| 木材的纖維素晶粒約 3 nm | 字幕 08 | 文獻 | 3.2 ± 0.1 nm [S20] |
+| 晶粒越小峰越寬(謝樂公式) | 字幕 08、說明框、晶粒大小 | 公式文獻、選項示意 | [S23;S27;S18;S20] |
+| 拿掉濾片多出 Kβ 峰,不是另一種物質 | 字幕 08、繞射圖 | 文獻、計算 | [S9 p.33-34];位置由布拉格定律算 |
+| Segal 結晶度指數,只是一種估法 | 字幕 07、讀值、說明框 | 文獻(方法)、模擬(數字) | [S17;S14;S16] |
+| 計數的大小、背景、雜訊、儀器峰寬、峰形 | 繞射圖、讀值 | 示意 | 說明框與頁尾寫明 |
+| 掃描約 6 秒、範圍 5 到 80°(纖維素與非晶 5 到 50°) | 掃描 | 示意 | 實際一張常要十幾分鐘到幾小時 [S9 p.17;S14] |
+| 元件位置、狹縫寬度、光束寬度、X 射線的顏色 | 3D | 示意 | X 射線看不見,用淡紫色畫 |
+
+### 技術
+
+單一 HTML 檔(xrd/index.html),用 three.js 0.183.2 繪圖(元件標籤用 CSS2DRenderer,繞射錐用 three.js 的裁切平面),不需要建置,不使用到站人數計數。程式分區、繞射模型、光路與影片時間軸見 xrd/MAINTENANCE.md。
+
+### 來源連結
+
+讀到內容的(2026-11-16,查證筆記 facts-xrd.md):
+
+- [S1] NIST, Certificate SRM 640f, Line Position and Line Shape Standard for Powder Diffraction (Silicon Powder), 2019(p.1 晶格常數與晶域、p.2 儀器、表 1):https://tsapps.nist.gov/srmext/certificates/archives/640f.pdf
+- [S2] NIST X-ray Transition Energies Database(Cu KL2、KL3、KM2/KM3、K 吸收邊;Ni K 吸收邊):https://physics.nist.gov/cgi-bin/XrayTrans/search.pl
+- [S3] Cline, Mendenhall, Black, Windover, Henins, J. Res. NIST 120, 173-222 (2015)(§2 到 §4):https://pmc.ncbi.nlm.nih.gov/articles/PMC4730681/
+- [S4] Swanson & Fuyat, NBS Circular 539 Vol. II (1953)(Si p.6-8、NaCl p.41-42):https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v2.pdf
+- [S5] NIST X-ray Mass Attenuation Coefficients, Nickel:https://physics.nist.gov/PhysRefData/XrayMassCoef/ElemTab/z28.html
+- [S7] Rigaku MiniFlex 型錄(p.5 偵測器、p.6 spinner、p.10 規格、p.11 版本)
+- [S8] M. Omori, Powder X-ray Diffraction Basic Course 2, Rigaku Journal 37(1), 12-19 (2021)
+- [S9] M. Manawan (Bruker AXS), The New D8 ADVANCE, 2022 投影片(p.16-33、59-73;原廠銷售資料)
+- [S12] PANalytical, The Empyrean Tube 型錄 (2014):https://malvernpanalytical.com/es/assets/Empyrean%20tube_tcm61-52050.pdf
+- [S14] Park et al., Biotechnol. Biofuels 3:10 (2010)(方法、表 2):https://pmc.ncbi.nlm.nih.gov/articles/PMC2890632/
+- [S15] A. D. French, Cellulose 21, 885-896 (2014), doi:10.1007/s10570-013-0030-4
+- [S16] French & Santiago Cintrón, Cellulose 20, 583-588 (2013), doi:10.1007/s10570-012-9833-y
+- [S22] Crystallography Open Database 4114994(纖維素 Iβ):https://www.crystallography.net/cod/4114994.cif
+- [S23] Holder & Schaak, ACS Nano 13, 7359-7365 (2019), doi:10.1021/acsnano.9b05157
+- [S24] J. Grebenkemper, Powder X-ray Diffraction, Chemistry LibreTexts(CC BY-NC-SA 4.0)
+- [S26] K. Nagao, Introduction to Powder X-ray Diffractometry I, Rigaku Journal 36(2) (2020)
+- [S27] Wikipedia: Scherrer equation(英文)
+
+只讀到摘要或經由別的文獻引用的:[S17] Segal et al., Textile Res. J. 29, 786-794 (1959)(摘要);[S18] Nam et al., Carbohydr. Polym. 135, 1-9 (2016)(摘要);[S20] Andersson et al., J. Wood Sci. 49, 531-537 (2003)(摘要);[S30] Debye & Scherrer (1916)(經 S23 引用)。
+
+查證筆記的缺口:食鹽的熱振動因子沒找到(頁面用 1953 年實測峰高,不用計算值);纖維素的相對強度是計算值、未用 Mercury 核對;非晶隆起的寬度與木粉的完整繞射圖都沒找到(頁面不放木粉,非晶樣品用球磨纖維素);國際晶體學表 Vol. C 的 Cu 波長表打不開(改用 NIST 的值)。
+
+## EPR 電子順磁共振
+
+網頁:https://tung-beauregard.github.io/instrument-principles/epr/
+
+把一台連續波 X 頻帶 EPR 儀(電子順磁共振,也叫 ESR 電子自旋共振)拆開來看:電磁鐵的兩個磁極夾著共振腔,微波橋裡的耿恩二極體發出約 9.5 GHz 的微波,經衰減器、循環器與波導管送進共振腔;頻率固定、慢慢加大磁場,落單(不成對)電子的兩個能量的差等於一份微波的能量時吸收微波翻面,共振腔反射回偵測二極體的微波跟著改變;磁場加上 100 kHz 的小抖動,鎖相放大器只挑出跟著抖的訊號,所以譜畫成一次微分。
+
+- 「導覽」自動播一遍,附字幕,共 8 章,100 秒
+- 樣品:DPPH 固體、TEMPOL 水溶液、DMPO-OH 水溶液(自旋捕捉)、木質素粉末;水溶液用扁平樣品槽
+- 改磁場:滑桿、在 3D 裡拖曳電磁鐵(每像素 0.005 mT)、點譜圖;讀值卡顯示磁場、微波頻率與這個磁場對應的 g 值
+- 調變幅度 0.02、0.1、0.5、2 mT;顯示一次微分或吸收(把一次微分積分回去)
+- 「掃描」約 6 秒由低磁場掃到高磁場;換調變幅度或樣品再掃一次,上一條留著比較
+- 下方的能量圖:兩種狀態的能量隨磁場分開,箭頭是一份微波的能量,剛好接上兩條線就是共振
+- 可切換組裝與展開兩種外觀
+
+### 數值與示意
+
+實驗室沒有這台儀器,頁面不寫型號。規格是幾台常見 X 頻帶儀器(Bruker EMX、EMXplus、ER 4102ST 標準共振腔,JEOL JES-X3 系列)的代表值,說明框與片尾字卡寫「代表性的 X 頻帶儀器」。磁鐵、共振腔、微波橋的大小與位置,電子的數量差與翻面,微波的顏色與反射的強弱,譜線的訊號大小與雜訊都是示意。
+
+公式與推算(程式的位置見 epr/MAINTENANCE.md「譜線模型」;下面標「計算」的數字 2026-11-16 用 Node 從 `epr/index.html` 的 module 切出「小工具」與「物理與譜線模型」兩區原樣執行算出):
+
+- 共振條件:hν = g μB B,B = hν ÷ (g μB)。h = 6.62607015 × 10⁻³⁴ J/Hz(定義值)、μB = 9.2740100657 × 10⁻²⁴ J/T(CODATA 2022),h ÷ μB = 71.4477 mT/GHz(計算),所以 B(mT) = 71.4477 × ν(GHz) ÷ g,g = 71.4477 × ν ÷ B。
+- 頻率固定 9.5 GHz(代表值;文獻與講義裡的實際量測在 9.3 到 9.88 GHz,每次量測寫自己的頻率)。自由電子 g = 2.0023 時 B = 338.99 mT ≈ 0.34 T(計算)。同一條 g = 2.0023 的線,9.385 GHz 在 334.88 mT、9.877 GHz 在 352.44 mT(計算):頻率不同,磁場位置不同,g 一樣。
+- 讀值卡的 g 值 = 71.4477 × 9.5 ÷ B:338.77 mT 2.0036、338.43 mT 2.0056、338.67 mT 2.0042、336 mT 2.0201、342 mT 1.9847(計算)。DMPO-OH 不顯示(g 值沒有查到可靠的數字)。
+- 季曼分裂:兩種狀態的能量 E₀ ± ½ g μB B,差 ΔE = g μB B,隨磁場線性變大(能量圖)。9.5 GHz 一份微波的能量 hν = 6.29 × 10⁻²⁴ J = 3.93 × 10⁻⁵ eV(計算)。
+- 數量差:波茲曼分布 n上 ÷ n下 = exp(−ΔE ÷ kT),298.15 K 時 0.99847,順著磁場的只多約 7.6 × 10⁻⁴(說明框寫「約萬分之八」);畫面上 70% 對 30% 是誇大的示意。
+- 和 NMR 比:電子與質子的磁矩比 658.21(字幕寫 658 倍);同樣 0.339 T 的磁場,氫核的共振頻率 = 42.577 MHz/T × 0.339 T = 14.43 MHz(計算,字幕寫 14 MHz)。
+- 超精細分裂:n 個自旋 I 的等價原子核分成 2nI + 1 條。TEMPOL 一個 ¹⁴N(I = 1)分成等高的三條,間距 aN = 16.6 G = 1.66 mT:9.5 GHz 時 336.77、338.43、340.09 mT(計算)。DMPO-OH 的 aN = aβH = 14.9 G,3 × 2 = 6 條中間兩對重疊成 1:2:2:1 四條,間距 1.49 mT;頁面把中心放在 338.99 mT(示意),四條在 336.755、338.245、339.735、341.225 mT。
+- 線形:一次微分的峰對峰寬度 ΔBpp。勞倫茲的半高半寬 γ = (√3 ÷ 2) ΔBpp,高斯的 σ = ΔBpp ÷ 2(計算)。DPPH 用勞倫茲(假設),木質素用高斯(假設)。每個樣品的吸收面積設成一樣(假設電子一樣多,示意):同樣的面積下一次微分的高度和 ΔBpp² 成反比,寬 10 倍的線矮 100 倍(計算);頁面上 0.1 mT 調變時 DPPH 的峰對峰 1.133、木質素 0.197(線寬 4.7 倍、線形不同,矮 5.8 倍),二次積分(面積)都是約 0.05(計算)。
+- 磁場調變:鎖相放大器的輸出是吸收曲線在調變下的一次諧波,S(B) = (2/π)∫₀^π A(B + h cos θ) cos θ dθ,h = 調變幅度(峰對峰)÷ 2;h 遠小於線寬時 S ≈ h × dA/dB(一次微分)。勞倫茲線用解析解(和數值積分比對一致到 10⁻⁶),高斯線用 64 點數值積分。DPPH 在 0.02、0.1、0.5、2 mT 調變時看到的峰對峰寬度 0.151、0.166、0.433、1.872 mT,峰對峰高度 0.244、1.133、2.449、1.792(計算):小調變線形最真但訊號弱,約等於線寬時訊號最大,太大時變寬、變形、又變矮,和文獻的規則一致(真實線形要小於 ΔBpp 的一成,最好的折衷約等於線寬)。
+- 雜訊(示意):每點加標準差 0.004 的常態亂數(和譜線同一個任意單位),最大值 ÷ 雜訊:DPPH 0.02 mT 31、0.1 mT 142;木質素 0.02 mT 5、0.1 mT 25(計算)。
+- 掃描:每個樣品約 6 秒掃完範圍,點距 0.005 mT(DPPH 336 到 342 mT,1201 點,每秒 1 mT;實際儀器例如 100 G 掃 40 秒、200 G 掃 30 秒,速度是示意)。
+- 波導:9.5 GHz 的自由空間波長 31.6 mm;WR-90(內寬 22.86 mm)的截止頻率 6.557 GHz,波導波長 λg = λ ÷ √(1 − (λ ÷ 2a)²) = 43.6 mm(計算);畫面上波導裡的正弦波用這個波長。
+- 單位:1 mT = 10 G(說明框)。
+
+規格與數值的狀態:
+
+| 畫面上的內容 | 出現的地方 | 狀態 | 依據 |
+| --- | --- | --- | --- |
+| 微波頻率 9.5 GHz(X 頻帶) | 讀值卡、字幕、片尾字卡、說明 | 代表值 | Auburn 講義 p.2-1(X 頻帶約 9.6 GHz 最常用)、Northwestern 手冊與文獻的實際量測 9.3 到 9.88 GHz;Ročnik Kozmelj 2024 表 2 用 9.5 GHz |
+| 磁場約 0.34 T(338.99 mT) | 字幕、片尾字卡、讀值卡 | 計算 | 共振條件與 CODATA 2022 的 h、μB、g_e |
+| 自由電子 g = 2.0023 | 片尾字卡、能量圖(DMPO-OH) | 文獻 | CODATA 2022 g_e = −2.00231930436092(取絕對值) |
+| 電子與質子的磁矩比 658 倍、氫核 14 MHz | 第 03 章字幕 | 文獻、計算 | CODATA 2022 μe/μp = −658.21068789、γp/2π = 42.577478461 MHz/T |
+| 耿恩二極體(固態微波源) | 標籤、第 03 章字幕 | 代表 | Bruker EMX 訓練講義(klystron 換成 Gunn 二極體)、JEOL JES-X3 產品頁 |
+| 衰減器 0 到 60 dB | 標籤 | 代表值 | Auburn p.2-2(1 到 10⁶ 倍)、UCSB EMXplus 設施頁 |
+| 循環器、參考臂、偵測二極體的作用 | 標籤、字幕、說明 | 文獻 | Auburn p.2-2、p.2-16 |
+| 共振腔調到幾乎不反射,樣品吸收時反射的微波出現 | 第 04 章字幕、橘色的反射微波、讀值條 | 文獻(反射的強弱是示意) | Auburn p.2-4 到 2-5(臨界耦合;吸收使 Q 下降、反射出現)。設計初稿寫「反射變少」,照這份來源改成「有微波反射回去」 |
+| 樣品放在微波磁場最強、電場最弱的地方;駐波 | 說明、駐波圈、第 03 章字幕 | 文獻;圈的形狀示意 | Auburn p.2-3 與 Fig. 3 |
+| 磁場調變 100 kHz、譜畫成一次微分 | 標籤、第 05 章字幕 | 文獻 | Auburn p.2-6 到 2-7、Fig. 8;Northwestern 手冊 p.13;JEOL |
+| 調變幅度 0.02 到 2 mT、過調變的規則 | 按鈕、說明框、說明 | 文獻(規則)、代表值(範圍) | Auburn p.2-7 與 Fig. 9;Northwestern p.12(銳利的線從 1 G 開始);EMXplus 最大 20 G |
+| 霍爾探針量磁場、控制器調整電流 | 標籤、第 02 章字幕 | 文獻(作用);位置是假設 | Bruker EMX 規格(Hall 磁場控制器);探針的實際位置沒有查到 |
+| 極面直徑 15 cm、間隙 6 cm | 3D 模型 | 代表值、示意 | JEOL JES-X310(極面 15 cm、間隙 60 mm);線圈與鐵軛的大小是示意 |
+| 4 mm 石英樣品管、樣品高 3 cm;水溶液用扁平樣品槽 | 3D 模型、說明框 | 文獻;尺寸示意 | Northwestern p.4(4 mm、高度 < 30 mm)、Bruker EMX 訓練講義;Auburn p.2-9(水像微波爐那樣吸收微波,水溶液用扁平樣品槽);師大儀器介紹 |
+| 室溫數量差約萬分之八 | 說明框 | 計算 | Auburn eq. 2(波茲曼分布) |
+| DPPH 固體一條線,g = 2.0036,ΔBpp 0.15 mT | 樣品、字幕、說明 | 文獻(線形是假設) | Wikipedia DPPH(引 Davies 2000、Poole 1996);Žilić et al. 2010(2.0036 ± 0.0001、粉末 0.15 mT);溶液裡是五條(Ionita 2021) |
+| DPPH 就是 UV-Vis 量抗氧化的自由基 | 第 06 章字幕 | 文獻 | Kedare & Singh 2011;Ionita 2021 |
+| TEMPOL 水溶液 g 2.0056、aN 16.6 G、三條等高 | 樣品、字幕、說明 | 文獻;線寬 0.15 mT 是示意 | Gafurov 2013 表 1。設計初稿用 TEMPO,但 TEMPO 在溶液裡的 g 值兩份來源互相矛盾,改用 TEMPOL |
+| DMPO-OH 1:2:2:1、aN = aβH = 14.9 G | 樣品、字幕、說明 | 文獻;g 值沒有查到,中心位置與線寬 0.15 mT 是示意 | Bhattacharjee et al. 2011(9.76 GHz 量測);Dojindo 自旋捕捉應用說明 Fig. 10 |
+| 木質素粉末一條寬線,g 2.0040 到 2.0043(頁面用 2.0042),ΔBpp 約 0.7 mT | 樣品、字幕、說明 | 文獻(線形是假設) | Ročnik Kozmelj et al. 2024 表 2(ΔBpp 6.45 到 7.56 G) |
+| 木材照光或加熱後自由基變多 | 第 08 章字幕 | 文獻 | Hon, Ifju & Feist 1980(照光);Kondratyeva et al. 2015(真空熱處理);新鮮的濕材在暗處量不到訊號(Hon 1980) |
+| 同樣多的電子,寬線比較矮;比多少要比面積 | 第 08 章字幕、說明框 | 文獻、計算 | Auburn p.2-15(二次積分與標準品比較) |
+| 1 mT = 10 G | 說明框 | 文獻 | NIST SP 811 表 10 |
+| 訊號大小、雜訊、掃描速度、反射的強弱、電子翻面的比例 | 譜圖、3D | 示意 | 程式註解與說明框 |
+
+### 技術
+
+單一 HTML 檔(epr/index.html),用 three.js 0.183.2 繪圖(零件標籤用 CSS2DRenderer),不需要建置,不使用到站人數計數。程式分區、模型與影片時間軸見 epr/MAINTENANCE.md。
+
+### 來源連結
+
+讀到內容的(2026-11-16 查證,全文或相關部分):
+
+- NIST CODATA 2022:μB https://physics.nist.gov/cgi-bin/cuu/Value?mub 、h https://physics.nist.gov/cgi-bin/cuu/Value?h 、g_e https://physics.nist.gov/cgi-bin/cuu/Value?gem 、μe/μp https://physics.nist.gov/cgi-bin/cuu/Value?muemsmup 、γp/2π https://physics.nist.gov/cgi-bin/cuu/Value?gammapbar 、k https://physics.nist.gov/cgi-bin/cuu/Value?k 、c https://physics.nist.gov/cgi-bin/cuu/Value?c
+- NIST Guide to the SI(SP 811)第 5 章表 10(高斯):https://www.nist.gov/pml/pubs/sp811/sec05.cfm
+- Auburn University EPR 課程講義第 2 章 Practical Aspects(p.2-1 到 2-28,Fig. 2 到 24):https://webhome.auburn.edu/~duinedu/epr/2_pracaspects.pdf
+- IMSERC, Northwestern University, EMXplus CW X-band Manual V1.0(2026-02-22):https://imserc.northwestern.edu/downloads/pcm-instruments-epr-emx-user-manual.pdf
+- Bruker EMXplus 產品頁:https://www.bruker.com/en/products-and-solutions/mr/epr-instruments/emxplus.html
+- Bruker ER 4102ST Standard Resonator:https://www.bruker.com/de/products-and-solutions/mr/epr-instruments/epr-resonators/Standard-Resonator.html
+- UCSB MRL Bruker EMXplus 設施頁:https://www.mrl.ucsb.edu/facilities/spectroscopy-facility/instruments/bruker-emxplus-epr-spectrometer
+- University of Saskatchewan SSSC, Brüker EMX EPR Specifications(2020):https://sssc.usask.ca/documents/bruker-emx-specifications.pdf
+- JEOL USA JES-X320 產品頁(JES-X3 系列):https://jeolusa.com/PRODUCTS/Electron-Spin-Resonance/JES-X320
+- 國立臺灣師範大學 儀器介紹「電子順磁共振光譜儀」:https://www.acad.ntnu.edu.tw/uploads/asset/data/6618e89333c9b39e950eb6f3/%E9%9B%BB%E5%AD%90%E9%A0%86%E7%A3%81%E5%85%B1%E6%8C%AF%E5%85%89%E8%AD%9C%E5%84%80.pdf
+- RF Cafe 波導規格(WR-90):https://rfcafe.com/references/electrical/ew-radar-handbook/microwave-waveguide-coaxial-cable.htm
+- 北京師範大學物理實驗講義「微波与铁磁共振」(波導公式 eq. 2、9):https://physics.bnu.edu.cn/docs/2024-10/unpub_37e5f3e682b042699c66dc6adc1580e3.pdf
+- Wikipedia, Electron paramagnetic resonance(第二手):https://en.wikipedia.org/wiki/Electron_paramagnetic_resonance ;DPPH:https://en.wikipedia.org/wiki/DPPH
+- Žilić D. et al. (2010) J Magn Reson 207(1):34-41,doi:10.1016/j.jmr.2010.08.005(arXiv:1202.3620)
+- Ionita P. (2021) Int J Mol Sci 22(4):1545,doi:10.3390/ijms22041545
+- Kedare S.B., Singh R.P. (2011) J Food Sci Technol 48(4):412-422,doi:10.1007/s13197-011-0251-1
+- Gafurov M.R. (2013) Magn Reson Solids 15(1):13103(Tempol 表 1):https://cyberleninka.ru/article/n/tempol-as-a-polarizing-agent-for-dynamic-nuclear-polarization-of-aqueous-solutions
+- Shenderovich I.G. (2024) Molecules 29(21):5032(TEMPO 的 g 值矛盾,未採用)
+- Bhattacharjee S. et al. (2011) Free Radic Biol Med 50(11):1536-1545(PMC3100166)
+- Dojindo, EPR Spin Trapping of Free Radicals with DMPO and BMPO:https://www.dojindo.com/products/B568/img/SpinTrapApplication.pdf
+- Ročnik Kozmelj T. et al. (2024) Int J Mol Sci 25(16):9044,doi:10.3390/ijms25169044
+- Hon D.N.-S., Ifju G., Feist W.C. (1980) Wood and Fiber 12(2):121-130:https://wfs.swst.org/index.php/wfs/article/view/1521
+- Chang T.-C. et al. (2014) Polym Degrad Stab 105:42-47,doi:10.1016/j.polymdegradstab.2014.03.036
+- Kondratyeva E.I. et al. (2015) Magn Reson Solids 17(2):15204:https://mrsej.kpfu.ru/contents/2015/MRSej_15204.pdf
+- 輔仁大學 實驗物理三 實驗 9 ESR(ΔE = g μB B):https://www.phy.fju.edu.tw/wp-content/uploads/2024/09/實驗物理三實驗9.pdf
+- 國家教育研究院 樂詞網(名詞:季曼分裂、循環器、霍爾探針、磁場調變等,2026-11-16 查詢)
+
+只看到部分內容或摘要的:Bruker EMX 訓練講義 What is EPR(第三方網站的副本,透過擷取摘要)、Bruker EPR 101 應用說明頁(行銷文字)、Krzystek et al. 1997(DPPH g 值的摘要)、Buettner & Mason 2003 與 Reszka et al. 2006(摘要)、Wilmad 707-SQ-250M 樣品管的商品頁。
+
+沒有讀到的:Buettner 1987 的自旋加成物參數表(PDF 404;DMPO-OH 的 14.9 G 依據上面兩份);Weil & Bolton 的教科書;Bruker EMX User's Manual(連不上);JEOL JES-X3 型錄 PDF(404)。沒有找到的數字:JEOL 的頻率範圍、霍爾探針的位置、扁平樣品槽的厚度、TEMPOL 與 DMPO-OH 的 X 頻帶線寬、DMPO-OH 的 g 值。
+
 ## NMR 核磁共振(以 Bruker AVANCE III 500 為例)
 
 網頁:https://tung-beauregard.github.io/instrument-principles/nmr/

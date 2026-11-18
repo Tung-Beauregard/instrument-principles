@@ -21,7 +21,7 @@ const opt = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
 const shotsAt = opt('--shots') ? path.resolve(opt('--shots')) : null;
 const STEP = Number(opt('--step') || 1);
 const names = argv.filter((a, i) => !a.startsWith('--') && !['--shots', '--step'].includes(argv[i - 1]));
-const ALL = ['uv-vis', 'nmr', 'mass-analyzers', 'spectroscopy', 'chromatography'];
+const ALL = ['uv-vis', 'nmr', 'mass-analyzers', 'spectroscopy', 'chromatography', 'ftir', 'fluorescence', 'xrd', 'epr'];
 const pages = names.length ? names : ALL;
 const BROWSER = process.env.CHECK_BROWSER || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const CJK = /[\u3400-\u9fff]/, READ_CPS = 17;
