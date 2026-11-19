@@ -151,6 +151,8 @@ html.film .sk-fld,html.touring .sk-fld{display:none}
 .titlecard .t3{font-size:20px;color:var(--ink-2);margin-top:14px}
 .titlecard .t4{font-size:14px;color:var(--muted);margin-top:22px}
 #tourExit{position:fixed;right:20px;top:18px;z-index:9;display:none}
+/* 導覽時分頁列只排到「結束導覽」的左邊(2026-11-19,和 FTIR 等新教材同一條;分頁列加了四個連結之後,1024 到 1100 px 寬時會伸到結束鈕底下) */
+html.touring .sitenav{max-width:calc(100vw / var(--ui,1) - 48px - 120px)}
 html.touring .ctl,html.touring .help,html.touring .lede,html.touring .sk-txt,html.touring .foot{display:none}
 html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
 html.touring .titlecard{display:flex}

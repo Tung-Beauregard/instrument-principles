@@ -376,12 +376,13 @@ button { font: inherit; color: inherit; }
   .side { top: 58px; }
 }
 /* 分頁列伸到右上控制面板底下時,控制面板改從分頁列下面開始;導覽時分頁列隱藏、示波窗排在右側,照原本的位置。
-   中文的分頁列到 947 px,視窗 1365 px 以下會蓋住控制面板的第一列(2026-11-09 以前中文沒有這條,1024×768 這類寬度一直壓著);
-   英文(../assets/i18n.js)的分頁列比較寬,到 1185 px,1700 px 以下 */
-@media (min-width: 961px) and (max-width: 1365px) {
+   中文的分頁列到 1155 px,視窗 1579 px 以下會蓋住控制面板的第一列(2026-11-09 以前中文沒有這條,1024×768 這類寬度一直壓著);
+   英文(../assets/i18n.js)的分頁列比較寬,到 1448 px,控制面板也比較寬,1919 px 以下。
+   2026-11-19 分頁列加了 FTIR、螢光、XRD、EPR 四個連結,門檻跟著從 1365、1700 px 改大;分頁列再變長時要重量 */
+@media (min-width: 961px) and (max-width: 1579px) {
   html:not(.mp) #app:not(.cine) .ctl { top: 62px; }
 }
-@media (min-width: 961px) and (max-width: 1700px) {
+@media (min-width: 961px) and (max-width: 1919px) {
   html[lang="en"]:not(.mp) #app:not(.cine) .ctl { top: 62px; }
 }
 /* 1101 到 1365 px 寬時,左下的操作提示會伸進左邊示波窗(穩定圖)的底下,提示的寬度改成只到示波窗的左邊

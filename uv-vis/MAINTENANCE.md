@@ -265,7 +265,7 @@ DPPH 與福林酚的吸收帶比 4 nm 寬很多，換波長寬度幾乎看不出
 
 章號由 `CAPS` 的章名前兩碼決定，第 04、05 章各有兩個章名。`CAMK` 共 20 格，大多是每章「移過去、慢慢飄」兩格一組。
 
-- **導覽：** `startTour()` 先 `stopScan()`、關掉說明視窗，把 `S` 的樣品、波長、寬度、外殼、掃描與相機位置存進 `tour.saved`，設 `tour.on`、`tour.t0`，加上 `html.touring`（控制面板、說明、介紹與頁尾藏起來，字幕、片頭片尾字卡與「結束導覽」出現；光譜螢幕出現時字幕往上移到 bottom 250 px，`.cap.withcon`），停用 OrbitControls 並 `nav.cancel()`。`endTour()`（Esc、「結束導覽」或播到 92 秒）還原 `S` 與相機，`W` 的顯示欄位設回互動模式的預設，字幕與字卡藏起來，`lastNote` 清空讓說明重寫。導覽中不能拖光柵，也不能用視角操作。
+- **導覽：** `startTour()` 先 `stopScan()`、關掉說明視窗，把 `S` 的樣品、波長、寬度、外殼、掃描與相機位置存進 `tour.saved`，設 `tour.on`、`tour.t0`，加上 `html.touring`（控制面板、說明、介紹與頁尾藏起來，字幕、片頭片尾字卡與「結束導覽」出現；光譜螢幕出現時字幕往上移到 bottom 250 px，`.cap.withcon`），停用 OrbitControls 並 `nav.cancel()`。`endTour()`（Esc、「結束導覽」或播到 92 秒）還原 `S` 與相機，`W` 的顯示欄位設回互動模式的預設，字幕與字卡藏起來，`lastNote` 清空讓說明重寫。導覽中不能拖光柵，也不能用視角操作。導覽時分頁列的寬度扣掉 120 px，只排到「結束導覽」的左邊（2026-11-19，和 FTIR 等新教材同一條；分頁列加了四個連結之後，1024 到 1100 px 寬時會伸到結束鈕底下）。
 - **`?film`：** `html.film` 版面（字幕 31 px、讀值卡與光譜螢幕放大，光譜螢幕移到右上），藏起控制面板、說明、分頁列、載入提示與「結束導覽」；從 `?t=` 指定的秒數開始（預設 0），播完從頭循環。版面的固定寬度（光譜螢幕 720 px、左上 560 px）是給大畫面用的，推測是 1920 × 1080 的錄影畫面。
 - **`?rec`：** 和 `?film` 一起用（`?film&rec`）。`DPR` 固定 1，`renderer` 開 `preserveDrawingBuffer`（截圖讀得到畫布），`quality.configure(…, { recording: true })` 強制完整畫質（陰影、bloom、composer 4 倍 MSAA）並停用畫質選單，`html.rec` 關掉 CSS 動畫，`drawPlot()` 不節流。不跑主迴圈；`window.__seek(t)` 依序 `film(t)`、`frameCommon(t)`、`render()`，再等一個畫格讓 DOM 標籤更新（註解：背景分頁的 rAF 可能停住，所以最多等 300 ms），回傳 true。只加 `?rec` 不加 `?film` 時，`updateDOM()` 不更新字幕與字卡，載入提示也不會消失。
 - **分頁切到背景：** `visibilitychange` 記下離開的時間，回來時把離開的長度加到 `filmStart`、`tour.t0`（導覽中）與 `S.scanT0`（掃描中），`last` 設成現在；所以影片、導覽與掃描都從離開的地方繼續，不會跳過（2026-10-05）。共用畫質模組在同一個事件裡重設自動畫質的取樣。
