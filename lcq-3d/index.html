@@ -376,13 +376,12 @@ button { font: inherit; color: inherit; }
   .side { top: 58px; }
 }
 /* 分頁列伸到右上控制面板底下時,控制面板改從分頁列下面開始;導覽時分頁列隱藏、示波窗排在右側,照原本的位置。
-   中文的分頁列到 1155 px,視窗 1579 px 以下會蓋住控制面板的第一列(2026-11-09 以前中文沒有這條,1024×768 這類寬度一直壓著);
-   英文(../assets/i18n.js)的分頁列比較寬,到 1448 px,控制面板也比較寬,1919 px 以下。
-   2026-11-19 分頁列加了 FTIR、螢光、XRD、EPR 四個連結,門檻跟著從 1365、1700 px 改大;分頁列再變長時要重量 */
-@media (min-width: 961px) and (max-width: 1579px) {
+   2026-11-19 起分頁列只列質譜區(← 儀器入口、離子阱質譜一組、質譜儀-不同分析器比較、GC-MS):中文到 620 px,視窗 1039 px 以下
+   會蓋住控制面板的第一列;英文(../assets/i18n.js)到 677 px,控制面板也比較寬,1139 px 以下。分頁列或控制面板變寬時要重量 */
+@media (min-width: 961px) and (max-width: 1039px) {
   html:not(.mp) #app:not(.cine) .ctl { top: 62px; }
 }
-@media (min-width: 961px) and (max-width: 1919px) {
+@media (min-width: 961px) and (max-width: 1139px) {
   html[lang="en"]:not(.mp) #app:not(.cine) .ctl { top: 62px; }
 }
 /* 1101 到 1365 px 寬時,左下的操作提示會伸進左邊示波窗(穩定圖)的底下,提示的寬度改成只到示波窗的左邊
@@ -433,7 +432,7 @@ html.mp #app.cine .cap{left:calc((100% - var(--scol)) / 2);max-width:calc(100% -
 </head>
 <body>
 <main id="app">
-  <nav id="sitenav" aria-label="儀器原理" data-en-aria-label="Instrument Principles"><a href="../" data-en="← All lessons">← 儀器入口</a><span class="sn-lesson" role="group" aria-label="離子阱質譜" data-en-aria-label="Ion trap MS"><span class="sn-name" aria-hidden="true" data-en="Ion trap MS">離子阱質譜</span><a href="../lcq/" data-en="Animated guide">動畫講解</a><a href="./" aria-current="page" data-en="Take it apart">拆開探索</a></span><a href="../gc-ms/">GC-MS</a><a href="../uv-vis/">UV-Vis</a><a href="../ftir/">FTIR</a><a href="../fluorescence/" data-en="Fluorescence">螢光</a><a href="../xrd/">XRD</a><a href="../epr/">EPR</a><a href="../nmr/">NMR</a><a href="../mass-analyzers/" data-en="Mass analyzers">質譜儀-不同分析器比較</a><a href="../spectroscopy/" data-en="Light and molecules">光與分子</a><a href="../chromatography/" data-en="Chromatography">層析</a><a href="../plot/" data-en="Data plotting">數據畫圖</a></nav>
+  <nav id="sitenav" aria-label="質譜" data-en-aria-label="Mass spectrometry"><a href="../" data-en="← All lessons">← 儀器入口</a><span class="sn-lesson" role="group" aria-label="離子阱質譜" data-en-aria-label="Ion trap MS"><span class="sn-name" aria-hidden="true" data-en="Ion trap MS">離子阱質譜</span><a href="../lcq/" data-en="Animated guide">動畫講解</a><a href="./" aria-current="page" data-en="Take it apart">拆開探索</a></span><a href="../mass-analyzers/" data-en="Mass analyzers">質譜儀-不同分析器比較</a><a href="../gc-ms/">GC-MS</a></nav>
   <canvas id="gl" aria-label="離子阱質譜儀(以 LCQ Deca XP 為例)的 3D 模型,可拖曳旋轉、滾輪縮放" data-en-aria-label="3D model of an ion trap mass spectrometer (example: LCQ Deca XP); drag to rotate, scroll to zoom"></canvas>
   <canvas id="ov" aria-hidden="true"></canvas>
   <div class="vignette"></div>

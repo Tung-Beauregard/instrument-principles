@@ -11,7 +11,15 @@
 // query   作用的視窗大小(預設 SMALL_DESKTOP)
 // 傳回 { apply(camera), freeRect() }:apply 傳回 true 表示這一格的投影由這裡處理;freeRect() 是目前量到的空地 {x, y, w, h, cx, cy}。
 // 空地每 0.4 秒與視窗大小改變時重量,不在每一格量。
+//
+// 分頁列與控制面板(2026-11-19):分頁列只列同一區之後,1024、1152 px 寬時光譜區的分頁列仍會伸到右上控制面板的下面
+// (這兩種寬度的控制面板本身就很寬)。apply() 每 0.4 秒看一次:分頁列(navClear.nav)的右端伸到控制面板(navClear.panel)
+// 左邊界 8 px 以內、而且控制面板在分頁列那一列時,<html> 加上 nav-clash,控制面板改從分頁列下面開始(top 62 px,
+// 規則由這裡放進頁面)。量的時候先拿掉 nav-clash,量的是控制面板原本的位置,才不會來回切換;不用寬度門檻,
+// 分頁列或控制面板變寬變窄都跟得上。手機版(html.mp)、導覽與影片(active() 為 false)不作用。
+// 這一條不受 query 限制,任何視窗大小都會看;navClear: null 關掉。
 export const SMALL_DESKTOP = '(max-width: 1279px), (max-height: 899px)';
+const NAV_CLASH_CSS = 'html.nav-clash:not(.mp):not(.touring):not(.film) #ctl{top:62px}';
 
 // 不和任何面板重疊的最大長方形(候選邊界取自面板的邊);面積最大的勝出,上一次的位置附近稍微加分,避免來回跳
 export function largestFreeRect(rects, w, h, prev = null, margin = 10) {
@@ -32,10 +40,28 @@ export function largestFreeRect(rects, w, h, prev = null, margin = 10) {
   return best || prev || { x: 0, y: 0, w, h, cx: w / 2, cy: h / 2 };
 }
 
-export function createFreeView({ panels = [], active = () => true, query = SMALL_DESKTOP, minZoom = 0.72 } = {}) {
+export function createFreeView({ panels = [], active = () => true, query = SMALL_DESKTOP, minZoom = 0.72, navClear = { nav: '.sitenav', panel: '#ctl' } } = {}) {
   const mq = typeof matchMedia === 'function' ? matchMedia(query) : { matches: false };
-  let free = null, measuredAt = -Infinity, dirty = true;
-  addEventListener('resize', () => { dirty = true; });
+  let free = null, measuredAt = -Infinity, dirty = true, navAt = -Infinity, navDirty = true;
+  addEventListener('resize', () => { dirty = true; navDirty = true; });
+  const root = document.documentElement;
+  if (navClear && !document.getElementById('nav-clash-css')) {
+    const st = document.createElement('style');
+    st.id = 'nav-clash-css'; st.textContent = NAV_CLASH_CSS;
+    document.head.appendChild(st);
+  }
+  function checkNav(now) {
+    navAt = now; navDirty = false;
+    let clash = false;
+    const nav = navClear && active() && !root.classList.contains('mp') ? document.querySelector(navClear.nav) : null;
+    const panel = nav ? document.querySelector(navClear.panel) : null;
+    if (panel) {
+      root.classList.remove('nav-clash');
+      const a = nav.getBoundingClientRect(), b = panel.getBoundingClientRect();
+      clash = a.width > 0 && b.width > 0 && a.right + 8 > b.left && b.top < a.bottom && b.bottom > a.top;
+    }
+    root.classList.toggle('nav-clash', clash);
+  }
   function measure(now) {
     const rects = [];
     for (const p of panels) {
@@ -55,6 +81,7 @@ export function createFreeView({ panels = [], active = () => true, query = SMALL
   function apply(camera) {
     const now = performance.now(), dt = view.last ? Math.min(0.1, (now - view.last) / 1000) : 0;
     view.last = now;
+    if (navClear && (navDirty || now - navAt > 400)) checkNav(now);
     if (!mq.matches || !active()) {
       if (view.set) { camera.clearViewOffset(); camera.zoom = 1; camera.updateProjectionMatrix(); view.set = false; }
       view.x = 0; view.y = 0; view.z = 1; free = null; dirty = true;

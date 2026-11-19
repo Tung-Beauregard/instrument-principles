@@ -66,6 +66,26 @@ for (const page of extraPages) {
   const href = `href="../${page.replace('index.html', '')}"`;
   assert.ok(files.some(file => file !== page && read(file).includes(href)), `No lesson links to ${page}`);
 }
+// 分頁列只列同一區(使用者 2026-11-19 選定):「← 儀器入口」後面是清單裡和本頁同一區的每一份教材(清單順序;
+// 一份教材在兩區時列兩區的聯集,例如 GC-MS 在質譜與層析),本頁 aria-current;nav 的 aria-label 是區名。
+// 生化原理、生化進階與官能基編號三區由 check-bio.mjs 檢查;離子阱質譜在 lcq/、lcq-3d/ 是「動畫講解」「拆開探索」一組
+const BIO_AREAS = new Set(['bio', 'bio-adv', 'fg']);
+const readyItems = instruments.filter(item => item.status === 'ready');
+for (const item of readyItems.filter(i => !i.categories.some(c => BIO_AREAS.has(c)))) {
+  const group = readyItems.filter(other => other.categories.some(c => item.categories.includes(c)));
+  for (const dir of item.id === 'lcq' ? ['lcq/', 'lcq-3d/'] : [item.href.replace('./', '')]) {
+    const nav = read(dir + 'index.html').match(/<nav (?:class|id)="sitenav" aria-label="([^"]+)"[^>]*>([\s\S]*?)<\/nav>/);
+    assert.ok(nav, `${dir}: 缺少分頁列`);
+    assert.equal(nav[1], item.categories.map(c => categories.find(cat => cat.id === c).name).join('、'), `${dir}: 分頁列的 aria-label 要是區名`);
+    const links = [...nav[2].matchAll(/<a href="([^"]+)"( aria-current="page")?/g)].map(m => ({ href: m[1], current: !!m[2] }));
+    const want = ['../', ...group.flatMap(other => {
+      if (other.id === 'lcq' && item.id === 'lcq') return dir === 'lcq/' ? ['./', '../lcq-3d/'] : ['../lcq/', './'];
+      return [other.id === item.id ? './' : '../' + other.href.replace('./', '')];
+    })];
+    assert.deepEqual(links.map(l => l.href), want, `${dir}: 分頁列要是「← 儀器入口」加上同一區的教材(清單順序)`);
+    assert.deepEqual(links.filter(l => l.current).map(l => l.href), ['./'], `${dir}: 分頁列要標出本頁`);
+  }
+}
 // share previews (2026-10-20): every page names its own address and a 1200x630 image that exists in assets/og/
 const SITE = 'https://tung-beauregard.github.io/instrument-principles/';
 for (const file of files) {

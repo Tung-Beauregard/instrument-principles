@@ -37,7 +37,7 @@ assets/
   render-quality.js        教材共用畫質、幀率上限與可選效能顯示
   render-quality.css       畫質選單
   ui-scale.css             大螢幕的介面放大（2K、4K）：依畫面大小定義放大倍數 `--ui`，以 1080P 的瀏覽器視窗為 1 倍
-  free-view.js             桌機小螢幕（1024×768 這類）的取景：3D 主角移到面板之間最大的空地
+  free-view.js             桌機小螢幕（1024×768 這類）的取景：3D 主角移到面板之間最大的空地；分頁列伸到右上控制面板底下時，控制面板改從分頁列下面開始（html.nav-clash）
   camera-nav.js            教材共用的視角操作：滾輪、觸控板、方向鍵與 WASD
   mobile-panels.js         手機版的面板收合：控制面板、譜與說明收成畫面右緣的「‹」把手，點了才彈出；全螢幕鈕；直拿時建議轉成橫式；分頁列排不下時捲到目前這一頁
   mobile-panels.css        右緣把手、停靠區與轉向提示的樣式（只在手機尺寸作用）
@@ -96,7 +96,7 @@ nomenclature/              官能基編號：有機化學命名法則（鍵線�
 carbohydrates/             官能基編號：醣類（碳的編號、成環、α 與 β、環狀糖的名字、糖苷鍵、纖維素與澱粉）
 wood-components/           官能基編號：木材三大成分（細胞壁、纖維素、半纖維素的糖、木質素的單體與鍵、分析方法）
                            以上每個資料夾都有 index.html 與 MAINTENANCE.md
-scripts/check-site.mjs     資料、相對連結與靜態備援檢查
+scripts/check-site.mjs     資料、相對連結、靜態備援與儀器教材的分頁列（只列同一區）檢查
 scripts/check-render-quality.mjs  各教材的 module 語法與畫質、幀率邏輯檢查
 scripts/check-camera-nav.mjs  共用視角操作的滾輪判斷與各教材接線檢查
 scripts/check-mobile-panels.mjs  手機版面板收合的樣式範圍（只在手機尺寸作用）與六份教材的接線檢查
@@ -135,7 +135,7 @@ HTTP 網站會載入 `content/instruments.json`；此檔是儀器卡片的主要
 - `image`：本站 SVG 或其他靜態圖片相對路徑。圖上有中文字的另有英文版的圖（`imageEn`，目前是光譜與木材三大成分兩張，檔名加 `-en`）；`imageAlt` 的英文是 `imageAltEn`。靜態備援卡片用 `data-en`、`data-en-alt`、`data-en-src` 寫同樣的英文。
 - 修改資料後，同步更新 `index.html` 的靜態備援卡片。執行檢查避免兩份內容不一致。
 
-新增教材時，先以 `upcoming` 建立項目；完成獨立教材頁面並驗證後，更新名稱、連結與狀態。同時更新入口靜態備援（每個分類一區，卡片標題的 `id` 是「分類-教材-title」）。W AI Studio 只有本站入口這一張卡片，不為各教材另加卡片。各教材上方的分頁列也要加上新教材的連結。
+新增教材時，先以 `upcoming` 建立項目；完成獨立教材頁面並驗證後，更新名稱、連結與狀態。同時更新入口靜態備援（每個分類一區，卡片標題的 `id` 是「分類-教材-title」）。W AI Studio 只有本站入口這一張卡片，不為各教材另加卡片。同一區每一頁的分頁列也要加上新教材的連結（分頁列只列同一區，見 AGENTS.md）。
 
 到站人數沿用 LCQ 教材的 Abacus 計數與 `lcq-visited` 儲存記錄，避免在入口與 LCQ 間重複計算同一瀏覽器。僅正式網站會新增計數；本機預覽或無法使用儲存空間時只讀取。服務暫時不可用時顯示「—」。清除瀏覽器資料或更換瀏覽器會重新計數，因此不是精確的不重複人數。
 
