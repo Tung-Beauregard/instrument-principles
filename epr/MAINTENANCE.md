@@ -135,7 +135,7 @@
 | 08 木質素、比面積 | 84.4 到 90.4、90.6 到 96.4 | | | 84.6 到 89.6 秒 335 → 342(種子 41),上一次是 DPPH;93 秒起改成吸收 |
 | 片尾 | 96.8 秒起字卡 | | 98.4 秒回到全景 | 96.4 到 99.2 秒外殼合上 |
 
-- 字幕的速度:中文最快每秒 6.6 字(英數字算半個),英文最快每秒 16.8 個字元(`capspeed.py`)。改字幕後重跑。
+- 字幕的速度:中文最快每秒 6.6 字(英數字算半個),英文最快每秒 16.8 個字元。改字幕後重跑。
 - **導覽取景 `tourView()`(2026-11-16):** 導覽(不是 `?film`,也不是手機)時把投影中心移到標題欄下緣與字幕上緣之間的空帶(每 0.4 秒量一次 `.hud` 與 `#cap`,字幕高度用 84 px 估),空帶矮時稍微拉遠(`camera.zoom` 最小 0.72),以每秒 5 的速率移過去。影片版面(1920 × 1080)不作用,鏡頭照 `CAMK`;1024 × 768 這類比例的導覽,主角才不會被字幕蓋到。結束導覽時清掉。
 - 導覽中分頁列讓出右上「結束導覽」的位置(`html.touring:not(.mp) .sitenav` 的 `max-width`),桌機小螢幕的字幕放在 bottom 214 px(譜比較矮)。
 - **`?film`、`?rec`、分頁切到背景:** 和 UV-Vis 相同(`window.__dur` = 100)。
@@ -154,12 +154,12 @@
 
 ## 修改的切入點
 
-- **文字:** 字幕 `CAPS`(格式 `[開始, 結束, zhEn('章', 'Ch'), zhEn('中文', 'English')]`,`capspeed.py` 才讀得到);片頭片尾字卡在 `updateDOM()`;標籤在各個 `label()`,動態的在 `frameCommon()`;說明在 `noteHTML()` 與 `SAMPLES[k].hint`;譜圖的字在 `drawPlot()`、`drawZee()`。
+- **文字:** 字幕 `CAPS`(格式 `[開始, 結束, zhEn('章', 'Ch'), zhEn('中文', 'English')]`,字幕速度的計算才讀得到);片頭片尾字卡在 `updateDOM()`;標籤在各個 `label()`,動態的在 `frameCommon()`;說明在 `noteHTML()` 與 `SAMPLES[k].hint`;譜圖的字在 `drawPlot()`、`drawZee()`。
 - **樣品:** 在 `SAMPLES` 加一個鍵(`g` 或 `center`、`a` 與 `pattern`、`dBpp`、`shape`、`win`、`cell`、`fill`、`hint`、`full`、`inText`),`lines`、`peak`、`Amax` 自動算;在 `#segSample` 加按鈕。影片固定用四個鍵(`film()` 與 `DP_SCAN` 寫死)。
 - **頻率或常數:** `NU`、`H_MUB`;讀值卡 `#cF` 的「9.50 GHz」是 HTML,說明框、片尾字卡、字幕也寫了 9.5 GHz、0.34 T,要一起改並同步 INSTRUMENTS.md。
 - **元件位置:** 元件群組多半用世界座標寫在各自的區塊;改了要一起看 `PATHS`(微波路徑)、`REF_PTS`、`cable()` 的點、`label()` 的兩組座標、`CAMK` 的看點、`SPB` 與 `spinLine`。
 - **導覽時間:** `FILM_DUR`、`CAMK`、`BK`、`CAPS`、`LBL_WIN` 與 `film()` 裡寫死的秒數(換樣品、掃描、吸收顯示、外殼、譜、片頭片尾)。
-- 改完跑 `modcheck.mjs`(或 `scripts/check-render-quality.mjs`)、`node scripts/check-i18n.mjs --list epr/index.html`、`capspeed.py`,再看 1024 × 768、1920 × 1080、手機兩種方向與 `?film&rec&t=秒` 各章一格。
+- 改完跑 切出 module 跑 `node --check`(或 `scripts/check-render-quality.mjs`)、`node scripts/check-i18n.mjs --list epr/index.html`、字幕速度,再看 1024 × 768、1920 × 1080、手機兩種方向與 `?film&rec&t=秒` 各章一格。
 
 ## 設計取捨
 

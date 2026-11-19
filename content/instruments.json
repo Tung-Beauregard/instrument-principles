@@ -16,9 +16,19 @@
       "nameEn": "Spectroscopy"
     },
     {
+      "id": "elem",
+      "name": "元素分析",
+      "nameEn": "Elemental analysis"
+    },
+    {
+      "id": "surface",
+      "name": "結構與表面",
+      "nameEn": "Structure and surfaces"
+    },
+    {
       "id": "nmr",
-      "name": "NMR",
-      "nameEn": "NMR"
+      "name": "磁共振",
+      "nameEn": "Magnetic resonance"
     },
     {
       "id": "bio",
@@ -143,6 +153,34 @@
       "href": "./ftir/"
     },
     {
+      "id": "nir",
+      "name": "NIR 近紅外光譜儀",
+      "nameEn": "NIR spectrometer",
+      "categories": [
+        "spec"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/nir.svg",
+      "imageAlt": "鹵素燈、光柵、往上照進樣品杯的光與四周偵測器的概念示意",
+      "imageAltEn": "Concept sketch of a halogen lamp, a grating, light shining up into a sample cup and the detectors around it",
+      "href": "./nir/"
+    },
+    {
+      "id": "raman",
+      "name": "拉曼光譜儀",
+      "nameEn": "Raman spectrometer",
+      "categories": [
+        "spec"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/raman.svg",
+      "imageAlt": "雷射、二向分光鏡、顯微鏡物鏡下的樣品、光柵與 CCD 的概念示意",
+      "imageAltEn": "Concept sketch of a laser, a dichroic mirror, a sample under a microscope objective, a grating and a CCD",
+      "href": "./raman/"
+    },
+    {
       "id": "fluorescence",
       "name": "螢光光譜儀",
       "nameEn": "Fluorescence spectrometer",
@@ -157,11 +195,67 @@
       "href": "./fluorescence/"
     },
     {
+      "id": "cd",
+      "name": "CD 圓二色光譜儀",
+      "nameEn": "CD spectrometer",
+      "categories": [
+        "spec"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/cd.svg",
+      "imageAlt": "光源、稜鏡、調變器後面輪流左旋右旋的偏振光與一對鏡像光譜的概念示意",
+      "imageAltEn": "Concept sketch of a lamp, a prism, light turning left and right after the modulator and a pair of mirror-image spectra",
+      "href": "./cd/"
+    },
+    {
+      "id": "aas",
+      "name": "AAS 原子吸收光譜儀",
+      "nameEn": "AAS: atomic absorption spectrometer",
+      "categories": [
+        "elem"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/aas.svg",
+      "imageAlt": "空心陰極燈轉盤、火焰、單色器、偵測器與檢量線的概念示意",
+      "imageAltEn": "Concept sketch of a hollow cathode lamp turret, a flame, a monochromator, a detector and a calibration line",
+      "href": "./aas/"
+    },
+    {
+      "id": "icp",
+      "name": "ICP 感應耦合電漿光譜儀",
+      "nameEn": "ICP emission spectrometer",
+      "categories": [
+        "elem"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/icp.svg",
+      "imageAlt": "感應線圈上的電漿、中階梯光柵、稜鏡與二維 CCD 上的光點的概念示意",
+      "imageAltEn": "Concept sketch of a plasma in the induction coil, an echelle grating, a prism and spots on a two-dimensional CCD",
+      "href": "./icp/"
+    },
+    {
+      "id": "xrf",
+      "name": "XRF X 射線螢光光譜儀",
+      "nameEn": "XRF: X-ray fluorescence spectrometer",
+      "categories": [
+        "elem"
+      ],
+      "status": "ready",
+      "theme": "mint",
+      "image": "./assets/xrf.svg",
+      "imageAlt": "從下方照向樣品的 X 射線管、矽漂移偵測器與元素能譜的概念示意",
+      "imageAltEn": "Concept sketch of an X-ray tube shining up at a sample, a silicon drift detector and an element spectrum",
+      "href": "./xrf/"
+    },
+    {
       "id": "xrd",
       "name": "XRD X 射線繞射儀",
       "nameEn": "XRD: X-ray diffractometer",
       "categories": [
-        "spec"
+        "surface"
       ],
       "status": "ready",
       "theme": "lavender",
@@ -171,18 +265,32 @@
       "href": "./xrd/"
     },
     {
-      "id": "epr",
-      "name": "EPR 電子順磁共振",
-      "nameEn": "EPR: electron paramagnetic resonance",
+      "id": "xps",
+      "name": "XPS X 射線光電子能譜儀",
+      "nameEn": "XPS: X-ray photoelectron spectrometer",
       "categories": [
-        "spec"
+        "surface"
       ],
       "status": "ready",
       "theme": "lavender",
-      "image": "./assets/epr.svg",
-      "imageAlt": "兩個銅線圈的電磁鐵、中間的共振腔與樣品管、放大的電子小磁鐵與一次微分譜線的概念示意",
-      "imageAltEn": "Concept sketch of an electromagnet with two copper coils, the cavity and sample tube between them, magnified electron spins and a first-derivative line",
-      "href": "./epr/"
+      "image": "./assets/xps.svg",
+      "imageAlt": "真空腔、單色器、樣品與半球分析器裡電子軌跡的概念示意",
+      "imageAltEn": "Concept sketch of a vacuum chamber, a monochromator, a sample and electron paths in a hemispherical analyzer",
+      "href": "./xps/"
+    },
+    {
+      "id": "sem",
+      "name": "SEM 掃描式電子顯微鏡",
+      "nameEn": "SEM: scanning electron microscope",
+      "categories": [
+        "surface"
+      ],
+      "status": "ready",
+      "theme": "lavender",
+      "image": "./assets/sem.svg",
+      "imageAlt": "電子鏡筒、樣品室、偵測器與一張掃描影像的概念示意",
+      "imageAltEn": "Concept sketch of an electron column, a sample chamber, detectors and a scanned image",
+      "href": "./sem/"
     },
     {
       "id": "nmr",
@@ -197,6 +305,34 @@
       "imageAlt": "剖開的超導磁鐵、線圈中的自旋與一張氫譜的概念示意",
       "imageAltEn": "Concept sketch of a cut-open superconducting magnet, spins inside the coil and a proton spectrum",
       "href": "./nmr/"
+    },
+    {
+      "id": "nmr-2d",
+      "name": "二維 NMR",
+      "nameEn": "2D NMR",
+      "categories": [
+        "nmr"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/nmr-2d.svg",
+      "imageAlt": "超導磁鐵、兩個脈衝之間的 t1 與一張二維等高線圖的概念示意",
+      "imageAltEn": "Concept sketch of a superconducting magnet, the t1 wait between two pulses and a two-dimensional contour map",
+      "href": "./nmr-2d/"
+    },
+    {
+      "id": "epr",
+      "name": "EPR 電子順磁共振",
+      "nameEn": "EPR: electron paramagnetic resonance",
+      "categories": [
+        "nmr"
+      ],
+      "status": "ready",
+      "theme": "blue",
+      "image": "./assets/epr.svg",
+      "imageAlt": "兩個銅線圈的電磁鐵、中間的共振腔與樣品管、放大的電子小磁鐵與一次微分譜線的概念示意",
+      "imageAltEn": "Concept sketch of an electromagnet with two copper coils, the cavity and sample tube between them, magnified electron spins and a first-derivative line",
+      "href": "./epr/"
     },
     {
       "id": "central-dogma",

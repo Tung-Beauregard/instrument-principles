@@ -16,7 +16,7 @@
 
 - 本站是 W AI Studio 的儀器原理教學入口，使用繁體中文；2026-11-06 起全站另有英文版（使用者要求），同一頁切換，英文寫在中文旁邊（`assets/i18n.js`，做法見 `docs/I18N.md`）。預設是中文，不看瀏覽器的語言設定；分享預覽（`og:` 標籤與分享圖）維持中文。
 - `index.html` 專責入口；每一台儀器有獨立、穩定的子目錄，使用小寫英文字與連字號。
-- 現有 `lcq/`、`gc-ms/`、`uv-vis/`、`ftir/`、`fluorescence/`、`xrd/`、`epr/`、`lcq-3d/`、`nmr/`、`mass-analyzers/`、`spectroscopy/`、`chromatography/`、`plot/` 路徑不可隨意更名，2026-10-26 起生化原理分區的 `central-dogma/`、`pcr/`、`sequencing/`、`dna-markers/`、`cloning/`、`terpene-synthase/`、`crispr/`、`immunoassay/`、`flow-cytometry/`、`proteomics/`，以及 2026-10-27 起生化進階分區的 `transcriptomics/`、`terpenoid-precursors/`、`enzyme-kinetics/`、`population-genetics/`、`phylogenetics/`、`gene-function/`，以及 2026-10-30 起官能基編號分區的 `carbohydrates/`、2026-10-31 起的 `nomenclature/`、`wood-components/` 也一樣。必須更名時，更新所有引用並保留舊網址轉向。
+- 現有 `lcq/`、`gc-ms/`、`uv-vis/`、`ftir/`、`fluorescence/`、`xrd/`、`epr/`、`nir/`、`raman/`、`cd/`、`aas/`、`icp/`、`xrf/`、`xps/`、`sem/`、`nmr-2d/`、`lcq-3d/`、`nmr/`、`mass-analyzers/`、`spectroscopy/`、`chromatography/`、`plot/` 路徑不可隨意更名，2026-10-26 起生化原理分區的 `central-dogma/`、`pcr/`、`sequencing/`、`dna-markers/`、`cloning/`、`terpene-synthase/`、`crispr/`、`immunoassay/`、`flow-cytometry/`、`proteomics/`，以及 2026-10-27 起生化進階分區的 `transcriptomics/`、`terpenoid-precursors/`、`enzyme-kinetics/`、`population-genetics/`、`phylogenetics/`、`gene-function/`，以及 2026-10-30 起官能基編號分區的 `carbohydrates/`、2026-10-31 起的 `nomenclature/`、`wood-components/` 也一樣。必須更名時，更新所有引用並保留舊網址轉向。
 - 生化原理分區（使用者 2026-10-26 要求，分類 `bio`）是用 2D 動畫講分子生物學與生物化學的教材，共用 `assets/bio-lesson.js`（播放器）、`assets/bio-draw.js`（畫圖工具）與 `assets/bio-lesson.css`（版面）。這一區的分頁列只列「← 儀器入口」與這一區的教材，儀器教材的分頁列不列它們；新增或刪掉這一區的教材時，這一區每一頁的分頁列都要一起改（`scripts/check-bio.mjs` 會檢查順序和清單一致）。章節代號（網址的 `#`）是對外網址，比照 `lcq/` 不可隨意更名。頁面與文件不寫提供研究主題的老師姓名（使用者 2026-10-26 決定）；姓名也不寫進程式，`check-bio.mjs` 只放雜湊來比對。手機直拿時的轉向提示與全螢幕的劇場模式都由播放器處理，頁面不要自己呼叫 `createRotateHint`；手機上講解一律全螢幕（使用者 2026-10-31 要求）：開頁不自動播放，開始播放時先進全螢幕（iPhone 的 Safari 用蓋滿畫面的劇場版面），離開全螢幕就暫停。
 - 生化進階分區（使用者 2026-10-27 要求，分類 `bio-adv`）是程度較深的同類教材（大學部高年級到研究生，帶公式與統計），共用同一套播放器與版面；分頁列自成一組，只列「← 儀器入口」與這一區的教材，和生化原理的分頁列互不列對方（`check-bio.mjs` 兩區都檢查）。進階教材「重點整理」的第一行連到對應的基礎教材。生化原理裡有七份在最後加了名稱以「進階:」開頭的章節；既有章節的代號不改，新章節一律加在最後。
 - 官能基編號分區（使用者 2026-10-30 要求，分類 `fg`）用同一套 2D 播放器與版面講有機分子的碳怎麼編號、官能基在哪裡，程度和生化原理相同（台灣高中畢業看得懂）；第一份是醣類（`carbohydrates/`）；2026-10-31 加上有機化學命名法則（`nomenclature/`，排在醣類前面，章節安排參考《有機化學天堂祕笈》第 5 章命名法與第 7 章組態，內容另寫，不引用書上的文字），之後依化合物的類別加新頁。2026-10-31 再加上木材三大成分（`wood-components/`，排在醣類後面，纖維素、半纖維素與木質素；半纖維素的糖與木質素的鍵都用碳的編號講）。中文名稱照台灣的寫法：號碼寫在主鏈前面（2-丁醇）、不同的取代基碳數少的寫在前面（2-甲基-3-乙基己烷；英文照字母順序）、configuration 叫組態、環狀糖的名字糖名在前（葡萄哌喃糖）；木材的名詞用中膠層（不用胞間層）、微纖絲、全纖維素、萃取物（林產化學也叫抽出物），用單一種糖命名的多醣寫「糖」（木聚糖），類別寫「醣」（多醣）；名詞以國家教育研究院樂詞網為準。分頁列自成一組，只列「← 儀器入口」與這一區的教材，和生化兩區互不列對方（`check-bio.mjs` 也檢查這一區）。
@@ -45,7 +45,7 @@
 6. 英文一起寫：清單的 `nameEn`、`imageAltEn`（圖上有中文字時另做 `-en` 的圖填 `imageEn`），頁面上每一段給人看的中文都有英文（`docs/I18N.md`），`node scripts/check-i18n.mjs` 要通過；2D 教材再跑 `check-i18n-layout.mjs`，有影片模式的 3D 教材跑 `check-i18n-film.mjs`；改既有頁面的英文時跑 `check-i18n-zh.mjs`，中文版一個字、一個樣式都不該變。
 7. 更新 `README.md`、`INSTRUMENTS.md`。W AI Studio 只放本站入口這一張卡片，由入口統一列出各教材，新增教材不另加卡片（使用者 2026-10-08 決定）；入口卡片的介紹或狀態真的需要改時才同步修改。
 
-光譜分類目前有 `spectroscopy/`（光與分子交互作用的總覽）、`uv-vis/`（UV-Vis 分光光度計）、`ftir/`（FTIR 紅外光譜儀）、`fluorescence/`（螢光光譜儀）、`xrd/`（XRD X 射線繞射儀）與 `epr/`（EPR 電子順磁共振）；XRD 與 EPR 不是光譜，2026-11-16 起暫時放在這一區。這四份不寫型號，元件以常見機型為例，數字的來源與「示意」標記見 INSTRUMENTS.md。新增其他光譜儀時，仍須確認種類與型號，不得虛構規格、功能或上線日期。
+光學、元素、表面與磁共振的 3D 教材分四區（使用者 2026-11-17 選定，2026-11-19 上線）：光譜（`spec`）有 `spectroscopy/`（光與分子交互作用的總覽）、`uv-vis/`、`ftir/`、`nir/`、`raman/`、`fluorescence/`、`cd/`；元素分析（`elem`）有 `aas/`、`icp/`、`xrf/`；結構與表面（`surface`）有 `xrd/`、`xps/`、`sem/`；磁共振（分類 id 仍是 `nmr`，區名原本是 NMR）有 `nmr/`、`nmr-2d/`、`epr/`。這些都照 `uv-vis/` 的 3D 版型；介面（標題大字、讀值卡、按鈕、元件標籤、章節字、字卡、牆上螢幕）一律用範本的青色，儀器的代表色只用在 3D 的光束與譜圖資料（使用者 2026-11-17 要求風格一致）。這些教材不寫型號，元件以常見機型為例，數字的來源與「示意」標記見 INSTRUMENTS.md。新增其他光譜儀時，仍須確認種類與型號，不得虛構規格、功能或上線日期。
 
 ## 4. 品牌與閱讀體驗
 
@@ -93,7 +93,7 @@
 | 文件 | 必須保存的內容 |
 | --- | --- |
 | `README.md` | 專案用途、目錄、預覽方式、相依套件與版本位置、檢查命令、實際發布方式，以及維護文件索引。 |
-| 各教材目錄的 `MAINTENANCE.md` | 依教材清單盤點 `lcq/`、`gc-ms/`、`uv-vis/`、`ftir/`、`fluorescence/`、`xrd/`、`epr/`、`lcq-3d/`、`nmr/`、`mass-analyzers/`、`spectroscopy/`、`chromatography/`、`plot/` 等目錄，記錄程式結構、重要函式與狀態、3D 場景和動畫的維護方法。新教材建立同類文件；已有文件增量更新。 |
+| 各教材目錄的 `MAINTENANCE.md` | 依教材清單盤點 `lcq/`、`gc-ms/`、`uv-vis/`、`ftir/`、`fluorescence/`、`xrd/`、`epr/`、`nir/`、`raman/`、`cd/`、`aas/`、`icp/`、`xrf/`、`xps/`、`sem/`、`nmr-2d/`、`lcq-3d/`、`nmr/`、`mass-analyzers/`、`spectroscopy/`、`chromatography/`、`plot/` 等目錄，記錄程式結構、重要函式與狀態、3D 場景和動畫的維護方法。新教材建立同類文件；已有文件增量更新。 |
 | `INSTRUMENTS.md` | 規格、公式、單位、參數、來源連結及可確認的頁碼；明確標示實測、推估、示意與待確認內容。 |
 | `docs/VALIDATION.md` | 可執行的檢查命令，以及各教材的操作步驟、預期結果、重要數值案例、外部依賴和尚無法覆蓋的檢查。 |
 | `docs/HANDOFF.md` | 最近變更、相關版本、實際驗證結果、已知問題、缺少的文件或來源、下一步。 |

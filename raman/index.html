@@ -1,0 +1,1642 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en="Raman spectrometer: scattered light, shifted">拉曼光譜儀 散射光換了顏色</title>
+<meta name="description" content="用 3D 模型拆開一台共軛焦拉曼光譜儀,看雷射照到樣品、散射光沿原路回來,濾掉雷射原色以後,光柵把極少數換了顏色的拉曼光依波長散開,CCD 一次記下整條拉曼光譜。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="拉曼光譜儀 散射光換了顏色">
+<meta property="og:description" content="用 3D 模型拆開一台共軛焦拉曼光譜儀,看雷射照到樣品、散射光沿原路回來,濾掉雷射原色以後,光柵把極少數換了顏色的拉曼光依波長散開,CCD 一次記下整條拉曼光譜。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/raman/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/raman.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="拉曼光譜儀教材的畫面:展開的雷射光路、顯微鏡、光柵與 CCD,以及拉曼光譜">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/ui-scale.css">
+<style>
+:root{
+  --bg:#0a0f13;
+  --panel:rgba(12,18,23,.80);
+  --line:rgba(160,215,235,.14);
+  --line-2:rgba(160,215,235,.30);
+  --ink:#eaf3f6; --ink-2:#a8bcc6; --muted:#71858f;
+  --cyan:#74e4ff; --amber:#ffc261; --violet:#bba6ff;
+  --btn:rgba(255,255,255,.05); --btn-on:#eef6f8; --btn-on-ink:#0c1318;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --sans:'Noto Sans TC','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;touch-action:none}
+.labels{position:fixed;inset:0;pointer-events:none;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+/* 左上:標題、數值、能階圖、說明 */
+.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw / var(--ui,1) - 48px));pointer-events:none}
+.hud::before{content:'';position:absolute;left:-80px;top:-60px;width:620px;height:300px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 25% 35%,rgba(10,15,19,.72),rgba(10,15,19,0) 70%)}
+.hud .k{display:block;font-weight:900;font-size:28px;letter-spacing:.02em;line-height:1.1}
+.hud .big{display:block;font-weight:900;font-size:44px;line-height:1.12;color:var(--cyan);text-shadow:0 0 22px rgba(116,228,255,.35)}
+.lede{margin:10px 0 12px;font-size:13.5px;line-height:1.7;color:var(--ink-2)}
+.chips{display:flex;gap:8px;margin-bottom:10px}
+.chip{padding:7px 12px 8px;min-width:100px}
+.chip small{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.12em}
+.chip b{font-family:var(--mono);font-weight:600;font-size:18px;color:var(--cyan);white-space:nowrap}
+.jab{padding:8px 10px 6px;margin-bottom:10px}
+.jab h6{margin:0 0 2px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em}
+#jab{width:100%;height:118px;display:block}
+.note{padding:11px 14px;font-size:13px;line-height:1.75}
+.note em{font-style:normal;font-weight:700}
+.c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)}
+
+/* 網站分頁 */
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw / var(--ui,1) - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
+.sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
+.sitenav a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* 3D 載入中 */
+.load{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:13px;pointer-events:none;transition:opacity .5s}
+.load i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--cyan);animation:spin 1s linear infinite}
+.load.done{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.load i{animation:none}}
+
+/* 右上:控制面板 */
+.ctl{position:fixed;right:20px;top:18px;z-index:6;padding:13px 15px 14px;display:grid;grid-template-columns:auto auto;gap:12px 20px}
+.grp h6{margin:0 0 7px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em;display:flex;justify-content:space-between;gap:8px}
+.grp h6 span{font-family:var(--mono);color:var(--ink-2);letter-spacing:0}
+.grp h6 span[lang]{font-family:inherit;color:inherit;letter-spacing:inherit}
+.seg{display:flex;gap:2px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px}
+.seg button,.btn{font:500 12.5px var(--sans);color:var(--ink-2);background:transparent;border:0;border-radius:7px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.seg button:hover,.btn:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.seg button.on{background:var(--btn-on);color:var(--btn-on-ink)}
+.seg.mono button{font-family:var(--mono);padding:6px 9px}
+.row{display:flex;gap:6px;align-items:center}
+.btn{background:var(--btn);border:1px solid var(--line);padding:6px 11px}
+.btn.on{background:var(--cyan);color:#062028;border-color:transparent}
+.btn.sq{width:32px;padding:6px 0;text-align:center;font-family:var(--mono)}
+
+.help{position:fixed;right:20px;top:264px;z-index:7;width:350px;max-height:calc(100vh / var(--ui,1) - 278px);overflow:auto;padding:14px 16px;font-size:12.5px;line-height:1.7;display:none}
+.help.show{display:block}
+.help b{font-size:13px}
+.help ul{margin:6px 0 8px;padding-left:18px}
+.help .fine{color:var(--muted);font-size:11.5px;margin:0}
+
+/* 底部:拉曼光譜 */
+.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(820px,calc(100vw / var(--ui,1) - 32px));padding:11px 14px 9px}
+.con-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:12.5px;margin-bottom:4px;white-space:nowrap}
+.con-head b{font-weight:700}
+.con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.legend{margin-left:auto;display:flex;gap:14px;color:var(--ink-2);font-size:11.5px}
+.legend i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:6px}
+.con-body{display:grid;grid-template-columns:1fr 168px;gap:14px;align-items:stretch}
+.plotwrap{position:relative;min-width:0}
+#plot{width:100%;height:170px;display:block;cursor:crosshair;touch-action:none}
+.meters{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.m .t{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.m .t b{font-family:var(--mono);font-weight:500;color:var(--ink-2)}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;width:50%;border-radius:3px;background:var(--cyan)}
+.m.big .t{margin-bottom:0}
+.m.big b.n{display:block;font-family:var(--mono);font-size:24px;font-weight:600;color:var(--cyan);line-height:1.2}
+.tip{position:absolute;pointer-events:none;padding:4px 8px;border-radius:6px;background:#0d151a;border:1px solid var(--line-2);font:500 11.5px var(--mono);color:var(--ink);white-space:nowrap;display:none;transform:translate(-50%,-120%)}
+
+.foot{position:fixed;left:24px;bottom:14px;z-index:4;max-width:250px;font-size:11px;line-height:1.55;color:var(--muted)}
+
+/* 元件標籤 */
+.lw{pointer-events:none}
+.lbl{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:3px 8px 3px 7px;border-radius:6px;background:rgba(9,14,18,.84);border:1px solid rgba(116,228,255,.32);font-size:11.5px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.lbl i{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);flex:none}
+.lbl b{font-weight:700;color:#fff}
+.lbl span{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+
+/* 導覽與影片 */
+.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw / var(--ui,1) - 40px));text-align:center;padding:13px 26px 15px}
+.cap .chap{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.16em;margin-bottom:5px}
+.cap .txt{font-size:18px;line-height:1.6;font-weight:500}
+.titlecard{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,15,19,.66) 0%,rgba(10,15,19,.4) 40%,rgba(10,15,19,0) 70%)}
+.titlecard .t1{font-weight:900;font-size:42px;letter-spacing:.04em}
+.titlecard .t2{font-weight:900;font-size:72px;color:var(--cyan);text-shadow:0 0 30px rgba(116,228,255,.4);line-height:1.15}
+.titlecard .t3{font-size:20px;color:var(--ink-2);margin-top:14px}
+.titlecard .t4{font-size:14px;color:var(--muted);margin-top:22px}
+#tourExit{position:fixed;right:20px;top:18px;z-index:9;display:none}
+html.touring .ctl,html.touring .help,html.touring .lede,html.touring .note,html.touring .foot{display:none}
+/* 導覽時分頁列只到「結束導覽」的左邊 */
+html.touring .sitenav{max-width:calc(100vw / var(--ui,1) - 48px - 120px)}
+html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
+html.touring .titlecard{display:flex}
+html.touring .cap.withcon{bottom:250px}
+
+html.film .ctl,html.film .help,html.film .lede,html.film .note,html.film .foot,html.film #tourExit,html.film .sitenav,html.film .load{display:none}
+html.film .cap{display:block;bottom:56px;max-width:1440px;padding:18px 40px 20px}
+html.film .cap .chap{font-size:16px;margin-bottom:8px}
+html.film .cap .txt{font-size:31px}
+html.film .titlecard{display:flex}
+html.film .titlecard .t1{font-size:56px}
+html.film .titlecard .t2{font-size:104px}
+html.film .titlecard .t3{font-size:28px}
+html.film .titlecard .t4{font-size:19px}
+html.film .hud{left:52px;top:44px;width:560px}
+html.film .hud::before{width:900px;height:420px}
+html.film .hud .k{font-size:34px}
+html.film .hud .big{font-size:54px}
+html.film #jab{height:170px}
+html.film .jab h6{font-size:14px}
+html[lang="en"]:not(.mp):not(.film) .hud .k{font-size:24px}
+html[lang="en"]:not(.mp):not(.film) .hud .big{font-size:32px}
+html[lang="en"].film .hud .k{font-size:28px}
+html[lang="en"].film .hud .big{font-size:46px}
+html.film .chips{margin-top:16px;gap:12px}
+html.film .chip{min-width:150px;padding:10px 16px 11px}
+html.film .chip small{font-size:14px}
+html.film .chip b{font-size:26px}
+html.film .console{left:auto;right:52px;top:48px;bottom:auto;transform:none;width:740px;padding:16px 20px 14px}
+html.film .con-head{font-size:17px;margin-bottom:8px}
+html.film .legend{font-size:15px}
+html.film #plot{height:250px}
+html.film .con-body{grid-template-columns:1fr 200px}
+html.film .m .t{font-size:14px}
+html.film .m.big b.n{font-size:32px}
+html.film .lbl{font-size:17px;padding:5px 12px 5px 10px;border-radius:8px;gap:8px}
+html.film .lbl span{font-size:14px}
+html.film .lbl i{width:8px;height:8px}
+html.rec *{transition:none!important;animation:none!important}
+
+@media (max-width:980px){
+  .lede,.foot{display:none}
+  .ctl{left:12px;right:12px;top:auto;bottom:250px;grid-template-columns:1fr;gap:8px;padding:10px 12px}
+  .hud{left:12px;top:12px}
+  .note{display:none}
+  .help{left:12px;right:12px;width:auto;top:120px}
+}
+@media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}}
+/* 手機版(html.mp,由 ../assets/mobile-panels.js 加上):標題與讀值縮小,控制面板與譜收在底部的停靠區 */
+html.mp .hud{left:12px;top:10px;width:min(380px,calc(100vw - 24px))}
+html.mp .hud .k{font-size:16px}
+html.mp .hud .big{font-size:26px;text-shadow:0 0 16px rgba(116,228,255,.3)}
+html.mp .sitenav{margin-bottom:8px;max-width:100%}
+html.mp .chips{gap:6px;margin:6px 0 0}
+html.mp .chip{flex:1 1 0;min-width:0;padding:5px 9px 6px}
+html.mp .chip small{font-size:10px;letter-spacing:.06em}
+html.mp .chip b{display:block;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+html.mp .lede,html.mp .note,html.mp .foot,html.mp .jab{display:none}
+html.mp .con-head > b,html.mp .con-head > .s{display:none}
+html.mp .legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px}
+html.mp #plot{height:150px}
+/* 說明框:放在標題下方,太長就捲動;橫拿時蓋在標題上,不擋右側的停靠區 */
+html.mp .help{left:12px;right:auto;top:var(--mp-free-top,120px);width:min(380px,calc(100vw - 24px - var(--mp-rail-w, 0px)));max-height:calc(100vh - var(--mp-free-top,120px) - 12px);max-height:calc(100dvh - var(--mp-free-top,120px) - 12px);overflow:auto;overscroll-behavior:contain}
+/* 導覽中:字幕放在停靠區上方 */
+html.mp.touring .cap.withcon{bottom:calc(var(--mp-dock-h,230px) + 20px)}
+@media (orientation:landscape){
+  html.mp .help{top:10px;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .cap,html.mp.touring .cap.withcon{left:12px;right:auto;bottom:12px;transform:none;max-width:calc(100vw - min(380px,46vw) - 36px)}
+}
+html.mp .ctl{grid-template-columns:1fr;gap:8px}
+/* 手機上元件標籤只留名稱(小字太擠,波長與位移看左上的讀值卡) */
+html.mp .lbl span{display:none}
+html.mp .con-body{grid-template-columns:minmax(0,1fr);gap:8px}
+html.mp .meters{flex-direction:row;align-items:flex-end;gap:12px}
+html.mp .meters .m{flex:1;min-width:0}
+html.mp .m.big b.n{font-size:20px}
+@media (orientation:landscape){
+  html.mp .hud{top:8px}
+  html.mp .sitenav{margin-bottom:6px}
+  html.mp .hud .k,html.mp .hud .big{display:inline;white-space:nowrap}
+  html.mp .hud .k{font-size:14px;margin-right:8px}
+  html.mp .hud .big{font-size:19px}
+  html.mp .chips{margin-top:4px}
+  html.mp .chip{padding:3px 8px 4px}
+  html.mp .chip b{font-size:13px}
+}
+/* 手機導覽(2026-11-09):分頁列藏起來,「結束導覽」放在它的位置;橫拿時標題欄只到停靠區的左邊;片頭片尾字卡縮小 */
+html.mp.touring .sitenav{visibility:hidden}
+html.mp.touring #tourExit{left:12px;right:auto;top:10px}
+@media (orientation:landscape){
+  html.mp.touring #tourExit{top:8px}
+  html.mp.touring .hud{width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .hud .k,html.mp.touring .hud .big{white-space:normal}
+}
+html.mp .titlecard{padding:0 16px}
+html.mp .titlecard .t1{font-size:24px}
+html.mp .titlecard .t2{font-size:40px}
+html.mp .titlecard .t3{font-size:14px;margin-top:8px}
+html.mp .titlecard .t4{font-size:11px;margin-top:10px}
+@media (orientation:landscape) and (max-height:340px){
+  html.mp.touring .cap{padding:8px 14px 9px}
+  html.mp.touring .cap .chap{font-size:11px;margin-bottom:3px}
+  html.mp.touring .cap .txt{font-size:15px;line-height:1.5}
+}
+/* 桌機小螢幕(1024×768、1366×768 這類):導言收起來、能階圖與譜圖矮一點、元件標籤只留名稱;3D 主角移到面板之間的空地(../assets/free-view.js) */
+@media (min-width:981px) and (max-width:1279px),(min-width:981px) and (max-height:899px){
+  .lede{display:none}
+  #jab{height:82px}
+  .lbl span{display:none}
+  #plot{height:120px}
+}
+/* 桌機小螢幕時頁尾的小字會被譜圖面板蓋住,收起來(說明框與片尾字卡都有寫示意) */
+@media (min-width:981px) and (max-width:1359px){.foot{display:none}}
+/* 大螢幕(2K、4K)的放大(見 ../assets/ui-scale.css):面板、字幕、片頭字卡與元件標籤依 --ui 放大;3D 畫布與 CSS2D 的定位層不放大 */
+.hud,.load,.ctl,.help,.console,.foot,.cap,.titlecard,#tourExit,.lbl{zoom:var(--ui,1)}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+}}
+</script>
+<link rel="stylesheet" href="../assets/render-quality.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<div id="stage"></div>
+<div class="load" id="load"><i></i><span data-en="Loading the 3D model">3D 模型載入中</span></div>
+
+<header class="hud">
+  <nav class="sitenav" aria-label="光譜" data-en-aria-label="Spectroscopy"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../spectroscopy/" data-en="Light and molecules">光與分子</a><a href="../uv-vis/">UV-Vis</a><a href="../ftir/">FTIR</a><a href="../nir/">NIR</a><a href="./" aria-current="page" data-en="Raman">拉曼</a><a href="../fluorescence/" data-en="Fluorescence">螢光</a><a href="../cd/">CD</a></nav>
+  <span class="k" data-en="Raman spectrometer">拉曼光譜儀</span>
+  <span class="big" data-en="Scattered light, shifted">散射光換了顏色</span>
+  <p class="lede" data-en="A laser lights the sample, and nearly all the scattered light keeps the laser's color (Rayleigh scattering). In the scattered light, about one photon in a million to ten million loses a little energy and comes out at a longer wavelength (Raman scattering); the energy lost is exactly that of a bond vibration. Block the laser color, spread the rest by wavelength with a grating, and a CCD records the Raman spectrum at once. Drag the CCD or click the plot to pick a position, or press Measure.">雷射照在樣品上,散射回來的光幾乎都和雷射同色(瑞立散射);散射光裡大約一百萬到一千萬個才有一個少了一點能量、波長變長(拉曼散射),少掉的正好是化學鍵振動的能量。濾掉雷射原色,用光柵依波長散開、CCD 一次記下,就是拉曼光譜。拖曳 CCD 或點譜圖選位置,或按「測量」。</p>
+  <div class="chips">
+    <div class="chip panel"><small data-en="Laser">雷射</small><b id="cL">532 nm</b></div>
+    <div class="chip panel"><small data-en="Raman shift">拉曼位移</small><b id="cS">1592 cm⁻¹</b></div>
+    <div class="chip panel"><small data-en="Wavelength">波長</small><b id="cW">581.2 nm</b></div>
+  </div>
+  <div class="jab panel"><h6 data-en="Energy levels (simplified)">能階圖(簡化)</h6><canvas id="jab"></canvas></div>
+  <div class="note panel" id="note"></div>
+</header>
+
+<aside class="ctl panel" id="ctl">
+  <div class="grp"><h6 data-en="Sample">樣品</h6>
+    <div class="seg" id="segSample">
+      <button data-v="van" class="on" data-en="Vanillin">香草醛</button><button data-v="cel" data-en="Paper">濾紙</button><button data-v="wood" data-en="Wood">木粉</button><button data-v="ps" data-en="Polystyrene">聚苯乙烯</button><button data-v="si" data-en="Silicon">矽</button>
+    </div>
+  </div>
+  <div class="grp"><h6 data-en="Laser (nm)">雷射(nm)</h6>
+    <div class="seg mono" id="segLaser"><button data-v="532" class="on">532</button><button data-v="785">785</button></div>
+  </div>
+  <div class="grp"><h6 data-en="Exposure (s)">曝光時間(秒)</h6>
+    <div class="seg mono" id="segExp"><button data-v="1">1</button><button data-v="10" class="on">10</button><button data-v="60">60</button></div>
+  </div>
+  <div class="grp"><h6 data-en="X axis">橫軸</h6>
+    <div class="seg" id="segAxis"><button data-v="shift" class="on" data-en="Raman shift">拉曼位移</button><button data-v="nm" data-en="Wavelength">波長</button></div>
+  </div>
+  <div class="grp"><h6 data-en="Case">外殼</h6>
+    <div class="row">
+      <div class="seg" id="segShell"><button data-v="0" data-en="Closed">組裝</button><button data-v="1" class="on" data-en="Open">展開</button></div>
+      <button class="btn" id="btnScan" data-en="Measure">測量</button>
+      <button class="btn" id="btnTour" data-en="Tour">導覽</button>
+      <button class="btn sq" id="btnHelp" aria-label="說明" data-en-aria-label="Help">?</button>
+    </div>
+  </div>
+</aside>
+
+<div class="help panel" id="help">
+  <b data-en="Controls">操作</b>
+  <ul lang="zh-Hant">
+    <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
+    <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
+    <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
+    <li>拖曳 CCD 晶片上的亮線,或在譜圖上點一下、拖曳,移動游標;左上的讀值卡寫出那一欄的拉曼位移與真正的波長,能階圖跟著改</li>
+    <li>「橫軸」:拉曼位移是比雷射少了多少能量(cm⁻¹,每公分幾個波),波長是光真正的波長(nm);換雷射時看哪一個不變</li>
+    <li>「測量」:CCD 曝光(畫面快轉),再由左往右讀出整條光譜;換雷射、曝光時間再量一次,上一次會留著比較</li>
+    <li>「導覽」:自動播一遍,內容和影片相同;按 Esc 結束</li>
+  </ul>
+  <ul lang="en">
+    <li>Mouse: drag to rotate the view; right-drag or Shift-drag to pan; scroll to zoom</li>
+    <li>Trackpad: swipe with two fingers to pan, pinch to zoom; touch screen: one finger rotates, two fingers pan and zoom</li>
+    <li>Keyboard: arrow keys or W A S D to move, Q E to turn, + − to zoom, hold Shift to go faster; R resets the view</li>
+    <li>Drag the bright line on the CCD chip, or click and drag on the plot, to move the cursor; the readouts at top left show that column's Raman shift and its real wavelength, and the energy diagram follows</li>
+    <li>"X axis": Raman shift is how much energy was lost compared with the laser (cm⁻¹, waves per centimeter); wavelength is the light's real wavelength (nm); switch lasers and see which one stays the same</li>
+    <li>"Measure": the CCD is exposed (fast-forwarded on screen), then the whole spectrum is read out from left to right; measure again with another laser or exposure and the previous one stays for comparison</li>
+    <li>"Tour": plays through automatically, the same as the video; press Esc to end it</li>
+  </ul>
+  <p class="fine" lang="zh-Hant">示意圖。元件的位置、大小與光路長度都是示意(真的光譜儀焦距約 20 到 80 cm,CCD 晶片約 2.7 × 0.7 cm,這裡放大);規格以常見的共軛焦拉曼顯微鏡與原廠的濾光片、CCD 資料為例:雷射 532 與 785 nm,樣品處的功率這裡兩顆都用 10 mW(示意);二向分光鏡在 45° 反射雷射、讓波長較長的光穿過;0° 的邊緣濾光片在雷射波長的 OD 大於 6(只剩不到百萬分之一),離雷射約 90 到 120 cm⁻¹(785 nm 約 60 到 80 cm⁻¹)以內量不到;CCD 致冷到約 −60 °C,一欄像素約 2 cm⁻¹。換雷射時,雷射線濾光片、二向分光鏡、邊緣濾光片與光柵都要換成配那顆雷射的。拉曼光子在畫面上放大了很多倍才看得到。聚苯乙烯的峰位與相對強度取自標準譜,矽約 520.5 cm⁻¹,纖維素與木質素的峰位取自文獻;香草醛只有 588、1511、1592、1665 cm⁻¹ 的峰位有出處,其他小峰與所有樣品的峰寬是示意,香草醛與木粉的峰高、螢光背景的大小也是示意。532 nm 下木質素 1600 cm⁻¹ 的峰另外加強(前共振,倍數是示意)。計數依散射光頻率(數光子時是三次方)與 CCD 在各波長的效率算出,所以每支峰換雷射後變弱的倍數不同。很多機型把樣品區關在罩子裡,門一開雷射就停(Class 1);開放式或接光纖探頭時沒有這層保護。785 nm 看不見,看不見不代表不危險。光譜是模擬的,不是實測數據。</p>
+  <p class="fine" lang="en">Schematic. Positions, sizes and path lengths are illustrative (a real spectrograph has a focal length of about 20 to 80 cm, and the CCD chip, about 2.7 × 0.7 cm, is enlarged here); specifications follow a common confocal Raman microscope and manufacturers' filter and CCD data: 532 and 785 nm lasers, both set to 10 mW at the sample here (illustrative); a dichroic mirror at 45° reflects the laser and passes longer wavelengths; a 0° edge filter has OD above 6 at the laser line (under a millionth left), and nothing within about 90 to 120 cm⁻¹ of the laser (about 60 to 80 cm⁻¹ at 785 nm) can be measured; the CCD is cooled to about −60 °C, and each pixel column covers about 2 cm⁻¹. Changing lasers also means changing the clean-up filter, dichroic mirror, edge filter and grating to the ones made for that laser. Raman photons are shown far more often than they really occur so you can see them. Polystyrene peak positions and relative intensities come from a standard spectrum, silicon is about 520.5 cm⁻¹, and cellulose and lignin positions come from the literature; for vanillin only the 588, 1511, 1592 and 1665 cm⁻¹ positions are sourced, its other small peaks and all peak widths are illustrative, and so are the vanillin and wood peak heights and the size of the fluorescence background. Under 532 nm the lignin peak at 1600 cm⁻¹ gets an extra boost (pre-resonance, illustrative factor). Counts follow the scattered light's frequency (cubed when counting photons) and the CCD's efficiency at each wavelength, so each peak weakens by a different factor when the laser changes. Many models keep the sample in an enclosure and stop the laser when the door opens (Class 1); open setups and fiber probes do not have that protection. 785 nm is invisible, which does not make it harmless. The spectra are simulated, not measured data.</p>
+</div>
+
+<section class="console panel" id="console">
+  <div class="con-head"><b data-en="Raman spectrum">拉曼光譜</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
+  <div class="con-body">
+    <div class="plotwrap"><canvas id="plot"></canvas><div class="tip" id="tip"></div></div>
+    <div class="meters">
+      <div class="m"><div class="t"><span lang="zh-Hant">拉曼訊號</span><span lang="en">Raman</span><b id="vR">0</b></div><div class="bar"><i id="mR"></i></div></div>
+      <div class="m"><div class="t"><span lang="zh-Hant">螢光背景</span><span lang="en">Background</span><b id="vB">0</b></div><div class="bar"><i id="mB"></i></div></div>
+      <div class="m big"><div class="t" data-en="S/N = signal ÷ noise">訊雜比 = 訊號 ÷ 雜訊</div><b class="n" id="vN">0</b></div>
+    </div>
+  </div>
+</section>
+
+<div class="foot" data-en="Schematic; internal positions, some peak heights and the fluorescence background are illustrative.">示意圖;機內元件位置、部分峰高與螢光背景為示意。</div>
+
+<div class="cap panel" id="cap"><div class="chap" id="chap"></div><div class="txt" id="capTxt"></div></div>
+<div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
+<button class="btn" id="tourExit" data-en="End tour">結束導覽</button>
+
+<script type="module">
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
+import { createMobilePanels } from '../assets/mobile-panels.js';
+import { createFreeView } from '../assets/free-view.js';
+const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const $ = s => document.querySelector(s);
+const Q = new URLSearchParams(location.search);
+const FILM = Q.has('film'), REC = Q.has('rec');
+const root = document.documentElement;
+if (FILM) root.classList.add('film');
+if (REC) root.classList.add('rec');
+// 手機版:控制面板與譜預設收成有標籤的細條,放在底部;直拿時建議轉成橫式(../assets/mobile-panels.js)
+const mp = createMobilePanels({
+  dock: true, top: '.hud', rotateHint: true,
+  suspended: () => FILM || root.classList.contains('touring'),
+  panels: [
+    { el: '#ctl', icon: 'adjust', label: zhEn('調整', 'Adjust'), items: zhEn('樣品、雷射、曝光時間、橫軸、外殼、測量、導覽、說明、畫質', 'sample, laser, exposure, x axis, case, measure, tour, help, quality'), onToggle: (open) => { if (!open) document.getElementById('help').classList.remove('show'); } },
+    { el: '#console', icon: 'chart', label: zhEn('拉曼光譜', 'Raman spectrum'), items: () => $('#conSample').textContent },
+  ],
+});
+$('#btnScan').addEventListener('click', () => mp.open('#console'));
+window.__err = null;
+addEventListener('error', e => { window.__err = String(e.message || e); });
+
+// ================= 小工具 =================
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = t => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const gauss = n => Math.sqrt(-2 * Math.log(Math.max(1e-6, hash(n)))) * Math.cos(6.2831853 * hash(n + 17.77));
+const MONO = "'IBM Plex Mono',Consolas,monospace";
+const fmtInt = n => Math.round(n).toLocaleString(zhEn('zh-TW', 'en-US'));
+
+// ================= 光譜模型 =================
+// 拉曼位移 Δν̃(cm⁻¹)= 10⁷/λ雷射 − 10⁷/λ散射(λ 用 nm)
+const lamOf = (laser, sh) => 1e7 / (1e7 / laser - sh);
+const shOf = (laser, l) => 1e7 / laser - 1e7 / l;
+const NU532 = 1e7 / 532;
+// 0° 長波通邊緣濾光片:50% 穿透點、開始全穿透的拉曼位移(Semrock RazorEdge E 級,換算成 cm⁻¹)
+const LASERS = { 532: { cut50: 93.5, cutFull: 119.4 }, 785: { cut50: 63.0, cutFull: 82.2 } };
+const edgeT = (laser, sh) => { const L = LASERS[laser]; return sstep(2 * L.cut50 - L.cutFull, L.cutFull, sh); };
+// CCD 的量子效率(深致冷背照式 CCD 的原廠表:250 nm 27%、550 nm 42%、750 nm 58%、800 nm 55%、1000 nm 12%;1000 nm 以上到 1060 nm 降到 0 是示意)
+const QE_PTS = [[250, .27], [550, .42], [750, .58], [800, .55], [1000, .12], [1060, 0]];
+function qe(l) {
+  if (l <= QE_PTS[0][0]) return QE_PTS[0][1];
+  for (let i = 1; i < QE_PTS.length; i++) { const [x1, y1] = QE_PTS[i], [x0, y0] = QE_PTS[i - 1]; if (l <= x1) return y0 + (y1 - y0) * (l - x0) / (x1 - x0); }
+  return 0;
+}
+const detK = (laser, sh) => qe(lamOf(laser, sh)) / .42;
+// 同樣的雷射功率下,CCD 數到的拉曼光子 ∝ (ν̃₀ − ν̃ₘ)³(散射功率 ∝ 頻率四次方,除以每個光子的能量),再乘偵測器效率;532 nm、位移 0 附近約 1
+const ramanK = (laser, sh) => ((1e7 / laser - sh) / NU532) ** 3 * detK(laser, sh);
+const SH0 = 50, SH1 = 3500, DSH = 2, NPT = Math.round((SH1 - SH0) / DSH) + 1;   // CCD 涵蓋的拉曼位移,每欄 2 cm⁻¹
+const FULL = 200000, READ = 4.7, DARK = .018;   // 一個像素最多裝的電子、讀出雜訊(e⁻)、−60 °C 的暗電流(e⁻/秒)
+const EXP_OPTS = [1, 10, 60];
+const EXP_SHOW = { 1: 1.2, 10: 1.8, 60: 2.6 }, READ_T = 1.8;   // 畫面上曝光(快轉)與讀出各花幾秒
+const LV = { vs: 1, s: .6, m: .3, w: .12, vw: .05, sh: .14 };   // 文獻的強度等級換成峰高(示意)
+// peaks:[位移 cm⁻¹, 峰高, 半高寬 cm⁻¹, 532 nm 時另乘的倍數];amp:峰高 1 在 532 nm、10 mW 時每秒幾個計數(示意);bg:螢光背景 [中心 nm, 每秒計數, 寬 nm](示意)
+const SAMPLES = {
+  van: { name: zhEn('香草醛', 'Vanillin'), full: zhEn('香草醛粉末', 'Vanillin powder'), main: 1592, amp: 1600, h: .6,
+    peaks: [[588, .25, 10], [1511, .3, 10], [1592, 1, 12], [1665, .42, 16], [2850, .05, 24], [2945, .08, 24], [3070, .12, 20]],
+    bg: { 532: [[600, 180, 80]], 785: [[880, 30, 150]] },
+    tags: [[1592, zhEn('1592 苯環', '1592 ring')], [1665, '1665 C=O'], [588, '588']] },
+  cel: { name: zhEn('濾紙', 'Paper'), full: zhEn('濾紙(纖維素)', 'Filter paper (cellulose)'), main: 1096, amp: 900, h: .06,
+    peaks: [[331, 'sh', 14], [348, 'w', 12], [381, 'm', 12], [437, 'm', 12], [459, 'm', 12], [492, 'w', 12], [520, 'm', 12], [898, 'm', 14], [971, 'w', 14], [997, 'w', 14], [1037, 'sh', 14], [1063, 'sh', 14], [1073, 'sh', 14], [1096, 's', 14], [1121, 's', 14], [1152, 'm', 16], [1294, 'm', 16], [1339, 'm', 16], [1380, 'm', 16], [1409, 'sh', 18], [1456, 'sh', 18], [1478, 'm', 16], [2739, 'w', 30], [2895, 'vs', 34], [2966, 'sh', 30], [3264, 'w', 160]].map(([c, k, w]) => [c, LV[k], w]),
+    bg: { 532: [[590, 250, 80]], 785: [[880, 40, 150]] },
+    tags: [[1096, '1096 C–O/C–C'], [2895, '2895 C–H'], [381, '381']] },
+  wood: { name: zhEn('木粉', 'Wood'), full: zhEn('木粉(纖維素與木質素)', 'Wood powder (cellulose and lignin)'), main: 1600, amp: 450, h: .6,
+    peaks: [[380, .15, 18], [438, .07, 16], [460, .07, 16], [520, .06, 16], [900, .07, 16], [1033, .05, 18], [1096, .3, 16], [1121, .27, 16], [1140, .14, 18], [1272, .11, 22], [1335, .12, 20], [1378, .11, 18], [1456, .14, 22], [1600, .62, 22, 1.4], [1660, .28, 20], [2895, 1, 40], [2940, .35, 40], [3070, .16, 30]],
+    bg: { 532: [[570, 6000, 42], [600, 1200, 90]], 785: [[850, 80, 140]] },
+    tags: [[1600, zhEn('1600 木質素', '1600 lignin')], [1096, zhEn('1096 纖維素', '1096 cellulose')], [2895, '2895 C–H']] },
+  ps: { name: zhEn('聚苯乙烯', 'Polystyrene'), full: zhEn('聚苯乙烯(拉曼位移標準品)', 'Polystyrene (Raman shift standard)'), main: 1001.4, amp: 2400, h: .5,
+    peaks: [[620.9, 16], [795.8, 10], [1001.4, 100], [1031.8, 27], [1155.3, 13], [1450.5, 8], [1583.1, 12], [1602.3, 28], [2852.4, 9], [2904.5, 13], [3054.3, 32]].map(([c, a]) => [c, a / 100, c > 2800 ? 14 : c === 1450.5 ? 12 : 7]),
+    bg: { 532: [[600, 60, 150]], 785: [[880, 15, 200]] },
+    tags: [[1001.4, zhEn('1001 苯環呼吸', '1001 ring breathing')], [3054.3, '3054'], [1602.3, '1602'], [620.9, '621']] },
+  si: { name: zhEn('矽', 'Silicon'), full: zhEn('矽晶片(快速檢查)', 'Silicon wafer (quick check)'), main: 520.5, amp: 6000, h: .1,
+    peaks: [[520.5, 1, 5]], bg: { 532: [], 785: [] }, tags: [[520.5, '520.5']] },
+};
+const SKEYS = Object.keys(SAMPLES);
+function peaksAt(sm, laser, sh) {
+  let v = 0;
+  for (const [c, a, w, pr] of sm.peaks) { const x = (sh - c) / (w / 2); v += a * (laser === 532 && pr ? pr : 1) / (1 + x * x); }
+  return v;
+}
+const ramanRate = (sm, laser, sh) => sm.amp * peaksAt(sm, laser, sh) * ramanK(laser, sh) * edgeT(laser, sh);
+function bgRate(sm, laser, sh) {
+  const l = lamOf(laser, sh); let v = 0;
+  for (const [c, a, w] of sm.bg[laser]) v += a * Math.exp(-(((l - c) / w) ** 2));
+  return v * detK(laser, sh) * edgeT(laser, sh);
+}
+const rateAt = (sm, laser, sh) => ramanRate(sm, laser, sh) + bgRate(sm, laser, sh);
+// 沒有雜訊的整條(每秒計數),每個樣品與雷射算一次
+const PREV = {};
+function previewOf(sample, laser) {
+  const k = `${sample}|${laser}`;
+  if (!PREV[k]) {
+    const sm = SAMPLES[sample], y = new Float32Array(NPT), r = new Float32Array(NPT); let mx = 0, mr = 0;
+    for (let i = 0; i < NPT; i++) { const sh = SH0 + i * DSH; r[i] = ramanRate(sm, laser, sh); y[i] = r[i] + bgRate(sm, laser, sh); mx = Math.max(mx, y[i]); mr = Math.max(mr, r[i]); }
+    PREV[k] = { y, r, max: mx, rmax: mr };
+  }
+  return PREV[k];
+}
+// 一次測量:每欄的計數加上光子雜訊(√計數)與讀出雜訊,超過一個像素裝得下的電子就飽和
+function traceOf(sc) {
+  const sm = SAMPLES[sc.sample], y = new Float32Array(NPT); let sat = false, mx = 0;
+  for (let i = 0; i < NPT; i++) {
+    const sh = SH0 + i * DSH, N = rateAt(sm, sc.laser, sh) * sc.exp, sd = Math.sqrt(N + DARK * sc.exp + READ * READ);
+    let n = N + sd * gauss(sh * 1.37 + sc.seed * 101.3);
+    if (n >= FULL) { n = FULL; sat = true; }
+    y[i] = n / sc.exp; mx = Math.max(mx, y[i]);
+  }
+  return { y, sat, max: mx };
+}
+const traceCache = new Map();
+function traceCached(sc) {
+  const k = `${sc.sample}|${sc.laser}|${sc.exp}|${sc.seed}`;
+  let v = traceCache.get(k);
+  if (!v) { v = traceOf(sc); if (traceCache.size > 30) traceCache.clear(); traceCache.set(k, v); }
+  return v;
+}
+// 測量進行到哪裡:曝光(f 從 0 到 1)→ 讀出(u 從 0 到 1,由左往右)→ 完成
+function measPhase(sc) {
+  const E = EXP_SHOW[sc.exp], el = sc.el;
+  if (el < E) return { ph: 'exp', f: el / E, u: 0 };
+  if (el < E + READ_T) return { ph: 'read', f: 1, u: (el - E) / READ_T };
+  return { ph: 'done', f: 1, u: sc.cut ?? 1 };
+}
+// 游標處:這次曝光的拉曼計數、背景計數、訊雜比
+function readAt(sample, laser, exp, sh) {
+  const sm = SAMPLES[sample], R = ramanRate(sm, laser, sh) * exp, B = bgRate(sm, laser, sh) * exp;
+  return { R, B, sn: R / Math.sqrt(R + B + DARK * exp + READ * READ), sat: R + B > FULL };
+}
+
+// 波長 → 顯示用顏色(sRGB 0..1);紫外與近紅外看不見,分別用淡紫與暗紅代表
+function wlColor(l) {
+  let r, g, b;
+  if (l < 380) { r = .62; g = .38; b = 1; }
+  else if (l < 440) { r = -(l - 440) / 60 * .8 + .1; g = 0; b = 1; }
+  else if (l < 490) { r = 0; g = (l - 440) / 50; b = 1; }
+  else if (l < 510) { r = 0; g = 1; b = -(l - 510) / 20; }
+  else if (l < 580) { r = (l - 510) / 70; g = 1; b = 0; }
+  else if (l < 645) { r = 1; g = -(l - 645) / 65; b = 0; }
+  else if (l <= 780) { r = 1; g = 0; b = 0; }
+  else { const t = clamp((l - 780) / 320, 0, 1); r = .78 - .3 * t; g = .05; b = .14 + .08 * t; }
+  return [clamp(r, 0, 1), clamp(g, 0, 1), clamp(b, 0, 1)];
+}
+const lin = rgb => new THREE.Color().setRGB(rgb[0], rgb[1], rgb[2], THREE.SRGBColorSpace);
+const css = (rgb, a = 1) => `rgba(${rgb.map(v => Math.round(v * 255)).join(',')},${a})`;
+
+// ================= 場景 =================
+let DPR = REC ? 1 : quality.pixelRatio(innerWidth, innerHeight, 1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: REC, powerPreference: 'high-performance' });
+renderer.setPixelRatio(DPR);
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+$('#stage').appendChild(renderer.domElement);
+window.__gl = (() => { try { const gl = renderer.getContext(), x = gl.getExtension('WEBGL_debug_renderer_info'); return x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { return '?'; } })();
+
+const labelR = new CSS2DRenderer();
+labelR.setSize(innerWidth, innerHeight);
+labelR.domElement.className = 'labels';
+document.body.appendChild(labelR.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a1015);
+scene.fog = new THREE.Fog(0x0a1015, 260, 600);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .5;
+
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 1, 1500);
+camera.position.set(32, 92, 84);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(-7, 8, -6);
+controls.enableDamping = true; controls.dampingFactor = .08;
+controls.minDistance = 18; controls.maxDistance = 240; controls.maxPolarAngle = 1.47;
+controls.update();
+
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), .75, .5, 1.25);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.HemisphereLight(0xcfe6ff, 0x1b1712, .45));
+const key = new THREE.DirectionalLight(0xffffff, 1.65);
+key.position.set(55, 110, 75); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 20, far: 320 });
+key.shadow.bias = -.0004; key.shadow.normalBias = .03;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0x74e4ff, .28); rim.position.set(-90, 50, -100); scene.add(rim);
+
+// ---------- 桌面與牆 ----------
+function canvasTex(w, h, draw, repeat) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+  return t;
+}
+const benchTop = new THREE.Mesh(new THREE.BoxGeometry(200, 4, 112), new THREE.MeshStandardMaterial({ color: 0x141b20, roughness: .58, metalness: .1 }));
+benchTop.position.set(0, -2, 4); benchTop.receiveShadow = true; scene.add(benchTop);
+const strip = new THREE.Mesh(new THREE.BoxGeometry(200, .45, .5), new THREE.MeshBasicMaterial({ color: new THREE.Color(.25, .85, 1.1) }));
+strip.position.set(0, -.35, 60.1); scene.add(strip);
+const wallTex = canvasTex(1024, 512, (c, w, h) => {
+  c.fillStyle = '#121a20'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 3;
+  for (let x = 0; x <= w; x += 128) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+  c.beginPath(); c.moveTo(0, 340); c.lineTo(w, 340); c.stroke();
+}, [3, 1]);
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(760, 300), new THREE.MeshStandardMaterial({ map: wallTex, roughness: .95 }));
+wall.position.set(0, 70, -160); scene.add(wall);
+function screenTex(kind) {
+  return canvasTex(640, 360, (c, w, h) => {
+    c.fillStyle = 'rgba(16,48,62,.9)'; c.fillRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(116,228,255,.6)'; c.lineWidth = 3; c.strokeRect(6, 6, w - 12, h - 12);
+    c.strokeStyle = c.fillStyle = 'rgba(200,244,255,.95)'; c.lineWidth = 4; c.lineCap = 'round';
+    c.font = `600 34px ${MONO}`; c.textAlign = 'center';
+    const arrow = (x0, y0, x1, y1, lw, col) => {
+      const a = Math.atan2(y1 - y0, x1 - x0); c.strokeStyle = col; c.lineWidth = lw;
+      c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+      c.beginPath(); c.moveTo(x1, y1); c.lineTo(x1 - 16 * Math.cos(a - .45), y1 - 16 * Math.sin(a - .45)); c.moveTo(x1, y1); c.lineTo(x1 - 16 * Math.cos(a + .45), y1 - 16 * Math.sin(a + .45)); c.stroke();
+    };
+    if (kind === 0) {
+      arrow(60, 150, 230, 150, 8, '#5dff6a');
+      c.fillStyle = 'rgba(200,244,255,.35)'; c.beginPath(); c.arc(270, 150, 34, 0, 7); c.fill();
+      arrow(310, 128, 520, 60, 9, '#5dff6a'); arrow(310, 172, 500, 232, 2.5, '#ffb43c');
+      c.fillStyle = 'rgba(200,244,255,.95)'; c.font = `600 28px ${MONO}`; c.textAlign = 'left';
+      c.fillText(zhEn('瑞立', 'Rayleigh'), 450, 112); c.fillText(zhEn('拉曼', 'Raman'), 470, 262);
+      c.textAlign = 'center'; c.font = `600 26px ${MONO}`;
+      c.fillText(zhEn('散射光裡 10⁶ 到 10⁷ 個才有 1 個拉曼', '1 Raman per 10⁶ to 10⁷ scattered'), w / 2, 320);
+    } else if (kind === 1) {
+      c.fillText(zhEn('拉曼位移 (cm⁻¹)', 'Raman shift (cm⁻¹)'), w / 2, 110);
+      c.fillText(zhEn('= 10⁷/λ雷射 − 10⁷/λ', '= 10⁷/λlaser − 10⁷/λ'), w / 2, 190);
+      c.font = `500 26px ${MONO}`; c.fillText(zhEn('λ 用 nm;換雷射,位移不變', 'λ in nm; same shift for any laser'), w / 2, 280);
+    } else {
+      c.fillText(zhEn('散射強度 ∝ 頻率⁴', 'Scattering ∝ frequency⁴'), w / 2, 120);
+      c.fillText('(785 / 532)⁴ ≈ 4.7', w / 2, 200);
+      c.font = `500 26px ${MONO}`; c.fillText(zhEn('長波長:螢光少,訊號也弱', 'Longer λ: less fluorescence, weaker signal'), w / 2, 285);
+    }
+  });
+}
+const SCREENS = [-110, 0, 110].map((x, i) => {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(76, 42.75), new THREE.MeshBasicMaterial({ map: screenTex(i), toneMapped: false, transparent: true, opacity: .9 }));
+  m.position.set(x, 64, -158); scene.add(m); return m;
+});
+
+// ---------- 儀器 ----------
+const BY = 18;       // 光軸高度(雷射與光譜儀這一層)
+const DECK = 13;     // 高台頂面
+const FY = 9.6;      // 焦點(樣品表面)的高度
+const V3 = THREE.Vector3, UP = new V3(0, 1, 0);
+const inst = new THREE.Group(); scene.add(inst);
+const optics = new THREE.Group(); inst.add(optics);
+const benchMap = (rx, rz) => canvasTex(128, 128, (c, w, h) => {
+  c.fillStyle = '#2b343a'; c.fillRect(0, 0, w, h); c.fillStyle = '#151b1f';
+  for (const [x, y] of [[32, 32], [96, 32], [32, 96], [96, 96]]) { c.beginPath(); c.arc(x, y, 6, 0, 7); c.fill(); }
+}, [rx, rz]);
+const MAT = {
+  shell: new THREE.MeshPhysicalMaterial({ color: 0xe4e8eb, roughness: .45, clearcoat: .35, clearcoatRoughness: .35, transparent: true }),
+  lid: new THREE.MeshPhysicalMaterial({ color: 0x3a4652, roughness: .35, clearcoat: .8, clearcoatRoughness: .2, transparent: true }),
+  vent: new THREE.MeshStandardMaterial({ color: 0x2a3035, roughness: .7, transparent: true }),
+  win: new THREE.MeshPhysicalMaterial({ color: 0xff9a2e, roughness: .1, transparent: true, opacity: .45, depthWrite: false }),
+  edge: new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: 0, depthWrite: false }),
+  plinth: new THREE.MeshStandardMaterial({ color: 0x2b3237, roughness: .6, metalness: .2 }),
+  bench: new THREE.MeshStandardMaterial({ roughness: .7, metalness: .3, map: benchMap(65 / 5, 65 / 5) }),
+  deck: new THREE.MeshStandardMaterial({ roughness: .7, metalness: .3, map: benchMap(62 / 5, 40 / 5) }),
+  black: new THREE.MeshStandardMaterial({ color: 0x14191d, roughness: .45, metalness: .6 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x2a3238, roughness: .5, metalness: .5 }),
+  metal: new THREE.MeshStandardMaterial({ color: 0xaab4ba, roughness: .45, metalness: .85 }),
+  anod: new THREE.MeshStandardMaterial({ color: 0x3a4650, roughness: .35, metalness: .7 }),
+  scope: new THREE.MeshStandardMaterial({ color: 0xb9c2c9, roughness: .5, metalness: .25 }),
+  mirror: new THREE.MeshStandardMaterial({ color: 0xdfe6ea, roughness: .14, metalness: 1, side: THREE.DoubleSide }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0xd6f2ff, roughness: .04, transparent: true, opacity: .3, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  slide: new THREE.MeshPhysicalMaterial({ color: 0xe4f6ff, roughness: .05, transparent: true, opacity: .35, clearcoat: 1, depthWrite: false }),
+  grating: new THREE.MeshPhysicalMaterial({ color: 0xd9dee4, metalness: .6, roughness: .2, iridescence: 1, iridescenceIOR: 1.8, iridescenceThicknessRange: [150, 900], transparent: true, opacity: .75, side: THREE.DoubleSide }),
+  dm532: new THREE.MeshPhysicalMaterial({ color: 0xb8ffc8, metalness: .5, roughness: .08, transparent: true, opacity: .6, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  dm785: new THREE.MeshPhysicalMaterial({ color: 0xf0b4c4, metalness: .5, roughness: .08, transparent: true, opacity: .6, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  ef532: new THREE.MeshPhysicalMaterial({ color: 0xff9a3c, roughness: .08, transparent: true, opacity: .62, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  ef785: new THREE.MeshPhysicalMaterial({ color: 0x5a1426, roughness: .08, transparent: true, opacity: .8, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  lf532: new THREE.MeshPhysicalMaterial({ color: 0x8dff9a, roughness: .08, transparent: true, opacity: .45, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  lf785: new THREE.MeshPhysicalMaterial({ color: 0x8a2a3c, roughness: .08, transparent: true, opacity: .6, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  laser: new THREE.MeshStandardMaterial({ color: 0x23292e, roughness: .35, metalness: .6 }),
+  ccd: new THREE.MeshStandardMaterial({ color: 0x30363c, roughness: .4, metalness: .6 }),
+  pcb: new THREE.MeshStandardMaterial({ color: 0x1f4a35, roughness: .6, metalness: .2 }),
+  ceramic: new THREE.MeshStandardMaterial({ color: 0xe8e4da, roughness: .8 }),
+  sVan: new THREE.MeshStandardMaterial({ color: 0xf3efe2, roughness: .85 }),
+  sCel: new THREE.MeshStandardMaterial({ color: 0xf7f7f3, roughness: .9 }),
+  sWood: new THREE.MeshStandardMaterial({ color: 0xc49a62, roughness: .85 }),
+  sPs: new THREE.MeshPhysicalMaterial({ color: 0xf4f4ef, roughness: .25, clearcoat: 1, transparent: true, opacity: .92 }),
+  sSi: new THREE.MeshStandardMaterial({ color: 0x3a4250, roughness: .16, metalness: .9 }),
+};
+function mesh(geo, mat, pos, parent = optics, shadow = true) {
+  const m = new THREE.Mesh(geo, mat); if (pos) m.position.set(pos[0], pos[1], pos[2]);
+  m.castShadow = shadow; m.receiveShadow = true; parent.add(m); return m;
+}
+// 支柱:從高台頂面立起
+function post(x, z, top, r = .38) {
+  const h = top - DECK; if (h <= .05) return;
+  mesh(new THREE.CylinderGeometry(r, r, h, 18), MAT.metal, [x, DECK + h / 2, z]);
+  mesh(new THREE.CylinderGeometry(r * 2.3, r * 2.5, .4, 22), MAT.black, [x, DECK + .2, z]);
+}
+
+mesh(new RoundedBoxGeometry(66, 3, 66, 3, .8), MAT.plinth, [0, 1.5, 0], inst);
+mesh(new THREE.BoxGeometry(64.6, .6, 64.6), MAT.bench, [0, 3.3, 0], inst, false);
+// 高台:雷射與光譜儀放在上面,前面低處是顯微鏡的樣品台
+mesh(new RoundedBoxGeometry(62, 9.1, 40.5, 2, .5), MAT.plinth, [0, 3.6 + 4.55, -11.75], inst);
+mesh(new THREE.BoxGeometry(61.4, .3, 39.9), MAT.deck, [0, DECK - .15, -11.75], inst, false);
+mesh(new THREE.BoxGeometry(27, .12, 19), MAT.black, [-10, DECK + .06, -22.5], inst, false);   // 光譜儀的底板
+
+// 外殼(展開時往外飛並淡出)
+const shellParts = [];
+function shellPart(move, rot = 0) { const g = new THREE.Group(); inst.add(g); shellParts.push({ g, move, rot }); return g; }
+function shellBox(g, size, pos, mat, radius) {
+  const m = mesh(new RoundedBoxGeometry(size[0], size[1], size[2], 4, radius), mat, pos, g);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(...size)), MAT.edge);
+  e.position.copy(m.position); g.add(e); return m;
+}
+const body = shellPart([0, 44, -26]);
+shellBox(body, [64.4, 24, 43], [0, 15.6, -11.6], MAT.shell, 1.6);
+for (let i = 0; i < 12; i++) mesh(new THREE.BoxGeometry(18, .06, .55), MAT.vent, [16, 27.62, -30 + i * 1.6], body, false);
+mesh(new THREE.SphereGeometry(.32, 16, 10), new THREE.MeshBasicMaterial({ color: new THREE.Color(.3, 2.2, .7) }), [26, 7, 9.95], body, false);
+const hood = shellPart([0, 38, 16]);
+shellBox(hood, [25, 24, 21.4], [0, 15.6, 20.8], MAT.shell, 1.4);
+const door = shellPart([0, 6, 30], -.25);
+shellBox(door, [21, 19, .8], [0, 14.6, 31.7], MAT.lid, .4);
+mesh(new THREE.BoxGeometry(15, 11, .1), MAT.win, [0, 15.4, 32.15], door, false);
+mesh(new THREE.BoxGeometry(5, .7, .8), MAT.metal, [0, 7.4, 32.4], door);
+
+// 光學元件位置(俯視 x, z)
+const P = {
+  L532: [22.4, 3], LF532: [20.4, 3], SWM: [16, 3], L785: [16, -4.4], LF785: [16, -2.2],
+  BE1: [11, 3], BE2: [6.4, 3], DM: [0, 3], EF: [0, -2], L1: [0, -5.5], PH: [0, -8.5], L2: [0, -11.5], SL: [0, -14],
+  FM1: [0, -18.5], CL: [-5, -18.5], GR: [-11, -18.5], FL: [-16.5, -24], CCD: [-20.5, -28], M0: [0, 19],
+};
+const O = {};
+function node(key, y = BY) { const g = new THREE.Group(); g.position.set(P[key][0], y, P[key][1]); optics.add(g); O[key] = { g }; return g; }
+const face = (g, n) => { g.rotation.y = Math.atan2(n[0], n[1]); };
+const dirTo = (a, b) => { const dx = P[b][0] - P[a][0], dz = P[b][1] - P[a][1], L = Math.hypot(dx, dz); return [dx / L, dz / L]; };
+const bis = (u, v) => { const x = u[0] + v[0], z = u[1] + v[1], L = Math.hypot(x, z); return [x / L, z / L]; };
+const D45 = Math.SQRT1_2;
+
+// 雷射:532 nm 固態雷射與 785 nm 二極體雷射(雷射的出口在節點上,本體往後延伸)
+function laserHead(key, dir, len, w, h, stripe, apMat) {
+  const g = node(key); face(g, dir);
+  mesh(new RoundedBoxGeometry(w, h, len, 3, .35), MAT.laser, [0, 0, -len / 2 - .2], g);
+  mesh(new THREE.BoxGeometry(w + .06, .5, len * .55), new THREE.MeshStandardMaterial({ color: stripe, roughness: .4, metalness: .3 }), [0, h / 2 - .4, -len * .55], g);
+  const ap = mesh(new THREE.CylinderGeometry(.62, .7, .5, 24), MAT.black, [0, 0, .05], g); ap.rotation.x = Math.PI / 2;
+  O[key].ap = mesh(new THREE.CircleGeometry(.3, 20), apMat, [0, 0, .31], g, false);
+  mesh(new THREE.BoxGeometry(w * .8, BY - h / 2 - DECK, len * .7), MAT.black, [0, -(h / 2 + (BY - h / 2 - DECK) / 2), -len / 2], g);
+  for (let i = 0; i < 6; i++) mesh(new THREE.BoxGeometry(.12, h * .7, .5), MAT.anod, [w / 2 + .06, -h * .08, -len * .25 - i * len * .1], g, false);
+}
+laserHead('L532', [-1, 0], 9, 4.6, 4.2, 0x2fa84a, new THREE.MeshBasicMaterial({ color: 0x113311, toneMapped: false }));
+laserHead('L785', [0, 1], 8, 3.6, 3.4, 0x8a2436, new THREE.MeshBasicMaterial({ color: 0x220811, toneMapped: false }));
+// 濾光片(一片玻璃夾在黑色環裡)
+function filterDisc(g, mat, r = .9) {
+  const d = mesh(new THREE.CylinderGeometry(r, r, .12, 32), mat, [0, 0, 0], g, false); d.rotation.x = Math.PI / 2;
+  const ring = mesh(new THREE.TorusGeometry(r + .08, .14, 10, 36), MAT.black, [0, 0, 0], g);
+  return d;
+}
+{ const g = node('LF532'); face(g, [1, 0]); filterDisc(g, MAT.lf532, .75); post(P.LF532[0], P.LF532[1], BY - 1); }
+{ const g = node('LF785'); face(g, [0, -1]); filterDisc(g, MAT.lf785, .75); post(P.LF785[0], P.LF785[1], BY - 1); }
+// 換雷射的反射鏡:785 nm 時升起來把光轉進光路,532 nm 時降下
+{
+  const g = node('SWM'); face(g, bis(dirTo('SWM', 'L785'), dirTo('SWM', 'BE1')));
+  const slide = new THREE.Group(); g.add(slide); O.SWM.slide = slide;
+  mesh(new THREE.BoxGeometry(1.7, 1.7, .14), MAT.mirror, [0, 0, 0], slide);
+  mesh(new THREE.BoxGeometry(1.9, 1.9, .22), MAT.black, [0, 0, -.2], slide);
+  mesh(new THREE.BoxGeometry(.28, 4.2, .28), MAT.black, [0, -2.9, -.3], slide);
+  mesh(new THREE.BoxGeometry(1.3, 1.6, 1.4), MAT.dark, [0, -4.2, -.9], g);
+}
+// 擴束器:小透鏡 + 大透鏡,中間三根桿子
+function lens(g, r, thick = .3) {
+  const L = mesh(new THREE.SphereGeometry(r, 32, 16), MAT.glass, [0, 0, 0], g, false); L.scale.set(1, 1, thick);
+  mesh(new THREE.TorusGeometry(r + .05, .14, 10, 40), MAT.black, [0, 0, 0], g);
+}
+{ const g = node('BE1'); face(g, [1, 0]); lens(g, .55, .45); post(P.BE1[0], P.BE1[1], BY - .7); }
+{ const g = node('BE2'); face(g, [1, 0]); lens(g, 1.05); post(P.BE2[0], P.BE2[1], BY - 1.2); }
+for (const [dy, dz] of [[.95, 0], [-.6, .75], [-.6, -.75]]) { const r = mesh(new THREE.CylinderGeometry(.07, .07, 4.6, 8), MAT.metal, [(P.BE1[0] + P.BE2[0]) / 2, BY + dy, P.BE1[1] + dz]); r.rotation.z = Math.PI / 2; }
+// 濾光片架:二向分光鏡(45°)與邊緣濾光片(0°)兩組上下疊著,換雷射時整組上下滑
+const CAR_DY = 3.6;
+{
+  const guide = mesh(new THREE.BoxGeometry(.4, 11.4, 8.4), MAT.anod, [-2.5, DECK + 5.7, .5]);
+  const car = new THREE.Group(); car.position.set(0, BY, 0); optics.add(car); O.CAR = { g: car };
+  mesh(new THREE.BoxGeometry(.3, CAR_DY + 2.8, 7.6), MAT.dark, [-2.15, CAR_DY / 2, .5], car);
+  const set = (y, dmMat, efMat) => {
+    const dm = new THREE.Group(); dm.position.set(0, y, 3); dm.rotation.y = Math.PI / 4; car.add(dm);
+    mesh(new THREE.BoxGeometry(2.3, 2.3, .1), dmMat, [0, 0, 0], dm, false);
+    for (const [w, h, x, yy] of [[2.7, .22, 0, 1.25], [2.7, .22, 0, -1.25], [.22, 2.7, 1.25, 0], [.22, 2.7, -1.25, 0]]) mesh(new THREE.BoxGeometry(w, h, .3), MAT.black, [x, yy, 0], dm);
+    mesh(new THREE.BoxGeometry(1.6, .25, .25), MAT.black, [-1.3, 0, 1.3], dm);
+    const ef = new THREE.Group(); ef.position.set(0, y, -2); car.add(ef);
+    filterDisc(ef, efMat, .95);
+    mesh(new THREE.BoxGeometry(1.2, .25, .25), MAT.black, [-1.6, 0, 0], ef);
+  };
+  set(0, MAT.dm532, MAT.ef532);
+  set(CAR_DY, MAT.dm785, MAT.ef785);
+}
+// 共軛焦的透鏡、針孔、透鏡,接著入射狹縫
+{ const g = node('L1'); face(g, [0, 1]); lens(g, .95); post(P.L1[0], P.L1[1], BY - 1.1); }
+{
+  const g = node('PH'); face(g, [0, 1]);
+  mesh(new THREE.BoxGeometry(2.4, 2.4, .14), MAT.black, [0, 0, 0], g);
+  O.PH.hole = mesh(new THREE.CircleGeometry(.09, 16), new THREE.MeshBasicMaterial({ color: 0x111111, toneMapped: false }), [0, 0, .08], g, false);
+  for (const s of [-1, 1]) { const k = mesh(new THREE.CylinderGeometry(.22, .22, .7, 12), MAT.metal, [s * 1.55, .6, 0], g); k.rotation.z = Math.PI / 2; }
+  post(P.PH[0], P.PH[1], BY - 1.2);
+}
+{ const g = node('L2'); face(g, [0, 1]); lens(g, .95); post(P.L2[0], P.L2[1], BY - 1.1); }
+{
+  const g = node('SL'); face(g, [0, 1]);
+  const bw = 1.4, gap = .12;
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(bw, 3.2, .16), MAT.black, [s * (gap / 2 + bw / 2), 0, 0], g);
+  mesh(new THREE.BoxGeometry(bw * 2 + .9, .4, .4), MAT.anod, [0, 1.75, 0], g);
+  mesh(new THREE.BoxGeometry(bw * 2 + .9, .5, 1), MAT.anod, [0, -1.8, 0], g);
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(.35, 3.8, .4), MAT.anod, [s * (bw + .25), 0, 0], g);
+  post(P.SL[0], P.SL[1], BY - 2);
+}
+// 反射鏡
+function mirror(key, a, b) {
+  const g = node(key); face(g, bis(dirTo(key, a), dirTo(key, b)));
+  const d = mesh(new THREE.CylinderGeometry(1.3, 1.3, .2, 36), MAT.mirror, [0, 0, 0], g); d.rotation.x = Math.PI / 2;
+  const bk = mesh(new THREE.CylinderGeometry(1.5, 1.5, .4, 36), MAT.black, [0, 0, -.3], g); bk.rotation.x = Math.PI / 2;
+  post(P[key][0], P[key][1], BY - 1.5);
+}
+mirror('FM1', 'SL', 'CL');
+{ const g = node('CL'); face(g, [1, 0]); lens(g, 1.25); post(P.CL[0], P.CL[1], BY - 1.4); }
+// 光柵轉台:兩片穿透式光柵背對背,換雷射時轉半圈
+{
+  const g = node('GR');
+  const tur = new THREE.Group(); tur.position.set(0, 0, 1.6); g.add(tur); O.GR.tur = tur;
+  for (const z of [-1.6, 1.6]) {
+    mesh(new THREE.BoxGeometry(.12, 2.6, 2.6), MAT.grating, [0, 0, z], tur, false);
+    for (const [h, y] of [[.3, 1.45], [.3, -1.45]]) mesh(new THREE.BoxGeometry(.4, h, 2.9), MAT.black, [0, y, z], tur);
+    for (const zz of [-1.45, 1.45]) mesh(new THREE.BoxGeometry(.4, 3.2, .3), MAT.black, [0, 0, z + zz], tur);
+  }
+  mesh(new THREE.CylinderGeometry(2.2, 2.2, .5, 36), MAT.anod, [0, -1.95, 0], tur);
+  mesh(new THREE.CylinderGeometry(.9, .9, 2.4, 20), MAT.dark, [P.GR[0], BY - 3.4, P.GR[1] + 1.6]);
+  mesh(new THREE.BoxGeometry(3.2, 1.2, 3.2), MAT.black, [P.GR[0], DECK + .6, P.GR[1] + 1.6]);
+}
+{ const g = node('FL'); face(g, [D45, D45]); lens(g, 1.45); post(P.FL[0], P.FL[1], BY - 1.6); }
+// CCD:致冷相機,晶片朝著聚焦透鏡(晶片放大很多,示意)
+const CHIP_W = 6, CHIP_H = 1.3;
+{
+  const g = node('CCD'); face(g, [D45, D45]);
+  mesh(new RoundedBoxGeometry(7.6, 4.6, 4.2, 3, .4), MAT.ccd, [0, 0, -2.3], g);
+  mesh(new THREE.BoxGeometry(7.2, 2.6, .2), MAT.black, [0, 0, -.12], g);
+  const chip = mesh(new THREE.PlaneGeometry(CHIP_W, CHIP_H), new THREE.MeshBasicMaterial({ color: 0x070b12, toneMapped: false }), [0, 0, .01], g, false);
+  O.CCD.chip = chip;
+  for (let i = 0; i < 9; i++) mesh(new THREE.BoxGeometry(.14, 3.8, 1.6), MAT.metal, [-3.2 + i * .8, 0, -5.1], g);
+  mesh(new THREE.BoxGeometry(2, .8, 1.6), MAT.black, [2, 2.7, -2.5], g);
+  mesh(new THREE.BoxGeometry(5, BY - 2.3 - DECK, 3.5), MAT.black, [0, -(2.3 + (BY - 2.3 - DECK) / 2), -2.3], g);
+}
+// 晶片上的光(依目前的光譜畫成彩色的一條)與游標
+const ccdCv = document.createElement('canvas'); ccdCv.width = 512; ccdCv.height = 32;
+const ccdTex = new THREE.CanvasTexture(ccdCv); ccdTex.colorSpace = THREE.SRGBColorSpace;
+const ccdGlow = mesh(new THREE.PlaneGeometry(CHIP_W, CHIP_H), new THREE.MeshBasicMaterial({ map: ccdTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [0, 0, .03], O.CCD.g, false);
+ccdGlow.material.color.setScalar(1.5);
+const ccdCur = mesh(new THREE.BoxGeometry(.06, CHIP_H + .4, .05), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), [0, 0, .08], O.CCD.g, false);
+const chipU = sh => (clamp(sh, SH0, SH1) - SH0) / (SH1 - SH0) - .5;   // −0.5..0.5,沿晶片長邊
+let ccdKey = '';
+function drawCCD(sample, laser, level, readU) {
+  const k = `${sample}|${laser}|${level.toFixed(2)}|${readU.toFixed(3)}`;
+  if (k === ccdKey) return; ccdKey = k;
+  const pv = previewOf(sample, laser), ctx = ccdCv.getContext('2d'), img = ctx.createImageData(512, 32), d = img.data;
+  for (let px = 0; px < 512; px++) {
+    const i = Math.round(px / 511 * (NPT - 1)), sh = SH0 + i * DSH, c = wlColor(lamOf(laser, sh));
+    let e = Math.min(1.4, Math.sqrt(pv.y[i] / pv.max)) * level;
+    if (px / 511 < readU) e *= .2;
+    for (let py = 0; py < 32; py++) {
+      const kk = Math.exp(-(((py - 15.5) / 9) ** 2)) * 255, j = (py * 512 + px) * 4;
+      d[j] = c[0] * e * kk; d[j + 1] = c[1] * e * kk; d[j + 2] = c[2] * e * kk; d[j + 3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0); ccdTex.needsUpdate = true;
+}
+
+// 顯微鏡:物鏡上方的 45° 反射鏡、物鏡轉盤、物鏡,下面是樣品台
+{
+  // 從高台伸出來的手臂(畫成剖開的槽,看得到裡面的光)
+  mesh(new THREE.BoxGeometry(4, .45, 8.4), MAT.scope, [0, BY - 1.9, 12.9]);
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(.3, 1.3, 8.4), MAT.scope, [s * 1.85, BY - 1.25, 12.9]);
+  // 頭部(剖開):左牆與頂板,看得到裡面 45° 的反射鏡
+  mesh(new THREE.BoxGeometry(.4, 4.6, 4.2), MAT.scope, [-2.1, BY + .2, 19]);
+  mesh(new THREE.BoxGeometry(4.2, .4, 4.2), MAT.scope, [0, BY + 2.5, 19]);
+  mesh(new THREE.BoxGeometry(4.2, .5, 4.2), MAT.scope, [0, BY - 2.05, 19]);
+  const g = node('M0'); g.rotation.x = Math.PI * .75;
+  const d = mesh(new THREE.BoxGeometry(2.4, 2.4, .16), MAT.mirror, [0, 0, 0], g);
+  mesh(new THREE.BoxGeometry(2.6, 2.6, .25), MAT.black, [0, 0, -.22], g);
+  // 物鏡轉盤
+  const tur = mesh(new THREE.CylinderGeometry(2.7, 2.7, .7, 40), MAT.metal, [0, 15.75, 17.7]); tur.rotation.x = -.32;
+  for (const s of [-1, 1]) {
+    const o = mesh(new THREE.CylinderGeometry(.75, .62, 3.6, 20), MAT.metal, [s * 1.9, 13.9, 16.9]); o.rotation.z = s * .38; o.rotation.x = -.3;
+  }
+  // 使用中的物鏡(直立)
+  mesh(new THREE.CylinderGeometry(1.05, 1.05, .5, 28), MAT.metal, [0, 15.35, 19]);
+  mesh(new THREE.CylinderGeometry(.95, .95, 2.6, 28), MAT.metal, [0, 13.8, 19]);
+  mesh(new THREE.CylinderGeometry(.97, .97, .22, 28), new THREE.MeshStandardMaterial({ color: 0x6fc6ff, roughness: .4 }), [0, 13.2, 19]);
+  mesh(new THREE.CylinderGeometry(.8, .8, 1.2, 28), MAT.metal, [0, 11.9, 19]);
+  mesh(new THREE.CylinderGeometry(.5, .8, .85, 28), MAT.metal, [0, 10.85, 19]);
+  mesh(new THREE.CylinderGeometry(.42, .42, .06, 24), MAT.glass, [0, 10.42, 19], optics, false);
+}
+// 樣品台(依樣品的厚度升降,讓樣品表面剛好在焦點)
+const STAGE0 = 8.9;
+const stage = new THREE.Group(); optics.add(stage);
+mesh(new RoundedBoxGeometry(15, .8, 12, 2, .2), MAT.anod, [0, STAGE0 - .4, 19.5], stage);
+mesh(new THREE.BoxGeometry(5, .9, 2.6), MAT.anod, [0, STAGE0 - 1.1, 12.2], stage);
+for (const z of [16.5, 22.5]) { const k = mesh(new THREE.CylinderGeometry(.42, .42, 1.2, 16), MAT.black, [8, STAGE0 - .9, z], stage); k.rotation.z = Math.PI / 2; }
+mesh(new THREE.BoxGeometry(7.6, .12, 2.6), MAT.slide, [0, STAGE0 + .06, 19], stage, false);
+for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(.5, .14, 2.4), MAT.metal, [s * 4.6, STAGE0 + .07, 19], stage);
+mesh(new THREE.BoxGeometry(6, 8.4, 1.4), MAT.dark, [0, 3.6 + 4.2, 9.25]);
+for (const s of [-1, 1]) { const k = mesh(new THREE.CylinderGeometry(1, 1, .7, 24), MAT.black, [s * 3.4, 6.2, 9.4]); k.rotation.z = Math.PI / 2; }
+const sampleG = new THREE.Group(); sampleG.position.set(0, STAGE0 + .12, 19); stage.add(sampleG);
+const SMESH = {};
+{
+  const pile = (mat) => { const m = mesh(new THREE.SphereGeometry(1.5, 32, 14, 0, Math.PI * 2, 0, Math.PI / 2), mat, [0, 0, 0], sampleG); m.scale.y = .4; return m; };
+  SMESH.van = pile(MAT.sVan);
+  SMESH.wood = pile(MAT.sWood);
+  SMESH.cel = mesh(new THREE.CylinderGeometry(2.4, 2.4, .06, 48), MAT.sCel, [0, .03, 0], sampleG);
+  SMESH.ps = mesh(new RoundedBoxGeometry(2.4, .5, 1.8, 2, .12), MAT.sPs, [0, .25, 0], sampleG);
+  SMESH.si = mesh(new THREE.BoxGeometry(2.8, .1, 2.2), MAT.sSi, [0, .05, 0], sampleG);
+}
+// 電路板、風扇
+mesh(new THREE.BoxGeometry(16, .2, 11), MAT.pcb, [19, DECK + .1, -24]);
+for (const [x, z, w, d] of [[14, -27, 2, 2], [18.5, -26, 1.4, 3], [22, -21, 2.6, 2.6], [24.5, -27.5, 3, 1.6], [16, -21, 1.6, 1.6]]) mesh(new THREE.BoxGeometry(w, .5, d), MAT.black, [x, DECK + .45, z]);
+{ const f = mesh(new THREE.CylinderGeometry(2.2, 2.2, .8, 32), MAT.dark, [26, BY, -31]); f.rotation.x = Math.PI / 2; }
+mesh(new THREE.BoxGeometry(6, 3, 5), MAT.dark, [-21, DECK + 1.5, 2]);
+
+optics.updateMatrixWorld(true);
+for (const k in O) O[k].p = O[k].g.position.clone();
+const FOCUS = new V3(0, FY, 19), OBJ_T = new V3(0, 15.6, 19), OBJ_B = new V3(0, 10.42, 19);
+const AP = { 532: new V3(22.4, BY, 3), 785: new V3(16, BY, -4.4) };
+const chipW = u => O.CCD.g.localToWorld(new V3(u * CHIP_W, 0, .05));
+const flPt = u => O.FL.g.localToWorld(new V3(u * 2.2, 0, 0));
+const GR0 = new V3(P.GR[0], BY, P.GR[1]);
+
+// 焦點的亮點與邊緣濾光片擋下的光
+const focusDot = mesh(new THREE.SphereGeometry(.13, 16, 10), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), [0, FY, 19], scene, false);
+const efGlow = mesh(new THREE.CircleGeometry(.85, 32), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [0, BY, -2 + .16], scene, false);
+const dmGlow = mesh(new THREE.CircleGeometry(.75, 32), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [0, BY, 3], scene, false);
+dmGlow.rotation.y = Math.PI / 4;
+const spotLight = new THREE.PointLight(0x5dff6a, 0, 9, 2); spotLight.position.copy(FOCUS).add(new V3(0, .4, 0)); scene.add(spotLight);
+
+// ================= 光線 =================
+const rayShader = {
+  vertexShader: `attribute vec3 aC; attribute float aD; varying vec3 vC; varying float vD;
+    void main(){ vC=aC; vD=aD; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: `uniform float uT; uniform float uK; varying vec3 vC; varying float vD;
+    void main(){ float p=fract(vD*0.11-uT*0.85); float pulse=smoothstep(0.0,0.06,p)*(1.0-smoothstep(0.06,0.45,p));
+      gl_FragColor=vec4(vC*uK*(0.5+1.5*pulse),1.0); }`,
+};
+function lineSet(max) {
+  const pos = new Float32Array(max * 3), col = new Float32Array(max * 3), dd = new Float32Array(max), geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('aC', new THREE.BufferAttribute(col, 3));
+  geo.setAttribute('aD', new THREE.BufferAttribute(dd, 1));
+  const mat = new THREE.ShaderMaterial({ uniforms: { uT: { value: 0 }, uK: { value: 1 } }, ...rayShader, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+  const obj = new THREE.LineSegments(geo, mat); obj.frustumCulled = false; scene.add(obj);
+  return { pos, col, dd, geo, mat, n: 0, max };
+}
+const RAYS = lineSet(7000), BURST = lineSet(200);
+function seg(L, a, b, c, k, d0) {
+  if (L.n + 2 > L.max) return d0;
+  const i = L.n * 3, len = a.distanceTo(b);
+  L.pos[i] = a.x; L.pos[i + 1] = a.y; L.pos[i + 2] = a.z; L.pos[i + 3] = b.x; L.pos[i + 4] = b.y; L.pos[i + 5] = b.z;
+  L.col[i] = L.col[i + 3] = c.r * k; L.col[i + 1] = L.col[i + 4] = c.g * k; L.col[i + 2] = L.col[i + 5] = c.b * k;
+  L.dd[L.n] = d0; L.dd[L.n + 1] = d0 + len; L.n += 2; return d0 + len;
+}
+function flushLines(L) { L.geo.setDrawRange(0, L.n); for (const a of ['position', 'aC', 'aD']) L.geo.attributes[a].needsUpdate = true; }
+const perp = d => { const a = Math.abs(d.y) < .9 ? UP : new V3(1, 0, 0), u = new V3().crossVectors(d, a).normalize(); return [u, new V3().crossVectors(d, u).normalize()]; };
+// 一束光:沿著 pts 走,每一點的半徑 rads,n 條線排成一圈(ang0 起)
+function bundle(L, pts, rads, c, k, d0, n = 4, ang0 = 0) {
+  let dm = d0;
+  for (let j = 0; j < n; j++) {
+    const an = ang0 + j / n * Math.PI * 2; let d = d0;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1], [u, v] = perp(b.clone().sub(a).normalize());
+      const off = r => u.clone().multiplyScalar(Math.cos(an) * r).addScaledVector(v, Math.sin(an) * r);
+      d = seg(L, a.clone().add(off(rads[i])), b.clone().add(off(rads[i + 1])), c, k, d);
+    }
+    dm = Math.max(dm, d);
+  }
+  return dm;
+}
+// 拉曼光(加上螢光)由哪些顏色組成:最強的幾支峰,背景大的時候再加幾個背景的顏色
+function lightMix(sample, laser) {
+  const sm = SAMPLES[sample], pv = previewOf(sample, laser), out = [];
+  const pk = sm.peaks.map(p => [p[0], ramanRate(sm, laser, p[0])]).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  for (const [s, v] of pk) out.push([s, v / pv.max]);
+  for (const s of [900, 1500, 2300]) { const b = bgRate(sm, laser, s) / pv.max; if (b > .25) out.push([s, b]); }
+  return out;
+}
+const FAN = []; for (let s = 120; s <= 3450; s += 110) FAN.push(s);
+let raysKey = '', burstKey = '';
+function buildRays(W) {
+  const key = `${W.laser}|${W.sample}|${Math.round(W.cursor)}`;
+  if (key === raysKey) return; raysKey = key;
+  const L = RAYS; L.n = 0;
+  const lz = W.laser, CL = lin(wlColor(lz)), K = 2.2, sm = W.sample, pv = previewOf(sm, lz);
+  const at = (x, y, z) => new V3(x, y, z);
+  // 1. 雷射 → 雷射線濾光片 →(785 nm 經換雷射的反射鏡)→ 擴束器 → 二向分光鏡
+  const be1 = at(P.BE1[0], BY, 3), be2 = at(P.BE2[0], BY, 3), dm = at(0, BY, 3), m0 = at(0, BY, 19);
+  const start = lz === 532 ? [AP[532], at(P.LF532[0], BY, 3), be1] : [AP[785], at(16, BY, -2.2), at(16, BY, 3), be1];
+  let d = bundle(L, start, start.map(() => .1), CL, K, 0, 3);
+  d = bundle(L, [be1, be2, dm], [.1, .62, .62], CL, K * .8, d, 4);
+  d = bundle(L, [dm, m0, OBJ_T], [.62, .62, .62], CL, K * .8, d, 4);
+  bundle(L, [OBJ_T, OBJ_B, FOCUS], [.62, .4, 0], CL, K * .9, d, 6);
+  // 2. 收回來的散射光:瑞立(雷射色)與拉曼(其他顏色)走同一條路往上,到二向分光鏡
+  const mix = lightMix(sm, lz), cols = mix.map(([s, w]) => [lin(wlColor(lamOf(lz, s))), clamp(.35 + w, .35, 1.3)]);
+  let e = bundle(L, [FOCUS, OBJ_B, OBJ_T, m0, dm], [0, .38, .3, .3, .3], CL, K * .55, 0, 3, Math.PI / 3);
+  // 瑞立散射大部分在二向分光鏡反射回雷射那一邊,剩一點穿過去,到邊緣濾光片被擋下
+  bundle(L, [dm, at(0, BY, -2)], [.3, .3], CL, K * .25, e, 3, Math.PI / 3);
+  let r = 0;
+  cols.forEach(([c, w], i) => { r = Math.max(r, bundle(L, [FOCUS, OBJ_B, OBJ_T, m0, dm], [0, .2, .16, .16, .16], c, K * .45 * w, 0, 1, i * 2.1)); });
+  // 3. 拉曼光:邊緣濾光片 → 透鏡 → 針孔 → 透鏡 → 狹縫 → 反射鏡 → 準直透鏡 → 光柵
+  const ef = at(0, BY, -2), l1 = at(0, BY, -5.5), ph = at(0, BY, -8.5), l2 = at(0, BY, -11.5), sl = at(0, BY, -14), fm = at(0, BY, -18.5), cl = at(P.CL[0], BY, P.CL[1]);
+  cols.forEach(([c, w], i) => { bundle(L, [dm, ef, l1, ph, l2, sl, fm, cl, GR0], [.16, .55, .7, 0, .7, 0, .9, 1, 1], c, K * .5 * w, r, 2, i * 1.3); });
+  // 4. 光柵依波長散開成一把扇形 → 聚焦透鏡 → CCD 上依波長排開
+  const dG = r + 40;
+  for (const s of FAN) {
+    const i = Math.round((s - SH0) / DSH), v = Math.sqrt(pv.y[i] / pv.max), c = lin(wlColor(lamOf(lz, s))), u = chipU(s);
+    const k = K * (.12 + .9 * v);
+    const f = flPt(u * .8), q = chipW(u);
+    seg(L, GR0, f, c, k, dG); seg(L, f, q, c, k, dG + GR0.distanceTo(f));
+  }
+  // 游標那一欄:亮一點
+  const uc = chipU(W.cursor), cc = lin(wlColor(lamOf(lz, W.cursor))), fc = flPt(uc * .8);
+  for (const dy of [-.08, .08]) { const g0 = GR0.clone().add(new V3(0, dy, 0)); seg(L, g0, fc, cc, K * 1.1, dG); seg(L, fc, chipW(uc).add(new V3(0, dy, 0)), cc, K * 1.1, dG + 8); }
+  flushLines(L);
+}
+// 焦點處往四面八方的散射:大部分是雷射色(瑞立),少數換了顏色(拉曼,畫面放大了很多倍)
+function buildBurst(W) {
+  const key = `${W.laser}|${W.sample}`;
+  if (key === burstKey) return; burstKey = key;
+  const L = BURST; L.n = 0;
+  const CL = lin(wlColor(W.laser)), mix = lightMix(W.sample, W.laser);
+  for (let i = 0; i < 40; i++) {
+    const th = hash(i * 3.1) * Math.PI * 2, ph = Math.acos(clamp(1 - hash(i * 7.7) * 1.15, -1, 1)), len = 1.3 + hash(i * 1.9) * 2.4;
+    const dir = new V3(Math.sin(ph) * Math.cos(th), Math.cos(ph), Math.sin(ph) * Math.sin(th));
+    const raman = i % 7 === 3, c = raman ? lin(wlColor(lamOf(W.laser, mix[i % mix.length][0]))) : CL;
+    seg(L, FOCUS, FOCUS.clone().addScaledVector(dir, len), c, raman ? 1.6 : 1.2, 0);
+  }
+  flushLines(L);
+}
+
+// 沿光路流動的光點
+const PN = 600;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3), pSz = new Float32Array(PN);
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('aC', new THREE.BufferAttribute(pCol, 3));
+pGeo.setAttribute('aS', new THREE.BufferAttribute(pSz, 1));
+const pMat = new THREE.ShaderMaterial({
+  uniforms: { uScale: { value: 500 } },
+  vertexShader: `attribute vec3 aC; attribute float aS; uniform float uScale; varying vec3 vC;
+    void main(){ vC=aC; vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=aS*uScale/-mv.z; gl_Position=projectionMatrix*mv; }`,
+  fragmentShader: `varying vec3 vC; void main(){ float d=length(gl_PointCoord-0.5); float a=smoothstep(0.5,0.0,d); gl_FragColor=vec4(vC*a*a,1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const photons = new THREE.Points(pGeo, pMat); photons.frustumCulled = false; scene.add(photons);
+let pn = 0;
+function flow(pts, c, k, size, t, salt = 0, keep = 1, sp = 2.6) {
+  const cum = [0]; for (let i = 0; i < pts.length - 1; i++) cum.push(cum[i] + pts[i].distanceTo(pts[i + 1]));
+  const L = cum[cum.length - 1], N = Math.floor(L / sp);
+  for (let i = 0; i < N && pn < PN; i++) {
+    if (keep < 1 && hash(i * 7.13 + salt) > keep) continue;
+    const s = (i * sp + t * 9) % L;
+    let j = 0; while (j < cum.length - 2 && s > cum[j + 1]) j++;
+    const u = (s - cum[j]) / (cum[j + 1] - cum[j]), a = pts[j], b = pts[j + 1];
+    pPos[pn * 3] = lerp(a.x, b.x, u); pPos[pn * 3 + 1] = lerp(a.y, b.y, u); pPos[pn * 3 + 2] = lerp(a.z, b.z, u);
+    pCol[pn * 3] = c.r * k; pCol[pn * 3 + 1] = c.g * k; pCol[pn * 3 + 2] = c.b * k; pSz[pn] = size; pn++;
+  }
+}
+function buildPhotons(W, t) {
+  pn = 0;
+  if (W.on > .02) {
+    const lz = W.laser, CL = lin(wlColor(lz)), on = W.on, at = (x, y, z) => new V3(x, y, z);
+    const dm = at(0, BY, 3), m0 = at(0, BY, 19);
+    const out = lz === 532 ? [AP[532], at(P.BE1[0], BY, 3)] : [AP[785], at(16, BY, 3), at(P.BE1[0], BY, 3)];
+    flow([...out, dm, m0, OBJ_T, OBJ_B, FOCUS], CL, 2.4 * on, .5, t, 1);
+    flow([FOCUS, OBJ_B, OBJ_T, m0, dm, at(0, BY, -1.9)], CL, 1.9 * on, .4, t + .7, 2, .7);
+    flow([dm, at(6, BY, 3)], CL, 1.3 * on, .36, t + .3, 3, .8);
+    const mix = lightMix(W.sample, lz);
+    mix.slice(0, 3).forEach(([s, w], i) => {
+      const u = chipU(s), c = lin(wlColor(lamOf(lz, s)));
+      flow([FOCUS, OBJ_B, OBJ_T, m0, dm, at(0, BY, -2), at(0, BY, -8.5), at(0, BY, -14), at(0, BY, -18.5), at(P.CL[0], BY, P.CL[1]), GR0, flPt(u * .8), chipW(u)], c, 2.4 * on * clamp(.5 + w, .5, 1.2), .42, t + i * .37, 5 + i, .3);
+    });
+  }
+  pGeo.setDrawRange(0, pn);
+  for (const a of ['position', 'aC', 'aS']) pGeo.attributes[a].needsUpdate = true;
+}
+
+// ================= 標籤 =================
+const LBL = {};
+function label(key, comp, anchor, title, sub) {
+  const outer = document.createElement('div'); outer.className = 'lw';
+  outer.innerHTML = `<div class="lbl"><i></i><b>${title}</b>${sub != null ? `<span>${sub}</span>` : ''}</div>`;
+  const o = new CSS2DObject(outer); o.position.set(...anchor); o.center.set(.5, 1); scene.add(o);
+  const lm = new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: .5, depthWrite: false });
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(...comp), new V3(...anchor)]), lm);
+  scene.add(line);
+  LBL[key] = { outer, line, lm, span: outer.querySelector('span'), op: -1, text: sub };
+}
+function labelOp(key, a) {
+  const L = LBL[key]; if (Math.abs(L.op - a) < .002) return; L.op = a;
+  L.outer.style.opacity = a; L.outer.style.visibility = a < .01 ? 'hidden' : 'visible';
+  L.lm.opacity = .5 * a; L.line.visible = a > .01;
+}
+function labelText(key, s) { const L = LBL[key]; if (L.text !== s) { L.text = s; L.span.textContent = s; } }
+label('LZ', [22, BY + 2.3, 3], [24.5, BY + 6.5, 5.5], zhEn('雷射', 'Laser'), zhEn('532 nm 綠光', '532 nm green'));
+label('LF', [20.4, BY + 1, 3], [18, BY + 5.5, -4], zhEn('雷射線濾光片', 'Clean-up filter'), zhEn('只留雷射那一色', 'laser line only'));
+label('BE', [8.6, BY + 1.3, 3], [9.5, BY + 4.4, 6], zhEn('擴束器', 'Beam expander'), zhEn('把光束放大', 'widens the beam'));
+label('DM', [-.6, BY + 1.3, 3.4], [-8.5, BY + 4.6, 5.5], zhEn('二向分光鏡', 'Dichroic mirror'), zhEn('反射雷射,長波長穿過', 'passes longer λ'));
+label('EF', [.6, BY + 1, -2], [4.8, BY + 3.4, -1.2], zhEn('邊緣濾光片', 'Edge filter'), zhEn('雷射原色剩不到 10⁻⁶', 'laser to under 10⁻⁶'));
+label('OBJ', [.9, 13, 19], [6, 15.6, 21.5], zhEn('物鏡', 'Objective'), zhEn('聚焦約 1 µm', 'focus about 1 µm'));
+label('SMP', [0, FY, 19], [-4.2, 12.6, 22.6], zhEn('樣品', 'Sample'), zhEn('香草醛', 'Vanillin'));
+label('PH', [0, BY + 1.2, -8.5], [3, BY + 5, -8.5], zhEn('針孔', 'Pinhole'), zhEn('只收焦點那一層', 'focal plane only'));
+label('SL', [0, BY + 1.9, -14], [3, BY + 5.4, -14.5], zhEn('入射狹縫', 'Entrance slit'), zhEn('光譜儀入口', 'into the spectrograph'));
+label('GR', [-11, BY - .6, -17.2], [-16, BY - 2.6, -10.5], zhEn('光柵', 'Grating'), zhEn('依波長散開', 'spreads by wavelength'));
+label('CCD', [-22, BY - 1.8, -25.5], [-23, BY - 3.6, -19], 'CCD', zhEn('約 −60 °C', 'about −60 °C'));
+const LBL_KEYS = Object.keys(LBL);
+
+// ================= 影片腳本(導覽與錄影共用) =================
+const FILM_DUR = 97;
+const CAMK = [
+  [0, [96, 74, 120], [0, 7, -2]], [5.5, [84, 66, 104], [0, 8, -2]],
+  [10, [62, 70, 84], [-2, 10, -3]], [11.8, [59, 68, 80], [-2, 10, -3]],
+  [14, [44, 40, 40], [14, 16, -1]], [17.2, [42, 38, 37], [14, 16, -1]],
+  [19.4, [24, 34, 50], [-4, 14, 9]], [23.4, [22, 32, 47], [-4, 14, 9]],
+  [25.6, [13, 22, 44], [-3, 11.5, 18]], [35.4, [11, 21, 41], [-3, 11.5, 18]],
+  [37.6, [17, 37, 28], [-11, 17, -2]], [47.4, [15, 36, 26], [-11, 17, -2]],
+  [49.6, [8, 68, 19], [-16, 15, -18.5]], [59.6, [6, 66, 17], [-16, 15, -18.5]],
+  [61.8, [40, 62, 62], [-8, 13, -8]], [72.2, [36, 60, 58], [-8, 13, -8]],
+  [74.4, [20, 22, 50], [0, 11, 16]], [79.6, [18, 21, 47], [0, 11, 16]],
+  [81.8, [34, 44, 64], [-4, 13, 2]], [91.6, [31, 42, 60], [-4, 13, 2]],
+  [95, [96, 74, 120], [0, 7, -2]], [97, [98, 75, 122], [0, 7, -2]],
+];
+const CAPS = [
+  [5.8, 11.6, zhEn('01 · 展開', '01 · Opening up'), zhEn('拉曼光譜儀量的是散射光。拿掉外殼:雷射、濾光片、顯微鏡、光柵與 CCD 都在一個箱子裡。', 'A Raman spectrometer measures scattered light. Inside: laser, filters, microscope, grating, CCD.')],
+  [12.0, 17.4, zhEn('02 · 雷射', '02 · Laser'), zhEn('雷射只有一種顏色,這裡是 532 nm 綠光;雷射線濾光片再濾掉其他雜光。', 'The laser has one color, here 532 nm green; a clean-up filter removes any other light.')],
+  [17.6, 23.4, zhEn('02 · 雷射', '02 · Laser'), zhEn('擴束器把光束放大;二向分光鏡把它反射進物鏡,聚焦在樣品上約 1 µm 的一點。', 'A beam expander widens it; a dichroic mirror sends it into the objective, focused to about 1 µm.')],
+  [23.8, 29.2, zhEn('03 · 散射', '03 · Scattering'), zhEn('光碰到分子會往四面八方散射;絕大部分顏色不變,叫瑞立散射。', 'Molecules scatter light every way; nearly all of it keeps its color: Rayleigh scattering.')],
+  [29.4, 35.4, zhEn('03 · 散射', '03 · Scattering'), zhEn('散射光裡約一百萬到一千萬個才有一個少了一點能量,正好是化學鍵振動的能量:拉曼散射。', "About 1 in 10⁶ to 10⁷ scattered photons loses one bond vibration's energy: Raman scattering.")],
+  [35.8, 41.6, zhEn('04 · 濾光片', '04 · Filters'), zhEn('雷射原色的散射光比拉曼光強約一千萬倍;二向分光鏡先把大部分反射回去。', 'Laser-colored scatter is about 10 million times stronger; the dichroic mirror reflects most of it.')],
+  [41.8, 47.4, zhEn('04 · 濾光片', '04 · Filters'), zhEn('後面的邊緣濾光片再擋一次,只剩不到百萬分之一;太靠近雷射顏色的光也被擋掉。', 'An edge filter cuts it to under a millionth; colors very near the laser are lost too.')],
+  [47.8, 53.2, zhEn('05 · 光柵與 CCD', '05 · Grating and CCD'), zhEn('針孔只讓焦點那一層的光過去;光柵再把拉曼光依波長散開。', 'A pinhole keeps only the focal plane; a grating spreads the Raman light by wavelength.')],
+  [53.4, 59.6, zhEn('05 · 光柵與 CCD', '05 · Grating and CCD'), zhEn('CCD 是像相機的感光晶片,致冷到約 −60 °C;每一欄像素收一小段波長,整段光譜一次記下。', 'The CCD, a camera chip cooled to about −60 °C, records each narrow band in a pixel column, all at once.')],
+  [60.0, 66.0, zhEn('06 · 拉曼位移', '06 · Raman shift'), zhEn('換成 785 nm 雷射,濾光片與光柵整組換;785 nm 是看不見的近紅外光,畫成深紅色。', 'Switch to the 785 nm laser, with its own filters and grating; 785 nm is invisible, drawn dark red.')],
+  [66.2, 72.2, zhEn('06 · 拉曼位移', '06 · Raman shift'), zhEn('同一支峰從 561.9 跑到 852.0 nm;改看少了多少能量(拉曼位移),位置不變,高度可能不同。', 'The peak moves from 561.9 to 852.0 nm, but its Raman shift (energy lost) stays; heights may differ.')],
+  [72.6, 79.6, zhEn('07 · 和紅外互補', '07 · With infrared'), zhEn('香草醛:苯環、C=C 這類容易被電場拉變形的鍵在拉曼強;極性強的 O–H、C=O 在紅外強,兩者互補。', 'Vanillin: easily deformed bonds such as rings and C=C are strong in Raman; polar O–H and C=O, in infrared.')],
+  [80.0, 85.4, zhEn('08 · 螢光背景', '08 · Fluorescence'), zhEn('綠光照木材,木質素會發螢光,背景很高,小峰看不清楚。', 'Under green light, lignin in wood fluoresces: a high background hides small peaks.')],
+  [85.6, 91.6, zhEn('08 · 螢光背景', '08 · Fluorescence'), zhEn('換 785 nm,背景小很多;但只看雷射的頻率,拉曼訊號也弱了約 4.7 倍。', '785 nm cuts the background a lot, but by laser frequency alone Raman gets about 4.7 times weaker.')],
+];
+const LBL_WIN = [[12, 17.6, ['LZ', 'LF']], [18.6, 23.6, ['BE', 'DM', 'OBJ']], [23.6, 35.6, ['SMP', 'OBJ']], [37, 47.6, ['DM', 'EF']], [49, 59.8, ['PH', 'SL', 'GR', 'CCD']], [61.2, 72.4, ['LZ', 'EF', 'GR']], [73.6, 79.8, ['SMP']], [80.6, 91.8, ['SMP']]];
+// 雷射:0 是 532 nm、1 是 785 nm(中間是換雷射的動作)
+const LASK = [[60.4, 61.8, 0, 1], [72.6, 73.8, 1, 0], [86.0, 87.4, 0, 1]];
+// 游標(拉曼位移):05 章掃過 CCD 再回來,07、08 章跟著樣品
+const CURK = [[54.0, 56.2, 1001.4, 3054.3], [56.6, 58.8, 3054.3, 1001.4], [72.6, 73.4, 1001.4, 1592], [79.8, 80.6, 1592, 1600]];
+// 測量:{ 樣品, 雷射, 曝光秒數, 種子, 開始的秒數 }
+const FM = {
+  A: { sample: 'ps', laser: 532, exp: 10, seed: 11, at: 48.4 },
+  B: { sample: 'ps', laser: 785, exp: 10, seed: 23, at: 62.2 },
+  C: { sample: 'van', laser: 532, exp: 10, seed: 31, at: 74.4 },
+  D: { sample: 'wood', laser: 532, exp: 10, seed: 41, at: 80.4 },
+  E: { sample: 'wood', laser: 785, exp: 10, seed: 53, at: 87.6 },
+};
+function track(t, segs, v0) {
+  let v = v0;
+  for (const [a, b, x, y, mode] of segs) {
+    if (t < a) break;
+    if (t >= b) { v = y; continue; }
+    const u = (t - a) / (b - a); v = lerp(x, y, mode === 'lin' ? u : ease(u)); break;
+  }
+  return v;
+}
+const lerp3 = (a, b, u) => new V3(lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u));
+function camAt(t) {
+  const K = CAMK;
+  if (t <= K[0][0]) return [new V3(...K[0][1]), new V3(...K[0][2])];
+  for (let i = 0; i < K.length - 1; i++) {
+    const [ta, pa, qa] = K[i], [tb, pb, qb] = K[i + 1];
+    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [lerp3(pa, pb, u), lerp3(qa, qb, u)]; }
+  }
+  const L = K[K.length - 1]; return [new V3(...L[1]), new V3(...L[2])];
+}
+const win = (t, a, b, f = .4) => sstep(a, a + f, t) * (1 - sstep(b - f, b, t));
+const fm = (m, t) => ({ ...m, el: t - m.at });
+
+// ================= 狀態 =================
+// scan:{ sample, laser, exp, seed, t0, done, cut };el 是開始之後過了幾秒
+const S = { sample: 'van', laser: 532, exp: 10, axis: 'shift', cursor: 1592, explode: 1, scan: null, ghost: null, scanning: false, seed: 1 };
+const W = { sample: 'van', laserMix: 0, laser: 532, on: 1, exp: 10, axis: 'shift', cursor: 1592, explode: 1, stageTop: STAGE0, scan: null, ghost: null, labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, jabK: 0, scatK: 0, efK: 0 };
+const stageFor = s => FY - .12 - SAMPLES[s].h;
+W.stageTop = stageFor(W.sample);
+
+function film(t) {
+  W.sample = t < 72.6 ? 'ps' : t < 79.8 ? 'van' : 'wood';
+  W.stageTop = track(t, [[72.6, 73.4, stageFor('ps'), stageFor('van')]], stageFor('ps'));
+  W.laserMix = track(t, LASK, 0);
+  W.exp = 10;
+  W.axis = t >= 60.2 && t < 67.6 ? 'nm' : 'shift';
+  W.cursor = track(t, CURK, 1001.4);
+  W.explode = sstep(6.2, 9.6, t) * (1 - sstep(92.2, 95.2, t));
+  W.scan = W.ghost = null;
+  if (t >= FM.A.at && t < FM.B.at) W.scan = fm(FM.A, t);
+  else if (t >= FM.B.at && t < 72.6) { W.scan = fm(FM.B, t); W.ghost = fm(FM.A, 1e9); }
+  else if (t >= FM.C.at && t < FM.D.at) W.scan = fm(FM.C, t);
+  else if (t >= FM.D.at && t < FM.E.at) W.scan = fm(FM.D, t);
+  else if (t >= FM.E.at) { W.scan = fm(FM.E, t); W.ghost = fm(FM.D, 1e9); }
+  const [cp, ct] = camAt(t); camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct);
+  W.labels = {}; for (const [a, b, keys] of LBL_WIN) for (const k of keys) W.labels[k] = Math.max(W.labels[k] || 0, win(t, a, b, .5));
+  W.conOp = win(t, 47.6, 92.6, .8);
+  W.jabK = win(t, 23.6, 35.8, .6);
+  W.scatK = win(t, 23.8, 35.6, .8);
+  W.efK = win(t, 35.8, 47.6, .6);
+  W.cap = null; for (const c of CAPS) if (t >= c[0] && t < c[1]) W.cap = { chap: c[2], txt: c[3], op: win(t, c[0], c[1], .35) };
+  W.title = win(t, .2, 5.6, .9); W.outro = sstep(92.2, 93.2, t); W.chips = win(t, 5.6, 92.6, .8);
+}
+
+let lastNote = '', lastLegend = '', lastCap = '', lastTitle = '';
+function frameCommon(t) {
+  const m = W.laserMix;
+  W.laser = m < .5 ? 532 : 785;
+  W.on = 1 - sstep(.06, .3, m) * (1 - sstep(.7, .94, m));   // 換雷射的途中先關掉
+  // 換雷射:反射鏡升降、濾光片架上下滑、光柵轉半圈
+  O.SWM.slide.position.y = -(1 - sstep(.3, .7, m)) * 4.6;
+  O.CAR.g.position.y = BY - CAR_DY * ease(clamp((m - .2) / .6, 0, 1));
+  O.GR.tur.rotation.y = Math.PI * ease(clamp((m - .15) / .7, 0, 1));
+  O.GR.tur.updateMatrixWorld(true);
+  stage.position.y = W.stageTop - STAGE0;
+  for (const k of SKEYS) SMESH[k].visible = k === W.sample;
+  // 光
+  buildRays(W); buildBurst(W); buildPhotons(W, t);
+  const pulse = .85 + .15 * Math.sin(t * 9);
+  RAYS.mat.uniforms.uT.value = BURST.mat.uniforms.uT.value = t;
+  RAYS.mat.uniforms.uK.value = W.on;
+  BURST.mat.uniforms.uK.value = W.on * (.55 + 1.2 * W.scatK);
+  const CL = lin(wlColor(W.laser));
+  focusDot.material.color.copy(CL).multiplyScalar(4 * W.on * pulse); focusDot.visible = W.on > .02;
+  efGlow.material.color.copy(CL).multiplyScalar((.55 + 1.3 * W.efK) * W.on * pulse);
+  dmGlow.material.color.copy(CL).multiplyScalar((.35 + .9 * W.efK) * W.on);
+  spotLight.color.copy(CL); spotLight.intensity = 9 * W.on;
+  O.L532.ap.material.color.copy(lin(wlColor(532))).multiplyScalar(W.laser === 532 ? 2.4 * W.on : .05);
+  O.L785.ap.material.color.copy(lin(wlColor(785))).multiplyScalar(W.laser === 785 ? 2.4 * W.on : .05);
+  O.PH.hole.material.color.copy(CL).multiplyScalar(.15 * W.on).add(new THREE.Color(.25, .12, .03).multiplyScalar(W.on));
+  // CCD:平常是雷射開著時晶片上的光;測量時曝光越久越亮,讀出時由左往右變暗
+  let level = .55 * W.on, readU = 0;
+  if (W.scan && W.scan.sample === W.sample && W.scan.laser === W.laser) {
+    const ph = measPhase(W.scan);
+    if (ph.ph === 'exp') level = W.on * (.4 + .9 * ph.f);
+    else if (ph.ph === 'read') { level = 1.3 * W.on; readU = ph.u; }
+  }
+  drawCCD(W.sample, W.laser, level, readU);
+  const uc = chipU(W.cursor);
+  ccdCur.position.x = uc * CHIP_W;
+  ccdCur.material.color.copy(lin(wlColor(lamOf(W.laser, W.cursor)))).multiplyScalar(.9).add(new THREE.Color(.22, .22, .22));
+  // 外殼
+  const k = ease(W.explode), o = 1 - sstep(0, .5, k);
+  for (const p of shellParts) {
+    p.g.position.set(p.move[0] * k, p.move[1] * k, p.move[2] * k); p.g.rotation.x = p.rot * k;
+    for (const c of p.g.children) if (c.isMesh) { c.visible = o > .01; c.castShadow = o > .5; }
+  }
+  for (const mm of [MAT.shell, MAT.lid, MAT.vent]) { mm.opacity = o; mm.depthWrite = o > .5; }
+  MAT.win.opacity = .45 * o;
+  MAT.edge.opacity = .55 * Math.sin(Math.PI * k);
+  bloom.strength = .32 + .43 * k;
+  // 標籤
+  for (const key of LBL_KEYS) labelOp(key, W.labels ? (W.labels[key] || 0) : sstep(.55, .9, W.explode));
+  labelText('LZ', W.laser === 532 ? zhEn('532 nm 綠光', '532 nm green') : zhEn('785 nm 看不見', '785 nm, invisible'));
+  labelText('SMP', SAMPLES[W.sample].name);
+  updateDOM();
+}
+
+// ================= 介面 =================
+const el = id => document.getElementById(id);
+function noteHTML() {
+  const L = W.laser, c = W.cursor, lam = lamOf(L, c).toFixed(1), sm = SAMPLES[W.sample], pc = (c / (1e7 / L) * 100).toFixed(1);
+  let s = zhEn(`雷射 <em class="c">${L} nm</em>;游標在 <em class="c">${Math.round(c)} cm⁻¹</em>:CCD 這一欄收到 <em class="c">${lam} nm</em> 的光,能量比雷射少了 ${pc}%,正好是一種振動的能量。`, `Laser <em class="c">${L} nm</em>; at the cursor, <em class="c">${Math.round(c)} cm⁻¹</em>, this CCD column gets <em class="c">${lam} nm</em> light, ${pc}% less energy than the laser: one vibration's worth.`);
+  const r = readAt(W.sample, L, W.exp, c);
+  if (c < LASERS[L].cutFull) s += zhEn(' 這裡太靠近雷射的顏色,被邊緣濾光片擋掉了。', ' This is too close to the laser color, so the edge filter blocks it.');
+  else if (L === 785 && lamOf(L, c) > 1000) s += zhEn(` 這裡的光在 ${lam} nm,CCD 在 1000 nm 以上幾乎收不到,所以 785 nm 的 C–H 區很弱。`, ` This light is at ${lam} nm, where the CCD barely responds above 1000 nm, so the C–H region is weak at 785 nm.`);
+  else if (r.sat) s += zhEn(' 曝光太久,像素裝滿了(飽和),平頂的那一段量不準;縮短曝光時間。', ' The exposure is too long: the pixels are full (saturated) and the flat top cannot be measured; shorten it.');
+  if (W.sample === 'wood') s += L === 532 ? zhEn(' 綠光照木材,木質素會發螢光(約 515 到 600 nm),背景很高;1600 cm⁻¹ 的木質素峰還看得到。', ' Under green light the lignin in wood fluoresces (about 515 to 600 nm), so the background is high; the 1600 cm⁻¹ lignin peak still shows.') : zhEn(' 785 nm 照木材,螢光小很多,峰在比較平的背景上。', ' At 785 nm the fluorescence is much weaker, so the peaks sit on a flatter background.');
+  else if (W.sample === 'ps') s += zhEn(' 聚苯乙烯是拉曼位移的標準品,11 支峰的位置都有標準值,儀器用它校正;1001 cm⁻¹ 常歸屬為苯環的呼吸振動。', ' Polystyrene is a Raman shift standard with 11 peaks of known position, used to calibrate instruments; 1001 cm⁻¹ is usually assigned to ring breathing.');
+  else if (W.sample === 'si') s += zhEn(' 矽只有一支很尖的峰,室溫約 520.5 cm⁻¹,常拿來快速檢查;溫度升高(雷射太強也會)峰會往低波數移。', ' Silicon has one sharp peak, about 520.5 cm⁻¹ at room temperature, handy for a quick check; it moves lower when the sample warms, which a strong laser can do.');
+  else if (W.sample === 'van') s += zhEn(' 香草醛的苯環(1592 cm⁻¹)在拉曼最強,1665 cm⁻¹ 是醛基 C=O;峰高是示意。', " Vanillin's ring (1592 cm⁻¹) is strongest in Raman and 1665 cm⁻¹ is the aldehyde C=O; peak heights are illustrative.");
+  else s += zhEn(' 濾紙幾乎是純纖維素:1096 cm⁻¹ 是 C–O 與 C–C 伸縮,2895 cm⁻¹ 是 C–H;380 附近的峰和結晶度有關。', ' Filter paper is nearly pure cellulose: 1096 cm⁻¹ is C–O and C–C stretching, 2895 cm⁻¹ is C–H, and the peak near 380 tracks crystallinity.');
+  if (L === 785) s += zhEn(' 785 nm 是近紅外光,肉眼看不到(畫成深紅色)。', ' 785 nm is near infrared and invisible (drawn dark red).');
+  return s;
+}
+const logBar = n => `${clamp(Math.log10(1 + Math.max(0, n)) / Math.log10(FULL), 0, 1) * 100}%`;
+function legendTag(sc) { return zhEn(`${sc.laser} nm · ${sc.exp} 秒`, `${sc.laser} nm · ${sc.exp} s`); }
+function updateDOM() {
+  const lam = lamOf(W.laser, W.cursor);
+  el('cL').textContent = `${W.laser} nm`; el('cS').textContent = `${Math.round(W.cursor)} cm⁻¹`; el('cW').textContent = `${lam.toFixed(1)} nm`;
+  if (!FILM && !tour.on) { const n = noteHTML(); if (n !== lastNote) { lastNote = n; el('note').innerHTML = n; } }
+  const r = readAt(W.sample, W.laser, W.exp, W.cursor), col = css(wlColor(lam));
+  el('vR').textContent = fmtInt(r.R); el('mR').style.width = logBar(r.R); el('mR').style.background = col;
+  el('vB').textContent = fmtInt(r.B); el('mB').style.width = logBar(r.B); el('mB').style.background = col;
+  el('vN').textContent = r.sat ? zhEn('飽和', 'saturated') : r.sn >= 10 ? r.sn.toFixed(0) : r.sn.toFixed(1);
+  el('conSample').textContent = SAMPLES[W.sample].full;
+  let lg = '';
+  if (W.scan) lg += `<span><i style="border-top:2px solid var(--cyan)"></i>${zhEn('這一次 ', 'this one, ')}${legendTag(W.scan)}</span>`;
+  if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>${zhEn('上一次 ', 'previous, ')}${legendTag(W.ghost)}</span>`;
+  if (!W.scan && !W.ghost) lg = `<span><i style="border-top:1px dashed var(--ink-2)"></i>${zhEn('預覽;按「測量」量一次', 'preview; press Measure')}</span>`;
+  if (lg !== lastLegend) { lastLegend = lg; el('legend').innerHTML = lg; }
+  const con = el('console');
+  con.style.opacity = W.conOp; con.style.visibility = W.conOp < .01 ? 'hidden' : 'visible';
+  if (W.conOp > .01) drawPlot();
+  drawJab();
+  if (FILM || tour.on) {
+    const cap = el('cap'), c = W.cap;
+    cap.style.opacity = c ? c.op : 0;
+    const ck = c ? c.chap + c.txt : '';
+    if (ck !== lastCap && c) { lastCap = ck; el('chap').textContent = c.chap; el('capTxt').textContent = c.txt; }
+    cap.classList.toggle('withcon', W.conOp > .01);
+    const tc = el('titlecard'), op = Math.max(W.title, W.outro);
+    tc.style.opacity = op; tc.style.visibility = op < .01 ? 'hidden' : 'visible';
+    const tk = W.outro > W.title ? 'o' : 't';
+    if (tk !== lastTitle) {
+      lastTitle = tk;
+      const tx = tk === 't'
+        ? zhEn(['拉曼光譜儀', '散射光換了顏色', '雷射照樣品,找出極少數換了顏色的光', ''], ['Raman spectrometer', 'Scattered light, shifted', 'Shine a laser, catch the rare light that changes color', ''])
+        : zhEn(['拉曼光譜儀', '濾掉雷射原色 · 看少了多少能量', '雷射 · 二向分光鏡 · 邊緣濾光片 · 針孔 · 光柵 · CCD', '示意動畫;元件位置、香草醛與木粉的峰高、螢光背景為示意,光譜是模擬的。'], ['Raman spectrometer', 'Block the laser color · read the energy lost', 'Laser · dichroic mirror · edge filter · pinhole · grating · CCD', 'Schematic animation; internal positions, vanillin and wood peak heights and the fluorescence background are illustrative; spectra are simulated.']);
+      ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => el(id).textContent = tx[i]);
+    }
+    document.querySelector('.hud').style.opacity = W.chips;
+    // 第 03 章講散射時,能階圖的框亮起來
+    document.querySelector('.jab').style.boxShadow = W.jabK > .01 ? `0 0 0 ${(1.5 * W.jabK).toFixed(2)}px rgba(116,228,255,${(.6 * W.jabK).toFixed(2)})` : '';
+  }
+}
+
+// ---------- 能階圖(簡化):雷射把分子推到虛態,放出同色的光(瑞立)或少了一份振動能量的光(斯托克斯);反斯托克斯從振動態出發,更少 ----------
+const jab = el('jab');
+let jabKey = '';
+function drawJab() {
+  const key = `${W.laser}|${Math.round(W.cursor)}|${(W.jabK * 20 | 0)}|${jab.clientWidth}|${jab.clientHeight}|${W.on > .5}`;
+  if (key === jabKey && !REC) return; jabKey = key;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (jab.currentCSSZoom || uiScale()), w = jab.clientWidth, h = jab.clientHeight;
+  if (!w) return;
+  if (jab.width !== Math.round(w * dpr) || jab.height !== Math.round(h * dpr)) { jab.width = Math.round(w * dpr); jab.height = Math.round(h * dpr); }
+  const c = jab.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const fs = FILM ? 14 : h < 100 ? 10 : 11, nu0 = 1e7 / W.laser, sh = W.cursor;
+  const yG = h - 11, top = 6;
+  const gap = Math.max(h < 100 ? 7 : 10, sh / nu0 * (yG - top));   // 振動能階的間距(太小時放大,示意)
+  const yA = top, yV = top + gap, yv = yG - gap;
+  const x0 = FILM ? 84 : 58, x1 = w - 4;
+  c.font = `${fs}px ${MONO}`; c.textBaseline = 'middle'; c.textAlign = 'left';
+  c.strokeStyle = 'rgba(234,243,246,.7)'; c.lineWidth = 1.5;
+  c.beginPath(); c.moveTo(x0, yG); c.lineTo(x1, yG); c.stroke();
+  c.strokeStyle = 'rgba(234,243,246,.4)'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(x0, yv); c.lineTo(x1, yv); c.stroke();
+  c.setLineDash([3, 3]); c.strokeStyle = 'rgba(234,243,246,.45)';
+  c.beginPath(); c.moveTo(x0, yV); c.lineTo(x1, yV); c.stroke(); c.setLineDash([]);
+  c.fillStyle = '#71858f';
+  c.fillText(zhEn('虛態', 'virtual'), 2, yV);
+  c.fillText(zhEn('基態', 'ground'), 2, yG + 2);
+  c.textAlign = 'right'; c.fillText(zhEn('振動', 'vibration'), x1, yv - fs * .75); c.textAlign = 'left';
+  const arrow = (x, ya, yb, col, lw = 2.2) => { c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); c.moveTo(x, ya); c.lineTo(x, yb); c.stroke(); const d = yb < ya ? 1 : -1, s = Math.min(6, Math.abs(yb - ya) / 3); c.beginPath(); c.moveTo(x, yb); c.lineTo(x - s * .8, yb + s * d); c.moveTo(x, yb); c.lineTo(x + s * .8, yb + s * d); c.stroke(); };
+  const W0 = x1 - x0, sc = W0 / 300;
+  const xL = x0 + 12 * sc, xR = x0 + 56 * sc, xS = x0 + 116 * sc, xAu = x0 + 196 * sc, xAd = x0 + 218 * sc;
+  const lite = rgb => css(rgb.map(v => .42 + .58 * v));   // 字用淡一點的同色,深紅色的字才看得清楚
+  const cL = css(wlColor(W.laser)), cS = css(wlColor(lamOf(W.laser, sh))), lA = 1e7 / (nu0 + sh), cA = css(wlColor(lA), .6);
+  const tL = lite(wlColor(W.laser)), tS = lite(wlColor(lamOf(W.laser, sh)));
+  arrow(xL, yG, yV, cL, 2.6);
+  arrow(xR, yV, yG, cL, 2.6);
+  arrow(xS, yV, yv, cS, 1.6);
+  arrow(xAu, yv, yA, css(wlColor(W.laser), .45), 1);
+  arrow(xAd, yA, yG, cA, 1);
+  const ym = (yV + yG) / 2;
+  c.textAlign = 'left';
+  c.fillStyle = tL; c.fillText(zhEn('瑞立', 'Rayleigh'), xR + 5, ym - fs * .6);
+  c.fillText(`${W.laser} nm`, xR + 5, ym + fs * .7);
+  c.fillStyle = tS; c.fillText(zhEn('斯托克斯', 'Stokes'), xS + 5, ym - fs * .6);
+  c.fillText(`${lamOf(W.laser, sh).toFixed(1)} nm`, xS + 5, ym + fs * .7);
+  c.fillStyle = 'rgba(168,188,198,.8)'; c.fillText(zhEn('反斯托克斯', 'anti-Stokes'), xAd + 5, ym - fs * .6);
+  if (h >= 100) c.fillText(zhEn('更少', 'rarer'), xAd + 5, ym + fs * .7);
+}
+
+// ---------- 光譜圖 ----------
+const plot = el('plot'), tip = el('tip');
+let hoverX = null, plotDrawnAt = -Infinity;
+const AX = { shift: [0, SH1], nm: [500, 1100] };
+// 縱軸刻度:1、2、2.5、5 乘 10 的次方
+function niceStep(v) { const p = 10 ** Math.floor(Math.log10(v)), f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
+function drawPlot() {
+  const now = performance.now();
+  if (!REC && now - plotDrawnAt < 1000 / 30) return;
+  plotDrawnAt = now;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (plot.currentCSSZoom || uiScale()), w = plot.clientWidth, h = plot.clientHeight;
+  if (!w) return;
+  if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
+  const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const axis = W.axis, [x0, x1] = AX[axis], sm = SAMPLES[W.sample];
+  const fs = FILM ? 14 : 11, Lp = FILM ? 64 : 50, Rp = FILM ? 22 : 16, Tp = FILM ? 26 : 20, Bp = FILM ? 30 : 22;
+  const pw = w - Lp - Rp, ph = h - Tp - Bp;
+  const Xv = v => Lp + (v - x0) / (x1 - x0) * pw;
+  const X = (laser, sh) => Xv(axis === 'shift' ? sh : lamOf(laser, sh));
+  // 縱軸跟著這一次(還沒有就看預覽或上一次);上一次比較高的部分截掉
+  const cur = W.scan && W.scan.sample === W.sample ? W.scan : null, gh = W.ghost && W.ghost.sample === W.sample ? W.ghost : null;
+  const pv = previewOf(W.sample, W.laser);
+  let ref = cur ? traceCached(cur).max : (!gh ? pv.max : traceCached(gh).max);
+  const step = niceStep(Math.max(ref, 20) * 1.12 / 4), ym = Math.ceil(Math.max(ref, 20) * 1.12 / step) * step;
+  const Y = v => Tp + (1 - v / ym) * ph;
+  c.font = `${fs}px ${MONO}`; c.lineWidth = 1;
+  c.textAlign = 'right'; c.textBaseline = 'middle';
+  for (let v = 0; v <= ym + 1e-6; v += step) {
+    const y = Math.round(Y(v)) + .5;
+    c.strokeStyle = v === 0 ? 'rgba(160,215,235,.25)' : 'rgba(160,215,235,.08)';
+    c.beginPath(); c.moveTo(Lp, y); c.lineTo(Lp + pw, y); c.stroke();
+    c.fillStyle = '#71858f'; c.fillText(fmtInt(v), Lp - 7, y);
+  }
+  const xStep = axis === 'shift' ? 500 : 100;
+  c.textAlign = 'center'; c.textBaseline = 'top';
+  for (let v = Math.ceil(x0 / xStep) * xStep; v <= x1; v += xStep) {
+    const x = Math.round(Xv(v)) + .5;
+    c.strokeStyle = 'rgba(160,215,235,.08)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+    c.fillStyle = '#71858f'; c.fillText(v, x, Tp + ph + 6);
+  }
+  c.fillStyle = '#71858f';
+  c.textAlign = zhEn('right', 'left'); c.fillText(zhEn('每秒計數', 'Counts per second'), zhEn(Lp - 7, 2), 2);
+  c.textAlign = 'left'; c.fillText(axis === 'shift' ? 'cm⁻¹' : 'nm', 2, Tp + ph + 6);
+  c.save(); c.beginPath(); c.rect(Lp, Tp - 2, pw, ph + 4); c.clip();
+  // 波長模式:底下一條看得見的顏色(780 nm 以上看不見)
+  if (axis === 'nm') for (let px = 0; px < pw; px += 2) { const l = x0 + px / pw * (x1 - x0); c.fillStyle = css(wlColor(l), l > 780 ? .35 : .55); c.fillRect(Lp + px, Tp + ph - 3, 2, 3); }
+  // 雷射的位置與邊緣濾光片擋掉的一段
+  for (const lz of [W.laser]) {
+    const xa = X(lz, 0), xb = X(lz, LASERS[lz].cutFull);
+    c.fillStyle = 'rgba(160,215,235,.07)'; c.fillRect(Math.min(xa, xb), Tp, Math.abs(xb - xa), ph);
+    c.strokeStyle = css(wlColor(lz), .8); c.lineWidth = 1.5; c.beginPath(); c.moveTo(xa + .5, Tp); c.lineTo(xa + .5, Tp + ph); c.stroke(); c.lineWidth = 1;
+    c.fillStyle = '#71858f'; c.textAlign = 'left'; c.textBaseline = 'top';
+    c.fillText(zhEn(`雷射 ${lz} nm(擋掉)`, `laser ${lz} nm (blocked)`), xa + 6, Tp + 2);
+  }
+  // 預覽(沒有測量時)
+  const line = (arr, laser, n, style, lw, dash) => {
+    c.setLineDash(dash || []); c.strokeStyle = style; c.lineWidth = lw; c.lineJoin = 'round'; c.beginPath();
+    for (let i = 0; i < n; i++) { const x = X(laser, SH0 + i * DSH), y = Y(Math.min(arr[i], ym * 1.3)); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.stroke(); c.setLineDash([]); c.lineWidth = 1;
+  };
+  if (!W.scan && !W.ghost) line(pv.y, W.laser, NPT, 'rgba(168,188,198,.55)', 1.2, [2, 4]);
+  let ghostClipped = false;
+  if (gh) { const tr = traceCached(gh); line(tr.y, gh.laser, NPT, 'rgba(255,194,97,.95)', FILM ? 2 : 1.4, [5, 3]); ghostClipped = tr.max > ym; }
+  let curN = 0, phase = null;
+  if (cur) {
+    phase = measPhase(cur); curN = phase.ph === 'exp' ? 0 : Math.max(2, Math.round(phase.u * (NPT - 1)) + 1);
+    if (curN > 1) line(traceCached(cur).y, cur.laser, curN, '#74e4ff', FILM ? 2.4 : 1.8);
+    if (phase.ph === 'read') { const xr = X(cur.laser, SH0 + (curN - 1) * DSH); c.strokeStyle = 'rgba(234,243,246,.7)'; c.beginPath(); c.moveTo(xr, Tp); c.lineTo(xr, Tp + ph); c.stroke(); }
+  }
+  // 峰的名稱(這一次已讀出的部分,或預覽)
+  const tagArr = cur ? (curN > 1 ? traceCached(cur).y : null) : (!gh ? pv.y : null);
+  if (tagArr) {
+    c.font = `${FILM ? 13 : 10.5}px ${MONO}`; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.fillStyle = '#a8bcc6';
+    const placed = [], lh = FILM ? 15 : 12, yMin = Tp + 2 * (fs + 6) + lh, satV = cur && traceCached(cur).sat ? FULL / cur.exp * .999 : Infinity;
+    const items = sm.tags.map(([s, t]) => [s, t, X(W.laser, s)]);
+    for (const [s, t, x] of items) {
+      const i = Math.round((s - SH0) / DSH); if (cur && i >= curN) continue;
+      let v = 0; for (let j = Math.max(0, i - 3); j <= Math.min(NPT - 1, i + 3); j++) v = Math.max(v, tagArr[j]);
+      if (v >= satV) continue;   // 飽和的地方看不出峰,不標
+      const tw = c.measureText(t).width, xc = clamp(x, Lp + tw / 2, Lp + pw - tw / 2);
+      let y = Math.max(yMin, Y(Math.min(v, ym)) - 3);
+      // 和已經寫上去的字重疊就往上挪一行,挪不上去就不標
+      const hit = yy => placed.some(p => Math.abs(p[0] - xc) < (p[1] + tw) / 2 + 4 && Math.abs(p[2] - yy) < lh);
+      while (hit(y) && y - lh >= yMin) y -= lh;
+      if (hit(y)) continue;
+      c.fillText(t, xc, y); placed.push([xc, tw, y]);
+    }
+    c.font = `${fs}px ${MONO}`;
+  }
+  if (ghostClipped) { c.fillStyle = 'rgba(255,194,97,.95)'; c.textAlign = 'right'; c.textBaseline = 'top'; c.fillText(zhEn('上一次超出圖框 ↑', 'previous goes off the top ↑'), Lp + pw - 4, Tp + fs + 6); }
+  // 曝光中:圖的中間寫進度
+  if (phase && phase.ph === 'exp') {
+    c.fillStyle = 'rgba(234,243,246,.85)'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `${FILM ? 17 : 13}px ${MONO}`;
+    c.fillText(zhEn(`曝光中 ${(phase.f * cur.exp).toFixed(cur.exp > 9 ? 0 : 1)} / ${cur.exp} 秒(快轉)`, `exposing ${(phase.f * cur.exp).toFixed(cur.exp > 9 ? 0 : 1)} / ${cur.exp} s (fast-forward)`), Lp + pw / 2, Tp + ph / 2);
+    c.font = `${fs}px ${MONO}`;
+  }
+  if (cur && phase.ph !== 'exp' && traceCached(cur).sat && curN > 1) { c.fillStyle = '#ffc261'; c.textAlign = 'center'; c.textBaseline = 'top'; c.fillText(zhEn('飽和', 'saturated'), Lp + pw / 2, Tp + 2); }
+  // 游標
+  {
+    const x = X(W.laser, W.cursor), col = wlColor(lamOf(W.laser, W.cursor)), i = Math.round((clamp(W.cursor, SH0, SH1) - SH0) / DSH);
+    const arr = cur && i < curN ? traceCached(cur).y : (!cur && !gh ? pv.y : null);
+    c.strokeStyle = css(col, .75); c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+    if (arr) { c.fillStyle = css(col); c.strokeStyle = '#0c1318'; c.lineWidth = 2; c.beginPath(); c.arc(x, Y(Math.min(arr[i], ym)), FILM ? 6 : 4.5, 0, 7); c.fill(); c.stroke(); c.lineWidth = 1; }
+  }
+  if (hoverX != null) {
+    c.setLineDash([3, 3]); c.strokeStyle = 'rgba(234,243,246,.5)';
+    c.beginPath(); c.moveTo(hoverX, Tp); c.lineTo(hoverX, Tp + ph); c.stroke(); c.setLineDash([]);
+  }
+  c.restore();
+  plot._map = { Lp, pw, x0, x1, axis };
+}
+// 圖上的橫座標 → 目前雷射下的拉曼位移
+function shiftAtPx(px) {
+  const m = plot._map; if (!m) return null;
+  const v = m.x0 + (px - m.Lp) / m.pw * (m.x1 - m.x0);
+  return m.axis === 'shift' ? v : shOf(W.laser, v);
+}
+function valueAt(sh) {
+  const i = Math.round((clamp(sh, SH0, SH1) - SH0) / DSH);
+  for (const [sc, tag] of [[W.scan, zhEn('這一次', 'this one')], [W.ghost, zhEn('上一次', 'previous')]]) {
+    if (!sc || sc.sample !== W.sample || sc.laser !== W.laser) continue;
+    const ph = measPhase(sc); if (ph.ph === 'exp' || i > ph.u * (NPT - 1)) continue;
+    return { v: traceCached(sc).y[i], tag };
+  }
+  return { v: previewOf(W.sample, W.laser).y[i], tag: zhEn('預覽', 'preview') };
+}
+let plotDrag = false;
+function plotPx(e) { const r = plot.getBoundingClientRect(), pz = plot.currentCSSZoom || uiScale(); return [(e.clientX - r.left) / pz, (e.clientY - r.top) / pz]; }
+plot.addEventListener('pointerdown', e => {
+  if (tour.on || FILM) return;
+  const [px] = plotPx(e), sh = shiftAtPx(px); if (sh == null) return;
+  plotDrag = true; setCursor(sh); W.cursor = S.cursor;
+  try { plot.setPointerCapture(e.pointerId); } catch (err) { /* 沒有可捕捉的指標時照樣可以點 */ }
+});
+plot.addEventListener('pointermove', e => {
+  const m = plot._map; if (!m) return;
+  const [px, py] = plotPx(e);
+  if (plotDrag) { const sh = shiftAtPx(px); if (sh != null) { setCursor(sh); W.cursor = S.cursor; } }
+  if (px < m.Lp || px > m.Lp + m.pw) { hoverX = null; tip.style.display = 'none'; return; }
+  hoverX = px;
+  const sh = shiftAtPx(px);
+  if (sh < SH0 || sh > SH1) { tip.style.display = 'none'; return; }
+  const v = valueAt(sh);
+  tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${py}px`;
+  tip.textContent = `${Math.round(sh)} cm⁻¹ · ${lamOf(W.laser, sh).toFixed(1)} nm · ${fmtInt(v.v)}${zhEn(' /秒', '/s')} · ${v.tag}`;
+});
+const endPlotDrag = () => { plotDrag = false; };
+plot.addEventListener('pointerup', endPlotDrag);
+plot.addEventListener('pointercancel', endPlotDrag);
+plot.addEventListener('pointerleave', () => { hoverX = null; tip.style.display = 'none'; });
+
+// ---------- 控制 ----------
+function segOn(id, v) { for (const b of el(id).querySelectorAll('button')) b.classList.toggle('on', b.dataset.v === String(v)); }
+function setCursor(v) { S.cursor = clamp(v, SH0, SH1); }
+// 停止:還在曝光就丟掉(還沒讀出資料);讀出到一半就留下已讀出的部分
+function stopScan() {
+  if (S.scanning && S.scan) {
+    const ph = measPhase({ ...S.scan, el: performance.now() / 1000 - S.scan.t0 });
+    if (ph.ph === 'exp') S.scan = null; else { S.scan.cut = ph.u; S.scan.done = true; }
+  }
+  S.scanning = false; el('btnScan').classList.remove('on'); el('btnScan').textContent = zhEn('測量', 'Measure');
+}
+function keepGhost() { if (S.scan && S.scan.done) { S.ghost = S.scan; S.scan = null; } }
+el('segSample').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.dataset.v === S.sample) return;
+  stopScan(); S.sample = b.dataset.v; S.scan = S.ghost = null; segOn('segSample', S.sample); setCursor(SAMPLES[S.sample].main);
+});
+el('segLaser').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const v = +b.dataset.v; if (v === S.laser) return;
+  stopScan(); keepGhost(); S.laser = v; segOn('segLaser', v);
+});
+el('segExp').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const v = +b.dataset.v; if (v === S.exp) return;
+  stopScan(); keepGhost(); S.exp = v; segOn('segExp', v);
+});
+el('segAxis').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.axis = b.dataset.v; segOn('segAxis', S.axis); });
+el('segShell').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.explode = +b.dataset.v; segOn('segShell', b.dataset.v); });
+el('btnScan').addEventListener('click', () => {
+  if (S.scanning) { stopScan(); return; }
+  if (S.scan && S.scan.done) S.ghost = S.scan;
+  S.seed++; S.scan = { sample: S.sample, laser: S.laser, exp: S.exp, seed: S.seed * 7.7, t0: performance.now() / 1000, done: false };
+  S.scanning = true; S.explode = 1; segOn('segShell', 1);
+  el('btnScan').classList.add('on'); el('btnScan').textContent = zhEn('停止', 'Stop');
+});
+el('btnHelp').addEventListener('click', () => el('help').classList.toggle('show'));
+
+// 拖曳 CCD 晶片上的游標
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), chipPlane = new THREE.Plane(), hitP = new V3();
+let drag = false;
+function rayFrom(e) { const r = renderer.domElement.getBoundingClientRect(); ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(ndc, camera); }
+function chipShift() {
+  const n = new V3(0, 0, 1).applyQuaternion(O.CCD.g.getWorldQuaternion(new THREE.Quaternion()));
+  chipPlane.setFromNormalAndCoplanarPoint(n, O.CCD.chip.getWorldPosition(new V3()));
+  if (!ray.ray.intersectPlane(chipPlane, hitP)) return null;
+  const lx = O.CCD.g.worldToLocal(hitP.clone()).x;
+  return SH0 + clamp(lx / CHIP_W + .5, 0, 1) * (SH1 - SH0);
+}
+renderer.domElement.addEventListener('pointerdown', e => {
+  if (tour.on || FILM || e.button !== 0) return;
+  rayFrom(e); if (!ray.intersectObjects([O.CCD.chip, ccdGlow], false).length) return;
+  drag = true; controls.enabled = false; const s = chipShift(); if (s != null) setCursor(s);
+  try { renderer.domElement.setPointerCapture(e.pointerId); } catch (err) { /* 同上 */ }
+  renderer.domElement.style.cursor = 'grabbing';
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  if (drag) { rayFrom(e); const s = chipShift(); if (s != null) setCursor(s); return; }
+  if (!tour.on && !FILM && e.buttons === 0) { rayFrom(e); renderer.domElement.style.cursor = ray.intersectObjects([O.CCD.chip, ccdGlow], false).length ? 'grab' : ''; }
+});
+const endDrag = () => { if (!drag) return; drag = false; controls.enabled = true; renderer.domElement.style.cursor = ''; };
+renderer.domElement.addEventListener('pointerup', endDrag);
+renderer.domElement.addEventListener('pointercancel', endDrag);
+
+// ---------- 導覽 ----------
+const tour = { on: false, t0: 0, saved: null };
+function startTour() {
+  stopScan(); el('help').classList.remove('show');
+  tour.saved = { sample: S.sample, laser: S.laser, exp: S.exp, axis: S.axis, cursor: S.cursor, explode: S.explode, scan: S.scan, ghost: S.ghost, cp: camera.position.clone(), ct: controls.target.clone() };
+  tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false; nav.cancel();
+}
+function endTour() {
+  if (!tour.on) return;
+  tour.on = false; root.classList.remove('touring'); controls.enabled = true;
+  const s = tour.saved; Object.assign(S, { sample: s.sample, laser: s.laser, exp: s.exp, axis: s.axis, cursor: s.cursor, explode: s.explode, scan: s.scan, ghost: s.ghost });
+  camera.position.copy(s.cp); controls.target.copy(s.ct); controls.update();
+  Object.assign(W, { sample: S.sample, laserMix: S.laser === 785 ? 1 : 0, exp: S.exp, axis: S.axis, cursor: S.cursor, stageTop: stageFor(S.sample), labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, jabK: 0, scatK: 0, efK: 0 });
+  el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; document.querySelector('.hud').style.opacity = 1; document.querySelector('.jab').style.boxShadow = ''; lastNote = '';
+}
+el('btnTour').addEventListener('click', startTour);
+el('tourExit').addEventListener('click', endTour);
+addEventListener('keydown', e => { if (e.key === 'Escape') endTour(); });
+
+// ---------- 視角操作 ----------
+// 共用的 ../assets/camera-nav.js:滑鼠滾輪縮放,觸控板雙指平移、捏合縮放,方向鍵或 WASD 移動、Q/E 轉向、+/− 縮放、R 回到預設視角
+const nav = createCameraNav({ camera, controls, active: () => !FILM && !tour.on, radius: 120 });
+
+// ================= 迴圈 =================
+function interactive(dt, now) {
+  W.sample = S.sample; W.exp = S.exp; W.axis = S.axis;
+  const lt = S.laser === 785 ? 1 : 0;
+  W.laserMix += clamp(lt - W.laserMix, -dt * .75, dt * .75);   // 換雷射約 1.3 秒
+  W.cursor = drag || plotDrag ? S.cursor : W.cursor + (S.cursor - W.cursor) * Math.min(1, dt * 10);
+  W.stageTop += (stageFor(S.sample) - W.stageTop) * Math.min(1, dt * 5);
+  W.explode += (S.explode - W.explode) * Math.min(1, dt * 2.4);
+  if (S.scanning && now - S.scan.t0 >= EXP_SHOW[S.scan.exp] + READ_T) { S.scan.done = true; S.scanning = false; el('btnScan').classList.remove('on'); el('btnScan').textContent = zhEn('測量', 'Measure'); }
+  W.scan = S.scan ? { ...S.scan, el: S.scan.done ? 1e9 : now - S.scan.t0 } : null;
+  W.ghost = S.ghost ? { ...S.ghost, el: 1e9 } : null;
+  W.labels = null; W.conOp = 1; W.cap = null; W.title = W.outro = 0; W.jabK = W.scatK = W.efK = 0;
+}
+// 手機版:3D 的投影中心移到標題與停靠區之外的空地(mp.applyView,導覽與影片時不作用)
+// 桌機小螢幕(1024×768 這類):3D 的投影中心移到面板之間最大的空地(../assets/free-view.js);手機、導覽與影片不作用
+const fv = createFreeView({ panels: ['.hud', '#ctl', '#console', '#help'], active: () => !FILM && !tour.on });
+function render() { if (!mp.applyView(camera)) fv.apply(camera); composer.render(); labelR.render(scene, camera); }
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);
+  quality.configure(renderer, composer, bloom, { recording: REC });
+  renderer.setPixelRatio(DPR);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h); composer.setPixelRatio(DPR); composer.setSize(w, h); bloom.setSize(w * DPR, h * DPR); labelR.setSize(w, h);
+  pMat.uniforms.uScale.value = h * DPR / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+}
+addEventListener('resize', resize);
+resize();
+
+// 字型載入後再畫(畫布上的字要用到)
+await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 3000))]);
+
+if (REC) {
+  window.__dur = FILM_DUR;
+  // 等一個畫格讓 DOM 標籤也更新;背景分頁的 rAF 可能停住,所以最多只等 300 ms
+  window.__seek = async t => { film(t); frameCommon(t); render(); await Promise.race([new Promise(r => requestAnimationFrame(() => r())), new Promise(r => setTimeout(r, 300))]); return true; };
+  await window.__seek(+Q.get('t') || 0);
+  window.__ready = true;
+} else {
+  let last = performance.now() / 1000;
+  let filmStart = last - (+Q.get('t') || 0), hiddenAt = null;
+  document.addEventListener('visibilitychange', () => {
+    const now = performance.now() / 1000;
+    if (document.hidden) hiddenAt = now;
+    else if (hiddenAt !== null) {
+      const gap = now - hiddenAt; filmStart += gap;
+      if (tour.on) tour.t0 += gap;
+      if (S.scanning) S.scan.t0 += gap;
+      last = now; hiddenAt = null;
+    }
+  });
+  const loop = () => {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    if (!quality.shouldRender(performance.now())) return;
+    quality.observe(performance.now());
+    const now = performance.now() / 1000, dt = Math.min(.05, now - last); last = now;
+    if (FILM) film((now - filmStart) % FILM_DUR);
+    else if (tour.on) { const t = now - tour.t0; if (t >= FILM_DUR) endTour(); else film(t); }
+    if (!FILM && !tour.on) { interactive(dt, now); nav.step(dt); controls.update(); }
+    frameCommon(FILM ? (now - filmStart) % FILM_DUR : tour.on ? now - tour.t0 : now);
+    render();
+  };
+  loop();
+  el('load').classList.add('done');
+  window.__ready = true;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1692 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en="X-ray fluorescence spectrometer (XRF): energy names elements">XRF X 射線螢光光譜儀 能量認出元素</title>
+<meta name="description" content="用 3D 模型拆開一台桌上型 X 射線螢光光譜儀,看 X 射線管的 X 射線從下方照進樣品,打掉原子內層的電子;外層電子補位時放出的 X 射線,能量只看是哪一種元素,偵測器一道一道量能量,畫成能譜。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="XRF X 射線螢光光譜儀 能量認出元素">
+<meta property="og:description" content="用 3D 模型拆開一台桌上型 X 射線螢光光譜儀,看 X 射線管的 X 射線從下方照進樣品,打掉原子內層的電子;外層電子補位時放出的 X 射線,能量只看是哪一種元素,偵測器一道一道量能量,畫成能譜。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/xrf/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/xrf.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="XRF 教材的畫面:展開的 X 射線管、樣品、偵測器與能譜">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/ui-scale.css">
+<style>
+:root{
+  --bg:#0a0f13;
+  --panel:rgba(12,18,23,.80);
+  --line:rgba(160,215,235,.14);
+  --line-2:rgba(160,215,235,.30);
+  --ink:#eaf3f6; --ink-2:#a8bcc6; --muted:#71858f;
+  --cyan:#74e4ff; --amber:#ffc261; --violet:#bba6ff; --xr:#c9b8ff; --el:#8fd3ff;
+  --btn:rgba(255,255,255,.05); --btn-on:#eef6f8; --btn-on-ink:#0c1318;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --sans:'Noto Sans TC','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;touch-action:none}
+.labels{position:fixed;inset:0;pointer-events:none;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+/* 左上:標題、數值、說明 */
+.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw / var(--ui,1) - 48px));pointer-events:none}
+.hud::before{content:'';position:absolute;left:-80px;top:-60px;width:620px;height:300px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 25% 35%,rgba(10,15,19,.72),rgba(10,15,19,0) 70%)}
+.hud .k{display:block;font-weight:900;font-size:28px;letter-spacing:.02em;line-height:1.1}
+.hud .big{display:block;font-weight:900;font-size:44px;line-height:1.12;color:var(--cyan);text-shadow:0 0 22px rgba(116,228,255,.35)}
+.lede{margin:10px 0 12px;font-size:13.5px;line-height:1.7;color:var(--ink-2)}
+.chips{display:flex;gap:8px;margin-bottom:10px}
+.chip{padding:7px 12px 8px;min-width:100px}
+.chip small{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.12em}
+.chip b{font-family:var(--mono);font-weight:600;font-size:18px;color:var(--cyan);white-space:nowrap}
+.note{padding:11px 14px;font-size:13px;line-height:1.75}
+.note em{font-style:normal;font-weight:700}
+.c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--xr)}
+
+/* 網站分頁 */
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw / var(--ui,1) - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
+.sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
+.sitenav a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* 3D 載入中 */
+.load{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:13px;pointer-events:none;transition:opacity .5s}
+.load i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--cyan);animation:spin 1s linear infinite}
+.load.done{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.load i{animation:none}}
+
+/* 右上:控制面板 */
+.ctl{position:fixed;right:20px;top:18px;z-index:6;padding:13px 15px 14px;display:grid;grid-template-columns:auto auto;gap:12px 20px}
+.grp h6{margin:0 0 7px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em;display:flex;justify-content:space-between;gap:8px}
+.grp h6 span{font-family:var(--mono);color:var(--ink-2);letter-spacing:0}
+.grp h6 span[lang]{font-family:inherit;color:inherit;letter-spacing:inherit}
+.seg{display:flex;gap:2px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px}
+.seg button,.btn{font:500 12.5px var(--sans);color:var(--ink-2);background:transparent;border:0;border-radius:7px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.seg button:hover,.btn:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.seg button.on{background:var(--btn-on);color:var(--btn-on-ink)}
+.seg.mono button{font-family:var(--mono);padding:6px 9px}
+.row{display:flex;gap:6px;align-items:center}
+.btn{background:var(--btn);border:1px solid var(--line);padding:6px 11px}
+.btn.on{background:var(--cyan);color:#062028;border-color:transparent}
+.btn.sq{width:32px;padding:6px 0;text-align:center;font-family:var(--mono)}
+
+.help{position:fixed;right:20px;top:264px;z-index:7;width:350px;max-height:calc(100vh / var(--ui,1) - 278px);overflow:auto;padding:14px 16px;font-size:12.5px;line-height:1.7;display:none}
+.help.show{display:block}
+.help b{font-size:13px}
+.help ul{margin:6px 0 8px;padding-left:18px}
+.help .fine{color:var(--muted);font-size:11.5px;margin:0}
+
+/* 底部:能譜 */
+.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw / var(--ui,1) - 32px));padding:11px 14px 9px}
+.con-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:12.5px;margin-bottom:4px;white-space:nowrap}
+.con-head b{font-weight:700}
+.con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.legend{margin-left:auto;display:flex;gap:14px;color:var(--ink-2);font-size:11.5px}
+.legend i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:6px}
+.con-body{display:grid;grid-template-columns:1fr 168px;gap:14px;align-items:stretch}
+.plotwrap{position:relative;min-width:0}
+#plot{width:100%;height:170px;display:block;cursor:crosshair}
+.meters{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.m .t{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.m .t b{font-family:var(--mono);font-weight:500;color:var(--ink-2)}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--cyan)}
+.m.big .t{margin-bottom:0}
+.m.big b.n{display:block;font-family:var(--mono);font-size:24px;font-weight:600;color:var(--cyan);line-height:1.2}
+.m.big b.n.txt{font:500 12.5px var(--sans);color:var(--muted);padding:5px 0 4px}
+.m.big b.n .pm{font-size:.62em;font-weight:500;color:var(--ink-2);white-space:nowrap}
+.zbtn{flex:none;font:500 11px var(--sans);color:var(--ink-2);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:6px;padding:1px 8px;cursor:pointer}
+.zbtn:hover{color:var(--ink);background:rgba(255,255,255,.1)}
+.zbtn.on{color:#062028;background:var(--cyan);border-color:transparent}
+html.touring .zbtn,html.film .zbtn{display:none}
+.tip{position:absolute;pointer-events:none;padding:4px 8px;border-radius:6px;background:#0d151a;border:1px solid var(--line-2);font:500 11.5px var(--mono);color:var(--ink);white-space:nowrap;display:none;transform:translate(-50%,-120%)}
+
+.foot{position:fixed;left:24px;bottom:14px;z-index:4;max-width:250px;font-size:11px;line-height:1.55;color:var(--muted)}
+
+/* 元件標籤;放大的原子與矽晶片旁邊的小字 */
+.lw{pointer-events:none;transition:opacity .2s}
+.lbl{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:3px 8px 3px 7px;border-radius:6px;background:rgba(9,14,18,.84);border:1px solid rgba(116,228,255,.32);font-size:11.5px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.lbl.dn{margin-bottom:0;margin-top:5px}
+.lbl i{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);flex:none}
+.lbl b{font-weight:700;color:#fff}
+.lbl span{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+.dl{font:700 14px var(--sans);color:var(--ink);white-space:nowrap;text-shadow:0 0 4px #0a0f13,0 0 10px #0a0f13,0 0 18px #0a0f13}
+.dl.mono{font-family:var(--mono)}
+.dl.am{color:var(--amber)}
+.dl.e{color:var(--el)}
+.dl.x{color:var(--xr)}
+.dl.sm{font-size:12px;font-weight:500;color:var(--ink-2)}
+
+/* 導覽與影片 */
+.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw / var(--ui,1) - 40px));text-align:center;padding:13px 26px 15px}
+.cap .chap{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.16em;margin-bottom:5px}
+.cap .txt{font-size:18px;line-height:1.6;font-weight:500}
+.titlecard{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,15,19,.66) 0%,rgba(10,15,19,.4) 40%,rgba(10,15,19,0) 70%)}
+.titlecard .t1{font-weight:900;font-size:42px;letter-spacing:.04em}
+.titlecard .t2{font-weight:900;font-size:72px;color:var(--cyan);text-shadow:0 0 30px rgba(116,228,255,.4);line-height:1.15}
+.titlecard .t3{font-size:20px;color:var(--ink-2);margin-top:14px}
+.titlecard .t4{font-size:14px;color:var(--muted);margin-top:22px}
+#tourExit{position:fixed;right:20px;top:18px;z-index:9;display:none}
+html.touring .ctl,html.touring .help,html.touring .lede,html.touring .note,html.touring .foot{display:none}
+/* 導覽時分頁列只到「結束導覽」的左邊 */
+html.touring .sitenav{max-width:calc(100vw / var(--ui,1) - 48px - 120px)}
+html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
+html.touring .titlecard{display:flex}
+html.touring .cap.withcon{bottom:250px}
+
+html.film .ctl,html.film .help,html.film .lede,html.film .note,html.film .foot,html.film #tourExit,html.film .sitenav,html.film .load{display:none}
+html.film .cap{display:block;bottom:56px;max-width:1440px;padding:18px 40px 20px}
+html.film .cap .chap{font-size:16px;margin-bottom:8px}
+html.film .cap .txt{font-size:31px}
+html.film .titlecard{display:flex}
+html.film .titlecard .t1{font-size:56px}
+html.film .titlecard .t2{font-size:104px}
+html.film .titlecard .t3{font-size:28px}
+html.film .titlecard .t4{font-size:19px}
+html.film .hud{left:52px;top:44px;width:560px}
+html.film .hud::before{width:900px;height:420px}
+html.film .hud .k{font-size:34px}
+html.film .hud .big{font-size:54px}
+/* 英文:標題比中文寬,字小一點 */
+html[lang="en"]:not(.mp):not(.film) .hud .k{font-size:22px}
+html[lang="en"]:not(.mp):not(.film) .hud .big{font-size:30px}
+html[lang="en"].film .hud .k{font-size:26px}
+html[lang="en"].film .hud .big{font-size:44px}
+html.film .chips{margin-top:16px;gap:12px}
+html.film .chip{min-width:150px;padding:10px 16px 11px}
+html.film .chip small{font-size:14px}
+html.film .chip b{font-size:26px}
+html.film .console{left:auto;right:52px;top:48px;bottom:auto;transform:none;width:760px;padding:16px 20px 14px}
+html.film .con-head{font-size:17px;margin-bottom:8px}
+html.film .legend{font-size:15px}
+html.film #plot{height:250px}
+html.film .con-body{grid-template-columns:1fr 210px}
+html.film .m .t{font-size:14px}
+html.film .m.big b.n{font-size:30px}
+html.film .m.big b.n.txt{font-size:16px}
+html.film .lbl{font-size:17px;padding:5px 12px 5px 10px;border-radius:8px;gap:8px}
+html.film .lbl span{font-size:14px}
+html.film .lbl i{width:8px;height:8px}
+html.film .dl{font-size:21px}
+html.film .dl.sm{font-size:17px}
+html.rec *{transition:none!important;animation:none!important}
+
+@media (max-width:980px){
+  .lede,.foot{display:none}
+  .ctl{left:12px;right:12px;top:auto;bottom:250px;grid-template-columns:1fr;gap:8px;padding:10px 12px}
+  .hud{left:12px;top:12px}
+  .note{display:none}
+  .help{left:12px;right:12px;width:auto;top:120px}
+}
+@media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}}
+/* 手機版(html.mp,由 ../assets/mobile-panels.js 加上):標題與讀值縮小,控制面板與譜收在底部的停靠區 */
+html.mp .hud{left:12px;top:10px;width:min(380px,calc(100vw - 24px))}
+html.mp .hud .k{font-size:16px}
+html.mp .hud .big{font-size:26px;text-shadow:0 0 16px rgba(116,228,255,.3)}
+html.mp .sitenav{margin-bottom:8px;max-width:100%}
+html.mp .chips{gap:6px;margin:6px 0 0}
+html.mp .chip{flex:1 1 0;min-width:0;padding:5px 9px 6px}
+html.mp .chip small{font-size:10px;letter-spacing:.06em}
+html.mp .chip b{display:block;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+html.mp .lede,html.mp .note,html.mp .foot{display:none}
+html.mp .con-head > b,html.mp .con-head > .s{display:none}
+html.mp .legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px}
+html.mp #plot{height:150px}
+/* 說明框:放在標題下方,太長就捲動;橫拿時蓋在標題上,不擋右側的停靠區 */
+html.mp .help{left:12px;right:auto;top:var(--mp-free-top,120px);width:min(380px,calc(100vw - 24px - var(--mp-rail-w, 0px)));max-height:calc(100vh - var(--mp-free-top,120px) - 12px);max-height:calc(100dvh - var(--mp-free-top,120px) - 12px);overflow:auto;overscroll-behavior:contain}
+/* 導覽中:字幕放在停靠區上方 */
+html.mp.touring .cap.withcon{bottom:calc(var(--mp-dock-h,230px) + 20px)}
+@media (orientation:landscape){
+  html.mp .help{top:10px;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .cap,html.mp.touring .cap.withcon{left:12px;right:auto;bottom:12px;transform:none;max-width:calc(100vw - min(380px,46vw) - 36px)}
+}
+html.mp .ctl{grid-template-columns:1fr;gap:8px}
+/* 手機上元件標籤只留名稱(小字太擠,計數看左上的讀值卡) */
+html.mp .lbl span{display:none}
+html.mp .dl{font-size:12px}
+html.mp .dl.sm{font-size:11px}
+html.mp .con-body{grid-template-columns:minmax(0,1fr);gap:8px}
+html.mp .meters{flex-direction:row;align-items:flex-end;gap:12px}
+html.mp .meters .m{flex:1;min-width:0}
+html.mp .m.big b.n{font-size:18px}
+html.mp .m.big b.n.txt{font-size:12px;padding:3px 0 2px}
+@media (orientation:landscape){
+  html.mp .hud{top:8px}
+  html.mp .sitenav{margin-bottom:6px}
+  html.mp .hud .k,html.mp .hud .big{display:inline;white-space:nowrap}
+  html.mp .hud .k{font-size:14px;margin-right:8px}
+  html.mp .hud .big{font-size:19px}
+  html.mp .chips{margin-top:4px}
+  html.mp .chip{padding:3px 8px 4px}
+  html.mp .chip b{font-size:13px}
+}
+/* 手機導覽(2026-11-09):分頁列藏起來,「結束導覽」放在它的位置;橫拿時標題欄只到停靠區的左邊;片頭片尾字卡縮小 */
+html.mp.touring .sitenav{visibility:hidden}
+html.mp.touring #tourExit{left:12px;right:auto;top:10px}
+@media (orientation:landscape){
+  html.mp.touring #tourExit{top:8px}
+  html.mp.touring .hud{width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .hud .k,html.mp.touring .hud .big{white-space:normal}
+}
+html.mp .titlecard{padding:0 16px}
+html.mp .titlecard .t1{font-size:24px}
+html.mp .titlecard .t2{font-size:40px}
+html.mp .titlecard .t3{font-size:14px;margin-top:8px}
+html.mp .titlecard .t4{font-size:11px;margin-top:10px}
+@media (orientation:landscape) and (max-height:340px){
+  html.mp.touring .cap{padding:8px 14px 9px}
+  html.mp.touring .cap .chap{font-size:11px;margin-bottom:3px}
+  html.mp.touring .cap .txt{font-size:15px;line-height:1.5}
+}
+/* 桌機小螢幕(1024×768、1366×768 這類):導言收起來、能譜矮一點、元件標籤只留名稱;3D 主角移到面板之間的空地(../assets/free-view.js) */
+@media (min-width:981px) and (max-width:1279px),(min-width:981px) and (max-height:899px){
+  .lede{display:none}
+  .lbl span{display:none}
+  #plot{height:120px}
+}
+/* 1360 px 以下頁尾的示意說明會被能譜蓋住,收起來(說明框與片尾字卡都有寫示意) */
+@media (min-width:981px) and (max-width:1359px){.foot{display:none}}
+/* 大螢幕(2K、4K)的放大(見 ../assets/ui-scale.css):面板、字幕、片頭字卡、元件標籤與放大圖旁的小字依 --ui 放大;3D 畫布與 CSS2D 的定位層不放大 */
+.hud,.load,.ctl,.help,.console,.foot,.cap,.titlecard,#tourExit,.lbl,.dl{zoom:var(--ui,1)}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+}}
+</script>
+<link rel="stylesheet" href="../assets/render-quality.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<div id="stage"></div>
+<div class="load" id="load"><i></i><span data-en="Loading the 3D model">3D 模型載入中</span></div>
+
+<header class="hud">
+  <nav class="sitenav" aria-label="元素分析" data-en-aria-label="Elemental analysis"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../aas/">AAS</a><a href="../icp/">ICP</a><a href="./" aria-current="page">XRF</a></nav>
+  <span class="k" data-en="X-ray fluorescence spectrometer (XRF)">XRF X 射線螢光光譜儀</span>
+  <span class="big" data-en="Energy names elements">能量認出元素</span>
+  <p class="lede" data-en="X-rays from the tube shine into the sample and knock electrons out of the inner shells of its atoms. An outer electron drops into the hole, and the spare energy leaves as a new X-ray (fluorescence) whose energy depends only on the element. The detector measures the energy of each X-ray and builds a spectrum: each element gives its own set of peaks. No dissolving is needed, but only a surface layer is seen. Pick a sample, press Measure, then move the cursor over the spectrum.">X 射線管的 X 射線照進樣品,把原子內層的電子打掉;外層電子掉下來補位,多出的能量變成一道新的 X 射線(螢光),能量只看是哪一種元素。偵測器一道一道量能量,畫成能譜,每種元素是一組峰。不必溶解樣品,但只看得到表面一層。選一個樣品按「測量」,再在能譜上移動游標看看。</p>
+  <div class="chips">
+    <div class="chip panel"><small data-en="Energy">能量</small><b id="cE">10.53 keV</b></div>
+    <div class="chip panel"><small data-en="Line">譜線</small><b id="cL">As Kα</b></div>
+    <div class="chip panel"><small data-en="Counts">計數</small><b id="cN">0</b></div>
+  </div>
+  <div class="note panel" id="note"></div>
+</header>
+
+<aside class="ctl panel" id="ctl">
+  <div class="grp"><h6 data-en="Sample">樣品</h6>
+    <div class="seg" id="segSample">
+      <button data-v="cca" class="on" data-en="CCA wood">CCA 木材</button><button data-v="cuaz" data-en="CuAz wood">銅唑木材</button><button data-v="wood" data-en="Untreated">未處理</button><button data-v="soil" data-en="Soil">土壤</button>
+    </div>
+  </div>
+  <div class="grp"><h6 data-en="Tube voltage (kV)">管電壓(kV)</h6>
+    <div class="seg mono" id="segKv"><button data-v="10">10</button><button data-v="30">30</button><button data-v="50" class="on">50</button></div>
+  </div>
+  <div class="grp"><h6 data-en="Filter">濾片</h6>
+    <div class="seg" id="segFilt"><button data-v="0" class="on" data-en="None">沒有</button><button data-v="1" data-en="Al 0.1 mm">鋁 0.1 mm</button></div>
+  </div>
+  <div class="grp"><h6 data-en="Time (s)">測量時間(秒)</h6>
+    <div class="seg mono" id="segTime"><button data-v="10">10</button><button data-v="60" class="on">60</button><button data-v="300">300</button></div>
+  </div>
+  <div class="grp"><h6 data-en="Case">外殼</h6>
+    <div class="row">
+      <div class="seg" id="segShell"><button data-v="0" data-en="Closed">組裝</button><button data-v="1" class="on" data-en="Open">展開</button></div>
+      <button class="btn" id="btnScan" data-en="Measure">測量</button>
+      <button class="btn" id="btnTour" data-en="Tour">導覽</button>
+      <button class="btn sq" id="btnHelp" aria-label="說明" data-en-aria-label="Help">?</button>
+    </div>
+  </div>
+</aside>
+
+<div class="help panel" id="help">
+  <b data-en="Controls">操作</b>
+  <ul lang="zh-Hant">
+    <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
+    <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
+    <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
+    <li>在能譜上移動游標或點一下,讀出那個能量、對到的譜線與計數;「對數」讓很小的峰也看得到</li>
+    <li>「測量」:偵測器一道一道數 X 射線,約 6 秒跑完設定的測量時間,能譜慢慢長高;換電壓、濾片或時間再量一次,上一次會留著比較</li>
+    <li>管電壓:X 射線最高的能量就是電壓(50 kV 最高 50 keV)。能量要超過吸收邊限才打得掉那一層的電子:砷的 K 層要 11.87 keV,所以 10 kV 量不到砷;銠靶自己的 K 線要 23.2 kV 以上才出現</li>
+    <li>濾片(0.1 mm 鋁片):擋掉低能量的 X 射線,8 keV 以下的背景幾乎消失,鉀、鈣、鉻這些低能量的峰也變弱,砷只少一成多</li>
+    <li>含量 = 淨計數 ÷ 靈敏度,靈敏度要用同材質的標準品(或理論計算)先求出來;± 只算計數的誤差,時間多 4 倍誤差才減半</li>
+    <li>「導覽」:自動播一遍,內容和影片相同;按 Esc 結束</li>
+  </ul>
+  <ul lang="en">
+    <li>Mouse: drag to rotate the view; right-drag or Shift-drag to pan; scroll to zoom</li>
+    <li>Trackpad: swipe with two fingers to pan, pinch to zoom; touch screen: one finger rotates, two fingers pan and zoom</li>
+    <li>Keyboard: arrow keys or W A S D to move, Q E to turn, + − to zoom, hold Shift to go faster; R resets the view</li>
+    <li>Move the cursor over the spectrum or click it to read the energy, the matching line and the counts; "Log" makes very small peaks visible</li>
+    <li>"Measure": the detector counts the X-rays one by one, runs through the set measuring time in about 6 seconds, and the spectrum slowly grows; measure again with another voltage, filter or time and the previous spectrum stays for comparison</li>
+    <li>Tube voltage: the highest X-ray energy equals the voltage (at most 50 keV at 50 kV). Only X-rays above the absorption edge can knock out an electron from that shell: the arsenic K shell needs 11.87 keV, so at 10 kV there is no arsenic; the rhodium K lines of the tube itself appear only above 23.2 kV</li>
+    <li>Filter (0.1 mm aluminum): it blocks low-energy X-rays, so the background below 8 keV almost disappears and low-energy peaks such as potassium, calcium and chromium get weaker, while arsenic drops only by a little over a tenth</li>
+    <li>Amount = net counts ÷ sensitivity; the sensitivity comes first from standards of the same material (or from calculation); the ± counts only the counting error, and 4 times the time halves it</li>
+    <li>"Tour": plays through automatically, the same as the video; press Esc to end it</li>
+  </ul>
+  <p class="fine" lang="zh-Hant">示意圖。以常見的桌上型能量分散式 XRF 為例:銠靶 X 射線管(4 到 50 kV、幾十瓦、氣冷)、可換的濾片與準直器、樣品放在上方的量測窗、從下方照射,矽漂移偵測器(SDD,用帕耳帖致冷片降溫,不用液態氮;解析度約 135 eV,以錳 Kα 計)。元件的位置、大小與散射角(約 100°)是示意。真的儀器有安全連鎖,X 射線開著時面板上的 X-RAYS ON 燈會亮,機殼外的劑量率在 1 µSv/h 以下;「展開」只是為了看裡面。能譜是計算的示意:譜線能量取自 NIST 的資料庫;峰高用簡化的基本參數法估算,X 射線管的連續 X 射線與銠的特性 X 射線各算一半;背景、散射峰的大小與計數多寡是示意;木材裡鉀、鈣、錳、鐵的小峰、空氣的氬峰、銠 L 線與土壤的銣、鍶小峰也是示意。CCA 處理材的含量由保留量 6.4 kg/m³ 換算(假設木材密度 500 kg/m³),銅唑處理材用 3.3 kg/m³,土壤是 NIST SRM 2710a 的認證值;含量的換算是示意,不能拿來鑑定樣品。另一種 XRF(波長分散式)先用晶體依波長把 X 射線分開再數,解析度比較好。</p>
+  <p class="fine" lang="en">Schematic. Modeled on a common benchtop energy-dispersive XRF: a rhodium-target X-ray tube (4 to 50 kV, tens of watts, air-cooled), exchangeable filters and collimators, the sample on a window on top, lit from below, and a silicon drift detector (SDD, cooled by a Peltier element instead of liquid nitrogen; resolution about 135 eV at manganese Kα). Part positions, sizes and the scattering angle (about 100°) are illustrative. A real instrument has safety interlocks, an X-RAYS ON lamp lights while X-rays are on, and the dose rate outside the case is 1 µSv/h or less; "Open" is only for looking inside. The spectra are calculated illustrations: line energies come from the NIST database; peak heights are estimated with a simplified fundamental-parameter model in which the tube's continuous X-rays and the rhodium lines each count for half; the background, scatter peak sizes and count levels are illustrative, and so are the small potassium, calcium, manganese and iron peaks of wood, the argon peak from air, the rhodium L line and the small rubidium and strontium peaks of the soil. Amounts in CCA wood are converted from a retention of 6.4 kg/m³ (assuming a wood density of 500 kg/m³), copper azole wood uses 3.3 kg/m³, and the soil uses the certified values of NIST SRM 2710a; the conversion to amounts is illustrative and must not be used to identify real samples. The other kind of XRF (wavelength-dispersive) first separates the X-rays by wavelength with a crystal and then counts them, giving better resolution.</p>
+</div>
+
+<section class="console panel" id="console">
+  <div class="con-head"><b data-en="X-ray energy spectrum">X 射線能譜</b><span class="s" id="conSample"></span><button class="zbtn" id="btnLog" data-en="Log">對數</button><span class="legend" id="legend"></span></div>
+  <div class="con-body">
+    <div class="plotwrap"><canvas id="plot"></canvas><div class="tip" id="tip"></div></div>
+    <div class="meters">
+      <div class="m"><div class="t"><span lang="zh-Hant">計數率</span><span lang="en">Count rate</span><b id="vR">0 kcps</b></div><div class="bar"><i id="mR"></i></div></div>
+      <div class="m"><div class="t"><span lang="zh-Hant">測量時間</span><span lang="en">Time</span><b id="vT">0/60 s</b></div><div class="bar"><i id="mT"></i></div></div>
+      <div class="m big"><div class="t" id="vQt" data-en="Amount ≈ net counts ÷ sensitivity">含量 ≈ 淨計數 ÷ 靈敏度</div><b class="n txt" id="vQ" data-en="after a measurement">測量後才算</b></div>
+    </div>
+  </div>
+</section>
+
+<div class="foot" data-en="Schematic; the spectra are calculated illustrations and part positions are illustrative.">示意圖;能譜是計算的示意,元件位置為示意。</div>
+
+<div class="cap panel" id="cap"><div class="chap" id="chap"></div><div class="txt" id="capTxt"></div></div>
+<div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
+<button class="btn" id="tourExit" data-en="End tour">結束導覽</button>
+
+<script type="module">
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
+import { createMobilePanels } from '../assets/mobile-panels.js';
+import { createFreeView } from '../assets/free-view.js';
+const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const $ = s => document.querySelector(s);
+const Q = new URLSearchParams(location.search);
+const FILM = Q.has('film'), REC = Q.has('rec');
+const root = document.documentElement;
+if (FILM) root.classList.add('film');
+if (REC) root.classList.add('rec');
+// 手機版:控制面板與能譜預設收成有標籤的細條,放在底部;直拿時建議轉成橫式(../assets/mobile-panels.js)
+const mp = createMobilePanels({
+  dock: true, top: '.hud', rotateHint: true,
+  suspended: () => FILM || root.classList.contains('touring'),
+  panels: [
+    { el: '#ctl', icon: 'adjust', label: zhEn('調整', 'Adjust'), items: zhEn('樣品、管電壓、濾片、測量時間、外殼、測量、導覽、說明、畫質', 'sample, tube voltage, filter, time, case, measure, tour, help, quality'), onToggle: (open) => { if (!open) document.getElementById('help').classList.remove('show'); } },
+    { el: '#console', icon: 'chart', label: zhEn('能譜', 'Spectrum'), items: () => $('#conSample').textContent },
+  ],
+});
+$('#btnScan').addEventListener('click', () => mp.open('#console'));
+window.__err = null;
+addEventListener('error', e => { window.__err = String(e.message || e); });
+
+// ================= 小工具 =================
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = t => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const gauss = n => Math.sqrt(-2 * Math.log(Math.max(1e-6, hash(n)))) * Math.cos(6.2831853 * hash(n + 17.77));
+const D2R = Math.PI / 180;
+const MONO = "'IBM Plex Mono',Consolas,monospace";
+const fmtInt = v => Math.round(v).toLocaleString('en-US');
+const fmtE = e => `${e.toFixed(2)} keV`;
+const sig = (v, n) => { if (!(v > 0)) return 0; const p = 10 ** (Math.floor(Math.log10(v)) - n + 1); return Math.round(v / p) * p; };
+const fmtRate = r => `${(r / 1000).toFixed(r < 10000 ? 2 : 1)} kcps`;
+
+// ================= 能譜模型 =================
+// 能量軸 0 到 25 keV,每 10 eV 一格(多頻道分析器的「頻道」)
+const E_MAX = 25, DE = .01, NCH = Math.round(E_MAX / DE) + 1;
+const MEAS_S = 6;               // 動畫裡一次測量跑幾秒(示意;不管設定的測量時間)
+const RATE = 4000;              // CCA 處理材的 As Kα 在 50 kV、沒有濾片時每秒幾個計數(示意,其他強度都以它為 1)
+// 偵測器解析度:FWHM = √(64² + 2.355² × F × ε × E) eV,范諾因數 F 0.118、每對電子電洞 ε 3.66 eV;Mn Kα(5.9 keV)135 eV
+const fwhm = E => Math.sqrt(64 * 64 + 2.3953 * E * 1000) / 1000;
+// 鋁的質量衰減係數(cm²/g,NIST);濾片 0.1 mm、密度 2.699 g/cm³
+const AL = [[1.5596, 3957], [2, 2263], [3, 788], [4, 360.5], [5, 193.4], [6, 115.3], [8, 50.33], [10, 26.23], [15, 7.955], [20, 3.441], [30, 1.128], [40, .5685], [50, .3681]];
+function muAl(E) {
+  if (E <= AL[0][0]) return 1e5;
+  for (let i = 0; i < AL.length - 1; i++) { const [a, ma] = AL[i], [b, mb] = AL[i + 1]; if (E <= b) return Math.exp(Math.log(ma) + Math.log(E / a) / Math.log(b / a) * Math.log(mb / ma)); }
+  return AL[AL.length - 1][1];
+}
+const tAl = E => Math.exp(-muAl(E) * 2.699 * .01);
+// 連續 X 射線激發一條譜線的效率 ∝ ∫(從吸收邊限 Ek 到管電壓 V)(V − E) ÷ E³ dE
+// (克拉默斯連續光譜 × 光電吸收隨能量下降;和查證筆記 10 到 50 kV 的計算差 3% 以內)
+const G = (Ek, V) => V <= Ek ? 0 : V / (2 * Ek * Ek) - 1 / Ek + 1 / (2 * V);
+const contKv = (Ek, V) => G(Ek, V) / G(Ek, 50);
+const cfCache = new Map();
+function contFilt(Ek, V) {
+  const key = `${Ek}|${V}`; let v = cfCache.get(key);
+  if (v === undefined) {
+    let a = 0, b = 0; const n = 600;
+    for (let i = 0; i < n; i++) { const E = Ek + (V - Ek) * (i + .5) / n, w = (V - E) / (E * E * E); a += w * tAl(E); b += w; }
+    v = b > 0 ? a / b : 0; cfCache.set(key, v);
+  }
+  return v;
+}
+// 銠靶自己的特性 X 射線:管電壓要超過吸收邊限(K 23.22 keV、L3 3.004 keV);強度 ∝ (V ÷ Vk − 1)^1.67,以 50 kV 為 1(示意)
+const RH_K = 23.22, RH_L = 3.004;
+const tubeLine = (V, Vk) => V <= Vk ? 0 : ((V / Vk - 1) / (50 / Vk - 1)) ** 1.67;
+
+// 譜線:[名稱, 元素, 種類, 能量 keV, 吸收邊限 keV, 連續 X 射線激發, 銠 K 線激發]
+// 兩種激發的強度都以「CCA 處理材的 As Kα = 1」為單位;查證筆記把兩種極端情況各自正規化後取平均,這裡照做(各算一半)
+const EL = {
+  K: zhEn('鉀', 'potassium'), Ca: zhEn('鈣', 'calcium'), Ti: zhEn('鈦', 'titanium'), Cr: zhEn('鉻', 'chromium'), Mn: zhEn('錳', 'manganese'), Fe: zhEn('鐵', 'iron'),
+  Cu: zhEn('銅', 'copper'), Zn: zhEn('鋅', 'zinc'), As: zhEn('砷', 'arsenic'), Pb: zhEn('鉛', 'lead'), Rb: zhEn('銣', 'rubidium'), Sr: zhEn('鍶', 'strontium'), Ar: zhEn('氬', 'argon'), C: zhEn('碳', 'carbon'), O: zhEn('氧', 'oxygen'),
+};
+const ln = (name, el, kind, E, Ek, c, r, x = {}) => ({ name, el, kind, E, Ek, c, r, ...x });
+// 木材本身的小峰(鉀、鈣、錳、鐵;含量沒有查到,大小是示意)與碳、氧(看不到,只給游標用)
+const WOOD_LINES = [
+  ln('K Kα', 'K', 'a', 3.313, 3.608, .020, .002, { fake: 1 }), ln('K Kβ', 'K', 'b', 3.590, 3.608, .0027, .0003, { fake: 1 }),
+  ln('Ca Kα', 'Ca', 'a', 3.691, 4.038, .022, .003, { fake: 1 }), ln('Ca Kβ', 'Ca', 'b', 4.013, 4.038, .003, .0004, { fake: 1 }),
+  ln('Mn Kα', 'Mn', 'a', 5.895, 6.538, .002, .001, { fake: 1 }), ln('Fe Kα', 'Fe', 'a', 6.400, 7.112, .0025, .0015, { fake: 1 }),
+  ln('C Kα', 'C', 'light', .277, .284, 0, 0), ln('O Kα', 'O', 'light', .525, .543, 0, 0),
+];
+// 空氣裡的氬(1.28 wt%)與 X 射線管的銠 L 線(散射回來);大小是示意
+const AIR_LINES = [ln('Ar Kα', 'Ar', 'ar', 2.958, 3.206, .008, .0005, { fake: 1 })];
+const s4 = v => v * .743 / 100;   // 土壤:Fe Kα 換算成 CCA As Kα 的單位(查證筆記的靈敏度比,計算)
+const SAMPLES = {
+  cca: {
+    name: zhEn('CCA 處理材', 'CCA wood'), full: zhEn('CCA 防腐處理木材(鉻化砷酸銅,保留量 6.4 kg/m³)', 'CCA-treated wood (chromated copper arsenate, 6.4 kg/m³)'),
+    matrix: 'wood', color: 0x9aa65e, home: 10.531, conc: { Cr: 3160, Cu: 1890, As: 2840 },
+    lines: [
+      ln('Cr Kα', 'Cr', 'a', 5.412, 5.989, .354, .048), ln('Cr Kβ', 'Cr', 'b', 5.947, 5.989, .062, .009),
+      ln('Cu Kα', 'Cu', 'a', 8.041, 8.979, .486, .215), ln('Cu Kβ', 'Cu', 'b', 8.905, 8.979, .089, .042),
+      ln('As Kα', 'As', 'a', 10.531, 11.867, 1, 1), ln('As Kβ', 'As', 'b', 11.726, 11.867, .180, .186),
+      ...WOOD_LINES,
+    ],
+  },
+  cuaz: {
+    name: zhEn('銅唑處理材', 'copper azole wood'), full: zhEn('銅唑防腐處理木材(保留量 3.3 kg/m³)', 'Copper azole treated wood (3.3 kg/m³)'),
+    matrix: 'wood', color: 0x86734a, home: 8.041, conc: { Cu: 6340 },
+    lines: [ln('Cu Kα', 'Cu', 'a', 8.041, 8.979, 1.078, 1.078), ln('Cu Kβ', 'Cu', 'b', 8.905, 8.979, .195, .208), ...WOOD_LINES],
+  },
+  wood: {
+    name: zhEn('未處理木材', 'untreated wood'), full: zhEn('未處理木材(木粉)', 'Untreated wood (wood meal)'),
+    matrix: 'wood', color: 0xd8b787, home: 3.313, conc: null,
+    lines: [...WOOD_LINES],
+  },
+  soil: {
+    name: zhEn('土壤標準品', 'soil standard'), full: zhEn('土壤標準品(NIST SRM 2710a,認證值)', 'Soil standard (NIST SRM 2710a, certified)'),
+    matrix: 'soil', color: 0x6e4c33, home: 6.400, conc: { K: 21700, Ca: 9640, Ti: 3110, Mn: 2140, Fe: 43200, Cu: 3420, Zn: 4180, As: 1540, Pb: 5520 },
+    quant: { As: 'As Kβ', Pb: 'Pb Lβ' },
+    lines: [
+      ln('K Kα', 'K', 'a', 3.313, 3.608, s4(10.2), s4(1.4)), ln('K Kβ', 'K', 'b', 3.590, 3.608, s4(1.7), s4(.2)),
+      ln('Ca Kα', 'Ca', 'a', 3.691, 4.038, s4(6.2), s4(1.2)), ln('Ca Kβ', 'Ca', 'b', 4.013, 4.038, s4(1.0), s4(.2)),
+      ln('Ti Kα', 'Ti', 'a', 4.509, 4.966, s4(3.1), s4(1.1)), ln('Ti Kβ', 'Ti', 'b', 4.932, 4.966, s4(.5), s4(.2)),
+      ln('Mn Kα', 'Mn', 'a', 5.895, 6.538, s4(4.1), s4(3.1)), ln('Mn Kβ', 'Mn', 'b', 6.491, 6.538, s4(.7), s4(.6)),
+      ln('Fe Kα', 'Fe', 'a', 6.400, 7.112, s4(100), s4(100)), ln('Fe Kβ', 'Fe', 'b', 7.058, 7.112, s4(17.3), s4(18.5)),
+      ln('Cu Kα', 'Cu', 'a', 8.041, 8.979, s4(10.2), s4(19.3)), ln('Cu Kβ', 'Cu', 'b', 8.905, 8.979, s4(1.8), s4(3.7)),
+      ln('Zn Kα', 'Zn', 'a', 8.631, 9.661, s4(14.3), s4(33.5)), ln('Zn Kβ', 'Zn', 'b', 9.572, 9.661, s4(2.6), s4(6.3)),
+      ln('As Kα', 'As', 'a', 10.531, 11.867, s4(6.4), s4(27.1)), ln('As Kβ', 'As', 'b', 11.726, 11.867, s4(1.2), s4(5.1)),
+      ln('Pb Lα', 'Pb', 'la', 10.541, 13.035, s4(8.85), s4(51.55)), ln('Pb Lβ', 'Pb', 'lb', 12.614, 15.200, s4(7.97), s4(46.4)),
+      ln('Rb Kα', 'Rb', 'a', 13.395, 15.200, s4(.8), s4(2.2), { fake: 1 }), ln('Sr Kα', 'Sr', 'a', 14.165, 16.105, s4(1.6), s4(4.4), { fake: 1 }),
+    ],
+  },
+};
+const SKEYS = Object.keys(SAMPLES);
+// 散射:銠靶的 K 線被樣品彈回來。瑞立(能量不變)與康普頓(散射角約 100°,能量少一點、比較寬);木材比土壤散射得多(約 7.9 倍)
+const SCAT = {
+  wood: { rl: .006, c: [1.667, .283], r: [.238, .0405], bg: .33 },
+  soil: { rl: .00076, c: [.188, .032], r: [.0537, .0091], bg: .33 / 7.9 },
+};
+const RH = { ka: 20.167, kb: 22.724, cka: 19.27, ckb: 21.60, la: 2.697 };
+// 背景:X 射線管的連續 X 射線被樣品散射進偵測器。50 kV、沒有濾片時的形狀(每 1 keV 一點,% of max,查證筆記的計算)
+const BG_TAB = {
+  wood: [0, 0, 0, 4, 11, 19, 29, 39, 51, 64, 76, 86, 93, 98, 100, 100, 96, 91, 86, 80, 74, 67, 60, 54, 49, 44, 39, 35, 32, 28, 25, 22, 20, 17, 15, 13, 12, 10, 9, 8, 6, 5, 5, 4, 3, 2, 2, 1, 1],
+  soil: [0, 0, 1, 9, 19, 31, 45, 59, 58, 69, 79, 89, 95, 100, 99, 99, 94, 91, 88, 84, 79, 75, 71, 66, 62, 58, 54, 50, 47, 43, 40, 37, 34, 31, 29, 26, 24, 22, 19, 17, 15, 14, 12, 10, 8, 7, 5, 4, 3],
+};
+// 頻道格點上的背景形狀:線性內插後用高斯(σ 0.35 keV)抹平,0 到 50 keV
+const BG50 = {};
+for (const k of ['wood', 'soil']) {
+  const tab = BG_TAB[k], n = Math.round(50 / DE) + 1, raw = new Float32Array(n), out = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const E = i * DE, j = Math.floor(E), u = E - j; raw[i] = j + 1 < tab.length ? lerp(tab[j], tab[j + 1], u) / 100 : 0; }
+  const s = 35, ker = []; let ks = 0; for (let d = -3 * s; d <= 3 * s; d++) { const w = Math.exp(-.5 * (d / s) ** 2); ker.push(w); ks += w; }
+  for (let i = 0; i < n; i++) { let a = 0; for (let d = -3 * s; d <= 3 * s; d++) { const j = clamp(i + d, 0, n - 1); a += raw[j] * ker[d + 3 * s]; } out[i] = a / ks; }
+  BG50[k] = out;
+}
+// 一條線的面積(CCA As Kα = 1):兩種激發各算一半
+function lineArea(l, V, filt) {
+  const c = l.c * contKv(l.Ek, V) * (filt ? contFilt(l.Ek, V) : 1);
+  const r = l.r * tubeLine(V, RH_K) * (filt ? tAl(RH.ka) : 1);
+  return .5 * (c + r);
+}
+// 這個條件下所有的峰(含散射峰):{ line, E, area, sig }
+function peaksOf(sample, V, filt) {
+  const sm = SAMPLES[sample], sc = SCAT[sm.matrix], out = [];
+  for (const l of [...sm.lines, ...AIR_LINES]) out.push({ l, E: l.E, area: lineArea(l, V, filt), sig: fwhm(l.E) / 2.3548 });
+  const kk = tubeLine(V, RH_K);
+  const sp = (name, kind, E, a, wide) => out.push({ l: { name, el: null, kind, E }, E, area: a, sig: fwhm(E) / 2.3548 * (wide ? 2.2 : 1) });
+  sp('Rh L', 'rhl', RH.la, sc.rl * tubeLine(V, RH_L) * (filt ? tAl(RH.la) : 1));
+  sp(zhEn('Rh Kα 康普頓', 'Rh Kα Compton'), 'compton', RH.cka, sc.c[0] * kk * (filt ? tAl(RH.cka) : 1), true);
+  sp(zhEn('Rh Kβ 康普頓', 'Rh Kβ Compton'), 'compton', RH.ckb, sc.c[1] * kk * (filt ? tAl(RH.ckb) : 1), true);
+  sp(zhEn('Rh Kα 瑞立', 'Rh Kα Rayleigh'), 'rayleigh', RH.ka, sc.r[0] * kk * (filt ? tAl(RH.ka) : 1));
+  sp(zhEn('Rh Kβ 瑞立', 'Rh Kβ Rayleigh'), 'rayleigh', RH.kb, sc.r[1] * kk * (filt ? tAl(RH.kb) : 1));
+  return out;
+}
+const bgAt = (matrix, E, V, filt) => {
+  if (E >= V || E < 0) return 0;
+  const i = Math.round(E / DE), b = BG50[matrix][Math.min(i, BG50[matrix].length - 1)];
+  return SCAT[matrix].bg * b * (V - E) / (50 - E) * (filt ? tAl(E) : 1);
+};
+// 期望值(不含雜訊):每個頻道每秒幾個計數,另外記背景、總計數率(含 25 keV 以上的部分)
+const expCache = new Map();
+function expected(sample, V, filt) {
+  const key = `${sample}|${V}|${filt}`; let x = expCache.get(key);
+  if (x) return x;
+  const sm = SAMPLES[sample], peaks = peaksOf(sample, V, filt), rate = new Float32Array(NCH), bg = new Float32Array(NCH);
+  let tot = 0;
+  for (let i = 0; i < NCH; i++) { bg[i] = RATE * DE * bgAt(sm.matrix, i * DE, V, filt); rate[i] = bg[i]; }
+  for (const p of peaks) {
+    if (p.area <= 0) continue;
+    const k = RATE * p.area * DE / (p.sig * Math.sqrt(2 * Math.PI)), i0 = Math.max(0, Math.floor((p.E - 5 * p.sig) / DE)), i1 = Math.min(NCH - 1, Math.ceil((p.E + 5 * p.sig) / DE));
+    for (let i = i0; i <= i1; i++) rate[i] += k * Math.exp(-.5 * ((i * DE - p.E) / p.sig) ** 2);
+    tot += RATE * p.area;
+  }
+  for (let E = .005; E < V; E += DE) tot += RATE * DE * bgAt(sm.matrix, E, V, filt);
+  let mx = 0; for (let i = 0; i < NCH; i++) mx = Math.max(mx, rate[i]);
+  x = { key, sample, V, filt, peaks, rate, bg, tot, max: mx };
+  if (expCache.size > 40) expCache.clear(); expCache.set(key, x);
+  return x;
+}
+// 一次測量 { sample, kV, filt, T, seed, p };最後的計數依泊松分布抽(同一個種子每次相同),
+// 中間的進度 p 用二項分布的常態近似(示意:能譜慢慢長高、雜訊慢慢變小)
+const finalCache = new Map();
+function finalOf(m) {
+  const key = `${m.sample}|${m.kV}|${m.filt}|${m.T}|${m.seed}`; let f = finalCache.get(key);
+  if (f) return f;
+  const ex = expected(m.sample, m.kV, m.filt), out = new Float32Array(NCH);
+  for (let i = 0; i < NCH; i++) {
+    const lam = ex.rate[i] * m.T;
+    if (lam < 30) { const u = hash(i * 1.37 + m.seed * 91.7); let k = 0, p = Math.exp(-lam), s = p; while (u > s && k < 200) { k++; p *= lam / k; s += p; } out[i] = k; }
+    else out[i] = Math.max(0, Math.round(lam + Math.sqrt(lam) * gauss(i * 1.37 + m.seed * 91.7)));
+  }
+  if (finalCache.size > 30) finalCache.clear(); finalCache.set(key, out);
+  return out;
+}
+const curCache = { key: '', v: null };
+function countsOf(m) {
+  const f = finalOf(m); if (m.p >= 1) return f;
+  const key = `${m.sample}|${m.kV}|${m.filt}|${m.T}|${m.seed}|${m.p.toFixed(4)}`;
+  if (curCache.key === key) return curCache.v;
+  const out = new Float32Array(NCH), p = clamp(m.p, 0, 1);
+  for (let i = 0; i < NCH; i++) { const N = f[i]; out[i] = clamp(Math.round(N * p + Math.sqrt(N * p * (1 - p)) * gauss(i * 2.71 + m.seed * 13.3)), 0, N); }
+  curCache.key = key; curCache.v = out;
+  return out;
+}
+const chOf = E => clamp(Math.round(E / DE), 0, NCH - 1);
+// 游標的能量對到哪一條線:貢獻最大的那一條;兩條都超過兩成(砷 Kα 與鉛 Lα)就寫成「A + B」
+function matchAt(sample, V, filt, E) {
+  const ex = expected(sample, V, filt), sm = SAMPLES[sample];
+  const i = chOf(E), tot = ex.rate[i];
+  const cs = [];
+  for (const p of ex.peaks) if (p.area > 0) { const v = RATE * DE * p.area / (p.sig * Math.sqrt(2 * Math.PI)) * Math.exp(-.5 * ((E - p.E) / p.sig) ** 2); if (v > 0) cs.push({ p, v }); }
+  cs.sort((a, b) => b.v - a.v);
+  const light = sm.lines.find(l => l.kind === 'light' && Math.abs(l.E - E) < .07);
+  if (light) return { kind: 'light', lab: light.name, l: light };
+  const floor = .002 * ex.max;
+  if (cs.length && cs[0].v > .3 * tot && cs[0].v > floor) {
+    if (cs[1] && cs[1].v > .2 * tot && cs[1].v > floor && cs[1].p.l.el && cs[0].p.l.el && cs[1].p.l.el !== cs[0].p.l.el) {
+      const [a, b] = [cs[0].p.l, cs[1].p.l].sort((x, y) => (x.el === 'As' ? -1 : y.el === 'As' ? 1 : 0));
+      return { kind: 'overlap', lab: `${a.name} + ${b.name}`, l: a, l2: b };
+    }
+    const l = cs[0].p.l; return { kind: l.kind, lab: l.name, l };
+  }
+  // 附近有線但這個電壓激發不了
+  const miss = sm.lines.find(l => l.kind !== 'light' && Math.abs(l.E - E) < 1.2 * fwhm(l.E) && lineArea(l, V, filt) <= 0);
+  if (miss) return { kind: 'miss', lab: miss.name, l: miss };
+  return { kind: 'bg', lab: zhEn('背景', 'background'), l: null };
+}
+// 含量的估計:那個元素的線(重疊時改用另一條)淨計數 ÷ 期望的淨計數 × 含量;± 只算計數誤差
+function quantOf(m, el) {
+  const sm = SAMPLES[m.sample]; if (!sm.conc || sm.conc[el] == null) return null;
+  const name = (sm.quant && sm.quant[el]) || sm.lines.find(l => l.el === el && (l.kind === 'a' || l.kind === 'la')).name;
+  const ex = expected(m.sample, m.kV, m.filt), pk = ex.peaks.find(p => p.l.name === name);
+  if (!pk || pk.area <= 0) return { el, name, none: true };
+  const f = countsOf(m), w = 1.1 * fwhm(pk.E), i0 = chOf(pk.E - w), i1 = chOf(pk.E + w);
+  let gross = 0, other = 0, own = 0;
+  const k = RATE * DE * pk.area / (pk.sig * Math.sqrt(2 * Math.PI));
+  for (let i = i0; i <= i1; i++) { const o = k * Math.exp(-.5 * ((i * DE - pk.E) / pk.sig) ** 2); gross += f[i]; own += o; other += ex.rate[i] - o; }
+  const T = m.T * clamp(m.p, 0, 1); if (T <= 0) return { el, name, wait: true };
+  const net = gross - other * T, expNet = own * T, c = sm.conc[el];
+  return { el, name, v: c * net / expNet, sd: c * Math.sqrt(Math.max(gross, 1)) / expNet };
+}
+
+// ================= 場景 =================
+let DPR = REC ? 1 : quality.pixelRatio(innerWidth, innerHeight, 1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: REC, powerPreference: 'high-performance' });
+renderer.setPixelRatio(DPR);
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+$('#stage').appendChild(renderer.domElement);
+window.__gl = (() => { try { const gl = renderer.getContext(), x = gl.getExtension('WEBGL_debug_renderer_info'); return x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { return '?'; } })();
+
+const labelR = new CSS2DRenderer();
+labelR.setSize(innerWidth, innerHeight);
+labelR.domElement.className = 'labels';
+document.body.appendChild(labelR.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a1015);
+scene.fog = new THREE.Fog(0x0a1015, 260, 600);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .5;
+
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 1, 1500);
+camera.position.set(36, 34, 80);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 15, 1);
+controls.enableDamping = true; controls.dampingFactor = .08;
+controls.minDistance = 14; controls.maxDistance = 240; controls.maxPolarAngle = 1.47;
+controls.update();
+
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), .75, .5, 1.25);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.HemisphereLight(0xcfe6ff, 0x1b1712, .45));
+const key = new THREE.DirectionalLight(0xffffff, 1.65);
+key.position.set(55, 110, 75); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 20, far: 320 });
+key.shadow.bias = -.0004; key.shadow.normalBias = .03;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0x74e4ff, .28); rim.position.set(-90, 50, -100); scene.add(rim);
+
+// ---------- 桌面與牆 ----------
+function canvasTex(w, h, draw, repeat) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+  return t;
+}
+const benchTop = new THREE.Mesh(new THREE.BoxGeometry(200, 4, 112), new THREE.MeshStandardMaterial({ color: 0x141b20, roughness: .58, metalness: .1 }));
+benchTop.position.set(0, -2, 4); benchTop.receiveShadow = true; scene.add(benchTop);
+const strip = new THREE.Mesh(new THREE.BoxGeometry(200, .45, .5), new THREE.MeshBasicMaterial({ color: new THREE.Color(.25, .85, 1.1) }));
+strip.position.set(0, -.35, 60.1); scene.add(strip);
+const wallTex = canvasTex(1024, 512, (c, w, h) => {
+  c.fillStyle = '#121a20'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 3;
+  for (let x = 0; x <= w; x += 128) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+  c.beginPath(); c.moveTo(0, 340); c.lineTo(w, 340); c.stroke();
+}, [3, 1]);
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(760, 300), new THREE.MeshStandardMaterial({ map: wallTex, roughness: .95 }));
+wall.position.set(0, 70, -160); scene.add(wall);
+// 牆上三塊說明螢幕:補位放出 X 射線、莫斯利定律、一種元素一組峰
+function screenTex(kind) {
+  return canvasTex(640, 360, (c, w, h) => {
+    c.fillStyle = 'rgba(16,48,62,.9)'; c.fillRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(116,228,255,.6)'; c.lineWidth = 3; c.strokeRect(6, 6, w - 12, h - 12);
+    c.strokeStyle = c.fillStyle = 'rgba(200,244,255,.95)'; c.lineWidth = 4; c.lineCap = 'round';
+    c.font = `600 34px ${MONO}`; c.textAlign = 'center';
+    if (kind === 0) {
+      const cx = 200, cy = 160;
+      c.lineWidth = 3; for (const r of [36, 72, 108]) { c.beginPath(); c.arc(cx, cy, r, 0, 7); c.stroke(); }
+      c.beginPath(); c.arc(cx, cy, 10, 0, 7); c.fill();
+      c.lineWidth = 5; c.beginPath(); c.moveTo(cx + 72 * Math.cos(-.9), cy + 72 * Math.sin(-.9)); c.lineTo(cx + 40 * Math.cos(-.9), cy + 40 * Math.sin(-.9)); c.stroke();
+      c.beginPath(); c.moveTo(cx + 108 * Math.cos(-.2), cy + 108 * Math.sin(-.2)); c.lineTo(cx + 40 * Math.cos(-.2), cy + 40 * Math.sin(-.2)); c.stroke();
+      c.font = `600 30px ${MONO}`; c.textAlign = 'left';
+      c.fillText('L → K : Kα', 350, 120); c.fillText('M → K : Kβ', 350, 190);
+      c.textAlign = 'center'; c.fillText(zhEn('外層補位,放出 X 射線', 'refill, give off an X-ray'), w / 2, 320);
+    } else if (kind === 1) {
+      c.lineWidth = 3; c.beginPath(); c.moveTo(90, 60); c.lineTo(90, 260); c.lineTo(560, 260); c.stroke();
+      const pts = [[19, 3.313], [24, 5.412], [26, 6.4], [29, 8.041], [33, 10.531]];
+      c.beginPath(); for (let z = 17; z <= 35; z += .25) { const e = .010204 * (z - 1) ** 2, x = 90 + (z - 16) * 24, y = 260 - e * 17; z === 17 ? c.moveTo(x, y) : c.lineTo(x, y); } c.stroke();
+      for (const [z, e] of pts) { c.beginPath(); c.arc(90 + (z - 16) * 24, 260 - e * 17, 8, 0, 7); c.fill(); }
+      c.font = `600 30px ${MONO}`; c.fillText('E(Kα) ≈ 10.2 eV × (Z − 1)²', w / 2, 320);
+    } else {
+      c.lineWidth = 3; c.beginPath();
+      for (let x = 60; x <= 580; x++) { const e = (x - 60) / 520 * 25; let y = 250 - 10 * Math.exp(-(((e - 14) / 7) ** 2)); for (const [p, a] of [[5.41, 60], [8.04, 95], [10.53, 170], [11.73, 34], [19.3, 80], [20.17, 40]]) y -= a * Math.exp(-(((e - p) / (p > 19 && p < 20 ? .25 : .09)) ** 2)); x === 60 ? c.moveTo(x, y) : c.lineTo(x, y); }
+      c.stroke();
+      c.font = `600 24px ${MONO}`;
+      c.fillText('Cr', 60 + 5.41 / 25 * 520, 175); c.fillText('Cu', 60 + 8.04 / 25 * 520, 140); c.fillText('As', 60 + 10.53 / 25 * 520, 66); c.fillText('Rh', 60 + 19.7 / 25 * 520, 155);
+      c.font = `600 30px ${MONO}`; c.fillText(zhEn('一種元素一組峰', 'one element, one set of peaks'), w / 2, 320);
+    }
+  });
+}
+[-110, 0, 110].forEach((x, i) => {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(76, 42.75), new THREE.MeshBasicMaterial({ map: screenTex(i), toneMapped: false, transparent: true, opacity: .9 }));
+  m.position.set(x, 112, -158); scene.add(m);   // 比範本高:這頁的鏡頭比較低,放在 64 會在畫面上緣被切掉一半;移到預設視角與導覽都看不到的高度
+});
+
+// ---------- 儀器 ----------
+// 座標:y 朝上、桌面頂面 y = 0、一個單位約 1 cm。樣品放在上方的量測窗,X 射線管與偵測器從下方斜斜看上去
+const BY = 24;                   // 量測窗(樣品底面)的高度
+const ANG = 40 * D2R;            // X 射線管與偵測器各和垂直線夾 40°,散射角 100°(示意)
+const V3 = THREE.Vector3, UP = new V3(0, 1, 0);
+const S0 = new V3(0, BY, 0);
+const uT = new V3(-Math.sin(ANG), -Math.cos(ANG), 0);      // 樣品 → X 射線管
+const uD = new V3(Math.sin(ANG), -Math.cos(ANG), 0);       // 樣品 → 偵測器
+const dIn = uT.clone().negate();                            // 入射 X 射線前進的方向
+const at = (u, d) => S0.clone().addScaledVector(u, d);
+const D_TUBE = 12.5, D_FIL = 8.6, D_COL = 4.6, D_DET = 5.4;
+const P = { F: at(uT, D_TUBE), W: at(uT, D_FIL), C: at(uT, D_COL), D: at(uD, D_DET) };
+const inst = new THREE.Group(); scene.add(inst);
+const MAT = {
+  shell: new THREE.MeshPhysicalMaterial({ color: 0xe4e8eb, roughness: .45, clearcoat: .35, clearcoatRoughness: .35, transparent: true }),
+  lid: new THREE.MeshPhysicalMaterial({ color: 0xc8141c, roughness: .3, clearcoat: 1, clearcoatRoughness: .1, transparent: true }),
+  vent: new THREE.MeshStandardMaterial({ color: 0x2a3035, roughness: .7, transparent: true }),
+  edge: new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: 0, depthWrite: false }),
+  plinth: new THREE.MeshStandardMaterial({ color: 0x2b3237, roughness: .6, metalness: .2 }),
+  bench: new THREE.MeshStandardMaterial({ roughness: .7, metalness: .3, map: canvasTex(128, 128, (c, w, h) => {
+    c.fillStyle = '#2b343a'; c.fillRect(0, 0, w, h); c.fillStyle = '#151b1f';
+    for (const [x, y] of [[32, 32], [96, 32], [32, 96], [96, 96]]) { c.beginPath(); c.arc(x, y, 6, 0, 7); c.fill(); }
+  }, [55 / 5, 59 / 5]) }),
+  black: new THREE.MeshStandardMaterial({ color: 0x14191d, roughness: .45, metalness: .6 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x2a3238, roughness: .5, metalness: .5 }),
+  metal: new THREE.MeshStandardMaterial({ color: 0xaab4ba, roughness: .45, metalness: .85 }),
+  anod: new THREE.MeshStandardMaterial({ color: 0x3a4650, roughness: .35, metalness: .7 }),
+  plate: new THREE.MeshStandardMaterial({ color: 0x5b6670, roughness: .4, metalness: .6 }),
+  rh: new THREE.MeshStandardMaterial({ color: 0xd8dadc, roughness: .22, metalness: 1 }),
+  tglass: new THREE.MeshPhysicalMaterial({ color: 0xe6eef4, roughness: .05, transparent: true, opacity: .22, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  tmetal: new THREE.MeshStandardMaterial({ color: 0x9aa5ad, roughness: .35, metalness: .9 }),
+  be: new THREE.MeshStandardMaterial({ color: 0xc7ccd3, roughness: .4, metalness: .3, emissive: 0x3a2a70, emissiveIntensity: .6 }),
+  cable: new THREE.MeshStandardMaterial({ color: 0x15181b, roughness: .8 }),
+  hose: new THREE.MeshPhysicalMaterial({ color: 0x9fb4c2, roughness: .3, transparent: true, opacity: .55, clearcoat: .6 }),
+  ceramic: new THREE.MeshStandardMaterial({ color: 0xe8e4da, roughness: .8 }),
+  pcb: new THREE.MeshStandardMaterial({ color: 0x1f4a35, roughness: .6, metalness: .2 }),
+  al: new THREE.MeshStandardMaterial({ color: 0xc9cdd0, roughness: .35, metalness: .9, side: THREE.DoubleSide }),
+  film: new THREE.MeshPhysicalMaterial({ color: 0xe9f6ff, roughness: .1, transparent: true, opacity: .28, depthWrite: false, side: THREE.DoubleSide }),
+  cup: new THREE.MeshPhysicalMaterial({ color: 0xf2f5f7, roughness: .25, transparent: true, opacity: .32, clearcoat: .5, depthWrite: false, side: THREE.DoubleSide }),
+  smp: new THREE.MeshStandardMaterial({ color: 0x9aa65e, roughness: .95 }),
+  chip: new THREE.MeshStandardMaterial({ color: 0x1b2a3d, roughness: .3, metalness: .6, emissive: 0x0a1630, emissiveIntensity: .5 }),
+};
+function mesh(geo, mat, pos, parent = inst, shadow = true) {
+  const m = new THREE.Mesh(geo, mat); if (pos) m.position.set(pos[0], pos[1], pos[2]);
+  m.castShadow = shadow; m.receiveShadow = true; parent.add(m); return m;
+}
+const curve = (pts, r, mat, parent = inst) => mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new V3(...p))), 32, r, 10), mat, null, parent);
+function post(x, z, y0, y1, r = .45) { const h = y1 - y0; if (h <= .05) return; mesh(new THREE.CylinderGeometry(r, r, h, 18), MAT.metal, [x, y0 + h / 2, z]); mesh(new THREE.CylinderGeometry(r * 2.2, r * 2.4, .45, 20), MAT.black, [x, y0 + .22, z]); }
+// 以一個方向為「上」(y)、另一個方向為 x 的座標架
+function basis(g, x, y) { const z = new V3().crossVectors(x, y).normalize(); g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(x.clone().normalize(), y.clone().normalize(), z)); }
+
+mesh(new RoundedBoxGeometry(57, 3, 61, 3, .8), MAT.plinth, [0, 1.5, 0]);
+mesh(new THREE.BoxGeometry(55.6, .6, 59.6), MAT.bench, [0, 3.3, 0], inst, false);
+
+// 外殼(展開時往外飛並淡出):左右、後面、前面四塊,樣品室的上蓋是紅色的
+const shellParts = [];
+function shellPart(move, rot = 0) { const g = new THREE.Group(); inst.add(g); shellParts.push({ g, move, rot }); return g; }
+function shellBox(g, size, pos, mat, radius) {
+  const m = mesh(new RoundedBoxGeometry(size[0], size[1], size[2], 4, radius), mat, pos, g);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(...size)), MAT.edge);
+  e.position.copy(m.position); g.add(e); return m;
+}
+const TOP = 29;
+const sideL = shellPart([-34, 10, 0]);
+shellBox(sideL, [14, TOP - 3.6, 60], [-21, 3.6 + (TOP - 3.6) / 2, 0], MAT.shell, 1.4);
+for (let i = 0; i < 8; i++) mesh(new THREE.BoxGeometry(.06, .5, 18), MAT.vent, [-28.03, 9 + i * 1.3, -8], sideL, false);
+const sideR = shellPart([34, 10, 0]);
+shellBox(sideR, [14, TOP - 3.6, 60], [21, 3.6 + (TOP - 3.6) / 2, 0], MAT.shell, 1.4);
+for (let i = 0; i < 8; i++) mesh(new THREE.BoxGeometry(.06, .5, 18), MAT.vent, [28.03, 9 + i * 1.3, -8], sideR, false);
+const rear = shellPart([0, 16, -40]);
+shellBox(rear, [28, TOP - 3.6, 18], [0, 3.6 + (TOP - 3.6) / 2, -21], MAT.shell, 1.2);
+const front = shellPart([0, 6, 40]);
+shellBox(front, [28, TOP - 3.6, 18], [0, 3.6 + (TOP - 3.6) / 2, 21], MAT.shell, 1.2);
+const LAMP = mesh(new THREE.SphereGeometry(.55, 20, 12), new THREE.MeshBasicMaterial({ color: new THREE.Color(3, 1.3, .3) }), [9, 24, 30.05], front, false);
+mesh(new THREE.BoxGeometry(5.6, 1.4, .2), MAT.vent, [5.2, 24, 30.04], front, false);
+mesh(new THREE.CylinderGeometry(.75, .75, .4, 24), MAT.dark, [-9, 24, 30.1], front).rotation.x = Math.PI / 2;
+const lidG = shellPart([0, 26, -16], -.45);
+shellBox(lidG, [28.6, 1.8, 24.6], [0, TOP + .9, 0], MAT.lid, .8);
+mesh(new THREE.BoxGeometry(8, .5, 1.2), MAT.dark, [0, TOP + 1.9, 11.2], lidG);
+
+// 量測窗所在的樣品台:中央開一個圓孔;底下是 X 射線管、濾片、準直器與偵測器(展開時看得到)
+{
+  const sh = new THREE.Shape(); sh.moveTo(-6.5, -5); sh.lineTo(6.5, -5); sh.lineTo(6.5, 5); sh.lineTo(-6.5, 5); sh.closePath();
+  const hole = new THREE.Path(); hole.absarc(0, 0, 1.2, 0, Math.PI * 2, true); sh.holes.push(hole);
+  const plate = mesh(new THREE.ExtrudeGeometry(sh, { depth: .7, bevelEnabled: false, curveSegments: 40 }), MAT.plate, [0, BY - .7, 0]);
+  plate.rotation.x = -Math.PI / 2;
+  mesh(new THREE.TorusGeometry(1.25, .1, 8, 40), MAT.metal, [0, BY + .02, 0]).rotation.x = Math.PI / 2;
+  mesh(new THREE.BoxGeometry(13, 1.2, 1), MAT.anod, [0, BY - 1.3, -4.6]);
+  for (const x of [-6, 6]) post(x, -4.6, 3.6, BY - 1.9, .5);
+}
+// 樣品杯:薄塑膠膜當底,裝木粉或土壤,放在量測窗上
+const CUP = new THREE.Group(); CUP.position.copy(S0); inst.add(CUP);
+mesh(new THREE.CylinderGeometry(1.58, 1.58, 2.4, 40, 1, true), MAT.cup, [0, 1.2, 0], CUP, false);
+mesh(new THREE.TorusGeometry(1.58, .07, 8, 40), MAT.cup, [0, 2.4, 0], CUP, false).rotation.x = Math.PI / 2;
+mesh(new THREE.CircleGeometry(1.58, 40), MAT.film, [0, .015, 0], CUP, false).rotation.x = -Math.PI / 2;
+const SMP = mesh(new THREE.CylinderGeometry(1.48, 1.48, 1.3, 40), MAT.smp, [0, .68, 0], CUP);
+// 照到的那一小塊(發光的圓點)
+const SPOT = mesh(new THREE.CircleGeometry(.55, 28), new THREE.MeshBasicMaterial({ color: new THREE.Color(.8, .7, 1.3), transparent: true, opacity: .5, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [0, .03, 0], CUP, false);
+SPOT.rotation.x = -Math.PI / 2;
+// 抽真空或通氦氣的管子(輕元素的 X 射線會被空氣吸收)
+curve([[0, BY - 1.3, -5.2], [0, 19, -10], [3, 12, -17], [6, 7.2, -23]], .42, MAT.hose);
+mesh(new THREE.BoxGeometry(3, 3.4, 3), MAT.anod, [6, 5.3, -24]);
+
+// X 射線管(和 XRD 那頁同一種外形:下半截透明,看得到燈絲與靶;管軸朝後、和光束垂直,鈹窗朝向樣品)
+const TUBE = new THREE.Group(); TUBE.position.copy(P.F); inst.add(TUBE);
+basis(TUBE, uT, new V3(0, 0, -1));      // 局部 x 指向樣品的反方向(鈹窗在 −x),局部 y 是管軸(朝後)
+mesh(new THREE.CylinderGeometry(1.05, 1.05, 2.4, 32), MAT.rh, [0, -1.25, 0], TUBE);
+const FOCUS = mesh(new THREE.SphereGeometry(.22, 16, 10), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.5, 1.25, 2.3) }), [0, .02, 0], TUBE, false);
+mesh(new THREE.CylinderGeometry(.62, .45, .7, 24), MAT.black, [0, 2.2, 0], TUBE);
+const FIL = mesh(new THREE.CylinderGeometry(.08, .08, .9, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(5, 2.6, .8) }), [0, 1.75, 0], TUBE, false);
+FIL.rotation.x = Math.PI / 2;
+mesh(new THREE.CylinderGeometry(2.05, 2.05, 6.6, 40, 1, true), MAT.tglass, [0, .45, 0], TUBE, false);
+mesh(new THREE.CylinderGeometry(2.25, 2.25, 9.4, 40), MAT.tmetal, [0, 8.45, 0], TUBE);
+mesh(new THREE.CylinderGeometry(2.4, 2.4, .5, 40), MAT.anod, [0, 3.75, 0], TUBE);
+mesh(new THREE.CylinderGeometry(2.3, 2.3, .9, 40), MAT.anod, [0, -3.2, 0], TUBE);
+for (let i = 0; i < 6; i++) mesh(new THREE.CylinderGeometry(2.75, 2.75, .12, 40), MAT.metal, [0, 5.6 + i * 1.1, 0], TUBE);   // 氣冷的散熱片
+const beWin = mesh(new THREE.CircleGeometry(.62, 24), MAT.be, [-2.08, .1, 0], TUBE, false); beWin.rotation.y = -Math.PI / 2;
+curve([[0, 13.1, 0], [0, 15, .4], [-1.2, 16.6, 2.8], [-1.8, 17.2, 7]], .6, MAT.cable, TUBE);
+inst.updateMatrixWorld(true);
+P.FIL = TUBE.localToWorld(new V3(0, 1.75, 0));
+// 高壓電源(示意)
+mesh(new THREE.BoxGeometry(9, 9, 9), MAT.anod, [-18, 8.1, -21]);
+for (let i = 0; i < 6; i++) mesh(new THREE.BoxGeometry(.06, .4, 6), MAT.vent, [-22.55, 6 + i * 1, -21], inst, false);
+post(P.F.x - .6, -7.5, 3.6, P.F.y - 2.3, .5);
+mesh(new THREE.TorusGeometry(2.4, .3, 10, 36), MAT.black, [P.F.x, P.F.y, -7.5]);
+
+// 主濾片輪:六個位置(一個空的、五片濾片),轉到選的那一片擋在光路上
+const WHEEL = new THREE.Group(); WHEEL.position.copy(P.W).add(new V3(0, 0, -2.3)); inst.add(WHEEL);
+basis(WHEEL, new V3(0, 0, 1), new V3(-Math.cos(ANG), Math.sin(ANG), 0));   // 局部 z 沿著光束;局部 x 指向光路上的那個孔
+const WHEEL_R = new THREE.Group(); WHEEL.add(WHEEL_R);
+{
+  const ring = new THREE.Shape(); ring.absarc(0, 0, 3.0, 0, Math.PI * 2, false);
+  for (let k = 0; k < 6; k++) { const h = new THREE.Path(), a = k * Math.PI / 3; h.absarc(2.2 * Math.cos(a), 2.2 * Math.sin(a), .55, 0, Math.PI * 2, true); ring.holes.push(h); }
+  const disc = mesh(new THREE.ExtrudeGeometry(ring, { depth: .22, bevelEnabled: false, curveSegments: 24 }), MAT.anod, [0, 0, -.11], WHEEL_R);
+  const cols = [null, 0xc9cdd0, 0xc98a52, 0xd8dcdf, 0x9aa0a5, 0xb8a27a];
+  cols.forEach((col, k) => { if (!col) return; const a = k * Math.PI / 3; const f = mesh(new THREE.CylinderGeometry(.55, .55, .05, 24), new THREE.MeshStandardMaterial({ color: col, roughness: .3, metalness: .9 }), [2.2 * Math.cos(a), 2.2 * Math.sin(a), 0], WHEEL_R, false); f.rotation.x = Math.PI / 2; });
+  mesh(new THREE.CylinderGeometry(.5, .5, .8, 20), MAT.metal, [0, 0, 0], WHEEL_R).rotation.x = Math.PI / 2;
+  mesh(new THREE.BoxGeometry(1.4, 1.4, 1.8), MAT.dark, [0, 0, 1.3], WHEEL);
+}
+post(WHEEL.position.x, WHEEL.position.z, 3.6, WHEEL.position.y - 3.4, .4);
+// 準直器:中間有細孔的金屬圓筒,決定照到樣品的範圍
+const COLL = new THREE.Group(); COLL.position.copy(P.C); inst.add(COLL);
+basis(COLL, new V3(0, 0, 1), dIn);
+mesh(new THREE.CylinderGeometry(.75, .75, 2.4, 28), MAT.metal, [0, 0, 0], COLL);
+mesh(new THREE.CylinderGeometry(.24, .24, 2.45, 16), MAT.black, [0, 0, 0], COLL, false);
+mesh(new THREE.BoxGeometry(.5, .5, 2.6), MAT.anod, [0, .6, -1.5], COLL);
+// 偵測器:矽漂移偵測器(SDD)。前端細長,尖端是鈹窗,後面是前置放大器、帕耳帖致冷片與散熱片
+const DET = new THREE.Group(); DET.position.copy(P.D); inst.add(DET);
+basis(DET, new V3(0, 0, 1), uD);         // 局部 y 從尖端往後
+mesh(new THREE.CylinderGeometry(.75, .75, 5.6, 28), MAT.metal, [0, 2.8, 0], DET);
+const DWIN = mesh(new THREE.CircleGeometry(.56, 24), new THREE.MeshBasicMaterial({ color: 0x15102c, toneMapped: false }), [0, -.02, 0], DET, false);
+DWIN.rotation.x = Math.PI / 2;
+mesh(new THREE.TorusGeometry(.62, .09, 8, 28), MAT.be, [0, 0, 0], DET).rotation.x = Math.PI / 2;
+mesh(new THREE.CylinderGeometry(1.35, 1.35, 3, 32), MAT.anod, [0, 7.1, 0], DET);
+mesh(new THREE.CylinderGeometry(1.4, 1.4, .35, 32), MAT.ceramic, [0, 8.8, 0], DET);
+for (let i = 0; i < 7; i++) mesh(new THREE.CylinderGeometry(2.1, 2.1, .14, 32), MAT.metal, [0, 9.2 + i * .4, 0], DET);
+mesh(new THREE.CylinderGeometry(.4, .4, .8, 16), MAT.dark, [0, 12.1, 0], DET);
+inst.updateMatrixWorld(true);
+P.DB = DET.localToWorld(new V3(0, 12.4, 0));
+post(P.D.x + 4.4, 2.2, 3.6, P.D.y - 6.3, .4);
+// 多頻道分析器(電路板):脈衝依高度分格計數;板上的小螢幕畫出累積的能譜(示意)
+const MCA_P = new V3(20.5, 3.75, 4);
+mesh(new THREE.BoxGeometry(11, .25, 15), MAT.pcb, [MCA_P.x, MCA_P.y, MCA_P.z]);
+for (const [x, z, w, d] of [[-3, -4, 2.4, 2.4], [1.5, -4.5, 3, 1.6], [-2.5, 1, 1.6, 3], [2.5, 1.5, 2.2, 2.2], [-3.5, 5, 1.4, 1.4]]) mesh(new THREE.BoxGeometry(w, .5, d), MAT.black, [MCA_P.x + x, 4.1, MCA_P.z + z]);
+mesh(new THREE.BoxGeometry(7.6, 4, .5), MAT.black, [MCA_P.x, 6.1, MCA_P.z + 6.6]);
+const mcaCv = document.createElement('canvas'); mcaCv.width = 256; mcaCv.height = 112;
+const mcaTex = new THREE.CanvasTexture(mcaCv); mcaTex.colorSpace = THREE.SRGBColorSpace;
+const MCA_SCR = mesh(new THREE.PlaneGeometry(7, 3.4), new THREE.MeshBasicMaterial({ map: mcaTex, toneMapped: false }), [MCA_P.x, 6.15, MCA_P.z + 6.88], inst, false);
+const CABLE_PTS = [P.DB, new V3(P.DB.x + 2.5, P.DB.y - 1.5, 1.2), new V3(15.5, 5.6, 2.4), new V3(16.6, 4.2, 3.2)];
+curve(CABLE_PTS.map(v => [v.x, v.y, v.z]), .3, MAT.cable);
+const CABLE = new THREE.CatmullRomCurve3(CABLE_PTS).getPoints(24);
+
+inst.updateMatrixWorld(true);
+
+// ================= 光線 =================
+const C_X = new THREE.Color(.8, .7, 1.3), C_E = new THREE.Color('#8fd3ff').multiplyScalar(1.7), C_P = new THREE.Color(.45, 1.5, 1.7);
+const RMAX = 1200;
+const rPos = new Float32Array(RMAX * 3), rCol = new Float32Array(RMAX * 3), rD = new Float32Array(RMAX);
+const rayGeo = new THREE.BufferGeometry();
+rayGeo.setAttribute('position', new THREE.BufferAttribute(rPos, 3));
+rayGeo.setAttribute('aC', new THREE.BufferAttribute(rCol, 3));
+rayGeo.setAttribute('aD', new THREE.BufferAttribute(rD, 1));
+const rayMat = new THREE.ShaderMaterial({
+  uniforms: { uT: { value: 0 } },
+  vertexShader: `attribute vec3 aC; attribute float aD; varying vec3 vC; varying float vD;
+    void main(){ vC=aC; vD=aD; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: `uniform float uT; varying vec3 vC; varying float vD;
+    void main(){ float p=fract(vD*0.11-uT*0.85); float pulse=smoothstep(0.0,0.06,p)*(1.0-smoothstep(0.06,0.45,p));
+      gl_FragColor=vec4(vC*(0.5+1.5*pulse),1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const rays = new THREE.LineSegments(rayGeo, rayMat); rays.frustumCulled = false; scene.add(rays);
+let rn = 0, raysKey = '';
+function seg(a, b, c, k, d0) {
+  if (rn + 2 > RMAX) return d0;
+  const i = rn * 3, L = a.distanceTo(b);
+  rPos[i] = a.x; rPos[i + 1] = a.y; rPos[i + 2] = a.z; rPos[i + 3] = b.x; rPos[i + 4] = b.y; rPos[i + 5] = b.z;
+  rCol[i] = rCol[i + 3] = c.r * k; rCol[i + 1] = rCol[i + 4] = c.g * k; rCol[i + 2] = rCol[i + 5] = c.b * k;
+  rD[rn] = d0; rD[rn + 1] = d0 + L; rn += 2; return d0 + L;
+}
+const add = (p, x, y, z) => new V3(p.x + x, p.y + y, p.z + z);
+// 樣品上照到的範圍(示意)與偵測器窗上的幾個點
+const SPOTS = [[0, 0], [.42, 0], [-.42, 0], [0, .42], [0, -.42]].map(([x, z]) => add(S0, x, .02, z));
+function buildRays(W) {
+  const key = `${W.kIn.toFixed(3)}|${W.kOut.toFixed(3)}|${W.filtPos.toFixed(2)}`;
+  if (key === raysKey) return;
+  raysKey = key; rn = 0;
+  const kF = lerp(1, .45, W.filtPos);   // 濾片之後的亮度(示意)
+  for (const s of SPOTS) {
+    const f = P.F.clone().lerp(s, (D_TUBE - D_FIL) / D_TUBE);
+    seg(f, s, C_X, 1.25 * W.kIn * kF, seg(P.F, f, C_X, 1.25 * W.kIn, 0));
+  }
+  if (W.kOut > .005) for (let i = 0; i < SPOTS.length; i++) {
+    const a = i * 1.257, d = add(P.D, .32 * Math.cos(a) * Math.cos(ANG), .32 * Math.cos(a) * Math.sin(ANG), .32 * Math.sin(a));
+    seg(SPOTS[i], i ? d : P.D, C_X, 1.3 * W.kOut, D_TUBE);
+  }
+  rayGeo.setDrawRange(0, rn);
+  for (const a of ['position', 'aC', 'aD']) rayGeo.attributes[a].needsUpdate = true;
+}
+// 沿光路流動的光點;燈絲到靶的電子、偵測器到分析器的脈衝也用這一組
+const PN = 420;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3), pSz = new Float32Array(PN);
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('aC', new THREE.BufferAttribute(pCol, 3));
+pGeo.setAttribute('aS', new THREE.BufferAttribute(pSz, 1));
+const pMat = new THREE.ShaderMaterial({
+  uniforms: { uScale: { value: 500 } },
+  vertexShader: `attribute vec3 aC; attribute float aS; uniform float uScale; varying vec3 vC;
+    void main(){ vC=aC; vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=aS*uScale/-mv.z; gl_Position=projectionMatrix*mv; }`,
+  fragmentShader: `varying vec3 vC; void main(){ float d=length(gl_PointCoord-0.5); float a=smoothstep(0.5,0.0,d); gl_FragColor=vec4(vC*a*a,1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const photons = new THREE.Points(pGeo, pMat); photons.frustumCulled = false; scene.add(photons);
+let pn = 0;
+function flow(pts, c, k, size, t, sp = 2.2, v = 7) {
+  if (k < .01) return;
+  const cum = [0]; for (let i = 0; i < pts.length - 1; i++) cum.push(cum[i] + pts[i].distanceTo(pts[i + 1]));
+  const L = cum[cum.length - 1], N = Math.max(1, Math.floor(L / sp));
+  for (let i = 0; i < N && pn < PN; i++) {
+    const s = (i * sp + t * v) % L;
+    let j = 0; while (j < cum.length - 2 && s > cum[j + 1]) j++;
+    const u = (s - cum[j]) / (cum[j + 1] - cum[j]), a = pts[j], b = pts[j + 1];
+    pPos[pn * 3] = lerp(a.x, b.x, u); pPos[pn * 3 + 1] = lerp(a.y, b.y, u); pPos[pn * 3 + 2] = lerp(a.z, b.z, u);
+    pCol[pn * 3] = c.r * k; pCol[pn * 3 + 1] = c.g * k; pCol[pn * 3 + 2] = c.b * k; pSz[pn] = size; pn++;
+  }
+}
+function buildPhotons(W, t) {
+  pn = 0;
+  flow([P.FIL, P.F], C_E, 2.4 * W.elec, .26, t, .3, 2);
+  for (const s of [SPOTS[0], SPOTS[1], SPOTS[2]]) flow([P.F, s], C_X, .9 * W.kIn, .32, t + s.x);
+  if (W.kOut > .005) for (const s of [SPOTS[0], SPOTS[3], SPOTS[4]]) flow([s, P.D], C_X, 1.1 * W.kOut, .3, t + s.z, 1.6, 5.5);
+  if (W.pulse > .01) flow(CABLE, C_P, 1.6 * W.pulse, .34, t, 1.8, 9);
+  pGeo.setDrawRange(0, pn);
+  for (const a of ['position', 'aC', 'aS']) pGeo.attributes[a].needsUpdate = true;
+}
+// 半透明的光束:入射(管 → 樣品)與螢光加散射(樣品 → 偵測器)
+const beamGeo = new THREE.CylinderGeometry(1, 1, 1, 20, 1, true);
+function beam(a, b, r) {
+  const m = new THREE.Mesh(beamGeo, new THREE.ShaderMaterial({
+    uniforms: { uC: { value: C_X.clone() }, uK: { value: 1 } },
+    vertexShader: `varying vec3 vN; varying vec3 vV; void main(){ vec4 mv=modelViewMatrix*vec4(position,1.0); vN=normalize(normalMatrix*normal); vV=normalize(-mv.xyz); gl_Position=projectionMatrix*mv; }`,
+    fragmentShader: `uniform vec3 uC; uniform float uK; varying vec3 vN; varying vec3 vV; void main(){ float f=abs(dot(normalize(vN),normalize(vV))); gl_FragColor=vec4(uC*uK*pow(f,3.0),1.0); }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  }));
+  m.frustumCulled = false; scene.add(m);
+  const d = b.clone().sub(a), L = d.length();
+  m.position.copy(a).addScaledVector(d, .5); m.quaternion.setFromUnitVectors(UP, d.normalize()); m.scale.set(r, L, r);
+  return m;
+}
+const B_IN1 = beam(P.F, P.W, .32), B_IN2 = beam(P.W, S0, .3), B_OUT = beam(S0, P.D, .42);
+function updateBeams(W) {
+  B_IN1.material.uniforms.uK.value = .38 * W.kIn;
+  B_IN2.material.uniforms.uK.value = .38 * W.kIn * lerp(1, .45, W.filtPos);
+  B_OUT.material.uniforms.uK.value = .4 * W.kOut;
+  FOCUS.material.color.setRGB(.6 + 1.2 * W.kIn, .5 + 1 * W.kIn, 1 + 1.6 * W.kIn);
+  SPOT.material.opacity = .25 + .35 * W.kIn;
+  DWIN.material.color.setRGB(.08 + .8 * W.kOut, .06 + .7 * W.kOut, .17 + 1.3 * W.kOut);
+  LAMP.material.color.setRGB(3, 1.3, .3);
+}
+
+// ================= 原子放大(第 03、04 章) =================
+// 砷原子的 K、L、M 三層(電子 2、8、18 個;再外層沒畫)。入射 X 射線從左下來(和真的光束同一個方向),螢光往右下(偵測器那邊)
+const ATOM = new THREE.Group(); ATOM.visible = false; scene.add(ATOM);
+const A_POS = new V3(0, BY + 10.2, 2);
+const RK = 1.3, RL = 2.5, RM = 3.8;
+const SLOT = { K: [220, 40], L: [...Array(8)].map((_, k) => 22.5 + k * 45), M: [...Array(18)].map((_, k) => 10 + k * 20) };
+const A_RAD = { K: RK, L: RL, M: RM };
+const slotPos = (sh, k) => { const a = SLOT[sh][k] * D2R; return new V3(A_RAD[sh] * Math.cos(a), A_RAD[sh] * Math.sin(a), 0); };
+{
+  const rings = [];
+  for (const r of [RK, RL, RM]) for (let i = 0; i < 96; i++) { const a0 = i / 96 * Math.PI * 2, a1 = (i + 1) / 96 * Math.PI * 2; rings.push(new V3(r * Math.cos(a0), r * Math.sin(a0), 0), new V3(r * Math.cos(a1), r * Math.sin(a1), 0)); }
+  ATOM.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(rings), new THREE.LineBasicMaterial({ color: 0x8fb8cc, transparent: true, opacity: .55, depthWrite: false })));
+  mesh(new THREE.SphereGeometry(.5, 24, 16), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.8, .9, .45) }), [0, 0, 0], ATOM, false);
+}
+const ELEC = new THREE.InstancedMesh(new THREE.SphereGeometry(.17, 14, 10), new THREE.MeshBasicMaterial({ color: new THREE.Color('#8fd3ff').multiplyScalar(1.5) }), 30);
+ELEC.frustumCulled = false; ATOM.add(ELEC);
+const VAC = mesh(new THREE.TorusGeometry(.2, .05, 8, 24), new THREE.MeshBasicMaterial({ color: new THREE.Color(2, 1.3, .35) }), [0, 0, 0], ATOM, false);
+// 波(入射與放出的 X 射線)畫成一小段正弦曲線
+const AW_MAX = 600;
+const awPos = new Float32Array(AW_MAX * 3), awCol = new Float32Array(AW_MAX * 3);
+const awGeo = new THREE.BufferGeometry();
+awGeo.setAttribute('position', new THREE.BufferAttribute(awPos, 3)); awGeo.setAttribute('color', new THREE.BufferAttribute(awCol, 3));
+const awLines = new THREE.LineSegments(awGeo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+awLines.frustumCulled = false; ATOM.add(awLines);
+// 放大圖和樣品之間的兩條虛線(放大鏡)
+const magGeo = new THREE.BufferGeometry(); magGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3));
+const MAG = new THREE.LineSegments(magGeo, new THREE.LineDashedMaterial({ color: 0x9fc4d6, transparent: true, opacity: 0, dashSize: .5, gapSize: .4, depthWrite: false }));
+MAG.frustumCulled = false; scene.add(MAG);
+let awn = 0;
+function awseg(a, b, c, k) {
+  if (awn + 2 > AW_MAX) return;
+  const i = awn * 3;
+  awPos[i] = a.x; awPos[i + 1] = a.y; awPos[i + 2] = .05; awPos[i + 3] = b.x; awPos[i + 4] = b.y; awPos[i + 5] = .05;
+  awCol[i] = awCol[i + 3] = c.r * k; awCol[i + 1] = awCol[i + 4] = c.g * k; awCol[i + 2] = awCol[i + 5] = c.b * k; awn += 2;
+}
+// 一段往 dir 前進的波:頭在 head,長 len
+function wave(head, dir, len, k, phase) {
+  const nx = -dir.y, ny = dir.x; let prev = null;
+  for (let s = 0; s <= len + 1e-6; s += .07) {
+    const env = Math.sin(Math.PI * s / len), q = .28 * env * Math.sin(s * 5.2 - phase);
+    const p = new V3(head.x - dir.x * s + nx * q, head.y - dir.y * s + ny * q, 0);
+    if (prev) awseg(prev, p, C_X, k * (.4 + .6 * env)); prev = p;
+  }
+}
+// 原子的狀態由時間軸決定(導覽與影片共用):每一段 [開始, 種類]
+// 'in' 入射 X 射線打中 K 層電子 0、'pe' 光電子飛走、'fall' 外層電子掉進空位、'out' 放出螢光
+const DIN2 = new V3(Math.sin(ANG), Math.cos(ANG), 0), DOUT2 = new V3(Math.sin(ANG), -Math.cos(ANG), 0), DPE = new V3(-.9, .44, 0).normalize();
+function atomFrame(W, t) {
+  const op = W.atom; ATOM.visible = op > .004; MAG.material.opacity = .55 * op;
+  if (!ATOM.visible) { for (const k of ['atomT', 'K', 'L', 'M', 'vac', 'pe', 'xin', 'xout', 'edge']) DL[k].want = 0; return; }
+  const e = ease(op);
+  ATOM.position.copy(add(S0, 0, 1.4, 0)).lerp(A_POS, e); ATOM.scale.setScalar(lerp(.05, 1, e));
+  ATOM.rotation.x = -Math.atan2(camera.position.y - ATOM.position.y, camera.position.z - ATOM.position.z);   // 正對鏡頭(只轉上下)
+  const A = W.ap;   // { tin, kind:'a'|'b', tfall, tout } 秒
+  const m4 = new THREE.Matrix4(); let n = 0;
+  const target = slotPos('K', 0), src = A && A.kind === 'b' ? ['M', 10] : ['L', 4];
+  const hit = A && t >= A.tin + 1.4, fallU = A ? clamp((t - A.tfall) / 1.1, 0, 1) : 0, filled = A && t >= A.tfall + 1.1;
+  const put = p => { m4.makeTranslation(p.x, p.y, .1); ELEC.setMatrixAt(n++, m4); };
+  for (const sh of ['K', 'L', 'M']) SLOT[sh].forEach((_, k) => {
+    if (sh === 'K' && k === 0 && hit) return;                       // 被打出去的那一個
+    if (A && sh === src[0] && k === src[1] && t >= A.tfall) return;  // 掉下去的那一個(另外畫)
+    put(slotPos(sh, k));
+  });
+  if (A && t >= A.tfall) { const p0 = slotPos(src[0], src[1]); put(p0.clone().lerp(target, ease(fallU)).addScaledVector(new V3(-target.y, target.x, 0).normalize(), .5 * Math.sin(Math.PI * fallU))); }
+  // 光電子:往左上飛走,慢慢淡掉
+  let pePos = null;
+  if (A && hit && t < A.tin + 3.2) { const u = (t - A.tin - 1.4) / 1.8; pePos = target.clone().addScaledVector(DPE, 1 + 5.5 * u * u + 1.5 * u); put(pePos); }
+  ELEC.count = n; ELEC.instanceMatrix.needsUpdate = true;
+  VAC.visible = !!(A && hit && !filled); VAC.position.copy(target).setZ(.1);
+  if (VAC.visible) VAC.scale.setScalar(1 + .25 * Math.sin(t * 6));
+  // 波
+  awn = 0;
+  if (A && t >= A.tin && t < A.tin + 1.45) { const u = (t - A.tin) / 1.4, head = target.clone().addScaledVector(DIN2, -8 * (1 - u)); wave(head, DIN2, 2.4, 1.3 * op, t * 9); DL.xin.o.position.set(head.x - 2.2, head.y - .4, .2); }
+  if (A && t >= A.tout && t < A.tout + 2) { const u = (t - A.tout) / 1.8, head = target.clone().addScaledVector(DOUT2, .3 + 8 * u); wave(head, DOUT2, Math.min(2.4, .3 + 8 * u), 1.5 * op * (1 - sstep(.85, 1, u)), t * 9); }
+  awGeo.setDrawRange(0, awn); awGeo.attributes.position.needsUpdate = true; awGeo.attributes.color.needsUpdate = true;
+  // 放大鏡的虛線
+  const mg = magGeo.attributes.position, c0 = add(S0, 0, 2.4, 0), wl = ATOM.localToWorld(new V3(-RM, 0, 0)), wr = ATOM.localToWorld(new V3(RM, 0, 0));
+  ATOM.updateMatrixWorld(true);
+  mg.setXYZ(0, c0.x - .4, c0.y, c0.z); mg.setXYZ(1, wl.x, wl.y, wl.z); mg.setXYZ(2, c0.x + .4, c0.y, c0.z); mg.setXYZ(3, wr.x, wr.y, wr.z);
+  mg.setXYZ(4, 0, 0, 0); mg.setXYZ(5, 0, 0, 0); mg.needsUpdate = true; MAG.computeLineDistances();
+  // 小字
+  const lop = sstep(.75, 1, op);
+  DL.atomT.want = lop; DL.K.want = DL.L.want = DL.M.want = lop;
+  DL.vac.want = VAC.visible ? lop * sstep(A.tin + 1.5, A.tin + 1.9, t) : 0;
+  DL.pe.want = pePos ? lop * (1 - sstep(A.tin + 2.6, A.tin + 3.2, t)) : 0; if (pePos) DL.pe.o.position.copy(pePos).add(new V3(-.2, .6, 0));
+  DL.xin.want = A && t >= A.tin && t < A.tin + 1.4 ? lop : 0;
+  DL.xout.want = A && t >= A.tout && t < A.tout + 3.4 ? lop : 0;
+  DL.edge.want = lop * (W.edgeNote || 0);
+  dlText('xout', A && A.kind === 'b' ? zhEn('Kβ 11.73 keV', 'Kβ 11.73 keV') : zhEn('Kα 10.53 keV', 'Kα 10.53 keV'), 'x mono');
+}
+
+// ================= 矽晶片放大(第 05 章) =================
+// 偵測器裡的矽晶片(放大):X 射線在矽裡變成一團電荷(1 個點 = 100 對電子電洞),沿著環狀電極的電場漂向中央的小電極
+const SDDB = new THREE.Group(); SDDB.visible = false; scene.add(SDDB);
+const SB_POS = add(P.D, 9, 3.2, 6);
+mesh(new THREE.CircleGeometry(3.2, 64), MAT.chip, [0, 0, 0], SDDB, false);
+{
+  const pts = [];
+  for (let r = .8; r <= 3.01; r += .44) for (let i = 0; i < 72; i++) { const a0 = i / 72 * Math.PI * 2, a1 = (i + 1) / 72 * Math.PI * 2; pts.push(new V3(r * Math.cos(a0), r * Math.sin(a0), .02), new V3(r * Math.cos(a1), r * Math.sin(a1), .02)); }
+  SDDB.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x9fb6c4, transparent: true, opacity: .6, depthWrite: false })));
+  mesh(new THREE.CircleGeometry(.24, 24), new THREE.MeshBasicMaterial({ color: new THREE.Color(.9, 2.2, 2.4) }), [0, 0, .03], SDDB, false);
+}
+const CLOUD = new THREE.InstancedMesh(new THREE.SphereGeometry(.09, 8, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color('#8fd3ff').multiplyScalar(1.8) }), 40);
+CLOUD.frustumCulled = false; SDDB.add(CLOUD);
+const sbGeo = new THREE.BufferGeometry(); sbGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3));
+const SBMAG = new THREE.LineSegments(sbGeo, new THREE.LineDashedMaterial({ color: 0x9fc4d6, transparent: true, opacity: 0, dashSize: .5, gapSize: .4, depthWrite: false }));
+SBMAG.frustumCulled = false; scene.add(SBMAG);
+// 導覽裡打到晶片的 X 射線:[時間, 元素, 能量 keV, 位置 x, y]
+const HITS = [[46.9, 'Cu', 8.041, -1.6, 1.3], [48.7, 'As', 10.531, 1.7, -1.2], [50.5, 'Cr', 5.412, -1.4, -1.6],
+  [52.3, 'Cu', 8.041, 1.2, 1.9], [53.3, 'As', 10.531, -2.1, .3], [54.3, 'Cr', 5.412, 2.2, .2], [55.3, 'As', 10.531, .4, -2.2], [56.3, 'Cu', 8.041, -.6, 2.3]];
+function sddFrame(W, t) {
+  const op = W.sdd; SDDB.visible = op > .004; SBMAG.material.opacity = .55 * op;
+  if (!SDDB.visible) { DL.chip.want = DL.pairs.want = 0; return; }
+  const e = ease(op);
+  SDDB.position.copy(P.D).lerp(SB_POS, e); SDDB.scale.setScalar(lerp(.05, 1, e));
+  SDDB.lookAt(camera.position); SDDB.updateMatrixWorld(true);
+  const m4 = new THREE.Matrix4(); let n = 0, cur = null;
+  for (const h of HITS) {
+    const u = (t - h[0]) / .9; if (u < 0 || u > 1.15) continue;
+    const N = Math.round(h[2] * 1000 / 3.66 / 100), d = 1 - ease(clamp(u, 0, 1));
+    for (let i = 0; i < N && n < 40; i++) { const a = hash(i * 3.3 + h[0]) * 6.283, r = .35 * Math.sqrt(hash(i * 7.1 + h[0])); m4.makeTranslation((h[3] + r * Math.cos(a)) * d, (h[4] + r * Math.sin(a)) * d, .08); CLOUD.setMatrixAt(n++, m4); }
+    if (u < 1.05) cur = h;
+  }
+  CLOUD.count = n; CLOUD.instanceMatrix.needsUpdate = true;
+  const sg = sbGeo.attributes.position, c0 = P.D, wl = SDDB.localToWorld(new V3(-3.2, 0, 0)), wr = SDDB.localToWorld(new V3(3.2, 0, 0));
+  sg.setXYZ(0, c0.x, c0.y, c0.z); sg.setXYZ(1, wl.x, wl.y, wl.z); sg.setXYZ(2, c0.x, c0.y, c0.z); sg.setXYZ(3, wr.x, wr.y, wr.z); sg.needsUpdate = true; SBMAG.computeLineDistances();
+  const lop = sstep(.75, 1, op);
+  DL.chip.want = lop;
+  if (cur) { const pr = Math.round(cur[2] * 1000 / 3.66 / 10) * 10; dlText('pairs', zhEn(`${EL[cur[1]]} Kα ${cur[2].toFixed(2)} keV:約 ${fmtInt(pr)} 對`, `${cur[1]} Kα ${cur[2].toFixed(2)} keV: about ${fmtInt(pr)} pairs`), 'e'); DL.pairs.o.position.set(cur[3], cur[4] + .7, .2); }
+  DL.pairs.want = cur ? lop : 0;
+}
+
+// ================= 標籤 =================
+const LBL = {};
+const lineMat = () => new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: .5, depthWrite: false });
+// below:標籤放在錨點下方;ax:錨點在標籤的哪裡(0 左邊、0.5 中間、1 右邊)
+function label(key, opt) {
+  const outer = document.createElement('div'); outer.className = 'lw';
+  outer.innerHTML = `<div class="lbl${opt.below ? ' dn' : ''}"><i></i><b>${opt.title}</b>${opt.sub != null ? `<span>${opt.sub}</span>` : ''}</div>`;
+  const o = new CSS2DObject(outer); o.center.set(opt.ax ?? .5, opt.below ? 0 : 1); o.position.set(...opt.anchor); scene.add(o);
+  const lm = lineMat(), line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(...opt.comp), new V3(...opt.anchor)]), lm);
+  line.frustumCulled = false; scene.add(line);
+  LBL[key] = { ...opt, outer, box: outer.firstChild, o, line, lm, span: outer.querySelector('span'), want: 0, op: -1, hit: false, text: opt.sub };
+}
+label('TUBE', { comp: [P.F.x - 1, P.F.y + 2.6, -8], anchor: [-16, 19.5, -9], ax: 1, title: zhEn('X 射線管', 'X-ray tube'), sub: zhEn('銠靶 · 50 kV', 'Rh target · 50 kV') });
+label('FIL', { comp: [WHEEL.position.x - 1.9, WHEEL.position.y + 1.7, WHEEL.position.z + .4], anchor: [-12, 24, 1], ax: 1, title: zhEn('濾片', 'Filter'), sub: zhEn('沒有', 'none') });
+label('COL', { comp: [P.C.x + .3, P.C.y - .5, .7], anchor: [.8, 17.2, 7], ax: .5, below: true, title: zhEn('準直器', 'Collimator'), sub: zhEn('限制照射範圍', 'sets the spot') });
+label('SMP', { comp: [0, BY + 2.5, 1], anchor: [3, BY + 8, 6], ax: 0, title: zhEn('樣品', 'Sample'), sub: zhEn('CCA 處理材', 'CCA wood') });
+label('DET', { comp: [P.D.x + 3.6, P.D.y - 3, 1.6], anchor: [15, 21, 5], ax: 0, title: zhEn('SDD 偵測器', 'SDD detector'), sub: zhEn('帕耳帖致冷', 'Peltier-cooled') });
+label('MCA', { comp: [MCA_P.x, 8.2, MCA_P.z + 6.8], anchor: [MCA_P.x + 1, 11.5, MCA_P.z + 10], ax: .5, title: zhEn('多頻道分析器', 'Analyzer (MCA)'), sub: zhEn('依能量分格計數', 'counts by energy') });
+const LBL_KEYS = Object.keys(LBL);
+const LBL_ORDER = ['SMP', 'TUBE', 'DET', 'FIL', 'COL', 'MCA'];
+function labelText(key, s) { const L = LBL[key]; if (L.text !== s) { L.text = s; L.span.textContent = s; } }
+// 放大圖旁邊的小字
+const DL = {};
+function dlabel(key, cls, pos, parent) {
+  const outer = document.createElement('div'); outer.className = 'lw';
+  outer.innerHTML = `<div class="dl ${cls}"></div>`;
+  const o = new CSS2DObject(outer); o.position.set(...pos); parent.add(o);
+  DL[key] = { outer, box: outer.firstChild, o, want: 0, op: -1, hit: false, text: '', cls };
+}
+function dlText(key, s, cls) { const L = DL[key]; if (L.text !== s) { L.text = s; L.box.textContent = s; } if (cls != null && L.cls !== cls) { L.cls = cls; L.box.className = `dl ${cls}`; } }
+dlabel('atomT', '', [0, RM + 1.1, 0], ATOM);
+dlabel('K', 'mono sm', [RK * .55 + .15, RK * .83 + .15, .2], ATOM);
+dlabel('L', 'mono sm', [RL * .55 + .2, RL * .83 + .2, .2], ATOM);
+dlabel('M', 'mono sm', [RM * .55 + .25, RM * .83 + .25, .2], ATOM);
+dlabel('vac', 'am', [slotPos('K', 0).x - .2, slotPos('K', 0).y - .55, .2], ATOM);
+dlabel('pe', 'e', [0, 0, 0], ATOM);
+dlabel('xin', 'x', [0, 0, .2], ATOM);
+dlabel('xout', 'x mono', [slotPos('K', 0).x + 4.8, slotPos('K', 0).y - 4.6, .2], ATOM);
+dlabel('edge', 'am', [-RM - 1.6, -RM - .4, .2], ATOM);
+dlabel('chip', '', [0, 3.9, 0], SDDB);
+dlabel('pairs', 'e', [0, 0, 0], SDDB);
+dlText('atomT', zhEn('砷原子(放大示意)', 'Arsenic atom (enlarged)')); dlText('K', 'K'); dlText('L', 'L'); dlText('M', 'M');
+dlText('vac', zhEn('空位', 'hole')); dlText('pe', zhEn('光電子', 'photoelectron')); dlText('xin', zhEn('X 射線', 'X-ray'));
+dlText('edge', zhEn('K 層:11.87 keV 以上才打得掉', 'K shell: needs over 11.87 keV'));
+dlText('chip', zhEn('矽晶片(放大;1 點 = 100 對)', 'Silicon chip (enlarged; 1 dot = 100 pairs)'));
+const DL_KEYS = Object.keys(DL);
+// 標籤不可以互相疊在一起,也不可以蓋到面板(標題、讀值卡、控制面板、能譜、字幕):疊到的先藏起來。
+// 依重要性排順序;互動時藏起來的要離開一點才再出現,避免在邊界上閃爍。影片與導覽每一格重算,同一個 t 結果相同
+const AVOID = ['.sitenav', '.hud .k', '.hud .big', '.chips', '#note', '#ctl', '#help', '#console', '#cap', '#tourExit', '.mp-dock', '.mp-rail'];
+const hudEl = $('.hud');
+let dcFrame = 0;
+function declutter() {
+  const all = [...DL_KEYS.map(k => DL[k]), ...LBL_ORDER.map(k => LBL[k])];
+  const det = FILM || tour.on;
+  if (det || REC || ++dcFrame % 3 === 0) {
+    const hudOp = +getComputedStyle(hudEl).opacity, obs = [];
+    for (const s of AVOID) for (const el of document.querySelectorAll(s)) {
+      if (hudOp < .05 && hudEl.contains(el)) continue;
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < .05) continue;
+      const r = el.getBoundingClientRect(); if (r.width > 0 && r.height > 0) obs.push(r);
+    }
+    const placed = [], W0 = innerWidth, H0 = innerHeight;
+    for (const L of all) {
+      if (L.want < .01) { L.hit = false; continue; }
+      const r = L.box.getBoundingClientRect();
+      if (!r.width) { L.hit = false; continue; }
+      const m = L.hit && !det ? 10 : 4;
+      const over = o => r.left < o.right + m && r.right > o.left - m && r.top < o.bottom + m && r.bottom > o.top - m;
+      L.hit = r.left < 2 || r.top < 2 || r.right > W0 - 2 || r.bottom > H0 - 2 || obs.some(over) || placed.some(over);
+      if (!L.hit) placed.push(r);
+    }
+  }
+  for (const L of all) {
+    const a = L.hit ? 0 : L.want;
+    if (Math.abs(a - L.op) < .002) continue;
+    L.op = a; L.outer.style.opacity = a; L.outer.style.visibility = a < .01 ? 'hidden' : 'visible';
+    if (L.line) { L.lm.opacity = .5 * a; L.line.visible = a > .01; }
+  }
+}
+
+// ================= 影片腳本(導覽與錄影共用) =================
+const FILM_DUR = 100;
+const CAMK = [
+  [0, [84, 66, 124], [0, 15, 0]], [5.5, [74, 60, 112], [0, 15, 0]],
+  [9.6, [36, 35, 72], [5, 18.5, 0]], [11.6, [34, 34, 69], [5, 18.5, 0]],
+  [13.8, [-27, 25, 33], [-6.5, 15.5, -3]], [17.6, [-28, 24, 31], [-6.5, 15.5, -3]],
+  [19.4, [-15, 30, 33], [-3.5, 19.5, 0]], [22.8, [-14, 29, 31], [-3.5, 19.5, 0]],
+  [24.6, [0, 47, 30], [0, BY + 8.4, 2]], [45.4, [1, 46.5, 29], [0, BY + 8.4, 2]],
+  [47.4, [31, 28, 31], [11, 20, 3]], [51.8, [32, 27.5, 30], [11, 20, 3]],
+  [53.6, [40, 28, 48], [13, 15.5, 4]], [57.2, [41, 27.5, 47], [13, 15.5, 4]],
+  [59.4, [42, 36, 72], [9, 18, 0]], [94.6, [39, 34, 68], [9, 18, 0]],
+  [97.8, [84, 66, 124], [0, 15, 0]], [100, [86, 67, 126], [0, 15, 0]],
+];
+const CAPS = [
+  [5.8, 11.8, zhEn('01 · 展開', '01 · Opening up'), zhEn('XRF 找出樣品裡有哪些元素。打開來看:左下是 X 射線管,右下是偵測器,樣品放在最上面。', "XRF finds a sample's elements. Inside: X-ray tube lower left, detector lower right, sample on top.")],
+  [12, 17.6, zhEn('02 · X 射線管', '02 · X-ray tube'), zhEn('燈絲的電子被高電壓加速,撞上銠靶打出 X 射線;和 XRD 的管子同一類,但只有幾十瓦。', 'Fast electrons hit a rhodium target and make X-rays; like the XRD tube, but only tens of watts.')],
+  [17.8, 23.1, zhEn('02 · X 射線管', '02 · X-ray tube'), zhEn('X 射線穿過濾片與準直器,從下方照到樣品;濾片擋掉低能量的部分,背景變低。', 'The filter cuts low energies and background; a collimator aims the beam up at the sample.')],
+  [23.4, 28.6, zhEn('03 · 打掉內層電子', '03 · Knocking one out'), zhEn('X 射線打中原子,把最內層(K 層)的電子打出去,原子留下一個空位。', "An X-ray knocks an electron out of the atom's innermost K shell, leaving a hole.")],
+  [28.8, 34, zhEn('03 · 打掉內層電子', '03 · Knocking one out'), zhEn('X 射線的能量要超過這一層的吸收邊限才打得掉;砷的 K 層要 11.87 keV 以上。', "It takes X-rays above the absorption edge: over 11.87 keV for arsenic's K shell.")],
+  [34.4, 40, zhEn('04 · 補位放光', '04 · Refilling the hole'), zhEn('外層電子掉進空位,多出的能量變成一道新的 X 射線;從 L 層掉下來的叫 Kα。', 'An outer electron drops into the hole; the spare energy leaves as a new X-ray. From L, it is Kα.')],
+  [40.2, 45.8, zhEn('04 · 補位放光', '04 · Refilling the hole'), zhEn('從 M 層掉下來的叫 Kβ。能量只看元素:原子序越大越高,約和 (Z − 1)² 成正比。', 'From M, it is Kβ. The energy depends only on the element, rising roughly with (Z − 1)².')],
+  [46.2, 51.8, zhEn('05 · 矽漂移偵測器', '05 · Silicon drift detector'), zhEn('每道 X 射線在矽晶片裡變成一團電荷:每 3.6 eV 一對電子電洞,銅 Kα 約 2200 對。', 'Each X-ray makes a charge cloud in silicon: one pair per 3.6 eV, about 2200 for copper Kα.')],
+  [52, 57.4, zhEn('05 · 矽漂移偵測器', '05 · Silicon drift detector'), zhEn('電荷漂向中央的小電極,多少和能量成正比;多頻道分析器依能量分格計數。', 'Charge, set by the energy, drifts to a tiny electrode; the analyzer sorts pulses by energy.')],
+  [57.8, 63.8, zhEn('06 · 能譜', '06 · Spectrum'), zhEn('CCA 處理材:鉻、銅、砷各有一組峰;右邊高能量的是銠靶的 X 射線被樣品散射回來。', 'CCA wood shows chromium, copper and arsenic peaks; at right, tube X-rays scattered back by the sample.')],
+  [64.2, 70.6, zhEn('07 · 看不到與分不開', '07 · Unseen and unresolved'), zhEn('氫沒有 X 射線螢光;碳、氧的 X 射線只有 0.28、0.52 keV,產率不到 1%,被空氣、樣品膜和鈹窗吸收。', 'Hydrogen gives none; carbon (0.28 keV) and oxygen (0.52 keV) yield under 1%, lost in air, film and window.')],
+  [70.8, 76.2, zhEn('07 · 看不到與分不開', '07 · Unseen and unresolved'), zhEn('換成土壤標準品。鉛的 K 層要 88 keV 才打得掉,這裡看到的是 L 層的線(Pb Lα)。', "Now a soil standard. Lead's K shell needs 88 keV, so here lead shows its L lines (Pb Lα).")],
+  [76.4, 82, zhEn('07 · 看不到與分不開', '07 · Unseen and unresolved'), zhEn('Pb Lα 和 As Kα 只差 10 eV,疊成一個峰;要看旁邊的 As Kβ 與 Pb Lβ 才分得出來。', 'Pb Lα and As Kα, 10 eV apart, merge into one peak; As Kβ and Pb Lβ tell them apart.')],
+  [82.4, 88, zhEn('08 · 電壓與定量', '08 · Voltage and amounts'), zhEn('管電壓降到 10 kV:X 射線最高 10 keV,打不掉砷和鉛的內層,它們的峰與散射峰都不見了。', 'At 10 kV the X-rays end at 10 keV: no arsenic or lead peaks, and no scatter peaks.')],
+  [88.2, 94.8, zhEn('08 · 電壓與定量', '08 · Voltage and amounts'), zhEn('含量要用同材質的標準品或理論計算換算;不用溶解樣品,但只量表面一層,偵測極限也比 ICP 高。', 'Amounts need matched standards or theory. No dissolving, but it sees just the surface; ICP finds smaller traces.')],
+];
+const LBL_WIN = [[7.2, 11.8, ['TUBE', 'SMP', 'DET']], [12, 17.6, ['TUBE']], [17.8, 23, ['FIL', 'COL']], [46.4, 57.4, ['DET', 'MCA']], [57.8, 63.8, ['SMP']], [70.8, 76.2, ['SMP']], [82.4, 88, ['TUBE']]];
+// 導覽裡的測量:[開始, 結束, 這一次, 上一次, 留到幾秒]
+const M_CCA = { sample: 'cca', kV: 50, filt: 0, T: 60, seed: 11 }, M_SOIL = { sample: 'soil', kV: 50, filt: 0, T: 60, seed: 23 }, M_SOIL10 = { sample: 'soil', kV: 10, filt: 0, T: 60, seed: 31 };
+const MEAS = [[58.2, 63.2, M_CCA, null, 70.6], [71, 75.8, M_SOIL, null, 82.6], [83, 87.6, M_SOIL10, M_SOIL, 999]];
+// 游標的能量:[開始, 結束, 從, 到]
+const CURK = [
+  [61.4, 62.2, 10.531, 19.27], [64.4, 65.4, 19.27, .277], [67.6, 68.2, .277, .525],
+  [70.8, 71.6, .525, 6.40], [74.4, 75.2, 6.40, 10.54], [77, 77.8, 10.54, 11.726], [79.4, 80.2, 11.726, 12.614], [82.6, 83.4, 12.614, 10.54],
+];
+// 原子的兩次示範:[入射開始, 種類, 外層電子開始掉, 放出 X 射線]
+const ATOM_A = { tin: 24.8, kind: 'a', tfall: 34.6, tout: 35.7 }, ATOM_B = { tin: 40.3, kind: 'b', tfall: 42.1, tout: 43.2 };
+function track(t, segs, v0) {
+  let v = v0;
+  for (const [a, b, x, y, mode] of segs) {
+    if (t < a) break;
+    if (t >= b) { v = y; continue; }
+    const u = (t - a) / (b - a); v = lerp(x, y, mode === 'lin' ? u : ease(u)); break;
+  }
+  return v;
+}
+const lerp3 = (a, b, u) => new V3(lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u));
+function camAt(t) {
+  const K = CAMK;
+  if (t <= K[0][0]) return [new V3(...K[0][1]), new V3(...K[0][2])];
+  for (let i = 0; i < K.length - 1; i++) {
+    const [ta, pa, qa] = K[i], [tb, pb, qb] = K[i + 1];
+    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [lerp3(pa, pb, u), lerp3(qa, qb, u)]; }
+  }
+  const L = K[K.length - 1]; return [new V3(...L[1]), new V3(...L[2])];
+}
+const win = (t, a, b, f = .4) => sstep(a, a + f, t) * (1 - sstep(b - f, b, t));
+
+// ================= 狀態 =================
+// meas:這一次的測量 { sample, kV, filt, T, seed, p, t0, done };ghost:上一次;cursor:游標的能量(keV)
+const S = { sample: 'cca', kV: 50, filt: 0, T: 60, explode: 1, meas: null, ghost: null, measuring: false, seed: 1, cursor: 10.531, logY: 0 };
+const W = { sample: 'cca', kV: 50, filt: 0, T: 60, filtPos: 0, explode: 1, elec: .5, kIn: 1, kOut: 1, pulse: 0, atom: 0, ap: null, edgeNote: 0, sdd: 0,
+  meas: null, ghost: null, cursor: 10.531, logY: 0, match: null, labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1 };
+
+function film(t) {
+  W.sample = t < 70.6 ? 'cca' : 'soil';
+  W.kV = t < 82.8 ? 50 : 10; W.filt = 0; W.T = 60; W.filtPos = 0; W.logY = t >= 84.4 && t < 95.4 ? 1 : 0;
+  W.explode = sstep(6.2, 9.6, t) * (1 - sstep(94.6, 97.8, t));
+  W.elec = .4 + .6 * win(t, 12, 17.8, .6);
+  W.atom = sstep(23.4, 24.6, t) * (1 - sstep(45.6, 46.6, t));
+  W.ap = t < 40.1 ? ATOM_A : ATOM_B;
+  W.edgeNote = win(t, 29, 34, .5);
+  W.sdd = sstep(46.4, 47.4, t) * (1 - sstep(57, 57.8, t));
+  W.meas = W.ghost = null;
+  for (const [a, b, m, g, until] of MEAS) if (t >= a && t < until) { W.meas = { ...m, p: clamp((t - a) / (b - a), 0, 1), done: t >= b }; W.ghost = g ? { ...g, p: 1, done: true } : null; }
+  W.pulse = Math.max(win(t, 52.4, 57.4, .5), W.meas && !W.meas.done ? 1 : 0);
+  W.cursor = track(t, CURK, 10.531);
+  const [cp, ct] = camAt(t); camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct);
+  W.labels = {}; for (const [a, b, keys] of LBL_WIN) for (const k of keys) W.labels[k] = Math.max(W.labels[k] || 0, win(t, a, b, .5));
+  W.conOp = win(t, 57.4, 95.4, .8);
+  W.cap = null; for (const c of CAPS) if (t >= c[0] && t < c[1]) W.cap = { chap: c[2], txt: c[3], op: win(t, c[0], c[1], .35) };
+  W.title = win(t, .2, 5.6, .9); W.outro = sstep(95.6, 96.6, t); W.chips = win(t, 5.6, 95.8, .8);
+}
+
+let lastNote = '', lastLegend = '', lastCap = '', lastTitle = '';
+function frameCommon(t) {
+  const sm = SAMPLES[W.sample], ex = expected(W.sample, W.kV, W.filt);
+  // X 射線的亮度(示意):管子的輸出約和電壓平方成正比;螢光與散射跟著總計數率
+  W.kIn = .3 + .7 * (W.kV / 50) ** 2;
+  W.kOut = .12 + .88 * Math.sqrt(clamp(ex.tot / 40000, 0, 1.6));
+  W.match = matchAt(W.sample, W.kV, W.filt, W.cursor);
+  MAT.smp.color.setHex(sm.color);
+  WHEEL_R.rotation.z = -W.filtPos * Math.PI / 3;
+  buildRays(W); buildPhotons(W, t); updateBeams(W);
+  rayMat.uniforms.uT.value = t;
+  atomFrame(W, t); sddFrame(W, t);
+  drawMca(t);
+  // 外殼
+  const k = ease(W.explode), o = 1 - sstep(0, .5, k);
+  for (const p of shellParts) {
+    p.g.position.set(p.move[0] * k, p.move[1] * k, p.move[2] * k); p.g.rotation.x = p.rot * k;
+    for (const c of p.g.children) if (c.isMesh) { c.visible = o > .01; c.castShadow = o > .5; }
+  }
+  for (const m of [MAT.shell, MAT.lid, MAT.vent]) { m.opacity = o; m.depthWrite = o > .5; }
+  MAT.edge.opacity = .55 * Math.sin(Math.PI * k);
+  bloom.strength = .32 + .43 * k;   // 外殼蓋著時少一點光暈,白色機殼才不會糊
+  // 標籤
+  for (const kk of LBL_KEYS) LBL[kk].want = W.labels ? (W.labels[kk] || 0) : sstep(.55, .9, W.explode);
+  labelText('TUBE', zhEn(`銠靶 · ${W.kV} kV`, `Rh target · ${W.kV} kV`));
+  labelText('FIL', W.filt ? zhEn('鋁 0.1 mm', 'Al 0.1 mm') : zhEn('沒有', 'none'));
+  labelText('SMP', sm.name);
+  labelText('DET', fmtRate(ex.tot));
+  updateDOM(t);
+}
+
+// ---------- 分析器板子上的小螢幕(示意):把現在的能譜畫成一格一格的長條 ----------
+let mcaKey = '', mcaAt = -1;
+function drawMca(t) {
+  const m = W.meas && W.meas.sample === W.sample ? W.meas : null;
+  const sddOn = W.sdd > .01;
+  const key = sddOn ? `sdd|${HITS.filter(h => t >= h[0] + .9).length}` : m ? `${m.sample}|${m.kV}|${m.filt}|${m.T}|${m.seed}|${m.p.toFixed(2)}` : `pv|${W.sample}|${W.kV}|${W.filt}`;
+  if (key === mcaKey) return;
+  const now = performance.now(); if (!REC && now - mcaAt < 100 && m && !m.done) return;
+  mcaKey = key; mcaAt = now;
+  const c = mcaCv.getContext('2d'), w = mcaCv.width, h = mcaCv.height, NB = 64;
+  c.fillStyle = '#04121a'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(116,228,255,.35)'; c.lineWidth = 2; c.strokeRect(1, 1, w - 2, h - 2);
+  const bins = new Float32Array(NB);
+  if (sddOn) { for (const hh of HITS) if (t >= hh[0] + .9) bins[Math.min(NB - 1, Math.floor(hh[2] / E_MAX * NB))] += 1; }
+  else {
+    const f = m ? countsOf(m) : expected(W.sample, W.kV, W.filt).rate;
+    for (let i = 0; i < NCH; i++) bins[Math.min(NB - 1, Math.floor(i * DE / E_MAX * NB))] += f[i];
+  }
+  let mx = 0; for (const b of bins) mx = Math.max(mx, b);
+  const bw = (w - 12) / NB;
+  for (let i = 0; i < NB; i++) {
+    const v = mx > 0 ? bins[i] / (sddOn ? Math.max(3, mx) : mx) : 0, bh = (h - 14) * (sddOn ? v : Math.sqrt(v));
+    c.fillStyle = m || sddOn ? 'rgba(120,236,255,.95)' : 'rgba(120,236,255,.35)';
+    c.fillRect(6 + i * bw, h - 7 - bh, Math.max(1, bw - 1), bh);
+  }
+  mcaTex.needsUpdate = true;
+}
+
+// ================= 介面 =================
+const el = id => document.getElementById(id);
+const KIND = { a: zhEn('L 層的電子掉進 K 層的空位', 'an L electron drops into a K-shell hole'), b: zhEn('M 層的電子掉進 K 層的空位', 'an M electron drops into a K-shell hole') };
+function noteHTML() {
+  const sm = SAMPLES[W.sample], m = W.match, E = W.cursor.toFixed(2);
+  let s = zhEn(`管電壓 <em class="c">${W.kV} kV</em>,X 射線最高 ${W.kV} keV`, `At <em class="c">${W.kV} kV</em> the X-rays reach at most ${W.kV} keV`);
+  if (W.kV <= RH_K) s += zhEn(',銠靶自己的 K 線(要 23.2 kV)出不來', ", too low for the tube's own rhodium K lines (23.2 kV)");
+  if (W.filt) s += zhEn(';鋁濾片擋掉低能量的 X 射線,背景變低', '; the aluminum filter blocks low energies, lowering the background');
+  s += zhEn('。', '. ');
+  const lab = m.lab, ev = `<em class="c">${E} keV</em>`, lv = `<em class="v">${lab}</em>`;
+  if (m.kind === 'a' || m.kind === 'b') s += zhEn(`游標 ${ev} 是 ${lv}:${EL[m.l.el]}原子裡,${KIND[m.kind]},放出這個能量的 X 射線。`, `The cursor at ${ev} is ${lv}: in ${EL[m.l.el]} atoms ${KIND[m.kind]} and gives off an X-ray of this energy.`);
+  else if (m.kind === 'la' || m.kind === 'lb') s += zhEn(`游標 ${ev} 是 ${lv}:鉛的 K 層要 88 keV 才打得掉,這是 L 層的空位被外層電子補上時放出的 L 線。`, `The cursor at ${ev} is ${lv}: lead's K shell needs 88 keV, so this is an L line, given off when an outer electron fills an L-shell hole.`);
+  else if (m.kind === 'overlap') s += zhEn(`游標 ${ev} 是 ${lv}:兩條線只差 10 eV(約峰寬的二十分之一),疊成一個峰;看 As Kβ(11.73 keV)與 Pb Lβ(12.61 keV)才分得出來。`, `The cursor at ${ev} is ${lv}: the two lines are only 10 eV apart (about 1/20 of the peak width) and merge; As Kβ (11.73 keV) and Pb Lβ (12.61 keV) tell them apart.`);
+  else if (m.kind === 'compton') s += zhEn(`游標 ${ev} 是銠靶的 X 射線被樣品撞偏、少了一點能量(康普頓散射);木頭這種輕的樣品散射得多。`, `The cursor at ${ev} is rhodium X-rays from the tube bounced off the sample with a little energy lost (Compton scattering); light samples such as wood scatter more.`);
+  else if (m.kind === 'rayleigh') s += zhEn(`游標 ${ev} 是銠靶的 X 射線被樣品原封不動彈回來(瑞立散射),能量不變。`, `The cursor at ${ev} is rhodium X-rays from the tube bounced back unchanged (Rayleigh scattering), same energy.`);
+  else if (m.kind === 'ar') s += zhEn(`游標 ${ev} 是空氣裡的氬發出的 Ar Kα;抽真空或通氦氣就沒有。`, `The cursor at ${ev} is Ar Kα from the argon in the air; it disappears in vacuum or helium.`);
+  else if (m.kind === 'rhl') s += zhEn(`游標 ${ev} 是銠靶的 L 線被散射回來;加濾片就擋掉。`, `The cursor at ${ev} is the rhodium L line of the tube, scattered back; a filter removes it.`);
+  else if (m.kind === 'light') s += zhEn(`游標 ${ev} 是 ${lv} 的位置:碳、氧的螢光產率不到 1%,X 射線又被空氣、樣品膜與鈹窗吸收,這裡什麼都沒有;氫根本沒有 X 射線螢光。`, `The cursor at ${ev} is where ${lv} would be: carbon and oxygen yield under 1%, and their X-rays are absorbed by air, film and window, so nothing shows; hydrogen gives none at all.`);
+  else if (m.kind === 'miss') s += zhEn(`游標 ${ev} 是 ${lv} 的位置:吸收邊限 ${m.l.Ek.toFixed(2)} keV 比 X 射線最高的 ${W.kV} keV 還高,打不掉,所以沒有峰。`, `The cursor at ${ev} is where ${lv} would be: its absorption edge, ${m.l.Ek.toFixed(2)} keV, is above the ${W.kV} keV maximum, so there is no peak.`);
+  else s += zhEn(`游標 ${ev} 只有背景:X 射線管的連續 X 射線被樣品散射進偵測器。`, `At ${ev} there is only background: continuous X-rays from the tube scattered by the sample into the detector.`);
+  return s;
+}
+const measDesc = m => zhEn(`${m.kV} kV · ${m.filt ? '鋁濾片' : '沒有濾片'} · ${m.T} 秒`, `${m.kV} kV · ${m.filt ? 'Al filter' : 'no filter'} · ${m.T} s`);
+function countsAtE(E) {
+  const i = chOf(E);
+  for (const [m, tag] of [[W.meas, zhEn('這一次', 'this run')], [W.ghost, zhEn('上一次', 'previous')]]) if (m && m.sample === W.sample) return { v: countsOf(m)[i], tag };
+  return { v: expected(W.sample, W.kV, W.filt).rate[i] * W.T, tag: zhEn('預覽', 'preview') };
+}
+function updateDOM(t) {
+  const sm = SAMPLES[W.sample], ex = expected(W.sample, W.kV, W.filt);
+  const E = hoverE != null && !FILM && !tour.on ? hoverE : W.cursor;
+  const mh = E === W.cursor ? W.match : matchAt(W.sample, W.kV, W.filt, E);
+  el('cE').textContent = fmtE(E); el('cL').textContent = mh.kind === 'bg' ? zhEn('背景', 'background') : mh.lab; el('cN').textContent = fmtInt(countsAtE(E).v);
+  if (!FILM && !tour.on) { const n = noteHTML(); if (n !== lastNote) { lastNote = n; el('note').innerHTML = n; } }
+  el('vR').textContent = fmtRate(ex.tot); el('mR').style.width = `${clamp(ex.tot / 60000 * 100, 0, 100)}%`;
+  const m = W.meas && W.meas.sample === W.sample ? W.meas : null, tt = m ? m.T * clamp(m.p, 0, 1) : 0, TT = m ? m.T : W.T;
+  el('vT').textContent = `${fmtInt(tt)}/${TT} s`; el('mT').style.width = `${clamp(tt / TT * 100, 0, 100)}%`;
+  // 含量(示意)
+  const qel = W.match && W.match.l && W.match.l.el && sm.conc && sm.conc[W.match.l.el] != null ? W.match.l.el : null;
+  const qt = qel ? zhEn(`${qel} 含量(mg/kg)≈ 淨計數 ÷ 靈敏度`, `${qel} (mg/kg) ≈ net counts ÷ sensitivity`) : zhEn('含量 ≈ 淨計數 ÷ 靈敏度', 'Amount ≈ net counts ÷ sensitivity');
+  if (el('vQt').textContent !== qt) el('vQt').textContent = qt;
+  let qv = '', small = true;
+  if (!sm.conc) qv = zhEn('只做定性', 'qualitative only');
+  else if (!qel) qv = zhEn('游標移到元素的峰', 'put the cursor on an element peak');
+  else if (!m) qv = zhEn('測量後才算', 'after a measurement');
+  else {
+    const q = quantOf(m, qel);
+    if (!q || q.none) qv = zhEn('激發不了,沒有峰', 'not excited, no peak');
+    else if (q.wait) qv = zhEn('測量中', 'measuring');
+    else { qv = `${fmtInt(sig(Math.max(0, q.v), 3))} <span class="pm">± ${fmtInt(sig(q.sd, 2))}</span>`; small = false; }
+  }
+  const vq = el('vQ'); if (vq._v !== qv) { vq._v = qv; if (small) vq.textContent = qv; else vq.innerHTML = qv; } vq.classList.toggle('txt', small);
+  el('conSample').textContent = sm.full;
+  let lg = '';
+  if (W.meas) lg += `<span><i style="border-top:2px solid var(--cyan)"></i>${zhEn('這一次', 'this run')} ${measDesc(W.meas)}</span>`;
+  if (W.ghost) lg += `<span><i style="border-top:2px dashed var(--amber)"></i>${zhEn('上一次', 'previous')} ${measDesc(W.ghost)}</span>`;
+  if (!W.meas && !W.ghost) lg = `<span><i style="border-top:1px dashed var(--ink-2)"></i>${zhEn('預覽;按「測量」累積計數', 'preview; press Measure to collect counts')}</span>`;
+  if (lg !== lastLegend) { lastLegend = lg; el('legend').innerHTML = lg; }
+  el('btnLog').classList.toggle('on', !!W.logY);
+  const con = el('console');
+  con.style.opacity = W.conOp; con.style.visibility = W.conOp < .01 ? 'hidden' : 'visible';
+  if (W.conOp > .01) drawPlot();
+  // 字幕與片頭
+  if (FILM || tour.on) {
+    const cap = el('cap'), c = W.cap;
+    cap.style.opacity = c ? c.op : 0;
+    const ck = c ? c.chap + c.txt : '';
+    if (ck !== lastCap && c) { lastCap = ck; el('chap').textContent = c.chap; el('capTxt').textContent = c.txt; }
+    cap.classList.toggle('withcon', W.conOp > .01);
+    const tc = el('titlecard'), op = Math.max(W.title, W.outro);
+    tc.style.opacity = op; tc.style.visibility = op < .01 ? 'hidden' : 'visible';
+    const tk = W.outro > W.title ? 'o' : 't';
+    if (tk !== lastTitle) {
+      lastTitle = tk;
+      const tx = tk === 't'
+        ? zhEn(['XRF X 射線螢光光譜儀', '能量認出元素', '每種元素放出自己能量的 X 射線', ''], ['X-ray fluorescence spectrometer (XRF)', 'Energy names elements', 'Each element gives off X-rays of its own energy', ''])
+        : zhEn(['XRF X 射線螢光光譜儀', '內層空位 · 補位放光 · 能譜', '銠靶 X 射線管 · 濾片 · 矽漂移偵測器 · Kα 與 Kβ · 散射峰', '示意動畫;元件位置為示意,能譜的峰高與散射峰的大小是計算的示意。'], ['X-ray fluorescence spectrometer (XRF)', 'Inner-shell hole · refill · spectrum', 'Rh-target X-ray tube · filter · silicon drift detector · Kα and Kβ · scatter peaks', 'Schematic animation; part positions are illustrative; peak heights and scatter peak sizes are calculated illustrations.']);
+      ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => el(id).textContent = tx[i]);
+    }
+    document.querySelector('.hud').style.opacity = W.chips;
+  }
+}
+
+// ---------- 能譜圖 ----------
+const plot = el('plot'), tip = el('tip');
+let hoverE = null, plotDrawnAt = -Infinity;
+const niceUp = v => { const e = 10 ** Math.floor(Math.log10(v)); for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * e >= v) return m * e; return 10 * e; };
+// 一欄一欄取最大與最小(每 10 eV 一格),很窄的峰也不會被跳過
+function columns(get, X) {
+  const out = []; let px = null, lo = 0, hi = 0;
+  for (let i = 0; i < NCH; i++) {
+    const x = Math.round(X(i * DE)), y = get(i);
+    if (x !== px) { if (px !== null) out.push(px, lo, hi); px = x; lo = hi = y; }
+    else { lo = Math.min(lo, y); hi = Math.max(hi, y); }
+  }
+  if (px !== null) out.push(px, lo, hi);
+  return out;
+}
+const fmtTick = v => v >= 1e6 ? `${v / 1e6}M` : v >= 1000 ? `${v / 1000}k` : String(v);
+function drawPlot() {
+  const now = performance.now();
+  if (!REC && now - plotDrawnAt < 1000 / 30) return;
+  plotDrawnAt = now;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (plot.currentCSSZoom || uiScale()), w = plot.clientWidth, h = plot.clientHeight; // 面板放大時多畫幾倍像素
+  if (!w) return;
+  if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
+  const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const fs = FILM ? 14 : 11, Lp = FILM ? 58 : 44, Rp = FILM ? 16 : 12, Tp = FILM ? 26 : 20, Bp = FILM ? 30 : 22;
+  const pw = w - Lp - Rp, ph = h - Tp - Bp;
+  const m = W.meas && W.meas.sample === W.sample ? W.meas : null, g = W.ghost && W.ghost.sample === W.sample ? W.ghost : null;
+  const ex = expected(W.sample, W.kV, W.filt);
+  let ym = 0;
+  if (m) ym = Math.max(ym, expected(m.sample, m.kV, m.filt).max * m.T);
+  if (g) ym = Math.max(ym, expected(g.sample, g.kV, g.filt).max * g.T);
+  if (!m && !g) ym = ex.max * W.T;
+  const logY = !!W.logY;
+  ym = logY ? 10 ** Math.ceil(Math.log10(Math.max(10, ym * 1.6))) : niceUp(Math.max(5, ym * 1.12 + 3 * Math.sqrt(ym)));
+  const X = e => Lp + e / E_MAX * pw;
+  const Y = logY ? v => Tp + (1 - Math.log10(Math.max(1, v)) / Math.log10(ym)) * ph : v => Tp + (1 - v / ym) * ph;
+  c.font = `${fs}px ${MONO}`; c.lineWidth = 1;
+  c.textAlign = 'right'; c.textBaseline = 'middle';
+  const ticks = [];
+  if (logY) for (let v = 1; v <= ym + 1e-6; v *= 10) ticks.push(v);
+  else { const st = niceUp(ym / 4.5); for (let v = 0; v <= ym + 1e-6; v += st) ticks.push(v); }
+  for (const v of ticks) {
+    const y = Math.round(Y(v)) + .5;
+    c.strokeStyle = v === 0 || (logY && v === 1) ? 'rgba(160,215,235,.25)' : 'rgba(160,215,235,.08)';
+    c.beginPath(); c.moveTo(Lp, y); c.lineTo(Lp + pw, y); c.stroke();
+    c.fillStyle = '#71858f'; c.fillText(fmtTick(Math.round(v)), Lp - 6, y);
+  }
+  c.textAlign = 'center'; c.textBaseline = 'top';
+  for (let e = 0; e <= E_MAX; e += 5) {
+    const x = Math.round(X(e)) + .5;
+    c.strokeStyle = 'rgba(160,215,235,.08)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+    c.fillStyle = '#71858f'; c.fillText(e, x, Tp + ph + 6);
+  }
+  c.strokeStyle = 'rgba(160,215,235,.25)';
+  for (let e = 1; e < E_MAX; e++) if (e % 5) { const x = Math.round(X(e)) + .5; c.beginPath(); c.moveTo(x, Tp + ph); c.lineTo(x, Tp + ph + 3); c.stroke(); }
+  c.textAlign = 'left'; c.fillStyle = '#71858f';
+  c.fillText(logY ? zhEn('計數(對數)', 'counts (log)') : zhEn('計數', 'counts'), 2, 2); c.fillText('keV', 2, Tp + ph + 6);
+  c.save(); c.beginPath(); c.rect(Lp, Tp - 2, pw, ph + 4); c.clip();
+  const drawCols = (cols, style, lw, dash) => {
+    if (cols.length < 6) return;
+    c.setLineDash(dash || []); c.strokeStyle = style; c.lineWidth = lw; c.lineJoin = 'round'; c.beginPath();
+    for (let i = 0; i < cols.length; i += 3) { const x = cols[i]; i ? c.lineTo(x, Y(cols[i + 1])) : c.moveTo(x, Y(cols[i + 1])); c.lineTo(x, Y(cols[i + 2])); }
+    c.stroke(); c.setLineDash([]); c.lineWidth = 1;
+  };
+  if (!m && !g) { const r = ex.rate, T = W.T; drawCols(columns(i => r[i] * T, X), 'rgba(168,188,198,.55)', 1, [2, 4]); }
+  if (g) { const f = countsOf(g); drawCols(columns(i => f[i], X), 'rgba(255,194,97,.9)', FILM ? 1.8 : 1.3, [5, 3]); }
+  if (m) { const f = countsOf(m); drawCols(columns(i => f[i], X), '#74e4ff', FILM ? 2.2 : 1.6); }
+  // 譜線的名字:依畫出來的高度由高到低放,疊到已經放好的就不寫
+  const ref = m || g, refEx = ref ? expected(ref.sample, ref.kV, ref.filt) : ex, refT = ref ? ref.T * (ref === m ? clamp(m.p, 0, 1) : 1) : W.T;
+  const cands = [], seen = new Set();
+  for (const p of refEx.peaks) {
+    if (p.area <= 0 || p.l.kind === 'light' || p.l.kind === 'rhl') continue;
+    if (p.l.kind === 'compton' && p.E > 21) continue; if (p.l.kind === 'rayleigh' && p.E > 21) continue;
+    const i = chOf(p.E), top = refEx.rate[i] * refT, bgv = refEx.bg[i] * refT;
+    if (top - bgv < (logY ? 2 * Math.sqrt(Math.max(bgv, 1)) + 3 : .035 * ym)) continue;
+    let txt = p.l.kind === 'compton' ? zhEn('康普頓', 'Compton') : p.l.kind === 'rayleigh' ? zhEn('瑞立', 'Rayleigh') : p.l.name;
+    if (p.l.el === 'As' && p.l.kind === 'a' && refEx.peaks.some(q => q.l.el === 'Pb' && q.l.kind === 'la' && q.area > 0)) txt = 'As Kα + Pb Lα';
+    if (p.l.el === 'Pb' && p.l.kind === 'la') continue;
+    if (seen.has(txt)) continue; seen.add(txt);
+    cands.push({ E: p.E, txt, v: top, col: p.l.el ? '#d6ccff' : '#a8bcc6' });
+  }
+  c.font = `${FILM ? 13 : 10}px ${MONO}`; c.textAlign = 'center'; c.textBaseline = 'bottom';
+  const placed = [];
+  for (const { E, txt, v, col } of cands.sort((p, q) => q.v - p.v)) {
+    const tw = c.measureText(txt).width, x = clamp(X(E), Lp + tw / 2 + 1, Lp + pw - tw / 2 - 1), y = Math.max(Tp + fs + 1, Y(v) - 3);
+    const box = [x - tw / 2 - 2, y - fs - 1, x + tw / 2 + 2, y];
+    if (placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
+    placed.push(box); c.fillStyle = 'rgba(12,18,23,.72)'; c.fillRect(box[0], box[1] + 1, box[2] - box[0], box[3] - box[1]); c.fillStyle = col; c.fillText(txt, x, y);
+  }
+  // 游標
+  {
+    const x = X(W.cursor), v = countsAtE(W.cursor).v, y = Y(clamp(v, 0, ym));
+    c.strokeStyle = 'rgba(201,184,255,.7)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+    c.fillStyle = '#c9b8ff'; c.strokeStyle = '#0c1318'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, FILM ? 6 : 4.5, 0, 7); c.fill(); c.stroke(); c.lineWidth = 1;
+  }
+  if (hoverE != null) {
+    const x = X(hoverE); c.setLineDash([3, 3]); c.strokeStyle = 'rgba(234,243,246,.5)';
+    c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke(); c.setLineDash([]);
+  }
+  c.restore();
+  plot._map = { Lp, pw };
+}
+function plotE(e) {
+  const m = plot._map; if (!m) return null;
+  const r = plot.getBoundingClientRect(), pz = plot.currentCSSZoom || uiScale(), px = (e.clientX - r.left) / pz;
+  if (px < m.Lp || px > m.Lp + m.pw) return null;
+  return { E: clamp((px - m.Lp) / m.pw * E_MAX, 0, E_MAX), px, py: (e.clientY - r.top) / pz };
+}
+plot.addEventListener('pointermove', e => {
+  const q = plotE(e); if (!q) { hoverE = null; tip.style.display = 'none'; return; }
+  hoverE = q.E;
+  const v = countsAtE(hoverE), mm = matchAt(W.sample, W.kV, W.filt, hoverE);
+  tip.style.display = 'block'; tip.style.left = `${q.px}px`; tip.style.top = `${q.py}px`;
+  const lab = mm.kind === 'bg' ? zhEn('背景', 'background') : mm.kind === 'miss' ? zhEn(`${mm.lab}(沒有激發)`, `${mm.lab} (not excited)`) : mm.lab;
+  tip.textContent = zhEn(`${hoverE.toFixed(2)} keV · ${lab} · ${fmtInt(v.v)} 計數 · ${v.tag}`, `${hoverE.toFixed(2)} keV · ${lab} · ${fmtInt(v.v)} counts · ${v.tag}`);
+});
+plot.addEventListener('pointerleave', () => { hoverE = null; tip.style.display = 'none'; });
+plot.addEventListener('click', e => { if (tour.on || FILM) return; const q = plotE(e); if (q) S.cursor = q.E; });
+
+// ---------- 控制 ----------
+function segOn(id, v) { for (const b of el(id).querySelectorAll('button')) b.classList.toggle('on', b.dataset.v === String(v)); }
+function stopMeas() { if (S.measuring) { S.measuring = false; if (S.meas) S.meas.done = true; } el('btnScan').classList.remove('on'); el('btnScan').textContent = zhEn('測量', 'Measure'); }
+// 換電壓、濾片或測量時間:這一次的結果變成「上一次」
+function keepGhost() { if (S.meas && S.meas.done) { S.ghost = S.meas; S.meas = null; } }
+el('segSample').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  stopMeas(); S.sample = b.dataset.v; S.meas = S.ghost = null; segOn('segSample', S.sample); S.cursor = SAMPLES[S.sample].home;
+});
+for (const [id, k] of [['segKv', 'kV'], ['segFilt', 'filt'], ['segTime', 'T']]) el(id).addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const v = +b.dataset.v; if (v === S[k]) return;
+  stopMeas(); keepGhost(); S[k] = v; segOn(id, v);
+});
+el('segShell').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.explode = +b.dataset.v; segOn('segShell', b.dataset.v); });
+el('btnLog').addEventListener('click', () => { S.logY = S.logY ? 0 : 1; });
+el('btnScan').addEventListener('click', () => {
+  if (S.measuring) { stopMeas(); return; }
+  if (S.meas && S.meas.done) S.ghost = S.meas;
+  S.seed++; S.meas = { sample: S.sample, kV: S.kV, filt: S.filt, T: S.T, seed: S.seed * 7.7, p: 0, t0: performance.now() / 1000, done: false };
+  S.measuring = true; S.explode = 1; segOn('segShell', 1);
+  el('btnScan').classList.add('on'); el('btnScan').textContent = zhEn('停止', 'Stop');
+});
+el('btnHelp').addEventListener('click', () => el('help').classList.toggle('show'));
+
+// ---------- 導覽 ----------
+const tour = { on: false, t0: 0, saved: null };
+function startTour() {
+  stopMeas(); el('help').classList.remove('show');
+  tour.saved = { ...S, cp: camera.position.clone(), ct: controls.target.clone() };
+  tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false; nav.cancel();
+}
+function endTour() {
+  if (!tour.on) return;
+  tour.on = false; root.classList.remove('touring'); controls.enabled = true;
+  const s = tour.saved; Object.assign(S, { sample: s.sample, kV: s.kV, filt: s.filt, T: s.T, explode: s.explode, meas: s.meas, ghost: s.ghost, cursor: s.cursor, logY: s.logY });
+  camera.position.copy(s.cp); controls.target.copy(s.ct); controls.update();
+  Object.assign(W, { filtPos: S.filt, atom: 0, sdd: 0, edgeNote: 0, labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1 });
+  el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; document.querySelector('.hud').style.opacity = 1; lastNote = '';
+}
+el('btnTour').addEventListener('click', startTour);
+el('tourExit').addEventListener('click', endTour);
+addEventListener('keydown', e => { if (e.key === 'Escape') endTour(); });
+
+// ---------- 視角操作 ----------
+// 共用的 ../assets/camera-nav.js:滑鼠滾輪縮放,觸控板雙指平移、捏合縮放,方向鍵或 WASD 移動、Q/E 轉向、+/− 縮放、R 回到預設視角
+const nav = createCameraNav({ camera, controls, active: () => !FILM && !tour.on, radius: 120 });
+
+// ================= 迴圈 =================
+function interactive(dt, now) {
+  if (S.measuring && S.meas) {
+    const p = (now - S.meas.t0) / MEAS_S;
+    if (p >= 1) { S.meas.p = 1; stopMeas(); } else S.meas.p = Math.max(0, p);
+  }
+  W.sample = S.sample; W.kV = S.kV; W.filt = S.filt; W.T = S.T; W.meas = S.meas; W.ghost = S.ghost; W.cursor = S.cursor; W.logY = S.logY;
+  W.filtPos += ((S.filt ? 1 : 0) - W.filtPos) * Math.min(1, dt * 5);
+  W.explode += (S.explode - W.explode) * Math.min(1, dt * 2.4);
+  W.elec = .5; W.atom = 0; W.sdd = 0; W.edgeNote = 0; W.pulse = S.measuring ? 1 : 0;
+  W.labels = null; W.conOp = 1; W.cap = null; W.title = W.outro = 0;
+}
+// 手機版:3D 的投影中心移到標題與停靠區之外的空地(mp.applyView,導覽與影片時不作用)
+// 桌機小螢幕(1024×768 這類):3D 的投影中心移到面板之間最大的空地(../assets/free-view.js);手機、導覽與影片不作用
+const fv = createFreeView({ panels: ['.hud', '#ctl', '#console', '#help'], active: () => !FILM && !tour.on });
+// 標籤先定位、決定藏哪些,再畫 3D(引線才會和標籤同一格出現或消失)
+function render() { if (!mp.applyView(camera)) fv.apply(camera); labelR.render(scene, camera); declutter(); composer.render(); }
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);
+  quality.configure(renderer, composer, bloom, { recording: REC });
+  renderer.setPixelRatio(DPR);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h); composer.setPixelRatio(DPR); composer.setSize(w, h); bloom.setSize(w * DPR, h * DPR); labelR.setSize(w, h);
+  pMat.uniforms.uScale.value = h * DPR / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+}
+addEventListener('resize', resize);
+resize();
+
+// 字型載入後再畫(畫布上的字要用到)
+await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 3000))]);
+for (const k of SKEYS) expected(k, 50, 0);
+
+if (REC) {
+  window.__dur = FILM_DUR;
+  // 等一個畫格讓 DOM 標籤也更新;背景分頁的 rAF 可能停住,所以最多只等 300 ms
+  window.__seek = async t => { film(t); frameCommon(t); render(); await Promise.race([new Promise(r => requestAnimationFrame(() => r())), new Promise(r => setTimeout(r, 300))]); return true; };
+  await window.__seek(+Q.get('t') || 0);
+  window.__ready = true;
+} else {
+  let last = performance.now() / 1000;
+  let filmStart = last - (+Q.get('t') || 0), hiddenAt = null;
+  document.addEventListener('visibilitychange', () => {
+    const now = performance.now() / 1000;
+    if (document.hidden) hiddenAt = now;
+    else if (hiddenAt !== null) {
+      const gap = now - hiddenAt; filmStart += gap;
+      if (tour.on) tour.t0 += gap;
+      if (S.measuring && S.meas) S.meas.t0 += gap;
+      last = now; hiddenAt = null;
+    }
+  });
+  const loop = () => {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    if (!quality.shouldRender(performance.now())) return;
+    quality.observe(performance.now());
+    const now = performance.now() / 1000, dt = Math.min(.05, now - last); last = now;
+    if (FILM) film((now - filmStart) % FILM_DUR);
+    else if (tour.on) { const t = now - tour.t0; if (t >= FILM_DUR) endTour(); else film(t); }
+    if (!FILM && !tour.on) { interactive(dt, now); nav.step(dt); controls.update(); }
+    frameCommon(FILM ? (now - filmStart) % FILM_DUR : tour.on ? now - tour.t0 : now);
+    render();
+  };
+  loop();
+  el('load').classList.add('done');
+  window.__ready = true;
+}
+</script>
+</body>
+</html>

@@ -11,8 +11,17 @@
 - [螢光光譜儀](https://tung-beauregard.github.io/instrument-principles/fluorescence/)
 - [XRD X 射線繞射儀](https://tung-beauregard.github.io/instrument-principles/xrd/)
 - [EPR 電子順磁共振](https://tung-beauregard.github.io/instrument-principles/epr/)
+- [NIR 近紅外光譜儀](https://tung-beauregard.github.io/instrument-principles/nir/)
+- [拉曼光譜儀](https://tung-beauregard.github.io/instrument-principles/raman/)
+- [CD 圓二色光譜儀](https://tung-beauregard.github.io/instrument-principles/cd/)
+- [AAS 原子吸收光譜儀](https://tung-beauregard.github.io/instrument-principles/aas/)
+- [ICP 感應耦合電漿光譜儀](https://tung-beauregard.github.io/instrument-principles/icp/)
+- [XRF X 射線螢光光譜儀](https://tung-beauregard.github.io/instrument-principles/xrf/)
+- [XPS X 射線光電子能譜儀](https://tung-beauregard.github.io/instrument-principles/xps/)
+- [SEM 掃描式電子顯微鏡](https://tung-beauregard.github.io/instrument-principles/sem/)
 - [GC-MS](https://tung-beauregard.github.io/instrument-principles/gc-ms/)
 - [NMR 核磁共振](https://tung-beauregard.github.io/instrument-principles/nmr/)
+- [二維 NMR](https://tung-beauregard.github.io/instrument-principles/nmr-2d/)
 - [質譜儀-不同分析器比較](https://tung-beauregard.github.io/instrument-principles/mass-analyzers/)
 - [層析-GC 與 HPLC](https://tung-beauregard.github.io/instrument-principles/chromatography/)
 - [光譜-光與分子](https://tung-beauregard.github.io/instrument-principles/spectroscopy/)
@@ -22,7 +31,7 @@
 - [數據畫圖](https://tung-beauregard.github.io/instrument-principles/plot/)（工具：把儀器匯出的檔案畫成報告用的圖）
 - [W AI Studio 主頁](https://tung-beauregard.github.io/w-studio/)
 
-目前共有十一份教材，入口依質譜、層析、光譜、NMR 分區（2026-10-08 起）：質譜有離子阱質譜、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計、FTIR 紅外光譜儀、螢光光譜儀、XRD X 射線繞射儀、EPR 電子順磁共振（XRD 是繞射、EPR 是電子的磁共振，2026-11-16 起暫時放在光譜區）；NMR 有 NMR 核磁共振。儀器型號與規格以各教材的來源說明為準。「生化原理」區（2026-10-26 起）有十份 2D 動畫教材，用分章動畫與可調的參數講分子生物學與生物化學的實驗原理：中心法則、PCR 與電泳、DNA 定序、DNA 鑑定與分子標記、基因選殖與蛋白表現、萜類合成酶、CRISPR 基因編輯、抗體檢測（西方墨點法與 ELISA）、流式細胞儀、蛋白質質譜定序；這一區不用 WebGL。「生化進階」區（2026-10-27 起）有六份給大學部高年級與研究生的教材，帶公式、統計與接近真實的數據：轉錄體分析、萜類前驅物（MEP 與 MVA 路徑）、酵素動力學、族群遺傳與產地鑑定、演化樹、在植物裡驗證基因功能；生化原理裡有七份也在最後加了「進階」章節。「官能基編號」區（2026-10-30 起）用同一套 2D 播放器講有機分子的碳怎麼編號、官能基在哪裡，有三份：有機化學命名法則（名字的五個部分、主鏈、編號、取代基，以及順反、立體中心、R 與 S、E 與 Z、鏡像異構物、內消旋與費雪投影式，2026-10-31 起）、醣類（醛糖與酮糖、鏈狀接成環狀、α 與 β、環狀糖的名字、糖苷鍵，到纖維素與澱粉）、木材三大成分（纖維素、半纖維素與木質素：細胞壁的層次、纖維素的微纖絲、半纖維素的糖差在哪一號碳、木質素的單體與用號碼命名的鍵、實驗室的分析方法，2026-10-31 起）。另有「工具」區（2026-10-22 起）放數據畫圖：把 FTIR、DSC、TGA、LCQ 質譜的檔案放進瀏覽器就畫成黑白的報告用圖，可下載 SVG 或 PNG；它不是教材，檔案只在瀏覽器裡處理。
+目前共有二十份教材，入口依質譜、層析、光譜、元素分析、結構與表面、磁共振分區（2026-10-08 起是質譜、層析、光譜、NMR 四區，2026-11-19 起照使用者 11-17 的選擇改成這樣）：質譜有離子阱質譜、質譜儀-不同分析器比較、GC-MS；層析有層析-GC 與 HPLC、GC-MS（兩區都列）；光譜有光譜-光與分子、UV-Vis 分光光度計、FTIR 紅外光譜儀、NIR 近紅外光譜儀、拉曼光譜儀、螢光光譜儀、CD 圓二色光譜儀；元素分析有 AAS 原子吸收光譜儀、ICP 感應耦合電漿光譜儀、XRF X 射線螢光光譜儀；結構與表面有 XRD X 射線繞射儀、XPS X 射線光電子能譜儀、SEM 掃描式電子顯微鏡；磁共振有 NMR 核磁共振、二維 NMR、EPR 電子順磁共振。儀器型號與規格以各教材的來源說明為準。「生化原理」區（2026-10-26 起）有十份 2D 動畫教材，用分章動畫與可調的參數講分子生物學與生物化學的實驗原理：中心法則、PCR 與電泳、DNA 定序、DNA 鑑定與分子標記、基因選殖與蛋白表現、萜類合成酶、CRISPR 基因編輯、抗體檢測（西方墨點法與 ELISA）、流式細胞儀、蛋白質質譜定序；這一區不用 WebGL。「生化進階」區（2026-10-27 起）有六份給大學部高年級與研究生的教材，帶公式、統計與接近真實的數據：轉錄體分析、萜類前驅物（MEP 與 MVA 路徑）、酵素動力學、族群遺傳與產地鑑定、演化樹、在植物裡驗證基因功能；生化原理裡有七份也在最後加了「進階」章節。「官能基編號」區（2026-10-30 起）用同一套 2D 播放器講有機分子的碳怎麼編號、官能基在哪裡，有三份：有機化學命名法則（名字的五個部分、主鏈、編號、取代基，以及順反、立體中心、R 與 S、E 與 Z、鏡像異構物、內消旋與費雪投影式，2026-10-31 起）、醣類（醛糖與酮糖、鏈狀接成環狀、α 與 β、環狀糖的名字、糖苷鍵，到纖維素與澱粉）、木材三大成分（纖維素、半纖維素與木質素：細胞壁的層次、纖維素的微纖絲、半纖維素的糖差在哪一號碳、木質素的單體與用號碼命名的鍵、實驗室的分析方法，2026-10-31 起）。另有「工具」區（2026-10-22 起）放數據畫圖：把 FTIR、DSC、TGA、LCQ 質譜的檔案放進瀏覽器就畫成黑白的報告用圖，可下載 SVG 或 PNG；它不是教材，檔案只在瀏覽器裡處理。
 
 離子阱質譜有兩個畫面：「動畫講解」（`lcq/`）與「拆開探索」（`lcq-3d/`）。拆開探索原本是另一份教材「LCQ 離子之旅」，2026-10-13 併入；入口只列一張卡片，兩個畫面由分頁列的「離子阱質譜」一組互相切換，網址都沒有變。
 
@@ -61,6 +70,24 @@ xrd/index.html             XRD X 射線繞射儀；X 射線管與偵測器一起
 xrd/MAINTENANCE.md         XRD 教材的程式結構與修改方式
 epr/index.html             EPR 電子順磁共振；電磁鐵、微波與共振腔，一次微分的譜線、g 值與超精細分裂
 epr/MAINTENANCE.md         EPR 教材的程式結構與修改方式
+nir/index.html             NIR 近紅外光譜儀；掃描式光柵與漫反射，泛音與合頻、水峰、二次微分、示意的含水率校正模型
+nir/MAINTENANCE.md         NIR 教材的程式結構與修改方式
+raman/index.html           拉曼光譜儀；雷射、邊緣濾光片、光柵與 CCD，拉曼位移、532 與 785 nm、木材的螢光背景
+raman/MAINTENANCE.md       拉曼光譜儀教材的程式結構與修改方式
+cd/index.html              CD 圓二色光譜儀；旋光與圓二色性兩種模式，偏振的畫法、鏡像光譜、蛋白質二級結構
+cd/MAINTENANCE.md          CD 教材的程式結構與修改方式
+aas/index.html             AAS 原子吸收光譜儀；空心陰極燈、火焰原子化、截光器、檢量線與背景校正
+aas/MAINTENANCE.md         AAS 教材的程式結構與修改方式
+icp/index.html             ICP 感應耦合電漿光譜儀；氬電漿、中階梯光柵與二維 CCD，可切換成 ICP-MS
+icp/MAINTENANCE.md         ICP 教材的程式結構與修改方式
+xrf/index.html             XRF X 射線螢光光譜儀；內層電子補位放光、矽漂移偵測器、元素能譜、管電壓
+xrf/MAINTENANCE.md         XRF 教材的程式結構與修改方式
+xps/index.html             XPS X 射線光電子能譜儀；超高真空、光電效應、半球分析器、化學位移、電荷中和
+xps/MAINTENANCE.md         XPS 教材的程式結構與修改方式
+sem/index.html             SEM 掃描式電子顯微鏡；電子鏡筒、逐行掃出的木材影像、二次與背向散射電子、EDS
+sem/MAINTENANCE.md         SEM 教材的程式結構與修改方式
+nmr-2d/index.html          二維 NMR；脈衝序列、資料堆疊與兩次傅立葉轉換，香草醛的 COSY、HSQC、HMBC
+nmr-2d/MAINTENANCE.md      二維 NMR 教材的程式結構與修改方式
 lcq-3d/index.html          離子阱質譜的「拆開探索」；不在入口清單，由分頁列進入
 lcq-3d/MAINTENANCE.md      拆開探索的程式結構與修改方式
 nmr/index.html             NMR 核磁共振；以 Bruker AVANCE III 500 為例，跟著訊號走一圈
@@ -188,11 +215,11 @@ node scripts/make-og-images.mjs http://127.0.0.1:8000/
 
 教材網址加上 `?perf=1` 可查看 FPS、繪圖比例與瀏覽器回報的繪圖裝置；資料僅顯示在本頁，不上傳。例如 `lcq-3d/?perf=1`。若顯示軟體繪圖，先檢查瀏覽器圖形加速與顯示驅動；畫質模式不保證特定裝置的幀率。
 
-十二個 3D 頁面（十一份教材，離子阱質譜有兩個畫面）共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
+二十一個 3D 頁面（二十份教材，離子阱質譜有兩個畫面）共用 `assets/camera-nav.js` 的視角操作（參考 [The Plane of Focus](https://sael.net/plane-of-focus/)）：滑鼠拖曳旋轉、右鍵或 Shift 拖曳平移、滾輪縮放；觸控板雙指滑動平移、捏合縮放；觸控螢幕單指旋轉、雙指平移與縮放；方向鍵或 WASD 移動、+ − 縮放、Shift 加快。Q/E 轉向與 R 回到預設視角只在沒有和教材既有快捷鍵衝突的頁面開啟，各頁的說明視窗列出實際可用的按鍵。
 
-手機上（寬度 760 px 以下，或高度 500 px 以下的橫拿畫面），UV-Vis、FTIR、螢光光譜儀、XRD、EPR、NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC、GC-MS 十份教材用 `assets/mobile-panels.js` 把控制面板、譜與說明收起來（2026-10-22）。2026-10-24 起收起的面板只剩畫面右緣的「‹」小把手，上面直排「調整」「圖譜」「說明」，點了面板才從右邊彈出、排在把手左邊，再點一次收回；按「掃描」「收訊」這類按鈕時譜會自動彈出。瀏覽器支援全螢幕時（Android 的 Chrome 等；iPhone 的 Safari 不支援網頁全螢幕），把手最下面有全螢幕鈕。面板展開時，3D 的主角會移到沒被擋住的地方；橫拿時標題縮成一行，其餘整片留給 3D；直拿的觸控手機會提示一次建議轉成橫式。導覽中把手藏起來，結束後回到原本的收合狀態。桌機與平板的版面不變。離子阱質譜的兩個畫面直拿時只多了轉向提示，版面照舊；手機橫拿時，拆開探索的控制面板也收成右緣的「調整」把手，動畫講解在播放中幾秒沒操作就讓出上下兩條（點一下就回來），全螢幕用它自己播放列上的按鈕。手機橫拿時寬度常常不到 760 px（作者的 Galaxy S23 Ultra 橫拿是 742×298），所以橫拿的版面一律看方向與高度，不看寬度。分頁列排不下時會捲到目前這一頁。
+手機上（寬度 760 px 以下，或高度 500 px 以下的橫拿畫面），UV-Vis、FTIR、NIR、拉曼、螢光光譜儀、CD、AAS、ICP、XRF、XRD、XPS、SEM、EPR、NMR、二維 NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC、GC-MS 十九份教材用 `assets/mobile-panels.js` 把控制面板、譜與說明收起來（2026-10-22）。2026-10-24 起收起的面板只剩畫面右緣的「‹」小把手，上面直排「調整」「圖譜」「說明」，點了面板才從右邊彈出、排在把手左邊，再點一次收回；按「掃描」「收訊」這類按鈕時譜會自動彈出。瀏覽器支援全螢幕時（Android 的 Chrome 等；iPhone 的 Safari 不支援網頁全螢幕），把手最下面有全螢幕鈕。面板展開時，3D 的主角會移到沒被擋住的地方；橫拿時標題縮成一行，其餘整片留給 3D；直拿的觸控手機會提示一次建議轉成橫式。導覽中把手藏起來，結束後回到原本的收合狀態。桌機與平板的版面不變。離子阱質譜的兩個畫面直拿時只多了轉向提示，版面照舊；手機橫拿時，拆開探索的控制面板也收成右緣的「調整」把手，動畫講解在播放中幾秒沒操作就讓出上下兩條（點一下就回來），全螢幕用它自己播放列上的按鈕。手機橫拿時寬度常常不到 760 px（作者的 Galaxy S23 Ultra 橫拿是 742×298），所以橫拿的版面一律看方向與高度，不看寬度。分頁列排不下時會捲到目前這一頁。
 
-維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[FTIR](./ftir/MAINTENANCE.md)、[螢光光譜儀](./fluorescence/MAINTENANCE.md)、[XRD](./xrd/MAINTENANCE.md)、[EPR](./epr/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)；生化原理：[中心法則](./central-dogma/MAINTENANCE.md)、[PCR 與電泳](./pcr/MAINTENANCE.md)、[DNA 定序](./sequencing/MAINTENANCE.md)、[DNA 鑑定](./dna-markers/MAINTENANCE.md)、[基因選殖](./cloning/MAINTENANCE.md)、[萜類合成酶](./terpene-synthase/MAINTENANCE.md)、[CRISPR](./crispr/MAINTENANCE.md)、[抗體檢測](./immunoassay/MAINTENANCE.md)、[流式細胞儀](./flow-cytometry/MAINTENANCE.md)、[蛋白質定序](./proteomics/MAINTENANCE.md)；生化進階：[轉錄體分析](./transcriptomics/MAINTENANCE.md)、[萜類前驅物](./terpenoid-precursors/MAINTENANCE.md)、[酵素動力學](./enzyme-kinetics/MAINTENANCE.md)、[族群遺傳與產地鑑定](./population-genetics/MAINTENANCE.md)、[演化樹](./phylogenetics/MAINTENANCE.md)、[在植物裡驗證基因功能](./gene-function/MAINTENANCE.md)；官能基編號：[有機化學命名法則](./nomenclature/MAINTENANCE.md)、[醣類](./carbohydrates/MAINTENANCE.md)、[木材三大成分](./wood-components/MAINTENANCE.md)。
+維護索引：[離子阱質譜：動畫講解](./lcq/MAINTENANCE.md)、[離子阱質譜：拆開探索](./lcq-3d/MAINTENANCE.md)、[GC-MS](./gc-ms/MAINTENANCE.md)、[UV-Vis](./uv-vis/MAINTENANCE.md)、[FTIR](./ftir/MAINTENANCE.md)、[螢光光譜儀](./fluorescence/MAINTENANCE.md)、[XRD](./xrd/MAINTENANCE.md)、[EPR](./epr/MAINTENANCE.md)、[NIR](./nir/MAINTENANCE.md)、[拉曼](./raman/MAINTENANCE.md)、[CD](./cd/MAINTENANCE.md)、[AAS](./aas/MAINTENANCE.md)、[ICP](./icp/MAINTENANCE.md)、[XRF](./xrf/MAINTENANCE.md)、[XPS](./xps/MAINTENANCE.md)、[SEM](./sem/MAINTENANCE.md)、[NMR](./nmr/MAINTENANCE.md)、[二維 NMR](./nmr-2d/MAINTENANCE.md)、[質譜儀-不同分析器比較](./mass-analyzers/MAINTENANCE.md)、[光譜-光與分子](./spectroscopy/MAINTENANCE.md)、[層析-GC 與 HPLC](./chromatography/MAINTENANCE.md)、[數據畫圖](./plot/MAINTENANCE.md)；生化原理：[中心法則](./central-dogma/MAINTENANCE.md)、[PCR 與電泳](./pcr/MAINTENANCE.md)、[DNA 定序](./sequencing/MAINTENANCE.md)、[DNA 鑑定](./dna-markers/MAINTENANCE.md)、[基因選殖](./cloning/MAINTENANCE.md)、[萜類合成酶](./terpene-synthase/MAINTENANCE.md)、[CRISPR](./crispr/MAINTENANCE.md)、[抗體檢測](./immunoassay/MAINTENANCE.md)、[流式細胞儀](./flow-cytometry/MAINTENANCE.md)、[蛋白質定序](./proteomics/MAINTENANCE.md)；生化進階：[轉錄體分析](./transcriptomics/MAINTENANCE.md)、[萜類前驅物](./terpenoid-precursors/MAINTENANCE.md)、[酵素動力學](./enzyme-kinetics/MAINTENANCE.md)、[族群遺傳與產地鑑定](./population-genetics/MAINTENANCE.md)、[演化樹](./phylogenetics/MAINTENANCE.md)、[在植物裡驗證基因功能](./gene-function/MAINTENANCE.md)；官能基編號：[有機化學命名法則](./nomenclature/MAINTENANCE.md)、[醣類](./carbohydrates/MAINTENANCE.md)、[木材三大成分](./wood-components/MAINTENANCE.md)。
 
 ## 畫面大小（1024×768 到 4K）
 
@@ -200,7 +227,7 @@ node scripts/make-og-images.mjs http://127.0.0.1:8000/
 
 - 大螢幕：`assets/ui-scale.css` 依畫面大小定義放大倍數 `--ui`。基準是 1080P 螢幕上放到最大的瀏覽器視窗（約 1920×950），寬與高都比它大時一級一級放大（每級 1/6 倍），2K（2560×1440）是 1.33 倍，4K（3840×2160）是 2 倍，最多 3 倍；比基準小一律 1 倍。2D 教材（`bio-lesson.css`）、入口（`styles.css`）與數據畫圖整頁套 `zoom: var(--ui)`，看起來和 1080P 一樣、只是大一號；3D 教材只放大面板、字幕、片頭字卡與元件標籤，3D 畫布照視窗大小。畫質的像素預算在「自動」與「完整」乘上 `--ui` 的平方（`render-quality.js`），4K 時 3D 也接近每個 CSS 像素畫一點（原本只畫一半，邊緣有鋸齒）；「流暢」不變，留給較弱的顯示卡。
 - 2D 教材的頁面寬度跟著畫面高度：動畫的高度是畫面高度扣掉上方實際占掉的高度（分頁列、標題與折成幾行的導言，由播放器量）和下方的字幕、播放列與留白（150 px），寬度依 16:9 推出來，所以動畫、字幕與播放列一定在第一個畫面裡。1920×950 的視窗時動畫從 922×519 放大到約 1184×666；1366×768 這類矮螢幕播放列不再掉到畫面外。
-- 小螢幕：寬 981 到 1279 px、或高不到 900 px 的桌機視窗（手機照 `mobile-panels.js`），UV-Vis、FTIR、螢光光譜儀、XRD、EPR、NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC 收起導言、譜圖矮一點，3D 主角的投影中心移到面板之間最大的空地（`assets/free-view.js`，空地小時稍微拉遠，鏡頭位置不動）；拆開探索在桌機與平板一律這樣取景，因為 1080P 時左上的說明也會擋到左端的噴霧室。GC-MS 原本就把主角放在面板之間的空地，動畫講解的介面只有上下兩條，這兩頁不另外取景。導覽與影片都不受影響。
+- 小螢幕：寬 981 到 1279 px、或高不到 900 px 的桌機視窗（手機照 `mobile-panels.js`），UV-Vis、FTIR、NIR、拉曼、螢光光譜儀、CD、AAS、ICP、XRF、XRD、XPS、SEM、EPR、NMR、二維 NMR、質譜儀-不同分析器比較、光譜-光與分子、層析-GC 與 HPLC 收起導言、譜圖矮一點，3D 主角的投影中心移到面板之間最大的空地（`assets/free-view.js`，空地小時稍微拉遠，鏡頭位置不動）；拆開探索在桌機與平板一律這樣取景，因為 1080P 時左上的說明也會擋到左端的噴霧室。GC-MS 原本就把主角放在面板之間的空地，動畫講解的介面只有上下兩條，這兩頁不另外取景。導覽與影片都不受影響。
 - 維護時：新加的面板、字幕或標籤要套 `zoom: var(--ui,1)`；放大的元素裡 `vw`、`vh` 會跟著放大，要寫成 `100vh / var(--ui,1)` 這種形式；面板裡的畫布用 `currentCSSZoom` 多畫幾倍像素，滑鼠座標（含 `offsetX`）除回去；JS 用像素擺放的元素（提示框、標籤、浮動資訊框）寫 `left`、`top`、`translate` 時除以 `currentCSSZoom`，沒有這個屬性的瀏覽器改用 `--ui` 的值（`render-quality.js` 的 `uiScale()`）；頁面自己另設的每格像素上限也要乘上 `--ui` 的平方（動畫講解的 `resize()`）。`scripts/check-ui-scale.mjs` 會檢查接線。
 
 ## 生化原理的播放器

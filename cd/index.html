@@ -1,0 +1,1791 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<script src="../assets/i18n.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en="CD spectrometer: telling left from right">CD 圓二色光譜儀 分辨左右手</title>
+<meta name="description" content="用 3D 模型拆開一台圓二色光譜儀,看氙燈的光經過石英晶體稜鏡變成線偏振光,再被光彈調變器輪流變成左旋、右旋圓偏振光;手性分子讓振動方向轉一個角度(旋光),或對兩種光吸收得不一樣(圓二色性)。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="儀器原理">
+<meta property="og:title" content="CD 圓二色光譜儀 分辨左右手">
+<meta property="og:description" content="用 3D 模型拆開一台圓二色光譜儀,看氙燈的光經過石英晶體稜鏡變成線偏振光,再被光彈調變器輪流變成左旋、右旋圓偏振光;手性分子讓振動方向轉一個角度(旋光),或對兩種光吸收得不一樣(圓二色性)。">
+<meta property="og:url" content="https://tung-beauregard.github.io/instrument-principles/cd/">
+<meta property="og:image" content="https://tung-beauregard.github.io/instrument-principles/assets/og/cd.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="CD 教材的畫面:展開的光路、沿光路畫出的偏振與圓二色光譜">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/ui-scale.css">
+<style>
+:root{
+  --bg:#0a0f13;
+  --panel:rgba(12,18,23,.80);
+  --line:rgba(160,215,235,.14);
+  --line-2:rgba(160,215,235,.30);
+  --ink:#eaf3f6; --ink-2:#a8bcc6; --muted:#71858f;
+  --cyan:#74e4ff; --amber:#ffc261; --violet:#bba6ff;
+  --btn:rgba(255,255,255,.05); --btn-on:#eef6f8; --btn-on-ink:#0c1318;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --sans:'Noto Sans TC','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;touch-action:none}
+.labels{position:fixed;inset:0;pointer-events:none;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+/* 左上:標題、數值、說明 */
+.hud{position:fixed;left:24px;top:20px;z-index:5;width:min(380px,calc(100vw / var(--ui,1) - 48px));pointer-events:none}
+.hud::before{content:'';position:absolute;left:-80px;top:-60px;width:620px;height:300px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 25% 35%,rgba(10,15,19,.72),rgba(10,15,19,0) 70%)}
+.hud .k{display:block;font-weight:900;font-size:28px;letter-spacing:.02em;line-height:1.1}
+.hud .big{display:block;font-weight:900;font-size:44px;line-height:1.12;color:var(--cyan);text-shadow:0 0 22px rgba(116,228,255,.35)}
+.lede{margin:10px 0 12px;font-size:13.5px;line-height:1.7;color:var(--ink-2)}
+.chips{display:flex;gap:8px;margin-bottom:10px}
+.chip{padding:7px 12px 8px;min-width:100px}
+.chip small{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.12em}
+.chip b{font-family:var(--mono);font-weight:600;font-size:18px;color:var(--cyan);white-space:nowrap}
+.note{padding:11px 14px;font-size:13px;line-height:1.75}
+.note em{font-style:normal;font-weight:700}
+.c{color:var(--cyan)} .a{color:var(--amber)} .v{color:var(--violet)}
+/* 迎著光看的小圖(偏振方向);寫法照螢光的能階圖 .jab */
+.pol{padding:8px 10px 6px;margin-bottom:10px}
+.pol h6{margin:0 0 2px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em}
+#pol{width:100%;height:112px;display:block}
+
+/* 網站分頁 */
+.sitenav{display:inline-flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto;max-width:calc(100vw / var(--ui,1) - 48px);overflow-x:auto;scrollbar-width:none}
+.sitenav::-webkit-scrollbar{display:none}
+.sitenav a{padding:4px 11px;border-radius:7px;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.sitenav a:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.sitenav a[aria-current="page"]{background:var(--ink);color:#0a0f19}
+.sitenav a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* 3D 載入中 */
+.load{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:13px;pointer-events:none;transition:opacity .5s}
+.load i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--cyan);animation:spin 1s linear infinite}
+.load.done{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.load i{animation:none}}
+
+/* 右上:控制面板 */
+.ctl{position:fixed;right:20px;top:18px;z-index:6;padding:13px 15px 14px;display:grid;grid-template-columns:auto auto;gap:12px 20px}
+.grp h6{margin:0 0 7px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.12em;display:flex;justify-content:space-between;gap:8px}
+.grp h6 span{font-family:var(--mono);color:var(--ink-2);letter-spacing:0}
+.grp h6 span[lang]{font-family:inherit;color:inherit;letter-spacing:inherit}
+.grp.off h6{opacity:.55}
+.seg{display:flex;gap:2px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px}
+.seg button,.btn{font:500 12.5px var(--sans);color:var(--ink-2);background:transparent;border:0;border-radius:7px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.seg button:hover,.btn:hover{color:var(--ink);background:rgba(255,255,255,.07)}
+.seg button.on{background:var(--btn-on);color:var(--btn-on-ink)}
+.seg.mono button{font-family:var(--mono);padding:6px 9px}
+#segSample button{padding:6px 8px}
+.row{display:flex;gap:6px;align-items:center}
+.btn{background:var(--btn);border:1px solid var(--line);padding:6px 11px}
+.btn.on{background:var(--cyan);color:#062028;border-color:transparent}
+.btn.sq{width:32px;padding:6px 0;text-align:center;font-family:var(--mono)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:180px;height:26px;background:transparent;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(90deg,rgba(116,228,255,.3),#74e4ff 50%,rgba(116,228,255,.3))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#fff;margin-top:-6px;box-shadow:0 0 0 3px rgba(116,228,255,.25),0 0 12px rgba(116,228,255,.6)}
+input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:linear-gradient(90deg,rgba(116,228,255,.3),#74e4ff 50%,rgba(116,228,255,.3))}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(116,228,255,.25),0 0 12px rgba(116,228,255,.6)}
+/* 波長滑桿(180 到 350 nm,全在紫外):範本的彩虹軌道依這個範圍重算色標(190 nm 以下同色) */
+#lam::-webkit-slider-runnable-track{background:linear-gradient(90deg,#8a63ff 0%,#8a63ff 6%,#5b7cff 100%)}
+#lam::-moz-range-track{background:linear-gradient(90deg,#8a63ff 0%,#8a63ff 6%,#5b7cff 100%)}
+input[type=range]:disabled{cursor:default;opacity:.35}
+
+.help{position:fixed;right:20px;top:254px;z-index:7;width:350px;max-height:calc(100vh / var(--ui,1) - 268px);overflow:auto;padding:14px 16px;font-size:12.5px;line-height:1.7;display:none}
+.help.show{display:block}
+.help b{font-size:13px}
+.help ul{margin:6px 0 8px;padding-left:18px}
+.help .fine{color:var(--muted);font-size:11.5px;margin:0}
+
+/* 底部:圓二色光譜或穿過檢偏鏡的光 */
+.console{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;width:min(800px,calc(100vw / var(--ui,1) - 32px));padding:11px 14px 9px}
+.con-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:12.5px;margin-bottom:4px;white-space:nowrap}
+.con-head b{font-weight:700}
+.con-head .s{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.legend{margin-left:auto;display:flex;gap:14px;color:var(--ink-2);font-size:11.5px}
+.legend i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:6px}
+.con-body{display:grid;grid-template-columns:1fr 168px;gap:14px;align-items:stretch}
+.plotwrap{position:relative}
+#plot{width:100%;height:170px;display:block;cursor:crosshair}
+.meters{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.m .t{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.m .t b{font-family:var(--mono);font-weight:500;color:var(--ink-2)}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;width:50%;border-radius:3px;background:var(--cyan)}
+.m.big .t{margin-bottom:0}
+.m.big b.n{display:block;font-family:var(--mono);font-size:24px;font-weight:600;color:var(--cyan);line-height:1.2}
+.tip{position:absolute;pointer-events:none;padding:4px 8px;border-radius:6px;background:#0d151a;border:1px solid var(--line-2);font:500 11.5px var(--mono);color:var(--ink);white-space:nowrap;display:none;transform:translate(-50%,-120%)}
+
+.foot{position:fixed;left:24px;bottom:14px;z-index:4;max-width:250px;font-size:11px;line-height:1.55;color:var(--muted)}
+
+/* 元件標籤 */
+.lw{pointer-events:none}
+.lbl{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:3px 8px 3px 7px;border-radius:6px;background:rgba(9,14,18,.84);border:1px solid rgba(116,228,255,.32);font-size:11.5px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.lbl i{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);flex:none}
+.lbl b{font-weight:700;color:#fff}
+.lbl span{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+
+/* 導覽與影片 */
+.cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:8;display:none;width:max-content;max-width:min(960px,calc(100vw / var(--ui,1) - 40px));text-align:center;padding:13px 26px 15px}
+.cap .chap{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.16em;margin-bottom:5px}
+.cap .txt{font-size:18px;line-height:1.6;font-weight:500}
+.titlecard{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:radial-gradient(ellipse at center,rgba(10,15,19,.66) 0%,rgba(10,15,19,.4) 40%,rgba(10,15,19,0) 70%)}
+.titlecard .t1{font-weight:900;font-size:42px;letter-spacing:.04em}
+.titlecard .t2{font-weight:900;font-size:72px;color:var(--cyan);text-shadow:0 0 30px rgba(116,228,255,.4);line-height:1.15}
+.titlecard .t3{font-size:20px;color:var(--ink-2);margin-top:14px}
+.titlecard .t4{font-size:14px;color:var(--muted);margin-top:22px}
+#tourExit{position:fixed;right:20px;top:18px;z-index:9;display:none}
+html.touring .ctl,html.touring .help,html.touring .lede,html.touring .note,html.touring .foot{display:none}
+/* 導覽時分頁列只到「結束導覽」的左邊 */
+html.touring .sitenav{max-width:calc(100vw / var(--ui,1) - 48px - 120px)}
+html.touring .cap,html.touring #tourExit,html.touring .titlecard{display:block}
+html.touring .titlecard{display:flex}
+html.touring .cap.withcon{bottom:250px}
+
+html.film .ctl,html.film .help,html.film .lede,html.film .note,html.film .foot,html.film #tourExit,html.film .sitenav,html.film .load{display:none}
+html.film .cap{display:block;bottom:56px;max-width:1440px;padding:18px 40px 20px}
+html.film .cap .chap{font-size:16px;margin-bottom:8px}
+html.film .cap .txt{font-size:31px}
+html.film .titlecard{display:flex}
+html.film .titlecard .t1{font-size:56px}
+html.film .titlecard .t2{font-size:104px}
+html.film .titlecard .t3{font-size:28px}
+html.film .titlecard .t4{font-size:19px}
+html.film .hud{left:52px;top:44px;width:560px}
+html.film .hud::before{width:900px;height:420px}
+html.film .hud .k{font-size:34px}
+html.film .hud .big{font-size:54px}
+html[lang="en"]:not(.mp):not(.film) .hud .k{font-size:24px}
+html[lang="en"]:not(.mp):not(.film) .hud .big{font-size:34px}
+html[lang="en"].film .hud .k{font-size:28px}
+html[lang="en"].film .hud .big{font-size:46px}
+html.film .chips{margin-top:16px;gap:12px}
+html.film .chip{min-width:150px;padding:10px 16px 11px}
+html.film .chip small{font-size:14px}
+html.film .chip b{font-size:26px}
+html.film #pol{height:160px}
+html.film .pol h6{font-size:14px}
+html.film .console{left:auto;right:52px;top:48px;bottom:auto;transform:none;width:720px;padding:16px 20px 14px}
+html.film .con-head{font-size:17px;margin-bottom:8px}
+html.film .legend{font-size:15px}
+html.film #plot{height:250px}
+html.film .con-body{grid-template-columns:1fr 200px}
+html.film .m .t{font-size:14px}
+html.film .m.big b.n{font-size:32px}
+html.film .lbl{font-size:17px;padding:5px 12px 5px 10px;border-radius:8px;gap:8px}
+html.film .lbl span{font-size:14px}
+html.film .lbl i{width:8px;height:8px}
+html.rec *{transition:none!important;animation:none!important}
+
+@media (max-width:980px){
+  .lede,.foot{display:none}
+  .ctl{left:12px;right:12px;top:auto;bottom:228px;grid-template-columns:1fr;gap:8px;padding:10px 12px}
+  .hud{left:12px;top:12px}
+  .note{display:none}
+  .help{left:12px;right:12px;width:auto;top:120px}
+  input[type=range]{width:100%}
+}
+@media(max-width:420px){#sitenav a,.sitenav a{padding-left:7px;padding-right:7px;font-size:11.5px}}
+/* 手機版(html.mp,由 ../assets/mobile-panels.js 加上):標題與讀值縮小,控制面板與譜收在底部的停靠區 */
+html.mp .hud{left:12px;top:10px;width:min(380px,calc(100vw - 24px))}
+html.mp .hud .k{font-size:16px}
+html.mp .hud .big{font-size:26px;text-shadow:0 0 16px rgba(116,228,255,.3)}
+html.mp .sitenav{margin-bottom:8px;max-width:100%}
+html.mp .chips{gap:6px;margin:6px 0 0}
+html.mp .chip{flex:1 1 0;min-width:0;padding:5px 9px 6px}
+html.mp .chip small{font-size:10px;letter-spacing:.06em}
+html.mp .chip b{display:block;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+html.mp .lede,html.mp .note,html.mp .foot,html.mp .pol{display:none}
+html.mp input[type=range]{width:100%}
+html.mp .con-head > b,html.mp .con-head > .s{display:none}
+html.mp .legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px}
+html.mp #plot{height:150px}
+/* 說明框:放在標題下方,太長就捲動;橫拿時蓋在標題上,不擋右側的停靠區 */
+html.mp .help{left:12px;right:auto;top:var(--mp-free-top,120px);width:min(380px,calc(100vw - 24px - var(--mp-rail-w, 0px)));max-height:calc(100vh - var(--mp-free-top,120px) - 12px);max-height:calc(100dvh - var(--mp-free-top,120px) - 12px);overflow:auto;overscroll-behavior:contain}
+/* 導覽中:字幕放在停靠區上方 */
+html.mp.touring .cap.withcon{bottom:calc(var(--mp-dock-h,230px) + 20px)}
+@media (orientation:landscape){
+  html.mp .help{top:10px;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .cap,html.mp.touring .cap.withcon{left:12px;right:auto;bottom:12px;transform:none;max-width:calc(100vw - min(380px,46vw) - 36px)}
+}
+html.mp .ctl{grid-template-columns:1fr;gap:8px}
+/* 手機上元件標籤只留名稱(小字太擠,HT 與光的強弱看讀值卡與讀值條) */
+html.mp .lbl span{display:none}
+html.mp .con-body{grid-template-columns:minmax(0,1fr);gap:8px}
+html.mp .meters{flex-direction:row;align-items:flex-end;gap:12px}
+html.mp .meters .m{flex:1;min-width:0}
+html.mp .m.big b.n{font-size:20px}
+/* 橫拿(高度常常只剩 300 px 左右):標題排成一行、讀值卡變矮,停靠區在右上角(見 mobile-panels.css) */
+@media (orientation:landscape){
+  html.mp .hud{top:8px}
+  html.mp .sitenav{margin-bottom:6px}
+  html.mp .hud .k,html.mp .hud .big{display:inline;white-space:nowrap}
+  html.mp .hud .k{font-size:14px;margin-right:8px}
+  html.mp .hud .big{font-size:19px}
+  html.mp .chips{margin-top:4px}
+  html.mp .chip{padding:3px 8px 4px}
+  html.mp .chip b{font-size:13px}
+}
+/* 手機導覽(2026-11-09):分頁列藏起來,「結束導覽」放在它的位置;橫拿時標題欄只到停靠區的左邊;片頭片尾字卡縮小 */
+html.mp.touring .sitenav{visibility:hidden}
+html.mp.touring #tourExit{left:12px;right:auto;top:10px}
+@media (orientation:landscape){
+  html.mp.touring #tourExit{top:8px}
+  html.mp.touring .hud{width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .hud .k,html.mp.touring .hud .big{white-space:normal}
+}
+html.mp .titlecard{padding:0 16px}
+html.mp .titlecard .t1{font-size:24px}
+html.mp .titlecard .t2{font-size:40px}
+html.mp .titlecard .t3{font-size:14px;margin-top:8px}
+html.mp .titlecard .t4{font-size:11px;margin-top:10px}
+@media (orientation:landscape) and (max-height:340px){
+  html.mp.touring .cap{padding:8px 14px 9px}
+  html.mp.touring .cap .chap{font-size:11px;margin-bottom:3px}
+  html.mp.touring .cap .txt{font-size:15px;line-height:1.5}
+}
+/* 桌機小螢幕(1024×768、1366×768 這類):導言收起來、小圖與譜圖矮一點、標籤只留名稱;3D 主角移到面板之間的空地(../assets/free-view.js) */
+@media (min-width:981px) and (max-width:1279px),(min-width:981px) and (max-height:899px){
+  .lede{display:none}
+  #pol{height:84px}
+  .lbl span{display:none}
+  #plot{height:120px}
+}
+/* 桌機小螢幕時頁尾的小字會被譜圖面板蓋住,收起來(說明框與片尾字卡都有寫示意) */
+@media (min-width:981px) and (max-width:1359px){.foot{display:none}}
+/* 大螢幕(2K、4K)的放大(見 ../assets/ui-scale.css):面板、字幕、片頭字卡與元件標籤依 --ui 放大;3D 畫布與 CSS2D 的定位層不放大 */
+.hud,.load,.ctl,.help,.console,.foot,.cap,.titlecard,#tourExit,.lbl{zoom:var(--ui,1)}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+}}
+</script>
+<link rel="stylesheet" href="../assets/render-quality.css">
+<link rel="stylesheet" href="../assets/mobile-panels.css">
+</head>
+<body>
+<div id="stage"></div>
+<div class="load" id="load"><i></i><span data-en="Loading the 3D model">3D 模型載入中</span></div>
+
+<header class="hud">
+  <nav class="sitenav" aria-label="光譜" data-en-aria-label="Spectroscopy"><a href="../" data-en="← All lessons">← 儀器入口</a><a href="../spectroscopy/" data-en="Light and molecules">光與分子</a><a href="../uv-vis/">UV-Vis</a><a href="../ftir/">FTIR</a><a href="../nir/">NIR</a><a href="../raman/" data-en="Raman">拉曼</a><a href="../fluorescence/" data-en="Fluorescence">螢光</a><a href="./" aria-current="page">CD</a></nav>
+  <span class="k" data-en="CD spectrometer">CD 圓二色光譜儀</span>
+  <span class="big" data-en="Telling left from right">分辨左右手</span>
+  <p class="lede" data-en="Some molecules cannot be laid over their mirror image, like left and right hands; they are called chiral. A pure mirror pair melts, boils and absorbs infrared alike, and differs only with polarized light or other chiral things such as enzymes. A polarimeter measures how far the vibration of polarized light is turned; a CD spectrometer measures how differently left and right circularly polarized light are absorbed (circular dichroism). Switch the mode, drag the analyzer, or press Scan.">有些分子和自己的鏡像疊不起來,就像左手和右手,稱為手性分子。一對純的鏡像分子,熔點、沸點、紅外光譜都一樣,碰到偏光或酵素這類手性的東西才不同。旋光儀量偏振光的振動方向被轉了幾度;圓二色光譜儀量左旋、右旋圓偏振光被吸收的量差多少(圓二色性,化學名詞是圓偏光二色性)。切換模式、拖曳檢偏鏡,或按「掃描」。</p>
+  <div class="chips">
+    <div class="chip panel"><small id="k1" data-en="Wavelength">波長</small><b id="c1">290.5 nm</b></div>
+    <div class="chip panel"><small id="k2" data-en="Ellipticity">橢圓度</small><b id="c2">+190 mdeg</b></div>
+    <div class="chip panel"><small id="k3">HT</small><b id="c3">318 V</b></div>
+  </div>
+  <div class="pol panel"><h6 data-en="Facing the light">迎著光看</h6><canvas id="pol"></canvas></div>
+  <div class="note panel" id="note"></div>
+</header>
+
+<aside class="ctl panel" id="ctl">
+  <div class="grp"><h6 data-en="Sample">樣品</h6>
+    <div class="seg" id="segSample">
+      <button data-v="csaP" data-m="cd" class="on" data-en="(+)-CSA">(+)-樟腦磺酸</button><button data-v="csaM" data-m="cd" data-en="(−)-CSA">(−)-樟腦磺酸</button><button data-v="helix" data-m="cd" data-en="α-helix">α 螺旋</button><button data-v="sheet" data-m="cd" data-en="β-sheet">β 褶板</button><button data-v="pinP" data-m="or" data-en="(+)-α-pinene" hidden>(+)-α-蒎烯</button><button data-v="pinM" data-m="or" data-en="(−)-α-pinene" hidden>(−)-α-蒎烯</button><button data-v="suc" data-m="or" data-en="Sucrose" hidden>蔗糖</button><button data-v="blank" data-m="or" data-en="Blank" hidden>空白</button>
+    </div>
+  </div>
+  <div class="grp"><h6 data-en="Mode">模式</h6>
+    <div class="seg" id="segMode"><button data-v="cd" class="on" data-en="CD">圓二色</button><button data-v="or" data-en="Rotation">旋光</button></div>
+  </div>
+  <div class="grp" id="gLam"><h6><span lang="zh-Hant">波長</span><span lang="en">Wavelength</span> <span id="lv">290.5 nm</span></h6>
+    <input type="range" id="lam" min="180" max="350" step="0.5" value="290.5" aria-label="波長" data-en-aria-label="Wavelength">
+  </div>
+  <div class="grp off" id="gAng"><h6><span lang="zh-Hant">檢偏鏡角度</span><span lang="en">Analyzer angle</span> <span id="av">0.0°</span></h6>
+    <input type="range" id="ang" min="-90" max="90" step="0.5" value="0" disabled aria-label="檢偏鏡角度" data-en-aria-label="Analyzer angle">
+  </div>
+  <div class="grp"><h6 data-en="Case">外殼</h6>
+    <div class="row">
+      <div class="seg" id="segShell"><button data-v="0" data-en="Closed">組裝</button><button data-v="1" class="on" data-en="Open">展開</button></div>
+      <button class="btn" id="btnScan" data-en="Scan">掃描</button>
+      <button class="btn" id="btnTour" data-en="Tour">導覽</button>
+      <button class="btn sq" id="btnHelp" aria-label="說明" data-en-aria-label="Help">?</button>
+    </div>
+  </div>
+</aside>
+
+<div class="help panel" id="help">
+  <b data-en="Controls">操作</b>
+  <ul lang="zh-Hant">
+    <li>滑鼠:拖曳旋轉視角;右鍵或按住 Shift 拖曳平移;滾輪縮放</li>
+    <li>觸控板:雙指滑動平移、兩指捏合縮放;觸控螢幕:單指旋轉、雙指平移與縮放</li>
+    <li>鍵盤:方向鍵或 W A S D 移動、Q E 轉向、+ − 縮放,按住 Shift 加快;R 回到預設視角</li>
+    <li>切換「圓二色」與「旋光」兩種模式;圓二色用波長滑桿換波長,旋光用檢偏鏡角度滑桿,或直接左右拖曳 3D 裡的檢偏鏡</li>
+    <li>「掃描」:圓二色模式從 350 nm 掃到 180 nm(動畫已加速),旋光模式把檢偏鏡轉過 180° 找最暗的角度;換樣品再掃一次,上一條會留著比較</li>
+    <li>「導覽」:自動播一遍,內容和影片相同;按 Esc 結束</li>
+  </ul>
+  <ul lang="en">
+    <li>Mouse: drag to rotate the view; right-drag or Shift-drag to pan; scroll to zoom</li>
+    <li>Trackpad: swipe with two fingers to pan, pinch to zoom; touch screen: one finger rotates, two fingers pan and zoom</li>
+    <li>Keyboard: arrow keys or W A S D to move, Q E to turn, + − to zoom, hold Shift to go faster; R resets the view</li>
+    <li>Switch between the CD and Rotation modes; in CD the slider sets the wavelength, in Rotation the analyzer slider turns the analyzer, or drag the analyzer in 3D left or right</li>
+    <li>"Scan": in CD the wavelength runs from 350 to 180 nm (sped up); in Rotation the analyzer turns through 180° to find the darkest angle; change the sample and scan again and the previous curve stays for comparison</li>
+    <li>"Tour": plays through automatically, the same as the video; press Esc to end it</li>
+  </ul>
+  <p class="fine" lang="zh-Hant">示意圖。元件以常見的桌上型圓二色光譜儀為例(規格參考 JASCO J-1500 與 Applied Photophysics Chirascan):150 W 級氙燈、晶體石英雙稜鏡單色器兼作起偏、熔融石英光彈調變器約 50 kHz、光電倍增管與鎖相放大器,光路通氮氣(氧會吸收遠紫外光,燈的紫外光也會把氧變成傷鏡面的臭氧)。專用的旋光儀傳統用鈉燈的 589 nm 黃光,這裡把兩種量法放在同一台上方便比較。樟腦磺酸以 0.06% 樟腦磺酸銨、1 cm 光徑為例(290.5 nm 約 +190 mdeg,由文獻的 Δε 算出),(−) 型由鏡像對稱推得;肌紅蛋白只有 222 nm 的強度有文獻值,其餘峰形、β 褶板整條、峰寬、吸光度、HT 與雜訊都是示意。旋光度由文獻的比旋光度算出(α-蒎烯 20 °C 純液體、蔗糖 10 g/100 mL),讀數每 180° 重複一次,實務上換管長再確認。比旋光度的完整單位是 deg mL g⁻¹ dm⁻¹;要和濃度無關的 CD 單位時用 [θ] = 3298 × Δε。偏振的畫法、光的波長與調變的速度都放慢放大過。</p>
+  <p class="fine" lang="en">Schematic. The parts follow a common benchtop CD spectrometer (specifications from the JASCO J-1500 and Applied Photophysics Chirascan): a 150 W class xenon lamp, a double crystal quartz prism monochromator that also polarizes, a fused quartz photoelastic modulator at about 50 kHz, a photomultiplier and a lock-in amplifier, with a nitrogen purge (oxygen absorbs far UV, and the lamp's UV turns oxygen into ozone that damages mirrors). A dedicated polarimeter traditionally uses the 589 nm yellow light of a sodium lamp; both methods are shown on one instrument for comparison. Camphorsulfonic acid is 0.06% ammonium camphorsulfonate in a 1 cm cell (about +190 mdeg at 290.5 nm, calculated from literature Δε); the (−) form is its mirror image. For myoglobin only the 222 nm strength is from the literature; the other band shapes, the whole β-sheet curve, band widths, absorbance, HT and noise are illustrative. Rotations are calculated from literature specific rotations (α-pinene at 20 °C, neat; sucrose 10 g/100 mL); the reading repeats every 180°, so in practice a second tube length is used to confirm. The full unit of specific rotation is deg mL g⁻¹ dm⁻¹; for a concentration-free CD unit, [θ] = 3298 × Δε. The polarization drawings, the wavelength of light and the modulation are slowed down and enlarged.</p>
+</div>
+
+<section class="console panel" id="console">
+  <div class="con-head"><b id="conTitle" data-en="CD spectrum">圓二色光譜</b><span class="s" id="conSample"></span><span class="legend" id="legend"></span></div>
+  <div class="con-body">
+    <div class="plotwrap"><canvas id="plot"></canvas><div class="tip" id="tip"></div></div>
+    <div class="meters">
+      <div class="m"><div class="t"><span id="m1t" data-en="Left light">左旋光</span><b id="v1">100%</b></div><div class="bar"><i id="b1"></i></div></div>
+      <div class="m"><div class="t"><span id="m2t" data-en="Right light">右旋光</span><b id="v2">100%</b></div><div class="bar"><i id="b2"></i></div></div>
+      <div class="m big"><div class="t" id="m3t" data-en="Ellipticity θ (mdeg) = 32982 × ΔA">橢圓度 θ(mdeg)= 32982 × ΔA</div><b class="n" id="v3">+190</b></div>
+    </div>
+  </div>
+</section>
+
+<div class="foot" data-en="Schematic; part positions, the polarization drawings and some spectra are illustrative.">示意圖;元件位置、偏振的畫法與部分光譜為示意。</div>
+
+<div class="cap panel" id="cap"><div class="chap" id="chap"></div><div class="txt" id="capTxt"></div></div>
+<div class="titlecard" id="titlecard"><div class="t1" id="tc1"></div><div class="t2" id="tc2"></div><div class="t3" id="tc3"></div><div class="t4" id="tc4"></div></div>
+<button class="btn" id="tourExit" data-en="End tour">結束導覽</button>
+
+<script type="module">
+import { createQualityControls, uiScale } from '../assets/render-quality.js';
+import { createCameraNav } from '../assets/camera-nav.js';
+import { createMobilePanels } from '../assets/mobile-panels.js';
+import { createFreeView } from '../assets/free-view.js';
+const quality = createQualityControls({ host: '#ctl', onChange: () => resize() });
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const $ = s => document.querySelector(s);
+const Q = new URLSearchParams(location.search);
+const FILM = Q.has('film'), REC = Q.has('rec');
+const root = document.documentElement;
+if (FILM) root.classList.add('film');
+if (REC) root.classList.add('rec');
+// 手機版:控制面板與譜預設收成有標籤的細條,放在底部;直拿時建議轉成橫式(../assets/mobile-panels.js)
+const mp = createMobilePanels({
+  dock: true, top: '.hud', rotateHint: true,
+  suspended: () => FILM || root.classList.contains('touring'),
+  panels: [
+    { el: '#ctl', icon: 'adjust', label: zhEn('調整', 'Adjust'), items: zhEn('樣品、模式、波長、檢偏鏡角度、外殼、掃描、導覽、說明、畫質', 'sample, mode, wavelength, analyzer angle, case, scan, tour, help, quality'), onToggle: (open) => { if (!open) document.getElementById('help').classList.remove('show'); } },
+    { el: '#console', icon: 'chart', label: zhEn('光譜與旋光', 'Spectrum and rotation'), items: () => $('#conSample').textContent },
+  ],
+});
+$('#btnScan').addEventListener('click', () => mp.open('#console'));
+window.__err = null;
+addEventListener('error', e => { window.__err = String(e.message || e); });
+
+// ================= 小工具 =================
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = t => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const gauss = n => Math.sqrt(-2 * Math.log(Math.max(1e-6, hash(n)))) * Math.cos(6.2831853 * hash(n + 17.77));
+const MONO = "'IBM Plex Mono',Consolas,monospace";
+const DEG = Math.PI / 180;
+const sgn = (v, eps) => (v > eps ? '+' : v < -eps ? '−' : '');
+const fmtDeg = (v, d = 1) => `${sgn(v, .5 * 10 ** -d)}${Math.abs(v).toFixed(d)}°`;
+const fmtTheta = v => { const a = Math.abs(v); return `${sgn(v, .005)}${a >= 100 ? a.toFixed(0) : a >= 10 ? a.toFixed(1) : a.toFixed(2)} mdeg`; };
+const pct = T => { const p = T * 100; return (p < 1 ? p.toFixed(2) : p < 10 ? p.toFixed(1) : p.toFixed(0)) + '%'; };
+const fmtDA = v => `${sgn(v, 5e-7)}${Math.abs(v).toFixed(Math.abs(v) < .001 ? 5 : 4)}`;
+
+// ================= 光譜模型 =================
+// 圓二色:各吸收帶 [中心 nm, 寬度 σ nm, 這個條件下的橢圓度 mdeg](高斯;寬度都是示意)
+const g1 = (l, c, s) => Math.exp(-.5 * ((l - c) / s) ** 2);
+const CD = {
+  // 0.06% 樟腦磺酸銨、1 cm:290.5 nm 約 +190 mdeg、192.5 nm 約 −390 mdeg(由 Δε +2.39、−4.92 算出)
+  csaP: { name: zhEn('(+)-樟腦磺酸', '(+)-CSA'), full: zhEn('(+)-樟腦磺酸銨 0.06% 水溶液,光徑 1 cm(校正用標準品)', '(+)-ammonium camphorsulfonate (CSA), 0.06% in water, 1 cm path (calibration standard)'), inText: zhEn('(+)-樟腦磺酸', '(+)-CSA'), path: 'cm', abs: 'csa', bands: [[290.5, 17, 190], [192.5, 9.5, -390]] },
+  // 鏡像異構物:大小相同、正負相反(由鏡像對稱推得)
+  csaM: { name: zhEn('(−)-樟腦磺酸', '(−)-CSA'), full: zhEn('(−)-樟腦磺酸銨 0.06%,光徑 1 cm(由鏡像對稱推得)', '(−)-ammonium camphorsulfonate, 0.06%, 1 cm path (mirror image of the (+) form)'), inText: zhEn('(−)-樟腦磺酸', '(−)-CSA'), path: 'cm', abs: 'csa', bands: [[290.5, 17, -190], [192.5, 9.5, 390]] },
+  // 肌紅蛋白 0.1 mg/mL、1 mm:222 nm 約 −20.8 mdeg(由 [θ]222 ≈ −23,000 算出);208 與 192 nm 的高度、所有寬度為示意
+  helix: { name: zhEn('α 螺旋', 'α-helix'), full: zhEn('肌紅蛋白(α 螺旋為主)0.1 mg/mL,光徑 1 mm', 'Myoglobin (mostly α-helix), 0.1 mg/mL, 1 mm path'), inText: zhEn('肌紅蛋白', 'myoglobin'), path: 'mm', abs: 'prot', bands: [[223, 6.8, -20.807], [207, 5.0, -19.526], [191.5, 6.0, 42.364]] },
+  // β 褶板:整條示意(約 217 nm 負、約 196 nm 正,比 α 螺旋淺)
+  sheet: { name: zhEn('β 褶板', 'β-sheet'), full: zhEn('β 褶板為主的蛋白質(示意)0.1 mg/mL,光徑 1 mm', 'A mostly β-sheet protein (illustrative), 0.1 mg/mL, 1 mm path'), inText: zhEn('這個蛋白質', 'this protein'), path: 'mm', abs: 'prot', bands: [[217, 8.5, -7.594], [196, 6.5, 17.359]] },
+};
+const thetaAt = (sm, l) => { let s = 0; for (const [c, w, a] of sm.bands) s += a * g1(l, c, w); return s; };
+// 光路上除了儀器以外吸掉的光(示意):溶劑(水)加樣品本身;樟腦磺酸在 285 nm 的 ε = 34.5 → 0.06% 時 A ≈ 0.08
+const ABS = {
+  csa: l => .083 * g1(l, 287, 20) / g1(285, 287, 20) + .35 * Math.exp(-(l - 190) / 10),
+  prot: l => .9 * Math.exp(-(l - 190) / 9) + .012 * g1(l, 278, 9),
+};
+const PATH_CM = { cm: 1, mm: .1 };
+const waterA = (l, cm) => cm * 2 * Math.exp(-(l - 185) / 4);       // 水在 1 cm、185 nm 以下開始不透光(示意的曲線)
+const sysA = l => .25 + .6 * Math.exp(-(l - 180) / 12);           // 燈、光學元件在遠紫外的損失(示意)
+const sampleA = (sm, l) => ABS[sm.abs](l) + waterA(l, PATH_CM[sm.path]);
+// HT:光少一點,光電倍增管的電壓就要升高(增益 ∝ 電壓的 Z 次方,這裡 Z = 6,示意),上限 1000 V
+const htAt = (sm, l) => Math.min(1000, 280 * 10 ** ((sampleA(sm, l) + sysA(l)) / 6));
+const HT_BAD = 600;
+const noiseCD = (sm, l) => .03 * 10 ** (.7 * (sampleA(sm, l) + sysA(l)));   // mdeg,示意
+for (const k in CD) {
+  const sm = CD[k]; let lo = 0, hi = 0, bad = 180;
+  for (let l = 180; l <= 350; l += .5) { const v = thetaAt(sm, l); lo = Math.min(lo, v); hi = Math.max(hi, v); if (htAt(sm, l) > HT_BAD) bad = l; }
+  Object.assign(sm, { lo, hi, bad });
+}
+// 旋光:鈉 D 線 589 nm、1 dm 樣品管;α = [α] × l × c(純液體的 c 用密度)
+const OR = {
+  pinP: { name: zhEn('(+)-α-蒎烯', '(+)-α-pinene'), full: zhEn('(+)-α-蒎烯 純液體,1 dm 樣品管,20 °C', '(+)-α-pinene, neat liquid, 1 dm tube, 20 °C'), inText: zhEn('(+)-α-蒎烯', '(+)-α-pinene'), spec: 51.14, c: .8591 },
+  pinM: { name: zhEn('(−)-α-蒎烯', '(−)-α-pinene'), full: zhEn('(−)-α-蒎烯 純液體,1 dm 樣品管,20 °C', '(−)-α-pinene, neat liquid, 1 dm tube, 20 °C'), inText: zhEn('(−)-α-蒎烯', '(−)-α-pinene'), spec: -51.28, c: .8590 },
+  suc: { name: zhEn('蔗糖', 'Sucrose'), full: zhEn('蔗糖 10 g/100 mL 水溶液,1 dm 樣品管,20 °C', 'Sucrose, 10 g/100 mL in water, 1 dm tube, 20 °C'), inText: zhEn('蔗糖水溶液', 'the sucrose solution'), spec: 66.37, c: .1 },
+  blank: { name: zhEn('空白', 'Blank'), full: zhEn('空白(只有水),1 dm 樣品管', 'Blank (water only), 1 dm tube'), inText: zhEn('空白', 'the blank'), spec: null, c: 0 },
+};
+for (const k in OR) OR[k].alpha = OR[k].spec == null ? 0 : OR[k].spec * 1 * OR[k].c;
+const NA_D = 589;
+const malus = (phi, a) => Math.sin((phi - a) * DEG) ** 2;   // 空白最暗處定為 0°:透過 = sin²(φ − α)
+// 掃描的曲線(同一個種子同一點的雜訊固定,掃描時前面畫好的點不會跳)
+function traceOf(sc) {
+  if (sc.mode === 'cd') {
+    const sm = CD[sc.sample], n = Math.floor((sc.from - sc.to) / .5 + 1e-6), out = new Float32Array((n + 1) * 2);
+    for (let i = 0; i <= n; i++) { const l = sc.from - i * .5; out[i * 2] = l; out[i * 2 + 1] = thetaAt(sm, l) + noiseCD(sm, l) * gauss(l * 13.37 + sc.seed); }
+    return out;
+  }
+  const a = OR[sc.sample].alpha, n = Math.floor((sc.to - sc.from) / .5 + 1e-6), out = new Float32Array((n + 1) * 2);
+  for (let i = 0; i <= n; i++) { const p = sc.from + i * .5; out[i * 2] = p; out[i * 2 + 1] = 100 * malus(p, a) + .25 * gauss(p * 7.31 + sc.seed); }
+  return out;
+}
+const traceCache = new Map();
+function traceCached(sc) {
+  const k = `${sc.mode}|${sc.sample}|${sc.from}|${sc.to.toFixed(2)}|${sc.seed}`;
+  let v = traceCache.get(k);
+  if (!v) { v = traceOf(sc); if (traceCache.size > 40) traceCache.clear(); traceCache.set(k, v); }
+  return v;
+}
+// 最暗的角度:對 y = a + b cos2φ + c sin2φ 做最小平方,α = ½ atan2(−c, −b)(讀數每 180° 重複,取 −90° 到 90°)
+const fitCache = new Map();
+function fitAlpha(sc) {
+  const k = `${sc.sample}|${sc.seed}`; if (fitCache.has(k)) return fitCache.get(k);
+  const tr = traceCached(sc); const M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], v = [0, 0, 0];
+  for (let i = 0; i < tr.length; i += 2) {
+    const f = [1, Math.cos(2 * tr[i] * DEG), Math.sin(2 * tr[i] * DEG)], y = tr[i + 1] / 100;
+    for (let r = 0; r < 3; r++) { v[r] += f[r] * y; for (let c = 0; c < 3; c++) M[r][c] += f[r] * f[c]; }
+  }
+  for (let i = 0; i < 3; i++) for (let r = i + 1; r < 3; r++) { const f = M[r][i] / M[i][i]; for (let c = i; c < 3; c++) M[r][c] -= f * M[i][c]; v[r] -= f * v[i]; }
+  const x = [0, 0, 0]; for (let i = 2; i >= 0; i--) { let s = v[i]; for (let c = i + 1; c < 3; c++) s -= M[i][c] * x[c]; x[i] = s / M[i][i]; }
+  let a = .5 * Math.atan2(-x[2], -x[1]) / DEG; if (a <= -90) a += 180; if (a > 90) a -= 180;
+  fitCache.set(k, a); return a;
+}
+
+// 波長 → 顯示用顏色(sRGB 0..1);紫外與近紅外看不見,分別用淡紫與暗紅代表(範本)
+function wlColor(l) {
+  let r, g, b;
+  if (l < 380) { r = .62; g = .38; b = 1; }
+  else if (l < 440) { r = -(l - 440) / 60 * .8 + .1; g = 0; b = 1; }
+  else if (l < 490) { r = 0; g = (l - 440) / 50; b = 1; }
+  else if (l < 510) { r = 0; g = 1; b = -(l - 510) / 20; }
+  else if (l < 580) { r = (l - 510) / 70; g = 1; b = 0; }
+  else if (l < 645) { r = 1; g = -(l - 645) / 65; b = 0; }
+  else if (l <= 780) { r = 1; g = 0; b = 0; }
+  else { const t = clamp((l - 780) / 320, 0, 1); r = .78 - .3 * t; g = .05; b = .14 + .08 * t; }
+  return [clamp(r, 0, 1), clamp(g, 0, 1), clamp(b, 0, 1)];
+}
+const lin = rgb => new THREE.Color().setRGB(rgb[0], rgb[1], rgb[2], THREE.SRGBColorSpace);
+const css = (rgb, a = 1) => `rgba(${rgb.map(v => Math.round(v * 255)).join(',')},${a})`;
+const C_XE = lin([.86, .9, 1]);
+const xeSpec = l => .45 + .55 * sstep(175, 260, l);   // 氙燈加光學元件的相對亮度(只影響畫面,示意)
+// 左旋、右旋兩個分量的顏色(3D 的分解與小圖)
+const C_L = '#ffa463', C_R = '#7fb2ff';
+
+// ================= 偏振(瓊斯向量)=================
+// 光沿 +z 走;迎著光看(從 +z 往 −z 看)x 向右、y 向上。順時針 = 右旋;旋光度為正 = 順時針。
+// 瓊斯向量寫成 [x 實部, x 虛部, y 實部, y 虛部];電場 E = Re{J e^{i(kz − ωt)}}
+const TP = 2.4;                                   // 光彈調變器一個週期(放慢成 2.4 秒,實際約 20 µs)
+const WK = 2 * Math.PI / 2.4, WW = 2 * Math.PI;   // 畫出來的光波:波長 2.4 單位、每秒 1 個週期(示意)
+const J_H = [1, 0, 0, 0];
+const pemDelta = (t, k) => Math.PI / 2 * k * Math.sin(2 * Math.PI * t / TP);   // 相位差;+90° 左旋、−90° 右旋
+// 光彈調變器的兩個軸在 ±45°;水平線偏振進去,y 方向(慢軸那一邊)落後 δ
+function jonesPEM(d) { const c = Math.cos(d), s = -Math.sin(d); return [(1 + c) / 2, s / 2, (1 - c) / 2, -s / 2]; }
+// 迎著光看順時針轉 ψ(弧度)
+function rotJ(J, p) { const c = Math.cos(p), s = Math.sin(p); return [J[0] * c + J[2] * s, J[1] * c + J[3] * s, -J[0] * s + J[2] * c, -J[1] * s + J[3] * c]; }
+// 投影到檢偏鏡的透光軸 a = (sin φ, cos φ)(φ 從垂直往順時針量)
+function analyzeJ(J, phi) { const ax = Math.sin(phi), ay = Math.cos(phi), re = ax * J[0] + ay * J[2], im = ax * J[1] + ay * J[3]; return [ax * re, ax * im, ay * re, ay * im]; }
+const handed = J => J[0] * J[3] - J[1] * J[2];   // Im(Jx* Jy):正 = 逆時針(左旋)、負 = 順時針(右旋)
+
+// ================= 場景 =================
+let DPR = REC ? 1 : quality.pixelRatio(innerWidth, innerHeight, 1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: REC, powerPreference: 'high-performance' });
+renderer.setPixelRatio(DPR);
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+$('#stage').appendChild(renderer.domElement);
+window.__gl = (() => { try { const gl = renderer.getContext(), x = gl.getExtension('WEBGL_debug_renderer_info'); return x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e) { return '?'; } })();
+
+const labelR = new CSS2DRenderer();
+labelR.setSize(innerWidth, innerHeight);
+labelR.domElement.className = 'labels';
+document.body.appendChild(labelR.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a1015);
+scene.fog = new THREE.Fog(0x0a1015, 260, 600);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .5;
+
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 1, 1500);
+camera.position.set(60, 64, 90);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(1, 4.5, -2);
+controls.enableDamping = true; controls.dampingFactor = .08;
+controls.minDistance = 22; controls.maxDistance = 240; controls.maxPolarAngle = 1.47;
+controls.update();
+
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * DPR, innerHeight * DPR, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), .75, .5, 1.25);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.HemisphereLight(0xcfe6ff, 0x1b1712, .45));
+const key = new THREE.DirectionalLight(0xffffff, 1.65);
+key.position.set(55, 110, 75); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 20, far: 320 });
+key.shadow.bias = -.0004; key.shadow.normalBias = .03;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0x74e4ff, .28); rim.position.set(-90, 50, -100); scene.add(rim);
+
+// ---------- 桌面與牆 ----------
+function canvasTex(w, h, draw, repeat) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+  return t;
+}
+const benchTop = new THREE.Mesh(new THREE.BoxGeometry(200, 4, 112), new THREE.MeshStandardMaterial({ color: 0x141b20, roughness: .58, metalness: .1 }));
+benchTop.position.set(0, -2, 4); benchTop.receiveShadow = true; scene.add(benchTop);
+const strip = new THREE.Mesh(new THREE.BoxGeometry(200, .45, .5), new THREE.MeshBasicMaterial({ color: new THREE.Color(.25, .85, 1.1) }));
+strip.position.set(0, -.35, 60.1); scene.add(strip);
+const wallTex = canvasTex(1024, 512, (c, w, h) => {
+  c.fillStyle = '#121a20'; c.fillRect(0, 0, w, h);
+  c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 3;
+  for (let x = 0; x <= w; x += 128) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+  c.beginPath(); c.moveTo(0, 340); c.lineTo(w, 340); c.stroke();
+}, [3, 1]);
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(760, 300), new THREE.MeshStandardMaterial({ map: wallTex, roughness: .95 }));
+wall.position.set(0, 70, -160); scene.add(wall);
+// 牆上三塊說明螢幕:線偏振 = 左旋 + 右旋、旋光、圓二色性
+function screenTex(kind) {
+  return canvasTex(640, 360, (c, w, h) => {
+    c.fillStyle = 'rgba(16,48,62,.9)'; c.fillRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(116,228,255,.6)'; c.lineWidth = 3; c.strokeRect(6, 6, w - 12, h - 12);
+    const ink = 'rgba(200,244,255,.95)';
+    c.strokeStyle = c.fillStyle = ink; c.lineWidth = 4; c.lineCap = 'round'; c.lineJoin = 'round';
+    c.font = `600 34px ${MONO}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    const head = (x, y, a, s = 14) => { c.beginPath(); c.moveTo(x, y); c.lineTo(x - s * Math.cos(a - .45), y - s * Math.sin(a - .45)); c.moveTo(x, y); c.lineTo(x - s * Math.cos(a + .45), y - s * Math.sin(a + .45)); c.stroke(); };
+    const dbl = (x, y, r, a) => { const dx = Math.cos(a) * r, dy = Math.sin(a) * r; c.beginPath(); c.moveTo(x - dx, y - dy); c.lineTo(x + dx, y + dy); c.stroke(); head(x + dx, y + dy, a); head(x - dx, y - dy, a + Math.PI); };
+    const circ = (x, y, r, cw, col) => { c.strokeStyle = col; c.beginPath(); c.arc(x, y, r, -Math.PI / 2 + .35, -Math.PI / 2 + 2 * Math.PI - .35, false); c.stroke();
+      const a = cw ? -Math.PI / 2 - .35 : -Math.PI / 2 + .35, hx = x + r * Math.cos(a), hy = y + r * Math.sin(a); head(hx, hy, cw ? 0 : Math.PI); c.strokeStyle = ink; };
+    if (kind === 0) {
+      c.globalAlpha = .35; for (const x of [110, 320, 530]) { c.beginPath(); c.arc(x, 150, 72, 0, 7); c.stroke(); } c.globalAlpha = 1;
+      dbl(110, 150, 62, 0);
+      c.fillText('=', 215, 150); c.fillText('+', 425, 150);
+      circ(320, 150, 50, false, C_L); circ(530, 150, 50, true, C_R);
+      c.fillStyle = ink; c.fillText(zhEn('線偏振 = 左旋 + 右旋', 'linear = left + right'), w / 2, 296);
+    } else if (kind === 1) {
+      c.globalAlpha = .35; c.beginPath(); c.arc(190, 160, 100, 0, 7); c.stroke(); c.globalAlpha = 1;
+      c.setLineDash([10, 10]); c.lineWidth = 3; c.beginPath(); c.moveTo(90, 160); c.lineTo(290, 160); c.stroke(); c.setLineDash([]);
+      c.lineWidth = 4; dbl(190, 160, 96, .7);
+      c.lineWidth = 3; c.beginPath(); c.arc(190, 160, 56, 0, .7); c.stroke(); c.fillText('α', 268, 128);
+      c.textAlign = 'left'; c.font = `600 30px ${MONO}`; c.fillText('[α] = α ÷ (l × c)', 318, 120); c.fillText(zhEn('l:dm', 'l: dm'), 318, 172); c.fillText(zhEn('c:g/mL', 'c: g/mL'), 318, 214);
+      c.textAlign = 'center'; c.font = `600 34px ${MONO}`; c.fillText(zhEn('迎著光看,順時針為 +', 'facing the light, clockwise is +'), w / 2, 304);
+    } else {
+      const bars = [[180, 210, C_L, zhEn('左', 'L')], [300, 196, C_R, zhEn('右', 'R')]];
+      c.lineWidth = 3; c.beginPath(); c.moveTo(120, 230); c.lineTo(380, 230); c.stroke();
+      for (const [x, hgt, col, t] of bars) { c.fillStyle = col; c.fillRect(x - 34, 230 - hgt * .7, 68, hgt * .7); c.fillStyle = ink; c.fillText(t, x, 262); }
+      c.font = `600 30px ${MONO}`; c.textAlign = 'left'; c.fillText('ΔA = A_L − A_R', 400, 120); c.fillText('θ = 32982 × ΔA', 400, 176);
+      c.textAlign = 'center'; c.font = `600 34px ${MONO}`; c.fillText(zhEn('左右吸收差一點點', 'a tiny L/R difference'), w / 2, 310);
+    }
+  });
+}
+[-110, 0, 110].forEach((x, i) => {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(76, 42.75), new THREE.MeshBasicMaterial({ map: screenTex(i), toneMapped: false, transparent: true, opacity: .9 }));
+  m.position.set(x, 64, -158); scene.add(m);
+});
+
+// ---------- 儀器 ----------
+const BY = 10;   // 光軸高度
+const V3 = THREE.Vector3, UP = new V3(0, 1, 0);
+const inst = new THREE.Group(); scene.add(inst);
+const optics = new THREE.Group(); inst.add(optics);
+const MAT = {
+  shell: new THREE.MeshPhysicalMaterial({ color: 0xe4e8eb, roughness: .45, clearcoat: .35, clearcoatRoughness: .35, transparent: true }),
+  lid: new THREE.MeshPhysicalMaterial({ color: 0x2e4f73, roughness: .3, clearcoat: 1, clearcoatRoughness: .1, transparent: true }),
+  vent: new THREE.MeshStandardMaterial({ color: 0x2a3035, roughness: .7, transparent: true }),
+  edge: new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: 0, depthWrite: false }),
+  plinth: new THREE.MeshStandardMaterial({ color: 0x2b3237, roughness: .6, metalness: .2 }),
+  bench: new THREE.MeshStandardMaterial({ roughness: .7, metalness: .3, map: canvasTex(128, 128, (c, w, h) => {
+    c.fillStyle = '#2b343a'; c.fillRect(0, 0, w, h); c.fillStyle = '#151b1f';
+    for (const [x, y] of [[32, 32], [96, 32], [32, 96], [96, 96]]) { c.beginPath(); c.arc(x, y, 6, 0, 7); c.fill(); }
+  }, [63 / 5, 69 / 5]) }),
+  black: new THREE.MeshStandardMaterial({ color: 0x14191d, roughness: .45, metalness: .6 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x2a3238, roughness: .5, metalness: .5 }),
+  metal: new THREE.MeshStandardMaterial({ color: 0xaab4ba, roughness: .45, metalness: .85 }),
+  anod: new THREE.MeshStandardMaterial({ color: 0x3a4650, roughness: .35, metalness: .7 }),
+  mirror: new THREE.MeshStandardMaterial({ color: 0xdfe6ea, roughness: .14, metalness: 1, side: THREE.DoubleSide }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0xd6f2ff, roughness: .04, transparent: true, opacity: .3, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  quartz: new THREE.MeshPhysicalMaterial({ color: 0xeaf8ff, roughness: .03, transparent: true, opacity: .14, clearcoat: 1, depthWrite: false }),
+  // 晶體石英稜鏡(本身就雙折射)與熔融石英(受力才雙折射)
+  prism: new THREE.MeshPhysicalMaterial({ color: 0xe6f6ff, roughness: .02, transparent: true, opacity: .3, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide, iridescence: .6, iridescenceIOR: 1.5 }),
+  fq: new THREE.MeshPhysicalMaterial({ color: 0xd8f0ff, emissive: 0x2a6a8a, emissiveIntensity: 0, roughness: .03, transparent: true, opacity: .32, clearcoat: 1, depthWrite: false }),
+  piezo: new THREE.MeshStandardMaterial({ color: 0xd8d2c4, roughness: .7 }),
+  polar: new THREE.MeshPhysicalMaterial({ color: 0x5a6670, roughness: .2, transparent: true, opacity: .55, clearcoat: 1, depthWrite: false, side: THREE.DoubleSide }),
+  axis: new THREE.MeshBasicMaterial({ color: new THREE.Color(1.3, 1.5, 1.6) }),
+  ceramic: new THREE.MeshStandardMaterial({ color: 0xe8e4da, roughness: .8 }),
+  ptfe: new THREE.MeshStandardMaterial({ color: 0xf1f1ee, roughness: .6 }),
+  pcb: new THREE.MeshStandardMaterial({ color: 0x1f4a35, roughness: .6, metalness: .2 }),
+  liq: new THREE.MeshPhysicalMaterial({ color: 0xcfe8ff, roughness: .15, transparent: true, opacity: .22, depthWrite: false }),
+  cable: new THREE.MeshStandardMaterial({ color: 0x1b1f23, roughness: .6 }),
+};
+function mesh(geo, mat, pos, parent = optics, shadow = true) {
+  const m = new THREE.Mesh(geo, mat); if (pos) m.position.set(pos[0], pos[1], pos[2]);
+  m.castShadow = shadow; m.receiveShadow = true; parent.add(m); return m;
+}
+function post(x, z, top, r = .42, parent = optics) {
+  const h = top - 3.6; if (h <= .05) return;
+  mesh(new THREE.CylinderGeometry(r, r, h, 20), MAT.metal, [x, 3.6 + h / 2, z], parent);
+  mesh(new THREE.CylinderGeometry(r * 2.3, r * 2.5, .5, 24), MAT.black, [x, 3.85, z], parent);
+}
+
+mesh(new RoundedBoxGeometry(64.4, 3, 70.4, 3, .8), MAT.plinth, [0, 1.5, -1], inst);
+mesh(new THREE.BoxGeometry(63, .6, 69), MAT.bench, [0, 3.3, -1], inst, false);
+
+// 外殼(展開時往外飛並淡出):後半(燈與單色器)、左前(樣品室)、右前(電路)
+const shellParts = [];
+function shellPart(move, rot = 0) { const g = new THREE.Group(); inst.add(g); shellParts.push({ g, move, rot }); return g; }
+function shellBox(g, size, pos, mat, radius) {
+  const m = mesh(new RoundedBoxGeometry(size[0], size[1], size[2], 4, radius), mat, pos, g);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(...size)), MAT.edge);
+  e.position.copy(m.position); g.add(e); return m;
+}
+const rear = shellPart([0, 46, -22]);
+shellBox(rear, [64, 20.4, 27], [0, 13.8, -22.5], MAT.shell, 1.6);
+for (let i = 0; i < 12; i++) mesh(new THREE.BoxGeometry(18, .06, .55), MAT.vent, [16, 24.02, -33 + i * 1.6], rear, false);
+const lid = shellPart([-16, 38, 8], -.2);
+shellBox(lid, [36, 15, 43], [-14, 11.1, 12.5], MAT.shell, 1.4);
+shellBox(lid, [35, 5, 41], [-14, 19.3, 12.4], MAT.lid, 2.0);
+const right = shellPart([30, 20, 0]);
+shellBox(right, [28, 15, 43], [18, 11.1, 12.5], MAT.shell, 1.4);
+for (let i = 0; i < 7; i++) mesh(new THREE.BoxGeometry(.06, .45, 16), MAT.vent, [32.02, 7 + i * 1.2, 14], right, false);
+mesh(new THREE.SphereGeometry(.32, 16, 10), new THREE.MeshBasicMaterial({ color: new THREE.Color(.3, 2.2, .7) }), [26, 6, 34.05], right, false);
+
+// 元件位置(俯視 x, z)。單色器裡兩個稜鏡各把光偏折 45°,最後沿 +z 走進樣品區
+const P = {
+  XE: [25, -28.3], S1: [17.5, -28.3], PR1: [9.3, -28.3], S2: [3.65, -22.65], PR2: [-2, -17], S3: [-2, -13],
+  PEM: [-2, -4], CELL: [-2, 5], ANA: [-2, 14], PMT: [-2, 24.4],
+};
+const SX = -2, Z = { s3: -13, pem: -4, cell: 5, t0: 0, t1: 10, ana: 14, pmt: 21.2 };
+const O = {};
+function node(key, y = BY) { const g = new THREE.Group(); g.position.set(P[key][0], y, P[key][1]); optics.add(g); O[key] = { g }; return g; }
+const face = (g, n) => { g.rotation.y = Math.atan2(n[0], n[1]); };
+const dirTo = (a, b) => { const dx = P[b][0] - P[a][0], dz = P[b][1] - P[a][1], L = Math.hypot(dx, dz); return [dx / L, dz / L]; };
+
+// 氙燈:短弧燈泡(上下兩根電極,中間一點電弧)、橢圓反射罩;燈室朝 −x 開口
+{
+  const g = node('XE'); face(g, [-1, 0]);
+  const pts = []; for (let i = 0; i <= 14; i++) { const r = .35 + i * .16; pts.push(new THREE.Vector2(r, r * r / 4.2 - 1.1)); }
+  const refl = mesh(new THREE.LatheGeometry(pts, 40), MAT.mirror, [0, 0, 0], g); refl.rotation.x = Math.PI / 2;
+  const bulb = mesh(new THREE.SphereGeometry(.55, 24, 16), new THREE.MeshPhysicalMaterial({ color: 0xeef4ff, emissive: 0x9fb4ff, emissiveIntensity: .45, transparent: true, opacity: .45 }), [0, 0, -.2], g, false);
+  bulb.scale.set(1, 1.3, 1);
+  for (const s of [1, -1]) {
+    mesh(new THREE.CylinderGeometry(s > 0 ? .13 : .08, .13, 1.6, 10), MAT.metal, [0, s * .95, -.2], g, false);
+    mesh(new THREE.CylinderGeometry(.2, .2, 2.6, 12), new THREE.MeshPhysicalMaterial({ color: 0xeef4ff, transparent: true, opacity: .35 }), [0, s * 2.6, -.2], g, false);
+    mesh(new THREE.CylinderGeometry(.42, .42, .9, 16), MAT.metal, [0, s * 4.1, -.2], g);
+  }
+  mesh(new THREE.SphereGeometry(.16, 16, 10), new THREE.MeshBasicMaterial({ color: new THREE.Color(5.5, 6, 7.5) }), [0, 0, -.2], g, false);
+  // 燈室:頂、底、兩側、後板,朝 −x 的一面打開
+  const h = new THREE.Group(); h.position.set(26.6, BY, -28.3); optics.add(h);
+  mesh(new THREE.BoxGeometry(8.4, .5, 9.6), MAT.black, [0, 5.1, 0], h);
+  mesh(new THREE.BoxGeometry(8.4, .5, 9.6), MAT.black, [0, -5.6, 0], h);
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(8.4, 11, .5), MAT.black, [0, -.25, s * 4.6], h);
+  mesh(new THREE.BoxGeometry(.5, 11, 9.6), MAT.black, [4.0, -.25, 0], h);
+  for (let i = 0; i < 6; i++) mesh(new THREE.BoxGeometry(7.6, 1.2, .14), MAT.anod, [0, 5.95, -3.4 + i * 1.36], h);
+  mesh(new THREE.BoxGeometry(.4, 1.6, 9.6), MAT.anod, [-4.2, 4.3, 0], h);
+}
+// 狹縫:兩片刀口留一條縫,上下再擋住,只留一小格(另一個振動方向的光落在上面那塊板子上)
+const bladeGeo = new THREE.BoxGeometry(1, 6, .22);
+function slit(key, inDir, halfW, gap) {
+  const g = node(key); face(g, [-inDir[0], -inDir[1]]);
+  const L = mesh(bladeGeo, MAT.black, [0, 0, 0], g), R = mesh(bladeGeo, MAT.black, [0, 0, 0], g);
+  for (const s of [1, -1]) mesh(new THREE.BoxGeometry(.9, 2.3, .22), MAT.black, [0, s * 1.85, 0], g);
+  mesh(new THREE.BoxGeometry(halfW * 2 + .8, .45, .5), MAT.anod, [0, 3.2, 0], g);
+  mesh(new THREE.BoxGeometry(halfW * 2 + .8, .6, 1.3), MAT.anod, [0, -3.3, 0], g);
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(.4, 6.9, .5), MAT.anod, [s * (halfW + .2), 0, 0], g);
+  Object.assign(O[key], { L, R, halfW });
+  const bw = halfW - gap / 2;
+  L.scale.x = R.scale.x = bw; L.position.x = -(gap / 2 + bw / 2); R.position.x = gap / 2 + bw / 2; O[key].gap = gap;
+  post(P[key][0], P[key][1], BY - 3.6);
+}
+slit('S1', [-1, 0], 2.6, .22);
+slit('S2', dirTo('PR1', 'S2'), 3.4, .22);
+slit('S3', [0, 1], 3.0, .22);
+// 稜鏡:三角柱;最小偏向時光在稜鏡裡平行底邊,底邊在光偏過去的那一側
+function prism(key, a, b) {
+  const g = node(key);
+  const d1 = dirTo(a, key), d2 = dirTo(key, b);
+  let nx = d2[0] - d1[0], nz = d2[1] - d1[1]; const L = Math.hypot(nx, nz); nx /= L; nz /= L;
+  g.rotation.y = Math.atan2(-nx, -nz);                         // 頂角朝外
+  const m = [d1[0] + d2[0], d1[1] + d2[1]], mL = Math.hypot(m[0], m[1]);
+  O[key].m = new V3(m[0] / mL, 0, m[1] / mL); O[key].n = new V3(nx, 0, nz);
+  O[key].bend = Math.sign(d1[0] * d2[1] - d1[1] * d2[0]); O[key].out = d2;
+  const pm = mesh(new THREE.CylinderGeometry(1.9, 1.9, 3.4, 3), MAT.prism, [0, 0, 0], g, false);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(pm.geometry), new THREE.LineBasicMaterial({ color: 0xbfeaff, transparent: true, opacity: .55 }));
+  g.add(e);
+  mesh(new THREE.CylinderGeometry(2.3, 2.3, .4, 3), MAT.anod, [0, -1.95, 0], g);
+  mesh(new THREE.CylinderGeometry(1.2, 1.2, .5, 24), MAT.dark, [0, -2.4, 0], g);
+  post(P[key][0], P[key][1], BY - 2.6);
+  O[key].hit = [pm];
+}
+prism('PR1', 'S1', 'S2');
+prism('PR2', 'S2', 'S3');
+// 光彈調變器:一根熔融石英棒(轉 45°)一端黏著壓電元件;中間用上下兩塊夾住
+{
+  const g = node('PEM');
+  const barG = new THREE.Group(); barG.rotation.z = Math.PI / 4; g.add(barG); O.PEM.barG = barG;
+  O.PEM.bar = mesh(new THREE.BoxGeometry(5.2, 1.25, 1.25), MAT.fq, [0, 0, 0], barG, false);
+  const pz = mesh(new THREE.BoxGeometry(1.1, 1.45, 1.45), MAT.piezo, [3.15, 0, 0], barG);
+  O.PEM.pz = pz;
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(1.12, .1, 1.47), MAT.metal, [3.15, s * .45, 0], barG, false);
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(.55, .7, 1.7), MAT.anod, [0, s * .95, 0], barG);
+  mesh(new THREE.BoxGeometry(.3, 3.4, .3), MAT.anod, [0, -2.4, 0], barG);
+  mesh(new THREE.BoxGeometry(4.6, 1.2, 3.4), MAT.dark, [0, -5.2, 0], g);
+  mesh(new THREE.CylinderGeometry(.08, .08, 3.6, 8), MAT.cable, [2.6, -2.6, 0], g, false).rotation.z = .55;
+}
+// 樣品:圓二色用石英比色管(1 cm 或 1 mm),旋光用 1 dm 樣品管;切換時一個降下、一個升上來
+const cellG = new THREE.Group(); cellG.position.set(SX, BY, Z.cell); optics.add(cellG);
+const cellCm = new THREE.Group(), cellMm = new THREE.Group(); cellG.add(cellCm, cellMm);
+mesh(new THREE.BoxGeometry(1.25, 4.5, 1.25), MAT.quartz, [0, .25, 0], cellCm, false);
+mesh(new THREE.BoxGeometry(1.02, 3, 1.0), MAT.liq, [0, -.45, 0], cellCm, false);
+mesh(new THREE.BoxGeometry(1.36, .55, 1.36), MAT.ptfe, [0, 2.75, 0], cellCm);
+mesh(new THREE.BoxGeometry(1.25, 4.5, .35), MAT.quartz, [0, .25, 0], cellMm, false);
+mesh(new THREE.BoxGeometry(1.02, 3, .1), MAT.liq, [0, -.45, 0], cellMm, false);
+mesh(new THREE.BoxGeometry(1.36, .5, .46), MAT.ptfe, [0, 2.73, 0], cellMm);
+mesh(new THREE.BoxGeometry(2.8, 2.2, 2.8), MAT.black, [0, -2.95, 0], cellG);
+for (const [x, z] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) mesh(new THREE.BoxGeometry(.35, 3.2, .35), MAT.anod, [x * 1.1, -.4, z * 1.1], cellG);
+mesh(new THREE.CylinderGeometry(.42, .42, 3, 16), MAT.metal, [0, -5.5, 0], cellG);
+const tubeG = new THREE.Group(); tubeG.position.set(SX, BY, (Z.t0 + Z.t1) / 2); optics.add(tubeG);
+{
+  const t = mesh(new THREE.CylinderGeometry(.72, .72, 10, 32, 1, true), MAT.glass, [0, 0, 0], tubeG, false); t.rotation.x = Math.PI / 2;
+  const l = mesh(new THREE.CylinderGeometry(.6, .6, 9.6, 24), MAT.liq, [0, 0, 0], tubeG, false); l.rotation.x = Math.PI / 2;
+  for (const s of [-1, 1]) { const cap = mesh(new THREE.CylinderGeometry(.92, .92, .55, 28, 1, true), MAT.metal, [0, 0, s * 5], tubeG); cap.rotation.x = Math.PI / 2; const ring = mesh(new THREE.TorusGeometry(.6, .1, 8, 28), MAT.metal, [0, 0, s * 5.28], tubeG); }
+  mesh(new THREE.CylinderGeometry(.32, .32, 1.1, 16), MAT.glass, [0, .95, 1.4], tubeG, false);
+  for (const s of [-1, 1]) { mesh(new THREE.BoxGeometry(2.2, 1.3, .7), MAT.anod, [0, -1.25, s * 3.4], tubeG); mesh(new THREE.CylinderGeometry(.35, .35, 4.6, 12), MAT.metal, [0, -4.1, s * 3.4], tubeG); }
+}
+// 檢偏鏡:可轉的偏光片(透光軸畫成亮線),外圈有刻度;旋光模式滑進光路
+const anaG = new THREE.Group(); anaG.position.set(SX, BY, Z.ana); optics.add(anaG);
+const anaRot = new THREE.Group(); anaG.add(anaRot);
+{
+  const polTex = canvasTex(256, 256, (c, w, h) => { c.fillStyle = '#3a4650'; c.fillRect(0, 0, w, h); c.strokeStyle = 'rgba(10,14,18,.55)'; c.lineWidth = 2; for (let x = 4; x < w; x += 8) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); } });
+  MAT.polar.map = polTex;
+  const disk = mesh(new THREE.CylinderGeometry(2.0, 2.0, .12, 48), MAT.polar, [0, 0, 0], anaRot, false); disk.rotation.x = Math.PI / 2;
+  mesh(new THREE.BoxGeometry(.11, 3.9, .18), MAT.axis, [0, 0, 0], anaRot, false);
+  mesh(new THREE.ConeGeometry(.22, .45, 3), MAT.axis, [0, 2.15, 0], anaRot, false);
+  const ring = mesh(new THREE.TorusGeometry(2.3, .16, 10, 64), MAT.anod, [0, 0, 0], anaG);
+  for (let i = 0; i < 24; i++) { const a = i * Math.PI / 12, big = i % 6 === 0; mesh(new THREE.BoxGeometry(.07, big ? .5 : .28, .1), big ? MAT.metal : MAT.anod, [Math.sin(a) * 2.62, Math.cos(a) * 2.62, .12], anaG, false).rotation.z = -a; }
+  mesh(new THREE.BoxGeometry(.9, 4.4, .6), MAT.anod, [0, -4.3, 0], anaG);
+  mesh(new THREE.BoxGeometry(1.6, .7, 1.6), MAT.dark, [0, -5.95, 0], anaG);
+  mesh(new THREE.BoxGeometry(14, .5, 1.2), MAT.anod, [SX - 5.5, 3.85, Z.ana], optics);
+  O.ANA = { g: anaG, hit: [disk, ring] };
+}
+// 光電倍增管(光從前面的窗進來)、高壓與訊號線、鎖相放大器
+{
+  const g = node('PMT');
+  const body = mesh(new THREE.CylinderGeometry(1.7, 1.7, 6.4, 32), MAT.black, [0, 0, 0], g); body.rotation.x = Math.PI / 2;
+  const fr = mesh(new THREE.TorusGeometry(1.62, .16, 10, 40), MAT.metal, [0, 0, -3.2], g);
+  O.PMT.win = mesh(new THREE.CircleGeometry(1.3, 32), new THREE.MeshBasicMaterial({ color: 0x0b1830, toneMapped: false }), [0, 0, -3.23], g, false);
+  O.PMT.win.rotation.y = Math.PI;
+  const sk = mesh(new THREE.CylinderGeometry(1.2, 1.2, 1.2, 24), MAT.dark, [0, 0, 3.8], g); sk.rotation.x = Math.PI / 2;
+  mesh(new THREE.BoxGeometry(3.8, 1.2, 5), MAT.anod, [0, -2.2, 0], g);
+  post(P.PMT[0], P.PMT[1], BY - 2.8);
+  const curve = new THREE.CatmullRomCurve3([new V3(SX, BY, 29), new V3(SX + 1, BY - 1.5, 31), new V3(SX + 6, 4.4, 30), new V3(9, 4.3, 27)]);
+  mesh(new THREE.TubeGeometry(curve, 40, .22, 8), MAT.cable, null, optics, false);
+}
+mesh(new THREE.BoxGeometry(14, .22, 15), MAT.pcb, [14, 3.72, 20], optics, false);
+for (const [x, z, w, d] of [[10, 16, 2.2, 2.2], [14, 15, 1.4, 3], [18.5, 16.5, 2.8, 2.8], [12, 24, 3, 1.6], [17, 23.5, 1.6, 1.6], [19.5, 25.5, 1.6, 2.4]]) mesh(new THREE.BoxGeometry(w, .5, d), MAT.black, [x, 4.05, z]);
+const ledMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(.2, .8, 1) });
+mesh(new THREE.SphereGeometry(.28, 14, 10), ledMat, [9, 4.15, 25], optics, false);
+// 氮氣:流量計(玻璃管裡一顆浮球)與通到燈室、單色器的管子
+const floatBall = (() => {
+  const x = -27, z = -31;
+  mesh(new THREE.BoxGeometry(2.2, 1, 2.2), MAT.anod, [x, 4.1, z]);
+  mesh(new THREE.CylinderGeometry(.45, .45, 7, 20, 1, true), MAT.glass, [x, 8.1, z], optics, false);
+  for (const y of [4.75, 11.7]) mesh(new THREE.CylinderGeometry(.62, .62, .7, 20), MAT.metal, [x, y, z]);
+  for (let i = 0; i < 6; i++) mesh(new THREE.BoxGeometry(.32, .05, .05), MAT.metal, [x + .5, 5.6 + i * 1.1, z + .2], optics, false);
+  const tube = new THREE.CatmullRomCurve3([new V3(x, 12, z), new V3(x, 13.4, z - 2), new V3(x + 8, 13.6, -33.8), new V3(20, 13.6, -33.8), new V3(25, 13, -33.2), new V3(26.6, 15.4, -28.3)]);
+  mesh(new THREE.TubeGeometry(tube, 60, .18, 8), new THREE.MeshStandardMaterial({ color: 0x8fb6c8, roughness: .3, transparent: true, opacity: .8 }), null, optics, false);
+  const br = new THREE.CatmullRomCurve3([new V3(4, 13.6, -33.8), new V3(4, 12, -31), new V3(4, 6, -29)]);
+  mesh(new THREE.TubeGeometry(br, 24, .14, 8), new THREE.MeshStandardMaterial({ color: 0x8fb6c8, roughness: .3, transparent: true, opacity: .8 }), null, optics, false);
+  return mesh(new THREE.SphereGeometry(.3, 16, 10), new THREE.MeshStandardMaterial({ color: 0xc8463c, roughness: .4 }), [x, 8, z], optics, false);
+})();
+
+optics.updateMatrixWorld(true);
+for (const k in O) O[k].p = O[k].g.position.clone();
+O.XE.arc = O.XE.g.localToWorld(new V3(0, 0, -.2));
+for (const k of ['S2', 'S3']) O[k].t = new V3(1, 0, 0).applyQuaternion(O[k].g.quaternion);
+// 稜鏡往「偏得更多」那一側在狹縫板上的方向(短波長偏得多)
+for (const [pk, sk] of [['PR1', 'S2'], ['PR2', 'S3']]) {
+  const d = O[pk].out, s = O[pk].bend, tv = new V3(-d[1] * s, 0, d[0] * s);
+  O[sk].dir = tv; O[sk].sg = Math.sign(tv.dot(O[sk].t)) || 1;
+}
+
+// 燈的局部照明
+const xl = new THREE.PointLight(0xdde6ff, 30, 22, 2); xl.position.copy(O.XE.arc); scene.add(xl);
+
+// ---------- 手性分子(第 02 章):一個手性中心與它的鏡像,中間一面鏡子 ----------
+const molG = new THREE.Group(); scene.add(molG); molG.visible = false;
+const molMats = [];
+const mm = (c, extra = {}) => { const m = new THREE.MeshStandardMaterial({ color: c, roughness: .35, metalness: .1, transparent: true, ...extra }); molMats.push(m); return m; };
+const TET = [[1, 1, 1], [1, -1, -1], [-1, 1, -1], [-1, -1, 1]].map(v => new V3(...v).normalize());
+const SUBS = [[.55, 0xe9edf0], [.72, 0x5aa86a], [.86, 0xd06a3c], [1.0, 0x5674c4]];
+const cMat = mm(0x59636c), bMat = mm(0x8a949c);
+function molecule(mirror) {
+  const g = new THREE.Group(); molG.add(g);
+  mesh(new THREE.SphereGeometry(.8, 24, 16), cMat, [0, 0, 0], g);
+  TET.forEach((d0, i) => {
+    const d = d0.clone(); if (mirror) d.x = -d.x;
+    const p = d.clone().multiplyScalar(2.5), [r, col] = SUBS[i];
+    mesh(new THREE.SphereGeometry(r, 24, 16), mm(col), [p.x, p.y, p.z], g);
+    const b = mesh(new THREE.CylinderGeometry(.17, .17, 2.5, 12), bMat, [p.x / 2, p.y / 2, p.z / 2], g);
+    b.quaternion.setFromUnitVectors(UP, d);
+  });
+  return g;
+}
+const molA = molecule(false), molB = molecule(true);
+// 放在儀器左邊的桌面上(外殼展開時不會撞到)
+const MOLX = -51.5, MOLZ = 10;
+molA.position.set(MOLX + 6.5, 8.6, MOLZ); molB.position.set(MOLX - 6.5, 8.6, MOLZ);
+for (const x of [MOLX - 6.5, MOLX + 6.5]) { mesh(new THREE.CylinderGeometry(.25, .25, 4.6, 12), mm(0x8a949c), [x, 2.3, MOLZ], molG); mesh(new THREE.CylinderGeometry(1.3, 1.5, .4, 24), mm(0x2a3238), [x, .2, MOLZ], molG); }
+const mirMat = mm(0xbfe9ff, { opacity: .2, metalness: .7, roughness: .05, depthWrite: false, side: THREE.DoubleSide });
+const mir = mesh(new THREE.PlaneGeometry(11, 10), mirMat, [MOLX, 6.6, MOLZ], molG, false); mir.rotation.y = Math.PI / 2;
+const mirEdge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(11, 10)), new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: .5 }));
+mirEdge.position.copy(mir.position); mirEdge.rotation.copy(mir.rotation); molG.add(mirEdge);
+for (const m of molMats) m.userData.op = m.opacity;
+
+// ================= 光線 =================
+const RMAX = 6000;
+const rPos = new Float32Array(RMAX * 3), rCol = new Float32Array(RMAX * 3), rD = new Float32Array(RMAX);
+const rayGeo = new THREE.BufferGeometry();
+rayGeo.setAttribute('position', new THREE.BufferAttribute(rPos, 3));
+rayGeo.setAttribute('aC', new THREE.BufferAttribute(rCol, 3));
+rayGeo.setAttribute('aD', new THREE.BufferAttribute(rD, 1));
+const rayMat = new THREE.ShaderMaterial({
+  uniforms: { uT: { value: 0 } },
+  vertexShader: `attribute vec3 aC; attribute float aD; varying vec3 vC; varying float vD;
+    void main(){ vC=aC; vD=aD; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: `uniform float uT; varying vec3 vC; varying float vD;
+    void main(){ float p=fract(vD*0.11-uT*0.85); float pulse=smoothstep(0.0,0.06,p)*(1.0-smoothstep(0.06,0.45,p));
+      gl_FragColor=vec4(vC*(0.5+1.5*pulse),1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const rays = new THREE.LineSegments(rayGeo, rayMat); rays.frustumCulled = false; scene.add(rays);
+let rn = 0, raysKey = '';
+function seg(a, b, c, k, d0) {
+  if (rn + 2 > RMAX) return d0;
+  const i = rn * 3, L = a.distanceTo(b);
+  rPos[i] = a.x; rPos[i + 1] = a.y; rPos[i + 2] = a.z; rPos[i + 3] = b.x; rPos[i + 4] = b.y; rPos[i + 5] = b.z;
+  rCol[i] = rCol[i + 3] = c.r * k; rCol[i + 1] = rCol[i + 4] = c.g * k; rCol[i + 2] = rCol[i + 5] = c.b * k;
+  rD[rn] = d0; rD[rn + 1] = d0 + L; rn += 2; return d0 + L;
+}
+const add = (p, x, y, z) => new V3(p.x + x, p.y + y, p.z + z);
+const sp = (z, dy = 0) => new V3(SX, BY + dy, z);
+// 稜鏡入射面、出射面上的幾個點
+function prismPts(key, side) {
+  const o = O[key], c = o.p.clone().addScaledVector(o.m, side * .75), out = [];
+  for (const v of [-.6, 0, .6]) for (const u of [-.55, 0, .55]) out.push(c.clone().addScaledVector(o.n, u).add(new V3(0, v, 0)));
+  return out;
+}
+// 稜鏡色散(石英的折射率約 A + B/λ²):狹縫板上的位置 ∝ 1/λ² 的差;G 是每 µm⁻² 幾個單位(示意)
+const G1 = .9, G2 = .45, POL2 = 1.1;   // POL2:另一個振動方向的光在板上高出多少(被擋掉)
+const invL = l => 1e6 / (l * l);       // λ(nm)→ 1/λ²(µm⁻²)
+const FANL = [175, 182, 190, 198, 207, 217, 228, 240, 254, 270, 290, 312, 336, 365, 400, 440, 490, 550, 620, 700, 800, 950];
+function fanPt(skey, G, l, ls, dy) {
+  const u = G * (invL(l) - invL(ls)); if (Math.abs(u) > O[skey].halfW - .05) return null;
+  return O[skey].p.clone().addScaledVector(O[skey].dir, u).add(new V3(0, dy, 0));
+}
+function buildRays(W) {
+  const key = `${W.lambda}|${W.I.map(v => v.toFixed(3)).join(',')}`;
+  if (key === raysKey) return;
+  raysKey = key; rn = 0;
+  const l = W.lambda, mono = lin(wlColor(l)), K = 2.4, kM = K * xeSpec(l);
+  // 1. 燈 → 反射罩口 → 入口狹縫
+  let dS1 = 0;
+  for (let i = 0; i < 8; i++) {
+    const a = i / 8 * Math.PI * 2, m = O.XE.g.localToWorld(new V3(Math.cos(a) * 1.7, Math.sin(a) * 1.7, .5));
+    dS1 = seg(m, O.S1.p, C_XE, K * .8, seg(O.XE.arc, m, C_XE, K * .8, 0));
+  }
+  // 2. 入口狹縫 → 第一個稜鏡
+  const in1 = prismPts('PR1', -1); for (const p of in1) seg(O.S1.p, p, C_XE, K * .7, dS1);
+  const d1 = dS1 + O.S1.p.distanceTo(O.PR1.p);
+  // 3. 第一個稜鏡 → 中間狹縫:依波長散開;另一個振動方向的光落在狹縫上方的板子上
+  const out1 = prismPts('PR1', 1).filter((p, i) => i % 3 === 1);
+  for (const lk of FANL) for (const [dy, f] of [[0, 1], [POL2, .45]]) {
+    const F = fanPt('S2', G1, lk, l, dy); if (!F) continue;
+    const c = lin(wlColor(lk)), k = K * xeSpec(lk) * .7 * f; for (const p of out1) seg(p, F, c, k, d1);
+  }
+  for (const [dy, f] of [[0, 1], [POL2, .45]]) { const F = fanPt('S2', G1, l, l, dy); for (const p of out1) seg(p, F, mono, kM * 1.1 * f, d1); }
+  const d2 = d1 + O.PR1.p.distanceTo(O.S2.p);
+  // 4. 中間狹縫 → 第二個稜鏡(只剩一個波長、一個振動方向)
+  for (const p of prismPts('PR2', -1)) seg(O.S2.p, p, mono, kM * .8, d2);
+  const d3 = d2 + O.S2.p.distanceTo(O.PR2.p);
+  // 5. 第二個稜鏡 → 出口狹縫:再散一次;殘留的另一個振動方向很弱
+  const out2 = prismPts('PR2', 1).filter((p, i) => i % 3 === 1);
+  for (const lk of FANL) for (const [dy, f] of [[0, 1], [POL2, .15]]) {
+    const F = fanPt('S3', G2, lk, l, dy); if (!F) continue;
+    const c = lin(wlColor(lk)), k = K * xeSpec(lk) * .5 * f; for (const p of out2) seg(p, F, c, k, d3);
+  }
+  for (const p of out2) seg(p, O.S3.p, mono, kM, d3);
+  // 6. 出口之後:沿 +z 經光彈調變器、樣品、(檢偏鏡)到光電倍增管
+  let d = d3 + O.PR2.p.distanceTo(O.S3.p);
+  const zs = [Z.s3, Z.pem, Z.t0, Z.t1, Z.ana, Z.pmt];
+  for (const dy of [-.2, 0, .2]) {
+    let e = d;
+    for (let i = 0; i < 5; i++) e = seg(sp(zs[i], dy), sp(zs[i + 1], dy), mono, kM * .9 * W.I[i], e);
+  }
+  rayGeo.setDrawRange(0, rn);
+  for (const a of ['position', 'aC', 'aD']) rayGeo.attributes[a].needsUpdate = true;
+}
+// 沿光路流動的光點(單色器裡)
+const PN = 360;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3), pSz = new Float32Array(PN);
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('aC', new THREE.BufferAttribute(pCol, 3));
+pGeo.setAttribute('aS', new THREE.BufferAttribute(pSz, 1));
+const pMat = new THREE.ShaderMaterial({
+  uniforms: { uScale: { value: 500 } },
+  vertexShader: `attribute vec3 aC; attribute float aS; uniform float uScale; varying vec3 vC;
+    void main(){ vC=aC; vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=aS*uScale/-mv.z; gl_Position=projectionMatrix*mv; }`,
+  fragmentShader: `varying vec3 vC; void main(){ float d=length(gl_PointCoord-0.5); float a=smoothstep(0.5,0.0,d); gl_FragColor=vec4(vC*a*a,1.0); }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+});
+const photons = new THREE.Points(pGeo, pMat); photons.frustumCulled = false; scene.add(photons);
+let pn = 0;
+function flow(pts, c, k, size, t) {
+  const cum = [0]; for (let i = 0; i < pts.length - 1; i++) cum.push(cum[i] + pts[i].distanceTo(pts[i + 1]));
+  const L = cum[cum.length - 1], spc = 3.4, N = Math.floor(L / spc);
+  for (let i = 0; i < N && pn < PN; i++) {
+    const s = (i * spc + t * 9) % L;
+    let j = 0; while (j < cum.length - 2 && s > cum[j + 1]) j++;
+    const u = (s - cum[j]) / (cum[j + 1] - cum[j]), a = pts[j], b = pts[j + 1];
+    pPos[pn * 3] = lerp(a.x, b.x, u); pPos[pn * 3 + 1] = lerp(a.y, b.y, u); pPos[pn * 3 + 2] = lerp(a.z, b.z, u);
+    pCol[pn * 3] = c.r * k; pCol[pn * 3 + 1] = c.g * k; pCol[pn * 3 + 2] = c.b * k; pSz[pn] = size; pn++;
+  }
+}
+function buildPhotons(W, t) {
+  pn = 0;
+  const mono = lin(wlColor(W.lambda)), k = 3 * xeSpec(W.lambda);
+  flow([O.XE.arc, O.S1.p, O.PR1.p], C_XE, 3, .6, t);
+  flow([O.PR1.p, O.S2.p, O.PR2.p, O.S3.p], mono, k, .55, t);
+  pGeo.setDrawRange(0, pn);
+  for (const a of ['position', 'aC', 'aS']) pGeo.attributes[a].needsUpdate = true;
+}
+// 出口狹縫之後的光束(半透明光柱),五段:到調變器、到樣品、樣品裡、到檢偏鏡、到偵測器
+const beamGeo = new THREE.CylinderGeometry(1, 1, 1, 20, 1, true);
+const BEAMS = [[Z.s3, Z.pem], [Z.pem, Z.t0], [Z.t0, Z.t1], [Z.t1, Z.ana], [Z.ana, Z.pmt]].map(([a, b]) => {
+  const m = new THREE.Mesh(beamGeo, new THREE.ShaderMaterial({
+    uniforms: { uC: { value: new THREE.Color() }, uK: { value: 1 } },
+    vertexShader: `varying vec3 vN; varying vec3 vV; void main(){ vec4 mv=modelViewMatrix*vec4(position,1.0); vN=normalize(normalMatrix*normal); vV=normalize(-mv.xyz); gl_Position=projectionMatrix*mv; }`,
+    fragmentShader: `uniform vec3 uC; uniform float uK; varying vec3 vN; varying vec3 vV; void main(){ float f=abs(dot(normalize(vN),normalize(vV))); gl_FragColor=vec4(uC*uK*pow(f,3.0),1.0); }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  }));
+  m.frustumCulled = false; scene.add(m);
+  m.position.set(SX, BY, (a + b) / 2); m.rotation.x = Math.PI / 2; m.scale.set(.16, b - a, .16);
+  return m;
+});
+
+// ================= 偏振的畫法 =================
+// 每一段光路畫:電場尖端的軌跡(線偏振是一條平面上的波,圓偏振是螺旋)、從光軸拉到尖端的細線、半透明的面;
+// 每一段前頭另有一個「站」:外圈、偏振的形狀(雙箭頭或帶箭頭的圈)、一支跟著光擺動或旋轉的白色箭頭
+const AMP = 1.35, DSZ = .1, NW = 170;
+const additive = (color, opacity) => ({ color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false });
+function makeWave() {
+  const rp = new Float32Array(NW * 2 * 3), rib = new THREE.BufferGeometry();
+  rib.setAttribute('position', new THREE.BufferAttribute(rp, 3));
+  const idx = []; for (let i = 0; i < NW - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } rib.setIndex(idx);
+  const ribM = new THREE.Mesh(rib, new THREE.MeshBasicMaterial({ ...additive(0xffffff, .2), side: THREE.DoubleSide })); ribM.frustumCulled = false;
+  const tp = new Float32Array(NW * 3), tip = new THREE.BufferGeometry(); tip.setAttribute('position', new THREE.BufferAttribute(tp, 3));
+  const tipL = new THREE.Line(tip, new THREE.LineBasicMaterial(additive(0xffffff, 1))); tipL.frustumCulled = false;
+  const NS = Math.ceil(NW / 3), spp = new Float32Array(NS * 2 * 3), spk = new THREE.BufferGeometry(); spk.setAttribute('position', new THREE.BufferAttribute(spp, 3));
+  const spkL = new THREE.LineSegments(spk, new THREE.LineBasicMaterial(additive(0xffffff, .5))); spkL.frustumCulled = false;
+  scene.add(ribM, tipL, spkL);
+  return { rp, rib, ribM, tp, tip, tipL, spp, spk, spkL };
+}
+const evalE = (J, z, t, out) => { const p = WK * z - WW * t, c = Math.cos(p), s = Math.sin(p); out[0] = J[0] * c - J[1] * s; out[1] = J[2] * c - J[3] * s; };
+const eTmp = [0, 0];
+// seg:{ z0, z1, J(陣列或依 z 的函式), amp };op:整段的透明度
+function drawWave(w, s, t, col, op, ribOp = .2) {
+  const vis = !!(op > .01 && s && s.z1 - s.z0 > .2);   // three.js 只把 visible === false 當成隱藏
+  w.ribM.visible = w.tipL.visible = w.spkL.visible = vis; if (!vis) return;
+  const n = Math.min(NW, Math.floor((s.z1 - s.z0) / DSZ) + 1);
+  let ns = 0;
+  for (let i = 0; i < n; i++) {
+    const z = s.z0 + (s.z1 - s.z0) * i / (n - 1), J = typeof s.J === 'function' ? s.J(z) : s.J, a = typeof s.amp === 'function' ? s.amp(z) : s.amp;
+    evalE(J, z, t, eTmp); const ex = SX + eTmp[0] * a * AMP, ey = BY + eTmp[1] * a * AMP;
+    const o = i * 6; w.rp[o] = SX; w.rp[o + 1] = BY; w.rp[o + 2] = z; w.rp[o + 3] = ex; w.rp[o + 4] = ey; w.rp[o + 5] = z;
+    w.tp[i * 3] = ex; w.tp[i * 3 + 1] = ey; w.tp[i * 3 + 2] = z;
+    if (i % 3 === 0) { const q = ns * 6; w.spp[q] = SX; w.spp[q + 1] = BY; w.spp[q + 2] = z; w.spp[q + 3] = ex; w.spp[q + 4] = ey; w.spp[q + 5] = z; ns++; }
+  }
+  w.rib.setDrawRange(0, (n - 1) * 6); w.tip.setDrawRange(0, n); w.spk.setDrawRange(0, ns * 2);
+  w.rib.attributes.position.needsUpdate = w.tip.attributes.position.needsUpdate = w.spk.attributes.position.needsUpdate = true;
+  w.ribM.material.color.copy(col); w.ribM.material.opacity = ribOp * op;
+  w.tipL.material.color.copy(col).multiplyScalar(1.5); w.tipL.material.opacity = op;
+  w.spkL.material.color.copy(col); w.spkL.material.opacity = .55 * op;
+}
+const WAVES = [0, 1, 2, 3, 4].map(makeWave);
+const DEC = [makeWave(), makeWave()];   // 第 03 章:線偏振拆成左旋、右旋兩個分量
+const COL_L = new THREE.Color(C_L), COL_R = new THREE.Color(C_R);
+const coneGeo = new THREE.ConeGeometry(.17, .44, 12);
+function makeStation() {
+  const g = new THREE.Group(); scene.add(g);
+  const rpts = []; for (let i = 0; i <= 64; i++) { const a = i / 64 * Math.PI * 2; rpts.push(new V3(Math.cos(a) * 1.75, Math.sin(a) * 1.75, 0)); }
+  const ring = new THREE.Line(new THREE.BufferGeometry().setFromPoints(rpts), new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: .28, depthWrite: false }));
+  g.add(ring);
+  const NE = 72, ep = new Float32Array((NE + 1) * 2 * 3), eg = new THREE.BufferGeometry(); eg.setAttribute('position', new THREE.BufferAttribute(ep, 3));
+  const ei = []; for (let i = 0; i < NE; i++) { const a = i * 2; ei.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } eg.setIndex(ei);
+  const emat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, side: THREE.DoubleSide, depthWrite: false, toneMapped: false });
+  const ell = new THREE.Mesh(eg, emat); ell.frustumCulled = false; g.add(ell);
+  const heads = [0, 1, 2].map(() => { const m = new THREE.Mesh(coneGeo, emat); g.add(m); return m; });
+  const vmat = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.6, 1.6), toneMapped: false, transparent: true });
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, 1, 8), vmat); g.add(shaft);
+  const vhead = new THREE.Mesh(coneGeo, vmat); g.add(vhead);
+  return { g, ring, NE, ep, eg, emat, heads, shaft, vhead, vmat };
+}
+const STA = [0, 1, 2, 3].map(makeStation);
+const tv = new V3(), tq = new THREE.Quaternion();
+function placeArrow(m, x, y, dx, dy, s = 1) {
+  const L = Math.hypot(dx, dy); if (L < 1e-4 || s < .01) { m.visible = false; return; }
+  m.visible = true; m.position.set(x, y, 0); tv.set(dx / L, dy / L, 0); m.quaternion.setFromUnitVectors(UP, tv); m.scale.setScalar(s);
+}
+// 一站:J 是這一點的瓊斯向量,a 是振幅比例
+function drawStation(st, z, J, a, t, col, op) {
+  st.g.visible = op > .01 && a > .02; if (!st.g.visible) return;
+  st.g.position.set(SX, BY, z);
+  st.ring.material.opacity = .28 * op; st.emat.color.copy(col).multiplyScalar(1.4); st.emat.opacity = .95 * op; st.vmat.opacity = op;
+  const R = AMP * a, NE = st.NE, pts = [];
+  let mx = 0, mn = 1e9, imx = 0;
+  for (let i = 0; i <= NE; i++) {
+    const p = i / NE * Math.PI * 2, c = Math.cos(p), s = Math.sin(p);
+    const x = (J[0] * c - J[1] * s) * R, y = (J[2] * c - J[3] * s) * R; pts.push([x, y]);
+    const r = Math.hypot(x, y); if (r > mx) { mx = r; imx = i; } mn = Math.min(mn, r);
+  }
+  const elp = mx > 1e-6 ? mn / mx : 0, w = .06;
+  let nx0 = 0, ny0 = 1;
+  for (let i = 0; i <= NE; i++) {
+    const a1 = pts[Math.max(0, i - 1)], a2 = pts[Math.min(NE, i + 1)];
+    let tx = a2[0] - a1[0], ty = a2[1] - a1[1]; const L = Math.hypot(tx, ty);
+    if (L > 1e-5) { nx0 = -ty / L; ny0 = tx / L; }
+    const [x, y] = pts[i], o = i * 6;
+    st.ep[o] = x - nx0 * w; st.ep[o + 1] = y - ny0 * w; st.ep[o + 2] = 0; st.ep[o + 3] = x + nx0 * w; st.ep[o + 4] = y + ny0 * w; st.ep[o + 5] = 0;
+  }
+  st.eg.attributes.position.needsUpdate = true;
+  // 箭頭:扁的時候是雙箭頭(線偏振),圓的時候是順著轉的方向的一個箭頭
+  const kl = 1 - sstep(.15, .35, elp), kc = sstep(.15, .35, elp);
+  const [ax, ay] = pts[imx];
+  placeArrow(st.heads[0], ax, ay, ax, ay, kl); placeArrow(st.heads[1], -ax, -ay, -ax, -ay, kl);
+  // 時間往前時 ψ 變小:轉的方向是 −dE/dψ
+  const p0 = imx / NE * Math.PI * 2, dx = -(-J[0] * Math.sin(p0) - J[1] * Math.cos(p0)), dy = -(-J[2] * Math.sin(p0) - J[3] * Math.cos(p0));
+  placeArrow(st.heads[2], ax, ay, dx, dy, kc);
+  // 這一瞬間的電場(白色箭頭)
+  evalE(J, z, t, eTmp); const ex = eTmp[0] * R, ey = eTmp[1] * R, L = Math.hypot(ex, ey);
+  if (L < .3) { st.shaft.visible = st.vhead.visible = false; }
+  else {
+    st.shaft.visible = true; const sl = L - .3; st.shaft.position.set(ex / L * sl / 2, ey / L * sl / 2, 0); st.shaft.scale.set(1, sl, 1);
+    tv.set(ex / L, ey / L, 0); st.shaft.quaternion.setFromUnitVectors(UP, tv);
+    placeArrow(st.vhead, ex / L * (L - .2), ey / L * (L - .2), ex, ey, 1);
+  }
+}
+
+// ================= 標籤 =================
+const LBL = {};
+function label(key, comp, anchor, title, sub) {
+  const outer = document.createElement('div'); outer.className = 'lw';
+  outer.innerHTML = `<div class="lbl"><i></i><b>${title}</b>${sub != null ? `<span>${sub}</span>` : ''}</div>`;
+  const o = new CSS2DObject(outer); o.position.set(...anchor); o.center.set(.5, 1); scene.add(o);
+  const lm = new THREE.LineBasicMaterial({ color: 0x74e4ff, transparent: true, opacity: .5, depthWrite: false });
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(...comp), new V3(...anchor)]), lm);
+  scene.add(line);
+  LBL[key] = { outer, line, lm, span: outer.querySelector('span'), op: -1, text: sub, o };
+}
+function labelOp(key, a) {
+  const L = LBL[key]; if (Math.abs(L.op - a) < .002) return; L.op = a;
+  L.outer.style.opacity = a; L.outer.style.visibility = a < .01 ? 'hidden' : 'visible';
+  L.lm.opacity = .5 * a; L.line.visible = a > .01;
+}
+function labelText(key, s) { const L = LBL[key]; if (L.text !== s) { L.text = s; L.span.textContent = s; } }
+label('XE', [24, BY + 5.4, -28.3], [21.5, BY + 8.2, -25], zhEn('氙燈', 'Xenon lamp'), zhEn('150 W 級', '150 W class'));
+label('MONO', [9.3, BY + 1.9, -28.3], [5, BY + 6.2, -25], zhEn('單色器', 'Monochromator'), zhEn('石英晶體稜鏡 · 兼作起偏', 'quartz prisms · also polarize'));
+label('PEM', [SX + 1.2, BY + 1.4, Z.pem], [SX + 2.2, BY + 5.8, Z.pem - 1], zhEn('光彈調變器', 'PEM'), zhEn('熔融石英 · 約 50 kHz', 'fused quartz · ~50 kHz'));
+label('SMP', [SX, BY + 2.5, Z.cell], [SX - 4.5, BY + 6.8, Z.cell], zhEn('樣品', 'Sample'), zhEn('光徑 1 cm', '1 cm path'));
+label('ANA', [SX, BY + 2.5, Z.ana], [SX - 4.5, BY + 6.6, Z.ana], zhEn('檢偏鏡', 'Analyzer'), zhEn('拖曳旋轉', 'drag to turn'));
+label('PMT', [SX, BY + 1.7, 24], [SX + 3.5, BY + 5.4, 26], zhEn('光電倍增管', 'Photomultiplier'), 'HT 318 V');
+label('LOCK', [14, 4.4, 19], [16.5, BY + 2.6, 20], zhEn('鎖相放大器', 'Lock-in amplifier'), zhEn('挑出 50 kHz', 'picks out 50 kHz'));
+label('N2', [-27, 9, -31], [-29, 9.5, -21], zhEn('氮氣', 'Nitrogen'), zhEn('趕走氧氣', 'keeps oxygen out'));
+const LBL_KEYS = Object.keys(LBL);
+
+// ================= 影片腳本(導覽與錄影共用) =================
+const FILM_DUR = 99.6;
+const CAMK = [
+  [0, [96, 74, 120], [0, 7, -2]], [5.5, [84, 66, 104], [0, 8, -2]],
+  [10, [60, 66, 84], [-2, 7, -5]], [11.6, [58, 64, 81], [-2, 7, -5]],
+  [13.4, [-22, 26, 52], [-53, 7, 9]], [22.8, [-25, 25, 49], [-53, 7, 9]],
+  [24.6, [30, 42, 8], [4, 9, -22]], [29.0, [28, 40, 6], [4, 9, -22]],
+  [30.6, [12, 30, -2], [-2, 9.5, -9]], [34.9, [11, 29, -3], [-2, 9.5, -9]],
+  [36.8, [30, 40, 52], [-4, 8.6, 10]], [47.6, [28, 38, 49], [-4, 8.6, 10]],
+  [49.6, [22, 24, 24], [1.5, 11, -2]], [58.8, [20, 23, 22], [1.5, 11, -2]],
+  [60.8, [38, 40, 56], [-1, 6, 15]], [70.6, [36, 38, 53], [-1, 6, 15]],
+  [72.6, [44, 54, 74], [-4, 4, 5]], [88.8, [41, 51, 70], [-4, 4, 5]],
+  [90.6, [0, 34, 12], [-20, 8, -24]], [95.2, [-1, 33, 10], [-20, 8, -24]],
+  [97.8, [96, 74, 120], [0, 7, -2]], [99.6, [98, 75, 122], [0, 7, -2]],
+];
+const LAM = [
+  [35.6, 37.0, 290.5, NA_D], [48.0, 49.4, NA_D, 290.5],
+  [70.8, 71.5, 290.5, 350], [71.6, 76.6, 350, 180, 'lin'], [77.0, 77.5, 180, 350], [77.6, 82.4, 350, 180, 'lin'],
+  [82.8, 83.3, 180, 350], [83.4, 88.2, 350, 180, 'lin'], [88.6, 89.1, 180, 350], [89.4, 94.2, 350, 180, 'lin'], [95.2, 96.8, 180, 290.5],
+];
+const PHI = [[38.0, 38.6, 0, -90], [38.8, 41.6, -90, 90, 'lin'], [42.0, 42.6, 90, -90], [42.8, 45.6, -90, 90, 'lin'], [46.4, 47.6, 90, 0]];
+const CAPS = [
+  [5.8, 11.8, zhEn('01 · 展開', '01 · Opening up'), zhEn('CD 量手性分子對偏光的反應。拿掉外殼:氙燈、單色器、光彈調變器、樣品、光電倍增管。', 'How chiral molecules treat polarized light. Inside: lamp, monochromator, modulator, sample, detector.')],
+  [12.2, 17.2, zhEn('02 · 手性', '02 · Chirality'), zhEn('有些分子和自己的鏡像疊不起來,就像左手和右手,稱為手性分子。', 'Like our two hands, some molecules cannot match their mirror image: they are chiral.')],
+  [17.4, 23.0, zhEn('02 · 手性', '02 · Chirality'), zhEn('一對純的鏡像異構物,熔點、沸點、紅外光譜都一樣;碰到偏光或酵素這類手性的東西才不同。', 'Pure mirror pairs melt, boil and absorb IR alike; polarized light or enzymes tell them apart.')],
+  [23.4, 29.2, zhEn('03 · 偏光', '03 · Polarized light'), zhEn('光是電場的振動。單色器的石英晶體稜鏡把兩個振動方向分開,狹縫只放一個過去。', 'Light is a vibrating electric field. Crystal quartz prisms split two directions; a slit keeps one.')],
+  [29.4, 35.0, zhEn('03 · 偏光', '03 · Polarized light'), zhEn('只朝一個方向振動的叫線偏振光;它可以看成一道左旋、一道右旋的圓偏振光加在一起。', 'One vibration direction means linear polarization: a left and a right circular wave added.')],
+  [35.4, 41.4, zhEn('04 · 旋光', '04 · Optical rotation'), zhEn('改用 589 nm 黃光:手性分子讓左旋、右旋兩道光快慢稍有不同,合起來的振動方向就轉了一個角度。', 'At 589 nm: in a chiral sample the two circular waves travel at different speeds, so their sum turns.')],
+  [41.6, 47.8, zhEn('04 · 旋光', '04 · Optical rotation'), zhEn('轉檢偏鏡找最暗的角度:(+)-α-蒎烯 1 dm 轉 +43.9°,(−) 型 −44.0°;比旋光度約 ±51°。', 'Darkest analyzer angle: +43.9° for 1 dm of (+)-α-pinene, −44.0° for (−); specific rotation about ±51°.')],
+  [48.2, 53.4, zhEn('05 · 光彈調變器', '05 · Photoelastic modulator'), zhEn('回到圓二色模式:光彈調變器是一塊熔融石英,壓電元件每秒把它壓、拉各約五萬次。', 'Back to CD. A piezo squeezes and stretches fused quartz about 50,000 times a second.')],
+  [53.6, 59.0, zhEn('05 · 光彈調變器', '05 · Photoelastic modulator'), zhEn('受力的石英讓兩個方向的光快慢不同:壓時變成一種旋向,拉時變成另一種。', 'Stressed quartz delays one direction: a squeeze gives one handedness, a stretch the other.')],
+  [59.4, 64.8, zhEn('06 · 圓二色性', '06 · Circular dichroism'), zhEn('手性分子吸收左旋、右旋光的量差一點點,吸光度差 ΔA 通常只有萬分之幾到千分之幾。', 'Left and right light are absorbed slightly differently: ΔA is typically 0.0001 to 0.001.')],
+  [65.0, 70.8, zhEn('06 · 圓二色性', '06 · Circular dichroism'), zhEn('偵測器看到每秒五萬次的微小閃爍,鎖相放大器把它挑出來:橢圓度 θ(mdeg)= 32982 × ΔA。', 'The detector sees a tiny 50 kHz flicker; a lock-in amplifier extracts it: θ (mdeg) = 32982 × ΔA.')],
+  [71.2, 77.0, zhEn('07 · 鏡像光譜', '07 · Mirror spectra'), zhEn('(+)-樟腦磺酸:290.5 nm 是正峰,192.5 nm 是負峰,約有兩倍深;常用來校正儀器。', 'Calibration standard (+)-camphorsulfonic acid: up at 290.5 nm, twice as deep down at 192.5 nm.')],
+  [77.2, 82.6, zhEn('07 · 鏡像光譜', '07 · Mirror spectra'), zhEn('換成 (−)-樟腦磺酸再掃一次:整條光譜上下顛倒,和上一次互為鏡像。', 'Now the (−) form: the whole spectrum flips upside down, a mirror image of the last one.')],
+  [83.0, 89.0, zhEn('08 · 蛋白質', '08 · Proteins'), zhEn('α 螺旋在 208、222 nm 是負的,約 192 nm 是正的;β 褶板形狀不同,可估二級結構。', 'α-helix dips at 208 and 222 nm and peaks near 192 nm; β-sheet differs, so shape hints at structure.')],
+  [89.2, 95.6, zhEn('08 · 蛋白質', '08 · Proteins'), zhEn('遠紫外要通氮氣:氧會吸收這段光,也會變成臭氧。偵測器電壓 HT 超過約 600 到 700 V 就不可信。', 'Far UV needs nitrogen: oxygen absorbs it and forms ozone. Detector voltage (HT) above 600 to 700 V: distrust.')],
+];
+const LBL_WIN = [
+  [6.9, 11.9, ['XE']], [7.6, 11.9, ['MONO']], [8.3, 11.9, ['PEM']], [9.0, 11.9, ['SMP']], [9.7, 11.9, ['PMT']],
+  [23.4, 29.3, ['MONO']], [35.4, 47.8, ['SMP', 'ANA']], [48.2, 59.0, ['PEM']], [59.4, 70.8, ['PMT', 'LOCK']],
+  [71.2, 82.6, ['SMP']], [83.0, 89.0, ['SMP']], [89.2, 95.6, ['N2']],
+];
+function track(t, segs, v0) {
+  let v = v0;
+  for (const [a, b, x, y, mode] of segs) {
+    if (t < a) break;
+    if (t >= b) { v = y; continue; }
+    const u = (t - a) / (b - a); v = lerp(x, y, mode === 'lin' ? u : ease(u)); break;
+  }
+  return v;
+}
+const lerp3 = (a, b, u) => new V3(lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u));
+function camAt(t) {
+  const K = CAMK;
+  if (t <= K[0][0]) return [new V3(...K[0][1]), new V3(...K[0][2])];
+  for (let i = 0; i < K.length - 1; i++) {
+    const [ta, pa, qa] = K[i], [tb, pb, qb] = K[i + 1];
+    if (t < tb) { const u = ease((t - ta) / (tb - ta)); return [lerp3(pa, pb, u), lerp3(qa, qb, u)]; }
+  }
+  const L = K[K.length - 1]; return [new V3(...L[1]), new V3(...L[2])];
+}
+const win = (t, a, b, f = .4) => sstep(a, a + f, t) * (1 - sstep(b - f, b, t));
+
+// ================= 狀態 =================
+// S:使用者設定;W:這一格畫出來的值。圓二色與旋光各記自己的這一次(scan)與上一次(ghost)
+const S = { mode: 'cd', cdSample: 'csaP', orSample: 'pinP', lambda: 290.5, phi: 0, explode: 1, runs: { cd: { scan: null, ghost: null }, or: { scan: null, ghost: null } }, scanning: false, scanT0: 0, seed: 1 };
+const W = { mode: 'cd', cdSample: 'csaP', orSample: 'pinP', lambda: 290.5, phi: 0, explode: 1, pemK: 1, anaIn: 0, tubeK: 0, scan: null, ghost: null, decomp: 0, molK: 0, polK: 0, labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, I: [1, 1, 1, 1, 1], t: 0 };
+const run = () => S.runs[S.mode];
+
+function film(t) {
+  W.mode = t >= 35.6 && t < 48.0 ? 'or' : 'cd';
+  W.cdSample = t < 77.0 ? 'csaP' : t < 82.8 ? 'csaM' : t < 88.6 ? 'helix' : 'sheet';
+  W.orSample = t < 42.0 ? 'pinP' : 'pinM';
+  W.lambda = track(t, LAM, 290.5);
+  W.phi = track(t, PHI, 0);
+  W.explode = sstep(6.2, 9.6, t) * (1 - sstep(95.2, 97.6, t));
+  W.pemK = (1 - sstep(22.6, 23.6, t)) + sstep(48.8, 50.0, t);
+  W.anaIn = sstep(35.8, 37.2, t) * (1 - sstep(48.0, 49.2, t));
+  W.tubeK = sstep(35.6, 36.6, t) * (1 - sstep(48.0, 49.0, t));
+  W.decomp = win(t, 29.4, 35.0, .6);
+  W.molK = win(t, 11.9, 23.2, .7);
+  W.polK = Math.max(win(t, 29.4, 35.0, .5), win(t, 35.6, 47.8, .5), win(t, 48.2, 70.8, .5));
+  W.scan = W.ghost = null;
+  if (W.mode === 'or') {
+    const a = { mode: 'or', sample: 'pinP', from: -90, seed: 3 };
+    if (t >= 38.8 && t < 42.0) W.scan = { ...a, to: t < 41.6 ? W.phi : 90, done: t >= 41.6 };
+    if (t >= 42.0) { W.ghost = { ...a, to: 90, done: true }; if (t >= 42.8) W.scan = { mode: 'or', sample: 'pinM', from: -90, seed: 9, to: t < 45.6 ? W.phi : 90, done: t >= 45.6 }; }
+  } else {
+    const cdRun = (sample, t0, t1, seed) => ({ mode: 'cd', sample, from: 350, seed, to: t < t1 ? Math.max(180, W.lambda) : 180, done: t >= t1, t0 });
+    if (t >= 71.6 && t < 77.0) W.scan = cdRun('csaP', 71.6, 76.6, 11);
+    else if (t >= 77.0 && t < 82.8) { W.ghost = { mode: 'cd', sample: 'csaP', from: 350, to: 180, seed: 11, done: true }; if (t >= 77.6) W.scan = cdRun('csaM', 77.6, 82.4, 17); }
+    else if (t >= 82.8 && t < 88.6) { if (t >= 83.4) W.scan = cdRun('helix', 83.4, 88.2, 23); }
+    else if (t >= 88.6) { W.ghost = { mode: 'cd', sample: 'helix', from: 350, to: 180, seed: 23, done: true }; if (t >= 89.4) W.scan = cdRun('sheet', 89.4, 94.2, 29); }
+  }
+  const [cp, ct] = camAt(t); camera.position.copy(cp); controls.target.copy(ct); camera.lookAt(ct);
+  W.labels = {}; for (const [a, b, keys] of LBL_WIN) for (const k of keys) W.labels[k] = Math.max(W.labels[k] || 0, win(t, a, b, .5));
+  W.conOp = win(t, 35.4, 96.2, .8);
+  W.cap = null; for (const c of CAPS) if (t >= c[0] && t < c[1]) W.cap = { chap: c[2], txt: c[3], op: win(t, c[0], c[1], .35) };
+  W.title = win(t, .2, 5.6, .9); W.outro = sstep(95.8, 96.6, t); W.chips = win(t, 5.6, 96.0, .8);
+}
+
+// 這一格的光路:每一段的瓊斯向量與振幅
+function stageSegs(t) {
+  const cd = CD[W.cdSample], or = OR[W.orSample], inOR = W.tubeK > .5, anaIn = W.anaIn > .97;
+  const Jp = jonesPEM(pemDelta(t, W.pemK));
+  const alpha = or.alpha * DEG, phi = W.phi * DEG;
+  const aIn = Math.sqrt(xeSpec(W.lambda));
+  const att = inOR ? 1 : 10 ** (-sampleA(cd, W.lambda) / 2);   // 振幅;光強是它的平方
+  const half = cd.path === 'cm' ? .63 : .18;
+  const zin = inOR ? Z.t0 : Z.cell - half, zout = inOR ? Z.t1 : Z.cell + half;
+  const Jc = inOR ? rotJ(Jp, alpha) : Jp;
+  const segs = [
+    { z0: Z.s3 + .4, z1: Z.pem - 1.2, J: J_H, amp: aIn },
+    { z0: Z.pem + 1.2, z1: zin, J: Jp, amp: aIn },
+    inOR ? { z0: zin + .05, z1: zout - .05, J: z => rotJ(Jp, alpha * (z - Z.t0) / (Z.t1 - Z.t0)), amp: aIn } : null,
+    { z0: zout, z1: anaIn ? Z.ana - .35 : Z.pmt - .3, J: Jc, amp: aIn * att },
+    anaIn ? { z0: Z.ana + .35, z1: Z.pmt - .3, J: analyzeJ(Jc, phi), amp: aIn * att } : null,
+  ];
+  const Ic = aIn * aIn * att * att, Id = anaIn ? Ic * malus(W.phi, or.alpha) : Ic;
+  return { segs, Jp, Jc, alpha, I: [aIn * aIn, aIn * aIn, inOR ? aIn * aIn : (aIn * aIn + Ic) / 2, Ic, Id] };
+}
+
+let lastNote = '', lastLegend = '', lastCap = '', lastTitle = '', lastMode = '';
+function frameCommon(t) {
+  W.t = t;
+  const cd = CD[W.cdSample], or = OR[W.orSample];
+  W.theta = thetaAt(cd, W.lambda); W.dA = W.theta / 32982; W.HT = htAt(cd, W.lambda); W.As = sampleA(cd, W.lambda);
+  W.T = malus(W.phi, or.alpha);
+  const st = stageSegs(t); W.I = st.I;
+  // 光彈調變器:石英棒一壓一拉(放大很多倍、放慢)
+  const ps = Math.sin(2 * Math.PI * t / TP) * W.pemK;
+  O.PEM.bar.scale.x = 1 + .045 * ps; O.PEM.pz.position.x = 3.15 + 2.6 * .045 * ps;
+  MAT.fq.emissiveIntensity = .9 * Math.abs(ps);
+  // 檢偏鏡滑進滑出、轉角;比色管與樣品管換位
+  anaG.position.x = SX - 9 * (1 - ease(W.anaIn));
+  anaRot.rotation.z = -W.phi * DEG;
+  cellG.position.y = BY - 9 * ease(clamp(W.tubeK * 2, 0, 1)); cellG.visible = W.tubeK < .5;
+  tubeG.position.y = BY - 9 * (1 - ease(clamp(W.tubeK * 2 - 1, 0, 1))); tubeG.visible = W.tubeK > .5;
+  cellCm.visible = cd.path === 'cm'; cellMm.visible = cd.path === 'mm';
+  floatBall.position.y = 8.2 + .12 * Math.sin(t * 2.3);
+  ledMat.color.setRGB(.2, .8, 1).multiplyScalar(W.pemK > .5 && W.mode === 'cd' ? (Math.sin(2 * Math.PI * t / TP) > 0 ? 2.4 : .25) : .25);
+  drawStrip(O.S2, G1, W.lambda, .45); drawStrip(O.S3, G2, W.lambda, .15);
+  buildRays(W); buildPhotons(W, t);
+  rayMat.uniforms.uT.value = t;
+  const mono = lin(wlColor(W.lambda));
+  for (let i = 0; i < 5; i++) { BEAMS[i].material.uniforms.uC.value.copy(mono); BEAMS[i].material.uniforms.uK.value = .6 * W.I[i]; }
+  O.PMT.win.material.color.setHex(0x0b1830).add(mono.clone().multiplyScalar(2 * W.I[4]));
+  // 偏振:光波與各站
+  const wop = sstep(.3, .8, W.explode);
+  // 第 03 章:線偏振 = 左旋(Jy = +i/2)+ 右旋(Jy = −i/2);這時線偏振的面淡一點,兩個分量才看得清楚
+  const dk = W.decomp * wop, sA = st.segs[0];
+  st.segs.forEach((s, i) => drawWave(WAVES[i], s, t, mono, wop, i === 0 ? .2 * (1 - .7 * W.decomp) : .2));
+  drawWave(DEC[0], { ...sA, J: [.5, 0, 0, .5] }, t, COL_L, dk, .16);
+  drawWave(DEC[1], { ...sA, J: [.5, 0, 0, -.5] }, t, COL_R, dk, .16);
+  const s3 = st.segs[3], s4 = st.segs[4];
+  drawStation(STA[0], Z.s3 + 2.6, J_H, sA.amp, t, mono, wop);
+  drawStation(STA[1], Math.min(Z.pem + 2.3, st.segs[1].z1 - .4), st.Jp, st.segs[1].amp, t, mono, wop);
+  drawStation(STA[2], s3.z0 + 2.0, s3.J, s3.amp, t, mono, wop);
+  if (s4) drawStation(STA[3], s4.z0 + 2.5, s4.J, s4.amp * 1, t, mono, wop); else STA[3].g.visible = false;
+  // 手性分子
+  molG.visible = W.molK > .01;
+  if (molG.visible) { const a = t * .6; molA.rotation.y = a; molB.rotation.y = -a; for (const m of molMats) m.opacity = m.userData.op * W.molK; mirEdge.material.opacity = .5 * W.molK; }
+  // 外殼
+  const k = ease(W.explode), o = 1 - sstep(0, .5, k);
+  for (const p of shellParts) {
+    p.g.position.set(p.move[0] * k, p.move[1] * k, p.move[2] * k); p.g.rotation.x = p.rot * k;
+    for (const c of p.g.children) if (c.isMesh) { c.visible = o > .01; c.castShadow = o > .5; }
+  }
+  for (const m of [MAT.shell, MAT.lid, MAT.vent]) { m.opacity = o; m.depthWrite = o > .5; }
+  MAT.edge.opacity = .55 * Math.sin(Math.PI * k);
+  bloom.strength = .32 + .43 * k;
+  // 標籤
+  const base = sstep(.55, .9, W.explode);
+  for (const key of LBL_KEYS) labelOp(key, W.labels ? (W.labels[key] || 0) : base * (key === 'ANA' ? sstep(.5, .9, W.anaIn) : 1));
+  labelText('SMP', W.tubeK > .5 ? zhEn('1 dm 樣品管', '1 dm tube') : cd.path === 'cm' ? zhEn('光徑 1 cm', '1 cm path') : zhEn('光徑 1 mm', '1 mm path'));
+  labelText('PEM', W.pemK > .5 ? zhEn('熔融石英 · 約 50 kHz', 'fused quartz · ~50 kHz') : zhEn('停止', 'stopped'));
+  labelText('PMT', W.mode === 'cd' ? `HT ${Math.round(W.HT)} V` : zhEn(`光 ${pct(W.T)}`, `light ${pct(W.T)}`));
+  updateDOM();
+}
+// 狹縫板上的光譜:稜鏡把光依波長散開,縫口那一格穿過去(留黑);上面那一條是另一個振動方向,被板子擋住
+function addStrip(o) {
+  const cv = document.createElement('canvas'); cv.width = 512; cv.height = 64;
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+  const m = mesh(new THREE.PlaneGeometry(o.halfW * 2, 3.6), new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [0, 0, .14], o.g, false);
+  m.material.color.setScalar(1.7);
+  o.strip = { ctx: cv.getContext('2d'), tex, key: '' };
+}
+addStrip(O.S2); addStrip(O.S3);
+function drawStrip(o, G, l, k2) {
+  const s = o.strip, key = l.toFixed(2);
+  if (key === s.key) return; s.key = key;
+  const img = s.ctx.createImageData(512, 64), d = img.data;
+  for (let px = 0; px < 512; px++) {
+    const ul = (px / 511 * 2 - 1) * o.halfW, u = ul * o.sg, inv = invL(l) + u / G;
+    let r = 0, g = 0, b = 0;
+    if (inv > .6 && inv < 32) { const lk = 1000 / Math.sqrt(inv), c = wlColor(lk), e = .35 + .65 * xeSpec(lk); r = c[0] * e; g = c[1] * e; b = c[2] * e; }
+    for (let py = 0; py < 64; py++) {
+      const v = (.5 - py / 63) * 3.6, i = (py * 512 + px) * 4;
+      const kk = (Math.exp(-((v / .32) ** 2)) * (Math.abs(ul) < o.gap / 2 && Math.abs(v) < .7 ? 0 : 1) + k2 * Math.exp(-(((v - POL2) / .32) ** 2))) * 255;
+      d[i] = r * kk; d[i + 1] = g * kk; d[i + 2] = b * kk; d[i + 3] = 255;
+    }
+  }
+  s.ctx.putImageData(img, 0, 0); s.tex.needsUpdate = true;
+}
+
+// ================= 介面 =================
+const el = id => document.getElementById(id);
+const lamIn = el('lam'), angIn = el('ang');
+const curSample = () => (W.mode === 'cd' ? CD[W.cdSample] : OR[W.orSample]);
+const foundAlpha = sc => (sc && sc.mode === 'or' && sc.done && sc.to - sc.from >= 120 ? fitAlpha(sc) : null);
+function noteHTML() {
+  if (W.mode === 'cd') {
+    const cd = CD[W.cdSample], l = W.lambda.toFixed(1);
+    let s = zhEn(`單色器選出 <em class="v">${l} nm</em> 的紫外光(看不見,這裡用淡紫色畫),光彈調變器讓它輪流變成左旋與右旋圓偏振光。`, `The monochromator passes <em class="v">${l} nm</em> UV light (invisible, drawn pale violet), and the PEM makes it left and right circular in turn.`);
+    if (Math.abs(W.theta) < .05) s += zhEn(`${cd.inText}在這裡對兩種光吸收得幾乎一樣多。`, ` Here ${cd.inText} absorbs both about equally.`);
+    else {
+      const more = W.theta > 0 ? zhEn('左旋光', 'left light') : zhEn('右旋光', 'right light');
+      s += zhEn(`${cd.inText}吸收${more}比較多,ΔA = <em class="c">${fmtDA(W.dA)}</em>,橢圓度 <em class="c">${fmtTheta(W.theta)}</em>。`, ` Here ${cd.inText} absorbs more ${more}: ΔA = <em class="c">${fmtDA(W.dA)}</em>, ellipticity <em class="c">${fmtTheta(W.theta)}</em>.`);
+    }
+    if (W.HT > HT_BAD) s += zhEn(` 偵測器的電壓 HT 升到 <em class="a">${Math.round(W.HT)} V</em>:光太少,這一段的數據不可信。`, ` The detector voltage (HT) is up at <em class="a">${Math.round(W.HT)} V</em>: too little light, so data here are unreliable.`);
+    return s;
+  }
+  const or = OR[W.orSample];
+  if (W.orSample === 'blank') return zhEn('空白(只有水)不會轉動振動方向,最暗的角度在 0°:這就是檢偏鏡的零點。', 'The blank (water only) does not turn the vibration, so the darkest angle is 0°: the zero of the analyzer.');
+  const fa = foundAlpha(W.scan);
+  if (fa == null) return zhEn(`589 nm 的黃光(鈉 D 線)穿過${or.inText}以後,振動方向轉了一個角度(看上面的小圖)。轉動檢偏鏡,或按「掃描」找出最暗的角度。`, `589 nm yellow light (the sodium D line) leaves ${or.inText} with its vibration turned (see the small view above). Turn the analyzer, or press Scan, to find the darkest angle.`);
+  return zhEn(`最暗的角度 <em class="c">${fmtDeg(fa)}</em> 就是旋光度 α(迎著光看順時針為正);比旋光度 = α ÷ (1 dm × ${or.c} g/mL) = <em class="c">${fmtDeg(fa / or.c)}</em>。`, `The darkest angle, <em class="c">${fmtDeg(fa)}</em>, is the optical rotation α (clockwise, facing the light, is +); specific rotation = α ÷ (1 dm × ${or.c} g/mL) = <em class="c">${fmtDeg(fa / or.c)}</em>.`);
+}
+function setModeText() {
+  const cdm = W.mode === 'cd';
+  el('k1').textContent = cdm ? zhEn('波長', 'Wavelength') : zhEn('檢偏鏡', 'Analyzer');
+  el('k2').textContent = cdm ? zhEn('橢圓度', 'Ellipticity') : zhEn('透過的光', 'Light through');
+  el('k3').textContent = cdm ? 'HT' : zhEn('旋光度', 'Rotation α');
+  el('m1t').textContent = cdm ? zhEn('左旋光', 'Left light') : zhEn('空白的光', 'Blank');
+  el('m2t').textContent = cdm ? zhEn('右旋光', 'Right light') : zhEn('樣品的光', 'Sample');
+  el('m3t').textContent = cdm ? zhEn('橢圓度 θ(mdeg)= 32982 × ΔA', 'Ellipticity θ (mdeg) = 32982 × ΔA') : zhEn('比旋光度 [α] = α ÷ (l × c)', 'Specific rotation [α] = α ÷ (l × c)');
+  el('conTitle').textContent = cdm ? zhEn('圓二色光譜', 'CD spectrum') : zhEn('穿過檢偏鏡的光', 'Light through the analyzer');
+}
+const legendItem = (style, text) => `<span><i style="${style}"></i>${text}</span>`;
+function updateDOM() {
+  const cdm = W.mode === 'cd';
+  if (W.mode !== lastMode) { lastMode = W.mode; setModeText(); }
+  const sm = curSample(), barCol = css(wlColor(W.lambda));
+  if (cdm) {
+    el('c1').textContent = `${W.lambda.toFixed(1)} nm`;
+    el('c2').textContent = W.pemK > .5 ? fmtTheta(W.theta) : zhEn('未量', 'not yet');
+    el('c3').textContent = `${Math.round(W.HT)} V`;
+    const IL = 10 ** -(W.As + W.dA / 2), IR = 10 ** -(W.As - W.dA / 2);
+    el('v1').textContent = `${(100 * IL).toFixed(2)}%`; el('b1').style.width = `${Math.min(100, IL * 100)}%`;
+    el('v2').textContent = `${(100 * IR).toFixed(2)}%`; el('b2').style.width = `${Math.min(100, IR * 100)}%`;
+    el('b1').style.background = C_L; el('b2').style.background = C_R;
+    el('v3').textContent = W.pemK > .5 ? fmtTheta(W.theta).replace(' mdeg', '') : zhEn('未量', 'not yet');
+  } else {
+    const fa = foundAlpha(W.scan), or = OR[W.orSample];
+    el('c1').textContent = fmtDeg(W.phi); el('c2').textContent = pct(W.T); el('c3').textContent = fa == null ? zhEn('未量', 'not yet') : fmtDeg(fa);
+    const Tb = malus(W.phi, 0);
+    el('v1').textContent = pct(Tb); el('b1').style.width = `${Tb * 100}%`;
+    el('v2').textContent = pct(W.T); el('b2').style.width = `${W.T * 100}%`;
+    el('b1').style.background = el('b2').style.background = barCol;
+    el('v3').textContent = or.spec == null ? zhEn('不旋光', 'none') : fa == null ? zhEn('未量', 'not yet') : fmtDeg(fa / or.c);
+  }
+  if (!FILM && !tour.on) { const n = noteHTML(); if (n !== lastNote) { lastNote = n; el('note').innerHTML = n; } }
+  el('conSample').textContent = sm.full;
+  let lg = '';
+  if (W.scan) lg += legendItem('border-top:2px solid var(--cyan)', zhEn(`掃描 ${(cdm ? CD : OR)[W.scan.sample].name}`, `scan, ${(cdm ? CD : OR)[W.scan.sample].name}`));
+  if (W.ghost) lg += legendItem('border-top:2px dashed var(--amber)', zhEn(`上一次 ${(cdm ? CD : OR)[W.ghost.sample].name}`, `previous, ${(cdm ? CD : OR)[W.ghost.sample].name}`));
+  if (!W.scan && !W.ghost) lg = legendItem('border-top:1px dashed var(--ink-2)', cdm ? zhEn('預覽;按「掃描」量整條光譜', 'preview; press Scan for the full spectrum') : zhEn('預覽;按「掃描」轉一圈找最暗處', 'preview; press Scan to find the darkest angle'));
+  if (cdm) lg += legendItem('height:9px;background:rgba(234,243,246,.13)', zhEn('HT 過高', 'HT too high'));
+  if (lg !== lastLegend) { lastLegend = lg; el('legend').innerHTML = lg; }
+  const con = el('console');
+  con.style.opacity = W.conOp; con.style.visibility = W.conOp < .01 ? 'hidden' : 'visible';
+  if (W.conOp > .01) drawPlot();
+  drawPol();
+  if (FILM || tour.on) {
+    const cap = el('cap'), c = W.cap;
+    cap.style.opacity = c ? c.op : 0;
+    const ck = c ? c.chap + c.txt : '';
+    if (ck !== lastCap && c) { lastCap = ck; el('chap').textContent = c.chap; el('capTxt').textContent = c.txt; }
+    cap.classList.toggle('withcon', W.conOp > .01);
+    const tc = el('titlecard'), op = Math.max(W.title, W.outro);
+    tc.style.opacity = op; tc.style.visibility = op < .01 ? 'hidden' : 'visible';
+    const tk = W.outro > W.title ? 'o' : 't';
+    if (tk !== lastTitle) {
+      lastTitle = tk;
+      const tx = tk === 't'
+        ? zhEn(['CD 圓二色光譜儀', '分辨左右手', '手性分子對左旋、右旋光的反應不同', ''], ['CD spectrometer', 'Telling left from right', 'Chiral molecules treat left and right light differently', ''])
+        : zhEn(['CD 圓二色光譜儀', '旋光 · 圓二色性 · 鏡像光譜', '氙燈 · 石英晶體稜鏡 · 光彈調變器 · 檢偏鏡 · 光電倍增管', '示意動畫;元件位置與偏振的畫法為示意,β 褶板的光譜、峰寬與 HT 為示意。'], ['CD spectrometer', 'Optical rotation · circular dichroism · mirror spectra', 'Xenon lamp · crystal quartz prisms · photoelastic modulator · analyzer · photomultiplier', 'Schematic animation; part positions and polarization drawings are illustrative, as are the β-sheet spectrum, band widths and HT.']);
+      ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => el(id).textContent = tx[i]);
+    }
+    document.querySelector('.hud').style.opacity = W.chips;
+    document.querySelector('.pol').style.boxShadow = W.polK > .01 ? `0 0 0 ${(1.5 * W.polK).toFixed(2)}px rgba(116,228,255,${(.6 * W.polK).toFixed(2)})` : '';
+  }
+}
+
+// ---------- 迎著光看的小圖 ----------
+const pol = el('pol');
+let polDrawnAt = -Infinity;
+function arrowHead(c, x, y, ang, s) { c.beginPath(); c.moveTo(x, y); c.lineTo(x - s * Math.cos(ang - .45), y - s * Math.sin(ang - .45)); c.moveTo(x, y); c.lineTo(x - s * Math.cos(ang + .45), y - s * Math.sin(ang + .45)); c.stroke(); }
+function dblArrow(c, cx, cy, r, ang, col, lw, dash) {
+  const dx = Math.cos(ang) * r, dy = Math.sin(ang) * r;
+  c.strokeStyle = col; c.lineWidth = lw; c.setLineDash(dash || []); c.beginPath(); c.moveTo(cx - dx, cy - dy); c.lineTo(cx + dx, cy + dy); c.stroke(); c.setLineDash([]);
+  arrowHead(c, cx + dx, cy + dy, ang, 7); arrowHead(c, cx - dx, cy - dy, ang + Math.PI, 7);
+}
+function drawPol() {
+  const now = performance.now();
+  if (!REC && now - polDrawnAt < 1000 / 30) return;
+  polDrawnAt = now;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (pol.currentCSSZoom || uiScale()), w = pol.clientWidth, h = pol.clientHeight;
+  if (!w || !h) return;
+  if (pol.width !== Math.round(w * dpr) || pol.height !== Math.round(h * dpr)) { pol.width = Math.round(w * dpr); pol.height = Math.round(h * dpr); }
+  const c = pol.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const t = W.t, fs = FILM ? 14 : 11, R = Math.min(h / 2 - 8, FILM ? 66 : 46), cx = R + 10, cy = h / 2;
+  const beam = css(wlColor(W.lambda)), ink2 = '#a8bcc6', muted = '#71858f';
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = 'rgba(160,215,235,.25)'; c.lineWidth = 1; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.stroke();
+  c.strokeStyle = 'rgba(160,215,235,.08)'; c.beginPath(); c.moveTo(cx - R, cy); c.lineTo(cx + R, cy); c.moveTo(cx, cy - R); c.lineTo(cx, cy + R); c.stroke();
+  c.font = `${fs}px ${MONO}`; c.textBaseline = 'top'; c.textAlign = 'left';
+  const tx = cx + R + 14, r0 = R * .92;
+  // 瓊斯向量的電場在小圖上(canvas 的 y 朝下)
+  const Ept = (J, p) => [cx + (J[0] * Math.cos(p) - J[1] * Math.sin(p)) * r0, cy - (J[2] * Math.cos(p) - J[3] * Math.sin(p)) * r0];
+  const ellipse = (J, col, lw, dash) => { c.strokeStyle = col; c.lineWidth = lw; c.setLineDash(dash || []); c.beginPath(); for (let i = 0; i <= 64; i++) { const [x, y] = Ept(J, i / 64 * Math.PI * 2); i ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke(); c.setLineDash([]); };
+  const vec = (J, col, lw) => { const p = -WW * t, [x, y] = Ept(J, p); c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); c.moveTo(cx, cy); c.lineTo(x, y); c.stroke(); const L = Math.hypot(x - cx, y - cy); if (L > 6) arrowHead(c, x, y, Math.atan2(y - cy, x - cx), 6); };
+  if (W.mode === 'or' || W.anaIn > .5) {
+    const or = OR[W.orSample], a = or.alpha;
+    dblArrow(c, cx, cy, r0, 0, 'rgba(168,188,198,.6)', 1.5, [3, 3]);
+    dblArrow(c, cx, cy, r0, a * DEG, beam, 2.4);
+    if (Math.abs(a) > 2) { c.strokeStyle = beam; c.lineWidth = 1.2; c.beginPath(); c.arc(cx, cy, R * .45, 0, a * DEG, a < 0); c.stroke(); c.fillStyle = beam; c.fillText('α', cx + R * .5 * Math.cos(a * DEG / 2) + 2, cy + R * .5 * Math.sin(a * DEG / 2) - fs / 2); }
+    if (W.anaIn > .5) {
+      const p = W.phi * DEG, ax = Math.sin(p), ay = -Math.cos(p);
+      c.strokeStyle = '#eaf3f6'; c.lineWidth = 1.3; c.setLineDash([6, 3]); c.beginPath(); c.moveTo(cx - ax * R, cy - ay * R); c.lineTo(cx + ax * R, cy + ay * R); c.stroke(); c.setLineDash([]);
+    }
+    const rows = [[zhEn('樣品前', 'Before sample'), '0°', 'rgba(168,188,198,.8)', 'dash'], [zhEn('樣品後', 'After sample'), fmtDeg(a), beam, 'solid'], [zhEn('檢偏鏡', 'Analyzer'), W.anaIn > .5 ? fmtDeg(W.phi) : zhEn('移開', 'out'), '#eaf3f6', 'ana'], [zhEn('透過', 'Through'), W.anaIn > .5 ? pct(W.T) : zhEn('移開', 'out'), null, '']];
+    const lh = (h - 8) / 4;
+    rows.forEach(([k, v, col, kind], i) => {
+      const y = 4 + i * lh;
+      if (col) { c.strokeStyle = col; c.lineWidth = kind === 'solid' ? 2.4 : 1.3; c.setLineDash(kind === 'solid' ? [] : kind === 'ana' ? [6, 3] : [3, 3]); c.beginPath(); c.moveTo(tx, y + fs * .6); c.lineTo(tx + 18, y + fs * .6); c.stroke(); c.setLineDash([]); }
+      c.fillStyle = muted; c.fillText(k, tx + 24, y); c.fillStyle = ink2; c.textAlign = 'right'; c.fillText(v, w - 4, y); c.textAlign = 'left';
+    });
+    return;
+  }
+  if (W.decomp > .3) {
+    // 線偏振 = 左旋 + 右旋
+    ellipse(J_H, 'rgba(168,188,198,.5)', 1.2);
+    vec([.5, 0, 0, .5], C_L, 2); vec([.5, 0, 0, -.5], C_R, 2); vec(J_H, beam, 2.6);
+    c.fillStyle = beam; c.fillText(zhEn('線偏振', 'Linear'), tx, 4);
+    c.fillStyle = muted; c.fillText('=', tx, 4 + fs * 1.6);
+    c.fillStyle = C_L; c.fillText(zhEn('左旋(逆時針)', 'Left (counterclockwise)'), tx + fs, 4 + fs * 1.6);
+    c.fillStyle = muted; c.fillText('+', tx, 4 + fs * 3.2);
+    c.fillStyle = C_R; c.fillText(zhEn('右旋(順時針)', 'Right (clockwise)'), tx + fs, 4 + fs * 3.2);
+    return;
+  }
+  // 圓二色:光彈調變器之後的偏振,左旋、右旋輪流;右邊是偵測器的光
+  const d = pemDelta(t, W.pemK), J = jonesPEM(d), hnd = handed(J), sd = Math.sin(d);
+  ellipse(J, 'rgba(168,188,198,.45)', 1.2, [3, 3]);
+  const stCol = sd > .5 ? C_L : sd < -.5 ? C_R : beam;
+  vec(J, stCol, 2.6);
+  const name = Math.abs(sd) > .87 ? (hnd > 0 ? zhEn('左旋', 'Left') : zhEn('右旋', 'Right')) : Math.abs(sd) < .26 ? zhEn('線偏振', 'Linear') : zhEn('橢圓偏振', 'Elliptical');
+  c.fillStyle = muted; c.fillText(zhEn('光彈調變器之後', 'After the PEM'), tx, 4);
+  c.fillStyle = stCol; c.font = `600 ${fs + 3}px ${MONO}`; c.fillText(name, tx, 6 + fs * 1.3); c.font = `${fs}px ${MONO}`;
+  const sx0 = tx + (FILM ? 150 : 104), sx1 = w - 4, sy0 = 6 + fs * 1.4, sy1 = h - 6;
+  if (sx1 - sx0 > 40) {
+    c.fillStyle = muted; c.fillText(zhEn('偵測器的光 ×50', 'Detector ×50'), sx0, 4);
+    const mid = (sy0 + sy1) / 2, amp = (sy1 - sy0) / 2;
+    c.strokeStyle = 'rgba(160,215,235,.25)'; c.setLineDash([3, 3]); c.lineWidth = 1; c.beginPath(); c.moveTo(sx0, mid); c.lineTo(sx1, mid); c.stroke(); c.setLineDash([]);
+    const m = clamp(50 * Math.LN10 / 2 * W.dA, -1, 1);
+    c.strokeStyle = beam; c.lineWidth = 1.6; c.beginPath();
+    for (let i = 0; i <= 80; i++) { const tt = t - (1 - i / 80) * 2 * TP, v = Math.sin(pemDelta(tt, W.pemK)) * m, x = lerp(sx0, sx1, i / 80), y = mid + v * amp * .9; i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.stroke();
+    c.fillStyle = ink2; c.fillText(`ΔA ${fmtDA(W.dA)}`, tx, h - fs - 4);
+  } else { c.fillStyle = ink2; c.fillText(`ΔA ${fmtDA(W.dA)}`, tx, h - fs - 4); }
+}
+
+// ---------- 譜圖 ----------
+const plot = el('plot'), tip = el('tip');
+let hoverX = null, previewKey = '', previewValues = [], plotDrawnAt = -Infinity;
+function niceStep(span, n) { for (const s of [5, 10, 20, 25, 50, 100, 200, 500]) if (span / s <= n) return s; return 1000; }
+function drawPlot() {
+  const now = performance.now();
+  if (!REC && now - plotDrawnAt < 1000 / 30) return;
+  plotDrawnAt = now;
+  const dpr = (REC ? 1 : Math.min(devicePixelRatio, 2)) * (plot.currentCSSZoom || uiScale()), w = plot.clientWidth, h = plot.clientHeight; // 面板放大時多畫幾倍像素
+  if (!w) return;
+  if (plot.width !== Math.round(w * dpr) || plot.height !== Math.round(h * dpr)) { plot.width = Math.round(w * dpr); plot.height = Math.round(h * dpr); }
+  const c = plot.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const cdm = W.mode === 'cd', fs = FILM ? 14 : 11, Lp = FILM ? 56 : 44, Rp = FILM ? 22 : 16, Tp = FILM ? 26 : 20, Bp = FILM ? 30 : 22;
+  const pw = w - Lp - Rp, ph = h - Tp - Bp;
+  let x0, x1, y0, y1, ys, xs;
+  if (cdm) {
+    const ks = [W.cdSample, W.scan && W.scan.sample, W.ghost && W.ghost.sample].filter(Boolean);
+    let lo = Math.min(...ks.map(k => CD[k].lo)), hi = Math.max(...ks.map(k => CD[k].hi));
+    ys = niceStep((hi - lo) * 1.15, clamp(Math.floor(ph / 24), 3, 7)); y0 = Math.floor(lo * 1.08 / ys) * ys; y1 = Math.ceil(hi * 1.12 / ys) * ys;
+    x0 = 180; x1 = 350; xs = 20;
+  } else { x0 = -90; x1 = 90; xs = 30; y0 = 0; y1 = 100; ys = ph < 100 ? 50 : 25; }
+  const X = v => Lp + (v - x0) / (x1 - x0) * pw, Y = v => Tp + (1 - (v - y0) / (y1 - y0)) * ph;
+  c.font = `${fs}px ${MONO}`; c.lineWidth = 1;
+  // HT 過高的區段(圓二色)
+  if (cdm) {
+    const bad = CD[W.cdSample].bad;
+    if (bad > x0) { c.fillStyle = 'rgba(234,243,246,.07)'; c.fillRect(Lp, Tp, X(bad) - Lp, ph); c.fillStyle = '#71858f'; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText('HT', Lp + 3, Tp + 3); }
+  }
+  c.textAlign = 'right'; c.textBaseline = 'middle';
+  for (let v = y0; v <= y1 + 1e-6; v += ys) {
+    const y = Math.round(Y(v)) + .5;
+    c.strokeStyle = Math.abs(v) < 1e-9 ? 'rgba(160,215,235,.25)' : 'rgba(160,215,235,.08)';
+    c.beginPath(); c.moveTo(Lp, y); c.lineTo(Lp + pw, y); c.stroke();
+    c.fillStyle = '#71858f'; c.fillText(String(Math.round(v)), Lp - 7, y);
+  }
+  c.textAlign = 'center'; c.textBaseline = 'top';
+  for (let v = Math.ceil(x0 / xs) * xs; v <= x1; v += xs) {
+    const x = Math.round(X(v)) + .5;
+    c.strokeStyle = cdm || v !== 0 ? 'rgba(160,215,235,.08)' : 'rgba(160,215,235,.25)'; c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+    c.fillStyle = '#71858f'; c.fillText(cdm ? v : `${v}°`, x, Tp + ph + 6);
+  }
+  c.fillStyle = '#71858f'; c.textBaseline = 'top';
+  c.textAlign = zhEn('right', 'left'); c.fillText(cdm ? zhEn('mdeg', 'mdeg') : zhEn('透過 %', 'through %'), zhEn(Lp - 7, 2), 2);
+  c.textAlign = 'left'; c.fillText(cdm ? 'nm' : '', 2, Tp + ph + 6);
+  c.save(); c.beginPath(); c.rect(Lp, Tp - 2, pw, ph + 4); c.clip();
+  if (!W.scan && !W.ghost) {
+    c.setLineDash([2, 4]); c.strokeStyle = 'rgba(168,188,198,.55)'; c.beginPath();
+    const key = `${W.mode}|${cdm ? W.cdSample : W.orSample}|${pw}`;
+    if (key !== previewKey) {
+      previewKey = key; previewValues = [];
+      for (let i = 0; i <= pw; i++) { const v = x0 + i / pw * (x1 - x0); previewValues.push(cdm ? thetaAt(CD[W.cdSample], v) : 100 * malus(v, OR[W.orSample].alpha)); }
+    }
+    for (let i = 0; i < previewValues.length; i++) { const y = Y(previewValues[i]); i ? c.lineTo(Lp + i, y) : c.moveTo(Lp + i, y); }
+    c.stroke(); c.setLineDash([]);
+  }
+  const drawTrace = (sc, style, lw, dash) => {
+    if (!sc || sc.mode !== W.mode) return;
+    const tr = traceCached(sc); if (tr.length < 4) return;
+    c.setLineDash(dash || []); c.strokeStyle = style; c.lineWidth = lw; c.lineJoin = 'round'; c.beginPath();
+    for (let i = 0; i < tr.length; i += 2) { const x = X(tr[i]), y = Y(tr[i + 1]); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.stroke(); c.setLineDash([]); c.lineWidth = 1;
+  };
+  drawTrace(W.ghost, 'rgba(255,194,97,.95)', FILM ? 2 : 1.5, [5, 3]);
+  drawTrace(W.scan, '#74e4ff', FILM ? 2.5 : 2);
+  // 目前的波長或檢偏鏡角度
+  const cur = cdm ? W.lambda : W.phi, col = wlColor(W.lambda);
+  if (cur >= x0 && cur <= x1) {
+    const x = X(cur), y = Y(cdm ? W.theta : 100 * W.T);
+    c.strokeStyle = css(col, .7); c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke();
+    c.fillStyle = css(col); c.strokeStyle = '#0c1318'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, FILM ? 6 : 4.5, 0, 7); c.fill(); c.stroke(); c.lineWidth = 1;
+  }
+  // 掃完以後標出最暗的角度
+  const fa = foundAlpha(W.scan);
+  if (!cdm && fa != null) {
+    const x = X(fa); c.fillStyle = '#74e4ff'; c.beginPath(); c.moveTo(x, Tp + ph - 1); c.lineTo(x - 5, Tp + ph - 10); c.lineTo(x + 5, Tp + ph - 10); c.fill();
+    c.textAlign = fa > 40 ? 'right' : 'left'; c.textBaseline = 'bottom'; c.fillText(zhEn(`最暗 ${fmtDeg(fa)}`, `darkest ${fmtDeg(fa)}`), x + (fa > 40 ? -8 : 8), Tp + ph - 12);
+  }
+  if (hoverX != null) {
+    const x = X(hoverX); c.setLineDash([3, 3]); c.strokeStyle = 'rgba(234,243,246,.5)';
+    c.beginPath(); c.moveTo(x, Tp); c.lineTo(x, Tp + ph); c.stroke(); c.setLineDash([]);
+  }
+  c.restore();
+  plot._map = { x0, x1, Lp, pw };
+}
+function valueAt(v) {
+  const cdm = W.mode === 'cd';
+  for (const sc of [W.scan, W.ghost]) {
+    if (!sc || sc.mode !== W.mode) continue;
+    const tr = traceCached(sc), i = Math.round(cdm ? (sc.from - v) / .5 : (v - sc.from) / .5);
+    if (i >= 0 && i * 2 + 1 < tr.length) return { y: tr[i * 2 + 1], tag: zhEn(`掃描 ${(cdm ? CD : OR)[sc.sample].name}`, `scan, ${(cdm ? CD : OR)[sc.sample].name}`) };
+  }
+  return { y: cdm ? thetaAt(CD[W.cdSample], v) : 100 * malus(v, OR[W.orSample].alpha), tag: zhEn('預覽', 'preview') };
+}
+plot.addEventListener('pointermove', e => {
+  const m = plot._map; if (!m) return;
+  const r = plot.getBoundingClientRect(), pz = plot.currentCSSZoom || uiScale(), px = (e.clientX - r.left) / pz;
+  if (px < m.Lp || px > m.Lp + m.pw) { hoverX = null; tip.style.display = 'none'; return; }
+  hoverX = m.x0 + (px - m.Lp) / m.pw * (m.x1 - m.x0);
+  const v = valueAt(hoverX);
+  tip.style.display = 'block'; tip.style.left = `${px}px`; tip.style.top = `${(e.clientY - r.top) / pz}px`;
+  tip.textContent = W.mode === 'cd'
+    ? zhEn(`${hoverX.toFixed(1)} nm · ${fmtTheta(v.y)} · HT ${Math.round(htAt(CD[W.cdSample], hoverX))} V · ${v.tag}`, `${hoverX.toFixed(1)} nm · ${fmtTheta(v.y)} · HT ${Math.round(htAt(CD[W.cdSample], hoverX))} V · ${v.tag}`)
+    : zhEn(`${fmtDeg(hoverX)} · 透過 ${v.y.toFixed(1)}% · ${v.tag}`, `${fmtDeg(hoverX)} · through ${v.y.toFixed(1)}% · ${v.tag}`);
+});
+plot.addEventListener('pointerleave', () => { hoverX = null; tip.style.display = 'none'; });
+
+// ---------- 控制 ----------
+function segOn(id, v) { for (const b of el(id).querySelectorAll('button')) b.classList.toggle('on', b.dataset.v === String(v)); }
+function stopScan() {
+  if (S.scanning) { S.scanning = false; const r = run(); if (r.scan) r.scan.done = true; }
+  el('btnScan').classList.remove('on'); el('btnScan').textContent = zhEn('掃描', 'Scan');
+}
+function setLambda(v) { S.lambda = clamp(v, 180, 350); lamIn.value = S.lambda; if (S.mode === 'cd') el('lv').textContent = `${S.lambda.toFixed(1)} nm`; }
+function setPhi(v) { S.phi = clamp(v, -90, 90); angIn.value = S.phi; if (S.mode === 'or') el('av').textContent = fmtDeg(S.phi); }
+function applyMode() {
+  const cdm = S.mode === 'cd';
+  for (const b of el('segSample').querySelectorAll('button')) b.hidden = b.dataset.m !== S.mode;
+  segOn('segSample', cdm ? S.cdSample : S.orSample); segOn('segMode', S.mode);
+  lamIn.disabled = !cdm; angIn.disabled = cdm;
+  el('gLam').classList.toggle('off', !cdm); el('gAng').classList.toggle('off', cdm);
+  el('lv').textContent = cdm ? `${S.lambda.toFixed(1)} nm` : `${NA_D} nm`;
+  el('av').textContent = cdm ? zhEn('移開', 'out') : fmtDeg(S.phi);
+}
+el('segSample').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.hidden) return;
+  const v = b.dataset.v, k = S.mode === 'cd' ? 'cdSample' : 'orSample'; if (S[k] === v) return;
+  stopScan(); const r = run(); if (r.scan && r.scan.done) { r.ghost = r.scan; r.scan = null; }
+  S[k] = v; segOn('segSample', v);
+});
+el('segMode').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.dataset.v === S.mode) return;
+  stopScan(); S.mode = b.dataset.v; applyMode();
+});
+el('segShell').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.explode = +b.dataset.v; segOn('segShell', b.dataset.v); });
+lamIn.addEventListener('input', () => { stopScan(); setLambda(+lamIn.value); });
+angIn.addEventListener('input', () => { stopScan(); setPhi(+angIn.value); });
+el('btnScan').addEventListener('click', () => {
+  if (S.scanning) { stopScan(); return; }
+  const r = run();
+  if (r.scan && r.scan.done) r.ghost = r.scan;
+  S.seed++;
+  r.scan = S.mode === 'cd'
+    ? { mode: 'cd', sample: S.cdSample, from: 350, to: 350, seed: S.seed * 7.7, done: false }
+    : { mode: 'or', sample: S.orSample, from: -90, to: -90, seed: S.seed * 7.7, done: false };
+  S.scanning = true; S.scanT0 = performance.now() / 1000; S.explode = 1; segOn('segShell', 1);
+  el('btnScan').classList.add('on'); el('btnScan').textContent = zhEn('停止', 'Stop');
+});
+el('btnHelp').addEventListener('click', () => el('help').classList.toggle('show'));
+
+// 拖曳檢偏鏡改角度(旋光模式)
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let drag = null;
+function pick(e) {
+  if (S.mode !== 'or' || W.anaIn < .9) return false;
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, camera); return ray.intersectObjects(O.ANA.hit, false).length > 0;
+}
+renderer.domElement.addEventListener('pointerdown', e => {
+  if (tour.on || FILM || e.button !== 0 || !pick(e)) return;
+  stopScan(); drag = { x: e.clientX, v: S.phi }; controls.enabled = false;
+  renderer.domElement.setPointerCapture(e.pointerId); renderer.domElement.style.cursor = 'grabbing';
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  if (drag) { setPhi(drag.v + (e.clientX - drag.x) * .5); return; }
+  if (!tour.on && !FILM && e.buttons === 0) renderer.domElement.style.cursor = pick(e) ? 'grab' : '';
+});
+const endDrag = () => { if (!drag) return; drag = null; controls.enabled = true; renderer.domElement.style.cursor = ''; };
+renderer.domElement.addEventListener('pointerup', endDrag);
+renderer.domElement.addEventListener('pointercancel', endDrag);
+
+// ---------- 導覽 ----------
+const tour = { on: false, t0: 0, saved: null };
+function startTour() {
+  stopScan(); el('help').classList.remove('show');
+  tour.saved = { mode: S.mode, cdSample: S.cdSample, orSample: S.orSample, lambda: S.lambda, phi: S.phi, explode: S.explode, runs: { cd: { ...S.runs.cd }, or: { ...S.runs.or } }, cp: camera.position.clone(), ct: controls.target.clone(), W: { lambda: W.lambda, phi: W.phi, pemK: W.pemK, anaIn: W.anaIn, tubeK: W.tubeK, explode: W.explode } };
+  tour.on = true; tour.t0 = performance.now() / 1000; root.classList.add('touring'); controls.enabled = false; nav.cancel();
+}
+function endTour() {
+  if (!tour.on) return;
+  tour.on = false; root.classList.remove('touring'); controls.enabled = true;
+  const s = tour.saved; Object.assign(S, { mode: s.mode, cdSample: s.cdSample, orSample: s.orSample, explode: s.explode, runs: s.runs });
+  setLambda(s.lambda); setPhi(s.phi); applyMode(); camera.position.copy(s.cp); controls.target.copy(s.ct); controls.update();
+  Object.assign(W, s.W, { labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, decomp: 0, molK: 0, polK: 0 });
+  el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; document.querySelector('.hud').style.opacity = 1; document.querySelector('.pol').style.boxShadow = ''; lastNote = '';
+}
+el('btnTour').addEventListener('click', startTour);
+el('tourExit').addEventListener('click', endTour);
+addEventListener('keydown', e => { if (e.key === 'Escape') endTour(); });
+
+// ---------- 視角操作 ----------
+// 共用的 ../assets/camera-nav.js:滑鼠滾輪縮放,觸控板雙指平移、捏合縮放,方向鍵或 WASD 移動、Q/E 轉向、+/− 縮放、R 回到預設視角
+const nav = createCameraNav({ camera, controls, active: () => !FILM && !tour.on, radius: 120 });
+
+// ================= 迴圈 =================
+function interactive(dt, now) {
+  const r = run();
+  if (S.scanning) {
+    if (S.mode === 'cd') {
+      let l = 350 - (now - S.scanT0) * (170 / 6);
+      if (l <= 180) { l = 180; r.scan.to = l; stopScan(); }
+      r.scan.to = l; setLambda(l); W.lambda = l;
+    } else {
+      let p = -90 + (now - S.scanT0) * (180 / 5);
+      if (p >= 90) { p = 90; r.scan.to = p; stopScan(); }
+      r.scan.to = p; setPhi(p); W.phi = p;
+    }
+  }
+  const k = x => Math.min(1, dt * x);
+  if (!(S.scanning && S.mode === 'cd')) W.lambda += ((S.mode === 'or' ? NA_D : S.lambda) - W.lambda) * k(S.mode === 'or' || Math.abs(W.lambda - S.lambda) > 60 ? 5 : 9);
+  if (drag) W.phi = S.phi; else if (!(S.scanning && S.mode === 'or')) W.phi += (S.phi - W.phi) * k(9);
+  W.explode += (S.explode - W.explode) * k(2.4);
+  const toOR = S.mode === 'or' ? 1 : 0;
+  W.anaIn += (toOR - W.anaIn) * k(4); W.tubeK += (toOR - W.tubeK) * k(4); W.pemK += ((1 - toOR) - W.pemK) * k(4);
+  if (Math.abs(W.anaIn - toOR) < 1e-3) W.anaIn = toOR;
+  if (Math.abs(W.tubeK - toOR) < 1e-3) W.tubeK = toOR;
+  W.mode = S.mode; W.cdSample = S.cdSample; W.orSample = S.orSample; W.scan = r.scan; W.ghost = r.ghost;
+  W.labels = null; W.conOp = 1; W.cap = null; W.title = W.outro = 0; W.decomp = 0; W.molK = 0; W.polK = 0;
+}
+// 手機版:3D 的投影中心移到標題與停靠區之外的空地(mp.applyView,導覽與影片時不作用)
+// 桌機小螢幕(1024×768 這類):3D 的投影中心移到面板之間最大的空地(../assets/free-view.js);手機、導覽與影片不作用
+const fv = createFreeView({ panels: ['.hud', '#ctl', '#console', '#help'], active: () => !FILM && !tour.on });
+function render() { if (!mp.applyView(camera)) fv.apply(camera); composer.render(); labelR.render(scene, camera); }
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  DPR = REC ? 1 : quality.pixelRatio(w, h, 1.5);
+  quality.configure(renderer, composer, bloom, { recording: REC });
+  renderer.setPixelRatio(DPR);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h); composer.setPixelRatio(DPR); composer.setSize(w, h); bloom.setSize(w * DPR, h * DPR); labelR.setSize(w, h);
+  pMat.uniforms.uScale.value = h * DPR / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+}
+addEventListener('resize', resize);
+resize();
+
+// 字型載入後再畫(畫布上的字要用到)
+await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 3000))]);
+setLambda(S.lambda); setPhi(S.phi); applyMode();
+
+if (REC) {
+  window.__dur = FILM_DUR;
+  // 等一個畫格讓 DOM 標籤也更新;背景分頁的 rAF 可能停住,所以最多只等 300 ms
+  window.__seek = async t => { film(t); frameCommon(t); render(); await Promise.race([new Promise(r => requestAnimationFrame(() => r())), new Promise(r => setTimeout(r, 300))]); return true; };
+  await window.__seek(+Q.get('t') || 0);
+  window.__ready = true;
+} else {
+  let last = performance.now() / 1000;
+  let filmStart = last - (+Q.get('t') || 0), hiddenAt = null;
+  document.addEventListener('visibilitychange', () => {
+    const now = performance.now() / 1000;
+    if (document.hidden) hiddenAt = now;
+    else if (hiddenAt !== null) {
+      const gap = now - hiddenAt; filmStart += gap;
+      if (tour.on) tour.t0 += gap;
+      if (S.scanning) S.scanT0 += gap;
+      last = now; hiddenAt = null;
+    }
+  });
+  const loop = () => {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    if (!quality.shouldRender(performance.now())) return;
+    quality.observe(performance.now());
+    const now = performance.now() / 1000, dt = Math.min(.05, now - last); last = now;
+    if (FILM) film((now - filmStart) % FILM_DUR);
+    else if (tour.on) { const t = now - tour.t0; if (t >= FILM_DUR) endTour(); else film(t); }
+    if (!FILM && !tour.on) { interactive(dt, now); nav.step(dt); controls.update(); }
+    frameCommon(FILM ? (now - filmStart) % FILM_DUR : tour.on ? now - tour.t0 : now);
+    render();
+  };
+  loop();
+  el('load').classList.add('done');
+  window.__ready = true;
+}
+</script>
+</body>
+</html>
