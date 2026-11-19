@@ -218,6 +218,27 @@ html.mp .m.big b.n{font-size:20px}
   html.mp .chip{padding:3px 8px 4px}
   html.mp .chip b{font-size:13px}
 }
+/* 手機導覽(2026-11-09):分頁列藏起來,「結束導覽」放在它的位置(原本在右上角,橫拿時壓在停靠區的譜上,直拿時壓在分頁列上);
+   橫拿時標題欄只到停靠區的左邊(600 到 740 px 寬的手機,譜原本蓋到讀值卡),放不下就換行;片頭片尾字卡縮小,矮的手機才放得下 */
+html.mp.touring .sitenav{visibility:hidden}
+html.mp.touring #tourExit{left:12px;right:auto;top:10px}
+@media (orientation:landscape){
+  html.mp.touring #tourExit{top:8px}
+  html.mp.touring .hud{width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .hud .k,html.mp.touring .hud .big{white-space:normal}
+}
+html.mp .titlecard{padding:0 16px}
+html.mp .titlecard .t1{font-size:24px}
+html.mp .titlecard .t2{font-size:40px}
+html.mp .titlecard.outro .t2{font-size:28px}
+html.mp .titlecard .t3{font-size:14px;margin-top:8px}
+html.mp .titlecard .t4{font-size:11px;margin-top:10px}
+/* 矮的橫拿手機(高 340 px 以下,例如 742×298):導覽字幕 18 px 時英文長句排成四行,會往上壓到讀值卡,字小一點 */
+@media (orientation:landscape) and (max-height:340px){
+  html.mp.touring .cap{padding:8px 14px 9px}
+  html.mp.touring .cap .chap{font-size:11px;margin-bottom:3px}
+  html.mp.touring .cap .txt{font-size:15px;line-height:1.5}
+}
 /* 桌機小螢幕(1024×768、1366×768 這類,2026-11-06):導言收起來、譜圖矮一點,面板讓出空間給 3D;3D 主角移到面板之間的空地
    (../assets/free-view.js,在這些尺寸與 761 到 980 px 的平板作用)。980 px 以下照原本的窄版,手機照 html.mp */
 @media (min-width:981px) and (max-width:1279px),(min-width:981px) and (max-height:899px){

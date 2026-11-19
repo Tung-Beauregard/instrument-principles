@@ -293,6 +293,38 @@ html.mp.sk-open .chips,html.mp.sk-open .sk-txt,html.mp.sk-open .hud .k,html.mp.s
   html.mp .chip{padding:3px 8px 4px}
   html.mp .chip b{font-size:13px}
 }
+/* 手機導覽(2026-11-09):分頁列藏起來,「結束導覽」放在它的位置(原本在右上角,橫拿時壓在停靠區的譜上,直拿時壓在分頁列上);
+   橫拿時標題欄只到停靠區的左邊(600 到 740 px 寬的手機,譜原本蓋到讀值卡),放不下就換行;片頭片尾字卡縮小,矮的手機才放得下 */
+html.mp.touring .sitenav{visibility:hidden}
+html.mp.touring #tourExit{left:12px;right:auto;top:10px}
+@media (orientation:landscape){
+  html.mp.touring #tourExit{top:8px}
+  html.mp.touring .hud{width:min(380px,calc(100vw - min(380px,46vw) - 36px))}
+  html.mp.touring .hud .k,html.mp.touring .hud .big{white-space:normal}
+}
+html.mp .titlecard{padding:0 16px}
+html.mp .titlecard .t1{font-size:24px}
+html.mp .titlecard .t2{font-size:40px}
+html.mp .titlecard.outro .t2{font-size:28px}
+html.mp .titlecard .t3{font-size:14px;margin-top:8px}
+html.mp .titlecard .t4{font-size:11px;margin-top:10px}
+/* 矮的橫拿手機(高 340 px 以下,例如 742×298):導覽字幕 18 px 時英文長句排成四行,會往上壓到讀值卡,字小一點 */
+@media (orientation:landscape) and (max-height:340px){
+  html.mp.touring .cap{padding:8px 14px 9px}
+  html.mp.touring .cap .chap{font-size:11px;margin-bottom:3px}
+  html.mp.touring .cap .txt{font-size:15px;line-height:1.5}
+}
+/* 手機導覽的比較表:出現時(html.cmp-on)標題與停靠區淡出,字幕改成貼底的一條、字小一點;
+   表格縮放到結束鈕下面、字幕上面的空間(--cmp-s、--cmp-cy 由 fitCmpPhone() 算)。原本表格蓋住標題與字幕,有的比畫面還高 */
+html.mp.touring .cmp{top:var(--cmp-cy,50%);transform:translate(-50%,-50%) scale(var(--cmp-s,1));max-height:none;overflow:visible;padding:10px 12px 8px}
+html.mp.touring .cmp th,html.mp.touring .cmp td{padding:4px 9px}
+/* 760 px 以下:框寬是畫面寬扣掉兩邊,但表格最窄放不進去時框跟著表格變寬(min-content),再由 --cmp-s 整個縮小 */
+@media (max-width:760px){html.mp.touring .cmp{left:50%;right:auto;width:calc(100vw - 24px);min-width:min-content}}
+@media (max-width:760px){html.mp.touring .cmp.nowrap{width:max-content;min-width:0}html.mp.touring .cmp.nowrap th,html.mp.touring .cmp.nowrap td{white-space:nowrap}}
+html.mp.touring.cmp-on .hud,html.mp.touring.cmp-on .mp-dock{opacity:0!important;visibility:hidden}
+html.mp.touring.cmp-on .cap{left:12px;right:12px;bottom:12px;transform:none;width:auto;max-width:none;padding:7px 12px 8px}
+html.mp.touring.cmp-on .cap .chap{display:none}
+html.mp.touring.cmp-on .cap .txt{font-size:13px;line-height:1.5}
 /* 英文:讀值比中文寬(Helium · 190 °C、Petroleum ether),手機上字小一點才放得進讀值卡 */
 html[lang="en"].mp .chip b{font-size:12px}
 /* 桌機小螢幕(1024×768、1366×768 這類,2026-11-06):導言收起來、譜圖矮一點,面板讓出空間給 3D;3D 主角移到面板之間的空地
@@ -1446,6 +1478,26 @@ function skText() {
 }
 const SKH = { micro: zhEn('管子裡面', 'Inside the tube'), broad: zhEn('峰為什麼會變寬', 'Why peaks widen'), rs: zhEn('分得開嗎', 'Separated?') };
 let lastNote = '', lastCap = '', lastTitle = '', lastCmp = -1, lastChip = '', lastSk = '', lastCon = '';
+// 手機導覽的比較表(2026-11-09):html 加上 cmp-on 時,標題與停靠區淡出、字幕改成貼底的一條(CSS);
+// 表格縮放到「結束導覽」下面、字幕上面的空間。這一段裡字幕換句時高度會變,取這一段最高的,表格才不會跟著跳
+// 760 px 以下表格可以在畫面寬度內換行,也可以每列排成一行再整個縮小(.nowrap);換了畫面大小時兩種都量,取放得比較大的
+let cmpCapH = 0, cmpVk = 0, cmpFitKey = '', cmpWrap = null;
+function fitCmpPhone() {
+  const vk = innerWidth * 10000 + innerHeight;
+  if (vk !== cmpVk) { cmpVk = vk; cmpCapH = 0; cmpWrap = null; }
+  const cm = el('cmp'), ex = el('tourExit').getBoundingClientRect();
+  cmpCapH = Math.max(cmpCapH, el('cap').offsetHeight);
+  const top = ex.bottom + 8, bot = innerHeight - 12 - cmpCapH - 8, cy = Math.round((top + bot) / 2);
+  const fit = () => Math.max(0.3, Math.min(1, (innerWidth - 24) / cm.offsetWidth, (bot - top) / cm.offsetHeight));
+  if (cmpWrap === null) { cm.classList.add('nowrap'); const sn = fit(); cm.classList.remove('nowrap'); cmpWrap = fit() >= sn; }
+  cm.classList.toggle('nowrap', !cmpWrap);
+  const s = fit();
+  const key = `${s.toFixed(3)}|${cy}`;
+  if (key === cmpFitKey) return;
+  cmpFitKey = key;
+  root.style.setProperty('--cmp-s', s.toFixed(3));
+  root.style.setProperty('--cmp-cy', `${cy}px`);
+}
 function updateDOM(t) {
   const film = FILM || tour.on;
   const ch = chipVals(), ck = ch.join('|');
@@ -1487,8 +1539,12 @@ function updateDOM(t) {
       ['tc1', 'tc2', 'tc3', 'tc4'].forEach((id, i) => { el(id).textContent = tx[i]; });
       el('titlecard').classList.toggle('outro', tk === 'o');
     }
-    document.querySelector('.hud').style.opacity = W.chips;
-    if (Math.abs(W.cmp - lastCmp) > 0.002) { lastCmp = W.cmp; const cm = el('cmp'); cm.style.opacity = W.cmp; cm.style.visibility = W.cmp < 0.01 ? 'hidden' : 'visible'; }
+    // 導覽時比較表壓到左上的標題與讀值卡(例如 1366×768 的層析),標題那一塊跟著淡出;手機另由 CSS 的 cmp-on 處理,影片模式照原本
+    let hudOp = W.chips;
+    if (W.cmp >= 0.01 && tour.on && !mp.active()) { const a = el('cmp').getBoundingClientRect(), b = document.querySelector('.hud').getBoundingClientRect(); if (a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top) hudOp *= 1 - W.cmp; }
+    document.querySelector('.hud').style.opacity = hudOp;
+    if (Math.abs(W.cmp - lastCmp) > 0.002) { lastCmp = W.cmp; const cm = el('cmp'); cm.style.opacity = W.cmp; cm.style.visibility = W.cmp < 0.01 ? 'hidden' : 'visible'; root.classList.toggle('cmp-on', W.cmp >= 0.01); }
+    if (W.cmp >= 0.01 && mp.active()) fitCmpPhone(); else cmpCapH = 0;
   }
 }
 // 比較表(影片最後一段)
@@ -1672,7 +1728,7 @@ function endTour() {
   tour.on = false; root.classList.remove('touring'); controls.enabled = true;
   const s = tour.saved; camera.position.copy(s.cp); controls.target.copy(s.ct); controls.update();
   Object.assign(W, { labels: null, conOp: 1, cap: null, title: 0, outro: 0, chips: 1, cmp: 0, skOp: 1 });
-  el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; el('cmp').style.opacity = 0; el('cmp').style.visibility = 'hidden'; document.querySelector('.hud').style.opacity = 1; lastNote = ''; lastCon = ''; lastSk = '';
+  el('cap').style.opacity = 0; el('titlecard').style.opacity = 0; el('cmp').style.opacity = 0; el('cmp').style.visibility = 'hidden'; root.classList.remove('cmp-on'); cmpCapH = 0; document.querySelector('.hud').style.opacity = 1; lastNote = ''; lastCon = ''; lastSk = '';
   S.run = null; S.next = nowS() + 0.6;
 }
 el('btnTour').addEventListener('click', startTour);
