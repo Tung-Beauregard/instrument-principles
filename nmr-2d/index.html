@@ -221,7 +221,8 @@ html.mp .meters .m{flex:1;min-width:0}
 html.mp .m.big b.n{font-size:20px}
 @media (orientation:landscape){
   html.mp .hud{top:8px}
-  html.mp .sitenav{margin-bottom:6px}
+  /* 分頁列自己佔一列(2026-11-19):只列同一區之後分頁列變短,行內排的標題原本會接在它後面,導覽時被拆成兩半 */
+  html.mp .sitenav{display:flex;width:max-content;margin-bottom:6px}
   html.mp .hud .k,html.mp .hud .big{display:inline;white-space:nowrap}
   html.mp .hud .k{font-size:14px;margin-right:8px}
   html.mp .hud .big{font-size:19px}
@@ -377,7 +378,8 @@ if (FILM) root.classList.add('film');
 if (REC) root.classList.add('rec');
 // 手機版:控制面板與譜預設收成把手,放在畫面右緣;直拿時建議轉成橫式(../assets/mobile-panels.js)
 const mp = createMobilePanels({
-  dock: true, top: '.hud', rotateHint: true,
+  dock: true, top: '.hud', rotateHint: true, squeeze: ['#plot'],
+  capFit: { cap: '#cap', text: '#capTxt', above: '.hud .chips' }, cardFit: { el: '#titlecard', avoid: '#tourExit' },
   suspended: () => FILM || root.classList.contains('touring'),
   panels: [
     { el: '#ctl', icon: 'adjust', label: zhEn('調整', 'Adjust'), items: zhEn('實驗、t1、增量次數、顯示、外殼、測量、導覽、說明、畫質', 'experiment, t1, increments, show, case, measure, tour, help, quality'), onToggle: (open) => { if (!open) document.getElementById('help').classList.remove('show'); } },

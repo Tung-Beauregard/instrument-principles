@@ -18,7 +18,21 @@
 //         離開手機尺寸時搬回原處。用在面板原本各自用 position: fixed 疊在底部的頁面。
 // top     停靠區最高只到這個元素的下緣(加 8 px),兩塊都展開也不會蓋住標題
 //         這個高度另外寫在 CSS 變數 --mp-free-top,停靠區自己的高度寫在 --mp-dock-h,頁面可以拿來排說明框與導覽字幕
+//         (--mp-dock-h 在停靠區或裡面的面板一變大小就在同一格畫面更新,不等每 0.4 秒一次的同步)
 // suspended() 傳回 true 時(導覽、影片)暫時全部展開、藏起細條,結束後恢復原本的收合狀態
+// squeeze 導覽與影片時(suspended)停靠區排不下、又不能捲的時候要變矮的元素(譜圖的畫布),選擇器字串的陣列,從第一項開始扣;
+//         一個字串選到好幾個元素時,它們要是並排在同一列的(例如並排的兩張圖),一起變矮同樣的高度;
+//         原本是正方形的(SEM 影像、ICP 的偵測器畫面)寬度跟著縮,維持正方形。
+//         每項最矮到原本的 squeezeMin 倍(預設 0.5)。用在很矮的橫拿手機(例如 600×280,停靠區只有 260 px 高),
+//         譜的下半截原本會被停靠區裁掉;平常操作時停靠區可以捲,不縮。頁面畫圖時要每次讀畫布的 clientWidth、clientHeight
+// capFit  { cap, text, above, min = 13, gap = 6 }:導覽與影片時字幕框(cap)和上面的元素(above,讀值卡)疊到或間距不到 gap px,
+//         字幕文字(text)一次縮小 1 px,最小 min px;縮到最小還是疊到,這一句播放期間 above 先藏起來(原本也是被字幕整個蓋住)。
+//         沒疊到時用樣式表原本的大小。用在很矮的橫拿手機(例如 600×280),英文長句在左欄排成四、五行,會往上壓到讀值卡。
+//         換字幕、<html> 或字幕框的 class 改變時(同一格畫面裡,例如比較表收起、字幕回到左欄)、視窗大小改變與每 0.4 秒重算;
+//         只看位置不看透明度,字幕淡入時就是最後的大小,播到一半不會變字
+// cardFit { el, avoid, gap = 8 }:導覽與影片時片頭片尾字卡(el)的字壓到結束鈕(avoid)或超出畫面時,改排在結束鈕下面那一塊的
+//         正中間,還是放不下就把字卡的每一行等比例縮小(CSS zoom,最小 0.5 倍);放得下時不動。換字卡或 <html> 的 class 改變時
+//         (同一格畫面裡)與每 0.4 秒重算。用在很矮的橫拿手機(例如 600×280),英文的片尾字卡會排到十幾行
 // rotateHint  true 時,觸控手機直拿的話在 top 元素下方提示「建議轉成橫式觀看」(見下面的 createRotateHint),
 //             8 秒後或按 × 收起;同一次瀏覽(sessionStorage)只出現一次,導覽中不出現
 // 橫拿手機時(landscape)停靠區改放在右上角、面板往下展開,下面整條讓給 3D 畫面。
@@ -148,13 +162,23 @@ export function createRotateHint({ top = null, suspended = () => false, query = 
   return { hide };
 }
 
-export function createMobilePanels({ panels = [], dock = false, top = null, suspended = () => false, rotateHint = false, rail = true, query = MOBILE_QUERY } = {}) {
+export function createMobilePanels({ panels = [], dock = false, top = null, suspended = () => false, rotateHint = false, rail = true, squeeze = [], squeezeMin = 0.5, capFit = null, cardFit = null, query = MOBILE_QUERY } = {}) {
   const root = document.documentElement;
   const mq = matchMedia(query);
   const landscape = matchMedia('(orientation: landscape)');
   const $ = (s) => (typeof s === 'string' ? document.querySelector(s) : s);
   const list = panels.map((cfg, i) => ({ ...cfg, i, el: $(cfg.el), open: !!cfg.open })).filter((p) => p.el);
   let on = false, susp = false, dockEl = null, uid = 0;
+  // 停靠區或裡面的面板一變大小(譜的圖例換行、讀值多一行),--mp-dock-h 在同一格畫面裡就更新(2026-11-19)。
+  // 原本只在每 0.4 秒一次的 sync 更新,直拿導覽時譜長高的那一下,放在停靠區上方的字幕會壓到譜的頂端 8 到 10 px。
+  // 這裡只改 CSS 變數、不改被觀察的元素;要縮的譜圖(squeeze)排到下一格再算:在這裡直接改面板的大小,
+  // ResizeObserver 會在同一格又要回報一次而發出錯誤事件(頁面的 window.__err 會記下來)
+  let squeezeRaf = 0;
+  const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => {
+    if (!on || !dockEl) return;
+    root.style.setProperty('--mp-dock-h', `${Math.round(dockEl.offsetHeight)}px`);
+    if (squeeze.length) { cancelAnimationFrame(squeezeRaf); squeezeRaf = requestAnimationFrame(fitSqueeze); }
+  }) : null;
   // the handles on the right edge (see the header comment); built once, attached while on
   const railEl = rail ? document.createElement('div') : null;
   if (railEl) railEl.className = 'mp-rail';
@@ -233,7 +257,7 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
     requestAnimationFrame(() => dispatchEvent(new Event('resize')));
   }
   function fitDock() {
-    if (!on) return;
+    if (!on) { fitSqueeze(); fitCaption(); fitCard(); return; }
     const t = top && $(top);
     const tr = t ? t.getBoundingClientRect() : null;
     const y = tr ? tr.bottom + 8 : 120;
@@ -246,10 +270,103 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
     const beside = tr && (d.left >= tr.right || d.right <= tr.left);
     const room = fromTop ? innerHeight - d.top - 12 : innerHeight - (beside ? 12 : y) - 12;
     dockEl.style.maxHeight = `${Math.max(120, room)}px`;
+    // during tours the charts listed in `squeeze` give up height when the dock overflows; before measuring the dock
+    fitSqueeze();
+    fitCaption();
+    fitCard();
     // pages place things above the dock with this (e.g. the tour captions)
     root.style.setProperty('--mp-dock-h', `${Math.round(dockEl.offsetHeight)}px`);
     const R = railEl && railEl.isConnected && !susp ? railEl.getBoundingClientRect() : null;
     free = measureFree([tr, dockEl.getBoundingClientRect(), R]);
+  }
+  // `squeeze` (see the header comment): drop the heights set here, measure how far the dock's content overflows,
+  // then take that much off the listed elements in order, each down to squeezeMin of its height; off, or not
+  // suspended, only the heights set here are cleared
+  const squeezed = new Set();
+  function fitSqueeze() {
+    if (!squeeze.length) return;
+    for (const e of squeezed) { e.style.height = ''; e.style.width = ''; }
+    squeezed.clear();
+    if (!on || !susp || !dockEl || !dockEl.isConnected) return;
+    let over = dockEl.scrollHeight - dockEl.clientHeight;
+    for (const sel of squeeze) {
+      if (over <= 0) break;
+      const els = [...document.querySelectorAll(sel)].filter((e) => dockEl.contains(e) && e.offsetHeight > 0);
+      if (!els.length) continue;
+      const h = Math.max(...els.map((e) => e.offsetHeight));
+      const cut = Math.min(over, Math.floor(h * (1 - squeezeMin)));
+      if (cut <= 0) continue;
+      for (const e of els) {
+        const nh = e.offsetHeight - cut;
+        // a square picture beside the chart (the SEM image, the ICP detector) stays square
+        if (Math.abs(e.offsetWidth - e.offsetHeight) <= 1) e.style.width = `${nh}px`;
+        e.style.height = `${nh}px`;
+        squeezed.add(e);
+      }
+      over -= cut;
+    }
+  }
+  // `capFit` and `cardFit` (see the header comment) first undo what they set, then measure the stylesheet's layout;
+  // by position only. Hidden by visibility (e.g. the title block behind a comparison table) counts as absent.
+  // A new caption or title card is set inside the page's frame; the observers run before that frame is painted.
+  const shown = (e) => !!e && e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden';
+  const capTxt = capFit ? $(capFit.text) : null;
+  let capHid = null;
+  function fitCaption() {
+    if (!capTxt) return;
+    if (capTxt.style.fontSize) capTxt.style.fontSize = '';
+    if (capHid) { capHid.style.visibility = ''; capHid = null; }
+    const cap = $(capFit.cap), above = $(capFit.above);
+    if (!on || !suspended() || !shown(cap) || !shown(above)) return;
+    const a = above.getBoundingClientRect(), min = capFit.min ?? 13, gap = capFit.gap ?? 6;
+    let fs = parseFloat(getComputedStyle(capTxt).fontSize);
+    for (;;) {
+      const c = cap.getBoundingClientRect();
+      if (c.left >= a.right || c.right <= a.left || c.top >= a.bottom + gap) return;
+      if (fs <= min) break;
+      fs = Math.max(min, fs - 1);
+      capTxt.style.fontSize = `${fs}px`;
+    }
+    // still in the way at the smallest size: the caption wins, the reading cards step aside while it is up
+    above.style.visibility = 'hidden';
+    capHid = above;
+  }
+  if (capTxt && typeof MutationObserver === 'function') new MutationObserver(fitCaption).observe(capTxt, { childList: true, characterData: true, subtree: true });
+  const cardEl = cardFit ? $(cardFit.el) : null;
+  let cardZoomed = [];
+  function fitCard() {
+    if (!cardEl) return;
+    if (cardEl.style.paddingTop) { cardEl.style.paddingTop = ''; cardEl.style.paddingBottom = ''; }
+    for (const c of cardZoomed) c.style.zoom = '';
+    cardZoomed = [];
+    if (!on || !suspended() || !cardEl.getClientRects().length) return;
+    const lines = [...cardEl.children].filter((c) => c.offsetHeight > 0);
+    if (!lines.length) return;
+    const ex = cardFit.avoid ? $(cardFit.avoid) : null;
+    const gap = cardFit.gap ?? 8, top0 = shown(ex) ? ex.getBoundingClientRect().bottom + gap : gap, bottom0 = innerHeight - gap;
+    const span = () => [lines[0].getBoundingClientRect().top, lines[lines.length - 1].getBoundingClientRect().bottom];
+    let [t, b] = span();
+    if (t >= top0 && b <= bottom0) return;
+    // centre the card in the part below the exit button; scale its lines down if it is still too tall
+    cardEl.style.paddingTop = `${Math.round(top0)}px`;
+    cardEl.style.paddingBottom = `${gap}px`;
+    let z = 1;
+    for (let i = 0; i < 4 && z > 0.5; i++) {
+      [t, b] = span();
+      if (b - t <= bottom0 - top0 + 0.5) break;
+      z = Math.max(0.5, (z * (bottom0 - top0)) / (b - t));
+      for (const c of lines) c.style.zoom = z.toFixed(3);
+      cardZoomed = lines;
+    }
+  }
+  if (cardEl && typeof MutationObserver === 'function') new MutationObserver(fitCard).observe(cardEl, { childList: true, characterData: true, subtree: true });
+  // a class on <html> (touring, a comparison table's cmp-on) or on the caption box moves things without a new text:
+  // e.g. the caption goes back from the full-width strip under a comparison table to the left column
+  if ((capTxt || cardEl) && typeof MutationObserver === 'function') {
+    const mo = new MutationObserver(() => { fitCaption(); fitCard(); });
+    mo.observe(root, { attributes: true, attributeFilter: ['class'] });
+    const capBox = capFit ? $(capFit.cap) : null;
+    if (capBox) mo.observe(capBox, { attributes: true, attributeFilter: ['class'] });
   }
   // the biggest empty rectangle left by the title, the dock and the handles (candidates are built from their edges);
   // the biggest area wins (the instruments are wide: below the title is better than the narrow column beside it),
@@ -309,11 +426,13 @@ export function createMobilePanels({ panels = [], dock = false, top = null, susp
       if (fsBtn) railEl.append(fsBtn);
     }
     if (dock) {
-      if (!dockEl) { dockEl = document.createElement('div'); dockEl.className = 'mp-dock'; }
+      if (!dockEl) { dockEl = document.createElement('div'); dockEl.className = 'mp-dock'; if (ro) ro.observe(dockEl); }
       document.body.append(dockEl);
       for (const p of collapsible) {
         p.home = { parent: p.el.parentNode, next: p.el.nextSibling };
         dockEl.append(p.el);
+        // the dock stops growing at its max-height; the panels inside still report when their content grows
+        if (ro) ro.observe(p.el);
       }
     }
     apply();

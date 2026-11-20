@@ -105,6 +105,8 @@
 
 `LBL_WIN` 的每一段比字幕晚一點開始(鏡頭移到位之後),而且各章的鏡頭讓元件落在左上的讀值卡與能階圖、右上的譜圖面板之外:2026-11-19 在 `?film&rec` 1920×1080 中英兩版每秒檢查一次,沒有標籤出畫面、壓在面板下或互相重疊。改 `CAMK` 或標籤位置後要再看一次(第 03 章的樣品、第 05 章的 CCD 最容易跑到能階圖底下)。
 
+- 手機導覽(2026-11-19,共用的 `../assets/mobile-panels.js`):直拿時字幕跟著停靠區的高度即時移動(`--mp-dock-h` 改由 ResizeObserver 在同一格畫面更新;以前每 0.4 秒一次,譜長高的那一下字幕會壓到譜 8 到 10 px)。`createMobilePanels` 另外傳三個選項,只在導覽中、而且真的放不下時作用:`squeeze: ['#plot']`(很矮的橫拿手機,例如 600×280,停靠區放不下時譜圖變矮,最矮一半)、`capFit`(字幕框壓到讀值卡時字幕一次小 1 px,最小 13 px;還是放不下,這一句播放期間讀值卡先藏起來)、`cardFit`(片頭片尾字卡壓到「結束導覽」或超出畫面時改排在它下面,放不下就整張縮小)。橫拿時分頁列自己佔一列(`display:flex;width:max-content`):分頁列只列同一區之後變短,行內排的標題原本會接在它後面,導覽時被拆成兩半。
+
 ## 修改的切入點
 
 - **文字:** 字幕 `CAPS`;片頭片尾字卡在 `updateDOM()`;標籤在 `label()` 與 `frameCommon()` 的 `labelText()`;說明 `noteHTML()`;圖例 `legendTag()` 與 `updateDOM()`;能階圖 `drawJab()`;譜圖的字在 `drawPlot()`;牆上說明 `screenTex()`。中英一起改,跑 `node scripts/check-i18n.mjs --list raman/index.html`。

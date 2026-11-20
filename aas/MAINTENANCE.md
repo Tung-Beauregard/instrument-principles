@@ -91,6 +91,8 @@
 | 08 背景校正、石墨爐 | 81 到 87、87.2 到 93 | 氘燈 | 81.2 到 84.1 秒關背景校正(氘燈暗),81.6 秒量一次(偏高);84.2 秒打開再量,上一次留著當比較 |
 | 片尾 | 93.2 到 94.2 秒字卡淡入 | | 92.6 到 95.8 秒外殼合上 |
 
+- 手機導覽(2026-11-19,共用的 `../assets/mobile-panels.js`):直拿時字幕跟著停靠區的高度即時移動(`--mp-dock-h` 改由 ResizeObserver 在同一格畫面更新;以前每 0.4 秒一次,譜長高的那一下字幕會壓到譜 8 到 10 px)。`createMobilePanels` 另外傳三個選項,只在導覽中、而且真的放不下時作用:`squeeze: ['#tplot, #cplot']`(很矮的橫拿手機,例如 600×280,停靠區放不下時並排的兩張圖一起變矮,最矮一半)、`capFit`(字幕框壓到讀值卡時字幕一次小 1 px,最小 13 px;還是放不下,這一句播放期間讀值卡先藏起來)、`cardFit`(片頭片尾字卡壓到「結束導覽」或超出畫面時改排在它下面,放不下就整張縮小)。橫拿時分頁列自己佔一列(`display:flex;width:max-content`):分頁列只列同一區之後變短,行內排的標題原本會接在它後面,導覽時被拆成兩半。
+
 ## 修改的切入點
 
 - **文字:** 字幕 `CAPS`;片頭片尾字卡在 `updateDOM()`;標籤在 `label()` 與 `frameCommon()` 的 `labelText()`;說明 `noteHTML()`;圖例在 `updateDOM()`;圖的軸名在 `drawTime()`、`drawCal()`;小面板的字在 `drawSig()`;放大格的字在 `insBack`;牆上說明 `screenTex()`。中英一起改(`zhEn`、`data-en`),跑 `node scripts/check-i18n.mjs --list aas/index.html`;字幕速度要重算(中文每秒 8 字、英文每秒 17 個字母以內,見 VALIDATION.md)。

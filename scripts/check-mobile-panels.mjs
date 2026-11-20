@@ -57,6 +57,12 @@ for (const [lesson, cfg] of Object.entries(LESSONS)) {
     assert.ok(/el: '#ctl'/.test(call) && /el: '#console'/.test(call), `${lesson}: 控制面板與譜都要能收合`);
     assert.ok(new RegExp(`${cfg.run.replace('#', '#?')}'\\)\\)?\\.addEventListener\\('click', \\(\\) => mp\\.open\\('#console'\\)\\)`).test(html), `${lesson}: 按 ${cfg.run} 時沒有打開譜`);
     assert.ok(/onToggle: \(open\) => \{ if \(!open\) .*\('help'\)\.classList\.remove\('show'\); \}/.test(call), `${lesson}: 收起控制面板時沒有一起關掉說明框`);
+    // 很矮的橫拿手機(600×280)導覽時停靠區不能捲,譜圖要列在 squeeze 裡,排不下時變矮(2026-11-19)
+    assert.ok(/squeeze: \['#[^']+'/.test(call), `${lesson}: 導覽時停靠區排不下要變矮的譜圖(squeeze)沒有列出來`);
+    // 同樣的矮畫面:字幕壓到讀值卡時縮字(capFit),片頭片尾字卡壓到結束鈕或超出畫面時縮(cardFit)
+    assert.ok(/capFit: \{ cap: '#cap', text: '#capTxt', above: '\.hud \.chips' \}/.test(call) && /cardFit: \{ el: '#titlecard', avoid: '#tourExit' \}/.test(call), `${lesson}: 導覽字幕與字卡要傳 capFit、cardFit`);
+    // 橫拿時標題是行內排的:分頁列要自己佔一列,不然短的分頁列(只列同一區)後面會接著標題(2026-11-19)
+    assert.ok(html.includes('html.mp .sitenav{display:flex;width:max-content;'), `${lesson}: 橫拿時分頁列要自己佔一列`);
     // 3D 讓位:render() 每一格呼叫 mp.applyView(camera);有直拿取景的頁面,手機版互動時不再自己往上移
     const r0 = html.indexOf('function render() {');
     assert.ok(r0 > 0 && /mp\.applyView\(camera\)/.test(html.slice(r0, r0 + 400)), `${lesson}: render() 沒有呼叫 mp.applyView(camera)`);
@@ -70,6 +76,9 @@ for (const [lesson, cfg] of Object.entries(LESSONS)) {
 {
   const js = readFileSync(new URL('../assets/mobile-panels.js', import.meta.url), 'utf8');
   assert.ok(/export function createRotateHint\(/.test(js), 'mobile-panels.js 要匯出 createRotateHint');
+  // 停靠區一變大小就更新 --mp-dock-h(直拿導覽的字幕跟著停靠區,2026-11-19);縮譜圖要排到下一格,不能在 ResizeObserver 裡直接改
+  assert.ok(/new ResizeObserver\(\(\) => \{\s+if \(!on \|\| !dockEl\) return;\s+root\.style\.setProperty\('--mp-dock-h'/.test(js), 'mobile-panels.js: 停靠區一變大小就要更新 --mp-dock-h');
+  assert.ok(/squeezeRaf = requestAnimationFrame\(fitSqueeze\)/.test(js) && /function fitSqueeze\(\)/.test(js), 'mobile-panels.js: 導覽中排不下的譜圖要在下一格縮(fitSqueeze)');
   assert.ok(/if \(rotateHint\) createRotateHint\(/.test(js), 'createMobilePanels 的 rotateHint 要交給 createRotateHint');
   for (const lesson of ['lcq', 'lcq-3d']) {
     const html = readFileSync(new URL(`../${lesson}/index.html`, import.meta.url), 'utf8');
